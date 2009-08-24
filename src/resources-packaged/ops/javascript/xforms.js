@@ -1614,6 +1614,10 @@ ORBEON.xforms.Controls = {
             // Text area
             var textarea = control.tagName.toLowerCase() == "textarea" ? control : control.getElementsByTagName("textarea")[0];
             textarea.value = newControlValue;
+            // Autosize textarea
+            if (ORBEON.util.Dom.hasClass(control, "xforms-textarea-appearance-xxforms-autosize")) {
+                ORBEON.xforms.Controls.autosizeTextarea(control);
+            }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // HTML area
@@ -1692,10 +1696,6 @@ ORBEON.xforms.Controls = {
             // Textarea, password
             control.value = newControlValue;
             control.previousValue = newControlValue;
-            // Autosize textarea
-            if (ORBEON.util.Dom.hasClass(control, "xforms-textarea-appearance-xxforms-autosize")) {
-                ORBEON.xforms.Controls.autosizeTextarea(control);
-            }
         }
     },
 

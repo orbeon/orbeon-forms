@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xml;
 
@@ -31,7 +31,6 @@ import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.ContentHandlerOutputStream;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PipelineUtils;
@@ -43,37 +42,17 @@ import org.orbeon.saxon.om.FastStringBuffer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
+import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.*;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -85,7 +64,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 public class XMLUtils {
 
@@ -144,7 +122,6 @@ public class XMLUtils {
             }
         }
     }
-
 
     /**
      * Create a new SAX parser factory.
@@ -1132,47 +1109,60 @@ public class XMLUtils {
     }
 
     /**
-     * Tell whether a string is whitespace, empty ("") or null.
-     *
-     * This is borrowed from Apache commons since we are not using the latest Apache commons.
+     * @param attributes    source attributes
+     * @return              new AttributesImpl containing  all attributes that were in src attributes and that were
+     *                      in the default name space.
      */
-    public static boolean isBlank(String str) {
-        int strLen;
-        if (str == null || (strLen = str.length()) == 0) {
-            return true;
-        }
-        for (int i = 0; i < strLen; i++) {
-            if ((!Character.isWhitespace(str.charAt(i)))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * @param atts src attribs
-     * @return new AttributesImpl containing  all attribs that were in src attribs and that were
-     *         in the default name space.
-     */
-    public static AttributesImpl getAttributesFromDefaultNamespace(final Attributes atts) {
+    public static AttributesImpl getAttributesFromDefaultNamespace(final Attributes attributes) {
         final AttributesImpl ret = new AttributesImpl();
-        final int size = atts.getLength();
+        final int size = attributes.getLength();
         for (int i = 0; i < size; i++) {
-            final String ns = atts.getURI(i);
+            final String ns = attributes.getURI(i);
             if (!"".equals(ns)) continue;
-            final String lnam = atts.getLocalName(i);
-            final String qnam = atts.getQName(i);
-            final String typ = atts.getType(i);
-            final String val = atts.getValue(i);
+            final String lnam = attributes.getLocalName(i);
+            final String qnam = attributes.getQName(i);
+            final String typ = attributes.getType(i);
+            final String val = attributes.getValue(i);
             ret.addAttribute(ns, lnam, qnam, typ, val);
         }
         return ret;
     }
 
+    /**
+     * Append classes to existing attributes. This creates a new AttributesImpl object.
+     *
+     * @param attributes    existing attributes
+     * @param newClasses    new classes to append
+     * @return              new attributes
+     */
     public static Attributes appendToClassAttribute(Attributes attributes, String newClasses) {
-        final String oldAttribute = attributes.getValue("class");
-        final String newAttribute = oldAttribute == null ? newClasses : oldAttribute + ' ' + newClasses;
-        return addOrReplaceAttribute(attributes, "", "", "class", newAttribute);
+        final String oldClassAttribute = attributes.getValue("class");
+        final String newClassAttribute = oldClassAttribute == null ? newClasses : oldClassAttribute + ' ' + newClasses;
+        return addOrReplaceAttribute(attributes, "", "", "class", newClassAttribute);
+    }
+
+    /**
+     * Append classes to existing mutable attributes.
+     *
+     * @param attributes    existing attributes
+     * @param newClasses    new classes to append
+     */
+    public static void appendToClassAttribute(AttributesImpl attributes, String newClasses) {
+        final int oldClassAttributeIndex = attributes.getIndex("class");
+
+        if (oldClassAttributeIndex == -1) {
+            // No existing class attribute
+
+            // Add
+            attributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, newClasses);
+        } else {
+            // Existing class attribute
+            final String oldClassAttribute = attributes.getValue(oldClassAttributeIndex);
+            final String newClassAttribute = oldClassAttribute + ' ' + newClasses;
+
+            // Replace value
+            attributes.setValue(oldClassAttributeIndex, newClassAttribute);
+        }
     }
 
     public static AttributesImpl addOrReplaceAttribute(Attributes attributes, String uri, String prefix, String localname, String value) {

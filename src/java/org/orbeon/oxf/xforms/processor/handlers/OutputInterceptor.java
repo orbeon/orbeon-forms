@@ -1,5 +1,19 @@
+/**
+ * Copyright (C) 2009 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -68,10 +82,10 @@ public class OutputInterceptor extends ForwardingContentHandler {
     public void flushCharacters(boolean finalFlush, boolean topLevel) throws SAXException {
 
         if (currentCharacters.length() > 0) {
-
+`
             final String currentString = currentCharacters.toString();
             final char[] chars = currentString.toCharArray();
-            if (XMLUtils.isBlank(currentString) || !topLevel) {
+            if (StringUtils.isBlank(currentString) || !topLevel) {
                 // Just output whitespace as is
                 super.characters(chars, 0, chars.length);
             } else {
@@ -80,8 +94,7 @@ public class OutputInterceptor extends ForwardingContentHandler {
                 checkDelimiters(XMLConstants.XHTML_NAMESPACE_URI, spanQName, topLevel);
 
                 // Wrap any other text within an xhtml:span
-//                super.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributesWithClass(XMLUtils.EMPTY_ATTRIBUTES));
-                super.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, topLevel ? getAttributesWithClass(XMLUtils.EMPTY_ATTRIBUTES) : XMLUtils.EMPTY_ATTRIBUTES);
+                super.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributesWithClass(XMLUtils.EMPTY_ATTRIBUTES));
                 super.characters(chars, 0, chars.length);
                 super.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }
@@ -136,10 +149,6 @@ public class OutputInterceptor extends ForwardingContentHandler {
 
     public String getDelimiterLocalName() {
         return delimiterLocalName;
-    }
-
-    public FastStringBuffer getAddedClasses() {
-        return addedClasses;
     }
 
     public boolean isMustGenerateFirstDelimiters() {

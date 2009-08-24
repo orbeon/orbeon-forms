@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2009 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "Controls in repeat (also tests setvalue/getvalue)",
@@ -199,7 +212,6 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     }
 }));
 
-/*
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "xforms:output appearance=\"xxforms:download\"",
@@ -228,7 +240,6 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         });
     }
 }));
-*/
 
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
     if (parent && parent.TestManager) {

@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
@@ -93,19 +93,20 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
             // Handle accessibility attributes (de facto, tabindex is supported on all elements)
             handleAccessibilityAttributes(attributes, newAttributes);
 
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
+            if (!handlerContext.isNewXHTMLLayout())
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
             {
                 if (XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME.equals(getAppearance(attributes))) {
                     // Download appearance
 
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
-                    final AttributesImpl aAttributes = new AttributesImpl();
+                    final AttributesImpl aAttributes = handlerContext.isNewXHTMLLayout() ? newAttributes : new AttributesImpl();
                     final String hrefValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, null);
 
                     if (hrefValue == null || hrefValue.trim().equals("")) {
                         // No URL so make sure a click doesn't cause navigation, and add class
                         aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
-                        aAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-readonly");
+                        XMLUtils.appendToClassAttribute(aAttributes, "xforms-readonly");
                     } else {
                         // URL value
                         aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);
@@ -132,7 +133,7 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
                 } else if (isImageMediatype) {
                     // Case of image media type with URI
                     final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
-                    final AttributesImpl imgAttributes = new AttributesImpl();
+                    final AttributesImpl imgAttributes = handlerContext.isNewXHTMLLayout() ? newAttributes : new AttributesImpl();
                     // @src="..."
                     // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
                     final String srcValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, mediatypeValue);
@@ -142,20 +143,35 @@ public class XFormsOutputHandler extends XFormsControlLifecyleHandler {
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
                 } else if (isHTMLMediaType) {
                     // HTML case
+
+                    if (handlerContext.isNewXHTMLLayout())
+                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
+
                     if (isConcreteControl) {
                         final String htmlValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, mediatypeValue);
                         XFormsUtils.streamHTMLFragment(contentHandler, htmlValue, outputControl.getLocationData(), xhtmlPrefix);
                     }
+
+                    if (handlerContext.isNewXHTMLLayout())
+                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
                 } else {
                     // Regular text case
+
+                    if (handlerContext.isNewXHTMLLayout())
+                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
+
                     if (isConcreteControl) {
                         final String textValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, mediatypeValue);
                         if (textValue != null && textValue.length() > 0)
                             contentHandler.characters(textValue.toCharArray(), 0, textValue.length());
                     }
+
+                    if (handlerContext.isNewXHTMLLayout())
+                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
                 }
             }
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
+            if (!handlerContext.isNewXHTMLLayout())
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
         }
     }
 }

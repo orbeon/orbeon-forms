@@ -82,7 +82,7 @@ public class OutputInterceptor extends ForwardingContentHandler {
     public void flushCharacters(boolean finalFlush, boolean topLevel) throws SAXException {
 
         if (currentCharacters.length() > 0) {
-`
+
             final String currentString = currentCharacters.toString();
             final char[] chars = currentString.toCharArray();
             if (StringUtils.isBlank(currentString) || !topLevel) {

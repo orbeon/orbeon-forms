@@ -3774,6 +3774,12 @@ ORBEON.widgets.RTE = function() {
             yuiRTE.on("editorContentLoaded", function() {
                 var rteContainer = control.parentNode;
                 rteContainer.className += " " + control.className;
+                // Store initial server value
+                // If we don't and user's JS code calls ORBEON.xforms.Document.setValue(), the value of the RTE is changed, our RFE changeEvent() is called,
+                // it sets the focus on the RTE, which calls focus(), which stores the current value (newly set) as the server value if no server value is defined.
+                // Then in executeNextRequest() we ignore the value change because it is the same the server value.
+                var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(control);
+                ORBEON.xforms.Globals.serverValue[control.id] = controlCurrentValue;
                 // Fire event we have a custom event listener from this RTE
                 if (YAHOO.lang.isObject(renderedCustomEvents[control.id]))
                     renderedCustomEvents[control.id].fire();

@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -33,15 +32,13 @@ public class XFormsOutputDefaultHandler extends XFormsOutputHandler {
         final XFormsOutputControl outputControl = (XFormsOutputControl) xformsControl;
         final boolean isConcreteControl = outputControl != null;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl);
 
         // Handle accessibility attributes on <span>
         handleAccessibilityAttributes(attributes, containerAttributes);
 
-        final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, DEFAULT_ENCLOSING_ELEMENT_NAME);
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, DEFAULT_ENCLOSING_ELEMENT_NAME, enclosingElementQName, containerAttributes);
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
         {
             if (isConcreteControl) {
                 final String mediatypeValue = attributes.getValue("mediatype");
@@ -50,6 +47,6 @@ public class XFormsOutputDefaultHandler extends XFormsOutputHandler {
                     contentHandler.characters(textValue.toCharArray(), 0, textValue.length());
             }
         }
-        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, DEFAULT_ENCLOSING_ELEMENT_NAME, enclosingElementQName);
+        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
     }
 }

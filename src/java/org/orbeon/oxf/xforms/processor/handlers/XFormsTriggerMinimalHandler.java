@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -27,8 +26,6 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
 
-    protected static final String ENCLOSING_ELEMENT_NAME = "a";
-
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
@@ -38,18 +35,22 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         containerAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
 
         // xhtml:a
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String aQName = XMLUtils.buildQName(xhtmlPrefix, ENCLOSING_ELEMENT_NAME);
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName, containerAttributes);
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
         {
             final String labelValue = getTriggerLabel(xformsControl);
+            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final boolean mustOutputHTMLFragment = xformsControl != null && xformsControl.isHTMLLabel(pipelineContext);
             outputLabelText(contentHandler, xformsControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
         }
-        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName);
+        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
     }
 
-//    private void hrefExperiment() {
+    @Override
+    protected String getContainingElementName() {
+        return "a";
+    }
+
+    //    private void hrefExperiment() {
 //        // TODO: Complete experimenting with outputting href value
 //        String hrefValue = "#";
 //        {

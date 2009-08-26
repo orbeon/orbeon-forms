@@ -17,7 +17,6 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -27,8 +26,6 @@ import org.xml.sax.helpers.AttributesImpl;
  * Handler for xforms:output[@mediatype = 'text/html'].
  */
 public class XFormsOutputHTMLHandler extends XFormsOutputHandler {
-
-    private static final String ENCLOSING_ELEMENT_NAME = "div";
 
     @Override
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
@@ -43,8 +40,7 @@ public class XFormsOutputHTMLHandler extends XFormsOutputHandler {
         // Handle accessibility attributes on <div>
         handleAccessibilityAttributes(attributes, containerAttributes);
 
-        final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, ENCLOSING_ELEMENT_NAME);
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, enclosingElementQName, containerAttributes);
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
         {
             if (isConcreteControl) {
                 final String mediatypeValue = attributes.getValue("mediatype");
@@ -52,6 +48,11 @@ public class XFormsOutputHTMLHandler extends XFormsOutputHandler {
                 XFormsUtils.streamHTMLFragment(contentHandler, htmlValue, outputControl.getLocationData(), xhtmlPrefix);
             }
         }
-        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, enclosingElementQName);
+        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
+    }
+
+    @Override
+    protected String getContainingElementName() {
+        return "div";
     }
 }

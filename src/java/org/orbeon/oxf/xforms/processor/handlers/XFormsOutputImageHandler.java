@@ -37,10 +37,9 @@ public class XFormsOutputImageHandler extends XFormsOutputHandler {
         final String mediatypeValue = attributes.getValue("mediatype");
 
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl);
-        final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, DEFAULT_ENCLOSING_ELEMENT_NAME);
 
         if (!handlerContext.isNewXHTMLLayout())
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, DEFAULT_ENCLOSING_ELEMENT_NAME, enclosingElementQName, containerAttributes);
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
         {
             final AttributesImpl imgAttributes = getImgAttributes(outputControl, mediatypeValue, containerAttributes);
 
@@ -52,7 +51,7 @@ public class XFormsOutputImageHandler extends XFormsOutputHandler {
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
         }
         if (!handlerContext.isNewXHTMLLayout())
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, DEFAULT_ENCLOSING_ELEMENT_NAME, enclosingElementQName);
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
     }
 
     private AttributesImpl getImgAttributes(XFormsOutputControl outputControl, String mediatypeValue, AttributesImpl newAttributes) {

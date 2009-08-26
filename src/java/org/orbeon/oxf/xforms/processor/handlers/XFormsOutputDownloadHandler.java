@@ -42,10 +42,9 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl);
-        final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, DEFAULT_ENCLOSING_ELEMENT_NAME);
 
         if (!handlerContext.isNewXHTMLLayout())
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, DEFAULT_ENCLOSING_ELEMENT_NAME, enclosingElementQName, containerAttributes);
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
         {
             final AttributesImpl aAttributes = getAnchorAttributes(outputControl, containerAttributes);
 
@@ -62,7 +61,7 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
         }
         if (!handlerContext.isNewXHTMLLayout())
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, DEFAULT_ENCLOSING_ELEMENT_NAME, enclosingElementQName);
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
     }
 
     private AttributesImpl getAnchorAttributes(XFormsOutputControl outputControl, AttributesImpl containerAttributes) {

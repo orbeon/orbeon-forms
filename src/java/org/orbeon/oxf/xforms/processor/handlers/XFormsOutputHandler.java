@@ -23,8 +23,6 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public abstract class XFormsOutputHandler extends XFormsControlLifecyleHandler {
 
-    protected static final String DEFAULT_ENCLOSING_ELEMENT_NAME = "span";
-
     public XFormsOutputHandler() {
         super(false);
     }

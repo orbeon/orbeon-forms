@@ -13,13 +13,19 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-/**
- * xforms:select.
- *
- * TODO: Subclasses per appearance.
- */
-public class XFormsSelectHandler extends XFormsSelect1Handler {
-    public XFormsSelectHandler() {
-        super();
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.xml.sax.Attributes;
+
+public class XFormsGroupInternalHandler extends XFormsGroupHandler {
+
+    @Override
+    protected boolean isMustOutputControl(XFormsSingleNodeControl xformsControl) {
+        // Do not output start, end, or LHHA
+        return false;
+    }
+
+    @Override
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
+        // NOP
     }
 }

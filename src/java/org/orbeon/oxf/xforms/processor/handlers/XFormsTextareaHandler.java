@@ -1,26 +1,25 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTextareaControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -28,6 +27,8 @@ import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * Handle xforms:textarea.
+ *
+ * TODO: Subclasses per appearance.
  */
 public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
 
@@ -41,31 +42,17 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final boolean isConcreteControl = textareaControl != null;
 
-        final AttributesImpl newAttributes;
-        if (handlerContext.isNewXHTMLLayout()) {
-            reusableAttributes.clear();
-            newAttributes = reusableAttributes;
-        } else {
-            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, textareaControl);
-            handleMIPClasses(classes, getPrefixedId(), textareaControl);
-            newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
-            handleReadOnlyAttribute(newAttributes, containingDocument, textareaControl);
-
-            if (isConcreteControl) {
-                // Output extension attributes in no namespace
-                textareaControl.addExtensionAttributes(newAttributes, "");
-            }
-        }
+        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
 
         // Create xhtml:textarea
         {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             if (!isStaticReadonly(textareaControl)) {
                 final String textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea");
-                newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
+                containerAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
 
                 // Handle accessibility attributes
-                handleAccessibilityAttributes(attributes, newAttributes);
+                handleAccessibilityAttributes(attributes, containerAttributes);
 
                 // Output all extension attributes
                 if (isConcreteControl) {
@@ -73,7 +60,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                     textareaControl.addExtensionAttributes(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
                 }
 
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, containerAttributes);
                 if (isConcreteControl) {
                     final String value = textareaControl.getExternalValue(pipelineContext);
                     if (value != null)
@@ -83,7 +70,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
             } else {
                 final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
 
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
                 if (isConcreteControl) {
                     final String value = textareaControl.getExternalValue(pipelineContext);
                     if (value != null) {

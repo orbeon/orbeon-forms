@@ -18,7 +18,6 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -37,7 +36,7 @@ public class OutputInterceptor extends ForwardingContentHandler {
     private String delimiterPrefix;
     private String delimiterLocalName;
 
-    private FastStringBuffer addedClasses;
+    private String addedClasses;
 
     private boolean mustGenerateFirstDelimiters = true ;
 
@@ -127,7 +126,7 @@ public class OutputInterceptor extends ForwardingContentHandler {
 
         if (addedClasses != null && addedClasses.length() > 0) {
             if (newClassAttribute == null) {
-                newClassAttribute = addedClasses.toString();
+                newClassAttribute = addedClasses;
             } else {
                 newClassAttribute += " " + addedClasses;
             }
@@ -155,7 +154,7 @@ public class OutputInterceptor extends ForwardingContentHandler {
         return mustGenerateFirstDelimiters;
     }
 
-    public void setAddedClasses(FastStringBuffer addedClasses) {
+    public void setAddedClasses(String addedClasses) {
         this.addedClasses = addedClasses;
     }
 

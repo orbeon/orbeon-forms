@@ -1178,7 +1178,7 @@ public class XFormsStaticState {
         }
     }
     
-    public void appendClasses(FastStringBuffer sb, String prefixedId) {
+    public void appendClasses(StringBuilder sb, String prefixedId) {
         if ((controlClasses == null))
             return;
 

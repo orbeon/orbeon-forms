@@ -31,6 +31,8 @@ import java.util.Collections;
 
 /**
  * Handle xforms:input.
+ *
+ * TODO: Subclasses per appearance.
  */
 public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
@@ -76,20 +78,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final boolean isConcreteControl = inputControl != null;
 
-        final AttributesImpl newAttributes;
-        if (handlerContext.isNewXHTMLLayout()) {
-            reusableAttributes.clear();
-            newAttributes = reusableAttributes;
-        } else {
-            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, inputControl);
-            handleMIPClasses(classes, getPrefixedId(), inputControl);
-            newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
-
-            if (isConcreteControl) {
-                // Output extension attributes in no namespace
-                inputControl.addExtensionAttributes(newAttributes, "");
-            }
-        }
+        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, inputControl, false);
 
         if (isBoolean) {
             // Produce a boolean output
@@ -117,11 +106,12 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             // Create xhtml:span
 //            final boolean isReadOnly = isConcreteControl && inputControl.isReadonly();
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+            final String enclosingElementLocalname = "span";
+            final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
             final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
 
             if (!handlerContext.isNewXHTMLLayout())
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);
 
             {
                 // Create xhtml:input
@@ -131,7 +121,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
                         // Main input field
                         {
-                            final String inputIdName = getFirstInputEffectiveId(effectiveId);// do as if this was in a component, noscript has to handle that
+                            final String inputIdName = getFirstInputEffectiveId(effectiveId);
 
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputIdName);
@@ -191,7 +181,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                         // NOTE: In the future, we probably want to do this as an XBL component
                         if (isDateTime) {
 
-                            final String inputIdName = getSecondInputEffectiveId(effectiveId);// do as if this was in a component, noscript has to handle that
+                            final String inputIdName = getSecondInputEffectiveId(effectiveId);
 
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputIdName);
@@ -234,14 +224,21 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                         if (isConcreteControl) {
                             final String formattedValue = inputControl.getReadonlyValueUseFormat(pipelineContext);
                             final String outputValue = (formattedValue != null) ? formattedValue : inputControl.getExternalValue(pipelineContext);
+
+                            if (handlerContext.isNewXHTMLLayout())
+                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);
+
                             if (outputValue != null)
                                 contentHandler.characters(outputValue.toCharArray(), 0, outputValue.length());
+
+                            if (handlerContext.isNewXHTMLLayout())
+                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
                         }
                     }
                 }
             }
             if (!handlerContext.isNewXHTMLLayout())
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
         }
     }
 
@@ -249,6 +246,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
         if (!isBoolean) {
             // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
     //        return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-1");
+            // do as if this was in a component, noscript has to handle that
             return effectiveId + "$xforms-input-1";
         } else {
             return null;
@@ -259,37 +257,19 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
         if (isDateTime) {
             // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
     //        return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-2");
+            // do as if this was in a component, noscript has to handle that
             return effectiveId + "$xforms-input-2";
         } else {
             return null;
         }
     }
 
-    private String getForEffectiveId(String effectiveId) {
+    @Override
+    protected String getForEffectiveId(String effectiveId) {
         if (isBoolean) {
-            return effectiveId;
+            return super.getForEffectiveId(effectiveId);
         } else {
             return getFirstInputEffectiveId(effectiveId);
         }
-    }
-
-    @Override
-    protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), "label", xformsControl, isTemplate);
-    }
-
-    @Override
-    protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), "alert", xformsControl, isTemplate);
-    }
-
-    @Override
-    protected void handleHint(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), "hint", xformsControl, isTemplate);
-    }
-
-    @Override
-    protected void handleHelp(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), "help", xformsControl, isTemplate);
     }
 }

@@ -6,7 +6,7 @@
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/../saxon" />
+      <root url="file://$PROJECT_DIR$/../Saxon" />
       <root url="file://$PROJECT_DIR$/../Xerces/src" />
     </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />

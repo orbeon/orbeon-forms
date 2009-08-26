@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
@@ -138,7 +138,7 @@ public class HandlerContext {
         if (!processedUserAgent) {
             final ExternalContext.Request request = externalContext.getRequest();
             isRenderingEngineIE6OrEarlier = UserAgent.isRenderingEngineIE6OrEarlier(request);
-            isRenderingEngineTrident = isRenderingEngineIE6OrEarlier ? true : UserAgent.isRenderingEngineTrident(request);
+            isRenderingEngineTrident = isRenderingEngineIE6OrEarlier || UserAgent.isRenderingEngineTrident(request);
             processedUserAgent = true;
         }
     }
@@ -200,15 +200,9 @@ public class HandlerContext {
     }
 
     public void findFormattingPrefixUndeclare(String formattingPrefix) throws SAXException {
-        final boolean isNewPrefix;
 
         final String existingFormattingPrefix = findFormattingPrefix();
-        if (existingFormattingPrefix == null || "".equals(existingFormattingPrefix)) {
-            // No prefix is currently mapped
-            isNewPrefix = true;
-        } else {
-            isNewPrefix = false;
-        }
+        final boolean isNewPrefix = StringUtils.isEmpty(existingFormattingPrefix);
 
         // End mapping if needed
         if (isNewPrefix)
@@ -241,10 +235,10 @@ public class HandlerContext {
         return (locator == null) ? null : new LocationData(locator);
     }
 
-    private Stack componentContextStack; // Stack<String> of static component id prefixes
+    private Stack<String> componentContextStack; // Stack<String> of static component id prefixes
 
     public String getIdPrefix() {
-        return (componentContextStack == null || componentContextStack.size() == 0) ? "" : (String) componentContextStack.peek();
+        return (componentContextStack == null || componentContextStack.size() == 0) ? "" : componentContextStack.peek();
     }
 
     public void pushComponentContext(String prefixedId) {
@@ -252,7 +246,7 @@ public class HandlerContext {
         final String newIdPrefix = prefixedId + XFormsConstants.COMPONENT_SEPARATOR;
 
         if (componentContextStack == null)
-            componentContextStack = new Stack();
+            componentContextStack = new Stack<String>();
         componentContextStack.push(newIdPrefix);
     }
 
@@ -260,41 +254,41 @@ public class HandlerContext {
         componentContextStack.pop();
     }
 
-    private Stack repeatContextStack;
+    private Stack<RepeatContext> repeatContextStack;
 
     public String getIdPostfix() {
         if (repeatContextStack == null || repeatContextStack.size() == 0)
             return "";
         else
-            return ((RepeatContext) repeatContextStack.peek()).getIdPostifx();
+            return (repeatContextStack.peek()).getIdPostifx();
     }
 
     public boolean isTemplate() {
         if (repeatContextStack == null || repeatContextStack.size() == 0)
             return false;
         else
-            return ((RepeatContext) repeatContextStack.peek()).isGenerateTemplate();
+            return (repeatContextStack.peek()).isGenerateTemplate();
     }
 
     public boolean isRepeatSelected() {
         if (repeatContextStack == null || repeatContextStack.size() == 0)
             return false;
         else
-            return ((RepeatContext) repeatContextStack.peek()).isRepeatSelected();
+            return (repeatContextStack.peek()).isRepeatSelected();
     }
 
     public boolean isTopLevelRepeat() {
         if (repeatContextStack == null || repeatContextStack.size() == 0)
             return false;
         else
-            return ((RepeatContext) repeatContextStack.peek()).isTopLevelRepeat();
+            return (repeatContextStack.peek()).isTopLevelRepeat();
     }
 
     public int getCurrentIteration() {
         if (repeatContextStack == null || repeatContextStack.size() == 0)
             return 0;
         else
-            return ((RepeatContext) repeatContextStack.peek()).getIteration();
+            return (repeatContextStack.peek()).getIteration();
     }
 
     public int countParentRepeats() {
@@ -316,7 +310,7 @@ public class HandlerContext {
         }
 
         if (repeatContextStack == null)
-            repeatContextStack = new Stack();
+            repeatContextStack = new Stack<RepeatContext>();
         repeatContextStack.push(new RepeatContext(generateTemplate, iteration, newIdPostfix, topLevelRepeat, repeatSelected));
     }
 

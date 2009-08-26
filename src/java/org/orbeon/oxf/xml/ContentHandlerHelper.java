@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xml;
 
@@ -22,14 +22,13 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.util.Stack;
 
 /**
- * Wrapper to a SAX ContentHandler. Provides more high-level methods to send events to a
- * ContentHandler.
+ * Wrapper to a SAX ContentHandler. Provides more high-level methods to send events to a ContentHandler.
  */
 public class ContentHandlerHelper {
 
     public static final String CDATA = "CDATA";
-    private Stack elementNamespaces = new Stack();
-    private Stack elements = new Stack();
+    private Stack<String> elementNamespaces = new Stack<String>();
+    private Stack<String> elements = new Stack<String>();
     private ContentHandler contentHandler;
     private AttributesImpl attributesImpl = new AttributesImpl();
 
@@ -48,11 +47,6 @@ public class ContentHandlerHelper {
             this.contentHandler = new InspectingContentHandler(contentHandler);
         else
             this.contentHandler = contentHandler;
-    }
-
-    public AttributesImpl getAttributesImpl() {
-        attributesImpl.clear();
-        return attributesImpl;
     }
 
     public void startElement(String name) {
@@ -99,8 +93,8 @@ public class ContentHandlerHelper {
 
     public void endElement() {
         try {
-            String name = (String) elements.pop();
-            String namespace = (String) elementNamespaces.pop();
+            String name = elements.pop();
+            String namespace = elementNamespaces.pop();
             contentHandler.endElement(namespace, name, name);
         } catch (SAXException e) {
             throw new OXFException(e);

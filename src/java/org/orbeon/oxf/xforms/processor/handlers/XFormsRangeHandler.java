@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
@@ -17,7 +17,6 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -28,11 +27,14 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
 
+    private static final String ENCLOSING_ELEMENT_NAME = "div";
+
     public XFormsRangeHandler() {
         super(false);
     }
 
-    protected void addCustomClasses(FastStringBuffer classes, XFormsSingleNodeControl xformsControl) {
+    @Override
+    protected void addCustomClasses(StringBuilder classes, XFormsSingleNodeControl xformsControl) {
         classes.append(" xforms-range-background");
     }
 
@@ -40,36 +42,33 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
-        final AttributesImpl newAttributes;
-        if (handlerContext.isNewXHTMLLayout()) {
-            reusableAttributes.clear();
-            newAttributes = reusableAttributes;
-        } else {
-            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, xformsControl);
-            addCustomClasses(classes, xformsControl);
-            handleMIPClasses(classes, getPrefixedId(), xformsControl);
-            newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
-
-            if (xformsControl != null) {
-                // Output extension attributes in no namespace
-                xformsControl.addExtensionAttributes(newAttributes, "");
-            }
-        }
+        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
 
         // Create xhtml:div
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
+        final String divQName = XMLUtils.buildQName(xhtmlPrefix, ENCLOSING_ELEMENT_NAME);
         {
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
-
+            if (!handlerContext.isNewXHTMLLayout())
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, divQName, containerAttributes);
             {
-                reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-range-thumb");
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+                final AttributesImpl sliderAttributes = getSliderAttributes(containerAttributes);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, divQName, sliderAttributes);
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, divQName);
             }
-
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+            if (!handlerContext.isNewXHTMLLayout())
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, divQName);
         }
+    }
+
+    private AttributesImpl getSliderAttributes(AttributesImpl containerAttributes) {
+        final AttributesImpl sliderAttributes;
+        if (handlerContext.isNewXHTMLLayout()) {
+            sliderAttributes = containerAttributes;
+        } else {
+            reusableAttributes.clear();
+            sliderAttributes = reusableAttributes;
+        }
+        sliderAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-range-thumb");
+        return sliderAttributes;
     }
 }

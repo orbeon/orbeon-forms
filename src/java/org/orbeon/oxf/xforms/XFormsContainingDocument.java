@@ -1007,21 +1007,11 @@ public class XFormsContainingDocument extends XBLContainer {
             }
 
             // For testing only
-    //        if (XFormsProperties.isAjaxTest()) {
-    //            if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
-    //                if ("category-select1".equals(controlId)) {
-    //                    if (testAjaxToggleValue == 0) {
-    //                        testAjaxToggleValue = 1;
-    //                        valueString = "supplier";
-    //                    } else {
-    //                        testAjaxToggleValue = 0;
-    //                        valueString = "customer";
-    //                    }
-    //                } else if (("xforms-element-287" + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + "1").equals(controlId)) {
-    //                    valueString = "value" + System.currentTimeMillis();
-    //                }
-    //            }
-    //        }
+            if (XFormsProperties.isAjaxTest()) {
+                if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
+                    valueString = "value" + System.currentTimeMillis();
+                }
+            }
 
             if (!handleGoingOnline) {
                 // When not going online, each event is within its own start/end outermost action handler

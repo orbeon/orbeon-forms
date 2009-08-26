@@ -52,6 +52,7 @@ public class XFormsSwitchHandler extends XFormsControlLifecyleHandler {
         }
     }
 
+    @Override
     protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
         if (!handlerContext.isNewXHTMLLayout()) {
             // Close xhtml:span

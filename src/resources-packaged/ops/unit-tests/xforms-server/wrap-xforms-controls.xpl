@@ -67,7 +67,8 @@
                 </xsl:template>
 
                 <!-- Keep repeat templates, controls, and LHHA only -->
-                <xsl:template match="xhtml:*[tokenize(@class, '\s+') = ('xforms-repeat-template', 'xforms-control', 'xforms-label', 'xforms-hint', 'xforms-help', 'xforms-alert', 'xforms-help-image')]">
+                <xsl:template match="xhtml:*[tokenize(@class, '\s+') = ('xforms-repeat-template', 'xforms-control', 'xforms-label',
+                                        'xforms-hint', 'xforms-help', 'xforms-alert', 'xforms-help-image', 'xforms-group', 'xforms-group-begin-end')]">
                     <xsl:copy-of select="."/>
                 </xsl:template>
 

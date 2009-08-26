@@ -227,7 +227,7 @@
         </output>
     </test>
     
-    <test description="New layout for xforms:output" name="oxf:pipeline">
+    <test description="Old layout for xforms:output" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -257,6 +257,130 @@
                 <xhtml:label class="xforms-help" id="my-old-output-help" for="my-old-output">My help</xhtml:label>
                 <xhtml:label class="xforms-alert-active xforms-alert" id="my-old-output-alert" for="my-old-output">My alert</xhtml:label>
                 <xhtml:label class="xforms-hint" id="my-old-output-hint" for="my-old-output">My hint</xhtml:label>
+            </controls>
+        </output>
+    </test>
+
+    <test description="New layout for xforms:group" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="main-model" xxforms:new-xhtml-layout="true">
+                        <xforms:instance id="tests">
+                            <instance>Hello!</instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="my-new-group" ref=".">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:output id="my-new-output-1" value="'Hello!'"/>
+                    </xforms:group>
+                    <xforms:group id="my-new-internal-group" ref="." appearance="xxforms:internal">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:output id="my-new-output-2" value="'Hello!'"/>
+                    </xforms:group>
+                    <xforms:group id="my-new-fieldset-group" ref="." appearance="xxforms:fieldset">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:output id="my-new-output-3" value="'Hello!'"/>
+                    </xforms:group>
+                    <xhtml:table>
+                        <xforms:group id="my-new-table-group" ref=".">
+                            <xforms:label>My label</xforms:label>
+                            <xhtml:tr>
+                                <xhtml:td><xforms:output id="my-new-output-4" value="'Hello!'"/></xhtml:td>
+                            </xhtml:tr>
+                        </xforms:group>
+                    </xhtml:table>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:span id="my-new-group" class="xforms-group xforms-invalid xforms-required">
+                    <xhtml:label class="xforms-label" id="my-new-group-label" for="my-new-group">My label</xhtml:label>
+                    <xhtml:span id="my-new-output-1" class="xforms-control xforms-output">
+                        <xhtml:span id="my-new-output-1-control" class="xforms-output-output">Hello!</xhtml:span>
+                    </xhtml:span>
+                </xhtml:span>
+                <xhtml:span id="my-new-output-2" class="xforms-control xforms-output">
+                    <xhtml:span id="my-new-output-2-control" class="xforms-output-output">Hello!</xhtml:span>
+                </xhtml:span>
+                <xhtml:fieldset id="my-new-fieldset-group" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-invalid xforms-required">
+                    <xhtml:legend class="xforms-label" id="my-new-fieldset-group-label">My label</xhtml:legend>
+                    <xhtml:span id="my-new-output-3" class="xforms-control xforms-output">
+                        <xhtml:span id="my-new-output-3-control" class="xforms-output-output">Hello!</xhtml:span>
+                    </xhtml:span>
+                </xhtml:fieldset>
+                <xhtml:tr id="group-begin-my-new-table-group" class="xforms-group-begin-end xforms-invalid xforms-required"/>
+                <xhtml:tr class="xforms-group-begin-end xforms-invalid xforms-required">
+                    <xhtml:td>
+                        <xhtml:span id="my-new-output-4" class="xforms-control xforms-output">
+                            <xhtml:span id="my-new-output-4-control" class="xforms-output-output">Hello!</xhtml:span>
+                        </xhtml:span>
+                    </xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr id="group-end-my-new-table-group" class="xforms-group-begin-end"/>
+            </controls>
+        </output>
+    </test>
+
+    <test description="Old layout for xforms:group" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="main-model" xxforms:new-xhtml-layout="false">
+                        <xforms:instance id="tests">
+                            <instance>Hello!</instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="my-new-group" ref=".">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:output id="my-new-output-1" value="'Hello!'"/>
+                    </xforms:group>
+                    <xforms:group id="my-new-internal-group" ref="." appearance="xxforms:internal">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:output id="my-new-output-2" value="'Hello!'"/>
+                    </xforms:group>
+                    <xforms:group id="my-new-fieldset-group" ref="." appearance="xxforms:fieldset">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:output id="my-new-output-3" value="'Hello!'"/>
+                    </xforms:group>
+                    <xhtml:table>
+                        <xforms:group id="my-new-table-group" ref=".">
+                            <xforms:label>My label</xforms:label>
+                            <xhtml:tr>
+                                <xhtml:td><xforms:output id="my-new-output-4" value="'Hello!'"/></xhtml:td>
+                            </xhtml:tr>
+                        </xforms:group>
+                    </xhtml:table>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:label class="xforms-label" id="my-new-group-label" for="my-new-group">My label</xhtml:label>
+                <xhtml:span id="my-new-group" class="xforms-group xforms-invalid xforms-required">
+                    <xhtml:span id="my-new-output-1" class="xforms-control xforms-output">Hello!</xhtml:span>
+                </xhtml:span>
+                <xhtml:span id="my-new-output-2" class="xforms-control xforms-output">Hello!</xhtml:span>
+                <xhtml:fieldset id="my-new-fieldset-group" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-invalid xforms-required">
+                    <xhtml:legend class="xforms-label" id="my-new-fieldset-group-label">My label</xhtml:legend>
+                    <xhtml:span id="my-new-output-3" class="xforms-control xforms-output">Hello!</xhtml:span>
+                </xhtml:fieldset>
+                <xhtml:tr id="group-begin-my-new-table-group" class="xforms-group-begin-end xforms-invalid xforms-required"/>
+                <xhtml:tr class="xforms-group-begin-end xforms-invalid xforms-required">
+                    <xhtml:td>
+                        <xhtml:span id="my-new-output-4" class="xforms-control xforms-output">Hello!</xhtml:span>
+                    </xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr id="group-end-my-new-table-group" class="xforms-group-begin-end"/>
             </controls>
         </output>
     </test>

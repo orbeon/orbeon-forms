@@ -92,6 +92,19 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit", triggerSubmitMinimalMatcher);
             controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit");
 
+            // xforms:group
+            controller.registerHandler(XFormsGroupInternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", controller.new Matcher() {
+                public boolean match(Attributes attributes) {
+                    return XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
+                }
+            });
+            controller.registerHandler(XFormsGroupFieldsetHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", controller.new Matcher() {
+                public boolean match(Attributes attributes) {
+                    return XFormsConstants.XXFORMS_FIELDSET_APPEARANCE_QNAME.equals(getAppearance(attributes));
+                }
+            });
+            controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group");
+
             // Other controls
             controller.registerHandler(XFormsSecretHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret");
             controller.registerHandler(XFormsTextareaHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
@@ -101,7 +114,6 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
             controller.registerHandler(XFormsSelect1Handler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
 
-            controller.registerHandler(XFormsGroupHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group");
             controller.registerHandler(XFormsSwitchHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch");
             controller.registerHandler(XFormsCaseHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "case");
             controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat");
@@ -109,12 +121,12 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog");
 
             // Add handlers for LHHA elements
-            if (true) {// TODO: check w/ XFStaticState if there are any standalone LHHA elements
+//            if (true) {// TODO: check w/ XFStaticState if there are any standalone LHHA elements
                 controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "label");
                 controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "help");
                 controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "hint");
                 controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert");
-            }
+//            }
 
             // Add handlers for custom components
             final Map<QName, Element> componentBindings = staticState.getXblBindings().getComponentBindings();

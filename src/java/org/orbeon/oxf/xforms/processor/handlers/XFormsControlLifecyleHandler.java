@@ -48,7 +48,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
     private XFormsSingleNodeControl xformsControl;
     private Attributes attributes;
     private String[] endConfig;
-    private String spanQName;
+    private String containingElementQName;
 
     protected XFormsControlLifecyleHandler(boolean repeating) {
         super(repeating, false);
@@ -60,6 +60,11 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     protected String getPrefixedId() {
         return prefixedId;
+    }
+
+    protected String getContainingElementName() {
+        // By default, controls are enclosed with a <span>
+        return "span";
     }
 
     @Override
@@ -79,12 +84,12 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
             final ContentHandler contentHandler = handlerContext.getController().getOutput();
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            if (handlerContext.isNewXHTMLLayout()) {
-                // Open control <span>
-                spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+            if (handlerContext.isNewXHTMLLayout() && isMustOutputContainerElement()) {
+                // Open control element, usually <span>
+                containingElementQName = XMLUtils.buildQName(xhtmlPrefix, getContainingElementName());
 
                 final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes);
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), containingElementQName, containerAttributes);
             }
 
             // Get local order for control
@@ -178,10 +183,10 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
                 }
             }
 
-            if (handlerContext.isNewXHTMLLayout()) {
-                // Close control <span>
+            if (handlerContext.isNewXHTMLLayout() && isMustOutputContainerElement()) {
+                // Close control element, usually <span>
                 final ContentHandler contentHandler = handlerContext.getController().getOutput();
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), containingElementQName);
             }
         }
     }
@@ -219,6 +224,11 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
     }
 
     protected boolean isMustOutputControl(XFormsSingleNodeControl xformsControl) {
+        // May be overridden by subclasses
+        return true;
+    }
+
+    protected boolean isMustOutputContainerElement() {
         // May be overridden by subclasses
         return true;
     }

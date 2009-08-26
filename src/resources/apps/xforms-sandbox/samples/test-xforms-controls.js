@@ -160,7 +160,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     timeValueId: "time-value" + XFORMS_SEPARATOR_1 + "1",
     timeValueInputId: "time-value$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
     dateValueId: "date-value" + XFORMS_SEPARATOR_1 + "1",
-    dateValueInputId: "date-value" + XFORMS_SEPARATOR_1 + "1$xforms-input-1",
+    dateValueInputId: "date-value$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
 
     workerTimeParsing: function(typedValue, expectedValue) {
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {

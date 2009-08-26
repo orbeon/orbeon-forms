@@ -1,22 +1,21 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -52,7 +51,7 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
         // Place interceptor if needed
         if (!handlerContext.isNoScript()) {
             // Find classes to add
-            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, null);
+            final StringBuilder classes = getInitialClasses(uri, localname, attributes, null);
 
             final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), currentCaseEffectiveId);
             newAttributes.addAttribute("", "style", "style", ContentHandlerHelper.CDATA, "display: " + (isVisible ? "block" : "none"));
@@ -68,7 +67,7 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
                 }
             });
 
-            currentOutputInterceptor.setAddedClasses(new FastStringBuffer(isVisible ? "xforms-case-selected" : "xforms-case-deselected"));
+            currentOutputInterceptor.setAddedClasses(new StringBuilder(isVisible ? "xforms-case-selected" : "xforms-case-deselected"));
 
             // TODO: is the use of XFormsElementFilterContentHandler necessary now?
             handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(currentOutputInterceptor)));

@@ -29,6 +29,8 @@ import java.util.Stack;
 
 /**
  * Handle xforms:group.
+ *
+ * TODO: Subclasses per appearance.
  */
 public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
 
@@ -50,6 +52,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
     private static final Map TABLE_CONTAINERS  = new HashMap();
 
     static {
+        // TODO: use Set
         TABLE_CONTAINERS.put("table", "");
         TABLE_CONTAINERS.put("tbody", "");
         TABLE_CONTAINERS.put("thead", "");
@@ -132,7 +135,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
             // Group outside table
 
             // Get classes
-            final FastStringBuffer classes = getInitialClasses(uri, localname, attributes, null);
+            final StringBuilder classes = getInitialClasses(uri, localname, attributes, null);
             handleMIPClasses(classes, getPrefixedId(), xformsControl);
 
             final ContentHandler contentHandler = controller.getOutput();
@@ -173,7 +176,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
 
             // Get classes for the first delimiter
             // As of August 2009, actually only need the marker class as well as xforms-disabled if the group is non-relevant
-            final FastStringBuffer classes = new FastStringBuffer("xforms-group-begin-end");
+            final StringBuilder classes = new StringBuilder("xforms-group-begin-end");
             handleMIPClasses(classes, getPrefixedId(), xformsControl);
 
             // Place interceptor on output
@@ -244,7 +247,7 @@ public class XFormsGroupHandler extends XFormsControlLifecyleHandler {
             // styling in particular.
             reusableAttributes.clear();
             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, labelClasses.toString());
-            outputLabelFor(handlerContext, reusableAttributes, effectiveId, effectiveId, "label", handlerContext.getLabelElementName(), labelValue, xformsControl != null && xformsControl.isHTMLLabel(pipelineContext));
+            outputLabelFor(handlerContext, reusableAttributes, effectiveId, effectiveId, LLHAC.LABEL, handlerContext.getLabelElementName(), labelValue, xformsControl != null && xformsControl.isHTMLLabel(pipelineContext));
         }
     }
 

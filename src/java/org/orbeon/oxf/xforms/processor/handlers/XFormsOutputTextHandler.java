@@ -13,27 +13,31 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.control.controls.XXFormsTextControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-public class XXFormsTextHandler extends XFormsBaseHandler {
+/**
+ * Handler for xforms:output[@appearance = 'xxforms:text'].
+ */
+public class XFormsOutputTextHandler extends XFormsOutputHandler {
 
-    public XXFormsTextHandler() {
-        super(false, false);
-    }
+    @Override
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        // Just output value for "text" appearance
+//        if (isImageMediatype || isHTMLMediaType) {
+//            throw new ValidationException("Cannot use mediatype value for \"xxforms:text\" appearance: " + mediatypeValue, handlerContext.getLocationData());
+//        }
 
-        final String effectiveId = handlerContext.getEffectiveId(attributes);
-        final XXFormsTextControl textControl = (XXFormsTextControl) containingDocument.getObjectByEffectiveId(effectiveId);
-
+        final XFormsOutputControl outputControl = (XFormsOutputControl) xformsControl;
+        final boolean isConcreteControl = outputControl != null;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        final boolean isConcreteControl = textControl != null;
 
         if (isConcreteControl) {
-            final String externalValue = textControl.getExternalValue(pipelineContext);
+            final String externalValue = outputControl.getExternalValue(pipelineContext);
             if (externalValue != null && externalValue.length() > 0)
                 contentHandler.characters(externalValue.toCharArray(), 0, externalValue.length());
         }

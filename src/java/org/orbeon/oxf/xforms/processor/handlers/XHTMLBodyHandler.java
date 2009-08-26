@@ -1,18 +1,19 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.xforms.*;
@@ -24,7 +25,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -47,14 +47,57 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         // Register control handlers on controller
         {
             final ElementHandlerController controller = handlerContext.getController();
+
+            // xforms:input
             controller.registerHandler(XFormsInputHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "input");
-            controller.registerHandler(XFormsOutputHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output");
-            controller.registerHandler(XFormsTriggerHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger");
-            controller.registerHandler(XFormsSubmitHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit");
+
+            // xforms:output
+            controller.registerHandler(XFormsOutputTextHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
+                public boolean match(Attributes attributes) {
+                    return XFormsConstants.XXFORMS_TEXT_APPEARANCE_QNAME.equals(controller.getAttributeQNameValue(attributes.getValue("appearance")));
+                }
+            });
+            controller.registerHandler(XFormsOutputDownloadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
+                public boolean match(Attributes attributes) {
+                    return XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME.equals(getAppearance(attributes));
+                }
+            });
+            controller.registerHandler(XFormsOutputImageHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
+                public boolean match(Attributes attributes) {
+                    final String mediatypeValue = attributes.getValue("mediatype");
+                    return mediatypeValue != null && mediatypeValue.startsWith("image/");
+                }
+            });
+            controller.registerHandler(XFormsOutputHTMLHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
+                public boolean match(Attributes attributes) {
+                    final String mediatypeValue = attributes.getValue("mediatype");
+                    return mediatypeValue != null && mediatypeValue.equals("text/html");
+                }
+            });
+            controller.registerHandler(XFormsOutputDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output");
+
+            // xforms:trigger
+            final ElementHandlerController.Matcher triggerSubmitMinimalMatcher = controller.new Matcher() {
+                public boolean match(Attributes attributes) {
+                    final QName appearance = getAppearance(attributes);
+                    return appearance != null && !handlerContext.isNoScript() // is noscript mode, use the full appearance
+                            && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance)    // minimal appearance
+                                || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance)); // legacy appearance
+                }
+            };
+            controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger", triggerSubmitMinimalMatcher);
+            controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger");
+
+            // xforms:submit
+            controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit", triggerSubmitMinimalMatcher);
+            controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit");
+
+            // Other controls
             controller.registerHandler(XFormsSecretHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret");
             controller.registerHandler(XFormsTextareaHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
             controller.registerHandler(XFormsUploadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "upload");
             controller.registerHandler(XFormsRangeHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "range");
+            
             controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
             controller.registerHandler(XFormsSelect1Handler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
 
@@ -74,10 +117,9 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             }
 
             // Add handlers for custom components
-            final Map componentBindings = staticState.getXblBindings().getComponentBindings();
+            final Map<QName, Element> componentBindings = staticState.getXblBindings().getComponentBindings();
             if (componentBindings != null) {
-                for (Iterator i = componentBindings.keySet().iterator(); i.hasNext();) {
-                    final QName currentQName = (QName) i.next();
+                for (final QName currentQName: componentBindings.keySet()) {
                     controller.registerHandler(XXFormsComponentHandler.class.getName(), currentQName.getNamespaceURI(), currentQName.getName());
                 }
             }
@@ -160,12 +202,11 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             // Store information about the initial index of each repeat
             {
                 final StringBuffer repeatIndexesStringBuffer = new StringBuffer();
-                final Map repeatIdToIndex = xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex(staticState);
+                final Map<String, Integer> repeatIdToIndex = xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex(staticState);
                 if (repeatIdToIndex.size() != 0) {
-                    for (Iterator i = repeatIdToIndex.entrySet().iterator(); i.hasNext();) {
-                        final Map.Entry currentEntry = (Map.Entry) i.next();
-                        final String repeatId = (String) currentEntry.getKey();
-                        final Integer index = (Integer) currentEntry.getValue();
+                    for (final Map.Entry<String, Integer> currentEntry: repeatIdToIndex.entrySet()) {
+                        final String repeatId = currentEntry.getKey();
+                        final Integer index = currentEntry.getValue();
 
                         if (repeatIndexesStringBuffer.length() > 0)
                             repeatIndexesStringBuffer.append(',');

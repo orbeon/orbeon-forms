@@ -12,12 +12,11 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<group description="XForms Server" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+<group description="XForms MIPs" xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xu="http://www.xmldb.org/xupdate"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
@@ -33,11 +32,11 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                <xforms:model id="main-model">
                                     <xforms:instance id="tests">
                                         <instance>
                                             <noFoundData>0</noFoundData>
@@ -89,11 +88,11 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                <xforms:model id="main-model">
                                     <xforms:instance id="main-instance">
                                         <instance>
                                             <this-is-an-existing-node/>
@@ -141,11 +140,11 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                <xforms:model id="main-model">
                                     <xforms:instance id="instance">
                                         <e1 gege="gigi1">
                                             <e2>
@@ -214,11 +213,11 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model xxforms:state-handling="client">
+                                <xforms:model>
 
                                     <xforms:instance id="instance">
                                         <instance>
@@ -321,11 +320,11 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model xxforms:state-handling="client">
+                                <xforms:model>
 
                                     <xforms:instance id="instance">
                                         <instance>
@@ -419,11 +418,11 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                             <xhtml:head>
-                                <xforms:model xxforms:state-handling="client" xmlns:foo="http://orbeon.org/oxf/xml/foo" id="my-model">
+                                <xforms:model xmlns:foo="http://orbeon.org/oxf/xml/foo" id="my-model">
                                     <xforms:instance id="my-instance">
                                         <fruits>
                                             <orange>bloody</orange>
@@ -499,11 +498,11 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="model" xxforms:state-handling="client">
+                                <xforms:model id="model">
                                     <xforms:instance id="instance">
                                         <instance xmlns="">
                                             <readonly/>
@@ -579,11 +578,11 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="form-model" xxforms:state-handling="client">
+                                <xforms:model id="form-model">
                                     <!-- Form instance -->
                                     <xforms:instance id="form-instance">
                                         <first-name xmlns=""/>
@@ -675,11 +674,11 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="form-model" xxforms:state-handling="client">
+                                <xforms:model id="form-model">
                                     <xforms:instance id="values">
                                         <values xmlns="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                                             <value nodetype="" valuetype="">Lucy</value>
@@ -753,11 +752,11 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="form-model" xxforms:state-handling="client" xxforms:expose-xpath-types="true">
+                                <xforms:model id="form-model" xxforms:expose-xpath-types="true">
                                     <xforms:instance id="values">
                                         <values xmlns="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                                             <value>Lucy</value>

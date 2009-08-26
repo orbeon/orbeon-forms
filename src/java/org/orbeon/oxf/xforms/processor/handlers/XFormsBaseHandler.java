@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.dom4j.Element;
-import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -37,6 +36,10 @@ import org.xml.sax.helpers.AttributesImpl;
  * Base class for all XHTML and XForms element handlers.
  */
 public abstract class XFormsBaseHandler extends ElementHandler {
+
+    public enum LLHAC {
+        LABEL, HELP, HINT, ALERT, CONTROL
+    }
 
     private boolean repeating;
     private boolean forwarding;
@@ -90,7 +93,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
     }
 
-    public void handleMIPClasses(FastStringBuffer sb, String controlPrefixedId, XFormsSingleNodeControl xformsControl) {
+    public void handleMIPClasses(StringBuilder sb, String controlPrefixedId, XFormsSingleNodeControl xformsControl) {
 
         // Output MIP classes only having a binding
         final boolean hasBinding = containingDocument.getStaticState().getControlInfoMap().get(controlPrefixedId).hasBinding();
@@ -182,16 +185,17 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                 destAttributes.addAttribute("", "accesskey", "accesskey", ContentHandlerHelper.CDATA, value);
         }
     }
-    protected AttributesImpl getAttributes(Attributes elementAttributes, String classes, String id) {
-        return getAttributes(reusableAttributes, elementAttributes, classes, id);
+
+    protected AttributesImpl getAttributes(Attributes elementAttributes, String classes, String effectiveId) {
+        return getAttributes(reusableAttributes, elementAttributes, classes, effectiveId);
     }
 
-    protected static AttributesImpl getAttributes(AttributesImpl reusableAttributes, Attributes elementAttributes, String classes, String id) {
+    protected static AttributesImpl getAttributes(AttributesImpl reusableAttributes, Attributes elementAttributes, String classes, String effectiveId) {
         reusableAttributes.clear();
 
         // Copy "id"
-        if (id != null) {
-            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, id);
+        if (effectiveId != null) {
+            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, effectiveId);
         }
         // Create "class" attribute if necessary
         {
@@ -212,13 +216,13 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return reusableAttributes;
     }
 
-    protected FastStringBuffer getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl xformsControl) {
+    protected StringBuilder getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl xformsControl) {
         return getInitialClasses(controlURI, controlName, controlAttributes, xformsControl, null, false);
     }
 
-    protected FastStringBuffer getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl xformsControl, QName appearance, boolean incrementalDefault) {
+    protected StringBuilder getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl xformsControl, QName appearance, boolean incrementalDefault) {
 
-        final FastStringBuffer sb = new FastStringBuffer(50);
+        final StringBuilder sb = new StringBuilder(50);
         // User-defined classes go first
         {
             {
@@ -315,26 +319,22 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return sb;
     }
 
-    protected String uriFromQName(String qName) {
-        return XMLUtils.uriFromQName(qName, handlerContext.getController().getNamespaceSupport());
-    }
-
     protected boolean isStaticReadonly(XFormsControl xformsControl) {
         return xformsControl != null && xformsControl.isStaticReadonly();
     }
 
-    protected void handleLabelHintHelpAlert(String controlEffectiveId, String forEffectiveId, String lhhaType, XFormsSingleNodeControl control, boolean isTemplate) throws SAXException {
+    protected void handleLabelHintHelpAlert(String controlEffectiveId, String forEffectiveId, LLHAC lhhaType, XFormsSingleNodeControl control, boolean isTemplate) throws SAXException {
 
-        final boolean isHint = lhhaType.equals("hint");
-        final boolean isAlert = lhhaType.equals("alert");
+        final boolean isHint = lhhaType == LLHAC.HINT;
+        final boolean isAlert = lhhaType == LLHAC.ALERT;
 
         // Don't handle alerts and help in read-only mode
         // TODO: Removing hints and help could be optional depending on appearance
         if (isStaticReadonly(control) && (isAlert || isHint))
             return;
 
-        final boolean isLabel = lhhaType.equals("label");
-        final boolean isHelp = lhhaType.equals("help");
+        final boolean isLabel = lhhaType == LLHAC.LABEL;
+        final boolean isHelp = lhhaType == LLHAC.HELP;
 
         final String labelHintHelpAlertValue;
         final boolean mustOutputHTMLFragment;
@@ -441,7 +441,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             if (classes.length() > 0)
                 classes.append(' ');
             classes.append("xforms-");
-            classes.append(lhhaType);
+            classes.append(lhhaType.name().toLowerCase());
 
             final String labelClasses = classes.toString();
 
@@ -490,24 +490,17 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
                 // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
                 final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : new AttributesImpl();
-                if (newAttributes != null) {
-                    outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), controlEffectiveId, forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment);
-                }
+                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), controlEffectiveId, forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment);
             }
         }
     }
 
-    protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String controlEffectiveId, String forEffectiveId, String lhhaType, String elementName, String value, boolean mustOutputHTMLFragment) throws SAXException {
+    protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String controlEffectiveId, String forEffectiveId, LLHAC lhha, String elementName, String value, boolean mustOutputHTMLFragment) throws SAXException {
 
         // Replace id attribute to be foo-label, foo-hint, foo-help, or foo-alert
         final AttributesImpl newAttribute;
-        if (lhhaType != null && controlEffectiveId != null) {
-            // E.g. foo$bar.1-2-3 -> foo$bar-alert.1-2-3
-//            final String newId = XFormsUtils.getEffectiveIdNoSuffix(forEffectiveId) + "-" + lhhaType + XFormsUtils.getEffectiveIdSuffixWithSeparator(forEffectiveId);
-//            newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id",  newId);
-
-            // E.g. foo$bar.1-2-3 -> foo$bar.1-2-3-alert
-            newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", controlEffectiveId + "-" + lhhaType);
+        if (lhha != null && controlEffectiveId != null) {
+            newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", getLHHACId(controlEffectiveId, lhha));
         } else {
             newAttribute = new AttributesImpl(attributes);
         }
@@ -532,6 +525,16 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName);
     }
 
+    protected static String getLHHACId(String controlEffectiveId, LLHAC lhhaType) {
+        // E.g. foo$bar.1-2-3 -> foo$bar.1-2-3-alert
+        return controlEffectiveId + '-' + lhhaType.name().toLowerCase();
+
+        // TODO: better to switch to following format?
+        // E.g. foo$bar.1-2-3 -> foo$bar-alert.1-2-3
+//        final String newId = XFormsUtils.getEffectiveIdNoSuffix(forEffectiveId) + "-" + lhhaType + XFormsUtils.getEffectiveIdSuffixWithSeparator(forEffectiveId);
+//        newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id",  newId);
+    }
+
     protected static void outputLabelText(ContentHandler contentHandler, XFormsControl xformsControl, String value, String xhtmlPrefix, boolean mustOutputHTMLFragment) throws SAXException {
         // Only output content when there value is non-empty
         if (value != null && !value.equals("")) {
@@ -542,23 +545,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
     }
 
-    protected static void copyAttributes(Attributes sourceAttributes, String sourceNamespaceURI, String[] sourceAttributeLocalNames, AttributesImpl destAttributes) {
-        for (final String attributeName: sourceAttributeLocalNames) {
-            final String attributeValue = sourceAttributes.getValue(sourceNamespaceURI, attributeName);
-            if (attributeValue != null)
-                destAttributes.addAttribute("", attributeName, attributeName, ContentHandlerHelper.CDATA, attributeValue);
-        }
-    }
-
     protected QName getAppearance(Attributes controlAttributes) {
-        final String appearanceValue = controlAttributes.getValue("appearance");
-        if (appearanceValue == null)
-            return null;
-
-        final String appearanceLocalname = XMLUtils.localNameFromQName(appearanceValue);
-        final String appearancePrefix = XMLUtils.prefixFromQName(appearanceValue);
-        final String appearanceURI = uriFromQName(appearanceValue);
-
-        return new QName(appearanceLocalname, new Namespace(appearancePrefix, appearanceURI));
+        return handlerContext.getController().getAttributeQNameValue(controlAttributes.getValue("appearance"));
     }
 }

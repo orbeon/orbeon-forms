@@ -1,30 +1,30 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xml;
 
+import org.dom4j.Namespace;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * This is the controller for the handlers system.
@@ -42,14 +42,15 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
 
     private Object elementHandlerContext;
     private DeferredContentHandler output;
-    private Map handlerKeysToNames = new HashMap();
-    private Map uriHandlerKeysToNames = new HashMap();
 
-    private Stack handlerInfos = new Stack();
+    private Map<String, List<HandlerMatcher>> matcherHandlers = new HashMap<String, List<HandlerMatcher>>();
+    private Map<String, String> uriHandlers = new HashMap<String, String>();
+
+    private Stack<HandlerInfo> handlerInfos = new Stack<HandlerInfo>();
     private HandlerInfo currentHandlerInfo;
     private boolean isFillingUpSAXStore;
 
-    private Stack elementNames = new Stack();
+    private Stack<String> elementNames = new Stack<String>();
 
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
@@ -58,25 +59,52 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
     private int level = 0;
 
     // Class.forName is expensive, so we cache mappings
-    private static Map classNameToHandlerClass = new HashMap();
+    private static Map<String, Class<ElementHandler>> classNameToHandlerClass = new HashMap<String, Class<ElementHandler>>();
 
     /**
-     * Register a handler. The handler can match on a URI + localname, or on URI only. URI
-     * matching has lower priority than URI + localname matching.
+     * Register a handler that matches on a URI only.
      *
      * @param handlerClassName  class name for the handler
      * @param uri               URI of the element that triggers the handler
-     * @param localname         local name of the element that triggers the handler
      */
-    public void registerHandler(String handlerClassName, String uri, String localname) {
-        if (localname != null)
-            handlerKeysToNames.put(XMLUtils.buildExplodedQName(uri, localname), handlerClassName);
-        else
-            uriHandlerKeysToNames.put(uri, handlerClassName);
+    public void registerHandler(String handlerClassName, String uri) {
+        registerHandler(handlerClassName, uri, null, null);
     }
 
-    public Object getElementHandlerContext() {
-        return elementHandlerContext;
+    /**
+     * Register a handler. The handler can match on a URI + localname, or on URI only in that order.
+     *
+     * @param handlerClassName  class name for the handler
+     * @param uri               URI of the element that triggers the handler
+     * @param localname         local name of the element that triggers the handler, or null if match on URI only
+     */
+    public void registerHandler(String handlerClassName, String uri, String localname) {
+        registerHandler(handlerClassName, uri, localname, null);
+    }
+
+    /**
+     * Register a handler. The handler can match on a URI + localname + custom matcher, URI + localname, or on URI only
+     * in that order.
+     *
+     * @param handlerClassName      class name for the handler
+     * @param uri                   URI of the element that triggers the handler
+     * @param localname             local name of the element that triggers the handler, or null if match on URI only
+     * @param matcher               matcher on attributes, or null
+     */
+    public void registerHandler(String handlerClassName, String uri, String localname, Matcher matcher) {
+        if (localname != null) {
+            // Match on URI + localname and optionally custom matcher
+            final String key = XMLUtils.buildExplodedQName(uri, localname);
+            List<HandlerMatcher> handlerMatchers = matcherHandlers.get(key);
+            if (handlerMatchers == null) {
+                handlerMatchers = new ArrayList<HandlerMatcher>();
+                matcherHandlers.put(key, handlerMatchers);
+            }
+            handlerMatchers.add(new HandlerMatcher(handlerClassName, matcher != null ? matcher : ALL_MATCHER));
+        } else {
+            // Match on URI only
+            uriHandlers.put(uri, handlerClassName);
+        }
     }
 
     public void setElementHandlerContext(Object elementHandlerContext) {
@@ -96,7 +124,7 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
     }
 
 
-    public Stack getElementNames() {
+    public Stack<String> getElementNames() {
         return elementNames;
     }
 
@@ -133,7 +161,8 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
             } else {
                 // Look for a new handler
                 final String explodedQName = XMLUtils.buildExplodedQName(uri, localname);
-                final ElementHandler elementHandler = getHandler(uri, explodedQName);
+
+                final ElementHandler elementHandler = getHandler(uri, explodedQName, attributes);
 
                 if (elementHandler != null) {
                     // New handler found
@@ -182,7 +211,7 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
 
                 // Pop current handler
                 handlerInfos.pop();
-                currentHandlerInfo = (HandlerInfo) ((handlerInfos.size() > 0) ? handlerInfos.peek() : null);
+                currentHandlerInfo = ((handlerInfos.size() > 0) ? handlerInfos.peek() : null);
             } else if (isFillingUpSAXStore) {
                 // Fill-up SAXStore
                 currentHandlerInfo.saxStore.endElement(uri, localname, qName);
@@ -232,7 +261,7 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
      */
     public void endBody() {
         handlerInfos.pop();
-        currentHandlerInfo = (HandlerInfo) ((handlerInfos.size() > 0) ? handlerInfos.peek() : null);
+        currentHandlerInfo = ((handlerInfos.size() > 0) ? handlerInfos.peek() : null);
     }
 
     public void characters(char[] chars, int start, int length) throws SAXException {
@@ -346,8 +375,7 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
 
                 // Use our own locator
                 this.locator = new XIncludeProcessor.OutputLocator();
-                if (locator != null)
-                    this.locator.pushLocator(locator);
+                this.locator.pushLocator(locator);
                 // We don't forward this (anyway nobody is listening initially)
             } else {
                 // This is likely during a SAXStore replay
@@ -363,37 +391,58 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
         return locator;
     }
 
-    private ElementHandler getHandler(String uri, String explodedQName) {
-        ElementHandler elementHandler;
-        final String handlerClassName = (String) handlerKeysToNames.get(explodedQName);
-        if (handlerClassName != null) {
-            // Found handler
-            elementHandler = getHandlerByClassName(handlerClassName);
-        } else {
-            // Search for URI-based handler
-            final String uriHandlerClassName = (String) uriHandlerKeysToNames.get(uri);
-            if (uriHandlerClassName != null) {
-                // Found handler
-                elementHandler = getHandlerByClassName(uriHandlerClassName);
-            } else {
-                elementHandler = null;
+    private ElementHandler getHandler(String uri, String explodedQName, Attributes attributes) {
+        // 1: Try full matchers
+        final List<HandlerMatcher> handlerMatchers = matcherHandlers.get(explodedQName);
+        if (handlerMatchers != null) {
+            // Try matchers in order
+            for (HandlerMatcher handlerMatcher: handlerMatchers) {
+                // Run matcher
+                if (handlerMatcher.matcher.match(attributes)) {
+                    return getHandlerByClassName(handlerMatcher.handlerClassName);
+                }
             }
         }
-        return elementHandler;
+
+        // 2: Try URI-based handler
+        final String uriHandlerClassName = uriHandlers.get(uri);
+        if (uriHandlerClassName != null) {
+            return getHandlerByClassName(uriHandlerClassName);
+        } else {
+            return null;
+        }
     }
 
+    /**
+     * Return a QName from an attribute value. The QName is resolved against namespaces in scope.
+     *
+     * @param attributeValue    value of the QName attribute, can be null
+     * @return                  QName or null if attributeValue is null
+     */
+    public QName getAttributeQNameValue(String attributeValue) {
+        if (attributeValue == null)
+            return null;
+
+        final String localname = XMLUtils.localNameFromQName(attributeValue);
+        final String prefix = XMLUtils.prefixFromQName(attributeValue);
+        final String uri = XMLUtils.uriFromQName(attributeValue, namespaceSupport);
+
+        return new QName(localname, new Namespace(prefix, uri));
+    }
+
+    @SuppressWarnings("unchecked")
     private ElementHandler getHandlerByClassName(String handlerClassName) {
-        Class handlerClass = (Class) classNameToHandlerClass.get(handlerClassName);
+        Class<ElementHandler> handlerClass = classNameToHandlerClass.get(handlerClassName);
         if (handlerClass == null) {
             try {
-                handlerClass = Class.forName(handlerClassName);
+                handlerClass = (Class<ElementHandler>) Class.forName(handlerClassName);
                 classNameToHandlerClass.put(handlerClassName, handlerClass);
             } catch (ClassNotFoundException e) {
                 throw ValidationException.wrapException(e, new LocationData(locator));
             }
         }
         try {
-            return (ElementHandler) handlerClass.newInstance();
+            return handlerClass.newInstance();
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new LocationData(locator));
         }
@@ -423,6 +472,31 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
             // Set initial locator so that SAXStore can obtain location data if any
             if (locator != null)
                 this.saxStore.setDocumentLocator(locator);
+        }
+    }
+
+    public abstract class Matcher {
+        public abstract boolean match(Attributes attributes);
+
+        protected QName getAppearance(Attributes attributes) {
+            return getAttributeQNameValue(attributes.getValue("appearance"));
+        }
+    }
+
+    private final Matcher ALL_MATCHER = new Matcher() {
+        @Override
+        public boolean match(Attributes attributes) {
+            return true;
+        }
+    };
+
+    private static class HandlerMatcher {
+        public String handlerClassName;
+        public Matcher matcher;
+
+        private HandlerMatcher(String handlerClassName, Matcher matcher) {
+            this.handlerClassName = handlerClassName;
+            this.matcher = matcher;
         }
     }
 }

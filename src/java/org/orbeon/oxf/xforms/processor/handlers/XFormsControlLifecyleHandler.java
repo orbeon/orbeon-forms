@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
-import org.dom4j.QName;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -23,7 +22,6 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -82,34 +80,11 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
             final ContentHandler contentHandler = handlerContext.getController().getOutput();
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             if (handlerContext.isNewXHTMLLayout()) {
-                // Open control <div>
+                // Open control <span>
                 spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
 
-                // Get appearance
-                final QName appearance = getAppearance(attributes);
-
-                // Get classes
-                final FastStringBuffer classes;
-                {
-                    // Initial classes: xforms-control, xforms-[control name], incremental, appearance, mediatype, xforms-static
-                    classes = getInitialClasses(uri, localname, attributes, xformsControl, appearance, isDefaultIncremental());
-                    // All MIP-related classes
-                    handleMIPClasses(classes, prefixedId, xformsControl);
-                    // Static classes: xforms-online, xforms-offline, ...
-                    containingDocument.getStaticState().appendClasses(classes, prefixedId);
-                    // Dynamic classes added by the control 
-                    addCustomClasses(classes, xformsControl);
-                }
-
-                // Get attributes
-                final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
-
-                // Add extension attributes in no namespace if possible
-                if (xformsControl != null) {
-                    xformsControl.addExtensionAttributes(newAttributes, "");
-                }
-
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+                final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
             }
 
             // Get local order for control
@@ -174,37 +149,37 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     @Override
     public void end(String uri, String localname, String qName) throws SAXException {
-        // Process everything after the control has been shown
-        if (endConfig != null) {
-            final boolean isTemplate = handlerContext.isTemplate();
+        if (isMustOutputControl(xformsControl)) {
+            // Process everything after the control has been shown
+            if (endConfig != null) {
+                final boolean isTemplate = handlerContext.isTemplate();
 
-            for (final String current: endConfig) {
-                if ("control".equals(current)) {
-                    // Handle control
-                    handleControlEnd(uri, localname, qName, attributes, staticId, effectiveId, xformsControl);
-                } else if ("label".equals(current)) {
-                    // xforms:label
-                    if (hasLocalLabel())
-                        handleLabel(staticId, effectiveId, attributes, xformsControl, isTemplate);
-                } else if ("alert".equals(current)) {
-                    // xforms:alert
-                    if (hasLocalAlert())
-                        handleAlert(staticId, effectiveId, attributes, xformsControl, isTemplate);
-                } else if ("hint".equals(current)) {
-                    // xforms:hint
-                    if (hasLocalHint())
-                        handleHint(staticId, effectiveId, xformsControl, isTemplate);
-                } else {
-                    // xforms:help
-                    if (hasLocalHelp())
-                        handleHelp(staticId, effectiveId, xformsControl, isTemplate);
+                for (final String current: endConfig) {
+                    if ("control".equals(current)) {
+                        // Handle control
+                        handleControlEnd(uri, localname, qName, attributes, staticId, effectiveId, xformsControl);
+                    } else if ("label".equals(current)) {
+                        // xforms:label
+                        if (hasLocalLabel())
+                            handleLabel(staticId, effectiveId, attributes, xformsControl, isTemplate);
+                    } else if ("alert".equals(current)) {
+                        // xforms:alert
+                        if (hasLocalAlert())
+                            handleAlert(staticId, effectiveId, attributes, xformsControl, isTemplate);
+                    } else if ("hint".equals(current)) {
+                        // xforms:hint
+                        if (hasLocalHint())
+                            handleHint(staticId, effectiveId, xformsControl, isTemplate);
+                    } else {
+                        // xforms:help
+                        if (hasLocalHelp())
+                            handleHelp(staticId, effectiveId, xformsControl, isTemplate);
+                    }
                 }
             }
-        }
 
-        if (handlerContext.isNewXHTMLLayout()) {
-            if (isMustOutputControl(xformsControl)) {
-                // Close control <div>
+            if (handlerContext.isNewXHTMLLayout()) {
+                // Close control <span>
                 final ContentHandler contentHandler = handlerContext.getController().getOutput();
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }
@@ -248,7 +223,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         return true;
     }
 
-    protected void addCustomClasses(FastStringBuffer classes, XFormsSingleNodeControl xformsControl) {
+    protected void addCustomClasses(StringBuilder classes, XFormsSingleNodeControl xformsControl) {
         // May be overridden by subclasses
     }
 
@@ -259,22 +234,29 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, effectiveId, "label", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LLHAC.LABEL, xformsControl, isTemplate);
     }
 
     protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, effectiveId, "alert", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LLHAC.ALERT, xformsControl, isTemplate);
     }
 
     protected void handleHint(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, effectiveId, "hint", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LLHAC.HINT, xformsControl, isTemplate);
     }
 
     protected void handleHelp(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, effectiveId, "help", xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LLHAC.HELP, xformsControl, isTemplate);
+    }
+
+    protected String getForEffectiveId(String controlEffectiveId) {
+        // Default:
+        // o new layout: point to foo$bar.1-2-3-control
+        // o old layout: point to foo$bar.1-2-3
+        return handlerContext.isNewXHTMLLayout() ? getLHHACId(controlEffectiveId, LLHAC.CONTROL) : controlEffectiveId;
     }
 
     // Must be overridden by subclasses
@@ -282,5 +264,42 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
         // May be overridden by subclasses
+    }
+
+    protected AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsSingleNodeControl xformsControl, boolean addId) {
+        final AttributesImpl containerAttributes;
+        if (handlerContext.isNewXHTMLLayout()) {
+            reusableAttributes.clear();
+            containerAttributes = reusableAttributes;
+            if (addId)
+                containerAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(effectiveId, LLHAC.CONTROL));
+        } else {
+            containerAttributes = getContainerAttributes(uri, localname, attributes);
+        }
+        return containerAttributes;
+    }
+
+    private AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes) {
+        // Get classes
+        final StringBuilder classes;
+        {
+            // Initial classes: xforms-control, xforms-[control name], incremental, appearance, mediatype, xforms-static
+            classes = getInitialClasses(uri, localname, attributes, xformsControl, getAppearance(attributes), isDefaultIncremental());
+            // All MIP-related classes
+            handleMIPClasses(classes, prefixedId, xformsControl);
+            // Static classes: xforms-online, xforms-offline, ...
+            containingDocument.getStaticState().appendClasses(classes, prefixedId);
+            // Dynamic classes added by the control
+            addCustomClasses(classes, xformsControl);
+        }
+
+        // Get attributes
+        final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+
+        // Add extension attributes in no namespace if possible
+        if (xformsControl != null) {
+            xformsControl.addExtensionAttributes(newAttributes, "");
+        }
+        return newAttributes;
     }
 }

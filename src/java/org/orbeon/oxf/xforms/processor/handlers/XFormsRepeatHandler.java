@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
@@ -22,7 +22,6 @@ import org.orbeon.oxf.xml.DeferredContentHandler;
 import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -85,9 +84,9 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
                 final int numberOfParentRepeats = handlerContext.countParentRepeats();
 
                 // Determine classes to add on root elements and around root characters
-                final FastStringBuffer addedClasses;
+                final StringBuilder addedClasses;
                 {
-                    addedClasses = new FastStringBuffer(200);
+                    addedClasses = new StringBuilder(200);
                     if (isCurrentIterationSelected && !isStaticReadonly(repeatControl)) {
                         addedClasses.append("xforms-repeat-selected-item-");
                         addedClasses.append(Integer.toString((numberOfParentRepeats % 4) + 1));
@@ -123,7 +122,7 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
             }
 
             // Determine classes to add on root elements and around root characters
-            final FastStringBuffer addedClasses = new FastStringBuffer(isTopLevelRepeat ? "xforms-repeat-template" : "");
+            final StringBuilder addedClasses = new StringBuilder(isTopLevelRepeat ? "xforms-repeat-template" : "");
 
             // Add classes such as DnD classes, etc.
             addRepeatClasses(addedClasses, attributes);
@@ -159,7 +158,7 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
                 outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-begin-end", "repeat-end-" + effectiveId);
     }
 
-    private static void addRepeatClasses(FastStringBuffer sb, Attributes attributes) {
+    private static void addRepeatClasses(StringBuilder sb, Attributes attributes) {
 
         final String dndAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd");
         if (dndAttribute != null && !dndAttribute.equals("none")) {

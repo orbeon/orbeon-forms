@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<group description="XForms Controls Layout" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <test description="New layout for xforms:input" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="main-model" xxforms:new-xhtml-layout="true">
+                        <xforms:instance id="tests">
+                            <instance>Hello!</instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:input id="my-new-input" ref=".">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                    </xforms:input>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:span id="my-new-input" class="xforms-control xforms-input xforms-invalid xforms-required xforms-required-filled xforms-type-NCName">
+                    <xhtml:label class="xforms-label" id="my-new-input-label" for="my-new-input$xforms-input-1">My label</xhtml:label>
+                    <xhtml:input id="my-new-input$xforms-input-1" type="text" name="my-new-input$xforms-input-1" value="Hello!" class="xforms-input-input xforms-type-NCName"/>
+                    <xhtml:img id="my-new-input-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                    <xhtml:label class="xforms-help" id="my-new-input-help" for="my-new-input$xforms-input-1">My help</xhtml:label>
+                    <xhtml:label class="xforms-alert-active xforms-alert" id="my-new-input-alert" for="my-new-input$xforms-input-1">My alert</xhtml:label>
+                    <xhtml:label class="xforms-hint" id="my-new-input-hint" for="my-new-input$xforms-input-1">My hint</xhtml:label>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
+    <test description="Old layout for xforms:input" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="main-model" xxforms:new-xhtml-layout="false">
+                        <xforms:instance id="tests">
+                            <instance>Hello!</instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:input id="my-old-input" ref=".">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                    </xforms:input>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:label class="xforms-label" id="my-old-input-label" for="my-old-input$xforms-input-1">My label</xhtml:label>
+                <xhtml:span id="my-old-input" class="xforms-control xforms-input xforms-invalid xforms-required xforms-required-filled xforms-type-NCName">
+                    <xhtml:input id="my-old-input$xforms-input-1" type="text" name="my-old-input$xforms-input-1" value="Hello!" class="xforms-input-input xforms-type-NCName"/>
+                </xhtml:span>
+                <xhtml:img id="my-old-input-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-old-input-help" for="my-old-input$xforms-input-1">My help</xhtml:label>
+                <xhtml:label class="xforms-alert-active xforms-alert" id="my-old-input-alert" for="my-old-input$xforms-input-1">My alert</xhtml:label>
+                <xhtml:label class="xforms-hint" id="my-old-input-hint" for="my-old-input$xforms-input-1">My hint</xhtml:label>
+            </controls>
+        </output>
+    </test>
+
+    <test description="New layout for xforms:select1[@appearance = 'minimal']" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="main-model" xxforms:new-xhtml-layout="true">
+                        <xforms:instance id="tests">
+                            <instance>apple</instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:select1 id="my-new-select1" ref="." appearance="minimal">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                        <xforms:item>
+                            <xforms:label>Apple</xforms:label>
+                            <xforms:value>apple</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>Orange</xforms:label>
+                            <xforms:value>orange</xforms:value>
+                        </xforms:item>
+                    </xforms:select1>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:span id="my-new-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-required xforms-required-filled xforms-type-NCName">
+                    <xhtml:label class="xforms-label" id="my-new-select1-label" for="my-new-select1-control">My label</xhtml:label>
+                    <xhtml:select id="my-new-select1-control" name="my-new-select1">
+                        <xhtml:option value="b3iUb0x15AA=" selected="selected">Apple</xhtml:option>
+                        <xhtml:option value="2KtpnvqzFEE=">Orange</xhtml:option>
+                    </xhtml:select>
+                    <xhtml:img id="my-new-select1-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                    <xhtml:label class="xforms-help" id="my-new-select1-help" for="my-new-select1-control">My help</xhtml:label>
+                    <xhtml:label class="xforms-alert-inactive xforms-alert" id="my-new-select1-alert" for="my-new-select1-control">My alert</xhtml:label>
+                    <xhtml:label class="xforms-hint" id="my-new-select1-hint" for="my-new-select1-control">My hint</xhtml:label>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+    
+    <test description="Old layout for xforms:select1[@appearance = 'minimal']" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="main-model" xxforms:new-xhtml-layout="false">
+                        <xforms:instance id="tests">
+                            <instance>apple</instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:select1 id="my-old-select1" ref="." appearance="minimal">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                        <xforms:item>
+                            <xforms:label>Apple</xforms:label>
+                            <xforms:value>apple</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>Orange</xforms:label>
+                            <xforms:value>orange</xforms:value>
+                        </xforms:item>
+                    </xforms:select1>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:label class="xforms-label" id="my-old-select1-label" for="my-old-select1">My label</xhtml:label>
+                <xhtml:select id="my-old-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-required xforms-required-filled xforms-type-NCName" name="my-old-select1">
+                    <xhtml:option value="b3iUb0x15AA=" selected="selected">Apple</xhtml:option>
+                    <xhtml:option value="2KtpnvqzFEE=">Orange</xhtml:option>
+                </xhtml:select>
+                <xhtml:img id="my-old-select1-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-old-select1-help" for="my-old-select1">My help</xhtml:label>
+                <xhtml:label class="xforms-alert-inactive xforms-alert" id="my-old-select1-alert" for="my-old-select1">My alert</xhtml:label>
+                <xhtml:label class="xforms-hint" id="my-old-select1-hint" for="my-old-select1">My hint</xhtml:label>
+            </controls>
+        </output>
+    </test>
+
+    <test description="New layout for xforms:output" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="main-model" xxforms:new-xhtml-layout="true">
+                        <xforms:instance id="tests">
+                            <instance>Hello!</instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="my-new-output" ref=".">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                    </xforms:output>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                    <xhtml:span id="my-new-output" class="xforms-control xforms-output xforms-invalid xforms-required xforms-required-filled xforms-type-NCName">
+                    <xhtml:label class="xforms-label" id="my-new-output-label" for="my-new-output-control">My label</xhtml:label>
+                    <xhtml:span id="my-new-output-control" class="xforms-output-output">Hello!</xhtml:span>
+                    <xhtml:img id="my-new-output-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                    <xhtml:label class="xforms-help" id="my-new-output-help" for="my-new-output-control">My help</xhtml:label>
+                    <xhtml:label class="xforms-alert-active xforms-alert" id="my-new-output-alert" for="my-new-output-control">My alert</xhtml:label>
+                    <xhtml:label class="xforms-hint" id="my-new-output-hint" for="my-new-output-control">My hint</xhtml:label>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+    
+    <test description="New layout for xforms:output" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="main-model" xxforms:new-xhtml-layout="false">
+                        <xforms:instance id="tests">
+                            <instance>Hello!</instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="my-old-output" ref=".">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                    </xforms:output>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:label class="xforms-label" id="my-old-output-label" for="my-old-output">My label</xhtml:label>
+                <xhtml:span id="my-old-output" class="xforms-control xforms-output xforms-invalid xforms-required xforms-required-filled xforms-type-NCName">Hello!</xhtml:span>
+                <xhtml:img id="my-old-output-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-old-output-help" for="my-old-output">My help</xhtml:label>
+                <xhtml:label class="xforms-alert-active xforms-alert" id="my-old-output-alert" for="my-old-output">My alert</xhtml:label>
+                <xhtml:label class="xforms-hint" id="my-old-output-hint" for="my-old-output">My hint</xhtml:label>
+            </controls>
+        </output>
+    </test>
+
+</group>

@@ -62,6 +62,14 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         return prefixedId;
     }
 
+    public String getEffectiveId() {
+        return effectiveId;
+    }
+
+    public XFormsSingleNodeControl getXFormsControl() {
+        return xformsControl;
+    }
+
     protected String getContainingElementName() {
         // By default, controls are enclosed with a <span>
         return "span";
@@ -296,6 +304,14 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
     }
 
     private AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes) {
+
+        // NOTE: Only reason we do not use the class members directly is to handle boolean xf:input, which delegates
+        // its output to xf:select1. Should be improved some day.
+
+        final String prefixedId = getPrefixedId();
+        final String effectiveId = getEffectiveId();
+        final XFormsSingleNodeControl xformsControl = getXFormsControl();
+
         // Get classes
         final StringBuilder classes;
         {

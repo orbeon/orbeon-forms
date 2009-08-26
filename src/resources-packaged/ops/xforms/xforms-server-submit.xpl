@@ -114,8 +114,9 @@
                                         <xsl:when test="contains($name, '$xforms-input-1')">
                                             <!-- Case of xforms:input, which may have two HTML input controls -->
                                             <xsl:variable name="source-control-id" select="replace($name, '\$xforms-input-1', '')"/>
+                                            <xsl:variable name="other-control-id" select="replace($name, '\$xforms-input-1', '\$xforms-input-2')"/>
                                             <xsl:attribute name="source-control-id" select="$source-control-id"/>
-                                            <xsl:variable name="second-input" select="../parameter[$name = concat($source-control-id, '$xforms-input-2')]"/>
+                                            <xsl:variable name="second-input" select="../parameter[$name = $other-control-id]"/>
                                             <xsl:choose>
                                                 <xsl:when test="$second-input">
                                                     <!-- This is a bit of a hack: we concatenate the two values with a

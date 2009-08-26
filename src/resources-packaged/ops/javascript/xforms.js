@@ -1110,13 +1110,13 @@ ORBEON.util.Utils = {
         for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
             idSuffixWithDepth += XFORMS_SEPARATOR_2 + "1";
         if (element.id) {
-            element.id = xformsAppendRepeatSuffix(element.id, idSuffixWithDepth);
+            element.id = ORBEON.util.Utils.appendRepeatSuffix(element.id, idSuffixWithDepth);
             ORBEON.xforms.Globals.idToElement[element.id] = element;
         }
         if (element.htmlFor)
-            element.htmlFor = xformsAppendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
+            element.htmlFor = ORBEON.util.Utils.appendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
         if (element.name) {
-            var newName = xformsAppendRepeatSuffix(element.name, idSuffixWithDepth);
+            var newName = ORBEON.util.Utils.appendRepeatSuffix(element.name, idSuffixWithDepth);
             if (element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio"
                     && ORBEON.xforms.Globals.isRenderingEngineTrident) {
                 // IE supports changing the name of elements, but according to the Microsoft documentation, "This does not
@@ -1157,6 +1157,92 @@ ORBEON.util.Utils = {
             depth = (depth == 4) ? 1 : depth + 1;
         }
         return "xforms-repeat-selected-item-" + depth;
+    },
+
+    // Replace in a tree a placeholder by some other string in text nodes and attribute values
+    stringReplace: function(node, placeholder, replacement) {
+
+        function stringReplaceWorker(node, placeholderRegExp, replacement) {
+            switch (node.nodeType) {
+                case ELEMENT_TYPE:
+                    for (var i = 0; i < node.attributes.length; i++) {
+                        var newValue = new String(node.attributes[i].value).replace(placeholderRegExp, replacement);
+                        if (newValue != node.attributes[i].value)
+                            ORBEON.util.Dom.setAttribute(node, node.attributes[i].name, newValue);
+                    }
+                    for (var i = 0; i < node.childNodes.length; i++)
+                        stringReplaceWorker(node.childNodes[i], placeholderRegExp, replacement);
+                    break;
+                case TEXT_TYPE:
+                    var newValue = new String(node.nodeValue).replace(placeholderRegExp, replacement);
+                    if (newValue != node.nodeValue)
+                        node.nodeValue = newValue;
+                    break;
+            }
+        }
+
+        var placeholderRegExp = new RegExp(placeholder.replace(new RegExp("\\$", "g"), "\\$"), "g");
+        stringReplaceWorker(node, placeholderRegExp, replacement);
+    },
+
+    appendRepeatSuffix: function(id, suffix) {
+        if (suffix == "")
+            return id;
+
+        // Remove "-" at the beginning of the suffix, if any
+        if (suffix.charAt(0) == XFORMS_SEPARATOR_2)
+            suffix = suffix.substring(1);
+
+        // Add suffix with the right separator
+        id += id.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
+        id += suffix;
+
+        return id;
+    },
+
+    /**
+     * Locate the delimiter at the given position starting from a repeat begin element.
+     *
+     * @param repeatId      Can be either a pure repeat ID, such as "foobar" or an ID that contains information of its
+     *                      position relative to its parents, such as "foobar.1". The former happens when we handle an
+     *                      event such as <xxf:repeat-index id="foobar" old-index="4" new-index="6"/>. In this case
+     *                      "foobar" means the "foobar at 'index' in the current foobar list". The latter happens when we handle
+     *                      an event such as <xxf:repeat-iteration id="foobar.1" relevant="false" iteration="10"/>, which
+     *                      does not necessarily apply to the current "foobar".
+     * @param index
+     */
+    findRepeatDelimiter: function(repeatId, index) {
+
+        // Find id of repeat begin for the current repeatId
+        var parentRepeatIndexes = "";
+        {
+            var currentId = repeatId;
+            while (true) {
+                var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[currentId];
+                if (parent == null) break;
+                var grandParent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
+                parentRepeatIndexes = (grandParent == null ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2)
+                        + ORBEON.xforms.Globals.repeatIndexes[parent] + parentRepeatIndexes;
+                currentId = parent;
+            }
+        }
+
+        var beginElementId = "repeat-begin-" + repeatId + parentRepeatIndexes;
+        var beginElement = ORBEON.util.Dom.getElementById(beginElementId);
+        if (!beginElement) return null;
+        var cursor = beginElement;
+        var cursorPosition = 0;
+        while (true) {
+                while (cursor.nodeType != ELEMENT_TYPE || !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")) {
+                cursor = cursor.nextSibling;
+                if (!cursor) return null;
+            }
+            cursorPosition++;
+            if (cursorPosition == index) break;
+            cursor = cursor.nextSibling;
+        }
+
+        return cursor;
     }
 };
 
@@ -1997,7 +2083,7 @@ ORBEON.xforms.Controls = {
     },
 
     setRepeatIterationRelevance: function(repeatID, iteration, relevant) {
-        var cursor = xformsFindRepeatDelimiter(repeatID, iteration).nextSibling;
+        var cursor = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration).nextSibling;
         while (!(cursor.nodeType == ELEMENT_TYPE &&
                  (ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
                          || ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end")))) {
@@ -5472,7 +5558,7 @@ ORBEON.xforms.Server = {
                                                 afterInsertionPoint = cursor;
                                                     // Nested repeat: does not contain a template
                                             } else {
-                                                var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + xformsAppendRepeatSuffix(repeatId, parentIndexes));
+                                                var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(repeatId, parentIndexes));
                                                 afterInsertionPoint = repeatEnd;
                                             }
                                         }
@@ -5522,7 +5608,7 @@ ORBEON.xforms.Server = {
                                         var parentIndexes = ORBEON.util.Dom.getAttribute(deleteElementElement, "parent-indexes");
                                         var count = ORBEON.util.Dom.getAttribute(deleteElementElement, "count");
                                         // Find end of the repeat
-                                        var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + xformsAppendRepeatSuffix(deleteId, parentIndexes));
+                                        var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(deleteId, parentIndexes));
                                         // Find last element to delete
                                         var lastElementToDelete;
                                         {
@@ -5727,10 +5813,10 @@ ORBEON.xforms.Server = {
                                                 var itemElement = itemsetTree[k];
                                                 var templateClone = template.cloneNode(true);
                                                 spanContainer.appendChild(templateClone);
-                                                xformsStringReplace(templateClone, "$xforms-template-label$", itemElement[0]);
-                                                xformsStringReplace(templateClone, "$xforms-template-value$", itemElement[1]);
-                                                xformsStringReplace(templateClone, "$xforms-item-index$", itemIndex);
-                                                xformsStringReplace(templateClone, "$xforms-effective-id$", controlId);
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-label$", itemElement[0]);
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", itemElement[1]);
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-index$", itemIndex);
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
                                                 // Restore checked state after copy
                                                 if (valueToChecked[itemElement[1]] == true) {
                                                     var inputToCheck = templateClone.getElementsByTagName("input")[0];
@@ -5913,10 +5999,10 @@ ORBEON.xforms.Server = {
                                                     // so each item has a label, which is different from the label of the control. Here we have an <xform:input>
                                                     // so there is no item label.
                                                     documentElement.appendChild(templateClone);
-                                                    xformsStringReplace(templateClone, "$xforms-template-label$", "");
-                                                    xformsStringReplace(templateClone, "$xforms-template-value$", "true");
-                                                    xformsStringReplace(templateClone, "$xforms-item-index$", "0");
-                                                    xformsStringReplace(templateClone, "$xforms-effective-id$", controlId);
+                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-label$", "");
+                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", "true");
+                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-index$", "0");
+                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
 
                                                     // Update classes
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
@@ -6228,7 +6314,7 @@ ORBEON.xforms.Server = {
                                         if (typeof repeatId == "string") { // hack because repeatId may be trash when some libraries override Object
                                             var oldIndex = ORBEON.xforms.Globals.repeatIndexes[repeatId];
                                             if (typeof oldIndex == "string" && oldIndex != 0) { // hack because repeatId may be trash when some libraries override Object
-                                                var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, oldIndex);
+                                                var oldItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(repeatId, oldIndex);
                                                 if (oldItemDelimiter != null) {
                                                     var cursor = oldItemDelimiter.nextSibling;
                                                     while (cursor.nodeType != ELEMENT_TYPE ||
@@ -6252,7 +6338,7 @@ ORBEON.xforms.Server = {
                                         if (typeof repeatId == "string") { // Hack because repeatId may be trash when some libraries override Object
                                             var newIndex = newRepeatIndexes[repeatId];
                                             if (typeof newIndex == "string" && newIndex != 0) { // Hack because repeatId may be trash when some libraries override Object
-                                                var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
+                                                var newItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(repeatId, newIndex);
                                                 var cursor = newItemDelimiter.nextSibling;
                                                 while (cursor.nodeType != ELEMENT_TYPE ||
                                                        (!YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
@@ -7292,109 +7378,6 @@ function xformsArrayContains(array, element) {
         if (array[i] == element)
             return true;
     return false;
-}
-
-function xformsStringReplaceWorker(node, placeholderRegExp, replacement) {
-    switch (node.nodeType) {
-        case ELEMENT_TYPE:
-            for (var i = 0; i < node.attributes.length; i++) {
-                var newValue = new String(node.attributes[i].value).replace(placeholderRegExp, replacement);
-                if (newValue != node.attributes[i].value)
-                    ORBEON.util.Dom.setAttribute(node, node.attributes[i].name, newValue);
-            }
-            for (var i = 0; i < node.childNodes.length; i++)
-                xformsStringReplaceWorker(node.childNodes[i], placeholderRegExp, replacement);
-            break;
-        case TEXT_TYPE:
-            var newValue = new String(node.nodeValue).replace(placeholderRegExp, replacement);
-            if (newValue != node.nodeValue)
-                node.nodeValue = newValue;
-            break;
-    }
-}
-
-// Replace in a tree a placeholder by some other string in text nodes and attribute values
-function xformsStringReplace(node, placeholder, replacement) {
-    var placeholderRegExp = new RegExp(placeholder.replace(new RegExp("\\$", "g"), "\\$"), "g");
-    xformsStringReplaceWorker(node, placeholderRegExp, replacement);
-}
-
-function xformsAppendRepeatSuffix(id, suffix) {
-    if (suffix == "")
-        return id;
-
-    // Remove "-" at the beginning of the suffix, if any
-    if (suffix.charAt(0) == XFORMS_SEPARATOR_2)
-        suffix = suffix.substring(1);
-
-    // Rationale: for label, hind, help, and alert cases, the suffix needs to be added before the -xyz.
-    // So here we remove the -xyz suffix from ID, and we we will add it afterwards
-    var possibleLabelSuffixes = ["-label", "-hint", "-help-image", "-help", "-alert"];
-    var labelSuffix = null;
-    for (var labelSuffixIndex = 0; labelSuffixIndex < possibleLabelSuffixes.length; labelSuffixIndex++) {
-        var possibleLabelSuffix = possibleLabelSuffixes[labelSuffixIndex];
-        var lastIndex = id.lastIndexOf(possibleLabelSuffix);
-        if (lastIndex != -1 && lastIndex + possibleLabelSuffix.length == id.length) {
-            labelSuffix = possibleLabelSuffix;
-            id = id.slice(0, lastIndex);
-            break;
-        }
-    }
-
-    // Add suffix with the right separator
-    id += id.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
-    id += suffix;
-
-    // If we had a label suffix, add it at the end
-    if (labelSuffix != null)
-        id += labelSuffix;
-
-    return id;
-}
-
-/**
- * Locate the delimiter at the given position starting from a repeat begin element.
- *
- * @param repeatId      Can be either a pure repeat ID, such as "todo" or an ID that contains information of its
- *                      position relative to its parents, such as "todo.1". The former happens when we handle an
- *                      event such as <xxf:repeat-index id="todo" old-index="4" new-index="6"/>. In this case
- *                      "todo" means the "todo at 'index' in the current todo list". The latter happens when we handle
- *                      an event such as <xxf:repeat-iteration id="todo.1" relevant="false" iteration="10"/>, which
- *                      does not necessarily apply to the current "todo".
- * @param index
- */
-function xformsFindRepeatDelimiter(repeatId, index) {
-
-    // Find id of repeat begin for the current repeatId
-    var parentRepeatIndexes = "";
-    {
-        var currentId = repeatId;
-        while (true) {
-            var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[currentId];
-            if (parent == null) break;
-            var grandParent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
-            parentRepeatIndexes = (grandParent == null ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2)
-                    + ORBEON.xforms.Globals.repeatIndexes[parent] + parentRepeatIndexes;
-            currentId = parent;
-        }
-    }
-
-    var beginElementId = "repeat-begin-" + repeatId + parentRepeatIndexes;
-    var beginElement = ORBEON.util.Dom.getElementById(beginElementId);
-    if (!beginElement) return null;
-    var cursor = beginElement;
-    var cursorPosition = 0;
-    while (true) {
-            while (cursor.nodeType != ELEMENT_TYPE || !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")) {
-            cursor = cursor.nextSibling;
-            if (!cursor) return null;
-        }
-        cursorPosition++;
-        if (cursorPosition == index) break;
-        cursor = cursor.nextSibling;
-    }
-
-    return cursor;
 }
 
 function xformsLog(object) {

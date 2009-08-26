@@ -526,13 +526,8 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     }
 
     protected static String getLHHACId(String controlEffectiveId, LLHAC lhhaType) {
-        // E.g. foo$bar.1-2-3 -> foo$bar.1-2-3-alert
-        return controlEffectiveId + '-' + lhhaType.name().toLowerCase();
-
-        // TODO: better to switch to following format?
-        // E.g. foo$bar.1-2-3 -> foo$bar-alert.1-2-3
-//        final String newId = XFormsUtils.getEffectiveIdNoSuffix(forEffectiveId) + "-" + lhhaType + XFormsUtils.getEffectiveIdSuffixWithSeparator(forEffectiveId);
-//        newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id",  newId);
+        // E.g. foo$bar.1-2-3 -> foo$bar$$alert.1-2-3
+        return XFormsUtils.appendToEffectiveId(controlEffectiveId, XFormsConstants.LHHAC_SEPARATOR + lhhaType.name().toLowerCase());
     }
 
     protected static void outputLabelText(ContentHandler contentHandler, XFormsControl xformsControl, String value, String xhtmlPrefix, boolean mustOutputHTMLFragment) throws SAXException {

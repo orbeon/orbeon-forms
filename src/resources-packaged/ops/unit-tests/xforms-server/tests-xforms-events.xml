@@ -33,7 +33,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -173,7 +173,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -253,7 +253,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
@@ -348,7 +348,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>

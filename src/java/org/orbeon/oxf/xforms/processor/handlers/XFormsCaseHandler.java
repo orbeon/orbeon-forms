@@ -67,7 +67,7 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
                 }
             });
 
-            currentOutputInterceptor.setAddedClasses(new StringBuilder(isVisible ? "xforms-case-selected" : "xforms-case-deselected"));
+            currentOutputInterceptor.setAddedClasses(isVisible ? "xforms-case-selected" : "xforms-case-deselected");
 
             // TODO: is the use of XFormsElementFilterContentHandler necessary now?
             handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(currentOutputInterceptor)));

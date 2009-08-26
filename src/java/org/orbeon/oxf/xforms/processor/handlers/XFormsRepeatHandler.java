@@ -97,7 +97,7 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
                     addRepeatClasses(addedClasses, attributes);
                 }
                 if (outputInterceptor != null)
-                    outputInterceptor.setAddedClasses(addedClasses);
+                    outputInterceptor.setAddedClasses(addedClasses.toString());
 
                 // Apply the content of the body for this iteration
                 handlerContext.pushRepeatContext(false, i, false, isCurrentIterationSelected);
@@ -128,7 +128,7 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
             addRepeatClasses(addedClasses, attributes);
 
             if (outputInterceptor != null)
-                outputInterceptor.setAddedClasses(addedClasses);
+                outputInterceptor.setAddedClasses(addedClasses.toString());
 
             // Apply the content of the body for this iteration
             handlerContext.pushRepeatContext(true, 0, false, false);

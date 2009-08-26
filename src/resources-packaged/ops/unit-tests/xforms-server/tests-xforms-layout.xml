@@ -315,7 +315,7 @@
                     </xhtml:span>
                 </xhtml:fieldset>
                 <xhtml:tr id="group-begin-my-new-table-group" class="xforms-group-begin-end xforms-invalid xforms-required"/>
-                <xhtml:tr class="xforms-group-begin-end xforms-invalid xforms-required">
+                <xhtml:tr class="xforms-invalid xforms-required">
                     <xhtml:td>
                         <xhtml:span id="my-new-output-4" class="xforms-control xforms-output">
                             <xhtml:span id="my-new-output-4-control" class="xforms-output-output">Hello!</xhtml:span>
@@ -375,7 +375,7 @@
                     <xhtml:span id="my-new-output-3" class="xforms-control xforms-output">Hello!</xhtml:span>
                 </xhtml:fieldset>
                 <xhtml:tr id="group-begin-my-new-table-group" class="xforms-group-begin-end xforms-invalid xforms-required"/>
-                <xhtml:tr class="xforms-group-begin-end xforms-invalid xforms-required">
+                <xhtml:tr class="xforms-invalid xforms-required">
                     <xhtml:td>
                         <xhtml:span id="my-new-output-4" class="xforms-control xforms-output">Hello!</xhtml:span>
                     </xhtml:td>

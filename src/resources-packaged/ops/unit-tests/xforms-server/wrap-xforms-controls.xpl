@@ -66,9 +66,10 @@
                     </controls>
                 </xsl:template>
 
-                <!-- Keep repeat templates, controls, and LHHA only -->
+                <!-- Keep repeat templates, controls, LHHA, and elements with MIP classes like repeat/group elements in tables -->
                 <xsl:template match="xhtml:*[tokenize(@class, '\s+') = ('xforms-repeat-template', 'xforms-control', 'xforms-label',
-                                        'xforms-hint', 'xforms-help', 'xforms-alert', 'xforms-help-image', 'xforms-group', 'xforms-group-begin-end')]">
+                                        'xforms-hint', 'xforms-help', 'xforms-alert', 'xforms-help-image', 'xforms-group', 'xforms-group-begin-end',
+                                        'xforms-invalid', 'xforms-required', 'xforms-readonly')]">
                     <xsl:copy-of select="."/>
                 </xsl:template>
 

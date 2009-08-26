@@ -93,29 +93,36 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
         } else {
             // Group within table
 
-            // Get classes for the first delimiter
-            // As of August 2009, actually only need the marker class as well as xforms-disabled if the group is non-relevant
-            final StringBuilder classes = new StringBuilder("xforms-group-begin-end");
-            handleMIPClasses(classes, getPrefixedId(), xformsControl);
-
             // Place interceptor on output
 
             // NOTE: Strictly, we should be able to do without the interceptor. We use it here because it
             // automatically handles ids and element names
             currentSavedOutput = controller.getOutput();
             if (!handlerContext.isNoScript()) {
+
+                final String elementClasses;
+                {
+                    // Get classes
+                    // As of August 2009, actually only need the marker class as well as xforms-disabled if the group is non-relevant
+                    final StringBuilder classes = new StringBuilder();
+                    handleMIPClasses(classes, getPrefixedId(), xformsControl);
+                    elementClasses = classes.toString();
+                }
+
+                final String firstDelimiterClasses = "xforms-group-begin-end " + elementClasses;
+
                 outputInterceptor = new OutputInterceptor(currentSavedOutput, groupElementQName, new OutputInterceptor.Listener() {
                     public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
                         // Delimiter: begin group
                         outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                                outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), classes.toString(), "group-begin-" + effectiveId);
+                                outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), firstDelimiterClasses, "group-begin-" + effectiveId);
                     }
                 });
                 // TODO: is the use of XFormsElementFilterContentHandler necessary now?
                 controller.setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(outputInterceptor)));
 
                 // Set control classes
-                outputInterceptor.setAddedClasses(classes);
+                outputInterceptor.setAddedClasses(elementClasses);
             } else if (isDisabled(xformsControl)) {
                 // In noscript, if the group not visible, set output to a black hole
                 handlerContext.getController().setOutput(new DeferredContentHandlerAdapter());

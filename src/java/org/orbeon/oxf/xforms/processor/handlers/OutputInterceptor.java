@@ -36,7 +36,7 @@ public class OutputInterceptor extends ForwardingContentHandler {
     private String delimiterPrefix;
     private String delimiterLocalName;
 
-    private StringBuilder addedClasses;
+    private String addedClasses;
 
     private boolean mustGenerateFirstDelimiters = true ;
 
@@ -126,7 +126,7 @@ public class OutputInterceptor extends ForwardingContentHandler {
 
         if (addedClasses != null && addedClasses.length() > 0) {
             if (newClassAttribute == null) {
-                newClassAttribute = addedClasses.toString();
+                newClassAttribute = addedClasses;
             } else {
                 newClassAttribute += " " + addedClasses;
             }
@@ -154,7 +154,7 @@ public class OutputInterceptor extends ForwardingContentHandler {
         return mustGenerateFirstDelimiters;
     }
 
-    public void setAddedClasses(StringBuilder addedClasses) {
+    public void setAddedClasses(String addedClasses) {
         this.addedClasses = addedClasses;
     }
 

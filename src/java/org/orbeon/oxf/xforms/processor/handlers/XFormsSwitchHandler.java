@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -32,23 +31,9 @@ public class XFormsSwitchHandler extends XFormsControlLifecyleHandler {
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         if (!handlerContext.isNewXHTMLLayout()) {
-
-            // Find classes to add
-            final AttributesImpl newAttributes; {
-                final StringBuilder classes = getInitialClasses(uri, localname, attributes, null);
-                handleMIPClasses(classes, getPrefixedId(), xformsControl);
-                newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
-
-                if (xformsControl != null) {
-                    // Output extension attributes in no namespace
-                    xformsControl.addExtensionAttributes(newAttributes, "");
-                }
-            }
-
             // Start xhtml:span
-            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-            handlerContext.getController().getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+            final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
+            handlerContext.getController().getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
         }
     }
 
@@ -56,9 +41,7 @@ public class XFormsSwitchHandler extends XFormsControlLifecyleHandler {
     protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
         if (!handlerContext.isNewXHTMLLayout()) {
             // Close xhtml:span
-            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-            handlerContext.getController().getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+            handlerContext.getController().getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
         }
     }
 }

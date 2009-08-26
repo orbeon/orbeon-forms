@@ -67,6 +67,14 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         return "span";
     }
 
+    protected String getContainingElementQName() {
+        if (containingElementQName == null) {
+            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+            containingElementQName = XMLUtils.buildQName(xhtmlPrefix, getContainingElementName());
+        }
+        return containingElementQName;
+    }
+
     @Override
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
@@ -86,10 +94,8 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             if (handlerContext.isNewXHTMLLayout() && isMustOutputContainerElement()) {
                 // Open control element, usually <span>
-                containingElementQName = XMLUtils.buildQName(xhtmlPrefix, getContainingElementName());
-
                 final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes);
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), containingElementQName, containerAttributes);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
             }
 
             // Get local order for control
@@ -186,7 +192,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
             if (handlerContext.isNewXHTMLLayout() && isMustOutputContainerElement()) {
                 // Close control element, usually <span>
                 final ContentHandler contentHandler = handlerContext.getController().getOutput();
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), containingElementQName);
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
             }
         }
     }

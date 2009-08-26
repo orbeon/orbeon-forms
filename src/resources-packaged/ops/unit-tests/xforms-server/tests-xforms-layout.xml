@@ -276,19 +276,31 @@
                 <xhtml:body>
                     <xforms:group id="my-new-group" ref=".">
                         <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
                         <xforms:output id="my-new-output-1" value="'Hello!'"/>
                     </xforms:group>
                     <xforms:group id="my-new-internal-group" ref="." appearance="xxforms:internal">
                         <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
                         <xforms:output id="my-new-output-2" value="'Hello!'"/>
                     </xforms:group>
                     <xforms:group id="my-new-fieldset-group" ref="." appearance="xxforms:fieldset">
                         <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
                         <xforms:output id="my-new-output-3" value="'Hello!'"/>
                     </xforms:group>
                     <xhtml:table>
                         <xforms:group id="my-new-table-group" ref=".">
                             <xforms:label>My label</xforms:label>
+                            <xforms:hint>My hint</xforms:hint>
+                            <xforms:help>My help</xforms:help>
+                            <xforms:alert>My alert</xforms:alert>
                             <xhtml:tr>
                                 <xhtml:td><xforms:output id="my-new-output-4" value="'Hello!'"/></xhtml:td>
                             </xhtml:tr>
@@ -304,6 +316,10 @@
                     <xhtml:span id="my-new-output-1" class="xforms-control xforms-output">
                         <xhtml:span id="my-new-output-1-control" class="xforms-output-output">Hello!</xhtml:span>
                     </xhtml:span>
+                    <xhtml:img id="my-new-group-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                    <xhtml:label class="xforms-help" id="my-new-group-help" for="my-new-group-control">My help</xhtml:label>
+                    <xhtml:label class="xforms-alert-active xforms-alert" id="my-new-group-alert" for="my-new-group-control">My alert</xhtml:label>
+                    <xhtml:label class="xforms-hint" id="my-new-group-hint" for="my-new-group-control">My hint</xhtml:label>
                 </xhtml:span>
                 <xhtml:span id="my-new-output-2" class="xforms-control xforms-output">
                     <xhtml:span id="my-new-output-2-control" class="xforms-output-output">Hello!</xhtml:span>
@@ -313,6 +329,10 @@
                     <xhtml:span id="my-new-output-3" class="xforms-control xforms-output">
                         <xhtml:span id="my-new-output-3-control" class="xforms-output-output">Hello!</xhtml:span>
                     </xhtml:span>
+                    <xhtml:img id="my-new-fieldset-group-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                    <xhtml:label class="xforms-help" id="my-new-fieldset-group-help" for="my-new-fieldset-group-control">My help</xhtml:label>
+                    <xhtml:label class="xforms-alert-active xforms-alert" id="my-new-fieldset-group-alert" for="my-new-fieldset-group-control">My alert</xhtml:label>
+                    <xhtml:label class="xforms-hint" id="my-new-fieldset-group-hint" for="my-new-fieldset-group-control">My hint</xhtml:label>
                 </xhtml:fieldset>
                 <xhtml:tr id="group-begin-my-new-table-group" class="xforms-group-begin-end xforms-invalid xforms-required"/>
                 <xhtml:tr class="xforms-invalid xforms-required">
@@ -342,19 +362,31 @@
                 <xhtml:body>
                     <xforms:group id="my-new-group" ref=".">
                         <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
                         <xforms:output id="my-new-output-1" value="'Hello!'"/>
                     </xforms:group>
                     <xforms:group id="my-new-internal-group" ref="." appearance="xxforms:internal">
                         <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
                         <xforms:output id="my-new-output-2" value="'Hello!'"/>
                     </xforms:group>
                     <xforms:group id="my-new-fieldset-group" ref="." appearance="xxforms:fieldset">
                         <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
                         <xforms:output id="my-new-output-3" value="'Hello!'"/>
                     </xforms:group>
                     <xhtml:table>
                         <xforms:group id="my-new-table-group" ref=".">
                             <xforms:label>My label</xforms:label>
+                            <xforms:hint>My hint</xforms:hint>
+                            <xforms:help>My help</xforms:help>
+                            <xforms:alert>My alert</xforms:alert>
                             <xhtml:tr>
                                 <xhtml:td><xforms:output id="my-new-output-4" value="'Hello!'"/></xhtml:td>
                             </xhtml:tr>
@@ -369,11 +401,19 @@
                 <xhtml:span id="my-new-group" class="xforms-group xforms-invalid xforms-required">
                     <xhtml:span id="my-new-output-1" class="xforms-control xforms-output">Hello!</xhtml:span>
                 </xhtml:span>
+                <xhtml:img id="my-new-group-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-new-group-help" for="my-new-group">My help</xhtml:label>
+                <xhtml:label class="xforms-alert-active xforms-alert" id="my-new-group-alert" for="my-new-group">My alert</xhtml:label>
+                <xhtml:label class="xforms-hint" id="my-new-group-hint" for="my-new-group">My hint</xhtml:label>
                 <xhtml:span id="my-new-output-2" class="xforms-control xforms-output">Hello!</xhtml:span>
                 <xhtml:fieldset id="my-new-fieldset-group" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-invalid xforms-required">
                     <xhtml:legend class="xforms-label" id="my-new-fieldset-group-label">My label</xhtml:legend>
                     <xhtml:span id="my-new-output-3" class="xforms-control xforms-output">Hello!</xhtml:span>
                 </xhtml:fieldset>
+                <xhtml:img id="my-new-fieldset-group-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-new-fieldset-group-help" for="my-new-fieldset-group">My help</xhtml:label>
+                <xhtml:label class="xforms-alert-active xforms-alert" id="my-new-fieldset-group-alert" for="my-new-fieldset-group">My alert</xhtml:label>
+                <xhtml:label class="xforms-hint" id="my-new-fieldset-group-hint" for="my-new-fieldset-group">My hint</xhtml:label>
                 <xhtml:tr id="group-begin-my-new-table-group" class="xforms-group-begin-end xforms-invalid xforms-required"/>
                 <xhtml:tr class="xforms-invalid xforms-required">
                     <xhtml:td>
@@ -381,6 +421,90 @@
                     </xhtml:td>
                 </xhtml:tr>
                 <xhtml:tr id="group-end-my-new-table-group" class="xforms-group-begin-end"/>
+            </controls>
+        </output>
+    </test>
+
+    <test description="New layout for xforms:trigger" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="main-model" xxforms:new-xhtml-layout="true">
+                        <xforms:instance id="tests">
+                            <instance>Hello!</instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:trigger id="my-new-trigger" ref=".">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                    </xforms:trigger>
+                    <xforms:trigger id="my-new-minimal-trigger" ref="." appearance="minimal">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                    </xforms:trigger>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+            <xhtml:span id="my-new-trigger" class="xforms-control xforms-trigger xforms-invalid xforms-required xforms-type-NCName">
+                <xhtml:button id="my-new-trigger-control" title="My hint" type="button">My label</xhtml:button>
+                <xhtml:img id="my-new-trigger-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-new-trigger-help" for="my-new-trigger-control">My help</xhtml:label>
+            </xhtml:span>
+            <xhtml:span id="my-new-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-invalid xforms-required xforms-type-NCName">
+                <xhtml:a id="my-new-minimal-trigger-control" title="My hint" href="#">My label</xhtml:a>
+                <xhtml:img id="my-new-minimal-trigger-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-new-minimal-trigger-help" for="my-new-minimal-trigger-control">My help</xhtml:label>
+            </xhtml:span>
+        </controls>
+        </output>
+    </test>
+
+    <test description="Old layout for xforms:trigger" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="main-model" xxforms:new-xhtml-layout="false">
+                        <xforms:instance id="tests">
+                            <instance>Hello!</instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:trigger id="my-old-trigger" ref=".">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                    </xforms:trigger>
+                    <xforms:trigger id="my-old-minimal-trigger" ref="." appearance="minimal">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                    </xforms:trigger>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:button id="my-old-trigger" class="xforms-control xforms-trigger xforms-invalid xforms-required xforms-type-NCName" title="My hint" type="button">My label</xhtml:button>
+                <xhtml:img id="my-old-trigger-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-old-trigger-help" for="my-old-trigger">My help</xhtml:label>
+                <xhtml:a id="my-old-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-invalid xforms-required xforms-type-NCName" title="My hint" href="#">My label</xhtml:a>
+                <xhtml:img id="my-old-minimal-trigger-help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-old-minimal-trigger-help" for="my-old-minimal-trigger">My help</xhtml:label>
             </controls>
         </output>
     </test>

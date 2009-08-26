@@ -437,7 +437,7 @@ public class Connection {
                     if (messageBody == null)
                         messageBody = new byte[0];
 
-                    // Log message mody for debugging purposes
+                    // Log message body for debugging purposes
                     if (logBody)
                         logRequestBody(indentedLogger, contentType, messageBody);
 

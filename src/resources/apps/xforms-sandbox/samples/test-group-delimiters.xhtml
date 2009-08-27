@@ -1,0 +1,64 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XForms Load</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="instance">
+                <instance>
+                    <count>0</count>
+                    <enabled level="1">true</enabled>
+                    <enabled level="2">false</enabled>
+                    <enabled level="3">true</enabled>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-group-delimiters.js"/>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:input id="count" ref="count"/>
+        <xforms:repeat nodeset="enabled">
+            <xhtml:div>
+                <fr:button>
+                    <xforms:label>Toggle level <xforms:output value="@level"/></xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="." value="if (. = 'true') then 'false' else 'true'"/>
+                </fr:button>
+                Level <xforms:output value="@level"/> is <xforms:output value="if (. = 'true') then 'shown' else 'hidden'"/>
+                <xforms:input id="level-enabled" ref="."/>
+            </xhtml:div>
+        </xforms:repeat>
+        <xhtml:table>
+            <xforms:group ref=".[enabled[@level = '1'] = 'true']" id="level-1">
+                <xforms:group ref=".[enabled[@level = '2'] = 'true']" id="level-2">
+                    <xforms:group ref=".[enabled[@level = '3'] = 'true']" id="level-3">
+                        <xhtml:tr id="tr">
+                            <xhtml:td>Shown</xhtml:td>
+                        </xhtml:tr>
+                    </xforms:group>
+                </xforms:group>
+            </xforms:group>
+        </xhtml:table>
+    </xhtml:body>
+</xhtml:html>

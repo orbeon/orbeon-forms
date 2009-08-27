@@ -5433,7 +5433,7 @@ ORBEON.xforms.Server = {
             }
         } else {
             if (!responseXML || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")) {
-                // The XML docucment does not come in o.responseXML: parse o.responseText.
+                // The XML document does not come in o.responseXML: parse o.responseText.
                 // This happens in particular when we get a response after a background upload.
                 var xmlString = o.responseText.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
                 responseXML = ORBEON.util.Dom.stringToDom(xmlString);

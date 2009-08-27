@@ -109,7 +109,15 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
                     elementClasses = classes.toString();
                 }
 
-                final String firstDelimiterClasses = "xforms-group-begin-end " + elementClasses;
+                final String firstDelimiterClasses;
+                {
+                    final StringBuilder classes = new StringBuilder("xforms-group-begin-end");
+                    if (elementClasses.length() > 0) {
+                        classes.append(' ');
+                        classes.append(elementClasses);
+                    }
+                    firstDelimiterClasses = classes.toString();
+                }
 
                 outputInterceptor = new OutputInterceptor(currentSavedOutput, groupElementQName, new OutputInterceptor.Listener() {
                     public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
@@ -172,8 +180,8 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
             // TODO: check why we output our own label here
             reusableAttributes.clear();
             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, getLabelClasses(xformsControl));
-            outputLabelFor(handlerContext, reusableAttributes, effectiveId, effectiveId, LLHAC.LABEL, handlerContext.getLabelElementName(),
-                    getLabelValue(xformsControl), xformsControl != null && xformsControl.isHTMLLabel(pipelineContext));
+            outputLabelFor(handlerContext, reusableAttributes, effectiveId, effectiveId, LHHAC.LABEL, handlerContext.getLabelElementName(),
+                    getLabelValue(xformsControl), xformsControl != null && xformsControl.isHTMLLabel(pipelineContext), !handlerContext.isNewXHTMLLayout());
         }
     }
 

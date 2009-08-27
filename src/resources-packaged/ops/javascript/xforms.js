@@ -1056,7 +1056,7 @@ ORBEON.util.Utils = {
         ORBEON.xforms.Globals.modalProgressPanel.show();
     },
 
-    countOccurences: function(str, character) {
+    countOccurrences: function(str, character) {
         var count = 0;
         var pos = str.indexOf(character);
         while ( pos != -1 ) {
@@ -1064,7 +1064,186 @@ ORBEON.util.Utils = {
             pos = str.indexOf(character,pos+1);
         }
         return count;
-    }    
+    },
+
+    appendToEffectiveId: function(effectiveId, ending) {
+        var prefixedId = ORBEON.util.Utils.getEffectiveIdNoSuffix(effectiveId);
+        return prefixedId + ending + ORBEON.util.Utils.getEffectiveIdSuffixWithSeparator(effectiveId);
+    },
+
+    getEffectiveIdNoSuffix: function(effectiveId) {
+        if (effectiveId == null)
+            return null;
+
+        var suffixIndex = effectiveId.indexOf(XFORMS_SEPARATOR_1);
+        if (suffixIndex != -1) {
+            return effectiveId.substring(0, suffixIndex);
+        } else {
+            return effectiveId;
+        }
+    },
+
+    getEffectiveIdSuffixWithSeparator: function(effectiveId) {
+        if (effectiveId == null)
+            return null;
+
+        var suffixIndex = effectiveId.indexOf(XFORMS_SEPARATOR_1);
+        if (suffixIndex != -1) {
+            return effectiveId.substring(suffixIndex);
+        } else {
+            return "";
+        }
+    },
+
+    getLocalName: function(element) {
+        if (element.nodeType == 1) {
+            return element.tagName.indexOf(":") == -1
+                    ? element.tagName
+                    : element.tagName.substr(element.tagName.indexOf(":") + 1);
+        } else {
+            return null;
+        }
+    },
+
+    addSuffixToIds: function(element, idSuffix, repeatDepth) {
+        var idSuffixWithDepth = idSuffix;
+        for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
+            idSuffixWithDepth += XFORMS_SEPARATOR_2 + "1";
+        if (element.id) {
+            element.id = ORBEON.util.Utils.appendRepeatSuffix(element.id, idSuffixWithDepth);
+            ORBEON.xforms.Globals.idToElement[element.id] = element;
+        }
+        if (element.htmlFor)
+            element.htmlFor = ORBEON.util.Utils.appendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
+        if (element.name) {
+            var newName = ORBEON.util.Utils.appendRepeatSuffix(element.name, idSuffixWithDepth);
+            if (element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio"
+                    && ORBEON.xforms.Globals.isRenderingEngineTrident) {
+                // IE supports changing the name of elements, but according to the Microsoft documentation, "This does not
+                // cause the name in the programming model to change in the collection of elements". This has a implication
+                // for radio buttons where using a same name for a set of radio buttons is used to group them together.
+                // http://msdn.microsoft.com/library/default.asp?url=/workshop/author/dhtml/reference/properties/name_2.asp
+                var clone = document.createElement("<" + element.tagName + " name='" + newName + "'>");
+                for (var attributeIndex = 0; attributeIndex < element.attributes.length; attributeIndex++) {
+                    var attribute = element.attributes[attributeIndex];
+                    if (attribute.nodeName.toLowerCase() != "name" && attribute.nodeName.toLowerCase() != "height" && attribute.nodeValue)
+                        clone.setAttribute(attribute.nodeName, attribute.nodeValue);
+                }
+                YAHOO.util.Event.addListener(clone, "focus", ORBEON.xforms.Events.focus);
+                YAHOO.util.Event.addListener(clone, "blur", ORBEON.xforms.Events.blur);
+                YAHOO.util.Event.addListener(clone, "change", ORBEON.xforms.Events.change);
+                element.replaceNode(clone);
+            } else {
+                element.name = newName;
+            }
+        }
+        // Remove references to hint, help, alert, label as they might have changed
+        for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
+            var childNode = element.childNodes[childIndex];
+            if (childNode.nodeType == ELEMENT_TYPE) {
+                if (childNode.id && childNode.id.indexOf("repeat-end-") == 0) repeatDepth--;
+                ORBEON.util.Utils.addSuffixToIds(childNode, idSuffix, repeatDepth);
+                if (childNode.id && childNode.id.indexOf("repeat-begin-") == 0) repeatDepth++;
+            }
+        }
+    },
+
+    getClassForRepeatId: function(repeatId) {
+        var depth = 1;
+        var currentRepeatId = repeatId;
+        while (true) {
+            currentRepeatId = ORBEON.xforms.Globals.repeatTreeChildToParent[currentRepeatId];
+            if (currentRepeatId == null) break;
+            depth = (depth == 4) ? 1 : depth + 1;
+        }
+        return "xforms-repeat-selected-item-" + depth;
+    },
+
+    // Replace in a tree a placeholder by some other string in text nodes and attribute values
+    stringReplace: function(node, placeholder, replacement) {
+
+        function stringReplaceWorker(node, placeholderRegExp, replacement) {
+            switch (node.nodeType) {
+                case ELEMENT_TYPE:
+                    for (var i = 0; i < node.attributes.length; i++) {
+                        var newValue = new String(node.attributes[i].value).replace(placeholderRegExp, replacement);
+                        if (newValue != node.attributes[i].value)
+                            ORBEON.util.Dom.setAttribute(node, node.attributes[i].name, newValue);
+                    }
+                    for (var i = 0; i < node.childNodes.length; i++)
+                        stringReplaceWorker(node.childNodes[i], placeholderRegExp, replacement);
+                    break;
+                case TEXT_TYPE:
+                    var newValue = new String(node.nodeValue).replace(placeholderRegExp, replacement);
+                    if (newValue != node.nodeValue)
+                        node.nodeValue = newValue;
+                    break;
+            }
+        }
+
+        var placeholderRegExp = new RegExp(placeholder.replace(new RegExp("\\$", "g"), "\\$"), "g");
+        stringReplaceWorker(node, placeholderRegExp, replacement);
+    },
+
+    appendRepeatSuffix: function(id, suffix) {
+        if (suffix == "")
+            return id;
+
+        // Remove "-" at the beginning of the suffix, if any
+        if (suffix.charAt(0) == XFORMS_SEPARATOR_2)
+            suffix = suffix.substring(1);
+
+        // Add suffix with the right separator
+        id += id.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
+        id += suffix;
+
+        return id;
+    },
+
+    /**
+     * Locate the delimiter at the given position starting from a repeat begin element.
+     *
+     * @param repeatId      Can be either a pure repeat ID, such as "foobar" or an ID that contains information of its
+     *                      position relative to its parents, such as "foobar.1". The former happens when we handle an
+     *                      event such as <xxf:repeat-index id="foobar" old-index="4" new-index="6"/>. In this case
+     *                      "foobar" means the "foobar at 'index' in the current foobar list". The latter happens when we handle
+     *                      an event such as <xxf:repeat-iteration id="foobar.1" relevant="false" iteration="10"/>, which
+     *                      does not necessarily apply to the current "foobar".
+     * @param index
+     */
+    findRepeatDelimiter: function(repeatId, index) {
+
+        // Find id of repeat begin for the current repeatId
+        var parentRepeatIndexes = "";
+        {
+            var currentId = repeatId;
+            while (true) {
+                var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[currentId];
+                if (parent == null) break;
+                var grandParent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
+                parentRepeatIndexes = (grandParent == null ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2)
+                        + ORBEON.xforms.Globals.repeatIndexes[parent] + parentRepeatIndexes;
+                currentId = parent;
+            }
+        }
+
+        var beginElementId = "repeat-begin-" + repeatId + parentRepeatIndexes;
+        var beginElement = ORBEON.util.Dom.getElementById(beginElementId);
+        if (!beginElement) return null;
+        var cursor = beginElement;
+        var cursorPosition = 0;
+        while (true) {
+                while (cursor.nodeType != ELEMENT_TYPE || !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")) {
+                cursor = cursor.nextSibling;
+                if (!cursor) return null;
+            }
+            cursorPosition++;
+            if (cursorPosition == index) break;
+            cursor = cursor.nextSibling;
+        }
+
+        return cursor;
+    }
 };
 
 /**
@@ -1944,7 +2123,7 @@ ORBEON.xforms.Controls = {
     },
 
     setRepeatIterationRelevance: function(repeatID, iteration, relevant) {
-        var cursor = xformsFindRepeatDelimiter(repeatID, iteration).nextSibling;
+        var cursor = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration).nextSibling;
         while (!(cursor.nodeType == ELEMENT_TYPE &&
                  (ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
                          || ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end")))) {
@@ -2310,9 +2489,9 @@ ORBEON.xforms.Controls = {
             var scrollY = document.body.scrollTop;
             // Check that top left corner and bottom right corner of dialog is in viewport
             var verticalConstraint = formHelpPanelRegion.top >= scrollY && formHelpPanelRegion.bottom <= scrollY + viewPortHeight;
-            var horizontalContraint = formHelpPanelRegion.left >= scrollX && formHelpPanelRegion.right <= scrollX + viewPortWidth;
+            var horizontalConstraint = formHelpPanelRegion.left >= scrollX && formHelpPanelRegion.right <= scrollX + viewPortWidth;
             // Reposition if any constraint is not met
-            showAndRepositionPanel = !verticalConstraint || !horizontalContraint;
+            showAndRepositionPanel = !verticalConstraint || !horizontalConstraint;
         }
 
         // Show and reposition dialog when needed
@@ -2932,6 +3111,7 @@ ORBEON.xforms.Events = {
         } else if (target != null && ORBEON.util.Dom.hasClass(target, "xforms-help-image")) {
             // Help image
 
+            // TODO: LHHAC: update this to support "$$i"
             var controlID = target.id.substring(0, target.id.length - "-help-image".length);
 
             // Get label and control for this help message
@@ -5325,18 +5505,18 @@ ORBEON.xforms.Server = {
                     // Store new dynamic and static state as soon as we find it. This is because the server only keeps the last
                     // dynamic state. So if a JavaScript error happens later on while processing the response,
                     // the next request we do we still want to send the latest dynamic state known to the server.
-                    if (xformsGetLocalName(responseRoot.childNodes[i]) == "dynamic-state") {
+                    if (ORBEON.util.Utils.getLocalName(responseRoot.childNodes[i]) == "dynamic-state") {
                         var newDynamicState = ORBEON.util.Dom.getStringValue(responseRoot.childNodes[i]);
                         ORBEON.xforms.Globals.formDynamicState[formID].value = newDynamicState;
-                    } else if (xformsGetLocalName(responseRoot.childNodes[i]) == "static-state") {
+                    } else if (ORBEON.util.Utils.getLocalName(responseRoot.childNodes[i]) == "static-state") {
                         var newStaticState = ORBEON.util.Dom.getStringValue(responseRoot.childNodes[i]);
                         ORBEON.xforms.Globals.formStaticState[formID].value = newStaticState;
-                    } else if (xformsGetLocalName(responseRoot.childNodes[i]) == "action") {
+                    } else if (ORBEON.util.Utils.getLocalName(responseRoot.childNodes[i]) == "action") {
                         var actionElement = responseRoot.childNodes[i];
 
                         // First repeat and delete "lines" in repeat (as itemset changed below might be in a new line)
                         for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
-                            var actionName = xformsGetLocalName(actionElement.childNodes[actionIndex]);
+                            var actionName = ORBEON.util.Utils.getLocalName(actionElement.childNodes[actionIndex]);
                             switch (actionName) {
 
                                 case "control-values": {
@@ -5406,7 +5586,7 @@ ORBEON.xforms.Server = {
                                                 afterInsertionPoint = cursor;
                                                     // Nested repeat: does not contain a template
                                             } else {
-                                                var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + xformsAppendRepeatSuffix(repeatId, parentIndexes));
+                                                var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(repeatId, parentIndexes));
                                                 afterInsertionPoint = repeatEnd;
                                             }
                                         }
@@ -5429,7 +5609,7 @@ ORBEON.xforms.Server = {
                                                     // Decrement nestedRepeatLevel when we we exit a nested repeat
                                                     if (ORBEON.util.Dom.hasClass(newTemplateNode, "xforms-repeat-begin-end") && templateNode.id.indexOf("repeat-end-") == 0)
                                                         nestedRepeatLevel--;
-                                                    xformsAddSuffixToIds(newTemplateNode, parentIndexes == "" ? String(suffix) : parentIndexes + XFORMS_SEPARATOR_2 + suffix, nestedRepeatLevel);
+                                                    ORBEON.util.Utils.addSuffixToIds(newTemplateNode, parentIndexes == "" ? String(suffix) : parentIndexes + XFORMS_SEPARATOR_2 + suffix, nestedRepeatLevel);
                                                     // Increment nestedRepeatLevel when we enter a nested repeat
                                                     if (ORBEON.util.Dom.hasClass(newTemplateNode, "xforms-repeat-begin-end") && templateNode.id.indexOf("repeat-begin-") == 0)
                                                         nestedRepeatLevel++;
@@ -5456,7 +5636,7 @@ ORBEON.xforms.Server = {
                                         var parentIndexes = ORBEON.util.Dom.getAttribute(deleteElementElement, "parent-indexes");
                                         var count = ORBEON.util.Dom.getAttribute(deleteElementElement, "count");
                                         // Find end of the repeat
-                                        var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + xformsAppendRepeatSuffix(deleteId, parentIndexes));
+                                        var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(deleteId, parentIndexes));
                                         // Find last element to delete
                                         var lastElementToDelete;
                                         {
@@ -5519,10 +5699,10 @@ ORBEON.xforms.Server = {
                         var controlsWithUpdatedItemsets = {};
                         for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
                             // Change values in an itemset
-                            if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "itemsets") {
+                            if (ORBEON.util.Utils.getLocalName(actionElement.childNodes[actionIndex]) == "itemsets") {
                                 var itemsetsElement = actionElement.childNodes[actionIndex];
                                 for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
-                                    if (xformsGetLocalName(itemsetsElement.childNodes[j]) == "itemset") {
+                                    if (ORBEON.util.Utils.getLocalName(itemsetsElement.childNodes[j]) == "itemset") {
                                         var itemsetElement = itemsetsElement.childNodes[j];
                                         var itemsetTree = ORBEON.util.String.eval(ORBEON.util.Dom.getStringValue(itemsetElement));
                                         var controlId = ORBEON.util.Dom.getAttribute(itemsetElement, "id");
@@ -5661,10 +5841,10 @@ ORBEON.xforms.Server = {
                                                 var itemElement = itemsetTree[k];
                                                 var templateClone = template.cloneNode(true);
                                                 spanContainer.appendChild(templateClone);
-                                                xformsStringReplace(templateClone, "$xforms-template-label$", itemElement[0]);
-                                                xformsStringReplace(templateClone, "$xforms-template-value$", itemElement[1]);
-                                                xformsStringReplace(templateClone, "$xforms-item-index$", itemIndex);
-                                                xformsStringReplace(templateClone, "$xforms-effective-id$", controlId);
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-label$", itemElement[0]);
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", itemElement[1]);
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-index$", itemIndex);
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
                                                 // Restore checked state after copy
                                                 if (valueToChecked[itemElement[1]] == true) {
                                                     var inputToCheck = templateClone.getElementsByTagName("input")[0];
@@ -5687,7 +5867,7 @@ ORBEON.xforms.Server = {
                         var serverEventsIndex = -1;
                         for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
 
-                            var actionName = xformsGetLocalName(actionElement.childNodes[actionIndex]);
+                            var actionName = ORBEON.util.Utils.getLocalName(actionElement.childNodes[actionIndex]);
                             switch (actionName) {
 
                                 // Update controls
@@ -5808,7 +5988,7 @@ ORBEON.xforms.Server = {
                                                     var newInputElement = document.createElement("input");
                                                     newInputElement.setAttribute("type", "text");
                                                     newInputElement.className = "xforms-input-input " + typeClassName;
-                                                    newInputElement.name = controlId + "$xforms-input-" + inputIndex;
+                                                    newInputElement.name = ORBEON.util.Utils.appendToEffectiveId(controlId, "$xforms-input-" + inputIndex);
                                                     newInputElement.id = newInputElement.name;
                                                     documentElement.appendChild(newInputElement);
                                                     // For non-W3C compliant browsers we must re-register a listener on the new element we just created
@@ -5847,10 +6027,10 @@ ORBEON.xforms.Server = {
                                                     // so each item has a label, which is different from the label of the control. Here we have an <xform:input>
                                                     // so there is no item label.
                                                     documentElement.appendChild(templateClone);
-                                                    xformsStringReplace(templateClone, "$xforms-template-label$", "");
-                                                    xformsStringReplace(templateClone, "$xforms-template-value$", "true");
-                                                    xformsStringReplace(templateClone, "$xforms-item-index$", "0");
-                                                    xformsStringReplace(templateClone, "$xforms-effective-id$", controlId);
+                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-label$", "");
+                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", "true");
+                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-index$", "0");
+                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
 
                                                     // Update classes
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
@@ -6136,7 +6316,7 @@ ORBEON.xforms.Server = {
                                     var newRepeatIndexes = new Array();
                                     // Extract data from server response
                                     for (var j = 0; j < repeatIndexesElement.childNodes.length; j++) {
-                                        if (xformsGetLocalName(repeatIndexesElement.childNodes[j]) == "repeat-index") {
+                                        if (ORBEON.util.Utils.getLocalName(repeatIndexesElement.childNodes[j]) == "repeat-index") {
                                             var repeatIndexElement = repeatIndexesElement.childNodes[j];
                                             var repeatId = ORBEON.util.Dom.getAttribute(repeatIndexElement, "id");
                                             var newIndex = ORBEON.util.Dom.getAttribute(repeatIndexElement, "new-index");
@@ -6162,14 +6342,14 @@ ORBEON.xforms.Server = {
                                         if (typeof repeatId == "string") { // hack because repeatId may be trash when some libraries override Object
                                             var oldIndex = ORBEON.xforms.Globals.repeatIndexes[repeatId];
                                             if (typeof oldIndex == "string" && oldIndex != 0) { // hack because repeatId may be trash when some libraries override Object
-                                                var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, oldIndex);
+                                                var oldItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(repeatId, oldIndex);
                                                 if (oldItemDelimiter != null) {
                                                     var cursor = oldItemDelimiter.nextSibling;
                                                     while (cursor.nodeType != ELEMENT_TYPE ||
                                                            (!YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
                                                                    && !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
                                                         if (cursor.nodeType == ELEMENT_TYPE)
-                                                            YAHOO.util.Dom.removeClass(cursor, xformsGetClassForRepeatId(repeatId));
+                                                            YAHOO.util.Dom.removeClass(cursor, ORBEON.util.Utils.getClassForRepeatId(repeatId));
                                                         cursor = cursor.nextSibling;
                                                     }
                                                 }
@@ -6186,13 +6366,13 @@ ORBEON.xforms.Server = {
                                         if (typeof repeatId == "string") { // Hack because repeatId may be trash when some libraries override Object
                                             var newIndex = newRepeatIndexes[repeatId];
                                             if (typeof newIndex == "string" && newIndex != 0) { // Hack because repeatId may be trash when some libraries override Object
-                                                var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
+                                                var newItemDelimiter = ORBEON.util.Utils.findRepeatDelimiter(repeatId, newIndex);
                                                 var cursor = newItemDelimiter.nextSibling;
                                                 while (cursor.nodeType != ELEMENT_TYPE ||
                                                        (!YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
                                                                && !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
                                                     if (cursor.nodeType == ELEMENT_TYPE)
-                                                        YAHOO.util.Dom.addClass(cursor, xformsGetClassForRepeatId(repeatId));
+                                                        YAHOO.util.Dom.addClass(cursor, ORBEON.util.Utils.getClassForRepeatId(repeatId));
                                                     cursor = cursor.nextSibling;
                                                 }
                                             }
@@ -6352,10 +6532,10 @@ ORBEON.xforms.Server = {
 //                        if (typeof xformsItemsetUpdatedListener != "undefined") {
 //                            for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
 //                                // Change values in an itemset
-//                                if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "itemsets") {
+//                                if (ORBEON.util.Utils.getLocalName(actionElement.childNodes[actionIndex]) == "itemsets") {
 //                                    var itemsetsElement = actionElement.childNodes[actionIndex];
 //                                    for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
-//                                        if (xformsGetLocalName(itemsetsElement.childNodes[j]) == "itemset") {
+//                                        if (ORBEON.util.Utils.getLocalName(itemsetsElement.childNodes[j]) == "itemset") {
 //                                            var itemsetElement = itemsetsElement.childNodes[j];
 //                                            var itemsetTree = ORBEON.util.String.eval(ORBEON.util.Dom.getStringValue(itemsetElement));
 //                                            var controlId = ORBEON.util.Dom.getAttribute(itemsetElement, "id");
@@ -7228,109 +7408,6 @@ function xformsArrayContains(array, element) {
     return false;
 }
 
-function xformsStringReplaceWorker(node, placeholderRegExp, replacement) {
-    switch (node.nodeType) {
-        case ELEMENT_TYPE:
-            for (var i = 0; i < node.attributes.length; i++) {
-                var newValue = new String(node.attributes[i].value).replace(placeholderRegExp, replacement);
-                if (newValue != node.attributes[i].value)
-                    ORBEON.util.Dom.setAttribute(node, node.attributes[i].name, newValue);
-            }
-            for (var i = 0; i < node.childNodes.length; i++)
-                xformsStringReplaceWorker(node.childNodes[i], placeholderRegExp, replacement);
-            break;
-        case TEXT_TYPE:
-            var newValue = new String(node.nodeValue).replace(placeholderRegExp, replacement);
-            if (newValue != node.nodeValue)
-                node.nodeValue = newValue;
-            break;
-    }
-}
-
-// Replace in a tree a placeholder by some other string in text nodes and attribute values
-function xformsStringReplace(node, placeholder, replacement) {
-    var placeholderRegExp = new RegExp(placeholder.replace(new RegExp("\\$", "g"), "\\$"), "g");
-    xformsStringReplaceWorker(node, placeholderRegExp, replacement);
-}
-
-function xformsAppendRepeatSuffix(id, suffix) {
-    if (suffix == "")
-        return id;
-
-    // Remove "-" at the beginning of the suffix, if any
-    if (suffix.charAt(0) == XFORMS_SEPARATOR_2)
-        suffix = suffix.substring(1);
-
-    // Rational: for label, hind, help, and alert cases, the suffix needs to be added before the -xyz.
-    // So here we remove the -xyz suffix from ID, and we we will add it afterwards
-    var possibleLabelSuffixes = ["-label", "-hint", "-help-image", "-help", "-alert"];
-    var labelSuffix = null;
-    for (var labelSuffixIndex = 0; labelSuffixIndex < possibleLabelSuffixes.length; labelSuffixIndex++) {
-        var possibleLabelSuffix = possibleLabelSuffixes[labelSuffixIndex];
-        var lastIndex = id.lastIndexOf(possibleLabelSuffix);
-        if (lastIndex != -1 && lastIndex + possibleLabelSuffix.length == id.length) {
-            labelSuffix = possibleLabelSuffix;
-            id = id.slice(0, lastIndex);
-            break;
-        }
-    }
-
-    // Add suffix with the right separator
-    id += id.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
-    id += suffix;
-
-    // If we had a label suffit, add it at the end
-    if (labelSuffix != null)
-        id += labelSuffix;
-
-    return id;
-}
-
-/**
- * Locate the delimiter at the given position starting from a repeat begin element.
- *
- * @param repeatId      Can be either a pure repeat ID, such as "todo" or an ID that contains information of its
- *                      position relative to its parents, such as "todo.1". The former happens when we handle an
- *                      event such as <xxf:repeat-index id="todo" old-index="4" new-index="6"/>. In this case
- *                      "todo" means the "todo at 'index' in the current todo list". The latter happens when we handle
- *                      an event such as <xxf:repeat-iteration id="todo.1" relevant="false" iteration="10"/>, which
- *                      does not necessarily apply to the current "todo".
- * @param index
- */
-function xformsFindRepeatDelimiter(repeatId, index) {
-
-    // Find id of repeat begin for the current repeatId
-    var parentRepeatIndexes = "";
-    {
-        var currentId = repeatId;
-        while (true) {
-            var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[currentId];
-            if (parent == null) break;
-            var grandParent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
-            parentRepeatIndexes = (grandParent == null ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2)
-                    + ORBEON.xforms.Globals.repeatIndexes[parent] + parentRepeatIndexes;
-            currentId = parent;
-        }
-    }
-
-    var beginElementId = "repeat-begin-" + repeatId + parentRepeatIndexes;
-    var beginElement = ORBEON.util.Dom.getElementById(beginElementId);
-    if (!beginElement) return null;
-    var cursor = beginElement;
-    var cursorPosition = 0;
-    while (true) {
-            while (cursor.nodeType != ELEMENT_TYPE || !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")) {
-            cursor = cursor.nextSibling;
-            if (!cursor) return null;
-        }
-        cursorPosition++;
-        if (cursorPosition == index) break;
-        cursor = cursor.nextSibling;
-    }
-
-    return cursor;
-}
-
 function xformsLog(object) {
     var debugDiv = ORBEON.util.Dom.getElementById("xforms-debug");
     if (debugDiv == null) {
@@ -7597,70 +7674,6 @@ function FCKeditor_OnComplete(editorInstance) {
     //
     //if (ORBEON.xforms.Globals.isRenderingEngineTrident)
     //    document.body.className = document.body.className;
-}
-
-function xformsGetLocalName(element) {
-    if (element.nodeType == 1) {
-        return element.tagName.indexOf(":") == -1
-                ? element.tagName
-                : element.tagName.substr(element.tagName.indexOf(":") + 1);
-    } else {
-        return null;
-    }
-}
-
-function xformsAddSuffixToIds(element, idSuffix, repeatDepth) {
-    var idSuffixWithDepth = idSuffix;
-    for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
-        idSuffixWithDepth += XFORMS_SEPARATOR_2 + "1";
-    if (element.id) {
-        element.id = xformsAppendRepeatSuffix(element.id, idSuffixWithDepth);
-        ORBEON.xforms.Globals.idToElement[element.id] = element;
-    }
-    if (element.htmlFor)
-        element.htmlFor = xformsAppendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
-    if (element.name) {
-        var newName = xformsAppendRepeatSuffix(element.name, idSuffixWithDepth);
-        if (element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio"
-                && ORBEON.xforms.Globals.isRenderingEngineTrident) {
-            // IE supports changing the name of elements, but according to the Microsoft documentation, "This does not
-            // cause the name in the programming model to change in the collection of elements". This has a implication
-            // for radio buttons where using a same name for a set of radio buttons is used to group them together.
-            // http://msdn.microsoft.com/library/default.asp?url=/workshop/author/dhtml/reference/properties/name_2.asp
-            var clone = document.createElement("<" + element.tagName + " name='" + newName + "'>");
-            for (var attributeIndex = 0; attributeIndex < element.attributes.length; attributeIndex++) {
-                var attribute = element.attributes[attributeIndex];
-                if (attribute.nodeName.toLowerCase() != "name" && attribute.nodeName.toLowerCase() != "height" && attribute.nodeValue)
-                    clone.setAttribute(attribute.nodeName, attribute.nodeValue);
-            }
-            YAHOO.util.Event.addListener(clone, "focus", ORBEON.xforms.Events.focus);
-            YAHOO.util.Event.addListener(clone, "blur", ORBEON.xforms.Events.blur);
-            YAHOO.util.Event.addListener(clone, "change", ORBEON.xforms.Events.change);
-            element.replaceNode(clone);
-        } else {
-            element.name = newName;
-        }
-    }
-    // Remove references to hint, help, alert, label as they might have changed
-    for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
-        var childNode = element.childNodes[childIndex];
-        if (childNode.nodeType == ELEMENT_TYPE) {
-            if (childNode.id && childNode.id.indexOf("repeat-end-") == 0) repeatDepth--;
-            xformsAddSuffixToIds(childNode, idSuffix, repeatDepth);
-            if (childNode.id && childNode.id.indexOf("repeat-begin-") == 0) repeatDepth++;
-        }
-    }
-}
-
-function xformsGetClassForRepeatId(repeatId) {
-    var depth = 1;
-    var currentRepeatId = repeatId;
-    while (true) {
-        currentRepeatId = ORBEON.xforms.Globals.repeatTreeChildToParent[currentRepeatId];
-        if (currentRepeatId == null) break;
-        depth = (depth == 4) ? 1 : depth + 1;
-    }
-    return "xforms-repeat-selected-item-" + depth;
 }
 
 function xformsDisplayLoading(progressMessage) {

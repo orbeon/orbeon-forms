@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 import org.orbeon.oxf.xforms.itemset.Item;
@@ -93,9 +94,19 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             // NOTE: In the future, we may want to use other appearances provided by xforms:select
 //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));
 
+            // TODO: This delegation to xforms:select1 handler is error-prone, is there a better way?
             final XFormsSelect1Handler select1Handler = new XFormsSelect1Handler() {
+                @Override
                 protected String getPrefixedId() {
                     return XFormsInputHandler.this.getPrefixedId();
+                }
+                @Override
+                public String getEffectiveId() {
+                    return XFormsInputHandler.this.getEffectiveId();
+                }
+                @Override
+                public XFormsSingleNodeControl getXFormsControl() {
+                    return XFormsInputHandler.this.getXFormsControl();
                 }
             };
             select1Handler.setContext(getContext());
@@ -244,10 +255,8 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
     private String getFirstInputEffectiveId(String effectiveId) {
         if (!isBoolean) {
-            // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
-    //        return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-1");
-            // do as if this was in a component, noscript has to handle that
-            return effectiveId + "$xforms-input-1";
+            // Do as if this was in a component, noscript has to handle that
+            return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-1");
         } else {
             return null;
         }
@@ -255,10 +264,8 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
     private String getSecondInputEffectiveId(String effectiveId) {
         if (isDateTime) {
-            // TODO: make this change when: 1) xforms-server-submit.xpl correctly replaces values and 2) test-xforms-controls.xhtml is changed as well
-    //        return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-2");
-            // do as if this was in a component, noscript has to handle that
-            return effectiveId + "$xforms-input-2";
+            // Do as if this was in a component, noscript has to handle that
+            return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input-2");
         } else {
             return null;
         }

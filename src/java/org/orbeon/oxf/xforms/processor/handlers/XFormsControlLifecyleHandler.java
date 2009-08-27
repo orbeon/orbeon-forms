@@ -62,6 +62,14 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         return prefixedId;
     }
 
+    public String getEffectiveId() {
+        return effectiveId;
+    }
+
+    public XFormsSingleNodeControl getXFormsControl() {
+        return xformsControl;
+    }
+
     protected String getContainingElementName() {
         // By default, controls are enclosed with a <span>
         return "span";
@@ -250,29 +258,29 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LLHAC.LABEL, xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LHHAC.LABEL, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
     }
 
     protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LLHAC.ALERT, xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LHHAC.ALERT, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
     }
 
     protected void handleHint(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LLHAC.HINT, xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LHHAC.HINT, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
     }
 
     protected void handleHelp(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LLHAC.HELP, xformsControl, isTemplate);
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LHHAC.HELP, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
     }
 
     protected String getForEffectiveId(String controlEffectiveId) {
         // Default:
-        // o new layout: point to foo$bar.1-2-3-control
+        // o new layout: point to foo$bar$$c.1-2-3
         // o old layout: point to foo$bar.1-2-3
-        return handlerContext.isNewXHTMLLayout() ? getLHHACId(controlEffectiveId, LLHAC.CONTROL) : controlEffectiveId;
+        return handlerContext.isNewXHTMLLayout() ? getLHHACId(controlEffectiveId, LHHAC_CODES.get(LHHAC.CONTROL)) : controlEffectiveId;
     }
 
     // Must be overridden by subclasses
@@ -288,7 +296,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
             reusableAttributes.clear();
             containerAttributes = reusableAttributes;
             if (addId)
-                containerAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(effectiveId, LLHAC.CONTROL));
+                containerAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(effectiveId, LHHAC_CODES.get(LHHAC.CONTROL)));
         } else {
             containerAttributes = getContainerAttributes(uri, localname, attributes);
         }
@@ -296,6 +304,14 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
     }
 
     private AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes) {
+
+        // NOTE: Only reason we do not use the class members directly is to handle boolean xf:input, which delegates
+        // its output to xf:select1. Should be improved some day.
+
+        final String prefixedId = getPrefixedId();
+        final String effectiveId = getEffectiveId();
+        final XFormsSingleNodeControl xformsControl = getXFormsControl();
+
         // Get classes
         final StringBuilder classes;
         {

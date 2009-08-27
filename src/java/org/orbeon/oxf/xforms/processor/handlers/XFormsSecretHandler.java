@@ -39,7 +39,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
         final XFormsSecretControl secretControl = (XFormsSecretControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, secretControl);
+        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, secretControl, true);
 
         // Create xhtml:input
         {
@@ -66,25 +66,5 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }
         }
-    }
-
-    private AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsSecretControl secretControl) {
-        final AttributesImpl containerAttributes;
-        if (handlerContext.isNewXHTMLLayout()) {
-            reusableAttributes.clear();
-            containerAttributes = reusableAttributes;
-            containerAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(effectiveId, LLHAC.CONTROL));
-        } else {
-            final StringBuilder classes = getInitialClasses(uri, localname, attributes, secretControl);
-            handleMIPClasses(classes, getPrefixedId(), secretControl);
-            containerAttributes = getAttributes(attributes, classes.toString(), effectiveId);
-            handleReadOnlyAttribute(containerAttributes, containingDocument, secretControl);
-
-            if (secretControl != null) {
-                // Output extension attributes in no namespace
-                secretControl.addExtensionAttributes(containerAttributes, "");
-            }
-        }
-        return containerAttributes;
     }
 }

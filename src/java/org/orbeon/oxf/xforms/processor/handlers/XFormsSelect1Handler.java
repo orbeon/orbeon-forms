@@ -542,7 +542,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
             final String label = item.getLabel();
             reusableAttributes.clear();
-            outputLabelFor(handlerContext, reusableAttributes, itemEffectiveId, itemEffectiveId, LLHAC.LABEL, "label", label, false);// TODO: may be HTML for full appearance
+            outputLabelFor(handlerContext, reusableAttributes, itemEffectiveId, itemEffectiveId, LHHAC.LABEL, "label", label, false, false);// TODO: may be HTML for full appearance
         }
 
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);

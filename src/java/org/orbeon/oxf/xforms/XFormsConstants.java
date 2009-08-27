@@ -285,6 +285,8 @@ public class XFormsConstants {
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
 
     public static final char COMPONENT_SEPARATOR = '$';
+    // Use "$$" to minimize chances of conflict with user-defined ids
+    public static final String LHHAC_SEPARATOR = "$$";
 
     public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = XMLConstants.XS_ANYURI_EXPLODED_QNAME;
     public static final QName DEFAULT_UPLOAD_TYPE_QNAME = XMLConstants.XS_ANYURI_QNAME;

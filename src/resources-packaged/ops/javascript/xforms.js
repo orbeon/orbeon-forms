@@ -1851,30 +1851,70 @@ ORBEON.xforms.Controls = {
 
     setRelevant: function(control, isRelevant) {
 
+        // Case of group delimiters
         if (ORBEON.util.Dom.hasClass(control, "xforms-group-begin-end")) {
-            // Case of group delimiters
-            // NOTE: similar logic used for readonly, should reuse code
 
-            // Figure out id of the end delimiter
-            var beginMarkerPrefix = "group-begin-";
-            var id = control.id.substring(beginMarkerPrefix.length);
-            var endMarker = "group-end-" + id;
-
-            // Iterate over nodes until we find the end delimiter
-            var current = control.nextSibling;
-            while (true) {
-                if (ORBEON.util.Dom.isElement(current)) {
-                    if (current.id == endMarker) break;
-                    if (isRelevant) {
-                        ORBEON.util.Dom.removeClass(current, "xforms-disabled");
-                        ORBEON.util.Dom.removeClass(current, "xforms-disabled-subsequent");
-                        ORBEON.util.Dom.nudgeAferDelay(current);
-                    } else {
-                        ORBEON.util.Dom.addClass(current, "xforms-disabled-subsequent");
+            // Check if there is a parent group which is disabled
+            var parentDisabled = false;
+            if (isRelevant) {
+                var depth = 0;
+                var current = control;
+                while (true) {
+                    current = YAHOO.util.Dom.getPreviousSibling(current);
+                    if (current == null) break;
+                    if (YAHOO.util.Dom.hasClass(current, "xforms-group-begin-end")) {
+                        if (current.id.indexOf("group-end") == 0) depth++;
+                        if (current.id.indexOf("group-begin") == 0) {
+                            depth--;
+                            if (depth < 0 && YAHOO.util.Dom.hasClass(current, "xforms-disabled")) {
+                                parentDisabled = true;
+                                break;
+                            }
+                        }
                     }
                 }
-                current = current.nextSibling;
             }
+
+            // Update class on begin delimiter
+            if (isRelevant) ORBEON.util.Dom.removeClass(control, "xforms-disabled");
+            else ORBEON.util.Dom.addClass(control, "xforms-disabled");
+
+            // Update classes on "children"
+            // Case where we don't do any updating of the children: becomes enabled, but we have a parent who is disabled
+            if (!(isRelevant && parentDisabled)) {
+                var depth = 0;
+                var disabledChildrenDepth = 0;
+                var current = control;
+                while (true) {
+                    current = YAHOO.util.Dom.getNextSibling(current);
+                    if (current == null) break;
+                    if (YAHOO.util.Dom.hasClass(current, "xforms-group-begin-end")) {
+                        if (current.id.indexOf("group-begin") == 0) {
+                            // Begin marker
+                            depth++;
+                            if (YAHOO.util.Dom.hasClass(current, "xforms-disabled") || disabledChildrenDepth > 0)
+                                disabledChildrenDepth++;
+                        } else if (current.id.indexOf("group-end") == 0) {
+                            // End marker
+                            depth--;
+                            if (depth == 0) break;
+                            if (disabledChildrenDepth > 0)
+                                disabledChildrenDepth--;
+                        }
+                    } else {
+                        // Other element
+                        if (isRelevant && disabledChildrenDepth == 0) {
+                            ORBEON.util.Dom.removeClass(current, "xforms-disabled");
+                            ORBEON.util.Dom.removeClass(current, "xforms-disabled-subsequent");
+                            ORBEON.util.Dom.nudgeAferDelay(current);
+                        }
+                        if (!isRelevant) {
+                            ORBEON.util.Dom.addClass(current, "xforms-disabled-subsequent");
+                        }
+                    }
+                }
+            }
+
         } else {
             var elementsToUpdate = [ control,
                 ORBEON.xforms.Controls._getControlLabel(control, "xforms-label"),
@@ -1933,25 +1973,12 @@ ORBEON.xforms.Controls = {
 
         if (ORBEON.util.Dom.hasClass(control, "xforms-group-begin-end")) {
             // Case of group delimiters
-            // NOTE: similar logic used for relevance, should reuse code
-
-            // Figure out id of the end delimiter
-            var beginMarkerPrefix = "group-begin-";
-            var id = control.id.substring(beginMarkerPrefix.length);
-            var endMarker = "group-end-" + id;
-
-            // Iterate over nodes until we find the end delimiter
-            var current = control.nextSibling;
-            while (true) {
-                if (ORBEON.util.Dom.isElement(current)) {
-                    if (current.id == endMarker) break;
-                    if (isReadonly) {
-                        ORBEON.util.Dom.addClass(current, "xforms-readonly");
-                    } else {
-                        ORBEON.util.Dom.removeClass(current, "xforms-readonly");
-                    }
-                }
-                current = current.nextSibling;
+            // Readonlyness is no inherited by controls inside the group, so we are just updating the class on the begin-marker 
+            // to be consistent with the markup generated by the server.
+            if (isReadonly) {
+                ORBEON.util.Dom.addClass(control, "xforms-readonly");
+            } else {
+                ORBEON.util.Dom.removeClass(control, "xforms-readonly");
             }
         } else if ((ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")

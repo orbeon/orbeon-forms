@@ -40,6 +40,7 @@ import org.orbeon.saxon.om.NodeInfo;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.net.URI;
 import java.util.*;
 
 
@@ -330,7 +331,14 @@ public class InitUtils {
                 if (name.startsWith(inputPropertyPrefix)) {
                     final Object value = map.get(name);
                     // Support both xs:string and xs:anyURI for processor input
-                    final String stringValue = (value instanceof String) ? (String) value : ((java.net.URL) value).toExternalForm();
+                    final String stringValue;
+                    if (value instanceof String) {
+                        stringValue = (String) value;
+                    } else if (value instanceof URI) {
+                        stringValue = value.toString();
+                    } else {
+                        throw new OXFException("Value must be a String or URI, found instead: " + value.getClass().getName());
+                    }
                     processorDefinition.addInput(name.substring(inputPropertyPrefix.length()), stringValue);
                 }
             }

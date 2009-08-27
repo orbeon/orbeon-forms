@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.pipeline.api;
 
@@ -20,15 +20,14 @@ import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Iterator;
 
 /**
  * ProcessorDefinition encapsulate a processor name and its associated inputs. A ProcessorDefinition
- * object can then be used to instanciate and run the given processor.
+ * object can then be used to instantiate and run the given processor.
  */
 public class ProcessorDefinition {
     private QName name;
-    private Map entries = new HashMap();
+    private Map<String, Object> entries = new HashMap<String, Object>();
 
     public ProcessorDefinition() {
     }
@@ -79,7 +78,7 @@ public class ProcessorDefinition {
      *
      * @return Map of name -> String or Element processor inputs mappings
      */
-    public Map getEntries() {
+    public Map<String, Object> getEntries() {
         return entries;
     }
 
@@ -95,9 +94,8 @@ public class ProcessorDefinition {
     public String toString() {
         final StringBuffer sb = new StringBuffer("[");
         sb.append(Dom4jUtils.qNameToExplodedQName(getName()));
-        for (Iterator i = getEntries().entrySet().iterator(); i.hasNext();) {
-            final Map.Entry currentEntry = (Map.Entry) i.next();
-            final String key = (String) currentEntry.getKey();
+        for (final Map.Entry<String, Object> currentEntry: getEntries().entrySet()) {
+            final String key = currentEntry.getKey();
             final Object value = currentEntry.getValue();
 
             sb.append(", ");

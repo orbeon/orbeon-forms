@@ -61,7 +61,8 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
             // Handle label classes
             reusableAttributes.clear();
             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, getLabelClasses(xformsControl));
-            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(effectiveId, LHHAC_CODES.get(LHHAC.LABEL)));
+            // The id should never be need on <legend>
+//            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(effectiveId, LHHAC_CODES.get(LHHAC.LABEL)));
 
             // Output xhtml:legend with label content
             final String legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend");

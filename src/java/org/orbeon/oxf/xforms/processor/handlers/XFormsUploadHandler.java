@@ -139,6 +139,6 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
 
     @Override
     protected String getForEffectiveId(String effectiveId) {
-        return XFormsUtils.appendToEffectiveId(effectiveId, "-input");
+        return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input");
     }
 }

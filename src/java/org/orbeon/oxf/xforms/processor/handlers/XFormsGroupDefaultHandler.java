@@ -180,8 +180,8 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
             // TODO: check why we output our own label here
             reusableAttributes.clear();
             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, getLabelClasses(xformsControl));
-            outputLabelFor(handlerContext, reusableAttributes, effectiveId, effectiveId, LLHAC.LABEL, handlerContext.getLabelElementName(),
-                    getLabelValue(xformsControl), xformsControl != null && xformsControl.isHTMLLabel(pipelineContext));
+            outputLabelFor(handlerContext, reusableAttributes, effectiveId, effectiveId, LHHAC.LABEL, handlerContext.getLabelElementName(),
+                    getLabelValue(xformsControl), xformsControl != null && xformsControl.isHTMLLabel(pipelineContext), !handlerContext.isNewXHTMLLayout());
         }
     }
 

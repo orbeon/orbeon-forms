@@ -1190,6 +1190,23 @@ public class XMLUtils {
         }
         return newAttributes;
     }
+    
+    public static AttributesImpl removeAttribute(Attributes attributes, String uri, String localname) {
+        final AttributesImpl newAttributes = new AttributesImpl();
+        for (int i = 0; i < attributes.getLength(); i++) {
+            final String attributeURI = attributes.getURI(i);
+            final String attributeValue = attributes.getValue(i);
+            final String attributeType = attributes.getType(i);
+            final String attributeQName = attributes.getQName(i);
+            final String attributeLocalname = attributes.getLocalName(i);
+
+            if (!uri.equals(attributeURI) || !localname.equals(attributeLocalname)) {
+                // Not a matched attribute
+                newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue);
+            }
+        }
+        return newAttributes;
+    }
 
     public static void streamNullDocument(ContentHandler contentHandler) throws SAXException {
         contentHandler.startDocument();

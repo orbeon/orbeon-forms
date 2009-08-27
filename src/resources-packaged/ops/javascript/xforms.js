@@ -2462,9 +2462,9 @@ ORBEON.xforms.Controls = {
             var scrollY = document.body.scrollTop;
             // Check that top left corner and bottom right corner of dialog is in viewport
             var verticalConstraint = formHelpPanelRegion.top >= scrollY && formHelpPanelRegion.bottom <= scrollY + viewPortHeight;
-            var horizontalContraint = formHelpPanelRegion.left >= scrollX && formHelpPanelRegion.right <= scrollX + viewPortWidth;
+            var horizontalConstraint = formHelpPanelRegion.left >= scrollX && formHelpPanelRegion.right <= scrollX + viewPortWidth;
             // Reposition if any constraint is not met
-            showAndRepositionPanel = !verticalConstraint || !horizontalContraint;
+            showAndRepositionPanel = !verticalConstraint || !horizontalConstraint;
         }
 
         // Show and reposition dialog when needed
@@ -3084,6 +3084,7 @@ ORBEON.xforms.Events = {
         } else if (target != null && ORBEON.util.Dom.hasClass(target, "xforms-help-image")) {
             // Help image
 
+            // TODO: LHHAC: update this to support "$$i"
             var controlID = target.id.substring(0, target.id.length - "-help-image".length);
 
             // Get label and control for this help message

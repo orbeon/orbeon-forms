@@ -62,6 +62,6 @@ public class XFormsLabelHintHelpAlertHandler extends XFormsBaseHandler {
         // TODO: must ask the control or handler what's the for effective id, for cases like xf:input, etc. where id of HTML element is not id of control
         final String forEffectiveId = controlEffectiveId;
 //        xxx TODO
-        handleLabelHintHelpAlert(controlEffectiveId, forEffectiveId, LLHAC.valueOf(localname.toUpperCase()), (XFormsSingleNodeControl) xformsControl, isTemplate);
+        handleLabelHintHelpAlert(controlEffectiveId, forEffectiveId, LHHAC.valueOf(localname.toUpperCase()), (XFormsSingleNodeControl) xformsControl, isTemplate, true);
     }
 }

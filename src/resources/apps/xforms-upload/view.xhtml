@@ -102,8 +102,8 @@
                         <xforms:output value="count(preceding-sibling::file) + 1"/>
                     </td>
                     <td>
-                        <xforms:group ref="instance('control-instance')/remove-upload-trigger">
-                            <xforms:trigger appearance="minimal">
+                        <xforms:group ref="instance('control-instance')/remove-upload-trigger" id="remove-group">
+                            <xforms:trigger appearance="minimal" id="remove-trigger">
                                 <xforms:label><xhtml:img src="../apps/xforms-upload/images/remove.gif"/></xforms:label>
                                 <xforms:delete ev:event="DOMActivate" nodeset="instance('files-instance')/file" at="index('file-repeat')"/>
                             </xforms:trigger>

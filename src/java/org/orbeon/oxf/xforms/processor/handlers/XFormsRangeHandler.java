@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -28,47 +27,59 @@ import org.xml.sax.helpers.AttributesImpl;
 public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
 
     private static final String ENCLOSING_ELEMENT_NAME = "div";
+    private static final String RANGE_BACKGROUND_CLASS = "xforms-range-background";
+    private static final String RANGE_THUMB_CLASS = "xforms-range-thumb";
 
     public XFormsRangeHandler() {
         super(false);
     }
 
     @Override
+    protected String getContainingElementName() {
+        return ENCLOSING_ELEMENT_NAME;
+    }
+
+    @Override
     protected void addCustomClasses(StringBuilder classes, XFormsSingleNodeControl xformsControl) {
-        classes.append(" xforms-range-background");
+        if (!handlerContext.isNewXHTMLLayout()) {
+            if (classes.length() > 0)
+                classes.append(' ');
+            classes.append(RANGE_BACKGROUND_CLASS);
+        }
     }
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
-
-        // Create xhtml:div
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String divQName = XMLUtils.buildQName(xhtmlPrefix, ENCLOSING_ELEMENT_NAME);
+        // Create nested xhtml:div elements
         {
-            if (!handlerContext.isNewXHTMLLayout())
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, divQName, containerAttributes);
+            final String divName = getContainingElementName();
+            final String divQName = getContainingElementQName();
+
+            final AttributesImpl backgroundAttributes = getBackgroundAttributes(uri, localname, attributes, effectiveId, xformsControl);
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName, backgroundAttributes);
             {
-                final AttributesImpl sliderAttributes = getSliderAttributes(containerAttributes);
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, divQName, sliderAttributes);
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, divQName);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName, getThumbAttributes());
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName);
             }
-            if (!handlerContext.isNewXHTMLLayout())
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, divQName);
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName);
         }
     }
 
-    private AttributesImpl getSliderAttributes(AttributesImpl containerAttributes) {
-        final AttributesImpl sliderAttributes;
+    private AttributesImpl getThumbAttributes() {
+        // Just set class
+        reusableAttributes.clear();
+        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, RANGE_THUMB_CLASS);
+        return reusableAttributes;
+    }
+
+    protected AttributesImpl getBackgroundAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsSingleNodeControl xformsControl) {
+        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
         if (handlerContext.isNewXHTMLLayout()) {
-            sliderAttributes = containerAttributes;
-        } else {
-            reusableAttributes.clear();
-            sliderAttributes = reusableAttributes;
+            // Add custom class (added in addCustomClasses() for old layout)
+            containerAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, RANGE_BACKGROUND_CLASS);
         }
-        sliderAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-range-thumb");
-        return sliderAttributes;
+        return containerAttributes;
     }
 }

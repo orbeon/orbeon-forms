@@ -3186,7 +3186,7 @@ ORBEON.xforms.Events = {
             if (overlay && overlay.cfg.getProperty("visible"))
                 ORBEON.xforms.Controls.updateLoadingPosition(formID);
         }
-        // Ajust position of dialogs with "constraintoviewport" since YUI doesn't do it automatically
+        // Adjust position of dialogs with "constraintoviewport" since YUI doesn't do it automatically
         // NOTE: comment this one out for now, as that causes issues like unreachable buttons for large dialogs, and funny scrolling
 //        for (var yuiDialogId in ORBEON.xforms.Globals.dialogs) {
 //            var yuiDialog = ORBEON.xforms.Globals.dialogs[yuiDialogId];
@@ -3199,8 +3199,12 @@ ORBEON.xforms.Events = {
     sliderValueChange: function(offset) {
         // Notify server that value changed
         var rangeControl = ORBEON.util.Dom.getElementById(this.id);
-        rangeControl.value = offset / 200;
-        xformsValueChanged(rangeControl, null);
+        if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY))
+            rangeControl = rangeControl.parentNode;
+
+        var value = offset / 200;
+        var event = new ORBEON.xforms.Server.Event(null, rangeControl.id, null, String(value), "xxforms-value-change-with-focus-change");
+        ORBEON.xforms.Server.fireEvents([event], false);
     },
 
     /**
@@ -4613,11 +4617,20 @@ ORBEON.xforms.Init = {
 
     _range: function(range) {
         range.tabIndex = 0;
-        range.previousValue = 0; // Will be modified once the initial value can be set
-        var thumbDiv = range.firstChild;
-        if (thumbDiv.nodeType != ELEMENT_TYPE) thumbDiv = thumbDiv.nextSibling;
-        thumbDiv.id = range.id + XFORMS_SEPARATOR_1 + "thumb";
-        var slider = YAHOO.widget.Slider.getHorizSlider(range.id, thumbDiv.id, 0, 200);
+        ORBEON.xforms.Globals.serverValue[range.id] = "0";
+
+        // In both cases the background <div> element must already have an id
+        var backgroundDiv;
+        if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {
+            backgroundDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-background", "div", range)[0];
+        } else {
+            backgroundDiv = range;
+        }
+
+        var thumbDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-thumb", "div", range)[0];
+        thumbDiv.id = ORBEON.util.Utils.appendToEffectiveId(range.id, "$$thumb");
+
+        var slider = YAHOO.widget.Slider.getHorizSlider(backgroundDiv.id, thumbDiv.id, 0, 200);
         slider.subscribe("change", ORBEON.xforms.Events.sliderValueChange);
     },
 

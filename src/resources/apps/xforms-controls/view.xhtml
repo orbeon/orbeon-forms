@@ -28,7 +28,7 @@
     <xhtml:head>
         <xhtml:title>XForms Controls</xhtml:title>
         <xhtml:style type="text/css">
-            .controls-range { margin-top: 1em; margin-bottom: 2em; }
+            .xforms-range { margin-top: 1em; margin-bottom: 2em; }
             .xforms-textarea { font-family: sans-serif; }
         </xhtml:style>
         <xforms:model id="main-model" xxforms:expose-xpath-types="true">
@@ -359,14 +359,12 @@
             </widget:tab>
             <widget:tab id="slider">
                 <widget:label>Range</widget:label>
-                <xhtml:div class="controls-range">
-                    <xforms:range ref="range/value" start="1" end="26">
-                        <xforms:action ev:event="xforms-value-changed">
-                            <xforms:recalculate/>
-                            <xforms:send submission="countries-submission"/>
-                        </xforms:action>
-                    </xforms:range>
-                </xhtml:div>
+                <xforms:range ref="range/value" start="1" end="26">
+                    <xforms:action ev:event="xforms-value-changed">
+                        <xforms:recalculate/>
+                        <xforms:send submission="countries-submission"/>
+                    </xforms:action>
+                </xforms:range>
                 <xhtml:p>
                     Countries starting with letter
                     <xhtml:b><xforms:output ref="range/letter"/></xhtml:b>

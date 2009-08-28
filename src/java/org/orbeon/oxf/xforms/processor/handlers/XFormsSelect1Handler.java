@@ -428,7 +428,9 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
         {
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName, containerAttributes);
+
+            if (!handlerContext.isNewXHTMLLayout())
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName, containerAttributes);
             {
                 if (handlerContext.isNoScript()) {
                     // Output <legend>
@@ -454,7 +456,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     }
                 }
             }
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName);
+            if (!handlerContext.isNewXHTMLLayout())
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName);
         }
 
         // NOTE: Templates for full items are output globally in XHTMLBodyHandler

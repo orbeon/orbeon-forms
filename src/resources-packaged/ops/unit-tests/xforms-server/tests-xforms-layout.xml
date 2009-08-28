@@ -34,13 +34,23 @@
                 <xhtml:head>
                     <xforms:model id="main-model" xxforms:new-xhtml-layout="true">
                         <xforms:instance id="tests">
-                            <instance>Hello!</instance>
+                            <instance>
+                                <default>Hello!</default>
+                                <boolean>true</boolean>
+                            </instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                        <xforms:bind nodeset="default" type="xs:NCName" required="true()"/>
+                        <xforms:bind nodeset="boolean" type="xs:boolean" required="true()"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:input id="my-new-input" ref=".">
+                    <xforms:input id="my-new-input" ref="default">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                    </xforms:input>
+                    <xforms:input id="my-new-boolean-input" ref="boolean">
                         <xforms:label>My label</xforms:label>
                         <xforms:hint>My hint</xforms:hint>
                         <xforms:help>My help</xforms:help>
@@ -59,6 +69,20 @@
                     <xhtml:label class="xforms-alert-active xforms-alert" for="my-new-input$xforms-input-1">My alert</xhtml:label>
                     <xhtml:label class="xforms-hint" for="my-new-input$xforms-input-1">My hint</xhtml:label>
                 </xhtml:span>
+                <xhtml:span id="my-new-boolean-input" class="xforms-control xforms-input xforms-required xforms-required-filled xforms-type-boolean">
+                    <xhtml:label class="xforms-label" for="my-new-boolean-input$$e0">My label</xhtml:label>
+                    <xhtml:span id="my-new-boolean-input$$c">
+                        <xhtml:span class="xforms-selected">
+                            <xhtml:span>
+                                <xhtml:input id="my-new-boolean-input$$e0" type="checkbox" name="my-new-boolean-input" value="true" checked="checked"/>
+                            </xhtml:span>
+                        </xhtml:span>
+                    </xhtml:span>
+                    <xhtml:img class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                    <xhtml:label class="xforms-help" for="my-new-boolean-input$$e0">My help</xhtml:label>
+                    <xhtml:label class="xforms-alert-inactive xforms-alert" for="my-new-boolean-input$$e0">My alert</xhtml:label>
+                    <xhtml:label class="xforms-hint" for="my-new-boolean-input$$e0">My hint</xhtml:label>
+                </xhtml:span>
             </controls>
         </output>
     </test>
@@ -70,13 +94,23 @@
                 <xhtml:head>
                     <xforms:model id="main-model" xxforms:new-xhtml-layout="false">
                         <xforms:instance id="tests">
-                            <instance>Hello!</instance>
+                            <instance>
+                                <default>Hello!</default>
+                                <boolean>true</boolean>
+                            </instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                        <xforms:bind nodeset="default" type="xs:NCName" required="true()"/>
+                        <xforms:bind nodeset="boolean" type="xs:boolean" required="true()"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:input id="my-old-input" ref=".">
+                    <xforms:input id="my-old-input" ref="default">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                    </xforms:input>
+                    <xforms:input id="my-old-boolean-input" ref="boolean">
                         <xforms:label>My label</xforms:label>
                         <xforms:hint>My hint</xforms:hint>
                         <xforms:help>My help</xforms:help>
@@ -95,6 +129,18 @@
                 <xhtml:label class="xforms-help" id="my-old-input$$p" for="my-old-input$xforms-input-1">My help</xhtml:label>
                 <xhtml:label class="xforms-alert-active xforms-alert" id="my-old-input$$a" for="my-old-input$xforms-input-1">My alert</xhtml:label>
                 <xhtml:label class="xforms-hint" id="my-old-input$$t" for="my-old-input$xforms-input-1">My hint</xhtml:label>
+                <xhtml:label class="xforms-label" id="my-old-boolean-input$$l" for="my-old-boolean-input$$e0">My label</xhtml:label>
+                <xhtml:span id="my-old-boolean-input" class="xforms-control xforms-input xforms-incremental xforms-input-appearance-minimal xforms-required xforms-required-filled xforms-type-boolean">
+                    <xhtml:span class="xforms-selected">
+                        <xhtml:span>
+                            <xhtml:input id="my-old-boolean-input$$e0" type="checkbox" name="my-old-boolean-input" value="true" checked="checked"/>
+                        </xhtml:span>
+                    </xhtml:span>
+                </xhtml:span>
+                <xhtml:img id="my-old-boolean-input$$i" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-old-boolean-input$$p" for="my-old-boolean-input$$e0">My help</xhtml:label>
+                <xhtml:label class="xforms-alert-inactive xforms-alert" id="my-old-boolean-input$$a" for="my-old-boolean-input$$e0">My alert</xhtml:label>
+                <xhtml:label class="xforms-hint" id="my-old-boolean-input$$t" for="my-old-boolean-input$$e0">My hint</xhtml:label>
             </controls>
         </output>
     </test>
@@ -499,12 +545,12 @@
         </input>
         <output name="response">
             <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
-<xhtml:button id="my-old-trigger" class="xforms-control xforms-trigger xforms-invalid xforms-required xforms-type-NCName" title="My hint" type="button">My label</xhtml:button>
-<xhtml:img id="my-old-trigger$$i" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
-<xhtml:label class="xforms-help" id="my-old-trigger$$p" for="my-old-trigger">My help</xhtml:label>
-<xhtml:a id="my-old-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-invalid xforms-required xforms-type-NCName" title="My hint" href="#">My label</xhtml:a>
-<xhtml:img id="my-old-minimal-trigger$$i" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
-<xhtml:label class="xforms-help" id="my-old-minimal-trigger$$p" for="my-old-minimal-trigger">My help</xhtml:label>
+                <xhtml:button id="my-old-trigger" class="xforms-control xforms-trigger xforms-invalid xforms-required xforms-type-NCName" title="My hint" type="button">My label</xhtml:button>
+                <xhtml:img id="my-old-trigger$$i" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-old-trigger$$p" for="my-old-trigger">My help</xhtml:label>
+                <xhtml:a id="my-old-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-invalid xforms-required xforms-type-NCName" title="My hint" href="#">My label</xhtml:a>
+                <xhtml:img id="my-old-minimal-trigger$$i" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-old-minimal-trigger$$p" for="my-old-minimal-trigger">My help</xhtml:label>
             </controls>
         </output>
     </test>

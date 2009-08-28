@@ -89,7 +89,8 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             // NOTE: We have decided that it did not make much sense to encrypt the value for boolean. This also poses
             // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
             // the encrypted value of "true". So we do not encrypt values.
-            itemset.addChildItem(new Item(isMultiple, false, Collections.EMPTY_LIST, "", "true"));
+            // NOTE: Put null label so that it is not output at all
+            itemset.addChildItem(new Item(isMultiple, false, Collections.EMPTY_LIST, null, "true"));
 
             // NOTE: In the future, we may want to use other appearances provided by xforms:select
 //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));
@@ -110,7 +111,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                 }
             };
             select1Handler.setContext(getContext());
-            select1Handler.outputContent(attributes, staticId, effectiveId, uri, localname, inputControl, itemset, isMultiple, true);
+            select1Handler.outputContent(uri, localname, attributes, staticId, effectiveId, inputControl, itemset, isMultiple, true);
 
         } else {
 
@@ -274,7 +275,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
     @Override
     protected String getForEffectiveId(String effectiveId) {
         if (isBoolean) {
-            return super.getForEffectiveId(effectiveId);
+            return XFormsSelect1Handler.getItemId(effectiveId, "0");
         } else {
             return getFirstInputEffectiveId(effectiveId);
         }

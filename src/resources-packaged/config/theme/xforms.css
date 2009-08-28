@@ -38,12 +38,6 @@ html body .xforms-form .xforms-disabled,
     position: absolute;
 }
 
-/* Hide the label inside the checkbox used for a boolean, as it is there just because we used the same template
-   for this checkbox as the template we use for the xforms:select appearance="full". This label is always
-   empty for inputs of type boolean and creates a ghost on IE6 in certain cases where the checkbox has the
-   focus. */
-html body .xforms-form .xforms-type-boolean label { display: none; }
-
 /* Special visibility rule for table borders */
 html body .xforms-form tr.xforms-disabled,
     html body .xforms-form .xforms-disabled tr,

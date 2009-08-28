@@ -1278,4 +1278,89 @@
         </output>
     </test>
 
+    <test description="Dispatch events to all iterations of repeated controls" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+                                    <xforms:instance xmlns="" id="instance">
+                                        <values>
+                                            <value/>
+                                            <value/>
+                                            <value/>
+                                            <value/>
+                                        </values>
+                                    </xforms:instance>
+                                    <xforms:action ev:event="xforms-ready">
+                                        <!-- Set initial index -->
+                                        <xforms:setindex repeat="my-repeat" index="3"/>
+                                        <!-- Save current index -->
+                                        <xxforms:variable name="initial-index" select="index('my-repeat')"/>
+                                        <!-- Iterate through all values -->
+                                        <xforms:action xxforms:iterate="value">
+                                            <!-- Set index and dispatch event -->
+                                            <xforms:setindex repeat="my-repeat" index="count(preceding-sibling::*) + 1"/>
+                                            <xforms:dispatch name="my-event" targetid="my-input"/>
+                                        </xforms:action>
+                                        <!-- Restore index -->
+                                        <xforms:setindex repeat="my-repeat" index="$initial-index"/>
+                                    </xforms:action>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <!-- Iterate over all the values -->
+                                <xforms:repeat nodeset="value" id="my-repeat">
+                                    <xforms:input id="my-input" ref=".">
+                                        <!-- Upon receiving event "my-event", set the value of the control -->
+                                        <xforms:setvalue ev:event="my-event" ref="." value="count(preceding-sibling::*) + 1"/>
+                                    </xforms:input>
+                                </xforms:repeat>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value>1</value>
+                                    <value>2</value>
+                                    <value>3</value>
+                                    <value>4</value>
+                                </values>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="3"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="4"/>
+                        <xxf:control id="my-input·1">1</xxf:control>
+                        <xxf:control id="my-input·2">2</xxf:control>
+                        <xxf:control id="my-input·3">3</xxf:control>
+                        <xxf:control id="my-input·4">4</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+
+
 </group>

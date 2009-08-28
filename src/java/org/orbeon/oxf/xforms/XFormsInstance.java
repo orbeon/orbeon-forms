@@ -350,7 +350,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             // "10.2 The setvalue Element [...] An xforms-binding-exception occurs if the Single Node Binding
             // indicates a node whose content is not simpleContent (i.e., a node that has element children)."
             if (!Dom4jUtils.isSimpleContent(node)) {
-                containingDocument.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(eventTarget));
+                containingDocument.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, eventTarget));
                 return;
             }
         }
@@ -520,11 +520,12 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
         final String eventName = event.getEventName();
         if (XFormsEvents.XXFORMS_INSTANCE_INVALIDATE.equals(eventName)) {
+            final IndentedLogger indentedLogger = event.getTargetXBLContainer().getContainingDocument().getIndentedLogger(XFormsModel.logger);
             // Invalidate instance if it is cached
             if (cache) {
-                XFormsServerSharedInstancesCache.instance().remove(propertyContext, sourceURI, null, handleXInclude);
+                XFormsServerSharedInstancesCache.instance().remove(propertyContext, indentedLogger, sourceURI, null, handleXInclude);
             } else {
-                XFormsContainingDocument.logger.warn("XForms - xxforms-instance-invalidate event dispatched to non-cached instance with id: " + getEffectiveId());
+                indentedLogger.logWarning("", "XForms - xxforms-instance-invalidate event dispatched to non-cached instance", "instance id", getEffectiveId());
             }
         }
     }

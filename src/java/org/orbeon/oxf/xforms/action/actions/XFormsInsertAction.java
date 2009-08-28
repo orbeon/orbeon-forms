@@ -442,7 +442,7 @@ public class XFormsInsertAction extends XFormsAction {
             }
 
             modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext,
-                    new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo,
+                    new XFormsInsertEvent(containingDocument, modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo,
                             positionAttribute == null ? "after" : positionAttribute, sourceNodes, clonedNodes, isAdjustIndexes));
 
             return insertedNodeInfos;

@@ -127,7 +127,7 @@ public class XFormsSetvalueAction extends XFormsAction {
             if (modifiedInstance != null) {// can be null if you set a value in a non-instance doc
 
                 // Dispatch extension event to instance
-                modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XXFormsValueChanged(modifiedInstance));
+                modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XXFormsValueChanged(containingDocument, modifiedInstance));
 
                 if (!isCalculate) {
                     // When this is called from a calculate, we don't set the flags as revalidate and refresh will have been set already

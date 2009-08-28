@@ -170,7 +170,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         // Dispatch destruction event to all models
         for (XFormsModel currentModel: models) {
-            dispatchEvent(propertyContext, new XFormsModelDestructEvent(currentModel));
+            dispatchEvent(propertyContext, new XFormsModelDestructEvent(containingDocument, currentModel));
         }
     }
 
@@ -270,7 +270,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     public void initializeModels(PropertyContext propertyContext, String[] eventsToDispatch) {
         for (int i = 0; i < eventsToDispatch.length; i++) {
-            if (i == 2) {// before dispaching xforms-ready
+            if (i == 2) {// before dispatching xforms-ready
                 // Initialize controls after all the xforms-model-construct-done events have been sent
                 initializeNestedControls(propertyContext);
 
@@ -282,7 +282,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
             // Iterate over all the models
             for (XFormsModel currentModel: models) {
-                dispatchEvent(propertyContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
+                dispatchEvent(propertyContext, XFormsEventFactory.createEvent(containingDocument, eventsToDispatch[i], currentModel));
             }
         }
     }

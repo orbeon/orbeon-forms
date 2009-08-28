@@ -54,7 +54,7 @@ public class XFormsSendAction extends XFormsAction {
         final Object submission = resolveEffectiveObject(actionInterpreter, propertyContext, eventObserver, resolvedSubmissionStaticId, actionElement);
         if (submission instanceof XFormsModelSubmission) {
             // Dispatch event to submission object
-            final XFormsEvent newEvent = new XFormsSubmitEvent((XFormsEventTarget) submission);
+            final XFormsEvent newEvent = new XFormsSubmitEvent(container.getContainingDocument(), (XFormsEventTarget) submission);
             addContextAttributes(actionInterpreter, propertyContext, actionElement, newEvent);
             container.dispatchEvent(propertyContext, newEvent);
         } else {

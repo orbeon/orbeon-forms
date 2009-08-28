@@ -48,7 +48,7 @@ public class TextReplacer extends BaseReplacer {
             // nothing in the document is replaced and submission processing concludes after dispatching
             // xforms-submit-error with appropriate context information, including an error-type of resource-error."
             throw new XFormsSubmissionException(submission, "Mediatype is neither text nor XML for replace=\"text\": " + connectionResult.getResponseMediaType(), "reading response body",
-                    new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
+                    new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
         }
     }
 
@@ -75,7 +75,7 @@ public class TextReplacer extends BaseReplacer {
                     // then submission processing ends after dispatching the event
                     // xforms-submit-error with an error-type of target-error."
                     throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element or attribute for replace=\"text\".", "processing targetref attribute",
-                            new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                            new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
                 }
             } else {
                 // Throw target-error
@@ -85,7 +85,7 @@ public class TextReplacer extends BaseReplacer {
                 // submission processing ends after dispatching the event
                 // xforms-submit-error with an error-type of target-error."
                 throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to a node for replace=\"text\".", "processing targetref attribute",
-                        new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
             }
         } else {
             // Handle default destination

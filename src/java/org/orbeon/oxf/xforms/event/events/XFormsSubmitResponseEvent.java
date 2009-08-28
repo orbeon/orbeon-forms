@@ -41,8 +41,8 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
     private final Map<String, List<String>>  headers;
     private final int statusCode;
 
-    public XFormsSubmitResponseEvent(String eventName, XFormsEventTarget targetObject, ConnectionResult connectionResult) {
-        super(eventName, targetObject, true, false);
+    public XFormsSubmitResponseEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, ConnectionResult connectionResult) {
+        super(containingDocument, eventName, targetObject, true, false);
         if (connectionResult != null) {
             this.resourceURI = connectionResult.resourceURI;
             this.headers = connectionResult.responseHeaders;
@@ -54,8 +54,8 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
         }
     }
 
-    public XFormsSubmitResponseEvent(String eventName, XFormsEventTarget targetObject, String resourceURI, int statusCode) {
-        super(eventName, targetObject, true, false);
+    public XFormsSubmitResponseEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, String resourceURI, int statusCode) {
+        super(containingDocument, eventName, targetObject, true, false);
         this.resourceURI = resourceURI;
         this.headers = null;
         this.statusCode = statusCode;

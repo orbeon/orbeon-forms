@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -41,14 +42,14 @@ public class XFormsInsertEvent extends XFormsEvent {
     private List clonedNodes;
     private boolean isAdjustIndexes;
 
-    public XFormsInsertEvent(XFormsEventTarget targetObject) {
-        super(XFormsEvents.XFORMS_INSERT, targetObject, true, false);
+    public XFormsInsertEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
+        super(containingDocument, XFormsEvents.XFORMS_INSERT, targetObject, true, false);
     }
 
-    public XFormsInsertEvent(XFormsEventTarget targetObject,
+    public XFormsInsertEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject,
                              List<Item> insertedNodes, List originItems,
                              NodeInfo insertLocationNodeInfo, String position, List sourceNodes, List clonedNodes, boolean isAdjustIndexes) {
-        super(XFormsEvents.XFORMS_INSERT, targetObject, true, false);
+        super(containingDocument, XFormsEvents.XFORMS_INSERT, targetObject, true, false);
         
         this.insertedNodeInfos = insertedNodes;
         this.originItems = originItems;

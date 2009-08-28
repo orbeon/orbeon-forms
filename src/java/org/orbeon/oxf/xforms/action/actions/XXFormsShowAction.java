@@ -58,7 +58,7 @@ public class XXFormsShowAction extends XFormsAction {
             final Object controlObject = resolveEffectiveControl(actionInterpreter, propertyContext, eventObserver.getEffectiveId(), dialogStaticId, actionElement);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XFormsEventTarget eventTarget = (XFormsEventTarget) controlObject;
-                final XFormsEvent newEvent = new XXFormsDialogOpenEvent(eventTarget, effectiveNeighborId, constrainToViewport);
+                final XFormsEvent newEvent = new XXFormsDialogOpenEvent(containingDocument, eventTarget, effectiveNeighborId, constrainToViewport);
                 addContextAttributes(actionInterpreter, propertyContext, actionElement, newEvent);
                 eventTarget.getXBLContainer(containingDocument).dispatchEvent(propertyContext, newEvent);
             } else {

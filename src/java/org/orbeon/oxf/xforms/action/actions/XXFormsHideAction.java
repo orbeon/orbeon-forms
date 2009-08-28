@@ -49,7 +49,7 @@ public class XXFormsHideAction extends XFormsAction {
             final Object controlObject = resolveEffectiveControl(actionInterpreter, propertyContext, eventObserver.getEffectiveId(), dialogStaticId, actionElement);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XFormsEventTarget eventTarget = (XFormsEventTarget) controlObject;
-                final XFormsEvent newEvent = new XXFormsDialogCloseEvent(eventTarget);
+                final XFormsEvent newEvent = new XXFormsDialogCloseEvent(containingDocument, eventTarget);
                 addContextAttributes(actionInterpreter, propertyContext, actionElement, newEvent);
                 eventTarget.getXBLContainer(containingDocument).dispatchEvent(propertyContext, newEvent);
             } else {

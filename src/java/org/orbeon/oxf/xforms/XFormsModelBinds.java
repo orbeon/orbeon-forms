@@ -568,7 +568,7 @@ public class XFormsModelBinds {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms calculate bind",
                         bind.getBindElement(), new String[] { "expression", bind.getCalculate() }));
 
-                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
+                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
             }
         }
     }
@@ -593,7 +593,7 @@ public class XFormsModelBinds {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms calculate bind",
                         bind.getBindElement(), new String[] { "expression", bind.getCalculate() }));
 
-                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
+                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
             }
         }
     }
@@ -638,7 +638,7 @@ public class XFormsModelBinds {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms required bind",
                         bind.getBindElement(), new String[] { "expression", bind.getRequired() }));
 
-                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
+                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
             }
         }
 
@@ -653,7 +653,7 @@ public class XFormsModelBinds {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms relevant bind",
                         bind.getBindElement(), new String[] { "expression", bind.getRelevant() }));
 
-                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
+                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
             }
         }
 
@@ -671,7 +671,7 @@ public class XFormsModelBinds {
                         bind.getBindElement(), new String[] { "expression", bind.getReadonly() }));
 
 
-                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
+                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
             }
         } else if (bind.getCalculate() != null) {
             // The bind doesn't have a readonly attribute, but has a calculate: set readonly to true()
@@ -696,7 +696,7 @@ public class XFormsModelBinds {
                     final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms custom bind",
                             bind.getBindElement(), new String[] { "name", key, "expression", expression }));
 
-                    container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
+                    container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
                 }
             }
         }
@@ -928,7 +928,7 @@ public class XFormsModelBinds {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms constraint bind",
                         bind.getBindElement(), new String[] { "expression", bind.getConstraint() }));
 
-                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(model, ve.getMessage(), ve));
+                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
             }
         }
 

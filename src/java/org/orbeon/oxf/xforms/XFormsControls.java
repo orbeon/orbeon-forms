@@ -1031,39 +1031,39 @@ public class XFormsControls implements XFormsObjectResolver {
                     final XBLContainer container = xformsControl.getXBLContainer();
 
                     if (isAllowSendingValueChangedEvents && (type & EventSchedule.VALUE) != 0) {
-                        container.dispatchEvent(propertyContext, new XFormsValueChangeEvent(xformsControl));
+                        container.dispatchEvent(propertyContext, new XFormsValueChangeEvent(containingDocument, xformsControl));
                     }
                     if (currentNodeInfo != null && currentNodeInfo instanceof NodeWrapper) {
                         if (isAllowSendingRequiredEvents && (type & EventSchedule.REQUIRED) != 0) {
                             final boolean currentRequiredState = InstanceData.getRequired(currentNodeInfo);
                             if (currentRequiredState) {
-                                container.dispatchEvent(propertyContext, new XFormsRequiredEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsRequiredEvent(containingDocument, xformsControl));
                             } else {
-                                container.dispatchEvent(propertyContext, new XFormsOptionalEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsOptionalEvent(containingDocument, xformsControl));
                             }
                         }
                         if (isAllowSendingRelevantEvents && (type & EventSchedule.RELEVANT) != 0) {
                             final boolean currentRelevantState = InstanceData.getInheritedRelevant(currentNodeInfo);
                             if (currentRelevantState) {
-                                container.dispatchEvent(propertyContext, new XFormsEnabledEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsEnabledEvent(containingDocument, xformsControl));
                             } else {
-                                container.dispatchEvent(propertyContext, new XFormsDisabledEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsDisabledEvent(containingDocument, xformsControl));
                             }
                         }
                         if (isAllowSendingReadonlyEvents && (type & EventSchedule.READONLY) != 0) {
                             final boolean currentReadonlyState = InstanceData.getInheritedReadonly(currentNodeInfo);
                             if (currentReadonlyState) {
-                                container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(containingDocument, xformsControl));
                             } else {
-                                container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(containingDocument, xformsControl));
                             }
                         }
                         if (isAllowSendingValidEvents && (type & EventSchedule.VALID) != 0) {
                             final boolean currentValidState = InstanceData.getValid(currentNodeInfo);
                             if (currentValidState) {
-                                container.dispatchEvent(propertyContext, new XFormsValidEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsValidEvent(containingDocument, xformsControl));
                             } else {
-                                container.dispatchEvent(propertyContext, new XFormsInvalidEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsInvalidEvent(containingDocument, xformsControl));
                             }
                         }
                     }
@@ -1093,34 +1093,34 @@ public class XFormsControls implements XFormsObjectResolver {
                                 final XBLContainer container = xformsControl.getXBLContainer();
 
                                 if (isAllowSendingRelevantEvents) {
-                                    container.dispatchEvent(propertyContext, new XFormsEnabledEvent(xformsControl));
+                                    container.dispatchEvent(propertyContext, new XFormsEnabledEvent(containingDocument, xformsControl));
                                 }
 
                                 // Also send other MIP events
                                 if (isAllowSendingRequiredEvents) {
                                     final boolean currentRequiredState = InstanceData.getRequired(currentNodeInfo);
                                     if (currentRequiredState) {
-                                        container.dispatchEvent(propertyContext, new XFormsRequiredEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsRequiredEvent(containingDocument, xformsControl));
                                     } else {
-                                        container.dispatchEvent(propertyContext, new XFormsOptionalEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsOptionalEvent(containingDocument, xformsControl));
                                     }
                                 }
 
                                 if (isAllowSendingReadonlyEvents) {
                                     final boolean currentReadonlyState = InstanceData.getInheritedReadonly(currentNodeInfo);
                                     if (currentReadonlyState) {
-                                        container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(containingDocument, xformsControl));
                                     } else {
-                                        container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(containingDocument, xformsControl));
                                     }
                                 }
 
                                 if (isAllowSendingValidEvents) {
                                     final boolean currentValidState = InstanceData.getValid(currentNodeInfo);
                                     if (currentValidState) {
-                                        container.dispatchEvent(propertyContext, new XFormsValidEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsValidEvent(containingDocument, xformsControl));
                                     } else {
-                                        container.dispatchEvent(propertyContext, new XFormsInvalidEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsInvalidEvent(containingDocument, xformsControl));
                                     }
                                 }
                             }
@@ -1163,17 +1163,17 @@ public class XFormsControls implements XFormsObjectResolver {
 
         // Control is disabled
         if (isAllowSendingRelevantEvents)
-            container.dispatchEvent(propertyContext, new XFormsDisabledEvent(xformsControl));
+            container.dispatchEvent(propertyContext, new XFormsDisabledEvent(containingDocument, xformsControl));
 
         // Send events for default MIP values
         if (isAllowSendingRequiredEvents)
-            container.dispatchEvent(propertyContext, new XFormsOptionalEvent(xformsControl));
+            container.dispatchEvent(propertyContext, new XFormsOptionalEvent(containingDocument, xformsControl));
 
         if (isAllowSendingReadonlyEvents)
-            container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(xformsControl));
+            container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(containingDocument, xformsControl));
 
         if (isAllowSendingValidEvents)
-            container.dispatchEvent(propertyContext, new XFormsValidEvent(xformsControl));
+            container.dispatchEvent(propertyContext, new XFormsValidEvent(containingDocument, xformsControl));
     }
 
     public static class EventSchedule {

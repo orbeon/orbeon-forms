@@ -406,7 +406,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // consists of a serialization of the selected instance data according to the rules stated at 11.9
                     // Submission Options."
 
-                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this, p.refNodeInfo, requestedSerialization);
+                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(containingDocument, XFormsModelSubmission.this, p.refNodeInfo, requestedSerialization);
                     container.dispatchEvent(propertyContext, serializeEvent);
 
                     // TODO: rest of submission should happen upon default action of event
@@ -510,7 +510,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         // If no event obtained, create default event
         if (submitErrorEvent == null) {
-            submitErrorEvent = new XFormsSubmitErrorEvent(propertyContext, XFormsModelSubmission.this,
+            submitErrorEvent = new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this,
                 XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR, submissionResult.getConnectionResult());
         }
 
@@ -529,7 +529,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         // If no event obtained, create default event
         if (submitErrorEvent == null) {
-            submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource,
+            submitErrorEvent = new XFormsSubmitErrorEvent(containingDocument, XFormsModelSubmission.this, resolvedActionOrResource,
                 XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR, 0);
         }
 
@@ -561,7 +561,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         replacer = new NoneReplacer(this, containingDocument);
                     } else {
                         throw new XFormsSubmissionException(this, "xforms:submission: invalid replace attribute: " + replace, "processing instance replacement",
-                                new XFormsSubmitErrorEvent(propertyContext, this, XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR, connectionResult));
+                                new XFormsSubmitErrorEvent(containingDocument, propertyContext, this, XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR, connectionResult));
                     }
                 } else {
                     // There is no body, notify that processing is terminated
@@ -587,7 +587,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             } else {
                 // Error code received
                 throw new XFormsSubmissionException(this, "xforms:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
-                        new XFormsSubmitErrorEvent(propertyContext, this, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
+                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, this, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
             }
 
             return replacer;
@@ -654,11 +654,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // Check that we have a current node and that it is pointing to a document or an element
             if (refNodeInfo == null)
                 throw new XFormsSubmissionException(XFormsModelSubmission.this, "Empty single-node binding on xforms:submission for submission id: " + id, "getting submission single-node binding",
-                        new XFormsSubmitErrorEvent(propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.NO_DATA, null));
+                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.NO_DATA, null));
     
             if (!(refNodeInfo instanceof DocumentInfo || refNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
                 throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding",
-                        new XFormsSubmitErrorEvent(propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.NO_DATA, null));
+                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.NO_DATA, null));
             }
     
             // Current instance may be null if the document submitted is not part of an instance
@@ -1061,7 +1061,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             }
             throw new XFormsSubmissionException(this, "xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
                     "checking instance validity",
-                    new XFormsSubmitErrorEvent(propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.VALIDATION_ERROR, null));
+                    new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.VALIDATION_ERROR, null));
         }
 
         return documentToSubmit;

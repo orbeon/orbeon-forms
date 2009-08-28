@@ -53,7 +53,7 @@ public class XFormsSetfocusAction extends XFormsAction {
         final Object controlObject = resolveEffectiveControl(actionInterpreter, propertyContext, eventObserver.getEffectiveId(), resolvedControlStaticId, actionElement);
         if (controlObject instanceof XFormsControl) {
             // Dispatch event to control object
-            containingDocument.dispatchEvent(propertyContext, new XFormsFocusEvent((XFormsEventTarget) controlObject));
+            containingDocument.dispatchEvent(propertyContext, new XFormsFocusEvent(containingDocument, (XFormsEventTarget) controlObject));
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

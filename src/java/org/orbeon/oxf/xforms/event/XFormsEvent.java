@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.EmptyIterator;
@@ -56,26 +57,29 @@ public abstract class XFormsEvent implements Cloneable {
 //    const unsigned short      AT_TARGET                      = 2;
 //    const unsigned short      BUBBLING_PHASE                 = 3;
 
-    private XFormsEvent originalEvent;  // original event (for retargetted event)
+    private XFormsEvent originalEvent;  // original event (for retargeted event)
 
-    private String eventName;
+    private final XBLContainer targetXBLContainer;
+    private final String eventName;
     private XFormsEventTarget targetObject;
-    private boolean bubbles;
-    private boolean cancelable;
+    private final boolean bubbles;
+    private final boolean cancelable;
 
     private Map<String, SequenceExtent> customAttributes;
 
+    // TODO: Assign for debugging
     private LocationData locationData;
 
-    protected XFormsEvent(String eventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
+    protected XFormsEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
+        this.targetXBLContainer = targetObject.getXBLContainer(containingDocument);
         this.eventName = eventName;
         this.targetObject = targetObject;
         this.bubbles = bubbles;
         this.cancelable = cancelable;
+    }
 
-        // Get Java location information for debugging only (getting Java location data is very inefficient)
-//        if (XFormsServer.logger.isDebugEnabled())
-//            this.locationData = Dom4jUtils.getLocationData(2, true);
+    public XBLContainer getTargetXBLContainer() {
+        return targetXBLContainer;
     }
 
     public String getEventName() {

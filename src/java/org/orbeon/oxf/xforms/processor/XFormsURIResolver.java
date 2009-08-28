@@ -150,22 +150,4 @@ public class XFormsURIResolver extends TransformerURIResolver {
             throw ValidationException.wrapException(e, new LocationData(urlString, -1, -1));
         }
     }
-
-    // This is currently not used
-//    public void readURLAsSAX(String urlString, String username, String password, ContentHandler contentHandler, String headersToForward) {
-//        try {
-//            final SAXSource source = (SAXSource) resolve(urlString, null, username, password, headersToForward);
-//
-//            final SAXResult saxResult = new SAXResult(contentHandler);
-//            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-//            identity.setResult(saxResult);
-//
-//            final XMLReader xmlReader = source.getXMLReader();
-//            xmlReader.setContentHandler(identity);
-//            xmlReader.parse(urlString);
-//
-//        } catch (Exception e) {
-//            throw ValidationException.wrapException(e, new LocationData(urlString, -1, -1));
-//        }
-//    }
 }

@@ -97,7 +97,7 @@ public class XFormsDispatchAction extends XFormsAction {
             final Object xformsEventTarget = resolveEffectiveObject(actionInterpreter, propertyContext, eventObserver, resolvedNewEventTargetStaticId, actionElement);
             if (xformsEventTarget instanceof XFormsEventTarget) {
                 // Create and dispatch the event
-                final XFormsEvent newEvent = XFormsEventFactory.createEvent(resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable);
+                final XFormsEvent newEvent = XFormsEventFactory.createEvent(containingDocument, resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable);
                 addContextAttributes(actionInterpreter, propertyContext, actionElement, newEvent);
                 actionInterpreter.getXBLContainer().dispatchEvent(propertyContext, newEvent);
             } else {

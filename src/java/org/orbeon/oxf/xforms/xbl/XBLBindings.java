@@ -22,11 +22,11 @@ import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorFactory;
 import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
@@ -68,8 +68,13 @@ public class XBLBindings {
         this.staticState = staticState;
         this.namespacesMap = namespacesMap;
 
+        final IndentedLogger indentedLogger = staticState.getIndentedLogger();
+
         final List<Element> xblElements = (staticStateElement != null) ? Dom4jUtils.elements(staticStateElement, XFormsConstants.XBL_XBL_QNAME) : Collections.<Element>emptyList();
         if (xblElements.size() > 0) {
+
+            indentedLogger.startHandleOperation("", "extracting top-level XBL documents");
+
             xblComponentsFactories = new HashMap<QName, XFormsControlFactory.Factory>();
             xblComponentBindings = new HashMap<QName, Element>();
             xblFullShadowTrees = new HashMap<String, Document>();
@@ -165,8 +170,8 @@ public class XBLBindings {
                 }
             }
 
-            XFormsContainingDocument.logDebugStatic(XFormsStaticState.LOG_TYPE, "created top-level XBL documents",
-                    "xbl:xbl count", Integer.toString(xblCount), "xbl:binding count", Integer.toString(xblBindingCount));
+            indentedLogger.endHandleOperation("", "xbl:xbl count", Integer.toString(xblCount),
+                    "xbl:binding count", Integer.toString(xblBindingCount));
         }
     }
 
@@ -185,9 +190,11 @@ public class XBLBindings {
         return result;
     }
 
-    public void processElementIfNeeded(Element controlElement, String controlPrefixedId, LocationData locationData, PropertyContext propertyContext,
+    public void processElementIfNeeded(PropertyContext propertyContext, IndentedLogger indentedLogger, Element controlElement,
+                                       String controlPrefixedId, LocationData locationData,
                                        DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, String prefix,
                                        FastStringBuffer repeatHierarchyStringBuffer, Stack<String> repeatAncestorsStack) {
+
         if (xblComponentBindings != null) {
             final Element bindingElement = xblComponentBindings.get(controlElement.getQName());
             if (bindingElement != null) {
@@ -197,7 +204,7 @@ public class XBLBindings {
                 final String newPrefix = controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR;
 
                 // Generate the shadow content for this particular binding
-                final Document fullShadowTreeDocument = generateXBLShadowContent(propertyContext, controlsDocumentInfo, controlElement, bindingElement, namespacesMap, newPrefix);
+                final Document fullShadowTreeDocument = generateXBLShadowContent(propertyContext, indentedLogger, controlsDocumentInfo, controlElement, bindingElement, namespacesMap, newPrefix);
                 if (fullShadowTreeDocument != null) {
 
                     final DocumentWrapper fullShadowTreeWrapper = new DocumentWrapper(fullShadowTreeDocument, null, xpathConfiguration);
@@ -210,7 +217,7 @@ public class XBLBindings {
                                 // Store models by "prefixed id"
                                 staticState.addModelDocument(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
                             }
-                            XFormsContainingDocument.logDebugStatic(XFormsStaticState.LOG_TYPE, "registered XBL implementation model documents", "count", Integer.toString(implementationModelDocuments.size()));
+                            indentedLogger.logDebug("", "registered XBL implementation model documents", "count", Integer.toString(implementationModelDocuments.size()));
                         }
                     }
 
@@ -222,7 +229,7 @@ public class XBLBindings {
                                 // Store models by "prefixed id"
                                 staticState.addModelDocument(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
                             }
-                            XFormsContainingDocument.logDebugStatic(XFormsStaticState.LOG_TYPE, "created and registered XBL template model documents", "count", Integer.toString(extractedModels.size()));
+                            indentedLogger.logDebug("", "created and registered XBL template model documents", "count", Integer.toString(extractedModels.size()));
                         }
                     }
 
@@ -230,7 +237,7 @@ public class XBLBindings {
                     xblFullShadowTrees.put(controlPrefixedId, fullShadowTreeDocument);
 
                     // Generate compact shadow tree for this static id
-                    final Document compactShadowTreeDocument = filterShadowTree(fullShadowTreeDocument, controlElement);
+                    final Document compactShadowTreeDocument = filterShadowTree(indentedLogger, fullShadowTreeDocument, controlElement);
                     xblCompactShadowTrees.put(controlPrefixedId, compactShadowTreeDocument);
 
                     // Remember id of binding
@@ -271,14 +278,24 @@ public class XBLBindings {
     /**
      * Generate shadow content for the given control id and XBL binding.
      *
+     * @param propertyContext   context
+     * @param indentedLogger    logger
+     * @param documentWrapper
      * @param boundElement      element to which the binding applies
      * @param binding           corresponding <xbl:binding>
+     * @param namespaceMappings
+     * @param prefix
      * @return                  shadow tree document
      */
-    private Document generateXBLShadowContent(final PropertyContext propertyContext, final DocumentWrapper documentWrapper,
-                                                    final Element boundElement, Element binding, Map<String, Map<String, String>> namespaceMappings, final String prefix) {
+    private Document generateXBLShadowContent(final PropertyContext propertyContext, final IndentedLogger indentedLogger, final DocumentWrapper documentWrapper,
+                                              final Element boundElement, Element binding, Map<String, Map<String, String>> namespaceMappings, final String prefix) {
         final Element templateElement = binding.element(XFormsConstants.XBL_TEMPLATE_QNAME);
         if (templateElement != null) {
+
+            if (indentedLogger.isDebugEnabled()) {
+                indentedLogger.startHandleOperation("", "generating XBL shadow content", "bound element", Dom4jUtils.elementToString(boundElement), "binding id", binding.attributeValue("id"));
+            }
+
             // TODO: in script mode, XHTML elements in template should only be kept during page generation
 
             // Here we create a completely separate document
@@ -517,9 +534,9 @@ public class XBLBindings {
             // Annotate tree
             final Document annotatedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, namespaceMappings, prefix);
 
-            if (XFormsContainingDocument.logger.isDebugEnabled()) {
-                XFormsContainingDocument.logDebugStatic(XFormsStaticState.LOG_TYPE, "annotated shadow tree",
-                        "bound element", Dom4jUtils.elementToString(boundElement), "document", Dom4jUtils.domToString(annotatedShadowTreeDocument));
+            if (indentedLogger.isDebugEnabled()) {
+                // XXX TODO: logging option to output whole document
+                indentedLogger.endHandleOperation("document", Dom4jUtils.domToString(annotatedShadowTreeDocument));
             }
 
             return annotatedShadowTreeDocument;
@@ -612,11 +629,16 @@ public class XBLBindings {
     /**
      * Filter a shadow tree document to keep only XForms controls. This does not modify the input document.
      *
+     * @param indentedLogger    logger
      * @param fullShadowTree    full shadow tree document
      * @param boundElement
      * @return                  compact shadow tree document
      */
-    private static Document filterShadowTree(Document fullShadowTree, Element boundElement) {
+    private static Document filterShadowTree(IndentedLogger indentedLogger, Document fullShadowTree, Element boundElement) {
+
+        if (indentedLogger.isDebugEnabled()) {
+            indentedLogger.startHandleOperation("", "filtering shadow tree", "bound element", Dom4jUtils.elementToString(boundElement));
+        }
 
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
         final LocationDocumentResult result= new LocationDocumentResult();
@@ -629,9 +651,9 @@ public class XBLBindings {
         // Extractor produces /static-state/xbl:template, so extract the nested element
         final Document compactShadowTree = Dom4jUtils.createDocumentCopyParentNamespaces(result.getDocument().getRootElement().element(XFormsConstants.XBL_TEMPLATE_QNAME), true);
 
-        if (XFormsContainingDocument.logger.isDebugEnabled()) {
-            XFormsContainingDocument.logDebugStatic(XFormsStaticState.LOG_TYPE, "compact shadow tree",
-                    "bound element", Dom4jUtils.elementToString(boundElement), "document", Dom4jUtils.domToString(compactShadowTree));
+        if (indentedLogger.isDebugEnabled()) {
+            // XXX TODO: logging option to output whole document
+            indentedLogger.endHandleOperation("", "document", Dom4jUtils.domToString(compactShadowTree));
         }
 
         return compactShadowTree;

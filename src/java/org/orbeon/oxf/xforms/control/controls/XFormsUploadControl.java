@@ -160,7 +160,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
         if ((value == null || value.trim().equals("")) && !(oldValue == null || oldValue.trim().equals(""))) {
             // Consider that file got "deselected" in the UI
-            getXBLContainer().dispatchEvent(propertyContext, new XFormsDeselectEvent(this));
+            getXBLContainer().dispatchEvent(propertyContext, new XFormsDeselectEvent(containingDocument, this));
         }
 
         final IndentedLogger indentedLogger = getIndentedLogger();

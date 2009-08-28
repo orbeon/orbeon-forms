@@ -47,13 +47,13 @@ public abstract class XFormsUIEvent extends XFormsEvent {
 
     private XFormsControl targetXFormsControl;
 
-    public XFormsUIEvent(String eventName, XFormsControl targetObject) {
-        super(eventName, targetObject, true, false);
+    public XFormsUIEvent(XFormsContainingDocument containingDocument, String eventName, XFormsControl targetObject) {
+        super(containingDocument, eventName, targetObject, true, false);
         this.targetXFormsControl = targetObject;
     }
 
-    protected XFormsUIEvent(String eventName, XFormsControl targetObject, boolean bubbles, boolean cancelable) {
-        super(eventName, targetObject, bubbles, cancelable);
+    protected XFormsUIEvent(XFormsContainingDocument containingDocument, String eventName, XFormsControl targetObject, boolean bubbles, boolean cancelable) {
+        super(containingDocument, eventName, targetObject, bubbles, cancelable);
         this.targetXFormsControl = targetObject;
     }
 

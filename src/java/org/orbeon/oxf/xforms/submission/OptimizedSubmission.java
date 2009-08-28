@@ -358,7 +358,7 @@ public class OptimizedSubmission extends BaseSubmission {
                 // "the event xforms-submit-done is dispatched"
                 if (xformsModelSubmission != null)
                     xformsModelSubmission.getXBLContainer(containingDocument).dispatchEvent(propertyContext,
-                            new XFormsSubmitDoneEvent(xformsModelSubmission, connectionResult.resourceURI, connectionResult.statusCode));
+                            new XFormsSubmitDoneEvent(containingDocument, xformsModelSubmission, connectionResult.resourceURI, connectionResult.statusCode));
                 // Just forward the reply to the response
                 requestDispatcher.forward(requestAdapter, effectiveResponse);
                 connectionResult.dontHandleResponse = true;

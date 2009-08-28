@@ -588,7 +588,8 @@ public class XFormsContainingDocument extends XBLContainer {
 
                     // Process response by dispatching an event to the submission
                     final XFormsModelSubmission submission = (XFormsModelSubmission) getObjectByEffectiveId(result.getSubmissionEffectiveId());
-                    submission.getXBLContainer(this).dispatchEvent(propertyContext, new XXFormsSubmitReplaceEvent(submission, result));
+                    final XBLContainer container = submission.getXBLContainer(this);
+                    container.dispatchEvent(propertyContext, new XXFormsSubmitReplaceEvent(this, submission, result));
 
                 } catch (Throwable throwable) {
                     // Something bad happened
@@ -1019,7 +1020,7 @@ public class XFormsContainingDocument extends XBLContainer {
             }
             {
                 // Create event
-                final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget,
+                final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(this, eventName, eventTarget, otherEventTarget,
                         true, bubbles, cancelable, valueString, filesElement, new String[] { dndStart, dndEnd} );
 
                 // Handle repeat focus. Don't dispatch event on DOMFocusOut however.
@@ -1056,7 +1057,7 @@ public class XFormsContainingDocument extends XBLContainer {
                     // Dispatch repeat focus event
                     {
                         // The event target is in a repeated structure, so make sure it gets repeat focus
-                        dispatchEvent(pipelineContext, new XXFormsRepeatFocusEvent(eventTarget));
+                        dispatchEvent(pipelineContext, new XXFormsRepeatFocusEvent(this, eventTarget));
                         // Get a fresh reference
                         eventTarget = (XFormsControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
                     }
@@ -1074,7 +1075,7 @@ public class XFormsContainingDocument extends XBLContainer {
                         // Then, dispatch DOMActivate unless the control is read-only
                         final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
                         if (!xformsOutputControl.isReadonly()) {
-                            dispatchEvent(pipelineContext, new XFormsDOMActivateEvent(xformsOutputControl));
+                            dispatchEvent(pipelineContext, new XFormsDOMActivateEvent(this, xformsOutputControl));
                         }
                     } else if (ignoredXFormsOutputExternalEvents.get(eventName) == null) {
                         // Dispatch other event
@@ -1106,14 +1107,16 @@ public class XFormsContainingDocument extends XBLContainer {
                             // NOTE: setExternalValue() above may cause e.g. xforms-select / xforms-deselect events to be
                             // dispatched, so we get the control again to have a fresh reference
                             final XFormsControl sourceXFormsControl = (XFormsControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
-                            if (sourceXFormsControl != null)
-                                dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(sourceXFormsControl));
+                            if (sourceXFormsControl != null) {
+                                dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(this, sourceXFormsControl));
+                            }
 
                             // Dispatch DOMFocusIn
                             final XFormsControl otherTargetXFormsControl
                                 = (XFormsControl) getObjectByEffectiveId(((XFormsControl) valueChangeWithFocusChangeEvent.getOtherTargetObject()).getEffectiveId());
-                            if (otherTargetXFormsControl != null)
-                                dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(otherTargetXFormsControl));
+                            if (otherTargetXFormsControl != null) {
+                                dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(this, otherTargetXFormsControl));
+                            }
                         }
 
                         // NOTE: Refresh is done with the automatic deferred updates
@@ -1352,8 +1355,8 @@ public class XFormsContainingDocument extends XBLContainer {
     public void goOnline(PropertyContext propertyContext) {
         // Dispatch to all models
         for (XFormsModel currentModel: getModels()) {
-            // TODO: Dispatch to children containers
-            dispatchEvent(propertyContext, new XXFormsOnlineEvent(currentModel));
+            // TODO: Dispatch to children containers?
+            dispatchEvent(propertyContext, new XXFormsOnlineEvent(this, currentModel));
         }
 //        this.goingOnline = true;
         this.goingOffline = false;
@@ -1369,7 +1372,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 final Object o = getObjectByEffectiveId(currentPrefixedId);// NOTE: won't work for triggers within repeats
                 if (o instanceof XFormsTriggerControl) {
                     final XFormsTriggerControl trigger = (XFormsTriggerControl) o;
-                    final XFormsEvent event = new XFormsDOMActivateEvent(trigger);
+                    final XFormsEvent event = new XFormsDOMActivateEvent(this, trigger);
                     // This attribute is a temporary HACK, used to improve performance when going offline. It causes
                     // the insert action to not rebuild controls to adjust indexes after insertion, as well as always
                     // inserting based on the last node of the insert nodes-set. This probably wouldn't be needed if
@@ -1387,7 +1390,7 @@ public class XFormsContainingDocument extends XBLContainer {
         // Dispatch xxforms-offline to all models
         for (XFormsModel currentModel: getModels()) {
             // TODO: Dispatch to children containers
-            dispatchEvent(propertyContext, new XXFormsOfflineEvent(currentModel));
+            dispatchEvent(propertyContext, new XXFormsOfflineEvent(this, currentModel));
         }
 //        this.goingOnline = false;
         this.goingOffline = true;

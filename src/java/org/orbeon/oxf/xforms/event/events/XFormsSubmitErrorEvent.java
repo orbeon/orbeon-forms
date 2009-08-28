@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -48,17 +49,17 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
 
     private final ErrorType errorType;
 
-    public XFormsSubmitErrorEvent(XFormsEventTarget targetObject) {
-        this(null, targetObject, ErrorType.XXFORMS_INTERNAL_ERROR, null);
+    public XFormsSubmitErrorEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
+        this(containingDocument, null, targetObject, ErrorType.XXFORMS_INTERNAL_ERROR, null);
     }
 
-    public XFormsSubmitErrorEvent(XFormsEventTarget targetObject, String resourceURI, ErrorType errorType, int statusCode) {
-        super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, resourceURI, statusCode);
+    public XFormsSubmitErrorEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, String resourceURI, ErrorType errorType, int statusCode) {
+        super(containingDocument, XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, resourceURI, statusCode);
         this.errorType = errorType;
     }
 
-    public XFormsSubmitErrorEvent(PropertyContext propertyContext, XFormsEventTarget targetObject, ErrorType errorType, ConnectionResult connectionResult) {
-        super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, connectionResult);
+    public XFormsSubmitErrorEvent(XFormsContainingDocument containingDocument, PropertyContext propertyContext, XFormsEventTarget targetObject, ErrorType errorType, ConnectionResult connectionResult) {
+        super(containingDocument, XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, connectionResult);
         this.errorType = errorType;
         
         final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger();

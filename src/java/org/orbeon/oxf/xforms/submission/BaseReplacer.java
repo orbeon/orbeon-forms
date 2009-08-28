@@ -35,6 +35,6 @@ public abstract class BaseReplacer implements Replacer {
 
     protected void dispatchSubmitDone(PropertyContext propertyContext, ConnectionResult connectionResult) {
         submission.getXBLContainer(containingDocument)
-                .dispatchEvent(propertyContext, new XFormsSubmitDoneEvent(submission, connectionResult));
+                .dispatchEvent(propertyContext, new XFormsSubmitDoneEvent(containingDocument, submission, connectionResult));
     }
 }

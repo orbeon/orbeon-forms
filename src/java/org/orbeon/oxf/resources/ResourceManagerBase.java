@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.resources;
 
@@ -22,7 +22,6 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
@@ -36,8 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -48,7 +45,6 @@ public abstract class ResourceManagerBase implements ResourceManager {
     private static final String MIN_RELOAD_INTERVAL_KEY = "oxf.resources.common.min-reload-interval";
     private static final long DEFAULT_MIN_RELOAD_INTERVAL = 2 * 1000;
 
-    private Map lastCalltoLastModified = Collections.synchronizedMap(new HashMap());
     private ExpirationMap lastModifiedMap;
 
     /**
@@ -80,7 +76,7 @@ public abstract class ResourceManagerBase implements ResourceManager {
             DOMResult domResult = new DOMResult(XMLUtils.createDocument());
             identity.setResult(domResult);
             getContentAsSAX(key, identity);
-            return (Document) domResult.getNode();
+            return domResult.getNode();
         } catch (IllegalArgumentException e) {
             throw new OXFException(e);
         }
@@ -301,7 +297,7 @@ public abstract class ResourceManagerBase implements ResourceManager {
             // We don't have the information or or it has expired
             try {
                 long lastModified = lastModifiedImpl(key, doNotThrowResourceNotFound);
-                lastModifiedMap.put(currentTimeMillis, key, new Long(lastModified));
+                lastModifiedMap.put(currentTimeMillis, key, lastModified);
                 return lastModified;
             } catch (ResourceNotFoundException e) {
                 lastModifiedMap.put(currentTimeMillis, key, e);
@@ -311,14 +307,30 @@ public abstract class ResourceManagerBase implements ResourceManager {
             if (value instanceof ResourceNotFoundException) {
                 throw (ResourceNotFoundException) value;
             } else {
-                return ((Long) value).longValue();
+                return (Long) value;
             }
         }
     }
 
-    abstract protected long lastModifiedImpl(String key, boolean doNotThrowResourceNotFound);
-
-    protected void invalidateLastModifiedCache(String key) {
-        lastCalltoLastModified.remove(key);
+    /**
+     * Check if a resource exists given its key.
+     *
+     * @param key   A Resource Manager key
+     * @return      true iif the resource exists
+     */
+    public boolean exists(String key) {
+        try {
+            final InputStream is = getContentAsStream(key);
+            try {
+                is.close();
+            } catch (IOException e) {
+                // ignore
+            }
+            return true;
+        } catch (ResourceNotFoundException e) {
+            return false;
+        }
     }
+
+    abstract protected long lastModifiedImpl(String key, boolean doNotThrowResourceNotFound);
 }

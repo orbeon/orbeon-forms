@@ -186,7 +186,7 @@ public class ImageServer extends ProcessorImpl {
                     }
                     // Try to open the connection
                     urlConnection = newURL.openConnection();
-                    // Get InputStream and make sure it supprorts marks
+                    // Get InputStream and make sure it supports marks
                     urlConnectionInputStream = urlConnection.getInputStream();
                     if (!urlConnectionInputStream.markSupported())
                         urlConnectionInputStream = new BufferedInputStream(urlConnectionInputStream);

@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.resources;
 
@@ -26,28 +26,27 @@ import java.lang.reflect.Constructor;
 import java.util.*;
 
 /**
- * The priority resource manager delegates to two or more resource managers the
- * loading of documents. For example, if a flat file resource manager doesn't
- * contain a document, a second classloader resource manager might load it.
+ * The priority resource manager delegates to two or more resource managers the loading of documents. For example, if a
+ * flat file resource manager doesn't contain a document, a second classloader resource manager might load it.
  *
- * This is an important feature that allows an application developper to bundle a
- * resource, and still allow the user to override it easily.
+ * This is an important feature that allows an application developer to bundle a resource, and still allow the user to
+ * override it easily.
  */
 public class PriorityResourceManagerImpl implements ResourceManager {
 
-    List resourceManagers = new ArrayList();
+    private final List<ResourceManager> resourceManagers = new ArrayList<ResourceManager>();
 
-    public PriorityResourceManagerImpl(Map props) {
+    public PriorityResourceManagerImpl(Map<String, String> props) {
 
         // Map an order number to a Map of local properties
-        final Map orderToPropertyNames = new HashMap();
+        final Map<Integer, Map<String, String>> orderToPropertyNames = new HashMap<Integer, Map<String, String>>();
 
         for (Iterator i = props.keySet().iterator(); i.hasNext();) {
             final String key = (String) i.next();
             if (key.startsWith(PriorityResourceManagerFactory.PRIORITY_PROPERTY)) {
                 final String substring = key.substring(PriorityResourceManagerFactory.PRIORITY_PROPERTY.length());
                 final int dotIndex = substring.indexOf('.');
-                final Integer position;
+                final int position;
                 final String localPropertyName;
                 if (dotIndex == -1) {
                     position = new Integer(substring);
@@ -58,9 +57,9 @@ public class PriorityResourceManagerImpl implements ResourceManager {
                 }
 
                 if (orderToPropertyNames.get(position) == null)
-                    orderToPropertyNames.put(position, new HashMap());
+                    orderToPropertyNames.put(position, new HashMap<String, String>());
 
-                final Map localProperties = (Map) orderToPropertyNames.get(position);
+                final Map<String, String> localProperties = orderToPropertyNames.get(position);
                 localProperties.put(localPropertyName, props.get(key));
             }
         }
@@ -73,15 +72,15 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         // Create resource managers
         for (Iterator i = orderToPropertyNames.entrySet().iterator(); i.hasNext();) {
             final Map.Entry currentEntry = (Map.Entry) i.next();
-            final int position = ((Integer) currentEntry.getKey()).intValue();
+            final int position = (Integer) currentEntry.getKey();
             final Map localProperties = (Map) currentEntry.getValue();
             try {
                 // Create instance
-                final Class clazz = Class.forName((String) props.get(PriorityResourceManagerFactory.PRIORITY_PROPERTY + position));
-                final Constructor constructor = clazz.getConstructor(new Class[]{Map.class});
+                final Class<ResourceManagerFactoryFunctor> clazz = (Class<ResourceManagerFactoryFunctor>) Class.forName((String) props.get(PriorityResourceManagerFactory.PRIORITY_PROPERTY + position));
+                final Constructor<ResourceManagerFactoryFunctor> constructor = clazz.getConstructor(Map.class);
                 final Map allProps = new HashMap(props);
                 allProps.putAll(localProperties);
-                final ResourceManagerFactoryFunctor factory = (ResourceManagerFactoryFunctor) constructor.newInstance(new Object[]{allProps});
+                final ResourceManagerFactoryFunctor factory = constructor.newInstance(allProps);
                 final ResourceManager instance = factory.makeInstance();
 
                 resourceManagers.set(position - 1, instance);
@@ -146,29 +145,28 @@ public class PriorityResourceManagerImpl implements ResourceManager {
      * @return a timestamp
      */
     public long lastModified(final String key, boolean doNotThrowResourceNotFound) {
-        for (Iterator i = resourceManagers.iterator(); i.hasNext();) {
-            ResourceManager resourceManager = (ResourceManager) i.next();
+        for (ResourceManager resourceManager: resourceManagers) {
             long lastModified = resourceManager.lastModified(key, true);
-            if (lastModified != -1) 
+            if (lastModified != -1)
                 return lastModified;
         }
         throw new ResourceNotFoundException("Cannot find resource " + key);
     }
 
     /**
-     * Returns the length of the file denoted by this abstract pathname.
-     * @return The length, in bytes, of the file denoted by this abstract pathname, or 0L if the file does not exist
+     * Returns the length of the file denoted by this abstract path name.
+     * @return The length, in bytes, of the file denoted by this abstract path name, or 0L if the file does not exist
      */
     public int length(final String key) {
-        return ((Integer) delegate(new Operation() {
+        return (Integer) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
-                return new Integer(resourceManager.length(key));
+                return resourceManager.length(key);
             }
-        })).intValue();
+        });
     }
 
     /**
-     * Indicates if the resource manager implementation suports write operations
+     * Indicates if the resource manager implementation supports write operations
      * @return true if write operations are allowed
      */
     public boolean canWrite(final String key) {
@@ -241,33 +239,14 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         });
     }
 
-//    public void writeDOM(final String key, final Node node) {
-//        delegate(new Operation() {
-//            public Object run(ResourceManager resourceManager) {
-//                resourceManager.writeDOM(key, node);
-//                return null;
-//            }
-//        });
-//    }
-//
-//    public void writeDOM4J(final String key, final Document document) {
-//        delegate(new Operation() {
-//            public Object run(ResourceManager resourceManager) {
-//                resourceManager.writeDOM4J(key, document);
-//                return null;
-//            }
-//        });
-//    }
-
     private static interface Operation {
         public Object run(ResourceManager resourceManager);
     }
 
     private Object delegate(Operation operation) {
         Exception firstException = null;
-        for (Iterator i = resourceManagers.iterator(); i.hasNext();) {
+        for (ResourceManager resourceManager: resourceManagers) {
             try {
-                ResourceManager resourceManager = (ResourceManager) i.next();
                 return operation.run(resourceManager);
             } catch (Exception e) {
                 if(!(e instanceof ResourceNotFoundException)) {
@@ -286,5 +265,13 @@ public class PriorityResourceManagerImpl implements ResourceManager {
             throw ((ResourceNotFoundException) firstException);
         else
             throw new OXFException(firstException);
+    }
+
+    public boolean exists(String key) {
+        for (ResourceManager resourceManager: resourceManagers) {
+            if (resourceManager.exists(key))
+                return true;
+        }
+        return false;
     }
 }

@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -45,104 +47,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         final XFormsStaticState staticState = containingDocument.getStaticState();
 
         // Register control handlers on controller
-        {
-            final ElementHandlerController controller = handlerContext.getController();
-
-            // xforms:input
-            controller.registerHandler(XFormsInputHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "input");
-
-            // xforms:output
-            controller.registerHandler(XFormsOutputTextHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
-                public boolean match(Attributes attributes) {
-                    return XFormsConstants.XXFORMS_TEXT_APPEARANCE_QNAME.equals(controller.getAttributeQNameValue(attributes.getValue("appearance")));
-                }
-            });
-            controller.registerHandler(XFormsOutputDownloadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
-                public boolean match(Attributes attributes) {
-                    return XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME.equals(getAppearance(attributes));
-                }
-            });
-            controller.registerHandler(XFormsOutputImageHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
-                public boolean match(Attributes attributes) {
-                    final String mediatypeValue = attributes.getValue("mediatype");
-                    return mediatypeValue != null && mediatypeValue.startsWith("image/");
-                }
-            });
-            controller.registerHandler(XFormsOutputHTMLHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
-                public boolean match(Attributes attributes) {
-                    final String mediatypeValue = attributes.getValue("mediatype");
-                    return mediatypeValue != null && mediatypeValue.equals("text/html");
-                }
-            });
-            controller.registerHandler(XFormsOutputDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output");
-
-            // xforms:trigger
-            final ElementHandlerController.Matcher triggerSubmitMinimalMatcher = controller.new Matcher() {
-                public boolean match(Attributes attributes) {
-                    final QName appearance = getAppearance(attributes);
-                    return appearance != null && !handlerContext.isNoScript() // is noscript mode, use the full appearance
-                            && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance)    // minimal appearance
-                                || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance)); // legacy appearance
-                }
-            };
-            controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger", triggerSubmitMinimalMatcher);
-            controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger");
-
-            // xforms:submit
-            controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit", triggerSubmitMinimalMatcher);
-            controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit");
-
-            // xforms:group
-            controller.registerHandler(XFormsGroupInternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", controller.new Matcher() {
-                public boolean match(Attributes attributes) {
-                    return XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
-                }
-            });
-            controller.registerHandler(XFormsGroupFieldsetHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", controller.new Matcher() {
-                public boolean match(Attributes attributes) {
-                    return XFormsConstants.XXFORMS_FIELDSET_APPEARANCE_QNAME.equals(getAppearance(attributes));
-                }
-            });
-            controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group");
-
-            // xforms:switch
-            controller.registerHandler(XFormsSwitchHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch");
-            controller.registerHandler(XFormsCaseHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "case");
-
-            // xforms:repeat
-            controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat");
-
-            // xforms:secret
-            controller.registerHandler(XFormsSecretHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret");
-
-            // xforms:upload
-            controller.registerHandler(XFormsUploadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "upload");
-
-            // xforms:range
-            controller.registerHandler(XFormsRangeHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "range");
-
-            // Other controls
-            controller.registerHandler(XFormsTextareaHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
-            controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
-            controller.registerHandler(XFormsSelect1Handler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
-            controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog");
-
-            // Add handlers for LHHA elements
-//            if (true) {// TODO: check w/ XFStaticState if there are any standalone LHHA elements
-                controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "label");
-                controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "help");
-                controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "hint");
-                controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert");
-//            }
-
-            // Add handlers for custom components
-            final Map<QName, Element> componentBindings = staticState.getXblBindings().getComponentBindings();
-            if (componentBindings != null) {
-                for (final QName currentQName: componentBindings.keySet()) {
-                    controller.registerHandler(XXFormsComponentHandler.class.getName(), currentQName.getNamespaceURI(), currentQName.getName());
-                }
-            }
-        }
+        registerHandlers(staticState);
 
         // Add class for YUI skin
         // TODO: should be configurable somehow
@@ -160,9 +65,10 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers
 //        formattingPrefix = handlerContext.findFormattingPrefixDeclare();
 
+        final String requestPath;
         final String xformsSubmissionPath;
         {
-            final String requestPath = handlerContext.getExternalContext().getRequest().getRequestPath();
+            requestPath = handlerContext.getExternalContext().getRequest().getRequestPath();
             final boolean isForwarded = OrbeonXFormsFilter.OPS_RENDERER_PATH.equals(requestPath);
             if (isForwarded) {
                 // This is the case where the request was forwarded to us (separate deployment)
@@ -176,7 +82,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         // Noscript panel is included before the xhtml:form element, in case the form is hidden through CSS
         if (!handlerContext.isNoScript()) {
             // TODO: must send startPrefixMapping()/endPrefixMapping()?
-            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/noscript-panel.xml" });
+            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", getIncludedResourcePath(requestPath, "noscript-panel.xml") });
         }
 
         // Create xhtml:form element
@@ -220,24 +126,24 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
 
             // Store information about the initial index of each repeat
             {
-                final StringBuffer repeatIndexesStringBuffer = new StringBuffer();
+                final StringBuilder repeatIndexesBuilder = new StringBuilder();
                 final Map<String, Integer> repeatIdToIndex = xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex(staticState);
                 if (repeatIdToIndex.size() != 0) {
                     for (final Map.Entry<String, Integer> currentEntry: repeatIdToIndex.entrySet()) {
                         final String repeatId = currentEntry.getKey();
                         final Integer index = currentEntry.getValue();
 
-                        if (repeatIndexesStringBuffer.length() > 0)
-                            repeatIndexesStringBuffer.append(',');
+                        if (repeatIndexesBuilder.length() > 0)
+                            repeatIndexesBuilder.append(',');
 
-                        repeatIndexesStringBuffer.append(repeatId);
-                        repeatIndexesStringBuffer.append(' ');
-                        repeatIndexesStringBuffer.append(index);
+                        repeatIndexesBuilder.append(repeatId);
+                        repeatIndexesBuilder.append(' ');
+                        repeatIndexesBuilder.append(index);
                     }
                 }
 
                 helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                        "type", "hidden", "name", "$repeat-indexes", "value", repeatIndexesStringBuffer.toString()
+                        "type", "hidden", "name", "$repeat-indexes", "value", repeatIndexesBuilder.toString()
                 });
             }
 
@@ -255,12 +161,12 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
             if (XFormsProperties.isAjaxShowErrors(containingDocument)) {
                 // XInclude dialog so users can configure it
                 // TODO: must send startPrefixMapping()/endPrefixMapping()?
-                helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/error-dialog.xml" });
+                helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", getIncludedResourcePath(requestPath, "error-dialog.xml") });
             }
 
             // Help panel
             // TODO: must send startPrefixMapping()/endPrefixMapping()?
-            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", "oxf:/config/help-panel.xml" });
+            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] { "href", getIncludedResourcePath(requestPath, "help-panel.xml") });
 
             // Templates
             {
@@ -288,6 +194,105 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         }
     }
 
+    private void registerHandlers(XFormsStaticState staticState) {
+        final ElementHandlerController controller = handlerContext.getController();
+
+        // xforms:input
+        controller.registerHandler(XFormsInputHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "input");
+
+        // xforms:output
+        controller.registerHandler(XFormsOutputTextHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
+            public boolean match(Attributes attributes) {
+                return XFormsConstants.XXFORMS_TEXT_APPEARANCE_QNAME.equals(controller.getAttributeQNameValue(attributes.getValue("appearance")));
+            }
+        });
+        controller.registerHandler(XFormsOutputDownloadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
+            public boolean match(Attributes attributes) {
+                return XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME.equals(getAppearance(attributes));
+            }
+        });
+        controller.registerHandler(XFormsOutputImageHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
+            public boolean match(Attributes attributes) {
+                final String mediatypeValue = attributes.getValue("mediatype");
+                return mediatypeValue != null && mediatypeValue.startsWith("image/");
+            }
+        });
+        controller.registerHandler(XFormsOutputHTMLHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
+            public boolean match(Attributes attributes) {
+                final String mediatypeValue = attributes.getValue("mediatype");
+                return mediatypeValue != null && mediatypeValue.equals("text/html");
+            }
+        });
+        controller.registerHandler(XFormsOutputDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output");
+
+        // xforms:trigger
+        final ElementHandlerController.Matcher triggerSubmitMinimalMatcher = controller.new Matcher() {
+            public boolean match(Attributes attributes) {
+                final QName appearance = getAppearance(attributes);
+                return appearance != null && !handlerContext.isNoScript() // is noscript mode, use the full appearance
+                        && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance)    // minimal appearance
+                            || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance)); // legacy appearance
+            }
+        };
+        controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger", triggerSubmitMinimalMatcher);
+        controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger");
+
+        // xforms:submit
+        controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit", triggerSubmitMinimalMatcher);
+        controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit");
+
+        // xforms:group
+        controller.registerHandler(XFormsGroupInternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", controller.new Matcher() {
+            public boolean match(Attributes attributes) {
+                return XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
+            }
+        });
+        controller.registerHandler(XFormsGroupFieldsetHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", controller.new Matcher() {
+            public boolean match(Attributes attributes) {
+                return XFormsConstants.XXFORMS_FIELDSET_APPEARANCE_QNAME.equals(getAppearance(attributes));
+            }
+        });
+        controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group");
+
+        // xforms:switch
+        controller.registerHandler(XFormsSwitchHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch");
+        controller.registerHandler(XFormsCaseHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "case");
+
+        // xforms:repeat
+        controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat");
+
+        // xforms:secret
+        controller.registerHandler(XFormsSecretHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret");
+
+        // xforms:upload
+        controller.registerHandler(XFormsUploadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "upload");
+
+        // xforms:range
+        controller.registerHandler(XFormsRangeHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "range");
+
+        // Other controls
+        controller.registerHandler(XFormsTextareaHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
+        controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
+        controller.registerHandler(XFormsSelect1Handler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
+        controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog");
+
+        // Add handlers for LHHA elements
+//            if (true) {// TODO: check w/ XFStaticState if there are any standalone LHHA elements
+        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "label");
+        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "help");
+        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "hint");
+        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert");
+//            }
+
+        // Add handlers for custom components
+        final Map<QName, Element> componentBindings = staticState.getXblBindings().getComponentBindings();
+        if (componentBindings != null) {
+            for (final QName currentQName: componentBindings.keySet()) {
+                controller.registerHandler(XXFormsComponentHandler.class.getName(), currentQName.getNamespaceURI(), currentQName.getName());
+            }
+        }
+    }
+
     public void end(String uri, String localname, String qName) throws SAXException {
         // Close xhtml:form
         helper.endElement();
@@ -295,5 +300,19 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         // Close xhtml:body
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.endElement(uri, localname, qName);
+    }
+
+    private String getIncludedResourcePath(String requestPath, String fileName) {
+        // Path will look like "/app-name/whatever"
+        final String[] pathElements = StringUtils.split(requestPath, '/');
+        if (pathElements.length >= 2) {
+            final String appName = pathElements[0];// it seems that split() does not return first blank match
+            final String path = "/apps/" + appName + "/" + fileName;
+            if (ResourceManagerWrapper.instance().exists(path)) {
+                return "oxf:" + path;
+            }
+        }
+        // Default
+        return "oxf:/config/" + fileName;
     }
 }

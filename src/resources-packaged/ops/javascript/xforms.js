@@ -5440,7 +5440,7 @@ ORBEON.xforms.Server = {
             }
         } else {
             if (!responseXML || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")) {
-                // The XML docucment does not come in o.responseXML: parse o.responseText.
+                // The XML document does not come in o.responseXML: parse o.responseText.
                 // This happens in particular when we get a response after a background upload.
                 var xmlString = o.responseText.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
                 responseXML = ORBEON.util.Dom.stringToDom(xmlString);
@@ -6034,10 +6034,13 @@ ORBEON.xforms.Server = {
                                                     // so each item has a label, which is different from the label of the control. Here we have an <xform:input>
                                                     // so there is no item label.
                                                     documentElement.appendChild(templateClone);
-                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-label$", "");
                                                     ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", "true");
                                                     ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-index$", "0");
                                                     ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
+
+                                                    // Remove nested label
+                                                    var labelElement = templateClone.getElementsByTagName("label")[0];
+                                                    labelElement.parentNode.removeChild(labelElement);
 
                                                     // Update classes
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");

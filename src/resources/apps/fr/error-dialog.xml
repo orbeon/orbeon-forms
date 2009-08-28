@@ -1,0 +1,57 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<div xmlns="http://www.w3.org/1999/xhtml"
+     class="xforms-error-panel xforms-initially-hidden">
+    <div class="hd">An error has occurred in Form Runner</div>
+    <div class="bd">
+        <p>
+            You may want to try one of the following:
+        </p>
+        <ul>
+            <li><a class="xforms-error-panel-close">Close this dialog</a> and continue to use this page.</li>
+            <li><a class="xforms-error-panel-reload">Reload this page</a>. Note that you will lose any unsaved changes.</li>
+            <li>
+                <p>
+                    If the above does not work, try reloading the page yourself. Note that you will lose any unsaved changes:
+                </p>
+                <ul>
+                    <li>
+                        With Firefox and Safari: hold down the <code>shift</code> key and click the Reload button in your browser toolbar.
+                    </li>
+                    <li>
+                        With Internet Explorer: hold down the <code>control</code> key and click the Reload button in your browser toolbar.
+                    </li>
+                </ul>
+            </li>
+            <li>Return <a href="/">home</a>.</li>
+        </ul>
+        <div class="xforms-error-panel-details-hidden">
+            <p>
+                <a class="xforms-error-panel-show-details">
+                    <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
+                    <span>Show details</span>
+                </a>
+            </p>
+        </div>
+        <div class="xforms-error-panel-details-shown xforms-disabled">
+            <p>
+                <a class="xforms-error-panel-hide-details">
+                    <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
+                    <span>Hide details</span>
+                </a>
+            </p>
+            <div class="xforms-error-panel-details"/>
+        </div>
+    </div>
+</div>

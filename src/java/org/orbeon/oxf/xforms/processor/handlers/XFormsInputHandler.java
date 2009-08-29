@@ -111,7 +111,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                 }
             };
             select1Handler.setContext(getContext());
-            select1Handler.outputContent(uri, localname, attributes, staticId, effectiveId, inputControl, itemset, isMultiple, true);
+            select1Handler.outputContent(uri, localname, attributes, staticId, effectiveId, inputControl, itemset, isMultiple, true, true);
 
         } else {
 

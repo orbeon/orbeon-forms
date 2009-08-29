@@ -125,12 +125,12 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         // 2. The control exists and is relevant
         final Itemset itemset = XFormsSelect1Control.getInitialItemset(pipelineContext, containingDocument, xformsSelect1Control, getPrefixedId());
 
-        outputContent(uri, localname, attributes, staticId, effectiveId, xformsSelect1Control, itemset, isMultiple, isFull);
+        outputContent(uri, localname, attributes, staticId, effectiveId, xformsSelect1Control, itemset, isMultiple, isFull, false);
     }
 
     public void outputContent(String uri, String localname, Attributes attributes, String staticId, String effectiveId,
                               final XFormsValueControl xformsSelect1Control, Itemset itemset,
-                              final boolean isMultiple, final boolean isFull) throws SAXException {
+                              final boolean isMultiple, final boolean isFull, boolean isBooleanInput) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
@@ -140,7 +140,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         if (!isStaticReadonly(xformsSelect1Control)) {
             if (isFull) {
                 // Full appearance
-                outputFull(uri, localname, attributes, staticId, effectiveId, xformsSelect1Control, itemset, isMultiple);
+                outputFull(uri, localname, attributes, staticId, effectiveId, xformsSelect1Control, itemset, isMultiple, isBooleanInput);
             } else {
 
                 if (isOpenSelection) {
@@ -412,7 +412,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         }
     }
 
-    private void outputFull(String uri, String localname, Attributes attributes, String staticId, String effectiveId, XFormsValueControl xformsControl, Itemset itemset, boolean isMultiple) throws SAXException {
+    private void outputFull(String uri, String localname, Attributes attributes, String staticId, String effectiveId,
+                            XFormsValueControl xformsControl, Itemset itemset, boolean isMultiple, boolean isBooleanInput) throws SAXException {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, !isFull);
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -429,7 +430,9 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
         {
 
-            if (!handlerContext.isNewXHTMLLayout())
+            // Old layout always output container <span>/<fieldset>, and in new layout we only put it for select/select1
+            final boolean outputContainerElement = !isBooleanInput || !handlerContext.isNewXHTMLLayout();
+            if (outputContainerElement)
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName, containerAttributes);
             {
                 if (handlerContext.isNoScript()) {
@@ -452,11 +455,11 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     for (Iterator<Item> i = itemset.toList().iterator(); i.hasNext(); itemIndex++) {
                         final Item item = i.next();
                         handleItemFull(pipelineContext, handlerContext, contentHandler, reusableAttributes, attributes, xhtmlPrefix, spanQName,
-                                containingDocument, xformsControl, staticId, effectiveId, isMultiple, fullItemType, item, Integer.toString(itemIndex), itemIndex == 0);
+                                containingDocument, xformsControl, staticId, effectiveId, isMultiple, fullItemType, item, Integer.toString(itemIndex), itemIndex == 0, isBooleanInput);
                     }
                 }
             }
-            if (!handlerContext.isNewXHTMLLayout())
+            if (outputContainerElement)
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName);
         }
 
@@ -477,7 +480,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 xhtmlPrefix, spanQName, containingDocument, null, staticId, effectiveId, isMultiple, fullItemType,
                 new Item(isMultiple, false, Collections.EMPTY_LIST, // make sure the value "$xforms-template-value$" is not encrypted
                         "$xforms-template-label$", "$xforms-template-value$"),
-                        "$xforms-item-index$", true);
+                        "$xforms-item-index$", true, false);
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
     }
 
@@ -495,7 +498,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                       AttributesImpl reusableAttributes, Attributes attributes, String xhtmlPrefix, String spanQName,
                                       XFormsContainingDocument containingDocument, XFormsValueControl xformsControl, String staticId,
                                       String effectiveId, boolean isMultiple, String type,
-                                      Item item, String itemIndex, boolean isFirst) throws SAXException {
+                                      Item item, String itemIndex, boolean isFirst, boolean isBooleanInput) throws SAXException {
 
         // Create an id for the item (making this unique)
         final String itemEffectiveId = getItemId(effectiveId, itemIndex);
@@ -516,8 +519,11 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         {
             // xhtml:span enclosing just the input
-            reusableAttributes.clear();
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
+            // TODO: WHY?
+//            if (!isBooleanInput) {
+//                reusableAttributes.clear();
+//                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
+//            }
             {
                 // xhtml:input
                 final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
@@ -549,10 +555,11 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
             }
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+//            if (!isBooleanInput) {
+//                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+//            }
 
             // We don't output the label within <input></input>, because XHTML won't display it.
-
             final String label = item.getLabel();
             if (label != null) { // allow null label to tell not to output the <label> element at all
                 reusableAttributes.clear();

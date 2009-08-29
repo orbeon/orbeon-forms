@@ -1,0 +1,59 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+  
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+  
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xforms="http://www.w3.org/2002/xforms">
+    <head>
+        <title>XForms tip: how to dispatch events to all iterations of repeated controls</title>
+        <xforms:model>
+            <xforms:instance xmlns="">
+                <values>
+                    <value/>
+                    <value/>
+                    <value/>
+                    <value/>
+                </values>
+            </xforms:instance>
+        </xforms:model>
+    </head>
+    <body>
+        <!-- Iterate over all the values -->
+        <xforms:repeat nodeset="value" id="my-repeat">
+            <div>
+                <xforms:input id="my-input" ref=".">
+                    <!-- Upon receiving event "my-event", set the value of the control -->
+                    <xforms:setvalue ev:event="my-event" ref="." value="count(preceding-sibling::*) + 1"/>
+                </xforms:input>
+            </div>
+        </xforms:repeat>
+
+        <xforms:trigger>
+            <xforms:label>Dispatch</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <!-- Save current index -->
+                <xxforms:variable name="initial-index" select="index('my-repeat')"/>
+                <!-- Iterate through all values -->
+                <xforms:action xxforms:iterate="value">
+                    <!-- Set index and dispatch event -->
+                    <xforms:setindex repeat="my-repeat" index="count(preceding-sibling::*) + 1"/>
+                    <xforms:dispatch name="my-event" targetid="my-input"/>
+                </xforms:action>
+                <!-- Restore index -->
+                <xforms:setindex repeat="my-repeat" index="$initial-index"/>
+            </xforms:action>
+        </xforms:trigger>
+    </body>
+</html>

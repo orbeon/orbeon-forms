@@ -72,9 +72,7 @@
                 <xhtml:span id="my-new-boolean-input" class="xforms-control xforms-input xforms-required xforms-required-filled xforms-type-boolean">
                     <xhtml:label class="xforms-label" for="my-new-boolean-input$$e0">My label</xhtml:label>
                     <xhtml:span class="xforms-selected">
-                        <xhtml:span>
-                            <xhtml:input id="my-new-boolean-input$$e0" type="checkbox" name="my-new-boolean-input" value="true" checked="checked"/>
-                        </xhtml:span>
+                        <xhtml:input id="my-new-boolean-input$$e0" type="checkbox" name="my-new-boolean-input" value="true" checked="checked"/>
                     </xhtml:span>
                     <xhtml:img class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
                     <xhtml:label class="xforms-help" for="my-new-boolean-input$$e0">My help</xhtml:label>
@@ -129,10 +127,8 @@
                 <xhtml:label class="xforms-hint" id="my-old-input$$t" for="my-old-input$xforms-input-1">My hint</xhtml:label>
                 <xhtml:label class="xforms-label" id="my-old-boolean-input$$l" for="my-old-boolean-input$$e0">My label</xhtml:label>
                 <xhtml:span id="my-old-boolean-input" class="xforms-control xforms-input xforms-incremental xforms-input-appearance-minimal xforms-required xforms-required-filled xforms-type-boolean">
-                    <xhtml:span class="xforms-selected">
-                        <xhtml:span>
-                            <xhtml:input id="my-old-boolean-input$$e0" type="checkbox" name="my-old-boolean-input" value="true" checked="checked"/>
-                        </xhtml:span>
+                <xhtml:span class="xforms-selected">
+                        <xhtml:input id="my-old-boolean-input$$e0" type="checkbox" name="my-old-boolean-input" value="true" checked="checked"/>
                     </xhtml:span>
                 </xhtml:span>
                 <xhtml:img id="my-old-boolean-input$$i" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>

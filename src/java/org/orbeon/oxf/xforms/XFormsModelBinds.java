@@ -74,13 +74,13 @@ public class XFormsModelBinds {
 
     private boolean isFirstCalculate;                           // whether this is the first recalculate for the associated XForms model
 
-    private static final Map<String, String> BUILTIN_XFORMS_SCHEMA_TYPES = new HashMap<String, String>();
+    private static final Set<String> BUILTIN_XFORMS_SCHEMA_TYPES = new HashSet<String>();
 
     static {
-        BUILTIN_XFORMS_SCHEMA_TYPES.put("dayTimeDuration", "");
-        BUILTIN_XFORMS_SCHEMA_TYPES.put("yearMonthDuration", "");
-        BUILTIN_XFORMS_SCHEMA_TYPES.put("email", "");
-        BUILTIN_XFORMS_SCHEMA_TYPES.put("card-number", "");
+        BUILTIN_XFORMS_SCHEMA_TYPES.add("dayTimeDuration");
+        BUILTIN_XFORMS_SCHEMA_TYPES.add("yearMonthDuration");
+        BUILTIN_XFORMS_SCHEMA_TYPES.add("email");
+        BUILTIN_XFORMS_SCHEMA_TYPES.add("card-number");
     }
 
     /**
@@ -788,7 +788,7 @@ public class XFormsModelBinds {
                     final boolean isBuiltInXFormsType = XFormsConstants.XFORMS_NAMESPACE_URI.equals(typeNamespaceURI);
                     final boolean isBuiltInXXFormsType = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(typeNamespaceURI);
 
-                    final boolean isBuiltInXFormsSchemaType = isBuiltInXFormsType && BUILTIN_XFORMS_SCHEMA_TYPES.get(typeLocalname) != null;
+                    final boolean isBuiltInXFormsSchemaType = isBuiltInXFormsType && BUILTIN_XFORMS_SCHEMA_TYPES.contains(typeLocalname);
 
                     if (isBuiltInXFormsSchemaType) {
                         // xforms:dayTimeDuration, xforms:yearMonthDuration, xforms:email, xforms:card-number

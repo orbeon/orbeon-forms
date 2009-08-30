@@ -32,15 +32,19 @@
             <xforms:instance id="main-instance">
                 <instance repeat-shown="true" readonly="" relevant="true">
                     <input>
+                        <label>Label</label>
                         <value>true</value>
                     </input>
                     <textarea>
+                        <label>Label</label>
                         <value>true</value>
                     </textarea>
                     <secret>
+                        <label>Label</label>
                         <value>true</value>
                     </secret>
                     <input-boolean>
+                        <label>Label</label>
                         <value>true</value>
                     </input-boolean>
                     <select>
@@ -115,7 +119,7 @@
             <xforms:group ref="input">
                 <xhtml:p>
                     <xforms:input ref="value" id="input">
-                        <xforms:label>Input</xforms:label>
+                        <xforms:label ref="../label"/>
                     </xforms:input>
                 </xhtml:p>
             </xforms:group>
@@ -125,7 +129,7 @@
             <xforms:group ref="textarea">
                 <xhtml:p>
                     <xforms:textarea ref="value" id="textarea">
-                        <xforms:label>Text area</xforms:label>
+                        <xforms:label ref="../label"/>
                     </xforms:textarea>
                 </xhtml:p>
             </xforms:group>
@@ -135,7 +139,7 @@
             <xforms:group ref="secret">
                 <xhtml:p>
                     <xforms:secret ref="value" id="secret">
-                        <xforms:label>Secret</xforms:label>
+                        <xforms:label ref="../label"/>
                     </xforms:secret>
                 </xhtml:p>
             </xforms:group>
@@ -145,7 +149,7 @@
             <xforms:group ref="input-boolean">
                 <xhtml:p>
                     <xforms:input ref="value" id="input-boolean">
-                        <xforms:label>True/false</xforms:label>
+                        <xforms:label ref="../label"/>
                     </xforms:input>
                 </xhtml:p>
             </xforms:group>

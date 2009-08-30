@@ -178,12 +178,12 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
                 // xforms:select[@appearance = 'full'], xforms:input[@type = 'xs:boolean']
                 XFormsSelect1Handler.outputItemFullTemplate(pipelineContext, handlerContext, contentHandler, htmlPrefix, spanQName,
                         containingDocument, reusableAttributes, attributes,
-                        "xforms-select-full-template", TEMPLATE_ID, TEMPLATE_ID, true, "checkbox");
+                        "xforms-select-full-template", TEMPLATE_ID, true, "checkbox");
 
                 // xforms:select1[@appearance = 'full']
                 XFormsSelect1Handler.outputItemFullTemplate(pipelineContext, handlerContext, contentHandler, htmlPrefix, spanQName,
                         containingDocument, reusableAttributes, attributes,
-                        "xforms-select1-full-template", TEMPLATE_ID, TEMPLATE_ID, true, "radio");
+                        "xforms-select1-full-template", TEMPLATE_ID, true, "radio");
             }
 
         } else {

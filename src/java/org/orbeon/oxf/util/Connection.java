@@ -79,6 +79,10 @@ public class Connection {
         try {
             final boolean isHTTPOrHTTPS = isHTTPOrHTTPS(connectionURL.getProtocol());
 
+            // Caller might pass null here
+            if (headerNameValues == null)
+                headerNameValues = Collections.emptyMap();
+
             // Get state if possible
             if (isHTTPOrHTTPS)
                 loadHttpState(externalContext, indentedLogger);
@@ -125,7 +129,7 @@ public class Connection {
         final Map<String, String> headersToForwardMap = getHeadersToForward(headersToForward);
 
         // Set headers if provided
-        if (headerNameValues != null && headerNameValues.size() > 0) {
+        if (headerNameValues.size() > 0) {
             for (final Map.Entry<String, String[]> currentEntry: headerNameValues.entrySet()) {
                 final String currentHeaderName = currentEntry.getKey();
                 final String[] currentHeaderValues = currentEntry.getValue();

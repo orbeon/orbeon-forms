@@ -39,6 +39,7 @@
             <xforms:instance id="instance">
                 <instance>
                     <age>35</age>
+                    <preference>false</preference>
                     <name/>
                     <secret>42</secret>
                     <textarea>The world is but a canvas for the imagination.</textarea>
@@ -49,10 +50,14 @@
                     <flavor>v c</flavor>
                     <carrier>fedex</carrier>
                     <country-name/>
-                    <new-item>
+                    <new-carrier>
+                        <label>USPS</label>
+                        <value>usps</value>
+                    </new-carrier>
+                    <new-flavor>
                         <label>Key lime</label>
                         <value>lime</value>
-                    </new-item>
+                    </new-flavor>
                     <range>
                         <value>1</value>
                         <letter>A</letter>
@@ -101,6 +106,8 @@
             <xforms:bind nodeset="instance('instance')">
                 <!-- Age must be a positive integer and at most 150 -->
                 <xforms:bind nodeset="age" type="xs:positiveInteger" constraint=". le 150"/>
+                <!-- Boolean value -->
+                <xforms:bind nodeset="preference" type="xs:boolean"/>
                 <!-- Secret password is 42 -->
                 <xforms:bind nodeset="secret" constraint=". = '42'"/>
                 <!-- Text must be longer than 10 characters -->
@@ -155,7 +162,13 @@
                     </xforms:input>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:secret ref="secret[false()]" incremental="true" class="password" navindex="2" id="secret">
+                    <xforms:input id="preference" ref="preference">
+                        <xforms:label class="fixed-width">I like XForms:</xforms:label>
+                        <xforms:hint>Select this checkbox if you like XForms</xforms:hint>
+                    </xforms:input>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:secret ref="secret" incremental="true" class="password" navindex="2" id="secret">
                         <xforms:label class="fixed-width">Password:</xforms:label>
                         <xforms:hint>The password is 42 ;)</xforms:hint>
                         <xforms:alert>Invalid password</xforms:alert>
@@ -164,7 +177,7 @@
                 </xhtml:p>
                 <xhtml:p>
                     <xforms:textarea ref="textarea" class="textarea" navindex="3" id="textarea">
-                        <xforms:label class="fixed-width">Text area:</xforms:label>
+                        <xforms:label class="fixed-width">Wisdom:</xforms:label>
                         <xforms:hint>Enter at least 11 characters</xforms:hint>
                         <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
                         <xforms:help><xforms:output mediatype="text/html" value="instance('resources-instance')/help/textarea"/></xforms:help>
@@ -269,6 +282,26 @@
                             <xforms:help>Select one item in the drop-down</xforms:help>
                         </xforms:select1>
                     </xhtml:p>
+                    <xhtml:p>
+                        <xforms:group>
+                            <xforms:label class="fixed-width">Label/value:</xforms:label>
+
+                            <xforms:input ref="new-carrier/label" navindex="10"/>
+                            <xforms:input ref="new-carrier/value" navindex="11"/>
+                            <xforms:trigger navindex="12">
+                                <xforms:label>Add carrier</xforms:label>
+                                <xforms:hint>Add a carrier to the list of carriers</xforms:hint>
+                                <xforms:action  ev:event="DOMActivate">
+                                    <xforms:insert nodeset="instance('carriers-instance')/carrier"
+                                        at="last()" position="after"/>
+                                    <xforms:setvalue ref="instance('carriers-instance')/carrier[last()]/@value"
+                                        value="instance('instance')/new-carrier/value"/>
+                                    <xforms:setvalue ref="instance('carriers-instance')/carrier[last()]/label"
+                                        value="instance('instance')/new-carrier/label"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xforms:group>
+                    </xhtml:p>
                 </xforms:group>
                 <xforms:group appearance="xxforms:fieldset">
                     <xforms:label>Multiple Value Selection</xforms:label>
@@ -292,45 +325,25 @@
                             <xforms:help>Select as many items form the list as you want</xforms:help>
                         </xforms:select>
                     </xhtml:p>
-                </xforms:group>
-                <xforms:group appearance="xxforms:fieldset">
-                    <xforms:label>Add</xforms:label>
                     <xhtml:p>
-                        <xforms:input ref="new-item/label" navindex="10">
-                            <xforms:label class="fixed-width">Label:</xforms:label>
-                        </xforms:input>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xforms:input ref="new-item/value" navindex="11">
-                            <xforms:label class="fixed-width">Value:</xforms:label>
-                        </xforms:input>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xhtml:span class="fixed-width"/>
-                        <xforms:trigger navindex="12">
-                            <xforms:label>Add carrier</xforms:label>
-                            <xforms:hint>Add a carrier to the list of carriers</xforms:hint>
-                            <xforms:action  ev:event="DOMActivate">
-                                <xforms:insert nodeset="instance('carriers-instance')/carrier"
-                                    at="last()" position="after"/>
-                                <xforms:setvalue ref="instance('carriers-instance')/carrier[last()]/@value"
-                                    value="instance('instance')/new-item/value"/>
-                                <xforms:setvalue ref="instance('carriers-instance')/carrier[last()]/label"
-                                    value="instance('instance')/new-item/label"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                        <xforms:trigger navindex="13">
-                            <xforms:label>Add flavor</xforms:label>
-                            <xforms:hint>Add a flavor to the list of flavors</xforms:hint>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:insert nodeset="instance('flavors-instance')/flavor"
-                                    at="last()" position="after"/>
-                                <xforms:setvalue ref="instance('flavors-instance')/flavor[last()]/@value"
-                                    value="instance('instance')/new-item/value"/>
-                                <xforms:setvalue ref="instance('flavors-instance')/flavor[last()]/label"
-                                    value="instance('instance')/new-item/label"/>
-                            </xforms:action>
-                        </xforms:trigger>
+                        <xforms:group>
+                            <xforms:label class="fixed-width">Label/value:</xforms:label>
+
+                            <xforms:input ref="new-flavor/label" navindex="10"/>
+                            <xforms:input ref="new-flavor/value" navindex="11"/>
+                            <xforms:trigger navindex="13">
+                                <xforms:label>Add flavor</xforms:label>
+                                <xforms:hint>Add a flavor to the list of flavors</xforms:hint>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:insert nodeset="instance('flavors-instance')/flavor"
+                                        at="last()" position="after"/>
+                                    <xforms:setvalue ref="instance('flavors-instance')/flavor[last()]/@value"
+                                        value="instance('instance')/new-flavor/value"/>
+                                    <xforms:setvalue ref="instance('flavors-instance')/flavor[last()]/label"
+                                        value="instance('instance')/new-flavor/label"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xforms:group>
                     </xhtml:p>
                 </xforms:group>
                 <xforms:group appearance="xxforms:fieldset">

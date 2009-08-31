@@ -283,7 +283,7 @@
                     better to have verbose error reporting from HTMLTidy.
                 </p>
                 <xml-source>
-                    <p:processor name="oxf:servlet-include">
+                    <p:processor name="oxf:servlet-include-generator">
                         <p:input name="config">
                             <config>
                                 <servlet-name>reports</servlet-name>

@@ -1184,7 +1184,11 @@ ORBEON.util.Utils = {
             }
         }
 
-        var placeholderRegExp = new RegExp(placeholder.replace(new RegExp("\\$", "g"), "\\$"), "g");
+        // Escape dollar signs we might have in the placeholder or replacement so they can be used in regexp
+        placeholder = placeholder.replace(new RegExp("\\$", "g"), "\\$");
+        replacement = replacement.replace(new RegExp("\\$", "g"), "$$$$");
+
+        var placeholderRegExp = new RegExp(placeholder, "g");
         stringReplaceWorker(node, placeholderRegExp, replacement);
     },
 
@@ -5879,6 +5883,7 @@ ORBEON.xforms.Server = {
                                                 var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e" + itemIndex);
                                                 ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-effective-id$", itemEffectiveId);
                                                 ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
+
                                                 // Restore checked state after copy
                                                 if (valueToChecked[itemElement[1]] == true) {
                                                     var inputToCheck = templateClone.getElementsByTagName("input")[0];

@@ -1,0 +1,59 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms">
+    <head>
+        <title>Dynamic dropdown depending on checkboxes</title>
+        <xf:model>
+            <xf:instance id="selected-values" xmlns="">
+                <instance>
+                    <pets/>
+                    <favorite/>
+                </instance>
+            </xf:instance>
+            <xf:instance id="pets" xmlns="">
+                <root>
+                    <item name="Cat" value="cat"/>
+                    <item name="Dog" value="dog"/>
+                    <item name="Fish" value="fish"/>
+                    <item name="Cobra" value="cobra"/>
+                </root>
+            </xf:instance>
+        </xf:model>
+        <style type="text/css">
+            .xforms-label { display: block; font-weight: bold }
+        </style>
+    </head>
+    <body>
+        <xf:select ref="pets" appearance="full">
+            <xf:label>Please list all your pets:</xf:label>
+            <xf:itemset nodeset="instance('pets')/item">
+                <xf:label ref="@name"/>
+                <xf:value ref="@value"/>
+            </xf:itemset>
+        </xf:select>
+        <br/>
+        <xf:select1 ref="favorite">
+            <xf:label>Select your favorite pet:</xf:label>
+            <xf:itemset>
+                <xf:label/>
+                <xf:value/>
+            </xf:itemset>
+            <xf:itemset nodeset="instance('pets')/item[@value = tokenize(context()/../pets, '\s+')]">
+                <xf:label ref="@name"/>
+                <xf:value ref="@value"/>
+            </xf:itemset>
+        </xf:select1>
+    </body>
+</html>

@@ -5876,7 +5876,8 @@ ORBEON.xforms.Server = {
                                                 spanContainer.appendChild(templateClone);
                                                 ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-label$", itemElement[0]);
                                                 ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", itemElement[1]);
-                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-index$", itemIndex);
+                                                var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e" + itemIndex);
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-effective-id$", itemEffectiveId);
                                                 ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
                                                 // Restore checked state after copy
                                                 if (valueToChecked[itemElement[1]] == true) {
@@ -6081,7 +6082,8 @@ ORBEON.xforms.Server = {
 
                                                     // Replace placeholders
                                                     ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", "true");
-                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-index$", "0");
+                                                    var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e0");
+                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-effective-id$", itemEffectiveId);
                                                     ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
 
                                                     // Update classes

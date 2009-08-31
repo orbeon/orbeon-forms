@@ -30,7 +30,7 @@ public abstract class BaseReplacer implements Replacer {
     }
 
     protected IndentedLogger getIndentedLogger() {
-        return containingDocument.getIndentedLogger(XFormsModelSubmission.logger);
+        return containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
     }
 
     protected void dispatchSubmitDone(PropertyContext propertyContext, ConnectionResult connectionResult) {

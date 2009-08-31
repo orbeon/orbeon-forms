@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
@@ -36,7 +37,7 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
         final String repeatId = (repeatIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), repeatIdExpression.evaluateAsString(xpathContext));
 
         // Note that this is deprecated. Move to warning later?
-        final IndentedLogger indentedLogger = getContainingDocument(xpathContext).getIndentedLogger();
+        final IndentedLogger indentedLogger = getContainingDocument(xpathContext).getIndentedLogger(XFormsControls.LOGGING_CATEGORY);
         if (indentedLogger.isDebugEnabled())
             indentedLogger.logDebug("xxforms:repeat-curent()", "function is deprecated, use context() or xxforms:context() instead");
 

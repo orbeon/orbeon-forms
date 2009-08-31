@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
-import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -21,7 +20,6 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.ListIterator;
@@ -155,18 +153,5 @@ public abstract class XFormsUIEvent extends XFormsEvent {
         final XFormsUIEvent newEvent = (XFormsUIEvent) super.retarget(newTargetObject);
         newEvent.targetXFormsControl = (XFormsControl) newTargetObject;
         return newEvent;
-    }
-
-    private IndentedLogger getIndentedLogger() {
-        return getContainingDocument().getIndentedLogger(XFormsEvents.logger);
-    }
-
-    // TODO: Need this at XFormsEvent level
-    private XFormsContainingDocument getContainingDocument() {
-        final XFormsEventTarget targetObject = getTargetObject();
-        if (targetObject instanceof XFormsControl)
-            return ((XFormsControl) targetObject).getXBLContainer().getContainingDocument();
-        else
-            return null;
     }
 }

@@ -44,6 +44,7 @@ import java.util.Map;
  */
 public class XFormsControls implements XFormsObjectResolver {
 
+    public static final String LOGGING_CATEGORY = "control";
     public static final Logger logger = LoggerFactory.createLogger(XFormsModel.class);
     public final IndentedLogger indentedLogger;
 
@@ -66,7 +67,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
     public XFormsControls(XFormsContainingDocument containingDocument) {
 
-        this.indentedLogger = containingDocument.getIndentedLogger(XFormsControls.logger);
+        this.indentedLogger = containingDocument.getIndentedLogger(LOGGING_CATEGORY);
 
         this.containingDocument = containingDocument;
         this.rootContainer = this.containingDocument;

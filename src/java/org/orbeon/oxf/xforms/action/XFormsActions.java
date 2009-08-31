@@ -27,6 +27,7 @@ import java.util.Map;
  */
 public class XFormsActions {
 
+    public static final String LOGGING_CATEGORY = "action";
     public static final Logger logger = LoggerFactory.createLogger(XFormsActions.class);
 
     // Standard XForms actions

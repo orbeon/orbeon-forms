@@ -52,7 +52,7 @@ public class XFormsActionInterpreter {
         this.container = container;
         this.containingDocument = container.getContainingDocument();
 
-        this.indentedLogger = containingDocument.getIndentedLogger(XFormsActions.logger);
+        this.indentedLogger = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY);
 
         this.xformsControls = containingDocument.getControls();
         this.contextStack = new XFormsContextStack(container);

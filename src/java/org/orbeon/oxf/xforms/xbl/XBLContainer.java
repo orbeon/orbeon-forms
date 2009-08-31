@@ -666,9 +666,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public void dispatchEvent(PropertyContext propertyContext, XFormsEvent originalEvent) {
 
-        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.logger);
+        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
 
-        if (XFormsEvents.logger.isDebugEnabled()) {
+        if (indentedLogger.isDebugEnabled()) {
             indentedLogger.startHandleOperation("dispatchEvent", "dispatching", "name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
                     originalEvent.getLocationData() != null ? originalEvent.getLocationData().toString() : null);
         }
@@ -783,7 +783,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                         nextBoundaryIndex++;
                     }
 
-                    if (XFormsEvents.logger.isDebugEnabled()) {
+                    if (indentedLogger.isDebugEnabled()) {
                         indentedLogger.logDebug("dispatchEvent", "retargeting",
                                 "name", originalEvent.getEventName(),
                                 "original id", originalEvent.getTargetObject().getEffectiveId(),
@@ -819,7 +819,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                         retargetedEvent = getRetargetedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
                         nextBoundaryIndex--;
 
-                        if (XFormsEvents.logger.isDebugEnabled()) {
+                        if (indentedLogger.isDebugEnabled()) {
                             indentedLogger.logDebug("dispatchEvent", "retargeting",
                                     "name", originalEvent.getEventName(),
                                     "original id", originalEvent.getTargetObject().getEffectiveId(),
@@ -885,7 +885,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     new String[] { "event", originalEvent.getEventName(), "target id", targetObject.getEffectiveId() }));
         }
 
-        if (XFormsEvents.logger.isDebugEnabled()) {
+        if (indentedLogger.isDebugEnabled()) {
             indentedLogger.endHandleOperation("name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
                     originalEvent.getLocationData() != null ? originalEvent.getLocationData().toString() : null);
         }

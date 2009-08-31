@@ -35,6 +35,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
@@ -64,9 +65,34 @@ public class XFormsContainingDocument extends XBLContainer {
     // Special id name for the top-level containing document
     public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";
 
+    // Per-document current logging indentation
     private static final IndentedLogger.Indentation indentation = new IndentedLogger.Indentation();
-    public static final Logger logger = LoggerFactory.createLogger(XFormsContainingDocument.class);
-    private final IndentedLogger indentedLogger = new IndentedLogger(logger, indentation, "XForms");
+
+    private static final String LOGGING_CATEGORY = "document";
+    private static final Logger logger = LoggerFactory.createLogger(XFormsContainingDocument.class);
+
+    private final Map<String, IndentedLogger> loggersMap = new HashMap<String, IndentedLogger>();
+    {
+        final Logger globalLogger = XFormsServer.getLogger();
+        final Set<String> debugConfig = XFormsProperties.getDebugLogging();
+
+        registerLogger(XFormsContainingDocument.logger, globalLogger, debugConfig, XFormsContainingDocument.LOGGING_CATEGORY);
+        registerLogger(XFormsModel.logger, globalLogger, debugConfig, XFormsModel.LOGGING_CATEGORY);
+        registerLogger(XFormsModelSubmission.logger, globalLogger, debugConfig, XFormsModelSubmission.LOGGING_CATEGORY);
+        registerLogger(XFormsControls.logger, globalLogger, debugConfig, XFormsControls.LOGGING_CATEGORY);
+        registerLogger(XFormsEvents.logger, globalLogger, debugConfig, XFormsEvents.LOGGING_CATEGORY);
+        registerLogger(XFormsActions.logger, globalLogger, debugConfig, XFormsActions.LOGGING_CATEGORY);
+    }
+
+    private void registerLogger(Logger localLogger, Logger globalLogger, Set<String> debugConfig, String category) {
+        if (XFormsServer.USE_SEPARATE_LOGGERS) {
+            loggersMap.put(category, new IndentedLogger(localLogger, indentation, category));
+        } else {
+            loggersMap.put(category, new IndentedLogger(globalLogger, debugConfig.contains(category), indentation, category));
+        }
+    }
+
+    private final IndentedLogger indentedLogger = getIndentedLogger(LOGGING_CATEGORY);
 
     // Global XForms function library
     private static XFormsFunctionLibrary functionLibrary = new XFormsFunctionLibrary();
@@ -108,49 +134,49 @@ public class XFormsContainingDocument extends XBLContainer {
     private boolean mustPerformInitializationFirstRefresh;
 
     // Event information
-    private static final Map<String, String> ignoredXFormsOutputExternalEvents = new HashMap<String, String>();
-    private static final Map<String, String> allowedXFormsOutputExternalEvents = new HashMap<String, String>();
-    private static final Map<String, String> allowedXFormsUploadExternalEvents = new HashMap<String, String>();
-    private static final Map<String, String> allowedXFormsControlsExternalEvents = new HashMap<String, String>();
+    private static final Set<String> ignoredXFormsOutputExternalEvents = new HashSet<String>();
+    private static final Set<String> allowedXFormsOutputExternalEvents = new HashSet<String>();
+    private static final Set<String> allowedXFormsUploadExternalEvents = new HashSet<String>();
+    private static final Set<String> allowedXFormsControlsExternalEvents = new HashSet<String>();
 
-    private static final Map<String, String> allowedXFormsRepeatExternalEvents = new HashMap<String, String>();
-    private static final Map<String, String> allowedXFormsSubmissionExternalEvents = new HashMap<String, String>();
-    private static final Map<String, String> allowedXFormsContainingDocumentExternalEvents = new HashMap<String, String>();
-    private static final Map<String, String> allowedXXFormsDialogExternalEvents = new HashMap<String, String>();
+    private static final Set<String> allowedXFormsRepeatExternalEvents = new HashSet<String>();
+    private static final Set<String> allowedXFormsSubmissionExternalEvents = new HashSet<String>();
+    private static final Set<String> allowedXFormsContainingDocumentExternalEvents = new HashSet<String>();
+    private static final Set<String> allowedXXFormsDialogExternalEvents = new HashSet<String>();
 
     static {
         // External events ignored on xforms:output
-        ignoredXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_DOM_FOCUS_IN, "");
-        ignoredXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_DOM_FOCUS_OUT, "");
+        ignoredXFormsOutputExternalEvents.add(XFormsEvents.XFORMS_DOM_FOCUS_IN);
+        ignoredXFormsOutputExternalEvents.add(XFormsEvents.XFORMS_DOM_FOCUS_OUT);
 
         // External events allowed on xforms:output
-        allowedXFormsOutputExternalEvents.putAll(ignoredXFormsOutputExternalEvents);
-        allowedXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_HELP, "");
+        allowedXFormsOutputExternalEvents.addAll(ignoredXFormsOutputExternalEvents);
+        allowedXFormsOutputExternalEvents.add(XFormsEvents.XFORMS_HELP);
 
         // External events allowed on xforms:upload
-        allowedXFormsUploadExternalEvents.putAll(allowedXFormsOutputExternalEvents);
-        allowedXFormsUploadExternalEvents.put(XFormsEvents.XFORMS_SELECT, "");
-        allowedXFormsUploadExternalEvents.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, "");
+        allowedXFormsUploadExternalEvents.addAll(allowedXFormsOutputExternalEvents);
+        allowedXFormsUploadExternalEvents.add(XFormsEvents.XFORMS_SELECT);
+        allowedXFormsUploadExternalEvents.add(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE);
 
         // External events allowed on other controls
-        allowedXFormsControlsExternalEvents.putAll(allowedXFormsOutputExternalEvents);
-        allowedXFormsControlsExternalEvents.put(XFormsEvents.XFORMS_DOM_ACTIVATE, "");
-        allowedXFormsControlsExternalEvents.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, "");
-        allowedXFormsControlsExternalEvents.put(XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE, "");// for noscript mode
+        allowedXFormsControlsExternalEvents.addAll(allowedXFormsOutputExternalEvents);
+        allowedXFormsControlsExternalEvents.add(XFormsEvents.XFORMS_DOM_ACTIVATE);
+        allowedXFormsControlsExternalEvents.add(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE);
+        allowedXFormsControlsExternalEvents.add(XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);// for noscript mode
 
         // External events allowed on xforms:repeat
-        allowedXFormsRepeatExternalEvents.put(XFormsEvents.XXFORMS_DND, "");
+        allowedXFormsRepeatExternalEvents.add(XFormsEvents.XXFORMS_DND);
 
         // External events allowed on xforms:submission
-        allowedXFormsSubmissionExternalEvents.put(XFormsEvents.XXFORMS_SUBMIT, "");
+        allowedXFormsSubmissionExternalEvents.add(XFormsEvents.XXFORMS_SUBMIT);
 
         // External events allowed on containing document
-        allowedXFormsContainingDocumentExternalEvents.put(XFormsEvents.XXFORMS_LOAD, "");
-        allowedXFormsContainingDocumentExternalEvents.put(XFormsEvents.XXFORMS_OFFLINE, "");
-        allowedXFormsContainingDocumentExternalEvents.put(XFormsEvents.XXFORMS_ONLINE, "");
+        allowedXFormsContainingDocumentExternalEvents.add(XFormsEvents.XXFORMS_LOAD);
+        allowedXFormsContainingDocumentExternalEvents.add(XFormsEvents.XXFORMS_OFFLINE);
+        allowedXFormsContainingDocumentExternalEvents.add(XFormsEvents.XXFORMS_ONLINE);
 
         // External events allowed on xxforms:dialog
-        allowedXXFormsDialogExternalEvents.put(XFormsEvents.XXFORMS_DIALOG_CLOSE, "");
+        allowedXXFormsDialogExternalEvents.add(XFormsEvents.XXFORMS_DIALOG_CLOSE);
     }
 
     // For testing only
@@ -577,6 +603,8 @@ public class XFormsContainingDocument extends XBLContainer {
         backgroundAsynchronousSubmissions = null;
 
         // NOTE: See http://wiki.orbeon.com/forms/projects/asynchronous-submissions
+
+        final IndentedLogger indentedLogger = getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
         indentedLogger.startHandleOperation("", "processing background asynchronous submissions");
         int count = 0;
         try {
@@ -604,6 +632,7 @@ public class XFormsContainingDocument extends XBLContainer {
     public void processForegroundAsynchronousSubmissions() {
         // NOTE: See http://wiki.orbeon.com/forms/doc/developer-guide/asynchronous-submissions
         if (hasForegroundAsynchronousSubmissions()) {
+            final IndentedLogger indentedLogger = getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
             indentedLogger.startHandleOperation("", "processing foreground asynchronous submissions");
             int count = 0;
             try {
@@ -930,7 +959,7 @@ public class XFormsContainingDocument extends XBLContainer {
                                      String otherControlEffectiveId, String valueString, Element filesElement,
                                      String dndStart, String dndEnd, boolean handleGoingOnline) {
 
-        final IndentedLogger indentedLogger = getIndentedLogger(XFormsEvents.logger);
+        final IndentedLogger indentedLogger = getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
         final String LOG_TYPE = "executeExternalEvent";
         try {
             indentedLogger.startHandleOperation(LOG_TYPE, "handling external event", "target id", targetEffectiveId, "event name", eventName);
@@ -957,7 +986,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 if (indentedLogger.isDebugEnabled()) {
                     indentedLogger.logDebug(LOG_TYPE, "processing trusted event", "target id", targetEffectiveId, "event name", eventName);
                 }
-            } else if (!checkForAllowedEvents(pipelineContext, eventName, eventTarget, handleGoingOnline)) {
+            } else if (!checkForAllowedEvents(pipelineContext, indentedLogger, eventName, eventTarget, handleGoingOnline)) {
                 // Event is not trusted and is not allowed
                 return;
             }
@@ -1077,7 +1106,7 @@ public class XFormsContainingDocument extends XBLContainer {
                         if (!xformsOutputControl.isReadonly()) {
                             dispatchEvent(pipelineContext, new XFormsDOMActivateEvent(this, xformsOutputControl));
                         }
-                    } else if (ignoredXFormsOutputExternalEvents.get(eventName) == null) {
+                    } else if (!ignoredXFormsOutputExternalEvents.contains(eventName)) {
                         // Dispatch other event
                         dispatchEvent(pipelineContext, xformsEvent);
                     }
@@ -1150,12 +1179,13 @@ public class XFormsContainingDocument extends XBLContainer {
      * Check whether the external event is allowed on the gtiven target/
      *
      * @param pipelineContext   pipeline context
+     * @param indentedLogger    logger
      * @param eventName         event name
      * @param eventTarget       event target
      * @param handleGoingOnline whether we are going online and therefore using optimized event handling
      * @return                  true iif the event is allowed
      */
-    private boolean checkForAllowedEvents(PipelineContext pipelineContext, String eventName, XFormsEventTarget eventTarget, boolean handleGoingOnline) {
+    private boolean checkForAllowedEvents(PipelineContext pipelineContext, IndentedLogger indentedLogger, String eventName, XFormsEventTarget eventTarget, boolean handleGoingOnline) {
         // Don't allow for events on non-relevant, readonly or xforms:output controls (we accept focus events on
         // xforms:output though).
         // This is also a security measure that also ensures that somebody is not able to change values in an instance
@@ -1167,7 +1197,7 @@ public class XFormsContainingDocument extends XBLContainer {
             if (eventTarget instanceof XXFormsDialogControl) {
                 // Target is a dialog
                 // Check for implicitly allowed events
-                if (allowedXXFormsDialogExternalEvents.get(eventName) == null) {
+                if (!allowedXXFormsDialogExternalEvents.contains(eventName)) {
                     if (indentedLogger.isDebugEnabled()) {
                         indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on xxforms:dialog", "control id", eventTarget.getEffectiveId(), "event name", eventName);
                     }
@@ -1175,7 +1205,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 }
             } else if (eventTarget instanceof XFormsRepeatControl) {
                 // Target is a repeat
-                if (allowedXFormsRepeatExternalEvents.get(eventName) == null) {
+                if (!allowedXFormsRepeatExternalEvents.contains(eventName)) {
                     if (indentedLogger.isDebugEnabled()) {
                         indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on xforms:repeat", "control id", eventTarget.getEffectiveId(), "event name", eventName);
                     }
@@ -1216,21 +1246,21 @@ public class XFormsContainingDocument extends XBLContainer {
                 if (!isExplicitlyAllowedExternalEvent(eventName)) {
                     // The event is not explicitly allowed: check for implicitly allowed events
                     if (xformsControl instanceof XFormsOutputControl) {
-                        if (allowedXFormsOutputExternalEvents.get(eventName) == null) {
+                        if (!allowedXFormsOutputExternalEvents.contains(eventName)) {
                             if (indentedLogger.isDebugEnabled()) {
                                 indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on xforms:output", "control id", eventTarget.getEffectiveId(), "event name", eventName);
                             }
                             return false;
                         }
                     } else if (xformsControl instanceof XFormsUploadControl) {
-                        if (allowedXFormsUploadExternalEvents.get(eventName) == null) {
+                        if (!allowedXFormsUploadExternalEvents.contains(eventName)) {
                             if (indentedLogger.isDebugEnabled()) {
                                 indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on xforms:upload", "control id", eventTarget.getEffectiveId(), "event name", eventName);
                             }
                             return false;
                         }
                     } else {
-                        if (allowedXFormsControlsExternalEvents.get(eventName) == null) {
+                        if (!allowedXFormsControlsExternalEvents.contains(eventName)) {
                             if (indentedLogger.isDebugEnabled()) {
                                 indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event", "control id", eventTarget.getEffectiveId(), "event name", eventName);
                             }
@@ -1243,7 +1273,7 @@ public class XFormsContainingDocument extends XBLContainer {
             // Target is a submission
             if (!isExplicitlyAllowedExternalEvent(eventName)) {
                 // The event is not explicitly allowed: check for implicitly allowed events
-                if (allowedXFormsSubmissionExternalEvents.get(eventName) == null) {
+                if (!allowedXFormsSubmissionExternalEvents.contains(eventName)) {
                     if (indentedLogger.isDebugEnabled()) {
                         indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on xforms:submission", "submission id", eventTarget.getEffectiveId(), "event name", eventName);
                     }
@@ -1253,7 +1283,7 @@ public class XFormsContainingDocument extends XBLContainer {
         } else if (eventTarget instanceof XFormsContainingDocument) {
             // Target is the containing document
             // Check for implicitly allowed events
-            if (allowedXFormsContainingDocumentExternalEvents.get(eventName) == null) {
+            if (!allowedXFormsContainingDocumentExternalEvents.contains(eventName)) {
                 if (indentedLogger.isDebugEnabled()) {
                     indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on containing document", "target id", eventTarget.getEffectiveId(), "event name", eventName);
                 }
@@ -1506,7 +1536,7 @@ public class XFormsContainingDocument extends XBLContainer {
         // Create XForms controls and models
         createControlsAndModels(pipelineContext);
 
-        // Before dispaching initialization events, remember that first refresh must be performed
+        // Before dispatching initialization events, remember that first refresh must be performed
         this.mustPerformInitializationFirstRefresh = XFormsProperties.isDispatchInitialEvents(this);
 
         // Group all xforms-model-construct-done and xforms-ready events within a single outermost action handler in
@@ -1531,17 +1561,7 @@ public class XFormsContainingDocument extends XBLContainer {
     private void createControlsAndModels(PipelineContext pipelineContext) {
 
         // Gather static analysis information
-        final long startTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
-        final boolean analyzed = xformsStaticState.analyzeIfNecessary(pipelineContext);
-        if (indentedLogger.isDebugEnabled()) {
-            if (analyzed)
-                indentedLogger.logDebug("", "performed static analysis",
-                            "time", Long.toString(System.currentTimeMillis() - startTime),
-                            "controls", Integer.toString(xformsStaticState.getControlInfoMap().size())
-                    );
-            else
-                indentedLogger.logDebug("", "static analysis already available");
-        }
+        xformsStaticState.analyzeIfNecessary(pipelineContext);
 
         // Create XForms controls
         xformsControls = new XFormsControls(this);
@@ -1581,42 +1601,67 @@ public class XFormsContainingDocument extends XBLContainer {
         return getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
     }
 
+    public static boolean isDebugEnabledStatic() {
+        final Logger globalLogger = XFormsServer.getLogger();
+        return globalLogger.isDebugEnabled();
+    }
+
     public static void logDebugStatic(String type, String message, String... parameters) {
-        IndentedLogger.logDebugStatic(logger, "XForms", type, message, parameters);
+        final Logger globalLogger = XFormsServer.getLogger();
+        IndentedLogger.logDebugStatic(globalLogger, "XForms", type, message, parameters);
     }
 
     public static void logWarningStatic(String type, String message, String... parameters) {
-        IndentedLogger.logWarningStatic(logger, "XForms", type, message, parameters);
-    }
-
-    public static void logWarningStatic(String type, String message, Throwable throwable) {
-        IndentedLogger.logWarningStatic(logger, "XForms", type, message, throwable);
-    }
-
-    public static void logErrorStatic(String type, String message, String... parameters) {
-        IndentedLogger.logErrorStatic(logger, "XForms", type, message, parameters);
+        final Logger globalLogger = XFormsServer.getLogger();
+        IndentedLogger.logWarningStatic(globalLogger, "XForms", type, message, parameters);
     }
 
     public static void logErrorStatic(String type, String message, Throwable throwable) {
-        IndentedLogger.logErrorStatic(logger, "XForms", type, message, throwable);
+        final Logger globalLogger = XFormsServer.getLogger();
+        IndentedLogger.logErrorStatic(globalLogger, "XForms", type, message, throwable);
     }
 
-    private final Map<Logger, IndentedLogger> loggersMap = new HashMap<Logger, IndentedLogger>();
-    {
-        loggersMap.put(XFormsContainingDocument.logger, new IndentedLogger(XFormsContainingDocument.logger, indentation, "containing document"));
-        loggersMap.put(XFormsModel.logger, new IndentedLogger(XFormsModel.logger, indentation, "model"));
-        loggersMap.put(XFormsInstance.logger, new IndentedLogger(XFormsInstance.logger, indentation, "instance"));
-        loggersMap.put(XFormsModelSubmission.logger, new IndentedLogger(XFormsModelSubmission.logger, indentation, "submission"));
-        loggersMap.put(XFormsControls.logger, new IndentedLogger(XFormsControls.logger, indentation, "control"));
-        loggersMap.put(XFormsEvents.logger, new IndentedLogger(XFormsEvents.logger, indentation, "event"));
-        loggersMap.put(XFormsActions.logger, new IndentedLogger(XFormsActions.logger, indentation, "action"));
+    /**
+     * Return a logger given a category.
+     *
+     * @param loggingCategory   category
+     * @return                  logger
+     */
+    public IndentedLogger getIndentedLogger(String loggingCategory) {
+        return loggersMap.get(loggingCategory);
     }
 
-    public IndentedLogger getIndentedLogger() {
-        return getIndentedLogger(XFormsContainingDocument.logger);
-    }
+    private static final Map<String, IndentedLogger> STATIC_LOGGERS_MAP = new HashMap<String, IndentedLogger>();
 
-    public IndentedLogger getIndentedLogger(Logger logger) {
-        return loggersMap.get(logger);
+    /**
+     * Return a static logger given all the details.
+     *
+     * @param localLogger       local logger, used only if separate loggers are configured
+     * @param globalLogger      global logger, usually XFormsServer.getLogger()
+     * @param category          category
+     * @return                  logger
+     */
+    public static IndentedLogger getIndentedLogger(Logger localLogger, Logger globalLogger, String category) {
+
+        final IndentedLogger existingIndentedLogger = STATIC_LOGGERS_MAP.get(category);
+        if (existingIndentedLogger != null) {
+            return existingIndentedLogger;
+        }
+
+        final IndentedLogger indentedLogger;
+        final Logger logger;
+        final boolean isDebugEnabled;
+        if (XFormsServer.USE_SEPARATE_LOGGERS) {
+            logger = localLogger;
+            isDebugEnabled = logger.isDebugEnabled();
+        } else {
+            logger = globalLogger;
+            isDebugEnabled = XFormsProperties.getDebugLogging().contains(category);
+        }
+        indentedLogger = new IndentedLogger(logger, isDebugEnabled, category);
+
+        STATIC_LOGGERS_MAP.put(category, indentedLogger);
+
+        return indentedLogger;
     }
 }

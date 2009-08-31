@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.event;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
@@ -81,6 +82,14 @@ public abstract class XFormsEvent implements Cloneable {
     public XBLContainer getTargetXBLContainer() {
         return targetXBLContainer;
     }
+    
+    protected XFormsContainingDocument getContainingDocument() {
+        return targetXBLContainer.getContainingDocument();
+    }
+
+    protected IndentedLogger getIndentedLogger() {
+        return getContainingDocument().getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
+    }
 
     public String getEventName() {
         return eventName;
@@ -113,7 +122,7 @@ public abstract class XFormsEvent implements Cloneable {
             // Return the target static id
 
             if ("target".equals(name)) {
-                XFormsContainingDocument.logger.warn("event('target') is deprecated. Use event('xxforms:target') instead.");
+                getIndentedLogger().logWarning("", "event('target') is deprecated. Use event('xxforms:target') instead.");
             }
 
             return new ListIterator(Collections.singletonList(new StringValue(targetObject.getId())));
@@ -121,7 +130,7 @@ public abstract class XFormsEvent implements Cloneable {
             // Return the event type
 
             if ("event".equals(name)) {
-                XFormsContainingDocument.logger.warn("event('event') is deprecated. Use event('xxforms:type') instead.");
+                getIndentedLogger().logWarning("", "event('event') is deprecated. Use event('xxforms:type') instead.");
             }
 
             return new ListIterator(Collections.singletonList(new StringValue(eventName)));
@@ -140,7 +149,7 @@ public abstract class XFormsEvent implements Cloneable {
         } else {
             // "If the event context information does not contain the property indicated by the string argument, then an
             // empty node-set is returned."
-            XFormsContainingDocument.logger.warn("Unsupported event context information for event('" + name + "').");
+            getIndentedLogger().logWarning("", "Unsupported event context information for event('" + name + "').");
             return EmptyIterator.getInstance();
         }
     }

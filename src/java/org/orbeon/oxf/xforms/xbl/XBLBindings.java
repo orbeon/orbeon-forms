@@ -27,6 +27,7 @@ import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
@@ -53,6 +54,8 @@ public class XBLBindings {
     private final XFormsStaticState staticState;            // associated static state
     private Map<String, Map<String, String>> namespacesMap; // Map<String prefixedId, Map<String prefix, String uri>> of namespace mappings
 
+    private final boolean logShadowTrees;                   // whether to log shadow trees as they are built
+
     private Map<QName, XFormsControlFactory.Factory> xblComponentsFactories;    // Map<QName bindingQName, Factory> of QNames to component factory
     private Map<QName, Element> xblComponentBindings;       // Map<QName bindingQName, Element bindingElement> of QNames to bindings
     private Map<String, Document> xblFullShadowTrees;       // Map<String treePrefixedId, Document> (with full content, e.g. XHTML)
@@ -63,12 +66,12 @@ public class XBLBindings {
     private Map<QName, List<Element>> xblHandlers;          // Map<QName bindingQName, List<Element handlerElement>>
     private Map<QName, List<Document>> xblImplementations;  // Map<QName bindingQName, List<Document>>
 
-    public XBLBindings(XFormsStaticState staticState, Map<String, Map<String, String>> namespacesMap, Element staticStateElement) {
+    public XBLBindings(IndentedLogger indentedLogger, XFormsStaticState staticState, Map<String, Map<String, String>> namespacesMap, Element staticStateElement) {
 
         this.staticState = staticState;
         this.namespacesMap = namespacesMap;
 
-        final IndentedLogger indentedLogger = staticState.getIndentedLogger();
+        this.logShadowTrees = XFormsProperties.getDebugLogging().contains("analysis-xbl-tree");
 
         final List<Element> xblElements = (staticStateElement != null) ? Dom4jUtils.elements(staticStateElement, XFormsConstants.XBL_XBL_QNAME) : Collections.<Element>emptyList();
         if (xblElements.size() > 0) {
@@ -170,7 +173,7 @@ public class XBLBindings {
                 }
             }
 
-            indentedLogger.endHandleOperation("", "xbl:xbl count", Integer.toString(xblCount),
+            indentedLogger.endHandleOperation("xbl:xbl count", Integer.toString(xblCount),
                     "xbl:binding count", Integer.toString(xblBindingCount));
         }
     }
@@ -535,8 +538,7 @@ public class XBLBindings {
             final Document annotatedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, namespaceMappings, prefix);
 
             if (indentedLogger.isDebugEnabled()) {
-                // XXX TODO: logging option to output whole document
-                indentedLogger.endHandleOperation("document", Dom4jUtils.domToString(annotatedShadowTreeDocument));
+                indentedLogger.endHandleOperation("document", logShadowTrees ? Dom4jUtils.domToString(annotatedShadowTreeDocument) : null);
             }
 
             return annotatedShadowTreeDocument;
@@ -634,7 +636,7 @@ public class XBLBindings {
      * @param boundElement
      * @return                  compact shadow tree document
      */
-    private static Document filterShadowTree(IndentedLogger indentedLogger, Document fullShadowTree, Element boundElement) {
+    private Document filterShadowTree(IndentedLogger indentedLogger, Document fullShadowTree, Element boundElement) {
 
         if (indentedLogger.isDebugEnabled()) {
             indentedLogger.startHandleOperation("", "filtering shadow tree", "bound element", Dom4jUtils.elementToString(boundElement));
@@ -652,8 +654,7 @@ public class XBLBindings {
         final Document compactShadowTree = Dom4jUtils.createDocumentCopyParentNamespaces(result.getDocument().getRootElement().element(XFormsConstants.XBL_TEMPLATE_QNAME), true);
 
         if (indentedLogger.isDebugEnabled()) {
-            // XXX TODO: logging option to output whole document
-            indentedLogger.endHandleOperation("", "document", Dom4jUtils.domToString(compactShadowTree));
+            indentedLogger.endHandleOperation("document", logShadowTrees ? Dom4jUtils.domToString(compactShadowTree) : null);
         }
 
         return compactShadowTree;

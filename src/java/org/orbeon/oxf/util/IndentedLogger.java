@@ -30,44 +30,27 @@ public class IndentedLogger {
 
     private Stack<Operation> stack = new Stack<Operation>();
 
-    private class Operation {
-        public String type;
-        public String message;
-        public long startTime;
-
-        public Operation() {
-            if (isDebugEnabled()) {
-                startTime = System.currentTimeMillis();
-            } else {
-                startTime = 0;
-            }
-        }
-
-        public Operation(String type, String message) {
-            this();
-            this.type = type;
-            this.message = message;
-        }
-
-        public long getTimeElapsed() {
-            return System.currentTimeMillis() - startTime;
-        }
-    }
-
     public IndentedLogger(Logger logger, String prefix) {
         this(logger, new Indentation(), prefix);
     }
 
     public IndentedLogger(Logger logger, Indentation indentation, String prefix) {
+        this(logger, logger.isDebugEnabled(), indentation, prefix);
+    }
+
+    public IndentedLogger(Logger logger, boolean isDebugEnabled, String prefix) {
+        this(logger, isDebugEnabled, new Indentation(), prefix);
+    }
+
+    public IndentedLogger(Logger logger, boolean isDebugEnabled, Indentation indentation, String prefix) {
         this.logger = logger;
+        this.isDebugEnabled = isDebugEnabled;
         this.indentation = indentation;
         this.prefix = prefix;
-
-        this.isDebugEnabled = logger.isDebugEnabled();
     }
 
     public IndentedLogger(IndentedLogger indentedLogger) {
-        this(indentedLogger.logger, new Indentation(indentedLogger.indentation.indentation), indentedLogger.prefix);
+        this(indentedLogger.logger, indentedLogger.isDebugEnabled, new Indentation(indentedLogger.indentation.indentation), indentedLogger.prefix);
     }
 
     public final boolean isDebugEnabled() {
@@ -121,6 +104,10 @@ public class IndentedLogger {
         for (int i = 0; i < level; i++)
             sb.append("  ");
         return sb.toString();
+    }
+
+    public void log(Level level, String type, String message, String... parameters) {
+        log(level, indentation.indentation, type, message, parameters);
     }
 
     public void logDebug(String type, String message) {
@@ -226,5 +213,29 @@ public class IndentedLogger {
         final PrintWriter writer = new PrintWriter(new StringWriter());
         throwable.printStackTrace(writer);
         return writer.toString();
+    }
+
+    private class Operation {
+        public String type;
+        public String message;
+        public long startTime;
+
+        public Operation() {
+            if (isDebugEnabled()) {
+                startTime = System.currentTimeMillis();
+            } else {
+                startTime = 0;
+            }
+        }
+
+        public Operation(String type, String message) {
+            this();
+            this.type = type;
+            this.message = message;
+        }
+
+        public long getTimeElapsed() {
+            return System.currentTimeMillis() - startTime;
+        }
     }
 }

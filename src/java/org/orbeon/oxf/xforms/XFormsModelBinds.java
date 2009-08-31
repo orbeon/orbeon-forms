@@ -303,7 +303,7 @@ public class XFormsModelBinds {
      */
     public static String getOfflineBindMappings(XFormsContainingDocument containingDocument) {
 
-        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModel.logger);
+        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
 
         if (indentedLogger.isDebugEnabled())
             indentedLogger.startHandleOperation("model", "getting offline bind mappings");

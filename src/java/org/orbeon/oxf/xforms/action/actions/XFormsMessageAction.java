@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 
@@ -83,7 +84,7 @@ public class XFormsMessageAction extends XFormsAction {
                 // Special log appearance
 
                 final String messagePrefix = "XForms - log message - ";
-                final IndentedLogger indentedLogger = containingDocument.getIndentedLogger();
+                final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), XFormsServer.getLogger(), XFormsServer.LOGGING_CATEGORY);
                 if (XFormsConstants.XXFORMS_LOG_DEBUG_LEVEL_QNAME.equals(levelQName)) {
                     indentedLogger.logDebug("xforms:message", messagePrefix + messageValue);
                 } else if (XFormsConstants.XXFORMS_LOG_INFO_DEBUG_LEVEL_QNAME.equals(levelQName)) {

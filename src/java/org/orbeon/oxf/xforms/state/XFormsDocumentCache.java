@@ -30,6 +30,8 @@ import org.orbeon.oxf.xforms.XFormsProperties;
  */
 public class XFormsDocumentCache {
 
+    private static final String LOG_TYPE = "containing document cache";
+
     private static final String XFORMS_DOCUMENT_CACHE_NAME = "xforms.cache.documents";
     private static final int XFORMS_DOCUMENT_CACHE_DEFAULT_SIZE = 10;
 
@@ -61,10 +63,10 @@ public class XFormsDocumentCache {
             // The pool is not in cache
             destinationPool = createXFormsContainingDocumentPool(xformsState);
             cache.add(pipelineContext, cacheKey, CONSTANT_VALIDITY, destinationPool);
-            XFormsStateManager.logger.debug("XForms - containing document cache (add): did not find document pool in cache; creating new pool and returning document to it.");
+            XFormsStateManager.getIndentedLogger().logDebug(LOG_TYPE, "add: did not find document pool in cache; creating new pool and returning document to it");
         } else {
             // Pool is already in cache
-            XFormsStateManager.logger.debug("XForms - containing document cache (add): found containing document pool in cache. Returning document to it.");
+            XFormsStateManager.getIndentedLogger().logDebug(LOG_TYPE, "add: found containing document pool in cache. Returning document to it");
         }
 
         // Return object to destination pool
@@ -78,7 +80,7 @@ public class XFormsDocumentCache {
         final ObjectPool sourceObjectPool = containingDocument.getSourceObjectPool();
         if (sourceObjectPool != null && sourceObjectPool != destinationPool) {
             try {
-                XFormsStateManager.logger.debug("XForms - containing document cache: discarding document from source pool.");
+                XFormsStateManager.getIndentedLogger().logDebug(LOG_TYPE, "add: discarding document from source pool");
                 sourceObjectPool.invalidateObject(containingDocument);
             } catch (Exception e) {
                 throw new OXFException(e);
@@ -110,11 +112,11 @@ public class XFormsDocumentCache {
         final ObjectPool pool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
         if (pool == null) {
             // We don't add the pool to the cache here
-            XFormsStateManager.logger.debug("XForms - containing document cache (getContainingDocument): did not find document pool in cache.");
+            XFormsStateManager.getIndentedLogger().logDebug(LOG_TYPE, "find: did not find document pool in cache");
             containingDocument = new XFormsContainingDocument(pipelineContext, xformsState);
         } else {
             // Get object from pool
-            XFormsStateManager.logger.debug("XForms - containing document cache (getContainingDocument): found containing document pool in cache; getting document from pool.");
+            XFormsStateManager.getIndentedLogger().logDebug(LOG_TYPE, "find: found containing document pool in cache; getting document from pool.");
             try {
                 containingDocument = (XFormsContainingDocument) pool.borrowObject();
             } catch (Exception e) {

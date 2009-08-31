@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xml;
 
@@ -90,6 +90,7 @@ public class XMLConstants {
     public final static QName XS_BASE64BINARY_QNAME = new QName("base64Binary", XSD_NAMESPACE);
     public final static QName XS_NCNAME_QNAME = new QName("NCName", XSD_NAMESPACE);
     public final static QName XS_NMTOKEN_QNAME = new QName("NMTOKEN", XSD_NAMESPACE);
+    public final static QName XS_NMTOKENS_QNAME = new QName("NMTOKENS", XSD_NAMESPACE);
     public final static QName XS_NONNEGATIVEINTEGER_QNAME = new QName("nonNegativeInteger", XSD_NAMESPACE);
     public static final QName XS_INT_QNAME = new QName("int", XSD_NAMESPACE);
     public static final QName XS_DECIMAL_QNAME = new QName("decimal", XSD_NAMESPACE);

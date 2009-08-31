@@ -36,7 +36,7 @@ public class XXFormsInvalidateInstanceAction extends XFormsAction {
         final String handleXIncludeString = resolveAVT(actionInterpreter, propertyContext, actionElement, "xinclude", false);
 
         // Use XFormsModel logger because it's what's used by XFormsServerSharedInstancesCache in other places
-        final IndentedLogger indentedLogger = actionInterpreter.getContainingDocument().getIndentedLogger(XFormsModel.logger);
+        final IndentedLogger indentedLogger = actionInterpreter.getContainingDocument().getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
 
         if (handleXIncludeString == null) {
             // No @xinclude attribute specified so remove all instances matching @resource

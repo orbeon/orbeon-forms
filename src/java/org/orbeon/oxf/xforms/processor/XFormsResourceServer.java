@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
+import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -20,6 +21,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -36,9 +39,15 @@ import java.util.*;
  */
 public class XFormsResourceServer extends ProcessorImpl {
 
+    public static final String LOGGING_CATEGORY = "resources";
+    private static final Logger logger = LoggerFactory.createLogger(XFormsResourceServer.class);
     private static final long ONE_YEAR_IN_MILLISECONDS = 365L * 24 * 60 * 60 * 1000;
 
     public XFormsResourceServer() {
+    }
+
+    public static IndentedLogger getIndentedLogger() {
+        return XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
     }
 
     public void start(PipelineContext pipelineContext) {
@@ -48,6 +57,8 @@ public class XFormsResourceServer extends ProcessorImpl {
 
         final String requestPath = request.getRequestPath();
         final String filename = requestPath.substring(requestPath.lastIndexOf('/') + 1);
+        
+        final IndentedLogger indentedLogger = getIndentedLogger();
 
         if (requestPath.startsWith(NetUtils.DYNAMIC_RESOURCES_PATH)) {
             // Dynamic resource requested
@@ -108,20 +119,20 @@ public class XFormsResourceServer extends ProcessorImpl {
                         NetUtils.copyStream(is, os);
                         os.flush();
                     } catch (Exception e) {
-                        XFormsContainingDocument.logWarningStatic("", "exception copying stream", e);
+                        indentedLogger.logWarning("", "exception copying stream", e);
                     } finally {
                         if (is != null) {
                             try {
                                 is.close();
                             } catch (IOException e) {
-                                XFormsContainingDocument.logWarningStatic("", "exception closing input stream", e);
+                                indentedLogger.logWarning("", "exception closing input stream", e);
                             }
                         }
                         if (os != null) {
                             try {
                                 os.close();
                             } catch (IOException e) {
-                                XFormsContainingDocument.logWarningStatic("", "exception closing output stream", e);
+                                indentedLogger.logWarning("", "exception closing output stream", e);
                             }
                         }
                     }
@@ -204,14 +215,14 @@ public class XFormsResourceServer extends ProcessorImpl {
                 os = response.getOutputStream();
                 response.setContentType(isCSS ? "text/css" : "application/x-javascript");
                 {
-                    final boolean isDebugEnabled = XFormsContainingDocument.logger.isDebugEnabled();
+                    final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
                     if (XFormsProperties.isCacheCombinedResources()) {
                         // Caching requested
-                        final File resourceFile = cacheResources(resources, pipelineContext, requestPath, combinedLastModified, isCSS, isMinimal);
+                        final File resourceFile = cacheResources(indentedLogger, resources, pipelineContext, requestPath, combinedLastModified, isCSS, isMinimal);
                         if (resourceFile != null) {
                             // Caching could take place, send out cached result
                             if (isDebugEnabled)
-                                XFormsContainingDocument.logDebugStatic("resources", "serving from cache ", "request path", requestPath);
+                                indentedLogger.logDebug("resources", "serving from cache ", "request path", requestPath);
                             final FileInputStream fis = new FileInputStream(resourceFile);
                             NetUtils.copyStream(fis, os);
                             fis.close();
@@ -219,14 +230,14 @@ public class XFormsResourceServer extends ProcessorImpl {
                         } else {
                             // Was unable to cache, just serve
                             if (isDebugEnabled)
-                                XFormsContainingDocument.logDebugStatic("resources", "caching requested but not possible, serving directly", "request path", requestPath);
-                            generate(resources, pipelineContext, os, isCSS, isMinimal);
+                                indentedLogger.logDebug("resources", "caching requested but not possible, serving directly", "request path", requestPath);
+                            generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
                         }
                     } else {
                         // Should not cache, just serve
                         if (isDebugEnabled)
-                            XFormsContainingDocument.logDebugStatic("resources", "caching not requested, serving directly", "request path", requestPath);
-                        generate(resources, pipelineContext, os, isCSS, isMinimal);
+                            indentedLogger.logDebug("resources", "caching not requested, serving directly", "request path", requestPath);
+                        generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
                     }
                 }
             } catch (OXFException e) {
@@ -238,7 +249,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     try {
                         os.close();
                     } catch (IOException e) {
-                        XFormsContainingDocument.logWarningStatic("", "exception closing output stream", e);
+                        indentedLogger.logWarning("", "exception closing output stream", e);
                     }
                 }
             }
@@ -265,6 +276,7 @@ public class XFormsResourceServer extends ProcessorImpl {
     /**
      * Try to cache the combined resources on disk.
      *
+     * @param indentedLogger        logger
      * @param resources             list of XFormsFeatures.ResourceConfig to consider
      * @param pipelineContext       current PipelineContext (used for rewriting and matchers)
      * @param resourcePath          path to store the cached resource to
@@ -273,11 +285,13 @@ public class XFormsResourceServer extends ProcessorImpl {
      * @param isMinimal             whether to use minimal resources
      * @return                      File pointing to the generated resource, null if caching could not take place
      */
-    public static File cacheResources(List<XFormsFeatures.ResourceConfig> resources, PipelineContext pipelineContext, String resourcePath, long combinedLastModified, boolean isCSS, boolean isMinimal) {
+    public static File cacheResources(IndentedLogger indentedLogger, List<XFormsFeatures.ResourceConfig> resources,
+                                      PipelineContext pipelineContext, String resourcePath, long combinedLastModified,
+                                      boolean isCSS, boolean isMinimal) {
         try {
             final File resourceFile;
             final String realPath = ResourceManagerWrapper.instance().getRealPath(resourcePath);
-            final boolean isDebugEnabled = XFormsContainingDocument.logger.isDebugEnabled();
+            final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
             if (realPath != null) {
                 // We hope to be able to cache as a resource
                 resourceFile = new File(realPath);
@@ -287,25 +301,25 @@ public class XFormsResourceServer extends ProcessorImpl {
                     if (resourceLastModified < combinedLastModified) {
                         // Resource is out of date, generate
                         if (isDebugEnabled)
-                            XFormsContainingDocument.logDebugStatic("resources", "cached combined resources out of date, saving", "resource path", resourcePath);
+                            indentedLogger.logDebug("resources", "cached combined resources out of date, saving", "resource path", resourcePath);
                         final FileOutputStream fos = new FileOutputStream(resourceFile);
-                        generate(resources, pipelineContext, fos, isCSS, isMinimal);
+                        generate(indentedLogger, resources, pipelineContext, fos, isCSS, isMinimal);
                     } else {
                         if (isDebugEnabled)
-                            XFormsContainingDocument.logDebugStatic("resources", "cached combined resources exist and are up-to-date", "resource path", resourcePath);
+                            indentedLogger.logDebug("resources", "cached combined resources exist and are up-to-date", "resource path", resourcePath);
                     }
                 } else {
                     // Resource doesn't exist, generate
                     if (isDebugEnabled)
-                        XFormsContainingDocument.logDebugStatic("resources", "cached combined resources don't exist, saving", "resource path", resourcePath);
+                        indentedLogger.logDebug("resources", "cached combined resources don't exist, saving", "resource path", resourcePath);
                     resourceFile.getParentFile().mkdirs();
                     resourceFile.createNewFile();
                     final FileOutputStream fos = new FileOutputStream(resourceFile);
-                    generate(resources, pipelineContext, fos, isCSS, isMinimal);
+                    generate(indentedLogger, resources, pipelineContext, fos, isCSS, isMinimal);
                 }
             } else {
                 if (isDebugEnabled)
-                    XFormsContainingDocument.logDebugStatic("resources", "unable to locate real path for cached combined resources, not saving", "resource path", resourcePath);
+                    indentedLogger.logDebug("resources", "unable to locate real path for cached combined resources, not saving", "resource path", resourcePath);
                 resourceFile = null;
             }
             return resourceFile;
@@ -317,6 +331,7 @@ public class XFormsResourceServer extends ProcessorImpl {
     /**
      * Generate the resources into the given OutputStream. The stream is flushed and closed when done.
      *
+     * @param indentedLogger        logger
      * @param resources             list of XFormsFeatures.ResourceConfig to consider
      * @param pipelineContext       current PipelineContext (used for rewriting and matchers)
      * @param os                    OutputStream to write to
@@ -325,7 +340,7 @@ public class XFormsResourceServer extends ProcessorImpl {
      * @throws URISyntaxException
      * @throws IOException
      */
-    private static void generate(List<XFormsFeatures.ResourceConfig> resources, PipelineContext pipelineContext, OutputStream os, boolean isCSS, boolean isMinimal) throws URISyntaxException, IOException {
+    private static void generate(IndentedLogger indentedLogger, List<XFormsFeatures.ResourceConfig> resources, PipelineContext pipelineContext, OutputStream os, boolean isCSS, boolean isMinimal) throws URISyntaxException, IOException {
         if (isCSS) {
             // CSS: rewrite url() in content
 
@@ -397,7 +412,7 @@ public class XFormsResourceServer extends ProcessorImpl {
 
                             outputWriter.write("url(" + rewrittenURI + ")");
                         } catch (Exception e) {
-                            XFormsContainingDocument.logWarningStatic("resources", "found invalid URI in CSS file", "uri", uriString);
+                            indentedLogger.logWarning("resources", "found invalid URI in CSS file", "uri", uriString);
                             outputWriter.write("url(" + uriString + ")");
                         }
                     }

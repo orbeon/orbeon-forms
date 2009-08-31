@@ -58,6 +58,7 @@ import java.util.Map;
  */
 public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObserver {
 
+    public static final String LOGGING_CATEGORY = "submission";
 	public final static Logger logger = LoggerFactory.createLogger(XFormsModelSubmission.class);
 
     private final XBLContainer container;
@@ -291,7 +292,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
             containingDocument.setGotSubmission();
 
-            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.logger);
+            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
 
             // Variables declared here as they are used in a catch/finally block
             SubmissionParameters p = null;
@@ -568,7 +569,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     if (p.isReplaceInstance || p.isReplaceText) {
                         // XForms 1.1 says it is fine not to have a body, but in most cases you will want to know that
                         // no instance replacement took place
-                        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.logger);
+                        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
                         indentedLogger.logWarning("", "instance or text replacement did not take place upon successful response because no body was provided.",
                                 "submission id", getEffectiveId());
                     }

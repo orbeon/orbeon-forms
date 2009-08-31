@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
+import org.orbeon.oxf.xforms.submission.BaseSubmission;
 import org.orbeon.oxf.xforms.submission.OptimizedSubmission;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -51,6 +52,7 @@ import java.util.*;
  */
 public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFormsObjectResolver {
 
+    public static final String LOGGING_CATEGORY = "model";
     public static final Logger logger = LoggerFactory.createLogger(XFormsModel.class);
     public final IndentedLogger indentedLogger;
 
@@ -86,7 +88,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     
     // Logging
     private final IndentedLogger connectionLogger;
-    private final boolean logBody;
 
     public XFormsModel(XBLContainer container, String effectiveId, Document modelDocument) {
 
@@ -94,13 +95,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         this.container = container;
         this.containingDocument = container.getContainingDocument();
 
-        this.indentedLogger = containingDocument.getIndentedLogger(logger);
+        this.indentedLogger = containingDocument.getIndentedLogger(LOGGING_CATEGORY);
 
         // Initialize instance logging
-        // Create new indented logger just for the Connection object. This will log more stuff.
         // NOTE: Use the XFormsModelSubmission logger for this, for consistency with submissions which want to
         // unify with instance loading anyway.
-        logBody = XFormsModelSubmission.logger.isDebugEnabled();
         connectionLogger = indentedLogger;
         
         // Remember document
@@ -444,7 +443,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                         "model effective id", effectiveId, "instance static id", currentInstance.getId());
 
                     // Log instance if needed
-                    currentInstance.logIfNeeded(getContainingDocument(), "serialized instance");
+                    if (XFormsProperties.getDebugLogging().contains("model-serialized-instance"))
+                        currentInstance.logInstance(indentedLogger, "serialized instance");
                 }
             }
         }
@@ -810,7 +810,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
             final ConnectionResult connectionResult = new Connection().open(externalContext,
-                    connectionLogger, logBody, Connection.Method.GET.name(), sourceURL, null, null, null, null, null,
+                    connectionLogger, BaseSubmission.isLogBody(), Connection.Method.GET.name(), sourceURL, null, null, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 
             // Handle connection errors
@@ -868,7 +868,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("load", "getting document from URI", "URI", absoluteResolvedURLString);
 
-            final ConnectionResult connectionResult = new Connection().open(externalContext, connectionLogger, logBody,
+            final ConnectionResult connectionResult = new Connection().open(externalContext, connectionLogger, BaseSubmission.isLogBody(),
                     Connection.Method.GET.name(), absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 

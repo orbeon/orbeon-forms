@@ -143,7 +143,7 @@ public class XFormsContextStack {
 
             final int variableCount = variableInfos.size();
 
-            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModel.logger);
+            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
             if (indentedLogger.isDebugEnabled()) {
                 indentedLogger.logDebug("", "evaluated variables", "count", Integer.toString(variableCount));
             }

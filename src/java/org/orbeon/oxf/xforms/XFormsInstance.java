@@ -13,11 +13,9 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -56,8 +54,6 @@ import java.util.Map;
  * Represent an XForms instance.
  */
 public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
-
-    public static final Logger logger = LoggerFactory.createLogger(XFormsInstance.class);
 
     private DocumentInfo documentInfo;
 
@@ -520,7 +516,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
         final String eventName = event.getEventName();
         if (XFormsEvents.XXFORMS_INSTANCE_INVALIDATE.equals(eventName)) {
-            final IndentedLogger indentedLogger = event.getTargetXBLContainer().getContainingDocument().getIndentedLogger(XFormsModel.logger);
+            final IndentedLogger indentedLogger = event.getTargetXBLContainer().getContainingDocument().getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
             // Invalidate instance if it is cached
             if (cache) {
                 XFormsServerSharedInstancesCache.instance().remove(propertyContext, indentedLogger, sourceURI, null, handleXInclude);
@@ -635,8 +631,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         return container.getContainingDocument().getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
     }
 
-    public void logIfNeeded(XFormsContainingDocument containingDocument, String message) {
-        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsInstance.logger);
+    public void logInstance(IndentedLogger indentedLogger, String message) {
         if (indentedLogger.isDebugEnabled()) {
             indentedLogger.logDebug("", message,
                     "effective model id", getEffectiveModelId(),

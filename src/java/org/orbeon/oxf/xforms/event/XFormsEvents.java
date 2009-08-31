@@ -21,7 +21,8 @@ import org.orbeon.oxf.util.LoggerFactory;
  */
 public class XFormsEvents {
 
-    public static Logger logger = LoggerFactory.createLogger(XFormsEvents.class);
+    public static final String LOGGING_CATEGORY = "event";
+    public static final Logger logger = LoggerFactory.createLogger(XFormsEvents.class);
 
     // Custom initialization events
     public static final String XXFORMS_ALL_EVENTS_REQUIRED = "xxforms-all-events-required";

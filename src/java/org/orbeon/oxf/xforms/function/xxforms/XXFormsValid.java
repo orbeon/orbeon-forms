@@ -54,7 +54,7 @@ public class XXFormsValid extends XFormsFunction {
             // NOTE: Don't recurse if we don't have a NodeWrapper, as those don't support MIPs anyway yet
             final Node node = (Node) ((NodeWrapper) item).getUnderlyingNode();
             final XFormsContainingDocument containingDocument = getContainingDocument(xpathContext);
-            result = XFormsSubmissionUtils.isSatisfiesValidRequired(containingDocument.getIndentedLogger(XFormsModelSubmission.logger), node, true, true, true);
+            result = XFormsSubmissionUtils.isSatisfiesValidRequired(containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY), node, true, true, true);
         } else {
             // Just return the value associated with this node
             result = XFormsSubmissionUtils.isSatisfiesValidRequired((NodeInfo) item, true, true);

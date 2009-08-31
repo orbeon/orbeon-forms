@@ -107,6 +107,12 @@ http://forge.objectweb.org/tracker/index.php?func=browse&group_id=168&atid=35020
                 </p>
             </section>
             <section>
+                <title>Configuration of XForms logging</title>
+                <p>
+                    [TODO]
+                </p>
+            </section>
+            <section>
                 <title>Deprecation and removal of Java classes</title>
                 <p>
                     The following classes, usually referenced from <code>web.xml</code> and <code>portlet.xml</code>,

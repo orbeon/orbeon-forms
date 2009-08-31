@@ -20,10 +20,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.StringUtils;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 
@@ -48,7 +45,7 @@ public abstract class BaseSubmission implements Submission {
     }
 
     protected IndentedLogger getIndentedLogger() {
-        return containingDocument.getIndentedLogger(XFormsModelSubmission.logger);
+        return containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
     }
 
     protected URL getResolvedSubmissionURL(PropertyContext propertyContext, ExternalContext externalContext, String resolvedActionOrResource, String queryString) {
@@ -181,5 +178,9 @@ public abstract class BaseSubmission implements Submission {
             // Synchronous submission or foreground asynchronous submission uses current logger
             return getIndentedLogger();
         }
+    }
+
+    public static boolean isLogBody() {
+        return XFormsProperties.getDebugLogging().contains("submission-body");
     }
 }

@@ -18,10 +18,7 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.saxon.om.FastStringBuffer;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class XFormsProperties {
 
@@ -291,6 +288,9 @@ public class XFormsProperties {
     private static final String CACHE_APPLICATION_SIZE_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache.application.size";
     private static final int CACHE_APPLICATION_SIZE_DEFAULT = 1024 * 1024;
 
+    private static final String DEBUG_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.debug";
+    private static final String ERROR_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.error";
+
     /**
      * Return a PropertyDefinition given a property name.
      *
@@ -317,6 +317,16 @@ public class XFormsProperties {
 
     public static String getXFormsPassword() {
         return Properties.instance().getPropertySet().getString(PASSWORD_PROPERTY);
+    }
+
+    public static Set<String> getDebugLogging() {
+        final Set<String> result = Properties.instance().getPropertySet().getNmtokens(DEBUG_LOGGING_PROPERTY);
+        return (result != null) ? result : Collections.<String>emptySet();
+    }
+
+    public static Set<String> getErrorLogging() {
+        final Set<String> result = Properties.instance().getPropertySet().getNmtokens(ERROR_LOGGING_PROPERTY);
+        return (result != null) ? result : Collections.<String>emptySet();
     }
 
     public static boolean isCacheDocument() {

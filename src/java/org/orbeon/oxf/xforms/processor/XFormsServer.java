@@ -58,17 +58,22 @@ import java.util.*;
  */
 public class XFormsServer extends ProcessorImpl {
 
+    public static final boolean USE_SEPARATE_LOGGERS = false;
+    public static final String LOGGING_CATEGORY = "server";
     private static final Logger logger = LoggerFactory.createLogger(XFormsServer.class);
 
     private static final String INPUT_REQUEST = "request";
     //private static final String OUTPUT_RESPONSE = "response"; // optional
 
     public static final Map<String, String> XFORMS_NAMESPACES = new HashMap<String, String>();
-
     static {
         XFORMS_NAMESPACES.put(XFormsConstants.XFORMS_SHORT_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
         XFORMS_NAMESPACES.put(XFormsConstants.XML_EVENTS_PREFIX, XFormsConstants.XML_EVENTS_NAMESPACE_URI);
         XFORMS_NAMESPACES.put(XFormsConstants.XXFORMS_SHORT_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);
+    }
+
+    public static Logger getLogger() {
+        return logger;
     }
 
     public XFormsServer() {
@@ -90,7 +95,7 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     /**
-     * Case where the response is generated throug the ExternalContext (submission with replace="all").
+     * Case where the response is generated through the ExternalContext (submission with replace="all").
      */
     public void start(PipelineContext pipelineContext) {
         doIt(pipelineContext, null);
@@ -135,7 +140,7 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         // Logger used for heartbeat and response
-        final IndentedLogger indentedLogger = new IndentedLogger(logger, "XForms server");
+        final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), XFormsServer.getLogger(), LOGGING_CATEGORY);
 
         // Check for message where there is only the heartbeat event
         if (eventElements.size() == 1) {
@@ -227,7 +232,7 @@ public class XFormsServer extends ProcessorImpl {
 
 //        final Object documentSynchronizationObject = (contentHandler != null) ? containingDocument : new Object();
         synchronized (containingDocument) {
-            final IndentedLogger eventsIndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.logger);
+            final IndentedLogger eventsIndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
             try {
                 // Run events if any
                 final Map<String, String> valueChangeControlIds = new HashMap<String, String>();

@@ -1,5 +1,5 @@
 /**
-label * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -1282,6 +1282,21 @@ ORBEON.util.Test = {
         // Takes a threshold after which YUI Test considers that the test has failed. The default is 10 s.
         // We set it to 20 s for tests that call a 5 s delay service multiple times.
         testCase.wait(20000);
+    },
+
+    /**
+     * Starts Firebug Lite if Firebug is not already available (as it is most of the time on Firefox)
+     */
+    startFirebugLite: function() {
+        if (! window.firebug) {
+            var firebugScript = document.createElement("script");
+            firebugScript.setAttribute('src','http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js');
+            document.body.appendChild(firebugScript);
+            (function(){
+                if (window.firebug) firebug.init();
+                else setTimeout(arguments.callee);
+            })();
+        }
     }
 };
 

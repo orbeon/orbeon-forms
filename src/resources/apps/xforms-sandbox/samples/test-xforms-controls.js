@@ -83,9 +83,11 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     testUpdateList: function() {
          ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
              // Set value in list to TNT
-             var select1List = this.getSelect("carrier-select1-compact" + XFORMS_SEPARATOR_1 + "1");
-             ORBEON.xforms.Controls.setCurrentValue(select1List, select1List.options[3].value);
-             ORBEON.xforms.Events.change({target: select1List});
+             var select1Id = "carrier-select1-compact" + XFORMS_SEPARATOR_1 + "1";
+             var select1Control = YAHOO.util.Dom.get(select1Id);
+             var select1List = this.getSelect(select1Id);
+             ORBEON.xforms.Controls.setCurrentValue(select1Control, select1List.options[3].value);
+             ORBEON.xforms.Events.change({target: select1Control});
          }, function() {
              // Check TNT radio button and checkbox is checked, and TNT item in list is selected
              YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select1-full$$e3" + XFORMS_SEPARATOR_1 + "1").checked);

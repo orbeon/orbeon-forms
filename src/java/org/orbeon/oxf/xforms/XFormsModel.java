@@ -85,9 +85,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     // Containing document
     private final XFormsContainingDocument containingDocument;
-    
-    // Logging
-    private final IndentedLogger connectionLogger;
 
     public XFormsModel(XBLContainer container, String effectiveId, Document modelDocument) {
 
@@ -96,11 +93,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         this.containingDocument = container.getContainingDocument();
 
         this.indentedLogger = containingDocument.getIndentedLogger(LOGGING_CATEGORY);
-
-        // Initialize instance logging
-        // NOTE: Use the XFormsModelSubmission logger for this, for consistency with submissions which want to
-        // unify with instance loading anyway.
-        connectionLogger = indentedLogger;
         
         // Remember document
         this.modelDocument = modelDocument;
@@ -810,7 +802,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
             final ConnectionResult connectionResult = new Connection().open(externalContext,
-                    connectionLogger, BaseSubmission.isLogBody(), Connection.Method.GET.name(), sourceURL, null, null, null, null, null,
+                    indentedLogger, BaseSubmission.isLogBody(), Connection.Method.GET.name(), sourceURL, null, null, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 
             // Handle connection errors
@@ -868,7 +860,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("load", "getting document from URI", "URI", absoluteResolvedURLString);
 
-            final ConnectionResult connectionResult = new Connection().open(externalContext, connectionLogger, BaseSubmission.isLogBody(),
+            final ConnectionResult connectionResult = new Connection().open(externalContext, indentedLogger, BaseSubmission.isLogBody(),
                     Connection.Method.GET.name(), absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.log4j.Logger;
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
@@ -28,6 +29,7 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -39,6 +41,7 @@ import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.*;
+import org.orbeon.saxon.value.StringValue;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -64,6 +67,10 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
 
 public class XFormsUtils {
+
+    private static final String LOGGING_CATEGORY = "utils";
+    private static final Logger logger = LoggerFactory.createLogger(XFormsUtils.class);
+    private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
 
     private static final int SRC_CONTENT_BUFFER_SIZE = 1024;
 
@@ -572,7 +579,7 @@ public class XFormsUtils {
 
     private static class DeflaterPoolableObjectFactory implements PoolableObjectFactory {
         public Object makeObject() throws Exception {
-            XFormsContainingDocument.logDebugStatic("", "creating new Deflater");
+            indentedLogger.logDebug("", "creating new Deflater");
             return new Deflater(Deflater.DEFAULT_COMPRESSION, true);
         }
 

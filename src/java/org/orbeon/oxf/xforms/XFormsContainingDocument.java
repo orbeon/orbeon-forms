@@ -1601,16 +1601,6 @@ public class XFormsContainingDocument extends XBLContainer {
         return getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
     }
 
-    public static boolean isDebugEnabledStatic() {
-        final Logger globalLogger = XFormsServer.getLogger();
-        return globalLogger.isDebugEnabled();
-    }
-
-    public static void logDebugStatic(String type, String message, String... parameters) {
-        final Logger globalLogger = XFormsServer.getLogger();
-        IndentedLogger.logDebugStatic(globalLogger, "XForms", type, message, parameters);
-    }
-
     public static void logWarningStatic(String type, String message, String... parameters) {
         final Logger globalLogger = XFormsServer.getLogger();
         IndentedLogger.logWarningStatic(globalLogger, "XForms", type, message, parameters);

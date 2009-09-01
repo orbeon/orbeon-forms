@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
+import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -22,6 +23,8 @@ import org.orbeon.oxf.processor.URIProcessorOutputImpl;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Connection;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -47,6 +50,10 @@ import java.net.URL;
  * URIProcessorOutputImpl.
  */
 public class XFormsURIResolver extends TransformerURIResolver {
+
+    private static final String LOGGING_CATEGORY = "resolver";
+    private static final Logger logger = LoggerFactory.createLogger(XFormsURIResolver.class);
+    private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
 
     private URIProcessorOutputImpl processorOutput;
 
@@ -99,8 +106,8 @@ public class XFormsURIResolver extends TransformerURIResolver {
                         }
                     };
 
-                    if (XFormsContainingDocument.isDebugEnabledStatic())
-                        XFormsContainingDocument.logDebugStatic("", "resolving resource through initialization resolver", "uri", urlString);
+                    if (indentedLogger.isDebugEnabled())
+                        indentedLogger.logDebug("", "resolving resource through initialization resolver", "uri", urlString);
 
                     return new SAXSource(xmlReader, new InputSource(urlString));
                 } else {

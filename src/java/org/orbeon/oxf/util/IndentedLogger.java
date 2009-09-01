@@ -20,6 +20,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Stack;
 
+/**
+ * Abstraction over log4j, which provides:
+ *
+ * o start/end operation with parameters
+ * o indenting depending on current nesting of operations
+ * o custom handling of debug level
+ */
 public class IndentedLogger {
 
     private final Logger logger;
@@ -58,7 +65,7 @@ public class IndentedLogger {
     }
 
     public void startHandleOperation(String type, String message) {
-        if (logger.isDebugEnabled()) {
+        if (isDebugEnabled) {
             stack.push(new Operation(type, message));
             logDebug(type, "start " + message);
             indentation.indentation++;
@@ -66,7 +73,7 @@ public class IndentedLogger {
     }
 
     public void startHandleOperation(String type, String message, String... parameters) {
-        if (logger.isDebugEnabled()) {
+        if (isDebugEnabled) {
             stack.push(new Operation(type, message));
             logDebug(type, "start " + message, parameters);
             indentation.indentation++;
@@ -74,7 +81,7 @@ public class IndentedLogger {
     }
 
     public void endHandleOperation() {
-        if (logger.isDebugEnabled()) {
+        if (isDebugEnabled) {
             indentation.indentation--;
             final Operation operation = stack.pop();
             if (operation != null) {
@@ -84,7 +91,7 @@ public class IndentedLogger {
     }
 
     public void endHandleOperation(String... parameters) {
-        if (logger.isDebugEnabled()) {
+        if (isDebugEnabled) {
             indentation.indentation--;
             final Operation operation = stack.pop();
             if (operation != null) {
@@ -118,20 +125,8 @@ public class IndentedLogger {
         log(Level.DEBUG, indentation.indentation, type, message, parameters);
     }
 
-    public static void logDebugStatic(Logger logger, String prefix, String type, String message, String... parameters) {
-        log(logger, Level.DEBUG, 0, prefix, type, message, parameters);
-    }
-
     public static void logWarningStatic(Logger logger, String prefix, String type, String message, String... parameters) {
         log(logger, Level.WARN, 0, prefix, type, message, parameters);
-    }
-
-    public static void logWarningStatic(Logger logger, String prefix, String type, String message, Throwable throwable) {
-        log(logger, Level.WARN, 0, prefix, type, message, throwableToString(throwable));
-    }
-
-    public static void logErrorStatic(Logger logger, String prefix, String type, String message, String... parameters) {
-        log(logger, Level.ERROR, 0, prefix, type, message, parameters);
     }
 
     public static void logErrorStatic(Logger logger, String prefix, String type, String message, Throwable throwable) {
@@ -159,7 +154,8 @@ public class IndentedLogger {
     }
 
     private void log(Level level, int indentLevel, String type, String message, String... parameters) {
-        log(logger, level, getActualIndentLevel(indentLevel), prefix, type, message, parameters);
+        if (!(level == Level.DEBUG && !isDebugEnabled)) // handle DEBUG level locally, everything else goes through
+            log(logger, level, getActualIndentLevel(indentLevel), prefix, type, message, parameters);
     }
 
     private int getActualIndentLevel(int indentLevel) {

@@ -25,7 +25,7 @@
         Debug logging:
 
         * Document: document model submission control event action
-        * Global:   analysis server html resources state
+        * Global:   analysis server html resources state resolver utils
         * Data:     analysis-xbl-tree submission-body model-serialized-instance
      -->
     <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug"                          value="document model submission control event action analysis server html"/>

@@ -16,10 +16,7 @@ package org.orbeon.oxf.xforms.submission;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -275,9 +272,9 @@ public class OptimizedSubmission extends BaseSubmission {
                     // Simulate a POST or PUT
                     effectiveResourceURI = resource;
 
-                    if (indentedLogger.isDebugEnabled())
-                        indentedLogger.logDebug("", "setting request body",
-                            "body", new String(messageBody, "UTF-8"));
+                    // Log request body
+                    if (indentedLogger.isDebugEnabled() && isLogBody())
+                        Connection.logRequestBody(indentedLogger, mediatype, messageBody);
 
                     rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
                     if (rootAdjustedResourceURI == null)

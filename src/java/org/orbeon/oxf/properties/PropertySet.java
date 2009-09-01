@@ -1,25 +1,25 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.properties;
 
-import org.dom4j.QName;
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.XMLConstants;
 
-import java.util.*;
 import java.net.URI;
+import java.util.*;
 
 /**
  * Represent a set of properties.
@@ -73,8 +73,7 @@ public class PropertySet {
     public Map<String, Object> getObjectMap() {
         if (size() > 0) {
             final Map<String, Object> result = new HashMap<String, Object>();
-            for (final Iterator<String> i = keySet().iterator(); i.hasNext();) {
-                String key = i.next();
+            for (String key: keySet()) {
                 result.put(key, getObject(key));
             }
             return result;
@@ -107,7 +106,7 @@ public class PropertySet {
             if (currentNode.children == null) {
                 currentNode.children = new LinkedHashMap<String, PropertyNode>();
             }
-            PropertyNode newNode = (PropertyNode) currentNode.children.get(currentToken);
+            PropertyNode newNode = currentNode.children.get(currentToken);
             if (newNode == null) {
                 newNode = new PropertyNode();
                 currentNode.children.put(currentToken, newNode);
@@ -131,22 +130,21 @@ public class PropertySet {
 
             // Go through all children
             if (propertyNode.children != null) {
-                for (Iterator<String> keys = propertyNode.children.keySet().iterator(); keys.hasNext();) {
-                    final String key = keys.next();
-                    final String newConsumed = consumed.length() == 0 ? key : consumed + "." +  key;
-                    final List<String> keyProperties = getPropertiesStartsWithWorker((PropertyNode) propertyNode.children.get(key), newConsumed, tokens, currentTokenPosition + 1);
+                for (final String key: propertyNode.children.keySet()) {
+                    final String newConsumed = consumed.length() == 0 ? key : consumed + "." + key;
+                    final List<String> keyProperties = getPropertiesStartsWithWorker(propertyNode.children.get(key), newConsumed, tokens, currentTokenPosition + 1);
                     result.addAll(keyProperties);
                 }
             }
         } else {
             // Regular token
-            final PropertyNode[] newPropertNodes = new PropertyNode[2];
+            final PropertyNode[] newPropertyNodes = new PropertyNode[2];
             // Find property node with exact name
-            newPropertNodes[0] = (PropertyNode) propertyNode.children.get(token);
+            newPropertyNodes[0] = propertyNode.children.get(token);
             // Find property node with *
-            newPropertNodes[1] = (PropertyNode) propertyNode.children.get("*");
+            newPropertyNodes[1] = propertyNode.children.get("*");
             for (int newPropertNodesIndex = 0; newPropertNodesIndex < 2; newPropertNodesIndex++) {
-                final PropertyNode newPropertNode = newPropertNodes[newPropertNodesIndex];
+                final PropertyNode newPropertNode = newPropertyNodes[newPropertNodesIndex];
                 if (newPropertNode != null) {
                     final String actualToken = newPropertNodesIndex == 0 ? token : "*";
                     final String newConsumed = consumed.length() == 0 ? actualToken : consumed + "." +  actualToken;
@@ -162,7 +160,7 @@ public class PropertySet {
         final List<String> tokensList = new ArrayList<String>();
         for (StringTokenizer nameTokenizer = new StringTokenizer(name, "."); nameTokenizer.hasMoreTokens();)
             tokensList.add(nameTokenizer.nextToken());
-        final String[] tokensArray = (String[]) tokensList.toArray(new String[tokensList.size()]);
+        final String[] tokensArray = tokensList.toArray(new String[tokensList.size()]);
         return getPropertiesStartsWithWorker(wildcardProperties, "", tokensArray, 0);
     }
 
@@ -180,11 +178,11 @@ public class PropertySet {
             if (propertyNode.children == null) return null;
             final String currentToken = tokens[currentTokenPosition];
             // Look for value with actual token
-            PropertyNode newNode = (PropertyNode) propertyNode.children.get(currentToken);
+            PropertyNode newNode = propertyNode.children.get(currentToken);
             TypeValue result = getPropertyWorker(newNode, tokens, currentTokenPosition + 1);
             if (result != null) return result;
             // If we couldn't find a value with the actual token, look for value with *
-            newNode = (PropertyNode) propertyNode.children.get("*");
+            newNode = propertyNode.children.get("*");
             return getPropertyWorker(newNode, tokens, currentTokenPosition + 1);
         }
     }
@@ -199,7 +197,7 @@ public class PropertySet {
     private Object getProperty(String name, final QName type) {
 
         // Try first from exact properties
-        TypeValue typeValue = (TypeValue) exactProperties.get(name);
+        TypeValue typeValue = exactProperties.get(name);
         if (typeValue == null) {
             // If not found try traversing tree which contains properties with wildcards
 
@@ -265,6 +263,14 @@ public class PropertySet {
         return (result.length() == 0) ? null : result;
     }
 
+    @SuppressWarnings("unchecked")
+    public Set<String> getNmtokens(String name) {
+        final Set<String> result = (Set<String>) getProperty(name, XMLConstants.XS_NMTOKENS_QNAME);
+        if (result == null)
+            return null;
+        return result;
+    }
+
     public String getString(String name, String defaultValue) {
         final String result = getString(name);
         return (result == null) ? defaultValue : result;
@@ -285,7 +291,7 @@ public class PropertySet {
 
     public Boolean getBoolean(String name, boolean defaultValue) {
         final Boolean result = getBoolean(name);
-        return (result == null) ? new Boolean(defaultValue) : result;
+        return (result == null) ? Boolean.valueOf(defaultValue) : result;
     }
 
     public Date getDate(String name) {

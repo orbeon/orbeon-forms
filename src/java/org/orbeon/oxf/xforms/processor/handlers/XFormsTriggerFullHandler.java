@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -58,7 +58,8 @@ public class XFormsTriggerFullHandler extends XFormsTriggerHandler {
                 final String inputLabelValue;
                 if (mustOutputHTMLFragment) {
                     // Only output character content within input
-                    XFormsServer.logger.warn("IE 6 does not support <button> elements properly. Only text within HTML content will appear garbled. Control id: " + effectiveId);
+                    final XFormsControls xformsControls = containingDocument.getControls();
+                    xformsControls.getIndentedLogger().logWarning("xforms:trigger", "IE 6 does not support <button> elements properly. Only text within HTML content will appear garbled.", "control id", effectiveId);
 
                     final StringBuilder sb = new StringBuilder(labelValue.length());
 

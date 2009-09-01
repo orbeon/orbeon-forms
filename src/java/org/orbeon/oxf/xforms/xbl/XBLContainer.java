@@ -18,6 +18,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
@@ -27,7 +28,6 @@ import org.orbeon.oxf.xforms.control.controls.XXFormsRootControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
@@ -170,7 +170,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         // Dispatch destruction event to all models
         for (XFormsModel currentModel: models) {
-            dispatchEvent(propertyContext, new XFormsModelDestructEvent(currentModel));
+            dispatchEvent(propertyContext, new XFormsModelDestructEvent(containingDocument, currentModel));
         }
     }
 
@@ -275,7 +275,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
             // Iterate over all the models
             for (XFormsModel currentModel: models) {
-                dispatchEvent(propertyContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
+                dispatchEvent(propertyContext, XFormsEventFactory.createEvent(containingDocument, eventsToDispatch[i], currentModel));
             }
         }
     }
@@ -706,8 +706,10 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public void dispatchEvent(PropertyContext propertyContext, XFormsEvent originalEvent) {
 
-        if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.startHandleOperation("event", "dispatching", "name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
+        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
+
+        if (indentedLogger.isDebugEnabled()) {
+            indentedLogger.startHandleOperation("dispatchEvent", "dispatching", "name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
                     originalEvent.getLocationData() != null ? originalEvent.getLocationData().toString() : null);
         }
 
@@ -788,11 +790,13 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                                     && eventHandler.isMatchEventName(retargetedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
                                 // Capture phase match on event name and target is specified
+                                indentedLogger.startHandleOperation("dispatchEvent", "capture handler");
                                 containingDocument.startHandleEvent(retargetedEvent);
                                 try {
                                     eventHandler.handleEvent(propertyContext, currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
                                 } finally {
                                     containingDocument.endHandleEvent();
+                                    indentedLogger.endHandleOperation();
                                 }
                                 propagate &= eventHandler.isPropagate();
                                 performDefaultAction &= eventHandler.isPerformDefaultAction();
@@ -819,8 +823,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                         nextBoundaryIndex++;
                     }
 
-                    if (XFormsServer.logger.isDebugEnabled()) {
-                        containingDocument.logDebug("event", "retargeting",
+                    if (indentedLogger.isDebugEnabled()) {
+                        indentedLogger.logDebug("dispatchEvent", "retargeting",
                                 "name", originalEvent.getEventName(),
                                 "original id", originalEvent.getTargetObject().getEffectiveId(),
                                 "new id", retargetedEvent.getTargetObject().getEffectiveId()
@@ -855,8 +859,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                         retargetedEvent = getRetargetedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
                         nextBoundaryIndex--;
 
-                        if (XFormsServer.logger.isDebugEnabled()) {
-                            containingDocument.logDebug("event", "retargeting",
+                        if (indentedLogger.isDebugEnabled()) {
+                            indentedLogger.logDebug("dispatchEvent", "retargeting",
                                     "name", originalEvent.getEventName(),
                                     "original id", originalEvent.getTargetObject().getEffectiveId(),
                                     "new id", retargetedEvent.getTargetObject().getEffectiveId()
@@ -879,11 +883,13 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                                     && eventHandler.isMatchEventName(retargetedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
                                 // Bubbling phase match on event name and target is specified
+                                indentedLogger.startHandleOperation("dispatchEvent", "bubble handler");
                                 containingDocument.startHandleEvent(retargetedEvent);
                                 try {
                                     eventHandler.handleEvent(propertyContext, currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
                                 } finally {
                                     containingDocument.endHandleEvent();
+                                    indentedLogger.endHandleOperation();
                                 }
                                 propagate &= eventHandler.isPropagate();
                                 performDefaultAction &= eventHandler.isPerformDefaultAction();
@@ -898,11 +904,13 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
             // Perform default action is allowed to
             if (performDefaultAction || !originalEvent.isCancelable()) {
+                indentedLogger.startHandleOperation("dispatchEvent", "default action handler");
                 containingDocument.startHandleEvent(originalEvent);
                 try {
                     targetObject.performDefaultAction(propertyContext, originalEvent);
                 } finally {
                     containingDocument.endHandleEvent();
+                    indentedLogger.endHandleOperation();
                 }
             }
         } catch (Exception e) {
@@ -917,8 +925,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     new String[] { "event", originalEvent.getEventName(), "target id", targetObject.getEffectiveId() }));
         }
 
-        if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.endHandleOperation("name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
+        if (indentedLogger.isDebugEnabled()) {
+            indentedLogger.endHandleOperation("name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
                     originalEvent.getLocationData() != null ? originalEvent.getLocationData().toString() : null);
         }
     }

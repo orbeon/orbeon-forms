@@ -166,7 +166,7 @@ html body .xforms-form tr.xforms-disabled,
 }
 
 /* Default size for YUI RTE (seems to work!) */
-textarea.xforms-mediatype-text-html { width: 550px; height: 300px }
+textarea.xforms-mediatype-text-html, .xforms-mediatype-text-html textarea { width: 550px; height: 300px }
 
 .xforms-select1-appearance-minimal {
     font-family: Arial, Helvetica, Geneva, sans-serif

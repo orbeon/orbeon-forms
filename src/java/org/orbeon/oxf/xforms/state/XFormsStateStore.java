@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005-2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.state;
 
@@ -111,14 +111,14 @@ public abstract class XFormsStateStore {
         // Add new dynamic state and move it to the front
         addOrReplaceOne(newRequestId, xformsState.getDynamicState(), isInitialEntry, currentSessionId, oldRequestId);
 
-        if (XFormsStateManager.logger.isDebugEnabled()) {
+        if (isDebugEnabled()) {
             debug("store size after adding: " + currentStoreSize + " bytes.");
             debugDumpKeys();
         }
     }
 
     public synchronized XFormsState find(String pageGenerationId, String requestId) {
-        if (XFormsStateManager.logger.isDebugEnabled()) {
+        if (isDebugEnabled()) {
             debug("store size before finding: " + currentStoreSize + " bytes.");
             debugDumpKeys();
         }
@@ -146,7 +146,7 @@ public abstract class XFormsStateStore {
                 ((StoreEntry) existingListEntry.element).addSessionId(currentSessionId);
             }
 
-            if (XFormsStateManager.logger.isDebugEnabled())
+            if (isDebugEnabled())
                 debug("added and refreshed entry for key: " + key);
         } else {
             // Entry doesn't exist, add it
@@ -167,7 +167,7 @@ public abstract class XFormsStateStore {
             expiredCount++;
         }
 
-        if (storeSizeBeforeExpire != currentStoreSize && XFormsStateManager.logger.isDebugEnabled())
+        if (storeSizeBeforeExpire != currentStoreSize && isDebugEnabled())
            debug("expired " + expiredCount + " entries (" + (storeSizeBeforeExpire - currentStoreSize) + " bytes).");
 
         // Add new element to store
@@ -177,7 +177,7 @@ public abstract class XFormsStateStore {
         // Update store size
         currentStoreSize += size;
 
-        if (XFormsStateManager.logger.isDebugEnabled())
+        if (isDebugEnabled())
             debug("added new entry of " + size + " bytes for key: " + key);
     }
 
@@ -221,7 +221,7 @@ public abstract class XFormsStateStore {
         // Update store size
         currentStoreSize -= stateSize;
 
-        if (XFormsStateManager.logger.isDebugEnabled())
+        if (isDebugEnabled())
             debug("removed entry of " + stateSize + " bytes for key: " + existingStoreEntry.key);
     }
 
@@ -249,8 +249,12 @@ public abstract class XFormsStateStore {
         return currentStoreSize;
     }
 
+    protected final boolean isDebugEnabled() {
+        return XFormsStateManager.getIndentedLogger().isDebugEnabled();
+    }
+
     protected void debug(String message) {
-        XFormsStateManager.logger.debug("XForms - " + getStoreDebugName() + " store: " + message);
+        XFormsStateManager.getIndentedLogger().logDebug("", getStoreDebugName() + " store: " + message);
     }
 
     protected void debugDumpKeys() {

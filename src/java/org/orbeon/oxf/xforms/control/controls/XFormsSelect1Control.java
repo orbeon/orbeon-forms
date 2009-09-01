@@ -272,9 +272,9 @@ public class XFormsSelect1Control extends XFormsValueControl {
                     // Handle xforms-select / xforms-deselect
                     // TODO: Dispatch to itemset or item once we support doing that
                     if (!itemWasSelected && itemIsSelected) {
-                        selectEvents.add(new XFormsSelectEvent(this, currentItemValue));
+                        selectEvents.add(new XFormsSelectEvent(containingDocument, this, currentItemValue));
                     } else if (itemWasSelected && !itemIsSelected) {
-                        deselectEvents.add(new XFormsDeselectEvent(this, currentItemValue));
+                        deselectEvents.add(new XFormsDeselectEvent(containingDocument, this, currentItemValue));
                     }
                 }
             }

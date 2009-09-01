@@ -1,18 +1,20 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.action;
 
+import org.apache.log4j.Logger;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.action.actions.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -24,6 +26,10 @@ import java.util.Map;
  * XForms actions definitions.
  */
 public class XFormsActions {
+
+    public static final String LOGGING_CATEGORY = "action";
+    public static final Logger logger = LoggerFactory.createLogger(XFormsActions.class);
+
     // Standard XForms actions
     public static final String XFORMS_ACTION_ACTION = "action";
     public static final String XFORMS_DISPATCH_ACTION = "dispatch";

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
@@ -28,8 +29,12 @@ public abstract class BaseReplacer implements Replacer {
         this.containingDocument = containingDocument;
     }
 
+    protected IndentedLogger getIndentedLogger() {
+        return containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+    }
+
     protected void dispatchSubmitDone(PropertyContext propertyContext, ConnectionResult connectionResult) {
         submission.getXBLContainer(containingDocument)
-                .dispatchEvent(propertyContext, new XFormsSubmitDoneEvent(submission, connectionResult));
+                .dispatchEvent(propertyContext, new XFormsSubmitDoneEvent(containingDocument, submission, connectionResult));
     }
 }

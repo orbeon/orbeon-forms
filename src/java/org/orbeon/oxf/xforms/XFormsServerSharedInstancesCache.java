@@ -18,7 +18,6 @@ import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 
 /**
  * Cache for shared and immutable XForms instances.
@@ -183,12 +182,10 @@ public class XFormsServerSharedInstancesCache {
         return new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, instanceSourceURI + "|" + Boolean.toString(handleXInclude) + (requestBodyHash != null ? "|" + requestBodyHash : ""));
     }
 
-    public synchronized void remove(PropertyContext propertyContext, String instanceSourceURI, String requestBodyHash, boolean handleXInclude) {
+    public synchronized void remove(PropertyContext propertyContext, IndentedLogger indentedLogger, String instanceSourceURI, String requestBodyHash, boolean handleXInclude) {
 
-        if (XFormsServer.logger.isDebugEnabled())
-            XFormsContainingDocument.logDebugStatic(LOG_TYPE, "removing instance",
-                    "URI", instanceSourceURI,
-                    "request hash", requestBodyHash);
+        if (indentedLogger.isDebugEnabled())
+            indentedLogger.logDebug(LOG_TYPE, "removing instance", "URI", instanceSourceURI, "request hash", requestBodyHash);
 
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final InternalCacheKey cacheKey = createCacheKey(instanceSourceURI, requestBodyHash, handleXInclude);
@@ -196,12 +193,12 @@ public class XFormsServerSharedInstancesCache {
         cache.remove(propertyContext, cacheKey);
     }
 
-    public synchronized void removeAll(PropertyContext propertyContext) {
+    public synchronized void removeAll(PropertyContext propertyContext, IndentedLogger indentedLogger) {
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final int count = cache.removeAll(propertyContext);
 
-        if (XFormsServer.logger.isDebugEnabled())
-            XFormsContainingDocument.logDebugStatic(LOG_TYPE, "removed all instances", "count", Integer.toString(count));
+        if (indentedLogger.isDebugEnabled())
+            indentedLogger.logDebug(LOG_TYPE, "removed all instances", "count", Integer.toString(count));
     }
 
     private static class SharedInstanceCacheEntry {

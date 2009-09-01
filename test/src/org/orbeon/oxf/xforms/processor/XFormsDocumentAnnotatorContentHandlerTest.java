@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.processor;
 
@@ -17,6 +17,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
@@ -33,7 +34,7 @@ import java.util.Map;
 
 public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTestBase {
 
-    public static final HashMap BASIC_NAMESPACE_MAPPINGS = new HashMap();
+    public static final HashMap<String, String> BASIC_NAMESPACE_MAPPINGS = new HashMap<String, String>();
     static {
         BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XFORMS_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
         BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XXFORMS_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);
@@ -43,68 +44,68 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
 
     public void testFormNamespaceElements() {
 
-        final Map mappings = new HashMap();
+        final Map<String, Map<String, String>> mappings = new HashMap<String, Map<String, String>>();
         final XFormsDocumentAnnotatorContentHandler ch = new XFormsDocumentAnnotatorContentHandler(mappings);
         XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", ch, false, false);
 
         // Test that ns information is provided for those elements
-        Map result = (Map) mappings.get("output-in-title");
+        Map<String, String> result = mappings.get("output-in-title");
         assertNotNull(result);
 
-        result = (Map) mappings.get("html");
+        result = mappings.get("html");
         assertNotNull(result);
         
-        result = (Map) mappings.get("main-instance");
+        result = mappings.get("main-instance");
         assertNotNull(result);
 
-        result = (Map) mappings.get("dateTime-component");
+        result = mappings.get("dateTime-component");
         assertNotNull(result);
 
-        result = (Map) mappings.get("dateTime1-control");
+        result = mappings.get("dateTime1-control");
         assertNotNull(result);
 
-        result = (Map) mappings.get("value1-control");
+        result = mappings.get("value1-control");
         assertNotNull(result);
 
-        result = (Map) mappings.get("output-in-label");
+        result = mappings.get("output-in-label");
         assertNotNull(result);
 
-        result = (Map) mappings.get("img-in-label");
+        result = mappings.get("img-in-label");
         assertNotNull(result);
 
-        result = (Map) mappings.get("span");
+        result = mappings.get("span");
         assertNotNull(result);
 
         // Test that ns information is NOT provided for those elements (because processed as part of shadow tree processing)
-        result = (Map) mappings.get("instance-in-xbl");
+        result = mappings.get("instance-in-xbl");
         assertNull(result);
 
-        result = (Map) mappings.get("div-in-xbl");
+        result = mappings.get("div-in-xbl");
         assertNull(result);
 
         // Test that ns information is NOT provided for those elements (because in instances or schemas)
-        result = (Map) mappings.get("instance-root");
+        result = mappings.get("instance-root");
         assertNull(result);
 
-        result = (Map) mappings.get("instance-value");
+        result = mappings.get("instance-value");
         assertNull(result);
 
-        result = (Map) mappings.get("xbl-instance-root");
+        result = mappings.get("xbl-instance-root");
         assertNull(result);
 
-        result = (Map) mappings.get("xbl-instance-value");
+        result = mappings.get("xbl-instance-value");
         assertNull(result);
 
-        result = (Map) mappings.get("schema-element");
+        result = mappings.get("schema-element");
         assertNull(result);
     }
 
     // Test that xxforms:attribute elements with @id and @for were created for
     public void testXXFormsAttribute() {
 
-        final Map mappings = new HashMap();
+        final Map<String, Map<String, String>> mappings = new HashMap<String, Map<String, String>>();
         final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);
-        final Document annotatedDocument = new XBLBindings(null, null, null).annotateShadowTree(document, mappings, "");
+        final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.getLogger(), ""), null, null, null).annotateShadowTree(document, mappings, "");
         final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, new Configuration());
 
         // Check there is an xxforms:attribute for "html" with correct name

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.apache.commons.collections.map.CompositeMap;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.Version;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -111,10 +112,12 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
         final boolean isCombineResources = XFormsProperties.isCombinedResources(containingDocument);
         final boolean isCacheCombinedResources = isCombineResources && XFormsProperties.isCacheCombinedResources();
+
+        final IndentedLogger resourcesIndentedLogger = XFormsResourceServer.getIndentedLogger();
         if (isCombineResources) {
-            containingDocument.logDebug("XForms resources", "creating xhtml:head with combined resources");
+            resourcesIndentedLogger.logDebug("", "creating xhtml:head with combined resources");
             if (isCacheCombinedResources) {
-                containingDocument.logDebug("XForms resources", "attempting to cache combined resources");
+                resourcesIndentedLogger.logDebug("", "attempting to cache combined resources");
             }
         }
 
@@ -135,7 +138,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                     // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
                     final List<XFormsFeatures.ResourceConfig> resources = XFormsFeatures.getCSSResources(containingDocument, javaScriptControlsAppearancesMap);
                     final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
-                    XFormsResourceServer.cacheResources(resources, pipelineContext, combinedResourceName, combinedLastModified, true, isMinimal);
+                    XFormsResourceServer.cacheResources(resourcesIndentedLogger, resources, pipelineContext, combinedResourceName, combinedLastModified, true, isMinimal);
                 }
             } else {
                 for (final XFormsFeatures.ResourceConfig resourceConfig: XFormsFeatures.getCSSResources(containingDocument, javaScriptControlsAppearancesMap)) {
@@ -187,13 +190,12 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                     // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
                     final List<XFormsFeatures.ResourceConfig> resources = XFormsFeatures.getJavaScriptResources(containingDocument, javaScriptControlsAppearancesMap);
                     final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
-                    XFormsResourceServer.cacheResources(resources, pipelineContext, combinedResourceName, combinedLastModified, false, isMinimal);
+                    XFormsResourceServer.cacheResources(resourcesIndentedLogger, resources, pipelineContext, combinedResourceName, combinedLastModified, false, isMinimal);
                 }
 
             } else {
                 for (final XFormsFeatures.ResourceConfig resourceConfig: XFormsFeatures.getJavaScriptResources(containingDocument, javaScriptControlsAppearancesMap)) {
                     // Only include stylesheet if needed
-
                     attributesImpl.clear();
                     final String[] attributesList = new String[]{"type", "text/javascript", "src", resourceConfig.getResourcePath(isMinimal)};
                     ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);

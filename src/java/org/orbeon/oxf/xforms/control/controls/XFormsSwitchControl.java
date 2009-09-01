@@ -103,10 +103,10 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
             // performs the following:"
 
             // "1. Dispatching an xforms-deselect event to the currently selected case."
-            previouslySelectedCaseControl.getXBLContainer().dispatchEvent(propertyContext, new XFormsDeselectEvent(previouslySelectedCaseControl));
+            previouslySelectedCaseControl.getXBLContainer().dispatchEvent(propertyContext, new XFormsDeselectEvent(containingDocument, previouslySelectedCaseControl));
 
             // "2. Dispatching an xform-select event to the case to be selected."
-            caseControl.getXBLContainer().dispatchEvent(propertyContext, new XFormsSelectEvent(caseControl));
+            caseControl.getXBLContainer().dispatchEvent(propertyContext, new XFormsSelectEvent(containingDocument, caseControl));
         }
     }
 

@@ -1,27 +1,27 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.Variable;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 
 import java.util.Iterator;
@@ -66,8 +66,9 @@ public class XFormsActionAction extends XFormsAction {
             }
         }
 
-        if (variablesCount > 0 && XFormsServer.logger.isDebugEnabled())
-            actionInterpreter.getContainingDocument().logDebug("action", "evaluated variables within action",
+        final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
+        if (variablesCount > 0 && indentedLogger.isDebugEnabled())
+            indentedLogger.logDebug("xforms:action", "evaluated variables within action",
                     "count", Integer.toString(variablesCount));
 
         // Unscope all variables

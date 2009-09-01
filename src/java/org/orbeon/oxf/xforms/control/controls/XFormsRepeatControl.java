@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.ControlTree;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -29,7 +30,6 @@ import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -202,7 +202,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
             // Delete node from source
             // NOTE: don't dispatch event, because one call to updateRepeatNodeset() is enough
-            final List deletedNodes = XFormsDeleteAction.doDelete(propertyContext, containingDocument, sourceNodeset, requestedSourceIndex, false);
+            final List deletedNodes = XFormsDeleteAction.doDelete(propertyContext, containingDocument,
+                    containingDocument.getControls().getIndentedLogger(), sourceNodeset, requestedSourceIndex, false);
             final NodeInfo deletedNodeInfo = (NodeInfo) deletedNodes.get(0);
 
             // Adjust destination collection to reflect new state
@@ -239,7 +240,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             // Insert nodes into destination
             final NodeInfo insertContextNodeInfo = deletedNodeInfo.getParent();
             // NOTE: Tell insert to not clone the node, as we know it is ready for insertion
-            XFormsInsertAction.doInsert(propertyContext, containingDocument, destinationPosition, destinationNodeset, insertContextNodeInfo, deletedNodes, actualDestinationIndex, false, true);
+            XFormsInsertAction.doInsert(propertyContext, containingDocument, containingDocument.getControls().getIndentedLogger(),
+                    destinationPosition, destinationNodeset, insertContextNodeInfo, deletedNodes, actualDestinationIndex, false, true);
 
             // TODO: should dispatch xxforms-move instead of xforms-insert?
 
@@ -285,7 +287,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             // Initialize all new iterations
             final ControlTree currentControlTree = containingDocument.getControls().getCurrentControlTree();
             for (XFormsRepeatIterationControl newIteration: newIterations) {
-                currentControlTree.initializeRepeatIterationTree(propertyContext, containingDocument, newIteration);
+                currentControlTree.initializeRepeatIterationTree(propertyContext, newIteration);
             }
         }
     }
@@ -312,8 +314,11 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
         final boolean isInsert = insertedNodeInfos != null;
 
-        final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
         final ControlTree currentControlTree = controls.getCurrentControlTree();
+
+        final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
+        final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
+
         if (newRepeatNodeset != null && newRepeatNodeset.size() > 0) {
 
             // For each new node, what its old index was, -1 if it was not there
@@ -336,17 +341,17 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
                     if (isRemoved) {
                         if (isDebugEnabled) {
-                            containingDocument.startHandleOperation("repeat", "removing iteration", "id", getEffectiveId(), "index", Integer.toString(i + 1));
+                            indentedLogger.startHandleOperation("xforms:repeat", "removing iteration", "id", getEffectiveId(), "index", Integer.toString(i + 1));
                         }
 
                         // Dispatch destruction events
-                        currentControlTree.dispatchDestructionEvents(propertyContext, containingDocument, movedOrRemovedIteration);
+                        currentControlTree.dispatchDestructionEvents(propertyContext, movedOrRemovedIteration);
 
                         // Indicate to iteration that it is being removed
                         movedOrRemovedIteration.iterationRemoved(propertyContext);
 
                         if (isDebugEnabled) {
-                            containingDocument.endHandleOperation();
+                            indentedLogger.endHandleOperation();
                         }
                     }
 
@@ -367,7 +372,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     // This new node was not in the old nodeset so create a new one
 
                     if (isDebugEnabled) {
-                        containingDocument.startHandleOperation("repeat", "creating new iteration", "id", getEffectiveId(), "index", Integer.toString(repeatIndex));
+                        indentedLogger.startHandleOperation("xforms:repeat", "creating new iteration", "id", getEffectiveId(), "index", Integer.toString(repeatIndex));
                     }
 
                     final XFormsContextStack contextStack = getXBLContainer().getContextStack();
@@ -378,7 +383,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     newIterations.add(newIteration);
 
                     if (isDebugEnabled) {
-                        containingDocument.endHandleOperation();
+                        indentedLogger.endHandleOperation();
                     }
                 } else {
                     // This new node was in the old nodeset so keep it
@@ -388,7 +393,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                         // Iteration index changed
 
                         if (isDebugEnabled) {
-                            containingDocument.logDebug("repeat", "moving iteration",
+                            indentedLogger.logDebug("xforms:repeat", "moving iteration",
                                    "id", getEffectiveId(),
                                    "old index", Integer.toString(newIteration.getIterationIndex()),
                                    "new index", Integer.toString(repeatIndex));
@@ -425,7 +430,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                         final int newRepeatIndex = foobar[i] + 1;
 
                         if (isDebugEnabled) {
-                            containingDocument.logDebug("repeat", "setting index to new node",
+                            indentedLogger.logDebug("xforms:repeat", "setting index to new node",
                                     "id", getEffectiveId(), "new index", Integer.toString(newRepeatIndex));
                         }
 
@@ -446,7 +451,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
                     if (newRepeatIndex != oldRepeatIndex) {
                         if (isDebugEnabled) {
-                            containingDocument.logDebug("repeat", "adjusting index for existing node",
+                            indentedLogger.logDebug("xforms:repeat", "adjusting index for existing node",
                                    "id", getEffectiveId(),
                                    "old index", Integer.toString(oldRepeatIndex),
                                    "new index", Integer.toString(newRepeatIndex));
@@ -463,7 +468,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                         // collection."
 
                         if (isDebugEnabled) {
-                            containingDocument.logDebug("repeat", "setting index to the size of the new nodeset",
+                            indentedLogger.logDebug("xforms:repeat", "setting index to the size of the new nodeset",
                                     "id", getEffectiveId(), "new index", Integer.toString(newRepeatNodeset.size()));
                         }
 
@@ -479,7 +484,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     setIndex(getStartIndex());
 
                     if (isDebugEnabled) {
-                        containingDocument.logDebug("repeat", "resetting index",
+                        indentedLogger.logDebug("xforms:repeat", "resetting index",
                                 "id", getEffectiveId(), "new index", Integer.toString(getIndex()));
                     }
                 }
@@ -495,25 +500,25 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 for (int i = 0; i < oldChildren.size(); i++) {
 
                     if (isDebugEnabled) {
-                        containingDocument.startHandleOperation("repeat", "removing iteration", "id", getEffectiveId(), "index", Integer.toString(i + 1));
+                        indentedLogger.startHandleOperation("xforms:repeat", "removing iteration", "id", getEffectiveId(), "index", Integer.toString(i + 1));
                     }
 
                     final XFormsRepeatIterationControl removedIteration = (XFormsRepeatIterationControl) oldChildren.get(i);
 
                     // Dispatch destruction events
-                    currentControlTree.dispatchDestructionEvents(propertyContext, containingDocument, removedIteration);
+                    currentControlTree.dispatchDestructionEvents(propertyContext, removedIteration);
 
                     // Deindex old iteration
                     currentControlTree.deindexSubtree(removedIteration, true);
                     if (isDebugEnabled) {
-                        containingDocument.endHandleOperation();
+                        indentedLogger.endHandleOperation();
                     }
                 }
             }
 
             if (isDebugEnabled) {
                 if (getIndex() != 0)
-                    containingDocument.logDebug("repeat", "setting index to 0", "id", getEffectiveId());
+                    indentedLogger.logDebug("xforms:repeat", "setting index to 0", "id", getEffectiveId());
             }
 
             setChildren(null);

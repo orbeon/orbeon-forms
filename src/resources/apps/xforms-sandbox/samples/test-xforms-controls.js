@@ -25,6 +25,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 ORBEON.xforms.Document.setValue("repeat-shown", "true");
             }, function() {
                 YAHOO.util.Assert.areEqual("true", ORBEON.xforms.Document.getValue(fullId));
+                YAHOO.util.Assert.areEqual("Label", ORBEON.xforms.Controls.getLabelMessage(YAHOO.util.Dom.get(fullId)));
             });
         });
    },
@@ -65,14 +66,15 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             YAHOO.util.Assert.areEqual(initialCarrierValue, ORBEON.xforms.Controls.getCurrentValue(carrierSelect1));
        });
     },
-    
+
     testUpdateRadio: function() {
          ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
              // Click on DHL radio
-             YAHOO.util.UserAction.click("carrier-select1-full" + XFORMS_SEPARATOR_1 + "1-opsitem2");
+             var dhlRadio = YAHOO.util.Dom.get("carrier-select1-full$$e2" + XFORMS_SEPARATOR_1 + "1");
+             dhlRadio.click();
          }, function() {
              // Check DHL checkbox is checked, and DHL item in lists is selected
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select-full" + XFORMS_SEPARATOR_1 + "1-opsitem2").checked);
+             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select-full$$e2" + XFORMS_SEPARATOR_1 + "1").checked);
              YAHOO.util.Assert.isTrue(this.getSelect("carrier-select1-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected);
              YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected);
         });
@@ -81,13 +83,15 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     testUpdateList: function() {
          ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
              // Set value in list to TNT
-             var select1List = this.getSelect("carrier-select1-compact" + XFORMS_SEPARATOR_1 + "1");
-             select1List.value = select1List.options[3].value;
-             ORBEON.xforms.Events.change({target: select1List});
+             var select1Id = "carrier-select1-compact" + XFORMS_SEPARATOR_1 + "1";
+             var select1Control = YAHOO.util.Dom.get(select1Id);
+             var select1List = this.getSelect(select1Id);
+             ORBEON.xforms.Controls.setCurrentValue(select1Control, select1List.options[3].value);
+             ORBEON.xforms.Events.change({target: select1Control});
          }, function() {
              // Check TNT radio button and checkbox is checked, and TNT item in list is selected
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select1-full" + XFORMS_SEPARATOR_1 + "1-opsitem3").checked);
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select-full" + XFORMS_SEPARATOR_1 + "1-opsitem3").checked);
+             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select1-full$$e3" + XFORMS_SEPARATOR_1 + "1").checked);
+             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("carrier-select-full$$e3" + XFORMS_SEPARATOR_1 + "1").checked);
              YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[3].selected);
         });
     },
@@ -95,7 +99,8 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     testUpdateCheckbox: function() {
          ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
              // Click on DHL checkbox (in addition to already selected TNT)
-             YAHOO.util.UserAction.click("carrier-select-full" + XFORMS_SEPARATOR_1 + "1-opsitem2");
+             var dhlCheckbox = YAHOO.util.Dom.get("carrier-select-full$$e2" + XFORMS_SEPARATOR_1 + "1");
+             dhlCheckbox.click();
          }, function() {
              // Check DHL and TNT are selected in the list
              YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected);

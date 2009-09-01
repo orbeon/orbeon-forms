@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.action.actions;
 
@@ -18,19 +18,21 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 9.3.6 The delete Element
@@ -43,6 +45,7 @@ public class XFormsDeleteAction extends XFormsAction {
                         XFormsEventObserver eventObserver, Element actionElement,
                         boolean hasOverriddenContext, Item overriddenContext) {
 
+        final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
@@ -55,16 +58,16 @@ public class XFormsDeleteAction extends XFormsAction {
         // "The delete action is terminated with no effect if [...] the context attribute is not given and the Node
         // Set Binding node-set is empty."
         if (contextAttribute == null && isEmptyNodesetBinding) {
-            if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("xforms:delete", "context is empty, terminating");
+            if (indentedLogger.isDebugEnabled())
+                indentedLogger.logDebug("xforms:delete", "context is empty, terminating");
             return;
         }
 
         // Handle insert context (with @context attribute)
         // "The delete action is terminated with no effect if the insert context is the empty node-set [...]."
         if (hasOverriddenContext && (overriddenContext == null || !(overriddenContext instanceof NodeInfo))) {
-            if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("xforms:delete", "overridden context is an empty nodeset or not a nodeset, terminating");
+            if (indentedLogger.isDebugEnabled())
+                indentedLogger.logDebug("xforms:delete", "overridden context is an empty nodeset or not a nodeset, terminating");
             return;
         }
 
@@ -110,11 +113,12 @@ public class XFormsDeleteAction extends XFormsAction {
                 }
             }
 
-            doDelete(propertyContext, containingDocument, collectionToUpdate, deleteIndex, true);
+            doDelete(propertyContext, containingDocument, indentedLogger, collectionToUpdate, deleteIndex, true);
         }
     }
 
-    public static List<Item> doDelete(PropertyContext propertyContext, XFormsContainingDocument containingDocument, List collectionToUpdate, int deleteIndex, boolean doDispatch) {
+    public static List<Item> doDelete(PropertyContext propertyContext, XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
+                                      List collectionToUpdate, int deleteIndex, boolean doDispatch) {
 
         final boolean isEmptyNodesetBinding = collectionToUpdate == null || collectionToUpdate.size() == 0;
 
@@ -126,7 +130,7 @@ public class XFormsDeleteAction extends XFormsAction {
 
             deletedNodeInfos = new ArrayList<Item>(collectionToUpdate.size());
             for (int i = 1; i <= collectionToUpdate.size(); i++) {
-                final NodeInfo deletedNodeInfo = doDeleteOne(containingDocument, collectionToUpdate, i);
+                final NodeInfo deletedNodeInfo = doDeleteOne(indentedLogger, collectionToUpdate, i);
                 if (deletedNodeInfo != null) {
                     deletedNodeInfos.add(deletedNodeInfo);
                 }
@@ -134,7 +138,7 @@ public class XFormsDeleteAction extends XFormsAction {
         } else {
             // Find actual deletion point
 
-            final NodeInfo deletedNodeInfo = doDeleteOne(containingDocument, collectionToUpdate, deleteIndex);
+            final NodeInfo deletedNodeInfo = doDeleteOne(indentedLogger, collectionToUpdate, deleteIndex);
             if (deletedNodeInfo != null) {
                 deletedNodeInfos = Collections.singletonList((Item) deletedNodeInfo);
             } else {
@@ -143,15 +147,15 @@ public class XFormsDeleteAction extends XFormsAction {
         }
 
         if (deletedNodeInfos.size() == 0) {
-            if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("xforms:delete", "empty collection, terminating");
+            if (indentedLogger.isDebugEnabled())
+                indentedLogger.logDebug("xforms:delete", "empty collection, terminating");
         } else {
             // Identify the instance that actually changes
             // NOTE: More than one instance may be modified. For now we look at the first one.
             final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode((NodeInfo) deletedNodeInfos.get(0));
 
-            if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("xforms:delete", "removed nodes",
+            if (indentedLogger.isDebugEnabled())
+                indentedLogger.logDebug("xforms:delete", "removed nodes",
                         "count", Integer.toString(deletedNodeInfos.size()), "instance",
                                 (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : null);
 
@@ -164,14 +168,14 @@ public class XFormsDeleteAction extends XFormsAction {
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
                 if (doDispatch)
-                    modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsDeleteEvent(modifiedInstance, deletedNodeInfos, deleteIndex));
+                    modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsDeleteEvent(containingDocument, modifiedInstance, deletedNodeInfos, deleteIndex));
             }
         }
 
         return deletedNodeInfos;
     }
 
-    private static NodeInfo doDeleteOne(XFormsContainingDocument containingDocument, List collectionToUpdate, int deleteIndex) {
+    private static NodeInfo doDeleteOne(IndentedLogger indentedLogger, List collectionToUpdate, int deleteIndex) {
         final NodeInfo nodeInfoToRemove = (NodeInfo) collectionToUpdate.get(deleteIndex - 1);
         final Node nodeToRemove = XFormsUtils.getNodeFromNodeInfo(nodeInfoToRemove, CANNOT_DELETE_READONLY_MESSAGE);
 
@@ -196,8 +200,8 @@ public class XFormsDeleteAction extends XFormsAction {
             // "except if the node is the root document element of an instance then the delete action
             // is terminated with no effect."
 
-            if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("xforms:delete", "ignoring attempt to delete document node");
+            if (indentedLogger.isDebugEnabled())
+                indentedLogger.logDebug("xforms:delete", "ignoring attempt to delete document node");
 
             return null;
         } else {

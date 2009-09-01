@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.log4j.Logger;
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
@@ -40,6 +41,7 @@ import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.*;
+import org.orbeon.saxon.value.StringValue;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -66,10 +68,15 @@ import java.util.zip.GZIPInputStream;
 
 public class XFormsUtils {
 
+    private static final String LOGGING_CATEGORY = "utils";
+    private static final Logger logger = LoggerFactory.createLogger(XFormsUtils.class);
+    private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
+
     private static final int SRC_CONTENT_BUFFER_SIZE = 1024;
 
     // Binary types supported for upload, images, etc.
     private static final Map<String, String> SUPPORTED_BINARY_TYPES = new HashMap<String, String>();
+
     static {
         SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_BASE64BINARY_EXPLODED_QNAME, "base64Binary");
         SUPPORTED_BINARY_TYPES.put(XMLConstants.XS_ANYURI_EXPLODED_QNAME, "anyURI");
@@ -122,8 +129,8 @@ public class XFormsUtils {
         return encodeXML(pipelineContext, documentToEncode, XFormsProperties.getXFormsPassword(), encodeLocationData);
     }
 
-    // Use a Deflater pool as creating Deflaters is expensive
-    final static SoftReferenceObjectPool deflaterPool = new SoftReferenceObjectPool(new DeflaterPoolableObjetFactory());
+    // Use a Deflater pool as creating deflaters is expensive
+    private static final SoftReferenceObjectPool DEFLATER_POOL = new SoftReferenceObjectPool(new DeflaterPoolableObjectFactory());
 
     public static String encodeXML(PropertyContext propertyContext, Document documentToEncode, String encryptionPassword, boolean encodeLocationData) {
         //        XFormsServer.logger.debug("XForms - encoding XML.");
@@ -162,7 +169,7 @@ public class XFormsUtils {
             // Compress if needed
             final byte[] gzipByteArray;
             if (XFormsProperties.isGZIPState()) {
-                deflater = (Deflater) deflaterPool.borrowObject();
+                deflater = (Deflater) DEFLATER_POOL.borrowObject();
                 final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 final DeflaterGZIPOutputStream gzipOutputStream = new DeflaterGZIPOutputStream(deflater, byteArrayOutputStream, 1024);
                 gzipOutputStream.write(bytesToEncode);
@@ -195,7 +202,7 @@ public class XFormsUtils {
         } catch (Throwable e) {
             try {
                 if (deflater != null)
-                    deflaterPool.invalidateObject(deflater);
+                    DEFLATER_POOL.invalidateObject(deflater);
             } catch (Exception e1) {
                 throw new OXFException(e1);
             }
@@ -204,7 +211,7 @@ public class XFormsUtils {
             try {
                 if (deflater != null) {
                     deflater.reset();
-                    deflaterPool.returnObject(deflater);
+                    DEFLATER_POOL.returnObject(deflater);
                 }
             } catch (Exception e) {
                 throw new OXFException(e);
@@ -508,7 +515,7 @@ public class XFormsUtils {
                     // Dispatch xforms-link-error to model
                     final XFormsModel currentModel = currentBindingContext.getModel();
                     // NOTE: xforms-link-error is no longer in XForms 1.1 starting 2009-03-10
-                    currentModel.getXBLContainer(null).dispatchEvent(propertyContext, new XFormsLinkErrorEvent(currentModel, srcAttributeValue, childElement, e));
+                    currentModel.getXBLContainer(null).dispatchEvent(propertyContext, new XFormsLinkErrorEvent(container.getContainingDocument(), currentModel, srcAttributeValue, childElement, e));
                     return null;
                 }
             }
@@ -570,9 +577,9 @@ public class XFormsUtils {
         return valueRepresentation;
     }
 
-    private static class DeflaterPoolableObjetFactory implements PoolableObjectFactory {
+    private static class DeflaterPoolableObjectFactory implements PoolableObjectFactory {
         public Object makeObject() throws Exception {
-            XFormsServer.logger.debug("XForms - creating new Deflater.");
+            indentedLogger.logDebug("", "creating new Deflater");
             return new Deflater(Deflater.DEFAULT_COMPRESSION, true);
         }
 

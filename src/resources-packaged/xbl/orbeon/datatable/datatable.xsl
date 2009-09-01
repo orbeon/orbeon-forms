@@ -235,47 +235,46 @@
 
             </xforms:model>
 
-            <xsl:if test="$paginated">
-                <xsl:choose>
-                    <xsl:when test="not($sortAndPaginationMode='external')">
-                        <xxforms:variable name="page" model="datatable" select="instance('page')"/>
-                        <xxforms:variable name="nbRows"
-                            select="count({$pass1//xforms:repeat[1]/@nodeset})"/>
-                        <xxforms:variable name="nbPages"
-                            select="ceiling($nbRows div {$rowsPerPage}) cast as xs:integer"/>
-                    </xsl:when>
+            <xsl:choose>
+                <xsl:when test="$paginated and not($sortAndPaginationMode='external')">
+                    <xxforms:variable name="page" model="datatable" select="instance('page')"/>
+                    <xxforms:variable name="nbRows"
+                        select="count({$pass1//xforms:repeat[1]/@nodeset})"/>
+                    <xxforms:variable name="nbPages"
+                        select="ceiling($nbRows div {$rowsPerPage}) cast as xs:integer"/>
+                </xsl:when>
 
-                    <xsl:when test="$sortAndPaginationMode='external'">
-                        <xxforms:variable name="page" xbl:attr="select=page"/>
-                        <xxforms:variable name="nbPages" xbl:attr="select=nbPages"/>
-                    </xsl:when>
-                </xsl:choose>
+                <xsl:when test="$paginated and $sortAndPaginationMode='external'">
+                    <xxforms:variable name="page" xbl:attr="select=page"/>
+                    <xxforms:variable name="nbPages" xbl:attr="select=nbPages"/>
+                </xsl:when>
+
+            </xsl:choose>
 
 
-                <xsl:choose>
-                    <xsl:when test="$maxNbPagesToDisplay &lt; 0">
-                        <xxforms:variable name="pages"
-                            select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"
-                        />
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xxforms:variable name="maxNbPagesToDisplay" select="{$maxNbPagesToDisplay} cast as xs:integer"/>
-                        <xxforms:variable name="radix" select="floor(($maxNbPagesToDisplay - 2) div 2) cast as xs:integer"/>
-                        <xxforms:variable name="minPage" select="
-                            (if ($page > $radix)
-                                then if ($nbPages >= $page + $radix)
-                                    then ($page - $radix)
-                                    else max((1, $nbPages - $maxNbPagesToDisplay + 1))
-                                else 1) cast as xs:integer"/>
-                                            <xxforms:variable name="pages"
-                            select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"
-                        />
-                        <!--<xxforms:variable name="pages"
-                            select="for $p in $minPage to min(($nbPages, $minPage + $maxNbPagesToDisplay - 1)) cast as xs:integer return xxforms:element('page', $p)"
-                        />-->
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:if>
+            <xsl:choose>
+                <xsl:when test="$paginated and $maxNbPagesToDisplay &lt; 0">
+                    <xxforms:variable name="pages"
+                        select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"
+                    />
+                </xsl:when>
+                <xsl:when test="$paginated">
+                    <xxforms:variable name="maxNbPagesToDisplay" select="{$maxNbPagesToDisplay} cast as xs:integer"/>
+                    <xxforms:variable name="radix" select="floor(($maxNbPagesToDisplay - 2) div 2) cast as xs:integer"/>
+                    <xxforms:variable name="minPage" select="
+                        (if ($page > $radix)
+                            then if ($nbPages >= $page + $radix)
+                                then ($page - $radix)
+                                else max((1, $nbPages - $maxNbPagesToDisplay + 1))
+                            else 1) cast as xs:integer"/>
+                                        <xxforms:variable name="pages"
+                        select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"
+                    />
+                    <!--<xxforms:variable name="pages"
+                        select="for $p in $minPage to min(($nbPages, $minPage + $maxNbPagesToDisplay - 1)) cast as xs:integer return xxforms:element('page', $p)"
+                    />-->
+                </xsl:when>
+            </xsl:choose>
             
             <xsl:variable name="pagination">
                 <xsl:if test="$paginated">

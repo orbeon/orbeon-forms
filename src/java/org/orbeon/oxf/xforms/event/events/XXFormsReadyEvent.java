@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -22,7 +23,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  */
 public class XXFormsReadyEvent extends XFormsEvent {
 
-    public XXFormsReadyEvent(XFormsEventTarget targetObject) {
-        super(XFormsEvents.XXFORMS_READY, targetObject, false, false);
+    public XXFormsReadyEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
+        super(containingDocument, XFormsEvents.XXFORMS_READY, targetObject, false, false);
     }
 }

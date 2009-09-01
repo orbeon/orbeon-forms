@@ -13,10 +13,9 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -27,7 +26,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -56,8 +54,6 @@ import java.util.Map;
  * Represent an XForms instance.
  */
 public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
-
-    static public Logger logger = LoggerFactory.createLogger(XFormsInstance.class);
 
     private DocumentInfo documentInfo;
 
@@ -342,7 +338,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             // "10.2 The setvalue Element [...] An xforms-binding-exception occurs if the Single Node Binding
             // indicates a node whose content is not simpleContent (i.e., a node that has element children)."
             if (!Dom4jUtils.isSimpleContent(node)) {
-                containingDocument.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(eventTarget));
+                containingDocument.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, eventTarget));
                 return;
             }
         }
@@ -503,11 +499,12 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
         final String eventName = event.getEventName();
         if (XFormsEvents.XXFORMS_INSTANCE_INVALIDATE.equals(eventName)) {
+            final IndentedLogger indentedLogger = event.getTargetXBLContainer().getContainingDocument().getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
             // Invalidate instance if it is cached
             if (cache) {
-                XFormsServerSharedInstancesCache.instance().remove(propertyContext, sourceURI, null, handleXInclude);
+                XFormsServerSharedInstancesCache.instance().remove(propertyContext, indentedLogger, sourceURI, null, handleXInclude);
             } else {
-                XFormsServer.logger.warn("XForms - xxforms-instance-invalidate event dispatched to non-cached instance with id: " + getEffectiveId());
+                indentedLogger.logWarning("", "XForms - xxforms-instance-invalidate event dispatched to non-cached instance", "instance id", getEffectiveId());
             }
         }
     }
@@ -617,9 +614,9 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         return container.getContainingDocument().getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
     }
 
-    public void logIfNeeded(XFormsContainingDocument containingDocument, String message) {
-        if (logger.isDebugEnabled()) {
-            containingDocument.logDebug("instance", message,
+    public void logInstance(IndentedLogger indentedLogger, String message) {
+        if (indentedLogger.isDebugEnabled()) {
+            indentedLogger.logDebug("", message,
                     "effective model id", getEffectiveModelId(),
                     "effective instance id", getEffectiveId(),
                     "instance", TransformerUtils.tinyTreeToString(getInstanceRootElementInfo()));

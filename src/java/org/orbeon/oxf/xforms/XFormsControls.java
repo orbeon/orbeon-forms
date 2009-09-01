@@ -13,8 +13,11 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -34,6 +37,10 @@ import java.util.Map;
  */
 public class XFormsControls implements XFormsObjectResolver {
 
+    public static final String LOGGING_CATEGORY = "control";
+    public static final Logger logger = LoggerFactory.createLogger(XFormsModel.class);
+    public final IndentedLogger indentedLogger;
+
     private boolean initialized;
     private ControlTree initialControlTree;
     private ControlTree currentControlTree;
@@ -50,16 +57,22 @@ public class XFormsControls implements XFormsObjectResolver {
 
     public XFormsControls(XFormsContainingDocument containingDocument, boolean isInitialization) {
 
+        this.indentedLogger = containingDocument.getIndentedLogger(LOGGING_CATEGORY);
+
         this.containingDocument = containingDocument;
         this.rootContainer = this.containingDocument;
 
         // Create minimal tree
-        initialControlTree = new ControlTree(containingDocument);
+        initialControlTree = new ControlTree(containingDocument, indentedLogger);
         currentControlTree = initialControlTree;
     }
 
     public boolean isInitialized() {
         return initialized;
+    }
+
+    public IndentedLogger getIndentedLogger() {
+        return indentedLogger;
     }
 
     public boolean isDirtySinceLastRequest() {
@@ -137,7 +150,7 @@ public class XFormsControls implements XFormsObjectResolver {
             } else {
                 // Create new controls tree
                 // NOTE: We set this first so that the tree is made available during construction to XPath functions like index() or xxforms:case() 
-                currentControlTree = initialControlTree = new ControlTree(containingDocument);
+                currentControlTree = initialControlTree = new ControlTree(containingDocument, indentedLogger);
 
                 // Initialize new control tree
                 currentControlTree.initialize(propertyContext, containingDocument, rootContainer, isRestoringState);
@@ -220,11 +233,11 @@ public class XFormsControls implements XFormsObjectResolver {
             throw new OXFException("Cannot call insertRepeatIteration() when initialControlTree == currentControlTree");
 
         final XFormsRepeatIterationControl repeatIterationControl;
-        containingDocument.startHandleOperation("controls", "adding iteration");
+        indentedLogger.startHandleOperation("controls", "adding iteration");
         {
             repeatIterationControl = currentControlTree.createRepeatIterationTree(propertyContext, containingDocument, bindingContext, repeatControl, iterationIndex);
         }
-        containingDocument.endHandleOperation();
+        indentedLogger.endHandleOperation();
 
         return repeatIterationControl;
     }
@@ -238,7 +251,7 @@ public class XFormsControls implements XFormsObjectResolver {
      */
     private void evaluateControlValuesIfNeeded(PropertyContext propertyContext, boolean isRefresh) {
 
-        containingDocument.startHandleOperation("controls", "evaluating");
+        indentedLogger.startHandleOperation("controls", "evaluating");
         {
             final Map<String, XFormsControl> effectiveIdsToControls = getCurrentControlTree().getEffectiveIdsToControls();
             // Evaluate all controls
@@ -249,7 +262,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 }
             }
         }
-        containingDocument.endHandleOperation();
+        indentedLogger.endHandleOperation();
     }
 
     /**
@@ -277,7 +290,7 @@ public class XFormsControls implements XFormsObjectResolver {
      */
     public void cloneInitialStateIfNeeded() {
         if (initialControlTree == currentControlTree && containingDocument.isHandleDifferences()) {
-            containingDocument.startHandleOperation("controls", "cloning");
+            indentedLogger.startHandleOperation("controls", "cloning");
             {
                 try {
                     // NOTE: We clone "back", that is the new tree is used as the "initial" tree. This is done so that
@@ -287,7 +300,7 @@ public class XFormsControls implements XFormsObjectResolver {
                     throw new OXFException(e);
                 }
             }
-            containingDocument.endHandleOperation();
+            indentedLogger.endHandleOperation();
         }
     }
 
@@ -311,13 +324,13 @@ public class XFormsControls implements XFormsObjectResolver {
             // Clone if needed
             cloneInitialStateIfNeeded();
 
-            containingDocument.startHandleOperation("controls", "updating bindings");
+            indentedLogger.startHandleOperation("controls", "updating bindings");
             final ControlTree.UpdateBindingsListener listener = new ControlTree.UpdateBindingsListener(propertyContext, currentControlTree.getEffectiveIdsToControls());
             {
                 // Visit all controls and update their bindings
                 visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener);
             }
-            containingDocument.endHandleOperation(
+            indentedLogger.endHandleOperation(
                     "controls updated", Integer.toString(listener.getUpdateCount()),
                     "repeat iterations", Integer.toString(listener.getIterationCount())
             );
@@ -580,13 +593,13 @@ public class XFormsControls implements XFormsObjectResolver {
 
         // Don't do anything if there are no children controls
         if (getCurrentControlTree().getChildren() == null) {
-            containingDocument.logDebug("model", "not performing refresh because no controls are available");
+            indentedLogger.logDebug("model", "not performing refresh because no controls are available");
             // Don't forget to clear the flag or we risk infinite recursion
             refreshDone();
             return;
         }
 
-        containingDocument.startHandleOperation("model", "performing refresh", "container id", container.getEffectiveId());
+        indentedLogger.startHandleOperation("model", "performing refresh", "container id", container.getEffectiveId());
         {
             // Update control bindings
             updateControlBindingsIfNeeded(propertyContext);
@@ -608,14 +621,14 @@ public class XFormsControls implements XFormsObjectResolver {
 
             } else {
                 // No UI events to send because there is no event handlers for any of them
-                containingDocument.logDebug("model", "refresh skipping sending of UI events because no listener was found", "container id", container.getEffectiveId());
+                indentedLogger.logDebug("model", "refresh skipping sending of UI events because no listener was found", "container id", container.getEffectiveId());
 
                 // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
                 // effect, and clear the corresponding flag."
                 refreshDone();
             }
         }
-        containingDocument.endHandleOperation();
+        indentedLogger.endHandleOperation();
     }
 
     private List<String> gatherRefreshEvents() {

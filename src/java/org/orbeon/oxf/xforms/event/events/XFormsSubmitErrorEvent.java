@@ -13,14 +13,18 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
+import org.apache.log4j.Level;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -48,85 +52,93 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
 
     private final ErrorType errorType;
 
-    public XFormsSubmitErrorEvent(XFormsEventTarget targetObject) {
-        this(null, targetObject, ErrorType.XXFORMS_INTERNAL_ERROR, null);
+    public XFormsSubmitErrorEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
+        this(containingDocument, null, targetObject, ErrorType.XXFORMS_INTERNAL_ERROR, null);
     }
 
-    public XFormsSubmitErrorEvent(XFormsEventTarget targetObject, String resourceURI, ErrorType errorType, int statusCode) {
-        super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, resourceURI, statusCode);
+    public XFormsSubmitErrorEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, String resourceURI, ErrorType errorType, int statusCode) {
+        super(containingDocument, XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, resourceURI, statusCode);
         this.errorType = errorType;
     }
 
-    public XFormsSubmitErrorEvent(PropertyContext propertyContext, XFormsEventTarget targetObject, ErrorType errorType, ConnectionResult connectionResult) {
-        super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, connectionResult);
+    public XFormsSubmitErrorEvent(XFormsContainingDocument containingDocument, PropertyContext propertyContext, XFormsEventTarget targetObject, ErrorType errorType, ConnectionResult connectionResult) {
+        super(containingDocument, XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, connectionResult);
         this.errorType = errorType;
+        
+        final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
 
-        // Try to add body information
-        if (connectionResult != null && connectionResult.hasContent()) {
+        if (connectionResult != null) {
 
-            // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is
-            // parsed into an XML document and the root element of the document is returned. If the parse fails, or if
-            // the error response specifies a text media type (starting with text/), then the response body is returned
-            // as a string. Otherwise, an empty string is returned."
+            // Log response details if not done already
+            connectionResult.logResponseDetailsIfNeeded(indentedLogger, Level.ERROR, "xforms-submit-error");
 
-            // Read the whole stream to a temp URI so we can read it more than once if needed
-            final String tempURI;
-            try {
-                // NOTE: cast to PipelineContext not desirable. Must rework interfaces?
-                tempURI = NetUtils.inputStreamToAnyURI((PipelineContext) propertyContext, connectionResult.getResponseInputStream(), NetUtils.REQUEST_SCOPE);
-                connectionResult.getResponseInputStream().close();
-            } catch (Exception e) {
-                // Simply can't read the body
-                XFormsServer.logger.warn("XForms - submission - error while reading response body ", e);
-                return;
-            }
+            // Try to add body information if present
+            if (connectionResult.hasContent()) {
 
-            boolean isXMLParseFailed = false;
-            if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
-                // XML content-type
-                // Read stream into Document
-                // TODO: In case of text/xml, charset is not handled. Should modify readTinyTree() and readDom4j()
-                InputStream is = null; 
+                // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is
+                // parsed into an XML document and the root element of the document is returned. If the parse fails, or if
+                // the error response specifies a text media type (starting with text/), then the response body is returned
+                // as a string. Otherwise, an empty string is returned."
+
+                // Read the whole stream to a temp URI so we can read it more than once if needed
+                final String tempURI;
                 try {
-                    is = new URL(tempURI).openStream();
-                    final DocumentInfo responseBody = TransformerUtils.readTinyTree(is, connectionResult.resourceURI, false);
-                    setBodyDocument(responseBody);
-                    return;
+                    // NOTE: cast to PipelineContext not desirable. Must rework interfaces?
+                    tempURI = NetUtils.inputStreamToAnyURI((PipelineContext) propertyContext, connectionResult.getResponseInputStream(), NetUtils.REQUEST_SCOPE);
+                    connectionResult.getResponseInputStream().close();
                 } catch (Exception e) {
-                    XFormsServer.logger.warn("XForms - submission - error while parsing response body as XML, defaulting to plain text.", e);
-                    isXMLParseFailed = true;
-                } finally {
-                    try {
-                        is.close();
-                    } catch (Exception e) {
-                        // NOP
-                    }
+                    // Simply can't read the body
+                    indentedLogger.logWarning("xforms-submit-error", "error while reading response body ", e);
+                    return;
                 }
-            }
 
-            if (isXMLParseFailed || XMLUtils.isTextContentType(connectionResult.getResponseMediaType())) {
-                // XML parsing failed, or we got a text content-type
-                // Read stream into String
-                try {
-                    final String charset = NetUtils.getTextCharsetFromContentType(connectionResult.getResponseContentType());
-                    final InputStream is = new URL(tempURI).openStream();
-                    final Reader reader = new InputStreamReader(is, charset);
+                boolean isXMLParseFailed = false;
+                if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
+                    // XML content-type
+                    // Read stream into Document
+                    // TODO: In case of text/xml, charset is not handled. Should modify readTinyTree() and readDom4j()
+                    InputStream is = null;
                     try {
-                        final String responseBody = NetUtils.readStreamAsString(reader);
-                        setBodyString(responseBody);
+                        is = new URL(tempURI).openStream();
+                        final DocumentInfo responseBody = TransformerUtils.readTinyTree(is, connectionResult.resourceURI, false);
+                        setBodyDocument(responseBody);
+                        return;
+                    } catch (Exception e) {
+                        indentedLogger.logWarning("xforms-submit-error", "error while parsing response body as XML, defaulting to plain text.", e);
+                        isXMLParseFailed = true;
                     } finally {
                         try {
-                            reader.close();
+                            is.close();
                         } catch (Exception e) {
                             // NOP
                         }
                     }
-                } catch (Exception e) {
-                    XFormsServer.logger.warn("XForms - submission - error while reading response body ", e);
                 }
-            } else {
-                // This is binary
-                // Don't store anything for now
+
+                if (isXMLParseFailed || XMLUtils.isTextContentType(connectionResult.getResponseMediaType())) {
+                    // XML parsing failed, or we got a text content-type
+                    // Read stream into String
+                    try {
+                        final String charset = NetUtils.getTextCharsetFromContentType(connectionResult.getResponseContentType());
+                        final InputStream is = new URL(tempURI).openStream();
+                        final Reader reader = new InputStreamReader(is, charset);
+                        try {
+                            final String responseBody = NetUtils.readStreamAsString(reader);
+                            setBodyString(responseBody);
+                        } finally {
+                            try {
+                                reader.close();
+                            } catch (Exception e) {
+                                // NOP
+                            }
+                        }
+                    } catch (Exception e) {
+                        indentedLogger.logWarning("xforms-submit-error", "error while reading response body ", e);
+                    }
+                } else {
+                    // This is binary
+                    // Don't store anything for now
+                }
             }
         }
     }
@@ -134,13 +146,10 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     public void setThrowable(Throwable throwable) {
         this.throwable = throwable;
 
-        if (errorType == ErrorType.VALIDATION_ERROR) {
+        final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+        if (errorType != ErrorType.VALIDATION_ERROR) {
             // Don't log validation errors as actual errors
-            if (XFormsServer.logger.isDebugEnabled())
-                XFormsServer.logger.debug("XForms - submission - xforms-submit-error throwable: " + throwableToString(throwable));
-        } else {
-            // Everything else gets logged as an error
-            XFormsServer.logger.error("XForms - submission - xforms-submit-error throwable: " + throwableToString(throwable));
+            indentedLogger.logError("xforms-submit-error", "setting throwable", "throwable", throwableToString(throwable));
         }
     }
 
@@ -154,12 +163,10 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
         return bodyDocument;
     }
 
-    public void setBodyDocument(DocumentInfo bodyDocument) {
-
-        if (XFormsServer.logger.isDebugEnabled()) {
-            XFormsServer.logger.debug("XForms - submission - error body document:\n" + TransformerUtils.tinyTreeToString(bodyDocument));
-        }
-
+    private void setBodyDocument(DocumentInfo bodyDocument) {
+        final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+        if (XFormsProperties.getErrorLogging().contains("submission-error-body"))
+            indentedLogger.logError("xforms-submit-error", "setting body document", "body", "\n" + TransformerUtils.tinyTreeToString(bodyDocument));
         this.bodyDocument = bodyDocument;
     }
 
@@ -167,12 +174,10 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
         return bodyString;
     }
 
-    public void setBodyString(String bodyString) {
-
-        if (XFormsServer.logger.isDebugEnabled()) {
-            XFormsServer.logger.debug("XForms - submission - error body string:\n" + bodyString);
-        }
-
+    private void setBodyString(String bodyString) {
+        final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+        if (XFormsProperties.getErrorLogging().contains("submission-error-body"))
+            indentedLogger.logError("xforms-submit-error", "setting body string", "body", "\n" + bodyString);
         this.bodyString = bodyString;
     }
 
@@ -182,7 +187,8 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
             // Return the body of the response if possible
 
             if ("body".equals(name)) {
-                XFormsServer.logger.warn("event('body') on xforms-submit-error is deprecated. Use event('response-body') instead.");
+                final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+                indentedLogger.logWarning("xforms-submit-error", "event('body') is deprecated. Use event('response-body') instead.");
             }
 
             // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is

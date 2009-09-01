@@ -16,13 +16,13 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -143,8 +143,9 @@ public class XFormsContextStack {
 
             final int variableCount = variableInfos.size();
 
-            if (XFormsServer.logger.isDebugEnabled()) {
-                containingDocument.logDebug("model", "evaluated variables", "count", Integer.toString(variableCount));
+            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
+            if (indentedLogger.isDebugEnabled()) {
+                indentedLogger.logDebug("", "evaluated variables", "count", Integer.toString(variableCount));
             }
 
             // Remove extra bindings added

@@ -16,9 +16,11 @@ package org.orbeon.oxf.xforms.event;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.EmptyIterator;
@@ -58,24 +60,35 @@ public abstract class XFormsEvent implements Cloneable {
 
     private XFormsEvent originalEvent;  // original event (for retargeted event)
 
-    private String eventName;
+    private final XBLContainer targetXBLContainer;
+    private final String eventName;
     private XFormsEventTarget targetObject;
-    private boolean bubbles;
-    private boolean cancelable;
+    private final boolean bubbles;
+    private final boolean cancelable;
 
     private Map<String, SequenceExtent> customAttributes;
 
+    // TODO: Assign for debugging
     private LocationData locationData;
 
-    protected XFormsEvent(String eventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
+    protected XFormsEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
+        this.targetXBLContainer = targetObject.getXBLContainer(containingDocument);
         this.eventName = eventName;
         this.targetObject = targetObject;
         this.bubbles = bubbles;
         this.cancelable = cancelable;
+    }
 
-        // Get Java location information for debugging only (getting Java location data is very inefficient)
-//        if (XFormsServer.logger.isDebugEnabled())
-//            this.locationData = Dom4jUtils.getLocationData(2, true);
+    public XBLContainer getTargetXBLContainer() {
+        return targetXBLContainer;
+    }
+    
+    protected XFormsContainingDocument getContainingDocument() {
+        return targetXBLContainer.getContainingDocument();
+    }
+
+    protected IndentedLogger getIndentedLogger() {
+        return getContainingDocument().getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
     }
 
     public String getEventName() {
@@ -109,7 +122,7 @@ public abstract class XFormsEvent implements Cloneable {
             // Return the target static id
 
             if ("target".equals(name)) {
-                XFormsServer.logger.warn("event('target') is deprecated. Use event('xxforms:target') instead.");
+                getIndentedLogger().logWarning("", "event('target') is deprecated. Use event('xxforms:target') instead.");
             }
 
             return new ListIterator(Collections.singletonList(new StringValue(targetObject.getId())));
@@ -117,7 +130,7 @@ public abstract class XFormsEvent implements Cloneable {
             // Return the event type
 
             if ("event".equals(name)) {
-                XFormsServer.logger.warn("event('event') is deprecated. Use event('xxforms:type') instead.");
+                getIndentedLogger().logWarning("", "event('event') is deprecated. Use event('xxforms:type') instead.");
             }
 
             return new ListIterator(Collections.singletonList(new StringValue(eventName)));
@@ -136,7 +149,7 @@ public abstract class XFormsEvent implements Cloneable {
         } else {
             // "If the event context information does not contain the property indicated by the string argument, then an
             // empty node-set is returned."
-            XFormsServer.logger.warn("Unsupported event context information for event('" + name + "').");
+            getIndentedLogger().logWarning("", "Unsupported event context information for event('" + name + "').");
             return EmptyIterator.getInstance();
         }
     }

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.util;
 
 import org.apache.commons.httpclient.HttpState;
+import org.apache.log4j.Level;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -25,9 +26,7 @@ import org.orbeon.saxon.om.FastStringBuffer;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -79,6 +78,10 @@ public class Connection {
         try {
             final boolean isHTTPOrHTTPS = isHTTPOrHTTPS(connectionURL.getProtocol());
 
+            // Caller might pass null here
+            if (headerNameValues == null)
+                headerNameValues = Collections.emptyMap();
+
             // Get state if possible
             if (isHTTPOrHTTPS)
                 loadHttpState(externalContext, indentedLogger);
@@ -109,8 +112,8 @@ public class Connection {
      * o authentication information including username
      * o a list of headers to forward
      *
-     * @param externalContext
-     * @param indentedLogger
+     * @param externalContext   context
+     * @param indentedLogger    logger
      * @param username
      * @param headerNameValues  LinkedHashMap<String headerName, String[] headerValues>
      * @param headersToForward
@@ -125,7 +128,7 @@ public class Connection {
         final Map<String, String> headersToForwardMap = getHeadersToForward(headersToForward);
 
         // Set headers if provided
-        if (headerNameValues != null && headerNameValues.size() > 0) {
+        if (headerNameValues.size() > 0) {
             for (final Map.Entry<String, String[]> currentEntry: headerNameValues.entrySet()) {
                 final String currentHeaderName = currentEntry.getKey();
                 final String[] currentHeaderValues = currentEntry.getValue();
@@ -185,7 +188,7 @@ public class Connection {
             }
 
             // 2. If there is no incoming JSESSIONID cookie, try to make our own cookie. This may fail with e.g.
-            // Websphere.
+            // WebSphere.
             if (!sessionCookieSet) {
                 final ExternalContext.Session session = externalContext.getSession(false);
 
@@ -323,7 +326,7 @@ public class Connection {
      * Open the connection. This sends request headers, request body, and reads status and response headers.
      *
      * @param indentedLogger    logger
-     * @param logBody
+     * @param logBody           whether the request/response body must be logged
      * @param httpMethod        method i.e. GET, etc.
      * @param connectionURL     URL to connect to
      * @param username          username or null
@@ -346,25 +349,6 @@ public class Connection {
             // https SHOULD be supported
             // file SHOULD be supported
             try {
-                // Log basic connection information
-                if (isDebugEnabled) {
-                    final URI connectionURI;
-                    try {
-                        String userInfo = connectionURL.getUserInfo();
-                        if (userInfo != null) {
-                            final int colonIndex = userInfo.indexOf(':');
-                            if (colonIndex != -1)
-                                userInfo = userInfo.substring(0, colonIndex + 1) + "xxxxxxxx";// hide password in logs
-                        }
-                        connectionURI = new URI(connectionURL.getProtocol(), userInfo, connectionURL.getHost(),
-                                connectionURL.getPort(), connectionURL.getPath(), connectionURL.getQuery(), connectionURL.getRef());
-                    } catch (URISyntaxException e) {
-                        throw new OXFException(e);
-                    }
-                    indentedLogger.logDebug(LOG_TYPE, "opening URL connection", "method", httpMethod,
-                            "URL", connectionURI.toString(), "request Content-Type", contentType);
-                }
-
                 // Create URL connection object
                 final URLConnection urlConnection = connectionURL.openConnection();
                 final HTTPURLConnection httpURLConnection = (urlConnection instanceof HTTPURLConnection) ? (HTTPURLConnection) urlConnection : null;
@@ -392,21 +376,25 @@ public class Connection {
                     }
                 }
 
-                // Handle SOAP
-                // Set request Content-Type, SOAPAction or Accept header if needed
-                final boolean didSOAP = handleSOAP(indentedLogger, httpMethod, headersMap, contentType, hasRequestBody);
+                // Update request headers
+                {
+                    // Handle SOAP
+                    // Set request Content-Type, SOAPAction or Accept header if needed
+                    final boolean didSOAP = handleSOAP(indentedLogger, httpMethod, headersMap, contentType, hasRequestBody);
 
-                // Set request content type if method was not
-                if (!didSOAP && hasRequestBody) {
-                    final String actualContentType = (contentType != null) ? contentType : "application/xml";
-                    headersMap.put("Content-Type", new String[] { actualContentType });
-                    indentedLogger.logDebug(LOG_TYPE, "setting header", "Content-Type", actualContentType);
+                    // Set request content type
+                    if (!didSOAP && hasRequestBody) {
+                        final String actualContentType = (contentType != null) ? contentType : "application/xml";
+                        headersMap.put("Content-Type", new String[] { actualContentType });
+                        indentedLogger.logDebug(LOG_TYPE, "setting header", "Content-Type", actualContentType);
+                    }
                 }
 
-                // Set headers if provided
+                // Set headers on connection
+                final List<String> headersToLog;
                 if (headersMap != null && headersMap.size() > 0) {
 
-                    final List<String> headersToLog = isDebugEnabled ? new ArrayList<String>() : null;
+                    headersToLog = isDebugEnabled ? new ArrayList<String>() : null;
 
                     for (Map.Entry<String,String[]> currentEntry: headersMap.entrySet()) {
                         final String currentHeaderName = currentEntry.getKey();
@@ -423,7 +411,30 @@ public class Connection {
                             }
                         }
                     }
+                } else{
+                    headersToLog = null;
+                }
 
+                // Log request details except body
+                if (isDebugEnabled) {
+                    // Basic connection information
+                    final URI connectionURI;
+                    try {
+                        String userInfo = connectionURL.getUserInfo();
+                        if (userInfo != null) {
+                            final int colonIndex = userInfo.indexOf(':');
+                            if (colonIndex != -1)
+                                userInfo = userInfo.substring(0, colonIndex + 1) + "xxxxxxxx";// hide password in logs
+                        }
+                        connectionURI = new URI(connectionURL.getProtocol(), userInfo, connectionURL.getHost(),
+                                connectionURL.getPort(), connectionURL.getPath(), connectionURL.getQuery(), connectionURL.getRef());
+                    } catch (URISyntaxException e) {
+                        throw new OXFException(e);
+                    }
+                    indentedLogger.logDebug(LOG_TYPE, "opening URL connection", "method", httpMethod,
+                            "URL", connectionURI.toString(), "request Content-Type", contentType);
+
+                    // Log all headers
                     if (headersToLog != null) {
                         final String[] strings = new String[headersToLog.size()];
                         indentedLogger.logDebug(LOG_TYPE, "request headers", headersToLog.toArray(strings));
@@ -471,86 +482,30 @@ public class Connection {
                     }
                 };
 
-                // Get response information that needs to be forwarded
-
-                // Status code
+                // Get response information that needs to be forwarded                
                 {
+                    // Status code
                     connectionResult.statusCode = (httpURLConnection != null) ? httpURLConnection.getResponseCode() : 200;
-                    if (isDebugEnabled)
-                        indentedLogger.logDebug(LOG_TYPE, "response", "status code", Integer.toString(connectionResult.statusCode));
-                }
 
-                // Headers
-                {
+                    // Headers
                     connectionResult.responseHeaders = urlConnection.getHeaderFields();
                     connectionResult.setLastModified(NetUtils.getLastModifiedAsLong(urlConnection));
 
-                    // Log headers if needed
-                    if (isDebugEnabled && connectionResult.responseHeaders.size() > 0) {
-                        final List<String> headersToLog = new ArrayList<String>();
-
-                        for (Map.Entry<String, List<String>> currentEntry: connectionResult.responseHeaders.entrySet()) {
-                            final String currentHeaderName = currentEntry.getKey();
-                            final List<String> currentHeaderValues = currentEntry.getValue();
-                            if (currentHeaderValues != null) {
-                                // Add all header values as "request properties"
-                                for (String currentHeaderValue: currentHeaderValues) {
-                                    headersToLog.add(currentHeaderName);
-                                    headersToLog.add(currentHeaderValue);
-                                }
-                            }
-                        }
-
-                        final String[] strings = new String[headersToLog.size()];
-                        indentedLogger.logDebug(LOG_TYPE, "response headers", headersToLog.toArray(strings));
-                    }
+                    // Content-Type
+                    connectionResult.setResponseContentType(urlConnection.getContentType(), "application/xml");
                 }
 
-                // Content-Type
-                {
-                    final String receivedContentType = urlConnection.getContentType();
-                    if (receivedContentType != null) {
-                        connectionResult.setResponseContentType(receivedContentType);
-                    } else {
-                        connectionResult.setResponseContentType("application/xml");
-                        if (isDebugEnabled)
-                            indentedLogger.logDebug(LOG_TYPE, "received null response Content-Type, using application/xml");
-                    }
+                // Log response details except body
+                if (isDebugEnabled) {
+                    connectionResult.logResponseDetailsIfNeeded(indentedLogger, Level.DEBUG, LOG_TYPE);
                 }
 
                 // Response stream
                 connectionResult.setResponseInputStream(urlConnection.getInputStream());
 
-                // Log response body if possible and requested
+                // Log response body
                 if (isDebugEnabled) {
-                    if (connectionResult.hasContent()) {
-                        indentedLogger.logDebug(LOG_TYPE, "response has content");
-
-                        if (logBody) {
-                            // Save response stream to byte array
-                            final InputStream is = connectionResult.getResponseInputStream();
-                            final byte[] tempResponse = NetUtils.inputStreamToByteArray(is);
-                            try {
-                                is.close();
-                            } catch (Exception e) {
-                                // NOP
-                            }
-
-                            // Restore response stream and get as text
-                            connectionResult.setResponseInputStream(new ByteArrayInputStream(tempResponse));
-                            final String responseBody = connectionResult.getTextResponseBody();
-                            if (responseBody != null) {
-                                // Log
-                                indentedLogger.logDebug("submission", "response body", "body", responseBody);
-                                // Restore response stream
-                                connectionResult.setResponseInputStream(new ByteArrayInputStream(tempResponse));
-                            } else {
-                                indentedLogger.logDebug("submission", "binary response body");
-                            }
-                        }
-                    } else {
-                        indentedLogger.logDebug(LOG_TYPE, "response has no content");
-                    }
+                    connectionResult.logResponseBody(indentedLogger, Level.DEBUG, LOG_TYPE, logBody);
                 }
 
                 return connectionResult;

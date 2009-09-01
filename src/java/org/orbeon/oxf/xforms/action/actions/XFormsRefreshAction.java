@@ -46,6 +46,6 @@ public class XFormsRefreshAction extends XFormsAction {
 
         // Because of inter-model dependencies, we consider for now that the action must force the operation
         container.requireRefresh();
-        container.dispatchEvent(propertyContext, new XFormsRefreshEvent(model));
+        container.dispatchEvent(propertyContext, new XFormsRefreshEvent(containingDocument, model));
     }
 }

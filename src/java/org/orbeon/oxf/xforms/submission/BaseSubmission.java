@@ -16,13 +16,11 @@ package org.orbeon.oxf.xforms.submission;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.StringUtils;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -45,6 +43,10 @@ public abstract class BaseSubmission implements Submission {
 
     protected ExternalContext getExternalContext(PropertyContext propertyContext) {
         return (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+    }
+
+    protected IndentedLogger getIndentedLogger() {
+        return containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
     }
 
     protected URL getResolvedSubmissionURL(PropertyContext propertyContext, ExternalContext externalContext, String resolvedActionOrResource, String queryString) {
@@ -197,5 +199,19 @@ public abstract class BaseSubmission implements Submission {
             // Just run it now
             return callable.call();
         }
+    }
+
+    protected IndentedLogger getConnectionLogger(final XFormsModelSubmission.SubmissionParameters p, final XFormsModelSubmission.SecondPassParameters p2) {
+        if (p2.isAsynchronous && !p.isReplaceNone) {
+            // Background asynchronous submission creates a new logger with its own indentation
+            return new IndentedLogger(getIndentedLogger());
+        } else {
+            // Synchronous submission or foreground asynchronous submission uses current logger
+            return getIndentedLogger();
+        }
+    }
+
+    public static boolean isLogBody() {
+        return XFormsProperties.getDebugLogging().contains("submission-body");
     }
 }

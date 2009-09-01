@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.*;
@@ -36,6 +37,8 @@ public class ControlTree implements Cloneable {
     private final boolean isAllowSendingValidEvents;
     private final boolean isAllowSendingRefreshEvents;
 
+    private final IndentedLogger indentedLogger;
+
     // Top-level controls
     private List<XFormsControl> children;   // top-level controls
 
@@ -44,7 +47,8 @@ public class ControlTree implements Cloneable {
 
     private boolean isBindingsDirty;    // whether the bindings must be reevaluated
 
-    public ControlTree(XFormsContainingDocument containingDocument) {
+    public ControlTree(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger) {
+        this.indentedLogger = indentedLogger;
         controlIndex = new ControlIndex(XFormsProperties.isNoscript(containingDocument));
 
         // Obtain global information about event handlers. This is a rough optimization so we can avoid sending certain
@@ -71,7 +75,7 @@ public class ControlTree implements Cloneable {
      */
     public void initialize(PropertyContext propertyContext, XFormsContainingDocument containingDocument, XBLContainer rootContainer, boolean isRestoringState) {
 
-        containingDocument.startHandleOperation("controls", "building");
+        indentedLogger.startHandleOperation("controls", "building");
 
         final int PROFILING_ITERATIONS = 1;
         for (int k = 0; k < PROFILING_ITERATIONS; k++) {
@@ -102,17 +106,17 @@ public class ControlTree implements Cloneable {
             }
 
             // Evaluate controls
-            controlIndex.evaluateAll(containingDocument, propertyContext);
+            controlIndex.evaluateAll(indentedLogger, propertyContext);
 
             // Dispatch initialization events for all controls created in index
             if (!isRestoringState) {
                 // Copy list because it can be modified concurrently as events are being dispatched and handled
                 final List<String> controlsEffectiveIds = new ArrayList<String>(controlIndex.getEffectiveIdsToControls().keySet());
-                dispatchCreationEvents(propertyContext, containingDocument, controlsEffectiveIds);
+                dispatchCreationEvents(propertyContext, controlsEffectiveIds);
             }
 
             if (k == PROFILING_ITERATIONS - 1) {
-                containingDocument.endHandleOperation(
+                indentedLogger.endHandleOperation(
                         "controls updated", Integer.toString(listener.getUpdateCount()),
                         "repeat iterations", Integer.toString(listener.getIterationCount())
                 );
@@ -128,15 +132,15 @@ public class ControlTree implements Cloneable {
         return isAllowSendingRefreshEvents;
     }
 
-    private void dispatchCreationEvents(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Collection<String> controlsEffectiveIds) {
-        containingDocument.startHandleOperation("controls", "dispatching creation events");
+    private void dispatchCreationEvents(PropertyContext propertyContext, Collection<String> controlsEffectiveIds) {
+        indentedLogger.startHandleOperation("controls", "dispatching creation events");
         {
             for (String effectiveId: controlsEffectiveIds) {
                 final XFormsControl control = controlIndex.getControl(effectiveId);
                 dispatchCreationEvents(propertyContext, control);
             }
         }
-        containingDocument.endHandleOperation();
+        indentedLogger.endHandleOperation();
     }
 
     public void dispatchCreationEvents(PropertyContext propertyContext, XFormsControl control) {
@@ -144,10 +148,11 @@ public class ControlTree implements Cloneable {
             if (control.isRelevant()) {
                 final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
                 final XBLContainer container = singleNodeControl.getXBLContainer();
+                final XFormsContainingDocument containingDocument = container.getContainingDocument();
 
                 // Dispatch xforms-enabled if needed
                 if (isAllowSendingRelevantEvents) {
-                    container.dispatchEvent(propertyContext, new XFormsEnabledEvent(singleNodeControl));
+                    container.dispatchEvent(propertyContext, new XFormsEnabledEvent(containingDocument, singleNodeControl));
                 }
 
                 // Dispatch events only if the MIP value is different from the default
@@ -155,25 +160,25 @@ public class ControlTree implements Cloneable {
                 // Dispatch xforms-required if needed
                 // TODO: must reacquire control and test for relevance again
                 if (isAllowSendingRequiredEvents && singleNodeControl.isRequired()) {
-                    container.dispatchEvent(propertyContext, new XFormsRequiredEvent(singleNodeControl));
+                    container.dispatchEvent(propertyContext, new XFormsRequiredEvent(containingDocument, singleNodeControl));
                 }
 
                 // Dispatch xforms-readonly if needed
                 // TODO: must reacquire control and test for relevance again
                 if (isAllowSendingReadonlyEvents && singleNodeControl.isReadonly()) {
-                    container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(singleNodeControl));
+                    container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(containingDocument, singleNodeControl));
                 }
 
                 // Dispatch xforms-invalid if needed
                 // TODO: must reacquire control and test for relevance again
                 if (isAllowSendingValidEvents && !singleNodeControl.isValid()) {
-                    container.dispatchEvent(propertyContext, new XFormsInvalidEvent(singleNodeControl));
+                    container.dispatchEvent(propertyContext, new XFormsInvalidEvent(containingDocument, singleNodeControl));
                 }
             }
         }
     }
 
-    public void dispatchDestructionEvents(PropertyContext propertyContext, XFormsContainingDocument containingDocument, XFormsRepeatIterationControl removedIteration) {
+    public void dispatchDestructionEvents(PropertyContext propertyContext, XFormsRepeatIterationControl removedIteration) {
         // Gather ids of controls to handle
         final List<String> controlsEffectiveIds = new ArrayList<String>();
         visitChildrenControls(removedIteration, true, new XFormsControls.XFormsControlVisitorAdapter() {
@@ -192,23 +197,24 @@ public class ControlTree implements Cloneable {
         });
 
         // Dispatch events
-        dispatchDestructionEvents(propertyContext, containingDocument, controlIndex, controlsEffectiveIds);
+        dispatchDestructionEvents(propertyContext, controlIndex, controlsEffectiveIds);
     }
 
-    private void dispatchDestructionEvents(PropertyContext propertyContext, XFormsContainingDocument containingDocument, ControlIndex index, List<String> controlsEffectiveIds) {
-        containingDocument.startHandleOperation("controls", "dispatching destruction events");
+    private void dispatchDestructionEvents(PropertyContext propertyContext, ControlIndex index, List<String> controlsEffectiveIds) {
+        indentedLogger.startHandleOperation("controls", "dispatching destruction events");
         // NOTE: We do not need copy the list here because it was created in dispatchDestructionEvents() above
         for (String effectiveId: controlsEffectiveIds) {
             final XFormsControl control = index.getControl(effectiveId);
             dispatchDestructionEvents(propertyContext, control);
         }
-        containingDocument.endHandleOperation();
+        indentedLogger.endHandleOperation();
     }
 
     public void dispatchDestructionEvents(PropertyContext propertyContext, XFormsControl control) {
         if (XFormsControl.supportsRefreshEvents(control)) {
             final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
             final XBLContainer container = singleNodeControl.getXBLContainer();
+            final XFormsContainingDocument containingDocument = container.getContainingDocument();
 
             // Don't test for relevance here
             // o In iteration removal case, control is still relevant
@@ -216,7 +222,7 @@ public class ControlTree implements Cloneable {
 
             // Dispatch xforms-disabled if needed
             if (isAllowSendingRelevantEvents) {
-                container.dispatchEvent(propertyContext, new XFormsDisabledEvent(singleNodeControl));
+                container.dispatchEvent(propertyContext, new XFormsDisabledEvent(containingDocument, singleNodeControl));
             }
 
             // TODO: if control *becomes* non-relevant and value changed, arguably we should dispatch the value-changed event
@@ -234,9 +240,10 @@ public class ControlTree implements Cloneable {
             if (control.isRelevant()) {
                 final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
                 final XBLContainer container = singleNodeControl.getXBLContainer();
+                final XFormsContainingDocument containingDocument = container.getContainingDocument();
 
                 if (isAllowSendingValueChangedEvents && singleNodeControl.isValueChanged()) {
-                    container.dispatchEvent(propertyContext, new XFormsValueChangeEvent(singleNodeControl));
+                    container.dispatchEvent(propertyContext, new XFormsValueChangeEvent(containingDocument, singleNodeControl));
                 }
 
                 // Dispatch events only if the MIP value is different from the previous value
@@ -248,9 +255,9 @@ public class ControlTree implements Cloneable {
 
                     if (previousValidState != newValidState) {
                         if (newValidState) {
-                            container.dispatchEvent(propertyContext, new XFormsValidEvent(singleNodeControl));
+                            container.dispatchEvent(propertyContext, new XFormsValidEvent(containingDocument, singleNodeControl));
                         } else {
-                            container.dispatchEvent(propertyContext, new XFormsInvalidEvent(singleNodeControl));
+                            container.dispatchEvent(propertyContext, new XFormsInvalidEvent(containingDocument, singleNodeControl));
                         }
                     }
                 }
@@ -261,9 +268,9 @@ public class ControlTree implements Cloneable {
 
                     if (previousRequiredState != newRequiredState) {
                         if (newRequiredState) {
-                            container.dispatchEvent(propertyContext, new XFormsRequiredEvent(singleNodeControl));
+                            container.dispatchEvent(propertyContext, new XFormsRequiredEvent(containingDocument, singleNodeControl));
                         } else {
-                            container.dispatchEvent(propertyContext, new XFormsOptionalEvent(singleNodeControl));
+                            container.dispatchEvent(propertyContext, new XFormsOptionalEvent(containingDocument, singleNodeControl));
                         }
                     }
                 }
@@ -274,9 +281,9 @@ public class ControlTree implements Cloneable {
 
                     if (previousReadonlyState != newReadonlyState) {
                         if (newReadonlyState) {
-                            container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(singleNodeControl));
+                            container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(containingDocument, singleNodeControl));
                         } else {
-                            container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(singleNodeControl));
+                            container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(containingDocument, singleNodeControl));
                         }
                     }
                 }
@@ -343,7 +350,7 @@ public class ControlTree implements Cloneable {
         return repeatIterationControl;
     }
 
-    public void initializeRepeatIterationTree(PropertyContext propertyContext, XFormsContainingDocument containingDocument, XFormsRepeatIterationControl repeatIteration) {
+    public void initializeRepeatIterationTree(PropertyContext propertyContext, XFormsRepeatIterationControl repeatIteration) {
 
         // Gather all control ids and controls
         final Map<String, XFormsControl> effectiveIdsToControls = new LinkedHashMap<String, XFormsControl>();
@@ -355,10 +362,10 @@ public class ControlTree implements Cloneable {
         });
 
         // Evaluate controls, passing directly all the controls
-        ControlIndex.evaluateAll(containingDocument, propertyContext, effectiveIdsToControls.values());
+        ControlIndex.evaluateAll(indentedLogger, propertyContext, effectiveIdsToControls.values());
 
         // Dispatch initialization events, passing the ids only
-        dispatchCreationEvents(propertyContext, containingDocument, effectiveIdsToControls.keySet());
+        dispatchCreationEvents(propertyContext, effectiveIdsToControls.keySet());
     }
 
     // NOTE: not used yet as of 2009-08
@@ -959,19 +966,19 @@ class ControlIndex {
                 || (isNoscript && control instanceof XFormsSelectControl && ((XFormsSelectControl) control).isFullAppearance());
     }
 
-    public void evaluateAll(XFormsContainingDocument containingDocument, PropertyContext propertyContext) {
-        evaluateAll(containingDocument, propertyContext, getEffectiveIdsToControls().values());
+    public void evaluateAll(IndentedLogger indentedLogger, PropertyContext propertyContext) {
+        evaluateAll(indentedLogger, propertyContext, getEffectiveIdsToControls().values());
     }
 
-    public static void evaluateAll(XFormsContainingDocument containingDocument, PropertyContext propertyContext, Collection<XFormsControl> effectiveIdsToControls) {
-        containingDocument.startHandleOperation("controls", "evaluating");
+    public static void evaluateAll(IndentedLogger indentedLogger, PropertyContext propertyContext, Collection<XFormsControl> effectiveIdsToControls) {
+        indentedLogger.startHandleOperation("controls", "evaluating");
         {
             // Evaluate all controls
             for (final XFormsControl currentControl: effectiveIdsToControls) {
                 currentControl.evaluateIfNeeded(propertyContext, false);
             }
         }
-        containingDocument.endHandleOperation();
+        indentedLogger.endHandleOperation();
     }
 
     public XFormsControl getControl(String effectiveId) {

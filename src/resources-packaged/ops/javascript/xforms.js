@@ -4001,7 +4001,9 @@ ORBEON.widgets.RTE = function() {
                 };
 
             // Create RTE object
-            var yuiRTE = new YAHOO.widget.Editor(control, rteConfig);
+            var textarea = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                ? control.getElementsByTagName("textarea")[0] : control;
+            var yuiRTE = new YAHOO.widget.Editor(textarea, rteConfig);
 
             // Register event listener for user interacting with the control
             // RTE fires afterNodeChange right at the end of initialisation, which mistakenly results
@@ -4020,8 +4022,10 @@ ORBEON.widgets.RTE = function() {
             isIncremental[control.id] = ORBEON.util.Dom.hasClass(control, "xforms-incremental");
             // Transform text area into RTE on the page
             yuiRTE.on("editorContentLoaded", function() {
-                var rteContainer = control.parentNode;
-                rteContainer.className += " " + control.className;
+                if (!ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {
+                    var rteContainer = control.parentNode;
+                    rteContainer.className += " " + control.className;
+                }
                 // Store initial server value
                 // If we don't and user's JS code calls ORBEON.xforms.Document.setValue(), the value of the RTE is changed, our RFE changeEvent() is called,
                 // it sets the focus on the RTE, which calls focus(), which stores the current value (newly set) as the server value if no server value is defined.

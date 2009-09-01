@@ -623,4 +623,144 @@
         </output>
     </test>
 
+    <test description="New layout for xforms:select[not(@appearance) or @appearance = 'compact']" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="main-model" xxforms:new-xhtml-layout="true">
+                        <xforms:instance id="tests">
+                            <instance>apple</instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:select id="my-new-select" ref=".">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                        <xforms:item>
+                            <xforms:label>Apple</xforms:label>
+                            <xforms:value>apple</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>Orange</xforms:label>
+                            <xforms:value>orange</xforms:value>
+                        </xforms:item>
+                    </xforms:select>
+                    <xforms:select id="my-new-compact-select" ref="." appearance="compact">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                        <xforms:item>
+                            <xforms:label>Apple</xforms:label>
+                            <xforms:value>apple</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>Orange</xforms:label>
+                            <xforms:value>orange</xforms:value>
+                        </xforms:item>
+                    </xforms:select>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:span id="my-new-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-required-filled xforms-type-NCName">
+                    <xhtml:label class="xforms-label" for="my-new-select$$c">My label</xhtml:label>
+                    <xhtml:select id="my-new-select$$c" name="my-new-select" multiple="multiple">
+                        <xhtml:option value="b3iUb0x15AA=" selected="selected">Apple</xhtml:option>
+                        <xhtml:option value="2KtpnvqzFEE=">Orange</xhtml:option>
+                    </xhtml:select>
+                    <xhtml:img class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                    <xhtml:label class="xforms-help" for="my-new-select$$c">My help</xhtml:label>
+                    <xhtml:label class="xforms-alert-inactive xforms-alert" for="my-new-select$$c">My alert</xhtml:label>
+                    <xhtml:label class="xforms-hint" for="my-new-select$$c">My hint</xhtml:label>
+                </xhtml:span>
+                <xhtml:span id="my-new-compact-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-required-filled xforms-type-NCName">
+                    <xhtml:label class="xforms-label" for="my-new-compact-select$$c">My label</xhtml:label>
+                    <xhtml:select id="my-new-compact-select$$c" name="my-new-compact-select" multiple="multiple">
+                        <xhtml:option value="b3iUb0x15AA=" selected="selected">Apple</xhtml:option>
+                        <xhtml:option value="2KtpnvqzFEE=">Orange</xhtml:option>
+                    </xhtml:select>
+                    <xhtml:img class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                    <xhtml:label class="xforms-help" for="my-new-compact-select$$c">My help</xhtml:label>
+                    <xhtml:label class="xforms-alert-inactive xforms-alert" for="my-new-compact-select$$c">My alert</xhtml:label>
+                    <xhtml:label class="xforms-hint" for="my-new-compact-select$$c">My hint</xhtml:label>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
+    <test description="Old layout for xforms:select[not(@appearance) or @appearance = 'compact']" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="main-model" xxforms:new-xhtml-layout="false">
+                        <xforms:instance id="tests">
+                            <instance>apple</instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:select id="my-new-select" ref=".">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                        <xforms:item>
+                            <xforms:label>Apple</xforms:label>
+                            <xforms:value>apple</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>Orange</xforms:label>
+                            <xforms:value>orange</xforms:value>
+                        </xforms:item>
+                    </xforms:select>
+                    <xforms:select id="my-new-compact-select" ref="." appearance="compact">
+                        <xforms:label>My label</xforms:label>
+                        <xforms:hint>My hint</xforms:hint>
+                        <xforms:help>My help</xforms:help>
+                        <xforms:alert>My alert</xforms:alert>
+                        <xforms:item>
+                            <xforms:label>Apple</xforms:label>
+                            <xforms:value>apple</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>Orange</xforms:label>
+                            <xforms:value>orange</xforms:value>
+                        </xforms:item>
+                    </xforms:select>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:label class="xforms-label" id="my-new-select$$l" for="my-new-select">My label</xhtml:label>
+                <xhtml:select id="my-new-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-required-filled xforms-type-NCName" name="my-new-select" multiple="multiple">
+                    <xhtml:option value="b3iUb0x15AA=" selected="selected">Apple</xhtml:option>
+                    <xhtml:option value="2KtpnvqzFEE=">Orange</xhtml:option>
+                </xhtml:select>
+                <xhtml:img id="my-new-select$$i" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-new-select$$p" for="my-new-select">My help</xhtml:label>
+                <xhtml:label class="xforms-alert-inactive xforms-alert" id="my-new-select$$a" for="my-new-select">My alert</xhtml:label>
+                <xhtml:label class="xforms-hint" id="my-new-select$$t" for="my-new-select">My hint</xhtml:label>
+                <xhtml:label class="xforms-label" id="my-new-compact-select$$l" for="my-new-compact-select">My label</xhtml:label>
+                <xhtml:select id="my-new-compact-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-required-filled xforms-type-NCName" name="my-new-compact-select" multiple="multiple">
+                    <xhtml:option value="b3iUb0x15AA=" selected="selected">Apple</xhtml:option>
+                    <xhtml:option value="2KtpnvqzFEE=">Orange</xhtml:option>
+                </xhtml:select>
+                <xhtml:img id="my-new-compact-select$$i" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                <xhtml:label class="xforms-help" id="my-new-compact-select$$p" for="my-new-compact-select">My help</xhtml:label>
+                <xhtml:label class="xforms-alert-inactive xforms-alert" id="my-new-compact-select$$a" for="my-new-compact-select">My alert</xhtml:label>
+                <xhtml:label class="xforms-hint" id="my-new-compact-select$$t" for="my-new-compact-select">My hint</xhtml:label>
+            </controls>
+        </output>
+    </test>
+
 </group>

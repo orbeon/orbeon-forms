@@ -277,12 +277,11 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog");
 
         // Add handlers for LHHA elements
-//            if (true) {// TODO: check w/ XFStaticState if there are any standalone LHHA elements
+        // TODO: check w/ XFStaticState if there are any standalone LHHA elements
         controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "label");
         controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "help");
         controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "hint");
         controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert");
-//            }
 
         // Add handlers for custom components
         final Map<QName, Element> componentBindings = staticState.getXblBindings().getComponentBindings();

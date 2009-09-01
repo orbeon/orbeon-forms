@@ -63,10 +63,11 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     @Override
     protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
 
-        QName appearance = getAppearance(attributes);
-
         this.isMultiple = localname.equals("select");
         this.isOpenSelection = "open".equals(attributes.getValue("selection"));
+        
+        QName appearance = getAppearance(attributes); // this uses isMultiple
+
         this.isAutocomplete = isOpenSelection
                 && XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME.equals(appearance);
 

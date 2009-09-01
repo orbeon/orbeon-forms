@@ -18,6 +18,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
@@ -27,7 +28,6 @@ import org.orbeon.oxf.xforms.control.controls.XXFormsRootControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
@@ -170,7 +170,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         // Dispatch destruction event to all models
         for (XFormsModel currentModel: models) {
-            dispatchEvent(propertyContext, new XFormsModelDestructEvent(currentModel));
+            dispatchEvent(propertyContext, new XFormsModelDestructEvent(containingDocument, currentModel));
         }
     }
 
@@ -270,7 +270,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     public void initializeModels(PropertyContext propertyContext, String[] eventsToDispatch) {
         for (int i = 0; i < eventsToDispatch.length; i++) {
-            if (i == 2) {// before dispaching xforms-ready
+            if (i == 2) {// before dispatching xforms-ready
                 // Initialize controls after all the xforms-model-construct-done events have been sent
                 initializeNestedControls(propertyContext);
 
@@ -282,7 +282,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
             // Iterate over all the models
             for (XFormsModel currentModel: models) {
-                dispatchEvent(propertyContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
+                dispatchEvent(propertyContext, XFormsEventFactory.createEvent(containingDocument, eventsToDispatch[i], currentModel));
             }
         }
     }
@@ -666,8 +666,10 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public void dispatchEvent(PropertyContext propertyContext, XFormsEvent originalEvent) {
 
-        if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.startHandleOperation("event", "dispatching", "name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
+        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
+
+        if (indentedLogger.isDebugEnabled()) {
+            indentedLogger.startHandleOperation("dispatchEvent", "dispatching", "name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
                     originalEvent.getLocationData() != null ? originalEvent.getLocationData().toString() : null);
         }
 
@@ -690,7 +692,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                         if (eventObserver instanceof XFormsComponentControl && targetObject != eventObserver) {
                             // Either retarget, or stop propagation if the event is trying to go through the component boundary
                             if (originalEvent instanceof XFormsUIEvent) {
-                                // UI events need to be retargetted
+                                // UI events need to be retargeted
                                 boundaries.add(eventObserver);
                                 eventsForBoundaries.put(eventObserver.getEffectiveId(), null);
                             } else {
@@ -717,18 +719,18 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             // Get event according to its target
             int nextBoundaryIndex = 0;
             String nextBoundaryEffectiveId;
-            XFormsEvent retargettedEvent;
+            XFormsEvent retargetedEvent;
 
-            // Handle event retargetting
+            // Handle event retargeting
             if (boundaries.size() == 0) {
                 // Original event all the way
                 nextBoundaryEffectiveId = null;
-                retargettedEvent = originalEvent;
+                retargetedEvent = originalEvent;
             } else {
-                // Start with retargetted event
+                // Start with retargeted event
                 final XFormsEventObserver observer = boundaries.get(nextBoundaryIndex);
                 nextBoundaryEffectiveId = observer.getEffectiveId();
-                retargettedEvent = getRetargettedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
+                retargetedEvent = getRetargetedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
                 nextBoundaryIndex++;
             }
 
@@ -745,45 +747,47 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) currentEventHandler;
                             // TODO: handler isTargetPhase()
                             if (!eventHandler.isBubblingPhase()
-                                    && eventHandler.isMatchEventName(retargettedEvent.getEventName())
-                                    && eventHandler.isMatchTarget(retargettedEvent.getTargetObject().getId())) {
+                                    && eventHandler.isMatchEventName(retargetedEvent.getEventName())
+                                    && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
                                 // Capture phase match on event name and target is specified
-                                containingDocument.startHandleEvent(retargettedEvent);
+                                indentedLogger.startHandleOperation("dispatchEvent", "capture handler");
+                                containingDocument.startHandleEvent(retargetedEvent);
                                 try {
-                                    eventHandler.handleEvent(propertyContext, currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargettedEvent);
+                                    eventHandler.handleEvent(propertyContext, currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
                                 } finally {
                                     containingDocument.endHandleEvent();
+                                    indentedLogger.endHandleOperation();
                                 }
                                 propagate &= eventHandler.isPropagate();
                                 performDefaultAction &= eventHandler.isPerformDefaultAction();
                             }
                         }
                         // Cancel propagation if requested and if authorized by event
-                        if (!propagate && retargettedEvent.isCancelable())
+                        if (!propagate && retargetedEvent.isCancelable())
                             break;
                     }
                 }
 
-                // Handle event retargetting
+                // Handle event retargeting
                 if (nextBoundaryEffectiveId != null && currentEventObserver.getEffectiveId().equals(nextBoundaryEffectiveId)) {
 
                     if (nextBoundaryIndex == boundaries.size()) {
                         // Original event
                         nextBoundaryEffectiveId = null;
-                        retargettedEvent = originalEvent;
+                        retargetedEvent = originalEvent;
                     } else {
-                        // Retargetted event
+                        // Retargeted event
                         final XFormsEventObserver observer = boundaries.get(nextBoundaryIndex);
                         nextBoundaryEffectiveId = observer.getEffectiveId();
-                        retargettedEvent = getRetargettedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
+                        retargetedEvent = getRetargetedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
                         nextBoundaryIndex++;
                     }
 
-                    if (XFormsServer.logger.isDebugEnabled()) {
-                        containingDocument.logDebug("event", "retargetting",
+                    if (indentedLogger.isDebugEnabled()) {
+                        indentedLogger.logDebug("dispatchEvent", "retargeting",
                                 "name", originalEvent.getEventName(),
                                 "original id", originalEvent.getTargetObject().getEffectiveId(),
-                                "new id", retargettedEvent.getTargetObject().getEffectiveId()
+                                "new id", retargetedEvent.getTargetObject().getEffectiveId()
                         );
                     }
                 }
@@ -796,7 +800,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                 Collections.reverse(eventObservers);
                 Collections.reverse(boundaries);
 
-                // Handle event retargetting
+                // Handle event retargeting
                 if (boundaries.size() > 0) {
                     nextBoundaryIndex--;
                     final XFormsEventObserver observer = boundaries.get(nextBoundaryIndex);
@@ -806,20 +810,20 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                 for (XFormsEventObserver currentEventObserver: eventObservers) {
                     final List currentEventHandlers = currentEventObserver.getEventHandlers(this);
 
-                    // Handle event retargetting
+                    // Handle event retargeting
                     if (nextBoundaryEffectiveId != null && currentEventObserver.getEffectiveId().equals(nextBoundaryEffectiveId)) {
 
-                        // Retargetted event
+                        // Retargeted event
                         final XFormsEventObserver observer = boundaries.get(nextBoundaryIndex);
                         nextBoundaryEffectiveId = observer.getEffectiveId();
-                        retargettedEvent = getRetargettedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
+                        retargetedEvent = getRetargetedEvent(eventsForBoundaries, nextBoundaryEffectiveId, observer, originalEvent);
                         nextBoundaryIndex--;
 
-                        if (XFormsServer.logger.isDebugEnabled()) {
-                            containingDocument.logDebug("event", "retargetting",
+                        if (indentedLogger.isDebugEnabled()) {
+                            indentedLogger.logDebug("dispatchEvent", "retargeting",
                                     "name", originalEvent.getEventName(),
                                     "original id", originalEvent.getTargetObject().getEffectiveId(),
-                                    "new id", retargettedEvent.getTargetObject().getEffectiveId()
+                                    "new id", retargetedEvent.getTargetObject().getEffectiveId()
                             );
                         }
                     }
@@ -827,7 +831,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     // Process "action at target"
                     // NOTE: This is used XFormsInstance for xforms-insert/xforms-delete processing
                     if (currentEventObserver == targetObject) {
-                        currentEventObserver.performTargetAction(propertyContext, currentEventObserver.getXBLContainer(containingDocument), retargettedEvent);
+                        currentEventObserver.performTargetAction(propertyContext, currentEventObserver.getXBLContainer(containingDocument), retargetedEvent);
                     }
 
                     // Process event handlers
@@ -836,14 +840,16 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) currentEventHandler;
                             // TODO: handler isTargetPhase()
                             if (eventHandler.isBubblingPhase()
-                                    && eventHandler.isMatchEventName(retargettedEvent.getEventName())
-                                    && eventHandler.isMatchTarget(retargettedEvent.getTargetObject().getId())) {
+                                    && eventHandler.isMatchEventName(retargetedEvent.getEventName())
+                                    && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
                                 // Bubbling phase match on event name and target is specified
-                                containingDocument.startHandleEvent(retargettedEvent);
+                                indentedLogger.startHandleOperation("dispatchEvent", "bubble handler");
+                                containingDocument.startHandleEvent(retargetedEvent);
                                 try {
-                                    eventHandler.handleEvent(propertyContext, currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargettedEvent);
+                                    eventHandler.handleEvent(propertyContext, currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
                                 } finally {
                                     containingDocument.endHandleEvent();
+                                    indentedLogger.endHandleOperation();
                                 }
                                 propagate &= eventHandler.isPropagate();
                                 performDefaultAction &= eventHandler.isPerformDefaultAction();
@@ -858,11 +864,13 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
             // Perform default action is allowed to
             if (performDefaultAction || !originalEvent.isCancelable()) {
+                indentedLogger.startHandleOperation("dispatchEvent", "default action handler");
                 containingDocument.startHandleEvent(originalEvent);
                 try {
                     targetObject.performDefaultAction(propertyContext, originalEvent);
                 } finally {
                     containingDocument.endHandleEvent();
+                    indentedLogger.endHandleOperation();
                 }
             }
         } catch (Exception e) {
@@ -877,24 +885,24 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     new String[] { "event", originalEvent.getEventName(), "target id", targetObject.getEffectiveId() }));
         }
 
-        if (XFormsServer.logger.isDebugEnabled()) {
-            containingDocument.endHandleOperation("name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
+        if (indentedLogger.isDebugEnabled()) {
+            indentedLogger.endHandleOperation("name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
                     originalEvent.getLocationData() != null ? originalEvent.getLocationData().toString() : null);
         }
     }
 
-    private XFormsEvent getRetargettedEvent(Map<String, XFormsEvent> eventsForBoundaries, String boundaryId, XFormsEventTarget newEventTarget, XFormsEvent originalEvent) {
-        XFormsEvent retargettedEvent = eventsForBoundaries.get(boundaryId);
+    private XFormsEvent getRetargetedEvent(Map<String, XFormsEvent> eventsForBoundaries, String boundaryId, XFormsEventTarget newEventTarget, XFormsEvent originalEvent) {
+        XFormsEvent retargetedEvent = eventsForBoundaries.get(boundaryId);
 
         // Event already created, just return it
-        if (retargettedEvent != null)
-            return retargettedEvent;
+        if (retargetedEvent != null)
+            return retargetedEvent;
 
         // Clone original event, retarget it, and remember it
-        retargettedEvent = originalEvent.retarget(newEventTarget);
-        eventsForBoundaries.put(boundaryId, retargettedEvent);
+        retargetedEvent = originalEvent.retarget(newEventTarget);
+        eventsForBoundaries.put(boundaryId, retargetedEvent);
 
-        return retargettedEvent;
+        return retargetedEvent;
     }
 
     public void setDeferredFlagsForSetindex() {

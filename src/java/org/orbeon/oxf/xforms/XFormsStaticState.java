@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.log4j.Logger;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -23,15 +24,13 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.URLRewriterUtils;
-import org.orbeon.oxf.util.UUIDUtils;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandler;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -60,21 +59,24 @@ import java.util.*;
  */
 public class XFormsStaticState {
 
+    public static final String LOGGING_CATEGORY = "analysis";
+    private static final Logger logger = LoggerFactory.createLogger(XFormsStaticState.class);
+    private final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
+
     private boolean initialized;
 
     private String uuid;
     private String encodedStaticState;      // encoded state
     private Document staticStateDocument;   // if present, stored there temporarily only until getEncodedStaticState() is called and encodedStaticState is produced
 
-    private Document controlsDocument;                      // controls document
-    // Map<String modelPrefixedId, Document modelDocument>
-    private LinkedHashMap<String, Document> modelDocuments = new LinkedHashMap<String, Document>();
-    private SAXStore xhtmlDocument;                         // entire XHTML document for noscript mode only
+    private Document controlsDocument;                                      // controls document
+    private LinkedHashMap<String, Document> modelDocuments = new LinkedHashMap<String, Document>(); // Map<String modelPrefixedId, Document modelDocument>
+    private SAXStore xhtmlDocument;                                         // entire XHTML document for noscript mode only
 
-    private Map<String, String> xxformsScripts;                         // Map of id to script content
+    private Map<String, String> xxformsScripts;                             // Map of id to script content
 
-    private Map<String, Object> nonDefaultProperties = new HashMap<String, Object>();   // Map of property name to property value (String, Integer, Boolean)
-    private Map<String, String> externalEventsMap;                         // Map<String, ""> of event names
+    private Map<String, Object> nonDefaultProperties = new HashMap<String, Object>();    // Map of property name to property value (String, Integer, Boolean)
+    private Map<String, String> externalEventsMap;                          // Map<String, ""> of event names
 
     private boolean isSeparateDeployment;
     private String requestContextPath;
@@ -86,7 +88,7 @@ public class XFormsStaticState {
     private List<URLRewriterUtils.PathMatcher> versionedPathMatchers;
 
     // Static analysis
-    private boolean isAnalyzed;             // whether this document has been analyzed already
+    private boolean isAnalyzed;                                             // whether this document has been analyzed already
 
     private Map<String, Map<String, ControlInfo>> controlTypes;             // Map<String type, Map<String prefixedId, ControlInfo info>>
     private Map<String, String> eventNamesMap;                              // Map<String eventName, String "">
@@ -123,7 +125,7 @@ public class XFormsStaticState {
      * producing an XForms page.
      *
      * @param propertyContext       current context
-     * @param staticStateDocument   Document containing the static state. The document may be modifed by this constructor and must be discarded afterwards by the caller.
+     * @param staticStateDocument   Document containing the static state. The document may be modified by this constructor and must be discarded afterwards by the caller.
      * @param namespacesMap         Map<String staticId, Map<String prefix, String uri>> of namespace mappings
      * @param annotatedDocument     optional SAXStore containing XHTML for noscript mode
      */
@@ -145,6 +147,10 @@ public class XFormsStaticState {
 
         // Initialize
         initialize(pipelineContext, staticStateDocument, null, null, encodedStaticState);
+    }
+
+    public IndentedLogger getIndentedLogger() {
+        return indentedLogger;
     }
 
     /**
@@ -171,7 +177,7 @@ public class XFormsStaticState {
     private void initialize(PropertyContext propertyContext, Document staticStateDocument, Map<String, Map<String, String>> namespacesMap,
                             SAXStore xhtmlDocument, String encodedStaticState) {
 
-        XFormsContainingDocument.logDebugStatic("static state", "initializing");
+        indentedLogger.startHandleOperation("", "initializing static state");
 
         final Element staticStateElement = staticStateDocument.getRootElement();
 
@@ -271,6 +277,8 @@ public class XFormsStaticState {
             this.staticStateDocument = staticStateDocument;
             initialized = false;
         }
+
+        indentedLogger.endHandleOperation();
     }
 
     private void extractProperties(Element staticStateElement) {
@@ -377,7 +385,7 @@ public class XFormsStaticState {
                 addModelDocument(modelElement.attributeValue("id"), modelDocument);
             }
 
-            XFormsContainingDocument.logDebugStatic("static state", "created top-level model documents", "count", Integer.toString(modelsCount));
+            indentedLogger.logDebug("", "created top-level model documents", "count", Integer.toString(modelsCount));
         }
 
         // Get controls document
@@ -405,21 +413,21 @@ public class XFormsStaticState {
                 }
             }
 
-            XFormsContainingDocument.logDebugStatic("static state", "created controls document", "top-level controls count", Integer.toString(topLevelControlsCount));
+            indentedLogger.logDebug("", "created controls document", "top-level controls count", Integer.toString(topLevelControlsCount));
         }
 
         // Extract models nested within controls
         {
             final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(controlsDocument, null, xpathConfiguration);
             final List<Document> extractedModels = extractNestedModels(pipelineContext, controlsDocumentInfo, false, locationData);
-            XFormsContainingDocument.logDebugStatic("static state", "created nested model documents", "count", Integer.toString(extractedModels.size()));
+            indentedLogger.logDebug("", "created nested model documents", "count", Integer.toString(extractedModels.size()));
             for (final Document currentModelDocument: extractedModels) {
                 addModelDocument(currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
             }
         }
 
         // Extract components
-        xblBindings = new XBLBindings(this, namespacesMap, staticStateElement);
+        xblBindings = new XBLBindings(indentedLogger, this, namespacesMap, staticStateElement);
     }
 
     /**
@@ -459,28 +467,6 @@ public class XFormsStaticState {
     public String getUUID() {
         return uuid;
     }
-
-//    /**
-//     * Whether the static state is fully initialized. It is the case when:
-//     *
-//     * o An encodedStaticState string was provided when restoring the static state, OR
-//     * o getEncodedStaticState() was called, thereby creating an encodedStaticState string
-//     *
-//     * Before the static state if fully initialized, cached instances can be added and contribute to the static state.
-//     * The lifecycle goes as follows:
-//     *
-//     * o Create initial static state from document
-//     * o 0..n add instances to state
-//     * o Create serialized static state string
-//     *
-//     * o Get existing static state from cache, OR
-//     * o Restore static state from serialized form
-//     *
-//     * @return  true iif static state is fully initialized
-//     */
-//    public boolean isInitialized() {
-//        return initialized;
-//    }
 
     /**
      * Get a serialized static state. If an encodedStaticState was provided during restoration, return that. Otherwise,
@@ -699,13 +685,13 @@ public class XFormsStaticState {
             if (cachedMap != null) {
                 return cachedMap;
             } else {
-                XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not cached",
+                indentedLogger.logDebug("", "namespace mappings not cached",
                         "prefix", prefix, "element", Dom4jUtils.elementToString(element));
                 return Dom4jUtils.getNamespaceContextNoDefault(element);
             }
         } else {
             // No id attribute
-            XFormsContainingDocument.logDebugStatic("static state", "namespace mappings not available because element doesn't have an id attribute",
+            indentedLogger.logDebug("", "namespace mappings not available because element doesn't have an id attribute",
                     "prefix", prefix, "element", Dom4jUtils.elementToString(element));
             return Dom4jUtils.getNamespaceContextNoDefault(element);
         }
@@ -748,11 +734,13 @@ public class XFormsStaticState {
     /**
      * Perform static analysis on this document if not already done.
      *
-     * @param pipelineContext   current pipeline context
+     * @param propertyContext   current pipeline context
      * @return                  true iif analysis was just performed in this call
      */
-    public synchronized boolean analyzeIfNecessary(final PropertyContext pipelineContext) {
+    public synchronized boolean analyzeIfNecessary(final PropertyContext propertyContext) {
         if (!isAnalyzed) {
+            final long startTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+
             controlTypes = new HashMap<String, Map<String, ControlInfo>>();
             eventNamesMap = new HashMap<String, String>();
             eventHandlersMap = new HashMap<String, List<XFormsEventHandler>>();
@@ -764,10 +752,10 @@ public class XFormsStaticState {
             final FastStringBuffer repeatHierarchyStringBuffer = new FastStringBuffer(1024);
             final Stack<String> repeatAncestorsStack = new Stack<String>();
             // NOTE: Say we DO want to exclude gathering event handlers within nested models, since those are gathered below
-            analyzeComponentTree(pipelineContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer, repeatAncestorsStack, true);
+            analyzeComponentTree(propertyContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer, repeatAncestorsStack, true);
 
             if (xxformsScripts != null && xxformsScripts.size() > 0)
-                XFormsContainingDocument.logDebugStatic("static state", "extracted script elements", "count", Integer.toString(xxformsScripts.size()));
+                indentedLogger.logDebug("", "extracted script elements", "count", Integer.toString(xxformsScripts.size()));
 
             // Finalize repeat hierarchy
             repeatHierarchyString = repeatHierarchyStringBuffer.toString();
@@ -778,14 +766,22 @@ public class XFormsStaticState {
                 final Document modelDocument = currentEntry.getValue();
                 final DocumentWrapper modelDocumentInfo = new DocumentWrapper(modelDocument, null, xpathConfiguration);
                 // NOTE: Say we don't want to exclude gathering event handlers within nested models, since this is a model
-                extractEventHandlers(pipelineContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
+                extractEventHandlers(propertyContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
 
-                extractXFormsScripts(pipelineContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId));
+                extractXFormsScripts(propertyContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId));
+            }
+
+            if (indentedLogger.isDebugEnabled()) {
+                indentedLogger.logDebug("", "performed static analysis",
+                            "time", Long.toString(System.currentTimeMillis() - startTime),
+                            "controls", Integer.toString(getControlInfoMap().size()));
+
             }
 
             isAnalyzed = true;
             return true;
         } else {
+            indentedLogger.logDebug("", "static analysis already available");
             return false;
         }
     }
@@ -865,17 +861,17 @@ public class XFormsStaticState {
         return false;
     }
 
-    public void analyzeComponentTree(final PropertyContext pipelineContext, final Configuration xpathConfiguration,
+    public void analyzeComponentTree(final PropertyContext propertyContext, final Configuration xpathConfiguration,
                                       final String prefix, Element startElement, final FastStringBuffer repeatHierarchyStringBuffer,
                                       final Stack<String> repeatAncestorsStack, boolean excludeModelEventHandlers) {
 
         final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(startElement.getDocument(), null, xpathConfiguration);
 
         // Extract event handlers for this tree of controls
-        extractEventHandlers(pipelineContext, controlsDocumentInfo, prefix, excludeModelEventHandlers);
+        extractEventHandlers(propertyContext, controlsDocumentInfo, prefix, excludeModelEventHandlers);
 
         // Extract scripts for this tree of controls
-        extractXFormsScripts(pipelineContext, controlsDocumentInfo, prefix);
+        extractXFormsScripts(propertyContext, controlsDocumentInfo, prefix);
 
         // Visit tree
         visitAllControlStatic(startElement, new XFormsStaticState.ControlElementVisitorListener() {
@@ -896,8 +892,8 @@ public class XFormsStaticState {
                 final LocationData locationData = new ExtendedLocationData((LocationData) controlElement.getData(), "gathering static control information", controlElement);
 
                 // If element is not built-in, check XBL and generate shadow content if needed
-                xblBindings.processElementIfNeeded(controlElement, controlPrefixedId, locationData, pipelineContext, controlsDocumentInfo,
-                        xpathConfiguration, prefix, repeatHierarchyStringBuffer, repeatAncestorsStack);
+                xblBindings.processElementIfNeeded(propertyContext, indentedLogger, controlElement, controlPrefixedId, locationData,
+                        controlsDocumentInfo, xpathConfiguration, prefix, repeatHierarchyStringBuffer, repeatAncestorsStack);
 
                 // Check for mandatory and optional bindings
                 final boolean hasBinding;
@@ -982,7 +978,7 @@ public class XFormsStaticState {
                     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
                     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
                     // don't check things like event handlers.
-                    final boolean hasNonStaticItem = (Boolean) XPathCache.evaluateSingle(pipelineContext, controlNodeInfo,
+                    final boolean hasNonStaticItem = (Boolean) XPathCache.evaluateSingle(propertyContext, controlNodeInfo,
                             "exists(./(xforms:choices | xforms:item | xforms:itemset)//xforms:*[@ref or @nodeset or @bind or @value])", BASIC_NAMESPACE_MAPPINGS,
                             null, null, null, null, locationData);
 
@@ -1028,7 +1024,7 @@ public class XFormsStaticState {
             //
             // o have @for attribute
             // o are the child of an xforms:* or xxforms:* element that has an id
-            final List lhhaElements = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+            final List lhhaElements = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
                 "//(xforms:label | xforms:help | xforms:hint | xforms:alert)[not(ancestor::xforms:instance) and exists(@for | parent::xforms:*/@id | parent::xxforms:*/@id)]", BASIC_NAMESPACE_MAPPINGS,
                 null, null, null, null, locationData);
 
@@ -1060,7 +1056,7 @@ public class XFormsStaticState {
                     alertsMap.put(controlPrefixedId, llhaElement);
                 }
             }
-            XFormsContainingDocument.logDebugStatic("static state", "extracted label, help, hint and alert elements", "count", Integer.toString(lhhaCount));
+            indentedLogger.logDebug("", "extracted label, help, hint and alert elements", "count", Integer.toString(lhhaCount));
         }
 
         // Gather online/offline information
@@ -1076,7 +1072,7 @@ public class XFormsStaticState {
 
                 // Search for xxforms:offline which are not within instances
                 for (final DocumentWrapper currentDocumentInfo: documentInfos) {
-                    hasOfflineSupport |= (Boolean) XPathCache.evaluateSingle(pipelineContext, currentDocumentInfo,
+                    hasOfflineSupport |= (Boolean) XPathCache.evaluateSingle(propertyContext, currentDocumentInfo,
                             "exists(//xxforms:offline[not(ancestor::xforms:instance)])", BASIC_NAMESPACE_MAPPINGS,
                             null, null, null, null, locationData);
 
@@ -1088,27 +1084,27 @@ public class XFormsStaticState {
 
             if (hasOfflineSupport) {
                 // NOTE: We attempt to localize what triggers can cause, upon DOMActivate, xxforms:online, xxforms:offline and xxforms:offline-save actions
-                final List onlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                final List onlineTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
                     "distinct-values(for $handler in for $action in //xxforms:online return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
                     "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
                     null, null, null, null, locationData);
 
-                final List offlineTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                final List offlineTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
                     "distinct-values(for $handler in for $action in //xxforms:offline return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
                     "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
                     null, null, null, null, locationData);
 
-                final List offlineSaveTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                final List offlineSaveTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
                     "distinct-values(for $handler in for $action in //xxforms:offline-save return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
                     "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
                     null, null, null, null, locationData);
 
-                offlineInsertTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                offlineInsertTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
                     "distinct-values(for $handler in for $action in //xforms:insert return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
                     "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
                     null, null, null, null, locationData);
 
-                final List offlineDeleteTriggerIds = XPathCache.evaluate(pipelineContext, controlsDocumentInfo,
+                final List offlineDeleteTriggerIds = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
                     "distinct-values(for $handler in for $action in //xforms:delete return ($action/ancestor-or-self::*[@ev:event and tokenize(@ev:event, '\\s+') = 'DOMActivate'])[1]" +
                     "   return for $id in $handler/../descendant-or-self::xforms:trigger/@id return string($id))", BASIC_NAMESPACE_MAPPINGS,
                     null, null, null, null, locationData);

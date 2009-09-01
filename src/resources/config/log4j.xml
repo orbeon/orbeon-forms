@@ -54,21 +54,10 @@
         </layout>
     </appender>
 
-    <!--<category name="org.orbeon.oxf.xforms.processor.XFormsServer">-->
-        <!--<priority value="debug"/>-->
-    <!--</category>-->
-
-    <!--<category name="org.orbeon.oxf.xforms.submission.XFormsModelSubmission">-->
-        <!--<priority value="debug"/>-->
-    <!--</category>-->
-
-    <!--<category name="org.orbeon.oxf.xforms.state.XFormsStateManager">-->
-        <!--<priority value="debug"/>-->
-    <!--</category>-->
-
-    <!--<category name="org.orbeon.oxf.xforms.XFormsInstance">-->
-        <!--<priority value="debug"/>-->
-    <!--</category>-->
+    <!-- XForms engine activity -->
+    <category name="org.orbeon.oxf.xforms.processor.XFormsServer">
+        <priority value="debug"/>
+    </category>
 
     <!-- To enable logging for any of the sub-systems below, copy that section outside of the
          comment block. The XFormsServer is the one you are most likely to be interested in. -->

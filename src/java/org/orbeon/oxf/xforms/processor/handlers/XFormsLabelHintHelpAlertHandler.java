@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -49,8 +49,9 @@ public class XFormsLabelHintHelpAlertHandler extends XFormsBaseHandler {
             xformsControl = (XFormsControl) containingDocument.getObjectByEffectiveId(controlEffectiveId);
 
             if (!(xformsControl instanceof XFormsSingleNodeControl)) {
-                XFormsServer.logger.warn("Control referred to with @for attribute on <" + localname + "> element is not a single node control: "
-                        + ((xformsControl != null) ? xformsControl.getClass().getName() : null));
+                final XFormsControls xformsControls = containingDocument.getControls();
+                xformsControls.getIndentedLogger().logWarning("", "Control referred to with @for attribute is not a single node control",
+                        "element", qName, "class", ((xformsControl != null) ? xformsControl.getClass().getName() : null));
                 return;
             }
         } else {

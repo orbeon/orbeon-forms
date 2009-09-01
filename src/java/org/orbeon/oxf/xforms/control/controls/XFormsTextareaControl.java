@@ -1,30 +1,30 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.util.PropertyContext;
 
 /**
  * Represents an xforms:textarea control.
@@ -71,13 +71,16 @@ public class XFormsTextareaControl extends XFormsValueControl {
     @Override
     public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
         if ("text/html".equals(getMediatype())) {
-            XFormsServer.logger.debug("XForms - Cleaning HTML - before cleanup: " + value);
+            final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
+            final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
+            if (isDebugEnabled)
+                indentedLogger.startHandleOperation("xforms:textarea", "cleaning-up HTML", "value", value);
 
             // Do TagSoup and XSLT cleaning
-            Document tagSoupedDocument = XFormsUtils.htmlStringToDom4jTagSoup(value, null);
-            if (XFormsServer.logger.isDebugEnabled())
-                XFormsServer.logger.debug("XForms - Cleaning HTML - after TagSoup cleanup: " + Dom4jUtils.domToString(tagSoupedDocument));
-            Document cleanedDocument = XMLUtils.cleanXML(tagSoupedDocument, "oxf:/ops/xforms/clean-html.xsl");
+            final Document tagSoupedDocument = XFormsUtils.htmlStringToDom4jTagSoup(value, null);
+            if (isDebugEnabled)
+                indentedLogger.logDebug("xforms:textarea", "after TagSoup cleanup", "value", Dom4jUtils.domToString(tagSoupedDocument));
+            final Document cleanedDocument = XMLUtils.cleanXML(tagSoupedDocument, "oxf:/ops/xforms/clean-html.xsl");
 
             // Remove dummy tags (the dummy tags are added by the XSLT, as we need a root element for XSLT processing)
             value = Dom4jUtils.domToString(cleanedDocument);
@@ -87,7 +90,8 @@ public class XFormsTextareaControl extends XFormsValueControl {
                 value = value.substring("<dummy-root>".length());                           // Remove start dummy tag
                 value = value.substring(0, value.length() - "</dummy-root>".length());      // Remove end dummy tag
             }
-            XFormsServer.logger.debug("XForms - Cleaning HTML - after XSLT cleanup:  " + value);
+            if (isDebugEnabled)
+                indentedLogger.endHandleOperation("value", value);
         }
         super.storeExternalValue(propertyContext, value, type, filesElement);
     }

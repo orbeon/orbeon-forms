@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
@@ -22,7 +23,6 @@ import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -52,7 +52,7 @@ public class InstanceReplacer extends BaseReplacer {
         } else {
             // Other media type is not allowed
             throw new XFormsSubmissionException(submission, "Body received with non-XML media type for replace=\"instance\": " + connectionResult.getResponseMediaType(), "processing instance replacement",
-                    new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
+                    new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
         }
     }
 
@@ -63,14 +63,15 @@ public class InstanceReplacer extends BaseReplacer {
         // 1. Wraps a Document within a DocumentInfo if needed
         // 2. Performs text nodes adjustments if needed
         try {
+            final IndentedLogger indentedLogger = getIndentedLogger();
             if (!isReadonly) {
                 // Resulting instance must not be read-only
 
                 // TODO: What about configuring validation? And what default to choose?
                 resultingDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
 
-                if (XFormsServer.logger.isDebugEnabled())
-                    containingDocument.logDebug("submission", "deserializing to mutable instance");
+                if (indentedLogger.isDebugEnabled())
+                    indentedLogger.logDebug("", "deserializing to mutable instance");
             } else {
                 // Resulting instance must be read-only
 
@@ -78,12 +79,12 @@ public class InstanceReplacer extends BaseReplacer {
                 // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
                 resultingDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
 
-                if (XFormsServer.logger.isDebugEnabled())
-                    containingDocument.logDebug("submission", "deserializing to read-only instance");
+                if (indentedLogger.isDebugEnabled())
+                    indentedLogger.logDebug("", "deserializing to read-only instance");
             }
         } catch (Exception e) {
             throw new XFormsSubmissionException(submission, e, "xforms:submission: exception while reading XML response.", "processing instance replacement",
-                    new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR, connectionResult));
+                    new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.PARSE_ERROR, connectionResult));
         }
 
         return resultingDocument;
@@ -104,7 +105,7 @@ public class InstanceReplacer extends BaseReplacer {
             // case, I think that this should be a (currently non-specified by XForms)
             // xforms-binding-error.
 
-            submission.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(submission));
+            submission.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, submission));
         } else {
 
             final NodeInfo destinationNodeInfo = submission.evaluateTargetRef(propertyContext,
@@ -118,14 +119,14 @@ public class InstanceReplacer extends BaseReplacer {
                 // xforms-submit-error with an error-type of target-error."
 
                 throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute",
-                        new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
             }
 
             // This is the instance which is effectively going to be updated
             final XFormsInstance updatedInstance = containingDocument.getInstanceForNode(destinationNodeInfo);
             if (updatedInstance == null) {
                 throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element in an existing instance for replace=\"instance\".", "processing targetref attribute",
-                        new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
             }
 
             // Whether the destination node is the root element of an instance
@@ -133,8 +134,10 @@ public class InstanceReplacer extends BaseReplacer {
             if (p2.isReadonly && !isDestinationRootElement) {
                 // Only support replacing the root element of an instance when using a shared instance
                 throw new XFormsSubmissionException(submission, "targetref attribute must point to instance root element when using read-only instance replacement.", "processing targetref attribute",
-                        new XFormsSubmitErrorEvent(propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
+                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
             }
+
+            final IndentedLogger indentedLogger = getIndentedLogger();
 
             // Obtain root element to insert
             final NodeInfo newDocumentRootElement;
@@ -146,8 +149,8 @@ public class InstanceReplacer extends BaseReplacer {
                 if (!p2.isReadonly) {
                     // Resulting instance must not be read-only
 
-                    if (XFormsServer.logger.isDebugEnabled())
-                        containingDocument.logDebug("submission", "replacing instance with mutable instance",
+                    if (indentedLogger.isDebugEnabled())
+                        indentedLogger.logDebug("", "replacing instance with mutable instance",
                             "instance", updatedInstance.getEffectiveId());
 
                     newInstance = new XFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
@@ -156,8 +159,8 @@ public class InstanceReplacer extends BaseReplacer {
                 } else {
                     // Resulting instance must be read-only
 
-                    if (XFormsServer.logger.isDebugEnabled())
-                        containingDocument.logDebug("submission", "replacing instance with read-only instance",
+                    if (indentedLogger.isDebugEnabled())
+                        indentedLogger.logDebug("", "replacing instance with read-only instance",
                             "instance", updatedInstance.getEffectiveId());
 
                     newInstance = new ReadonlyXFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
@@ -189,7 +192,7 @@ public class InstanceReplacer extends BaseReplacer {
                 // Dispatch xforms-insert event
                 // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
                 newInstance.getXBLContainer(containingDocument).dispatchEvent(propertyContext,
-                    new XFormsInsertEvent(newInstance, Collections.singletonList((Item) newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
+                    new XFormsInsertEvent(containingDocument, newInstance, Collections.singletonList((Item) newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
                             "after", null, null, true));
 
             } else {
@@ -201,7 +204,7 @@ public class InstanceReplacer extends BaseReplacer {
 
                 // Insert before the target node, so that the position of the inserted node
                 // wrt its parent does not change after the target node is removed
-                final List insertedNode = XFormsInsertAction.doInsert(propertyContext, containingDocument, "before",
+                final List insertedNode = XFormsInsertAction.doInsert(propertyContext, containingDocument, indentedLogger, "before",
                         destinationCollection, destinationNodeInfo.getParent(),
                         Collections.singletonList(newDocumentRootElement), 1, false, true);
 
@@ -209,7 +212,7 @@ public class InstanceReplacer extends BaseReplacer {
                     // The node to replace is NOT a root element
 
                     // Perform the deletion of the selected node
-                    XFormsDeleteAction.doDelete(propertyContext, containingDocument, destinationCollection, 1, true);
+                    XFormsDeleteAction.doDelete(propertyContext, containingDocument, indentedLogger, destinationCollection, 1, true);
                 }
 
                 // Perform model instance update

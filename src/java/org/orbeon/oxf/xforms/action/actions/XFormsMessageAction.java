@@ -1,21 +1,23 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -24,7 +26,6 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.Item;
 
 import java.util.HashMap;
@@ -83,14 +84,15 @@ public class XFormsMessageAction extends XFormsAction {
                 // Special log appearance
 
                 final String messagePrefix = "XForms - log message - ";
+                final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), XFormsServer.getLogger(), XFormsServer.LOGGING_CATEGORY);
                 if (XFormsConstants.XXFORMS_LOG_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    XFormsServer.logger.debug(messagePrefix + messageValue);
+                    indentedLogger.logDebug("xforms:message", messagePrefix + messageValue);
                 } else if (XFormsConstants.XXFORMS_LOG_INFO_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    XFormsServer.logger.info(messagePrefix + messageValue);
+                    indentedLogger.logInfo("xforms:message", messagePrefix + messageValue);
                 } else if (XFormsConstants.XXFORMS_LOG_WARN_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    XFormsServer.logger.warn(messagePrefix + messageValue);
+                    indentedLogger.logWarning("xforms:message", messagePrefix + messageValue);
                 } else if (XFormsConstants.XXFORMS_LOG_ERROR_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    XFormsServer.logger.error(messagePrefix + messageValue);
+                    indentedLogger.logError("xforms:message", messagePrefix + messageValue);
                 }
 
             } else if (SUPPORTED_APPEARANCES.get(levelQName) != null) {

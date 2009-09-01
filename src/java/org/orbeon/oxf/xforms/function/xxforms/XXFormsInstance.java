@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -60,8 +61,7 @@ public class XXFormsInstance extends XFormsFunction {
             return new ListIterator(Collections.singletonList(instance.getInstanceRootElementInfo()));
         } else {
             // "an empty node-set is returned"
-            getContainingDocument(xpathContext).logWarning("function", "Instance not found with xxforms:instance() function",
-                    "instance id", instanceId);
+            getContainingDocument(xpathContext).getIndentedLogger(XFormsModel.LOGGING_CATEGORY).logWarning("xxforms:instance()", "instance not found", "instance id", instanceId);
             return EmptyIterator.getInstance();
         }
     }

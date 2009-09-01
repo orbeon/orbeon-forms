@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.state;
 
@@ -17,11 +17,13 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 
 /**
  * Centralize XForms state management.
@@ -29,8 +31,11 @@ import org.orbeon.oxf.xforms.XFormsUtils;
  * TODO: Get rid of the old "session" store code as it is replaced by the new persistent store.
  */
 public class XFormsStateManager {
-
-    public static Logger logger = LoggerFactory.createLogger(XFormsStateManager.class);
+    
+    private static final String LOG_TYPE = "state manager";
+    private static final String LOGGING_CATEGORY = "state";
+    private static final Logger logger = LoggerFactory.createLogger(XFormsStateManager.class);
+    private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
 
     // All these must have the same length
     public static final String SESSION_STATE_PREFIX = "sess:";
@@ -42,6 +47,10 @@ public class XFormsStateManager {
     // Ideally we wouldn't want to force session creation, but it's hard to implement the more elaborate expiration
     // strategy without session. See https://wiki.objectweb.org/ops/Wiki.jsp?page=XFormsStateStoreImprovements
     public static final boolean FORCE_SESSION_CREATION = true;
+
+    public static IndentedLogger getIndentedLogger() {
+        return indentedLogger;
+    }
 
     /**
      * Get the initial encoded XForms state as it must be sent to the client within the (X)HTML, and if needed (server
@@ -187,7 +196,7 @@ public class XFormsStateManager {
             // Both prefixes must be the same
             if (!staticStatePrefix.equals(dynamicStatePrefix)) {
                 final String message = "Inconsistent XForms state prefixes: " + staticStatePrefix + ", " + dynamicStatePrefix;
-                logger.debug(message);
+                indentedLogger.logDebug(LOG_TYPE, message);
                 throw new OXFException(message);
             }
 
@@ -203,7 +212,7 @@ public class XFormsStateManager {
             } else {
                 // Invalid prefix
                 final String message = "Invalid state prefix: " + staticStatePrefix;
-                logger.debug(message);
+                indentedLogger.logDebug(LOG_TYPE, message);
                 throw new OXFException(message);
             }
 
@@ -222,18 +231,18 @@ public class XFormsStateManager {
                     if (currentSession == null || currentSession.isNew()) {
                         // This means that no session is currently existing, or a session exists but it is newly created
                         final String message = "Your session has expired. " + PLEASE_RELOAD_PAGE_MESSAGE;
-                        logger.error(message);
+                        indentedLogger.logError("", message);
                         throw new OXFException(message + " " + UUIDS_MESSAGE);
                     } else {
                         // There is a session and it is still known by the client
                         final String message = UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE;
-                        logger.error(message);
+                        indentedLogger.logError("", message);
                         throw new OXFException(message + " " + UUIDS_MESSAGE);
                     }
 
                 } else {
                     final String message = UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE;
-                    logger.error(message);
+                    indentedLogger.logError("", message);
                     throw new OXFException(message + " " + UUIDS_MESSAGE);
                 }
             }
@@ -262,25 +271,25 @@ public class XFormsStateManager {
         // Create encoded static state and make sure encryption is used
         final String newEncodedStaticState;
         {
-            final long startTime = logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+            final long startTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
             final String encodedStaticState = xformsDecodedClientState.getXFormsState().getStaticState();
             newEncodedStaticState = XFormsUtils.ensureEncrypted(pipelineContext, encodedStaticState);
 
-            if (logger.isDebugEnabled()) {
+            if (indentedLogger.isDebugEnabled()) {
                 final long elapsedTime = System.currentTimeMillis() - startTime;
-                logger.debug("Time to encode static state: " + elapsedTime);
+                indentedLogger.logDebug(LOG_TYPE, "encoded static state", "time", Long.toString(elapsedTime));
             }
         }
 
         // Create encoded dynamic state and make sure encryption is used
         final String newEncodedDynamicState;
         {
-            final long startTime = logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+            final long startTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
             newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext, true);
-            if (logger.isDebugEnabled()) {
+            if (indentedLogger.isDebugEnabled()) {
                 final long elapsedTime = System.currentTimeMillis() - startTime;
-                logger.debug("Time to encode dynamic state: " + elapsedTime);
+                indentedLogger.logDebug(LOG_TYPE, "encoded dynamic state", "time", Long.toString(elapsedTime));
             }
         }
 
@@ -314,10 +323,10 @@ public class XFormsStateManager {
             if (containingDocument.isDirtySinceLastRequest() || isMustChangeStateHandling) {
                 if (containingDocument.isDirtySinceLastRequest()) {
                     // The document is dirty
-                    logger.debug("Document is dirty: generate new dynamic state.");
+                    indentedLogger.logDebug(LOG_TYPE, "Document is dirty: generate new dynamic state.");
                 } else {
                     // Changing modes
-                    logger.debug("Changing state handling mode: generate new dynamic state.");
+                    indentedLogger.logDebug(LOG_TYPE, "Changing state handling mode: generate new dynamic state.");
                 }
 
                 // Produce page generation id if needed
@@ -357,13 +366,13 @@ public class XFormsStateManager {
                 }
             } else {
                 // The document is not dirty AND we are not changing mode: no real encoding takes place here
-                logger.debug("Document is not dirty: keep existing dynamic state.");
+                indentedLogger.logDebug(LOG_TYPE, "Document is not dirty: keep existing dynamic state.");
                 newXFormsState = xformsDecodedClientState.getXFormsState();
 
                 staticStateString = xformsDecodedClientState.getIncomingStaticStateEncoded(containingDocument);
                 dynamicStateString = xformsDecodedClientState.getIncomingDynamicStateEncoded(containingDocument);
 
-                if (logger.isDebugEnabled() && !XFormsProperties.isClientStateHandling(containingDocument)) {
+                if (indentedLogger.isDebugEnabled() && !XFormsProperties.isClientStateHandling(containingDocument)) {
                     // Check that dynamic state is the same
                     // TODO: Need XML-aware comparison here
 //                    final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext);
@@ -372,8 +381,8 @@ public class XFormsStateManager {
 //                        final Document oldDocument = XFormsUtils.decodeXML(pipelineContext, xformsDecodedClientState.getXFormsState().getDynamicState());
 //                        final Document newDocument = XFormsUtils.decodeXML(pipelineContext, newEncodedDynamicState);
 //
-//                        logger.debug("Old document:\n" + Dom4jUtils.domToString(oldDocument));
-//                        logger.debug("New document:\n" + Dom4jUtils.domToString(newDocument));
+//                        indentedLogger.logDebug(LOG_TYPE, "Old document:\n" + Dom4jUtils.domToString(oldDocument));
+//                        indentedLogger.logDebug(LOG_TYPE, "New document:\n" + Dom4jUtils.domToString(newDocument));
 //
 //                        throw new OXFException("Document is not dirty but dynamic state turns out to be different from original.");
 //                    }
@@ -430,7 +439,7 @@ public class XFormsStateManager {
             if (!XFormsProperties.isClientStateHandling(containingDocument)) {
                 if (newStaticStateUUID == null) {
                     final String message = "Null value for newStaticStateUUID";
-                    logger.debug(message);
+                    indentedLogger.logDebug(LOG_TYPE, message);
                     throw new OXFException(message);
                 }
                 if (XFormsProperties.isLegacySessionStateHandling(containingDocument)) {
@@ -451,7 +460,7 @@ public class XFormsStateManager {
             if (!XFormsProperties.isClientStateHandling(containingDocument)) {
                 if (newDynamicStateUUID == null) {
                     final String message = "Null value for newDynamicStateUUID";
-                    logger.debug(message);
+                    indentedLogger.logDebug(LOG_TYPE, message);
                     throw new OXFException(message);
                 }
                 if (XFormsProperties.isLegacySessionStateHandling(containingDocument)) {

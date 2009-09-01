@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.ListIterator;
@@ -45,13 +45,13 @@ public abstract class XFormsUIEvent extends XFormsEvent {
 
     private XFormsControl targetXFormsControl;
 
-    public XFormsUIEvent(String eventName, XFormsControl targetObject) {
-        super(eventName, targetObject, true, false);
+    public XFormsUIEvent(XFormsContainingDocument containingDocument, String eventName, XFormsControl targetObject) {
+        super(containingDocument, eventName, targetObject, true, false);
         this.targetXFormsControl = targetObject;
     }
 
-    protected XFormsUIEvent(String eventName, XFormsControl targetObject, boolean bubbles, boolean cancelable) {
-        super(eventName, targetObject, bubbles, cancelable);
+    protected XFormsUIEvent(XFormsContainingDocument containingDocument, String eventName, XFormsControl targetObject, boolean bubbles, boolean cancelable) {
+        super(containingDocument, eventName, targetObject, bubbles, cancelable);
         this.targetXFormsControl = targetObject;
     }
 
@@ -59,7 +59,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
         if ("target-ref".equals(name) || XXFORMS_BINDING_ATTRIBUTE.equals(name)) {
 
             if ("target-ref".equals(name)) {
-                XFormsServer.logger.warn("event('target-ref') is deprecated. Use event('xxforms:binding') instead.");
+                getIndentedLogger().logWarning("", "event('target-ref') is deprecated. Use event('xxforms:binding') instead.");
             }
 
             // Return the node to which the control is bound
@@ -71,7 +71,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
         } else if ("alert".equals(name) || XXFORMS_ALERT_ATTRIBUTE.equals(name)) {
 
             if ("alert".equals(name)) {
-                XFormsServer.logger.warn("event('alert') is deprecated. Use event('xxforms:alert') instead.");
+                getIndentedLogger().logWarning("", "event('alert') is deprecated. Use event('xxforms:alert') instead.");
             }
 
             final String alert = targetXFormsControl.getAlert(getPipelineContext());
@@ -82,7 +82,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
         } else if ("label".equals(name) || XXFORMS_LABEL_ATTRIBUTE.equals(name)) {
 
             if ("label".equals(name)) {
-                XFormsServer.logger.warn("event('label') is deprecated. Use event('xxforms:label') instead.");
+                getIndentedLogger().logWarning("", "event('label') is deprecated. Use event('xxforms:label') instead.");
             }
 
             final String label = targetXFormsControl.getLabel(getPipelineContext());
@@ -93,7 +93,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
         } else if ("hint".equals(name) || XXFORMS_HINT_ATTRIBUTE.equals(name)) {
 
             if ("hint".equals(name)) {
-                XFormsServer.logger.warn("event('hint') is deprecated. Use event('xxforms:hint') instead.");
+                getIndentedLogger().logWarning("", "event('hint') is deprecated. Use event('xxforms:hint') instead.");
             }
 
             final String hint = targetXFormsControl.getHint(getPipelineContext());
@@ -104,7 +104,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
         } else if ("help".equals(name) || XXFORMS_HELP_ATTRIBUTE.equals(name)) {
 
             if ("help".equals(name)) {
-                XFormsServer.logger.warn("event('help') is deprecated. Use event('xxforms:help') instead.");
+                getIndentedLogger().logWarning("", "event('help') is deprecated. Use event('xxforms:help') instead.");
             }
 
             final String help = targetXFormsControl.getHelp(getPipelineContext());
@@ -115,7 +115,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
         } else if ("repeat-indexes".equals(name) || XXFORMS_REPEAT_INDEXES_ATTRIBUTE.equals(name)) {
 
             if ("repeat-indexes".equals(name)) {
-                XFormsServer.logger.warn("event('repeat-indexes') is deprecated. Use event('xxforms:repeat-indexes') instead.");
+                getIndentedLogger().logWarning("", "event('repeat-indexes') is deprecated. Use event('xxforms:repeat-indexes') instead.");
             }
 
             final String effectiveTargetId = targetXFormsControl.getEffectiveId();

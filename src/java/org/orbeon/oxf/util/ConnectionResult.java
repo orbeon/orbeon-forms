@@ -13,10 +13,12 @@
  */
 package org.orbeon.oxf.util;
 
+import org.apache.log4j.Level;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +31,12 @@ public class ConnectionResult {
     public int statusCode;
     private String responseMediaType;
     private String responseContentType;
+    private String originalResponseContentType;
     public Map<String, List<String>> responseHeaders;
     private Long lastModified;
     public String resourceURI;
+
+    private boolean didLogResponseDetails;
 
     private InputStream responseInputStream;
     private boolean hasContent;
@@ -55,11 +60,20 @@ public class ConnectionResult {
     }
 
     public void setResponseContentType(String responseContentType) {
-        this.responseContentType = responseContentType;
+        setResponseContentType(responseContentType, null);
+    }
+
+    public void setResponseContentType(String responseContentType, String defaultContentType) {
+        this.originalResponseContentType = responseContentType;
+        this.responseContentType = (responseContentType != null) ? responseContentType : defaultContentType;
     }
 
     public String getResponseContentType() {
         return responseContentType;
+    }
+
+    public String getOriginalResponseContentType() {
+        return originalResponseContentType;
     }
 
     public String getResponseMediaType() {
@@ -176,6 +190,86 @@ public class ConnectionResult {
         } else {
             // This is a binary result
             return null;
+        }
+    }
+
+    /**
+     * Log response details if not already logged.
+     *
+     * @param indentedLogger    logger
+     * @param logLevel          log level
+     * @param logType           log type string
+     */
+    public void logResponseDetailsIfNeeded(IndentedLogger indentedLogger, Level logLevel, String logType) {
+        if (!didLogResponseDetails) {
+            // Status code
+            indentedLogger.log(logLevel, logType, "response", "status code", Integer.toString(statusCode));
+
+            // Log headers if needed
+            if (responseHeaders.size() > 0) {
+                final List<String> headersToLog = new ArrayList<String>();
+
+                for (Map.Entry<String, List<String>> currentEntry: responseHeaders.entrySet()) {
+                    final String currentHeaderName = currentEntry.getKey();
+                    final List<String> currentHeaderValues = currentEntry.getValue();
+                    if (currentHeaderValues != null) {
+                        // Add all header values as "request properties"
+                        for (String currentHeaderValue: currentHeaderValues) {
+                            headersToLog.add(currentHeaderName);
+                            headersToLog.add(currentHeaderValue);
+                        }
+                    }
+                }
+
+                final String[] strings = new String[headersToLog.size()];
+                indentedLogger.log(logLevel, logType, "response headers", headersToLog.toArray(strings));
+            }
+
+            // Content-Type
+            if (getOriginalResponseContentType() == null)
+                indentedLogger.log(logLevel, logType, "received null response Content-Type", "default Content-Type", getResponseContentType());
+
+            didLogResponseDetails = true;
+        }
+    }
+
+    /**
+     * Log response body.
+     *
+     * @param indentedLogger    logger
+     * @param logLevel          log level
+     * @param logType           log type string
+     * @param logBody           whether to actually log the body
+     * @throws IOException
+     */
+    public void logResponseBody(IndentedLogger indentedLogger, Level logLevel, String logType, boolean logBody) throws IOException {
+        if (hasContent()) {
+            indentedLogger.log(logLevel, logType, "response has content");
+
+            if (logBody) {
+                // Save response stream to byte array
+                final InputStream is = getResponseInputStream();
+                final byte[] tempResponse = NetUtils.inputStreamToByteArray(is);
+                try {
+                    is.close();
+                } catch (Exception e) {
+                    // NOP
+                }
+
+                // Restore response stream and get as text
+                setResponseInputStream(new ByteArrayInputStream(tempResponse));
+                final String responseBody = getTextResponseBody();
+                if (responseBody != null) {
+                    // Log
+                    indentedLogger.log(logLevel, "submission", "response body", "body", responseBody);
+                    // Restore response stream
+                    setResponseInputStream(new ByteArrayInputStream(tempResponse));
+                } else {
+                    indentedLogger.log(logLevel, "submission", "binary response body");
+                }
+            }
+        } else {
+            indentedLogger.log(logLevel, logType, "response has no content");
         }
     }
 }

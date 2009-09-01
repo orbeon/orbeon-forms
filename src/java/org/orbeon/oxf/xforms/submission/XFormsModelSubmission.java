@@ -31,7 +31,6 @@ import org.orbeon.oxf.xforms.event.events.XFormsSubmitSerializeEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsSubmitEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsSubmitReplaceEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -59,6 +58,7 @@ import java.util.Map;
  */
 public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObserver {
 
+    public static final String LOGGING_CATEGORY = "submission";
 	public final static Logger logger = LoggerFactory.createLogger(XFormsModelSubmission.class);
 
     private final XBLContainer container;
@@ -292,10 +292,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
             containingDocument.setGotSubmission();
 
+            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+
             // Variables declared here as they are used in a catch/finally block
             SubmissionParameters p = null;
             String resolvedActionOrResource = null;
-            final long submissionStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+            final long submissionStartTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
             // Make sure submission element info is extracted
             extractSubmissionElement();
@@ -312,7 +314,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 {
                     final XFormsModelSubmission existingSubmission = containingDocument.getClientActiveSubmission();
                     if (p.isDeferredSubmission && existingSubmission != null) {
-                        containingDocument.logWarning("submission", "another submission requiring a second pass already exists",
+                        indentedLogger.logWarning("", "another submission requiring a second pass already exists",
                                 "existing submission", existingSubmission.getEffectiveId(),
                                 "new submission", this.getEffectiveId());
                         return;
@@ -348,7 +350,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                     // Create document to submit here because in case of error, an Ajax response will still be produced
                     if (serialize) {
-                        createDocumentToSubmit(propertyContext, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant);
+                        createDocumentToSubmit(propertyContext, indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant);
                     }
 
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
@@ -388,7 +390,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     }
 
                     // Create document to submit
-                    documentToSubmit = createDocumentToSubmit(propertyContext, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant);
+                    documentToSubmit = createDocumentToSubmit(propertyContext, indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant);
 
                 } else {
                     // Don't recreate document
@@ -405,7 +407,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // consists of a serialization of the selected instance data according to the rules stated at 11.9
                     // Submission Options."
 
-                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this, p.refNodeInfo, requestedSerialization);
+                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(containingDocument, XFormsModelSubmission.this, p.refNodeInfo, requestedSerialization);
                     container.dispatchEvent(propertyContext, serializeEvent);
 
                     // TODO: rest of submission should happen upon default action of event
@@ -423,7 +425,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 // Result information
                 SubmissionResult submissionResult = null;
-                final long externalSubmissionStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
+                final long externalSubmissionStartTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
                 try {
                     // Iterate through submissions and run the first match
@@ -438,9 +440,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     handleSubmissionResult(propertyContext, p, p2, submissionResult);
                 } finally {
                     // Log time spent in submission if needed
-                    if (XFormsServer.logger.isDebugEnabled()) {
+                    if (indentedLogger.isDebugEnabled()) {
                         final long submissionTime = System.currentTimeMillis() - externalSubmissionStartTime;
-                        containingDocument.logDebug("submission", "external submission time including handling returned body",
+                        indentedLogger.logDebug("", "external submission time including handling returned body",
                             "time", Long.toString(submissionTime));
                     }
                 }
@@ -455,10 +457,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
             } finally {
                 // Log total time spent in submission if needed
-                if (XFormsServer.logger.isDebugEnabled()) {
+                if (indentedLogger.isDebugEnabled()) {
                     final long submissionTime = System.currentTimeMillis() - submissionStartTime;
-                    containingDocument.logDebug("submission", "total submission time",
-                        "time", Long.toString(submissionTime));
+                    indentedLogger.logDebug("", "total submission time", "time", Long.toString(submissionTime));
                 }
             }
 
@@ -510,7 +511,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         // If no event obtained, create default event
         if (submitErrorEvent == null) {
-            submitErrorEvent = new XFormsSubmitErrorEvent(propertyContext, XFormsModelSubmission.this,
+            submitErrorEvent = new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this,
                 XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR, submissionResult.getConnectionResult());
         }
 
@@ -529,7 +530,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         // If no event obtained, create default event
         if (submitErrorEvent == null) {
-            submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource,
+            submitErrorEvent = new XFormsSubmitErrorEvent(containingDocument, XFormsModelSubmission.this, resolvedActionOrResource,
                 XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR, 0);
         }
 
@@ -561,15 +562,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         replacer = new NoneReplacer(this, containingDocument);
                     } else {
                         throw new XFormsSubmissionException(this, "xforms:submission: invalid replace attribute: " + replace, "processing instance replacement",
-                                new XFormsSubmitErrorEvent(propertyContext, this, XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR, connectionResult));
+                                new XFormsSubmitErrorEvent(containingDocument, propertyContext, this, XFormsSubmitErrorEvent.ErrorType.XXFORMS_INTERNAL_ERROR, connectionResult));
                     }
                 } else {
                     // There is no body, notify that processing is terminated
                     if (p.isReplaceInstance || p.isReplaceText) {
                         // XForms 1.1 says it is fine not to have a body, but in most cases you will want to know that
                         // no instance replacement took place
-                        XFormsServer.logger.warn("XForms - submission - instance or text replacement did not take place upon successful response because no body was provided. Submission: "
-                                + getEffectiveId());
+                        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+                        indentedLogger.logWarning("", "instance or text replacement did not take place upon successful response because no body was provided.",
+                                "submission id", getEffectiveId());
                     }
 
                     // "For a success response not including a body, submission processing concludes after dispatching
@@ -586,7 +588,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             } else {
                 // Error code received
                 throw new XFormsSubmissionException(this, "xforms:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
-                        new XFormsSubmitErrorEvent(propertyContext, this, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
+                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, this, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
             }
 
             return replacer;
@@ -653,11 +655,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // Check that we have a current node and that it is pointing to a document or an element
             if (refNodeInfo == null)
                 throw new XFormsSubmissionException(XFormsModelSubmission.this, "Empty single-node binding on xforms:submission for submission id: " + id, "getting submission single-node binding",
-                        new XFormsSubmitErrorEvent(propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.NO_DATA, null));
+                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.NO_DATA, null));
     
             if (!(refNodeInfo instanceof DocumentInfo || refNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
                 throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding",
-                        new XFormsSubmitErrorEvent(propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.NO_DATA, null));
+                        new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.NO_DATA, null));
             }
     
             // Current instance may be null if the document submitted is not part of an instance
@@ -1033,7 +1035,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         return actualMethod;
     }
 
-    private Document createDocumentToSubmit(PropertyContext propertyContext, NodeInfo currentNodeInfo, XFormsInstance currentInstance, XFormsModel modelForInstance, boolean resolvedValidate, boolean resolvedRelevant) {
+    private Document createDocumentToSubmit(PropertyContext propertyContext, IndentedLogger indentedLogger, NodeInfo currentNodeInfo,
+                                            XFormsInstance currentInstance, XFormsModel modelForInstance, boolean resolvedValidate, boolean resolvedRelevant) {
         final Document documentToSubmit;
 
         // Revalidate instance
@@ -1050,16 +1053,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean instanceSatisfiesValidRequired
                 = (currentInstance != null && currentInstance.isReadOnly())
                 || !resolvedValidate
-                || XFormsSubmissionUtils.isSatisfiesValidRequired(containingDocument, documentToSubmit, true, true, true);
+                || XFormsSubmissionUtils.isSatisfiesValidRequired(indentedLogger, documentToSubmit, true, true, true);
         if (!instanceSatisfiesValidRequired) {
-            if (XFormsServer.logger.isDebugEnabled()) {
+            if (indentedLogger.isDebugEnabled()) {
                 final String documentString = TransformerUtils.tinyTreeToString(currentNodeInfo);
-                containingDocument.logDebug("submission", "instance document or subset thereof cannot be submitted",
+                indentedLogger.logDebug("", "instance document or subset thereof cannot be submitted",
                         "document", documentString);
             }
             throw new XFormsSubmissionException(this, "xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
                     "checking instance validity",
-                    new XFormsSubmitErrorEvent(propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.VALIDATION_ERROR, null));
+                    new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.VALIDATION_ERROR, null));
         }
 
         return documentToSubmit;

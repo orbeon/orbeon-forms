@@ -1,21 +1,25 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
@@ -23,23 +27,26 @@ import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xforms.itemset.Itemset;
+import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
-import org.xml.sax.Locator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents all this XForms containing document controls and the context in which they operate.
  */
 public class XFormsControls implements XFormsObjectResolver {
 
-    private Locator locator;
+    public static final String LOGGING_CATEGORY = "control";
+    public static final Logger logger = LoggerFactory.createLogger(XFormsModel.class);
+    public final IndentedLogger indentedLogger;
 
     private boolean initialized;
     private ControlTree initialControlTree;
@@ -60,6 +67,8 @@ public class XFormsControls implements XFormsObjectResolver {
 
     public XFormsControls(XFormsContainingDocument containingDocument) {
 
+        this.indentedLogger = containingDocument.getIndentedLogger(LOGGING_CATEGORY);
+
         this.containingDocument = containingDocument;
         this.rootContainer = this.containingDocument;
 
@@ -74,6 +83,10 @@ public class XFormsControls implements XFormsObjectResolver {
 
     public boolean isInitialized() {
         return initialized;
+    }
+
+    public IndentedLogger getIndentedLogger() {
+        return indentedLogger;
     }
 
     public boolean isDirtySinceLastRequest() {
@@ -105,7 +118,7 @@ public class XFormsControls implements XFormsObjectResolver {
      * TODO: this is called in XFormsContainingDocument.prepareForExternalEventsSequence() but it is not really an
      * initialization in that case.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      */
     public void initialize(PropertyContext propertyContext) {
         initializeState(propertyContext, false);
@@ -115,7 +128,7 @@ public class XFormsControls implements XFormsObjectResolver {
      * Initialize the controls if needed, passing initial state information. This is called if the state of the engine
      * needs to be rebuilt.
      *
-     * @param propertyContext
+     * @param propertyContext       current context
      * @param evaluateItemsets      whether to evaluateItemsets (for dynamic state restoration)
      */
     public void initializeState(PropertyContext propertyContext, boolean evaluateItemsets) {
@@ -141,7 +154,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 currentControlTree = initialControlTree = new ControlTree(XFormsProperties.isNoscript(containingDocument));
 
                 // Initialize new control tree
-                currentControlTree.initialize(propertyContext, containingDocument, rootContainer, evaluateItemsets);
+                currentControlTree.initialize(propertyContext, containingDocument, indentedLogger, rootContainer, evaluateItemsets);
             }
 
             // We are now clean
@@ -212,7 +225,7 @@ public class XFormsControls implements XFormsObjectResolver {
      *
      * WARNING: The binding context must be set to the current iteration before calling.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      * @param repeatControl     repeat control
      * @param iterationIndex    new iteration to repeat (1..repeat size + 1)
      */
@@ -223,9 +236,9 @@ public class XFormsControls implements XFormsObjectResolver {
             throw new OXFException("Cannot call insertRepeatIteration() when initialControlTree == currentControlTree");
 
         final XFormsRepeatIterationControl repeatIterationControl;
-        containingDocument.startHandleOperation("controls", "adding iteration");
+        indentedLogger.startHandleOperation("controls", "adding iteration");
         repeatIterationControl = currentControlTree.createRepeatIterationTree(propertyContext, bindingContext, repeatControl, iterationIndex);
-        containingDocument.endHandleOperation();
+        indentedLogger.endHandleOperation();
 
         return repeatIterationControl;
     }
@@ -238,7 +251,7 @@ public class XFormsControls implements XFormsObjectResolver {
      */
     public void evaluateControlValuesIfNeeded(PipelineContext pipelineContext) {
 
-        containingDocument.startHandleOperation("controls", "evaluating");
+        indentedLogger.startHandleOperation("controls", "evaluating");
         {
             final Map effectiveIdsToControls = getCurrentControlTree().getEffectiveIdsToControls();
             // Evaluate all controls
@@ -250,7 +263,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 }
             }
         }
-        containingDocument.endHandleOperation();
+        indentedLogger.endHandleOperation();
     }
 
     /**
@@ -278,7 +291,7 @@ public class XFormsControls implements XFormsObjectResolver {
      */
     public void cloneInitialStateIfNeeded() {
         if (initialControlTree == currentControlTree && containingDocument.isHandleDifferences()) {
-            containingDocument.startHandleOperation("controls", "cloning");
+            indentedLogger.startHandleOperation("controls", "cloning");
             {
                 try {
                     // NOTE: We clone "back", that is the new tree is used as the "initial" tree. This is done so that
@@ -288,14 +301,14 @@ public class XFormsControls implements XFormsObjectResolver {
                     throw new OXFException(e);
                 }
             }
-            containingDocument.endHandleOperation();
+            indentedLogger.endHandleOperation();
         }
     }
 
     /**
      * Rebuild the controls tree bindings if needed.
      *
-     * @param propertyContext
+     * @param propertyContext   current context
      */
     public boolean updateControlBindingsIfNeeded(final PropertyContext propertyContext) {
 
@@ -311,13 +324,13 @@ public class XFormsControls implements XFormsObjectResolver {
             // Clone if needed
             cloneInitialStateIfNeeded();
 
-            containingDocument.startHandleOperation("controls", "updating bindings");
+            indentedLogger.startHandleOperation("controls", "updating bindings");
             final UpdateBindingsListener listener = new UpdateBindingsListener(propertyContext, currentControlTree.getEffectiveIdsToControls(), currentControlTree.getEventsToDispatch());
             {
                 // Visit all controls and update their bindings
                 visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener);
             }
-            containingDocument.endHandleOperation(
+            indentedLogger.endHandleOperation(
                     "controls updated", Integer.toString(listener.getUpdateCount()),
                     "repeat iterations", Integer.toString(listener.getIterationCount())
             );
@@ -345,14 +358,6 @@ public class XFormsControls implements XFormsObjectResolver {
 
             return true;
         }
-    }
-
-    public Locator getLocator() {
-        return locator;
-    }
-
-    public void setLocator(Locator locator) {
-        this.locator = locator;
     }
 
     /**
@@ -762,13 +767,13 @@ public class XFormsControls implements XFormsObjectResolver {
 
         // Don't do anything if there are no children controls
         if (getCurrentControlTree().getChildren() == null) {
-            containingDocument.logDebug("model", "not performing refresh because no controls are available");
+            indentedLogger.logDebug("model", "not performing refresh because no controls are available");
             // Don't forget to clear the flag or we risk infinite recursion
             model.refreshDone();
             return;
         }
 
-        containingDocument.startHandleOperation("model", "performing refresh", "model id", model.getEffectiveId());
+        indentedLogger.startHandleOperation("model", "performing refresh", "model id", model.getEffectiveId());
 
         // Update control bindings if needed
         updateControlBindingsIfNeeded(propertyContext);
@@ -1027,39 +1032,39 @@ public class XFormsControls implements XFormsObjectResolver {
                     final XBLContainer container = xformsControl.getXBLContainer();
 
                     if (isAllowSendingValueChangedEvents && (type & EventSchedule.VALUE) != 0) {
-                        container.dispatchEvent(propertyContext, new XFormsValueChangeEvent(xformsControl));
+                        container.dispatchEvent(propertyContext, new XFormsValueChangeEvent(containingDocument, xformsControl));
                     }
                     if (currentNodeInfo != null && currentNodeInfo instanceof NodeWrapper) {
                         if (isAllowSendingRequiredEvents && (type & EventSchedule.REQUIRED) != 0) {
                             final boolean currentRequiredState = InstanceData.getRequired(currentNodeInfo);
                             if (currentRequiredState) {
-                                container.dispatchEvent(propertyContext, new XFormsRequiredEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsRequiredEvent(containingDocument, xformsControl));
                             } else {
-                                container.dispatchEvent(propertyContext, new XFormsOptionalEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsOptionalEvent(containingDocument, xformsControl));
                             }
                         }
                         if (isAllowSendingRelevantEvents && (type & EventSchedule.RELEVANT) != 0) {
                             final boolean currentRelevantState = InstanceData.getInheritedRelevant(currentNodeInfo);
                             if (currentRelevantState) {
-                                container.dispatchEvent(propertyContext, new XFormsEnabledEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsEnabledEvent(containingDocument, xformsControl));
                             } else {
-                                container.dispatchEvent(propertyContext, new XFormsDisabledEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsDisabledEvent(containingDocument, xformsControl));
                             }
                         }
                         if (isAllowSendingReadonlyEvents && (type & EventSchedule.READONLY) != 0) {
                             final boolean currentReadonlyState = InstanceData.getInheritedReadonly(currentNodeInfo);
                             if (currentReadonlyState) {
-                                container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(containingDocument, xformsControl));
                             } else {
-                                container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(containingDocument, xformsControl));
                             }
                         }
                         if (isAllowSendingValidEvents && (type & EventSchedule.VALID) != 0) {
                             final boolean currentValidState = InstanceData.getValid(currentNodeInfo);
                             if (currentValidState) {
-                                container.dispatchEvent(propertyContext, new XFormsValidEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsValidEvent(containingDocument, xformsControl));
                             } else {
-                                container.dispatchEvent(propertyContext, new XFormsInvalidEvent(xformsControl));
+                                container.dispatchEvent(propertyContext, new XFormsInvalidEvent(containingDocument, xformsControl));
                             }
                         }
                     }
@@ -1089,34 +1094,34 @@ public class XFormsControls implements XFormsObjectResolver {
                                 final XBLContainer container = xformsControl.getXBLContainer();
 
                                 if (isAllowSendingRelevantEvents) {
-                                    container.dispatchEvent(propertyContext, new XFormsEnabledEvent(xformsControl));
+                                    container.dispatchEvent(propertyContext, new XFormsEnabledEvent(containingDocument, xformsControl));
                                 }
 
                                 // Also send other MIP events
                                 if (isAllowSendingRequiredEvents) {
                                     final boolean currentRequiredState = InstanceData.getRequired(currentNodeInfo);
                                     if (currentRequiredState) {
-                                        container.dispatchEvent(propertyContext, new XFormsRequiredEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsRequiredEvent(containingDocument, xformsControl));
                                     } else {
-                                        container.dispatchEvent(propertyContext, new XFormsOptionalEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsOptionalEvent(containingDocument, xformsControl));
                                     }
                                 }
 
                                 if (isAllowSendingReadonlyEvents) {
                                     final boolean currentReadonlyState = InstanceData.getInheritedReadonly(currentNodeInfo);
                                     if (currentReadonlyState) {
-                                        container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(containingDocument, xformsControl));
                                     } else {
-                                        container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(containingDocument, xformsControl));
                                     }
                                 }
 
                                 if (isAllowSendingValidEvents) {
                                     final boolean currentValidState = InstanceData.getValid(currentNodeInfo);
                                     if (currentValidState) {
-                                        container.dispatchEvent(propertyContext, new XFormsValidEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsValidEvent(containingDocument, xformsControl));
                                     } else {
-                                        container.dispatchEvent(propertyContext, new XFormsInvalidEvent(xformsControl));
+                                        container.dispatchEvent(propertyContext, new XFormsInvalidEvent(containingDocument, xformsControl));
                                     }
                                 }
                             }
@@ -1137,7 +1142,7 @@ public class XFormsControls implements XFormsObjectResolver {
             }
         } else {
             // No UI events to send because there is no event handlers for any of them
-            containingDocument.logDebug("model", "refresh skipping sending of UI events because no listener was found", "model id", model.getEffectiveId());
+            indentedLogger.logDebug("model", "refresh skipping sending of UI events because no listener was found", "model id", model.getEffectiveId());
 
             // NOTE: We clear for all models, as we are processing refresh events for all models here. This may have to be changed in the future.
             containingDocument.synchronizeInstanceDataEventState();
@@ -1148,7 +1153,7 @@ public class XFormsControls implements XFormsObjectResolver {
             model.refreshDone();
         }
 
-        containingDocument.endHandleOperation();
+        indentedLogger.endHandleOperation();
     }
 
     private void sendDefaultEventsForDisabledControl(PropertyContext propertyContext, XFormsControl xformsControl,
@@ -1159,17 +1164,17 @@ public class XFormsControls implements XFormsObjectResolver {
 
         // Control is disabled
         if (isAllowSendingRelevantEvents)
-            container.dispatchEvent(propertyContext, new XFormsDisabledEvent(xformsControl));
+            container.dispatchEvent(propertyContext, new XFormsDisabledEvent(containingDocument, xformsControl));
 
         // Send events for default MIP values
         if (isAllowSendingRequiredEvents)
-            container.dispatchEvent(propertyContext, new XFormsOptionalEvent(xformsControl));
+            container.dispatchEvent(propertyContext, new XFormsOptionalEvent(containingDocument, xformsControl));
 
         if (isAllowSendingReadonlyEvents)
-            container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(xformsControl));
+            container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(containingDocument, xformsControl));
 
         if (isAllowSendingValidEvents)
-            container.dispatchEvent(propertyContext, new XFormsValidEvent(xformsControl));
+            container.dispatchEvent(propertyContext, new XFormsValidEvent(containingDocument, xformsControl));
     }
 
     public static class EventSchedule {

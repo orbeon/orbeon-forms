@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -22,8 +23,8 @@ public class XXFormsSubmitReplaceEvent extends XFormsEvent {
 
     private final SubmissionResult submissionResult;
 
-    public XXFormsSubmitReplaceEvent(XFormsEventTarget targetObject, SubmissionResult submissionResult) {
-        super(XFormsEvents.XXFORMS_SUBMIT_REPLACE, targetObject, false, false);
+    public XXFormsSubmitReplaceEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, SubmissionResult submissionResult) {
+        super(containingDocument, XFormsEvents.XXFORMS_SUBMIT_REPLACE, targetObject, false, false);
         this.submissionResult = submissionResult;
     }
 

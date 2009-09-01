@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.URIProcessorOutputImpl;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Connection;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
@@ -98,8 +99,8 @@ public class XFormsURIResolver extends TransformerURIResolver {
                         }
                     };
 
-                    if (XFormsToXHTML.logger.isDebugEnabled())
-                        XFormsToXHTML.logger.debug("XForms - resolving resource through initialization resolver for URI: " + urlString);
+                    if (XFormsContainingDocument.isDebugEnabledStatic())
+                        XFormsContainingDocument.logDebugStatic("", "resolving resource through initialization resolver", "uri", urlString);
 
                     return new SAXSource(xmlReader, new InputSource(urlString));
                 } else {
@@ -149,22 +150,4 @@ public class XFormsURIResolver extends TransformerURIResolver {
             throw ValidationException.wrapException(e, new LocationData(urlString, -1, -1));
         }
     }
-
-    // This is currently not used
-//    public void readURLAsSAX(String urlString, String username, String password, ContentHandler contentHandler, String headersToForward) {
-//        try {
-//            final SAXSource source = (SAXSource) resolve(urlString, null, username, password, headersToForward);
-//
-//            final SAXResult saxResult = new SAXResult(contentHandler);
-//            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-//            identity.setResult(saxResult);
-//
-//            final XMLReader xmlReader = source.getXMLReader();
-//            xmlReader.setContentHandler(identity);
-//            xmlReader.parse(urlString);
-//
-//        } catch (Exception e) {
-//            throw ValidationException.wrapException(e, new LocationData(urlString, -1, -1));
-//        }
-//    }
 }

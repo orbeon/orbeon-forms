@@ -15,13 +15,13 @@ package org.orbeon.oxf.xforms.action;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -41,6 +41,8 @@ public class XFormsActionInterpreter {
     private final XBLContainer container;
     private final XFormsContainingDocument containingDocument;
 
+    private final IndentedLogger indentedLogger;
+
     private final XFormsControls xformsControls;
     private final XFormsContextStack contextStack;
 
@@ -49,6 +51,8 @@ public class XFormsActionInterpreter {
 
         this.container = container;
         this.containingDocument = container.getContainingDocument();
+
+        this.indentedLogger = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY);
 
         this.xformsControls = containingDocument.getControls();
         this.contextStack = new XFormsContextStack(container);
@@ -108,9 +112,10 @@ public class XFormsActionInterpreter {
                 }
             }
 
-            if (variablesCount > 0 && XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("action", "evaluated variables for outer action",
+            if (variablesCount > 0 && indentedLogger.isDebugEnabled()) {
+                indentedLogger.logDebug("interpreter", "evaluated variables for outer action",
                         "count", Integer.toString(variablesCount));
+            }
         }
 
         // Push binding for outermost action
@@ -123,6 +128,10 @@ public class XFormsActionInterpreter {
 
     public XFormsContainingDocument getContainingDocument() {
         return containingDocument;
+    }
+
+    public IndentedLogger getIndentedLogger() {
+        return indentedLogger;
     }
 
     public XFormsControls getXFormsControls() {
@@ -271,22 +280,22 @@ public class XFormsActionInterpreter {
             }
 
             // We are executing the action
-            if (XFormsServer.logger.isDebugEnabled()) {
+            if (indentedLogger.isDebugEnabled()) {
                 if (whileIterationAttribute == null)
-                    containingDocument.startHandleOperation("action", "executing", "action name", actionName);
+                    indentedLogger.startHandleOperation("interpreter", "executing", "action name", actionName);
                 else
-                    containingDocument.startHandleOperation("action", "executing", "action name", actionName, "while iteration", Integer.toString(whileIteration));
+                    indentedLogger.startHandleOperation("interpreter", "executing", "action name", actionName, "while iteration", Integer.toString(whileIteration));
             }
 
             // Get action and execute it
             final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
             xformsAction.execute(this, propertyContext, targetEffectiveId, eventObserver, actionElement, hasOverriddenContext, contextItem);
 
-            if (XFormsServer.logger.isDebugEnabled()) {
+            if (indentedLogger.isDebugEnabled()) {
                 if (whileIterationAttribute == null)
-                    containingDocument.endHandleOperation("action name", actionName);
+                    indentedLogger.endHandleOperation("action name", actionName);
                 else
-                    containingDocument.endHandleOperation("action name", actionName, "while iteration", Integer.toString(whileIteration));
+                    indentedLogger.endHandleOperation("action name", actionName, "while iteration", Integer.toString(whileIteration));
             }
 
             // Stop if there is no iteration
@@ -327,8 +336,8 @@ public class XFormsActionInterpreter {
         // Don't evaluate the condition if the context has gone missing
         {
             if (contextNodeset.size() == 0) {//  || containingDocument.getInstanceForNode((NodeInfo) contextNodeset.get(contextPosition - 1)) == null
-                if (XFormsServer.logger.isDebugEnabled())
-                    containingDocument.logDebug("action", "not executing", "action name", actionName, "condition type", conditionType, "reason", "missing context");
+                if (indentedLogger.isDebugEnabled())
+                    indentedLogger.logDebug("interpreter", "not executing", "action name", actionName, "condition type", conditionType, "reason", "missing context");
                 return false;
             }
         }
@@ -341,8 +350,8 @@ public class XFormsActionInterpreter {
         if (!(Boolean) conditionResult.get(0)) {
             // Don't execute action
 
-            if (XFormsServer.logger.isDebugEnabled())
-                containingDocument.logDebug("action", "not executing", "action name", actionName, "condition type", conditionType, "reason", "condition evaluated to 'false'", "condition", conditionAttribute);
+            if (indentedLogger.isDebugEnabled())
+                indentedLogger.logDebug("interpreter", "not executing", "action name", actionName, "condition type", conditionType, "reason", "condition evaluated to 'false'", "condition", conditionAttribute);
 
             return false;
         } else {

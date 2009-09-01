@@ -197,7 +197,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     @Override
     protected void persistEntry(StoreEntry storeEntry) {
 
-        if (XFormsStateManager.logger.isDebugEnabled()) {
+        if (isDebugEnabled()) {
             debug("persisting entry for key: " + storeEntry.key + " (" + (storeEntry.value.length() * 2) + " bytes).");
         }
 
@@ -301,7 +301,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
             }
             sessionToKeysMap.remove(sessionId);
 
-            if (expiredCount > 0 && XFormsStateManager.logger.isDebugEnabled())
+            if (expiredCount > 0 && isDebugEnabled())
                 debug("expired " + expiredCount + " entries for session " + sessionId + " (" + (storeSizeBeforeExpire - getCurrentStoreSize()) + " bytes).");
         }
     }
@@ -455,7 +455,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     @Override
     protected String findPersistedEntry(String key) {
 
-        if (XFormsStateManager.logger.isDebugEnabled()) {
+        if (isDebugEnabled()) {
             debug("finding persisting entry for key: " + key + ".");
         }
 

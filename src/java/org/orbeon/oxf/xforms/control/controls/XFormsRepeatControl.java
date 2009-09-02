@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -259,6 +260,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         // Move things around and create new iterations if needed
         if (!compareNodesets(oldRepeatNodeset, newRepeatNodeset)) {
             updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, insertedNodeInfos);
+            // Dispatch custom event to notify that the nodeset has changed
+            getXBLContainer().dispatchEvent(propertyContext, new XXFormsNodesetChangedEvent(containingDocument, this));
         }
     }
 

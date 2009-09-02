@@ -54,10 +54,10 @@
 
         </xforms:model>
         <xhtml:style type="text/css">
-            p                    { text-align: center }
-            .center              { margin-left: auto; margin-right: auto }
-            .search-logo         { margin-bottom: 1em; display: block }
-            .search-button       { margin-top: 1em; display: block }
+            p { text-align: center }
+            .center { margin-left: auto; margin-right: auto }
+            .search-logo { margin-bottom: 1em; display: block }
+            .search-button { margin-top: 1em; display: block; text-align: center; margin-left: auto; margin-right: auto }
             .xbl-fr-autocomplete { width: 16em; margin-top: 1em; margin-left: auto; margin-right: auto }
         </xhtml:style>
     </xhtml:head>
@@ -82,7 +82,7 @@
                 <xforms:send ev:event="DOMActivate" submission="google-search"/>
             </fr:autocomplete>
             <!-- Google Search button: triggers the 'google-search' submission -->
-            <xforms:trigger class="search-button center">
+            <xforms:trigger class="search-button">
                 <xforms:label>Google Search</xforms:label>
                 <xforms:send submission="google-search" ev:event="DOMActivate"/>
             </xforms:trigger>

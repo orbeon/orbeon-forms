@@ -275,198 +275,216 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final String eventName = event.getEventName();
 
         if (XFormsEvents.XXFORMS_SUBMIT_REPLACE.equals(eventName)) {
-
             // Custom event to process the response of asynchronous submissions
 
-            final XXFormsSubmitReplaceEvent replaceEvent = (XXFormsSubmitReplaceEvent) event;
-
-            // Big bag of initial runtime parameters
-            final SubmissionParameters p = new SubmissionParameters(propertyContext, eventName);
-            final SecondPassParameters p2 = new SecondPassParameters(propertyContext, p);
-            final SubmissionResult submissionResult = replaceEvent.getSubmissionResult();
-            handleSubmissionResult(propertyContext, p, p2, submissionResult);
+            doSubmitReplace(propertyContext, event);
 
         } else if (XFormsEvents.XFORMS_SUBMIT.equals(eventName) || XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
             // 11.1 The xforms-submit Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
-            containingDocument.setGotSubmission();
-
-            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
-
-            // Variables declared here as they are used in a catch/finally block
-            SubmissionParameters p = null;
-            String resolvedActionOrResource = null;
-            final long submissionStartTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
-
-            // Make sure submission element info is extracted
-            extractSubmissionElement();
-
-            try {
-                // Big bag of initial runtime parameters
-                p = new SubmissionParameters(propertyContext, eventName);
-
-                if (p.isDeferredSubmissionSecondPass)
-                    containingDocument.setGotSubmissionSecondPass();
-
-                // If a submission requiring a second pass was already set, then we ignore a subsequent submission but
-                // issue a warning
-                {
-                    final XFormsModelSubmission existingSubmission = containingDocument.getClientActiveSubmission();
-                    if (p.isDeferredSubmission && existingSubmission != null) {
-                        indentedLogger.logWarning("", "another submission requiring a second pass already exists",
-                                "existing submission", existingSubmission.getEffectiveId(),
-                                "new submission", this.getEffectiveId());
-                        return;
-                    }
-                }
-
-                /* ***** Update data model ************************************************************************** */
-
-                // "The data model is updated"
-                final XFormsModel modelForInstance;
-                if (p.refInstance != null) {
-                    modelForInstance = p.refInstance.getModel(containingDocument);
-                    {
-                        // NOTE: XForms 1.1 seems to say this should happen regardless of whether we serialize or not. If
-                        // the instance is not serialized and if no instance data is otherwise used for the submission,
-                        // this seems however unneeded.
-
-                        // TODO: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
-                        modelForInstance.rebuildRecalculateIfNeeded(propertyContext);
-                    }
-                } else {
-                    // Case where no instance was found
-                    modelForInstance = null;
-                }
-
-                /* ***** Handle deferred submission ***************************************************************** */
-
-                // Resolve the target AVT because XFormsServer requires it for deferred submission
-                resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsTarget);
-
-                // Deferred submission: end of the first pass
-                if (p.isDeferredSubmissionFirstPass) {
-
-                    // Create document to submit here because in case of error, an Ajax response will still be produced
-                    if (serialize) {
-                        createDocumentToSubmit(propertyContext, indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant);
-                    }
-
-                    // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
-                    containingDocument.setClientActiveSubmission(this);
-                    return;
-                }
-
-                /* ***** Submission second pass ********************************************************************* */
-
-                // Compute parameters only needed during second pass
-                final SecondPassParameters p2 = new SecondPassParameters(propertyContext, p);
-                resolvedActionOrResource = p2.actionOrResource; // in case of exception
-
-                /* ***** Serialization ****************************************************************************** */
-
-                // Get serialization requested from @method and @serialization attributes
-                final String requestedSerialization = getRequestedSerialization(p2.serialization, p.resolvedMethod);
-
-                final Document documentToSubmit;
-                if (serialize) {
-                    // Handle uploaded files if any
-                    final Element filesElement = (event instanceof XXFormsSubmitEvent) ? ((XXFormsSubmitEvent) event).getFilesElement() : null;
-                    if (filesElement != null) {
-                        // Handle all file elements
-
-                        // NOTE: We used to request handling of temp files only if NOT replace="all". Guessing the
-                        // rationale was that user would be navigating to new page anyway. However, this was not a
-                        // correct assumption: the page might load in another window/tab, result in an file being
-                        // downloaded, or simply the file might be used by the next page.
-                        XFormsUploadControl.handleFileElement(propertyContext, containingDocument, filesElement, null, true);
-                    }
-
-                    // Check if a submission requires file upload information
-                    if (requestedSerialization.startsWith("multipart/")) {
-                        // Annotate before re-rooting/pruning
-                        XFormsSubmissionUtils.annotateBoundRelevantUploadControls(propertyContext, containingDocument, p.refInstance);
-                    }
-
-                    // Create document to submit
-                    documentToSubmit = createDocumentToSubmit(propertyContext, indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant);
-
-                } else {
-                    // Don't recreate document
-                    documentToSubmit = null;
-                }
-
-                final String overriddenSerializedData;
-                if (serialize && !p.isDeferredSubmissionSecondPassReplaceAll) { // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
-                    // Fire xforms-submit-serialize
-
-                    // "The event xforms-submit-serialize is dispatched. If the submission-body property of the event
-                    // is changed from the initial value of empty string, then the content of the submission-body
-                    // property string is used as the submission serialization. Otherwise, the submission serialization
-                    // consists of a serialization of the selected instance data according to the rules stated at 11.9
-                    // Submission Options."
-
-                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(containingDocument, XFormsModelSubmission.this, p.refNodeInfo, requestedSerialization);
-                    container.dispatchEvent(propertyContext, serializeEvent);
-
-                    // TODO: rest of submission should happen upon default action of event
-
-                    overriddenSerializedData = serializeEvent.getSerializedData();
-                } else {
-                    overriddenSerializedData = null;
-                }
-
-                // Serialize
-                final SerializationParameters sp = new SerializationParameters(propertyContext, p, p2,
-                        requestedSerialization, documentToSubmit, overriddenSerializedData);
-
-                /* ***** Execute submission ************************************************************************* */
-
-                // Result information
-                SubmissionResult submissionResult = null;
-                final long externalSubmissionStartTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
-
-                try {
-                    // Iterate through submissions and run the first match
-                    for (Submission submission: submissions) {
-                        if (submission.isMatch(propertyContext, p, p2, sp)) {
-                            submissionResult = submission.connect(propertyContext, p, p2, sp);
-                            break;
-                        }
-                    }
-
-                    /* ***** Submission response ******************************************************************** */
-                    handleSubmissionResult(propertyContext, p, p2, submissionResult);
-                } finally {
-                    // Log time spent in submission if needed
-                    if (indentedLogger.isDebugEnabled()) {
-                        final long submissionTime = System.currentTimeMillis() - externalSubmissionStartTime;
-                        indentedLogger.logDebug("", "external submission time including handling returned body",
-                            "time", Long.toString(submissionTime));
-                    }
-                }
-            } catch (Throwable throwable) {
-                /* ***** Handle errors ****************************************************************************** */
-                if (p != null && p.isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument)) {
-                    // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
-                    throw new XFormsSubmissionException(this, throwable, "Error while processing xforms:submission", "processing submission");
-                } else {
-                    // Any exception will cause an error event to be dispatched
-                    sendSubmitError(propertyContext, resolvedActionOrResource, throwable);
-                }
-            } finally {
-                // Log total time spent in submission if needed
-                if (indentedLogger.isDebugEnabled()) {
-                    final long submissionTime = System.currentTimeMillis() - submissionStartTime;
-                    indentedLogger.logDebug("", "total submission time", "time", Long.toString(submissionTime));
-                }
-            }
+            doSubmit(propertyContext, event);
 
         } else if (XFormsEvents.XFORMS_BINDING_EXCEPTION.equals(eventName)) {
             // The default action for this event results in the following: Fatal error.
             throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(), event.getTargetObject().getLocationData());
         }
+    }
+
+    private void doSubmit(PropertyContext propertyContext, XFormsEvent event) {
+        containingDocument.setGotSubmission();
+
+        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+
+        // Variables declared here as they are used in a catch/finally block
+        SubmissionParameters p = null;
+        String resolvedActionOrResource = null;
+
+        // Make sure submission element info is extracted
+        extractSubmissionElement();
+
+        try {
+            // Big bag of initial runtime parameters
+            p = new SubmissionParameters(propertyContext, event.getEventName());
+
+            if (indentedLogger.isDebugEnabled()) {
+                final String message = p.isDeferredSubmissionFirstPass ? "submission first pass" : p.isDeferredSubmissionSecondPass ? "submission second pass" : "submission";
+                indentedLogger.startHandleOperation("", message, "id", getEffectiveId());
+            }
+
+            if (p.isDeferredSubmissionSecondPass)
+                containingDocument.setGotSubmissionSecondPass();
+
+            // If a submission requiring a second pass was already set, then we ignore a subsequent submission but
+            // issue a warning
+            {
+                final XFormsModelSubmission existingSubmission = containingDocument.getClientActiveSubmission();
+                if (p.isDeferredSubmission && existingSubmission != null) {
+                    indentedLogger.logWarning("", "another submission requiring a second pass already exists",
+                            "existing submission", existingSubmission.getEffectiveId(),
+                            "new submission", this.getEffectiveId());
+                    return;
+                }
+            }
+
+            /* ***** Update data model ****************************************************************************** */
+
+            // "The data model is updated"
+            final XFormsModel modelForInstance;
+            if (p.refInstance != null) {
+                modelForInstance = p.refInstance.getModel(containingDocument);
+                {
+                    // NOTE: XForms 1.1 seems to say this should happen regardless of whether we serialize or not. If
+                    // the instance is not serialized and if no instance data is otherwise used for the submission,
+                    // this seems however unneeded.
+
+                    // TODO: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
+                    modelForInstance.rebuildRecalculateIfNeeded(propertyContext);
+                }
+            } else {
+                // Case where no instance was found
+                modelForInstance = null;
+            }
+
+            /* ***** Handle deferred submission ********************************************************************* */
+
+            // Resolve the target AVT because XFormsServer requires it for deferred submission
+            resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsTarget);
+
+            // Deferred submission: end of the first pass
+            if (p.isDeferredSubmissionFirstPass) {
+
+                // Create document to submit here because in case of error, an Ajax response will still be produced
+                if (serialize) {
+                    createDocumentToSubmit(propertyContext, indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant);
+                }
+
+                // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
+                containingDocument.setClientActiveSubmission(this);
+                return;
+            }
+
+            /* ***** Submission second pass ************************************************************************* */
+
+            // Compute parameters only needed during second pass
+            final SecondPassParameters p2 = new SecondPassParameters(propertyContext, p);
+            resolvedActionOrResource = p2.actionOrResource; // in case of exception
+
+            /* ***** Serialization ********************************************************************************** */
+
+            // Get serialization requested from @method and @serialization attributes
+            final String requestedSerialization = getRequestedSerialization(p2.serialization, p.resolvedMethod);
+
+            final Document documentToSubmit;
+            if (serialize) {
+                // Handle uploaded files if any
+                final Element filesElement = (event instanceof XXFormsSubmitEvent) ? ((XXFormsSubmitEvent) event).getFilesElement() : null;
+                if (filesElement != null) {
+                    // Handle all file elements
+
+                    // NOTE: We used to request handling of temp files only if NOT replace="all". Guessing the
+                    // rationale was that user would be navigating to new page anyway. However, this was not a
+                    // correct assumption: the page might load in another window/tab, result in an file being
+                    // downloaded, or simply the file might be used by the next page.
+                    XFormsUploadControl.handleFileElement(propertyContext, containingDocument, filesElement, null, true);
+                }
+
+                // Check if a submission requires file upload information
+                if (requestedSerialization.startsWith("multipart/")) {
+                    // Annotate before re-rooting/pruning
+                    XFormsSubmissionUtils.annotateBoundRelevantUploadControls(propertyContext, containingDocument, p.refInstance);
+                }
+
+                // Create document to submit
+                documentToSubmit = createDocumentToSubmit(propertyContext, indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant);
+
+            } else {
+                // Don't recreate document
+                documentToSubmit = null;
+            }
+
+            final String overriddenSerializedData;
+            if (serialize && !p.isDeferredSubmissionSecondPassReplaceAll) { // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
+                // Fire xforms-submit-serialize
+
+                // "The event xforms-submit-serialize is dispatched. If the submission-body property of the event
+                // is changed from the initial value of empty string, then the content of the submission-body
+                // property string is used as the submission serialization. Otherwise, the submission serialization
+                // consists of a serialization of the selected instance data according to the rules stated at 11.9
+                // Submission Options."
+
+                final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(containingDocument, XFormsModelSubmission.this, p.refNodeInfo, requestedSerialization);
+                container.dispatchEvent(propertyContext, serializeEvent);
+
+                // TODO: rest of submission should happen upon default action of event
+
+                overriddenSerializedData = serializeEvent.getSerializedData();
+            } else {
+                overriddenSerializedData = null;
+            }
+
+            // Serialize
+            final SerializationParameters sp = new SerializationParameters(propertyContext, p, p2,
+                    requestedSerialization, documentToSubmit, overriddenSerializedData);
+
+            /* ***** Execute submission ***************************************************************************** */
+
+            // Result information
+            SubmissionResult submissionResult = null;
+
+            /* ***** Submission connection ************************************************************************** */
+            try {
+                if (indentedLogger.isDebugEnabled())
+                    indentedLogger.startHandleOperation("", "connection");
+
+                // Iterate through submissions and run the first match
+                for (Submission submission: submissions) {
+                    if (submission.isMatch(propertyContext, p, p2, sp)) {
+                        submissionResult = submission.connect(propertyContext, p, p2, sp);
+                        break;
+                    }
+                }
+            } finally {
+                if (indentedLogger.isDebugEnabled())
+                    indentedLogger.endHandleOperation("submitted asynchronously", Boolean.toString(submissionResult == null));
+            }
+            /* ***** Submission result processing ******************************************************************* */
+            if (submissionResult != null) {// submissionResult is null in case the submission is running asynchronously
+                try {
+                    if (indentedLogger.isDebugEnabled())
+                        indentedLogger.startHandleOperation("", "handling result");
+
+                    handleSubmissionResult(propertyContext, p, p2, submissionResult);
+                } finally {
+                    if (indentedLogger.isDebugEnabled())
+                        indentedLogger.endHandleOperation();
+                }
+            }
+        } catch (Throwable throwable) {
+            /* ***** Handle errors ********************************************************************************** */
+            if (p != null && p.isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument)) {
+                // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
+                throw new XFormsSubmissionException(this, throwable, "Error while processing xforms:submission", "processing submission");
+            } else {
+                // Any exception will cause an error event to be dispatched
+                sendSubmitError(propertyContext, resolvedActionOrResource, throwable);
+            }
+        } finally {
+            // Log total time spent in submission
+            if (indentedLogger.isDebugEnabled()) {
+                indentedLogger.endHandleOperation();
+            }
+        }
+    }
+
+    private void doSubmitReplace(PropertyContext propertyContext, XFormsEvent event) {
+        final XXFormsSubmitReplaceEvent replaceEvent = (XXFormsSubmitReplaceEvent) event;
+
+        // Big bag of initial runtime parameters
+        final SubmissionParameters p = new SubmissionParameters(propertyContext, event.getEventName());
+        final SecondPassParameters p2 = new SecondPassParameters(propertyContext, p);
+        final SubmissionResult submissionResult = replaceEvent.getSubmissionResult();
+        handleSubmissionResult(propertyContext, p, p2, submissionResult);
     }
 
     private void handleSubmissionResult(PropertyContext propertyContext, SubmissionParameters p, SecondPassParameters p2, SubmissionResult submissionResult) {
@@ -676,13 +694,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // o we don't check if we are requested not to with an attribute
             //
             // o we only check for replace="instance|none" and if serialization must take place
-        
-            
-            if (refInstance!= null && !containingDocument.isInitializing() && !containingDocument.isGotSubmissionSecondPass() && xxfFormsEnsureUploads && !isReplaceAll && serialize) {
-                hasBoundRelevantUploadControl = XFormsSubmissionUtils.hasBoundRelevantUploadControls(containingDocument, refInstance);
-            } else {
-                hasBoundRelevantUploadControl = false;
-            }
+            hasBoundRelevantUploadControl = refInstance != null && !containingDocument.isInitializing()
+                    && !containingDocument.isGotSubmissionSecondPass() && xxfFormsEnsureUploads && !isReplaceAll
+                    && serialize && XFormsSubmissionUtils.hasBoundRelevantUploadControls(containingDocument, refInstance);
         
             // Evaluate early AVTs
             xpathContext = new XPathCache.XPathContext(prefixToURIMap, contextStack.getCurrentVariables(), functionLibrary, functionContext, null, getLocationData());

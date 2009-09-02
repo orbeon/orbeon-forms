@@ -103,10 +103,10 @@
 
 
                 <xhtml:table id="{$id}-table"
-                    class="datatable datatable-{$id} yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
+                    class="datatable datatable-{$id} yui-dt-table {@class} {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
                     style="{$height} {$width}">
                     <!-- Copy attributes that are not parameters! -->
-                    <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id' ))]"/>
+                    <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id', 'class' ))]"/>
                     <xsl:if test="not(xhtml:colgroup)">
                         <!-- If there is no colgroup element, add one -->
                         <xhtml:colgroup>
@@ -505,7 +505,7 @@
 
     <xsl:template name="yui-dt-liner">
         <xsl:param name="position"/>
-        <xhtml:div class="yui-dt-liner datatable-cell-content dt-{$id}-col-{count(preceding-sibling::xhtml:th) + 1}">
+        <xhtml:div class="yui-dt-liner datatable-cell-content">
             <xhtml:span class="yui-dt-label">
                 <xsl:choose>
                     <xsl:when test="@fr:sortable = 'true' and $sortAndPaginationMode='external'">
@@ -669,7 +669,7 @@
             ">
 
             <xsl:apply-templates select="@*[name() != 'class']" mode="YUI"/>
-            <xhtml:div class="yui-dt-liner datatable-cell-content dt-{$id}-col-{count(preceding-sibling::xhtml:td) + 1}">
+            <xhtml:div class="yui-dt-liner datatable-cell-content">
                 <xsl:apply-templates select="node()" mode="YUI"/>
             </xhtml:div>
         </xhtml:td>

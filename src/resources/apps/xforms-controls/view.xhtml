@@ -286,9 +286,9 @@
                         <xforms:group>
                             <xforms:label class="fixed-width">Label/value:</xforms:label>
 
-                            <xforms:input ref="new-carrier/label" navindex="10"/>
-                            <xforms:input ref="new-carrier/value" navindex="11"/>
-                            <xforms:trigger navindex="12">
+                            <xforms:input ref="new-carrier/label" navindex="8"/>
+                            <xforms:input ref="new-carrier/value" navindex="9"/>
+                            <xforms:trigger navindex="10">
                                 <xforms:label>Add carrier</xforms:label>
                                 <xforms:hint>Add a carrier to the list of carriers</xforms:hint>
                                 <xforms:action  ev:event="DOMActivate">
@@ -306,7 +306,7 @@
                 <xforms:group appearance="xxforms:fieldset">
                     <xforms:label>Multiple Value Selection</xforms:label>
                     <xhtml:p>
-                        <xforms:select ref="flavor" appearance="full" navindex="8">
+                        <xforms:select ref="flavor" appearance="full" navindex="11">
                             <xforms:label class="fixed-width">Flavor:</xforms:label>
                             <xforms:itemset nodeset="instance('flavors-instance')/flavor">
                                 <xforms:label ref="label"/>
@@ -316,7 +316,7 @@
                         </xforms:select>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:select ref="flavor" appearance="compact" navindex="9">
+                        <xforms:select ref="flavor" appearance="compact" navindex="12">
                             <xforms:label class="fixed-width"/>
                             <xforms:itemset nodeset="instance('flavors-instance')/flavor">
                                 <xforms:label ref="label"/>
@@ -325,13 +325,21 @@
                             <xforms:help>Select as many items form the list as you want</xforms:help>
                         </xforms:select>
                     </xhtml:p>
+                    <fr:box-select ref="flavor">
+                        <xforms:label class="fixed-width"/>
+                        <xforms:itemset nodeset="instance('flavors-instance')/flavor">
+                            <xforms:label ref="label"/>
+                            <xforms:value ref="@value"/>
+                        </xforms:itemset>
+                        <xforms:help>Check as many checkboxes as you want</xforms:help>
+                    </fr:box-select>
                     <xhtml:p>
                         <xforms:group>
                             <xforms:label class="fixed-width">Label/value:</xforms:label>
 
-                            <xforms:input ref="new-flavor/label" navindex="10"/>
-                            <xforms:input ref="new-flavor/value" navindex="11"/>
-                            <xforms:trigger navindex="13">
+                            <xforms:input ref="new-flavor/label" navindex="13"/>
+                            <xforms:input ref="new-flavor/value" navindex="14"/>
+                            <xforms:trigger navindex="15">
                                 <xforms:label>Add flavor</xforms:label>
                                 <xforms:hint>Add a flavor to the list of flavors</xforms:hint>
                                 <xforms:action ev:event="DOMActivate">

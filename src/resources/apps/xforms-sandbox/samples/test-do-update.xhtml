@@ -45,8 +45,8 @@
                     // http://forge.ow2.org/tracker/index.php?func=detail&aid=313988&group_id=168&atid=350207
                     testTypeQuickly: function() {
 
-                        var emailInput = YAHOO.util.Dom.getChildren("email")[0];
-                        var confirmInput = YAHOO.util.Dom.getChildren("confirm")[0];
+                        var emailInput = YAHOO.util.Dom.get("email").getElementsByTagName("input")[0];
+                        var confirmInput = YAHOO.util.Dom.get("confirm").getElementsByTagName("input")[0];
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                             ORBEON.xforms.Document.setValue("email", "a");
                             window.setTimeout(function() {

@@ -71,7 +71,7 @@
 					},
 
 					triggerTest: function() {
-						var button = YAHOO.util.Dom.getElementsByClassName("xforms-trigger")[this.testType < 4 ? 0 : 1];
+						var button = YAHOO.util.Dom.get("triggers").getElementsByTagName("button")[this.testType < 4 ? 0 : 1];
 						button.click();
 						this.wait(this.checkConditions, XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS);
 					},
@@ -132,27 +132,28 @@
 
         <xforms:input ref="/root/*[number(/root/@position)] treat as element(a)"/>
 
+        <xforms:group id="triggers">
         <xforms:trigger>
-            <xforms:label>Server-side XPath error</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:setvalue ref="/root/@position" value="'2'"/>
-            </xforms:action>
-        </xforms:trigger>
+                <xforms:label>Server-side XPath error</xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:setvalue ref="/root/@position" value="'2'"/>
+                </xforms:action>
+            </xforms:trigger>
 
-        <xforms:trigger>
-            <xforms:label>Client-side JS error</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xxforms:script>
-					try {
-						invalidFunctionCall();
-					}
-					catch(e) {
-						var form = YAHOO.util.Dom.getElementsByClassName("xforms-form")[0];
-						ORBEON.xforms.Server.exceptionWhenTalkingToServer(e,form.id);
-					}
-				</xxforms:script>
-            </xforms:action>
-        </xforms:trigger>
-
+            <xforms:trigger>
+                <xforms:label>Client-side JS error</xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xxforms:script>
+                        try {
+                            invalidFunctionCall();
+                        }
+                        catch(e) {
+                            var form = YAHOO.util.Dom.getElementsByClassName("xforms-form")[0];
+                            ORBEON.xforms.Server.exceptionWhenTalkingToServer(e,form.id);
+                        }
+                    </xxforms:script>
+                </xforms:action>
+            </xforms:trigger>
+        </xforms:group>
     </xhtml:body>
 </xhtml:html>

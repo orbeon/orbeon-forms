@@ -678,7 +678,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 control.setBindingContext(propertyContext, newBindingContext);
 
                 // Update iterations
-                final List newIterations = ((XFormsRepeatControl) control).updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, null);
+                final List<XFormsRepeatIterationControl> newIterations = ((XFormsRepeatControl) control).updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, null);
 
                 // Remember newly created iterations so we don't recurse into them in startRepeatIteration()
                 for (Object newIteration: newIterations) {

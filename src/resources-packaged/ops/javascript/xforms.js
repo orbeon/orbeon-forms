@@ -1655,7 +1655,10 @@ ORBEON.xforms.Controls = {
             } else if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
                 return control.innerHTML;
             } else {
-                return ORBEON.util.Dom.getStringValue(control);
+                var spanWithValue = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                    ? control.getElementsByTagName("span")[0]
+                    : control;
+                return ORBEON.util.Dom.getStringValue(spanWithValue);
             }
         }
     },

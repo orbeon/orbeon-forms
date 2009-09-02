@@ -39,11 +39,6 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 	var plainId = this.table.getAttribute('id');
 	this.id = plainId.substring(0, plainId.length - '-table'.length);
 	var width = ORBEON.widgets.datatable.utils.getStyle(this.table, 'width', 'auto');
-	var pxWidth = this.table.clientWidth;
-	if (width.indexOf('%') != - 1) {
-		// Convert % into px...
-		width = pxWidth + 'px';
-	}
 	this.height = ORBEON.widgets.datatable.utils.getStyle(this.table, 'height', 'auto');
 	this.scrollV = YAHOO.util.Dom.hasClass(this.table, 'fr-scrollV');
 	this.scrollH = YAHOO.util.Dom.hasClass(this.table, 'fr-scrollH');
@@ -66,6 +61,17 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 	this.table.parentNode.replaceChild(this.container, this.table);
 	this.container.appendChild(this.headerContainer);
 	this.headerContainer.appendChild(this.header);
+
+    // the following block is required to calculate the width in a way that works for IE 6.0 :(
+    this.headerContainer.style.overflow="hidden";
+    this.headerContainer.style.width=width;
+    var pxWidth = this.headerContainer.clientWidth;
+    if (width.indexOf('%') != - 1) {
+        // Convert % into px...
+        width = pxWidth + 'px';
+    }
+    this.headerContainer.style.overflow="";
+    this.headerContainer.style.width="";
 
 	// See how big the table would be without its size restriction
 	if (this.scrollH) {
@@ -277,9 +283,12 @@ ORBEON.widgets.datatable.prototype.getTableHeightForWidth = function (width) {
 ORBEON.widgets.datatable.prototype.optimizeWidth = function (minWidth) {
     this.headerContainer.style.position="absolute";
     this.headerContainer.style.width="2500px";
+    var savedWidth =  this.table.style.width;
+    this.table.style.width = "auto";
     var width = this.table.clientWidth;
     this.headerContainer.style.position="";
     this.headerContainer.style.width="";
+    this.table.style.width = savedWidth;
     if (minWidth > width) {
         return minWidth;
     }

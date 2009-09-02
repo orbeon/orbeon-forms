@@ -286,6 +286,7 @@ ORBEON.widgets.datatable.prototype.optimizeWidth = function (minWidth) {
     var savedWidth =  this.table.style.width;
     this.table.style.width = "auto";
     var width = this.table.clientWidth;
+    this.tableHeight = this.table.clientHeight;
     this.headerContainer.style.position="";
     this.headerContainer.style.width="";
     this.table.style.width = savedWidth;

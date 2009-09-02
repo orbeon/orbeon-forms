@@ -203,8 +203,15 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
             var rule;
             // See _setColumnWidth in YUI datatable.js...
             if (YAHOO.env.ua.ie == 0) {
-                // This is a hack! We need to remove the prefix to match classes added in XSLT!
-                var className = '.dt-' + this.id.substring(this.id.lastIndexOf('$') + 1) + '-col-' + (j + 1);
+                var  className = 'dt-' + this.id + '-col-' + (j + 1);
+                className = className.replace('\$', '-', 'g');
+                YAHOO.util.Dom.addClass(childDiv, className);
+                for (var k = 0; k < this.bodyRows.length; k++) {
+                    var row = this.bodyRows[k];
+                    if (row.cells.length > j && ! YAHOO.util.Dom.hasClass(row, 'xforms-repeat-template')) {
+                        YAHOO.util.Dom.addClass(YAHOO.util.Selector.query('div', row.cells[j], true), className);
+                    }
+                }
                 if (! this.styleElt) {
                     this.styleElt = document.createElement('style');
                     this.styleElt.type = 'text/css';
@@ -212,10 +219,10 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
                 }
                 if (this.styleElt) {
                     if (this.styleElt.styleSheet && this.styleElt.styleSheet.addRule) {
-                        this.styleElt.styleSheet.addRule(classname, 'width:' + width);
+                        this.styleElt.styleSheet.addRule('.' + className, 'width:' + width);
                         rule = this.styleElt.styleSheet.rules[ this.styleElt.styleSheet.rules.length - 1];
                     } else if (this.styleElt.sheet && this.styleElt.sheet.insertRule) {
-                        this.styleElt.sheet.insertRule(className + ' {width:' + width + ';}', this.styleElt.sheet.cssRules.length);
+                        this.styleElt.sheet.insertRule('.' + className + ' {width:' + width + ';}', this.styleElt.sheet.cssRules.length);
                         rule = this.styleElt.sheet.cssRules[ this.styleElt.sheet.cssRules.length - 1];
                     }
                 }
@@ -305,26 +312,47 @@ ORBEON.widgets.datatable.prototype.rewriteColumnsWidths = function () {
         var divs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', headerColumn);
         if (divs.length > 0) {
             var div = divs[0];
-            if (div != undefined && div.style.width != "") {
-                var width = div.style.width;
-                var styles =[div.style];
-                for (var irow = 0; irow < this.bodyRows.length; irow++) {
-                    var row = this.bodyRows[irow];
-                    if (row.cells.length > icol) {
-                        var cell = row.cells[icol];
-                        var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
-                        if (cellDivs.length > 0) {
-                            var cellDiv = cellDivs[0];
-                            if (cellDiv != undefined) {
-                                cellDiv.style.width = width;
-                                styles[styles.length] = cellDiv.style;
+            if (div != undefined ) {
+                if (div.style.width != "") {
+                    // Resizing is supported through width attributes
+                    var width = div.style.width;
+                    var styles =[div.style];
+                    for (var irow = 0; irow < this.bodyRows.length; irow++) {
+                        var row = this.bodyRows[irow];
+                        if (row.cells.length > icol) {
+                            var cell = row.cells[icol];
+                            var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
+                            if (cellDivs.length > 0) {
+                                var cellDiv = cellDivs[0];
+                                if (cellDiv != undefined) {
+                                    cellDiv.style.width = width;
+                                    styles[styles.length] = cellDiv.style;
+                                }
                             }
                         }
                     }
-                }
-                var colResizer = this.colResizers[icol];
-                if (colResizer != undefined) {
-                    colResizer.setStyleArray(styles);
+                    var colResizer = this.colResizers[icol];
+                    if (colResizer != undefined) {
+                        colResizer.setStyleArray(styles);
+                    }
+                } else {
+                    // Resizing is supported through dynamic styles
+                    var  className = 'dt-' + this.id + '-col-' + (icol + 1);
+                    className = className.replace('\$', '-', 'g');                    
+                    for (var irow = 0; irow < this.bodyRows.length; irow++) {
+                        var row = this.bodyRows[irow];
+                        if (row.cells.length > icol) {
+                            var cell = row.cells[icol];
+                            var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
+                            if (cellDivs.length > 0) {
+                                var cellDiv = cellDivs[0];
+                                if (cellDiv != undefined) {
+                                    YAHOO.util.Dom.addClass(cellDiv, className);
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         }

@@ -25,6 +25,10 @@ public class OptimizedGetSubmission extends BaseSubmission {
         super(submission);
     }
 
+    public String getType() {
+        return "optimized get";
+    }
+
     public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
         return p.isHandlingOptimizedGet;

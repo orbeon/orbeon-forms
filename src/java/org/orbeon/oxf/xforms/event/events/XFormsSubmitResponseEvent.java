@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.ConnectionResult;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -116,12 +117,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
         }
     }
 
-    // TODO: Need this at XFormsEvent level
-    protected XFormsContainingDocument getContainingDocument() {
-        final XFormsEventTarget targetObject = getTargetObject();
-        if (targetObject instanceof XFormsModelSubmission)
-            return ((XFormsModelSubmission) targetObject).getContainingDocument();
-        else
-            return null;
+    protected IndentedLogger getIndentedLogger () {
+        return getContainingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
     }
 }

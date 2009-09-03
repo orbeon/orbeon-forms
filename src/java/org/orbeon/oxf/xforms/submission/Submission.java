@@ -21,6 +21,8 @@ import org.orbeon.oxf.util.PropertyContext;
  */
 public interface Submission {
 
+    public String getType();
+
     boolean isMatch(PropertyContext propertyContext,
                     XFormsModelSubmission.SubmissionParameters p,
                     XFormsModelSubmission.SecondPassParameters p2,

@@ -44,6 +44,10 @@ public class CacheableSubmission extends BaseSubmission {
         super(submission);
     }
 
+    public String getType() {
+        return "cacheable";
+    }
+
     public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
@@ -55,8 +59,6 @@ public class CacheableSubmission extends BaseSubmission {
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
         // Get the instance from shared instance cache
         // This can only happen is method="get" and replace="instance" and xxforms:cache="true" or xxforms:shared="application"
-
-        final IndentedLogger connectionLogger = getConnectionLogger(p, p2);
 
         // Convert URL to string
         final String absoluteResolvedURLString;
@@ -74,6 +76,8 @@ public class CacheableSubmission extends BaseSubmission {
             requestBodyHash = null;
         }
 
+        final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
+
         // Parameters to callable
         final String submissionEffectiveId = submission.getEffectiveId();
         final String instanceStaticId;
@@ -81,7 +85,7 @@ public class CacheableSubmission extends BaseSubmission {
         final String validation;
         {
             // Find and check replacement location
-            final XFormsInstance updatedInstance = checkInstanceToUpdate(propertyContext, connectionLogger, p);
+            final XFormsInstance updatedInstance = checkInstanceToUpdate(propertyContext, detailsLogger, p);
 
             instanceStaticId = updatedInstance.getId();
             modelEffectiveId = updatedInstance.getEffectiveModelId();
@@ -99,7 +103,7 @@ public class CacheableSubmission extends BaseSubmission {
 
         // Try from cache first
         final XFormsInstance cacheResult = XFormsServerSharedInstancesCache.instance().findConvertNoLoad(propertyContext,
-                connectionLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
+                detailsLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
                 handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
 
         if (cacheResult != null) {
@@ -112,17 +116,28 @@ public class CacheableSubmission extends BaseSubmission {
             // Return result
             return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
         } else {
+
+            final IndentedLogger timingLogger = getTimingLogger(p, p2);
+
             // Create callable for synchronous or asynchronous loading
             final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
                 public SubmissionResult call() {
+
+                    if (p2.isAsynchronous && timingLogger.isDebugEnabled())
+                        timingLogger.startHandleOperation("", "running asynchronous submission", "id", submission.getEffectiveId(), "cacheable", "true");
+
+                    final boolean[] status = { false , false};
                     try {
                         final XFormsInstance newInstance = XFormsServerSharedInstancesCache.instance().findConvert(propertyContext,
-                                connectionLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
+                                detailsLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
                                 handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument), timeToLive, validation,
                             new XFormsServerSharedInstancesCache.Loader() {
                                 public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId,
                                                                    String modelEffectiveId, String instanceSourceURI,
                                                                    boolean handleXInclude, long timeToLive, String validation) {
+
+                                    // Update status
+                                    status[0] = true;
 
                                     // Call regular submission
                                     SubmissionResult submissionResult = null;
@@ -140,6 +155,9 @@ public class CacheableSubmission extends BaseSubmission {
                                             // There was no throwable
                                             // We know that RegularSubmission returns a Replacer with an instance document
                                             final DocumentInfo documentInfo = (DocumentInfo) ((InstanceReplacer) submissionResult.getReplacer()).getResultingDocument();
+
+                                            // Update status
+                                            status[1] = true;
 
                                             // Create new shared instance
                                             return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, instanceSourceURI,
@@ -167,6 +185,10 @@ public class CacheableSubmission extends BaseSubmission {
                     } catch (Throwable throwable) {
                         // Any other throwable
                         return new SubmissionResult(submissionEffectiveId, throwable, null);
+                    } finally {
+                        if (p2.isAsynchronous && timingLogger.isDebugEnabled())
+                            timingLogger.endHandleOperation("id", submission.getEffectiveId(), "asynchronous", Boolean.toString(p2.isAsynchronous),
+                                    "loading attempted", Boolean.toString(status[0]), "deserialized", Boolean.toString(status[1]));
                     }
                 }
             };

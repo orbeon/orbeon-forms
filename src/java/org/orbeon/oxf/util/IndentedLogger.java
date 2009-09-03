@@ -56,8 +56,19 @@ public class IndentedLogger {
         this.prefix = prefix;
     }
 
-    public IndentedLogger(IndentedLogger indentedLogger) {
-        this(indentedLogger.logger, indentedLogger.isDebugEnabled, new Indentation(indentedLogger.indentation.indentation), indentedLogger.prefix);
+    /**
+     * Create a new IndentedLogger allowing overriding indentation and/or isDebugEnabled.
+     *
+     * @param indentedLogger    initial logger
+     * @param indentation       new indentation to use
+     * @param isDebugEnabled    new isDebugEnabled
+     */
+    public IndentedLogger(IndentedLogger indentedLogger, Indentation indentation, boolean isDebugEnabled) {
+        this(indentedLogger.logger, isDebugEnabled, indentation, indentedLogger.prefix);
+    }
+
+    public Indentation getIndentation() {
+        return indentation;
     }
 
     public final boolean isDebugEnabled() {

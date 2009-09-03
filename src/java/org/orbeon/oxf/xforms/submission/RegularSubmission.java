@@ -33,6 +33,10 @@ public class RegularSubmission extends BaseSubmission {
         super(submission);
     }
 
+    public String getType() {
+        return "regular";
+    }
+
     public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
         return true;
@@ -53,7 +57,8 @@ public class RegularSubmission extends BaseSubmission {
         // element.
         final String newForwardSubmissionHeaders = p.isReplaceAll ? forwardSubmissionHeaders + " user-agent" : forwardSubmissionHeaders;
 
-        final IndentedLogger connectionLogger = getConnectionLogger(p, p2);
+        final IndentedLogger timingLogger = getTimingLogger(p, p2);
+        final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
 
         // Evaluate headers if any
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(propertyContext, p.contextStack);
@@ -69,17 +74,24 @@ public class RegularSubmission extends BaseSubmission {
                 // Here we just want to run the submission and not touch the XFCD. Remember, we can't change XFCD
                 // because it may get out of the caches and not be picked up by further incoming Ajax requests.
 
-                // NOTE: If the submission was truly asynchronous, we should not touch ExternalContext either.
-                // But currently, since the submission actually runs at the end of a request, we do have access to
+                // NOTE: If the submission was truly asynchronous, we should not touch ExternalContext either. But
+                // currently, since the submission actually runs within the scope of a request, we do have access to
                 // ExternalContext, so we still use it.
 
+                if (p2.isAsynchronous && timingLogger.isDebugEnabled())
+                    timingLogger.startHandleOperation("", "running asynchronous submission", "id", submission.getEffectiveId());
+
                 // Open the connection
+                final boolean[] status = { false , false};
                 ConnectionResult connectionResult = null;
                 try {
-                    connectionResult = new Connection().open(externalContext, connectionLogger, isLogBody(),
+                    connectionResult = new Connection().open(externalContext, detailsLogger, isLogBody(),
                         p.actualHttpMethod, absoluteResolvedURL, p2.username, p2.password,
                         sp.actualRequestMediatype, sp.messageBody,
                         customHeaderNameValues, newForwardSubmissionHeaders);
+
+                    // Update status
+                    status[0] = true;
 
                     // Obtain replacer
                     final Replacer replacer = submission.getReplacer(propertyContext, connectionResult, p);
@@ -87,10 +99,17 @@ public class RegularSubmission extends BaseSubmission {
                     // Deserialize here so it can run in parallel
                     replacer.deserialize(propertyContext, connectionResult, p, p2);
 
+                    // Update status
+                    status[1] = true;
+
                     return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
                 } catch (Throwable throwable) {
                     // Exceptions are handled further down
                     return new SubmissionResult(submissionEffectiveId, throwable, connectionResult);
+                } finally {
+                    if (p2.isAsynchronous && timingLogger.isDebugEnabled())
+                        timingLogger.endHandleOperation("id", submission.getEffectiveId(), "asynchronous", Boolean.toString(p2.isAsynchronous),
+                                "connected", Boolean.toString(status[0]), "deserialized", Boolean.toString(status[1]));
                 }
             }
         };

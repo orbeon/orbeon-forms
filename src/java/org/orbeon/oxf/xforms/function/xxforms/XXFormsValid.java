@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.dom4j.Node;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.submission.XFormsSubmissionUtils;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
@@ -54,7 +54,8 @@ public class XXFormsValid extends XFormsFunction {
             // NOTE: Don't recurse if we don't have a NodeWrapper, as those don't support MIPs anyway yet
             final Node node = (Node) ((NodeWrapper) item).getUnderlyingNode();
             final XFormsContainingDocument containingDocument = getContainingDocument(xpathContext);
-            result = XFormsSubmissionUtils.isSatisfiesValidRequired(containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY), node, true, true, true);
+            // NOTE: Rationale for using XFormsModel.LOGGING_CATEGORY is that this regards instance validity.
+            result = XFormsSubmissionUtils.isSatisfiesValidRequired(containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY), node, true, true, true);
         } else {
             // Just return the value associated with this node
             result = XFormsSubmissionUtils.isSatisfiesValidRequired((NodeInfo) item, true, true);

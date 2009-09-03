@@ -596,6 +596,12 @@ public class XFormsContainingDocument extends XBLContainer {
             processBackgroundAsynchronousSubmissionsBatch(propertyContext);
     }
 
+    /**
+     * Process all current background submissions if any. Submissions are processed in the order in which they are made
+     * available upon termination by the completion service.
+     *
+     * @param propertyContext   current context
+     */
     private void processBackgroundAsynchronousSubmissionsBatch(PropertyContext propertyContext) {
 
         // Get then reset current batch list
@@ -617,6 +623,7 @@ public class XFormsContainingDocument extends XBLContainer {
                     // Process response by dispatching an event to the submission
                     final XFormsModelSubmission submission = (XFormsModelSubmission) getObjectByEffectiveId(result.getSubmissionEffectiveId());
                     final XBLContainer container = submission.getXBLContainer(this);
+                    // NOTE: not clear whether we should use an event for this as there doesn't seem to be a benefit
                     container.dispatchEvent(propertyContext, new XXFormsSubmitReplaceEvent(this, submission, result));
 
                 } catch (Throwable throwable) {
@@ -629,6 +636,10 @@ public class XFormsContainingDocument extends XBLContainer {
         }
     }
 
+    /**
+     * Process all current foreground submissions if any. Submissions are processed in the order in which they were
+     * executed.
+     */
     public void processForegroundAsynchronousSubmissions() {
         // NOTE: See http://wiki.orbeon.com/forms/doc/developer-guide/asynchronous-submissions
         if (hasForegroundAsynchronousSubmissions()) {

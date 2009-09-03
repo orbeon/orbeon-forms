@@ -35,6 +35,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
     this.headerRow = this.header.getElementsByTagName('thead')[0].getElementsByTagName('tr')[0];
 	this.headerColumns = this.headerRow.getElementsByTagName('th');
 	this.bodyRows = this.table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    this.nbRows = this.bodyRows.length;
 	this.bodyColumns = this.bodyRows[2].getElementsByTagName('td');
 	var plainId = this.table.getAttribute('id');
 	this.id = plainId.substring(0, plainId.length - '-table'.length);
@@ -316,56 +317,67 @@ ORBEON.widgets.datatable.prototype.adjustWidth = function (deltaX, index) {
 	}
 }
 
-ORBEON.widgets.datatable.prototype.rewriteColumnsWidths = function () {
-    for (var icol = 0; icol < this.headerColumns.length; icol++) {
-        var headerColumn = this.headerColumns[icol];
-        var divs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', headerColumn);
-        if (divs.length > 0) {
-            var div = divs[0];
-            if (div != undefined ) {
-                if (div.style.width != "") {
-                    // Resizing is supported through width attributes
-                    var width = div.style.width;
-                    var styles =[div.style];
-                    for (var irow = 0; irow < this.bodyRows.length; irow++) {
-                        var row = this.bodyRows[irow];
-                        if (row.cells.length > icol) {
-                            var cell = row.cells[icol];
-                            var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
-                            if (cellDivs.length > 0) {
-                                var cellDiv = cellDivs[0];
-                                if (cellDiv != undefined) {
-                                    cellDiv.style.width = width;
-                                    styles[styles.length] = cellDiv.style;
+ORBEON.widgets.datatable.prototype.update = function () {
+    // This method is called when the xforms:repeat nodeset has been changed
+    // this.nbRows is the number of rows memorized during the last run of this method...
+    if (this.nbRows == undefined) {
+        this.nbRows = -1;
+    }
+    var nbRows = this.bodyRows.length;
+    if (nbRows > this.nbRows) {
+        // If we have new rows, we need to (re)write their cells width
+        for (var icol = 0; icol < this.headerColumns.length; icol++) {
+            var headerColumn = this.headerColumns[icol];
+            var divs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', headerColumn);
+            if (divs.length > 0) {
+                var div = divs[0];
+                if (div != undefined ) {
+                    if (div.style.width != "") {
+                        // Resizing is supported through width attributes
+                        var width = div.style.width;
+                        var styles =[div.style];
+                        for (var irow = 0; irow < this.bodyRows.length; irow++) {
+                            var row = this.bodyRows[irow];
+                            if (row.cells.length > icol) {
+                                var cell = row.cells[icol];
+                                var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
+                                if (cellDivs.length > 0) {
+                                    var cellDiv = cellDivs[0];
+                                    if (cellDiv != undefined) {
+                                        cellDiv.style.width = width;
+                                        styles[styles.length] = cellDiv.style;
+                                    }
                                 }
                             }
                         }
-                    }
-                    var colResizer = this.colResizers[icol];
-                    if (colResizer != undefined) {
-                        colResizer.setStyleArray(styles);
-                    }
-                } else {
-                    // Resizing is supported through dynamic styles
-                    var  className = 'dt-' + this.id + '-col-' + (icol + 1);
-                    className = className.replace('\$', '-', 'g');                    
-                    for (var irow = 0; irow < this.bodyRows.length; irow++) {
-                        var row = this.bodyRows[irow];
-                        if (row.cells.length > icol) {
-                            var cell = row.cells[icol];
-                            var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
-                            if (cellDivs.length > 0) {
-                                var cellDiv = cellDivs[0];
-                                if (cellDiv != undefined) {
-                                    YAHOO.util.Dom.addClass(cellDiv, className);
+                        var colResizer = this.colResizers[icol];
+                        if (colResizer != undefined) {
+                            colResizer.setStyleArray(styles);
+                        }
+                    } else {
+                        // Resizing is supported through dynamic styles
+                        var  className = 'dt-' + this.id + '-col-' + (icol + 1);
+                        className = className.replace('\$', '-', 'g');
+                        for (var irow = 0; irow < this.bodyRows.length; irow++) {
+                            var row = this.bodyRows[irow];
+                            if (row.cells.length > icol) {
+                                var cell = row.cells[icol];
+                                var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
+                                if (cellDivs.length > 0) {
+                                    var cellDiv = cellDivs[0];
+                                    if (cellDiv != undefined) {
+                                        YAHOO.util.Dom.addClass(cellDiv, className);
+                                    }
                                 }
                             }
                         }
-                    }
 
+                    }
                 }
             }
         }
+
+        this.nbRows = nbRows;
 
     }
 }
@@ -547,7 +559,7 @@ ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
                 setTimeout(cmd, 100);
             }
         } else {
-            ORBEON.widgets.datatable.datatables[id].rewriteColumnsWidths();
+            ORBEON.widgets.datatable.datatables[id].update();
         }
     }
 
@@ -559,7 +571,7 @@ ORBEON.widgets.datatable.update = function (target) {
 	var id = container.id;
     if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled') ) {
         if (ORBEON.widgets.datatable.datatables[id] != undefined) {
-            ORBEON.widgets.datatable.datatables[id].rewriteColumnsWidths();
+            ORBEON.widgets.datatable.datatables[id].update();
         }
     }
 

@@ -47,6 +47,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 	this.headBodySplit = this.scroll;
 	this.hasFixedWidthContainer = width != 'auto';
 	this.hasFixedWidthTable = this.hasFixedWidthContainer && ! this.scrollH;
+    this.adjustHeightForIE = false;
 
 	// Create a global container
 	this.container = document.createElement('div');
@@ -112,6 +113,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 
 	if (this.scrollH && ! this.scrollV && this.height == 'auto' && YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8) {
 		this.height = (this.tableHeight + 22) + 'px';
+        this.adjustHeightForIE = true;
 	}
 
 	this.thead = YAHOO.util.Selector.query('thead', this.table, true);
@@ -376,10 +378,17 @@ ORBEON.widgets.datatable.prototype.update = function () {
                 }
             }
         }
-
-        this.nbRows = nbRows;
-
     }
+
+    this.nbRows = nbRows;
+
+    if (this.adjustHeightForIE) {
+        // We need to update the container height for old broken versions of IE :( ...
+        this.tableHeight = this.table.clientHeight;
+        this.height = (this.tableHeight + 22) + 'px';
+        this.bodyContainer.style.height = this.height;
+    }
+
 }
 
 ORBEON.widgets.datatable.scrollHandler = function (e) {

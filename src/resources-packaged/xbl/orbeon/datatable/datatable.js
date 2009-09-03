@@ -385,8 +385,11 @@ ORBEON.widgets.datatable.prototype.update = function () {
     if (this.adjustHeightForIE) {
         // We need to update the container height for old broken versions of IE :( ...
         this.tableHeight = this.table.clientHeight;
-        this.height = (this.tableHeight + 22) + 'px';
+        var bodyHeight =  this.tableHeight + 22;
+        this.height = bodyHeight + 'px';
         this.bodyContainer.style.height = this.height;
+        var height = bodyHeight + this.headerContainer.clientHeight;
+        this.container.style.height = height + 'px';
     }
 
 }

@@ -179,12 +179,12 @@ p, fieldset, table { margin-bottom: 1em }
 .fr-goto-content { border: 2px solid #888888; padding: .5em; float: left; margin-left: 1em }
 
 /* Make button appear the same color as a link */
-.xforms-trigger-appearance-xxforms-minimal {
+.xforms-trigger-appearance-xxforms-minimal, .xforms-trigger-appearance-xxforms-minimal button {
     color: #6E6E6E;
 }
 
 /* Set controls background */
-.xforms-input input, textarea.xforms-textarea, input.xforms-secret {
+.xforms-input input, textarea.xforms-textarea, input.xforms-secret, .xforms-textarea textarea, .xforms-secret input {
     background-image: url(field.png);
     background-repeat: repeat-x;
     border: 1px solid #ccc;

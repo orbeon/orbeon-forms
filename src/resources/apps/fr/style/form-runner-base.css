@@ -91,12 +91,12 @@
 }
 
 /* Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox) */
-button.xforms-trigger, input.xforms-trigger { white-space: nowrap }
-button.xforms-trigger img { margin-right: 10px }
+button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-trigger input { white-space: nowrap }
+button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 
 /* Make the button look like a link for noscript mode */
 /* TODO: add *zoom: 1 for IE? */
-.xforms-trigger-appearance-xxforms-minimal {
+.xforms-trigger-appearance-xxforms-minimal, .xforms-trigger-appearance-xxforms-minimal button {
     display: -moz-inline-box; display: inline-block;
     text-decoration: underline;
     font-size: inherit;
@@ -236,12 +236,14 @@ button.xforms-trigger img { margin-right: 10px }
     text-align: right;
 }
 
-.fr-buttons .xforms-trigger {
+.fr-buttons .xforms-trigger, .fr-buttons .xforms-trigger button, .fr-buttons .xforms-trigger input {
     width: 9.5em; *width: 9em
 }
 
 /* Special sizing for expand/collapse buttons */
-.fr-buttons #fr-collapse-all-button .xforms-trigger, .fr-buttons #fr-expand-all-button .xforms-trigger {
+.fr-buttons #fr-collapse-all-button .xforms-trigger, .fr-buttons #fr-expand-all-button .xforms-trigger,
+    .fr-buttons #fr-collapse-all-button .xforms-trigger button, .fr-buttons #fr-expand-all-button .xforms-trigger button {
+
     min-width: 2em;
     width: 2em;
     padding: 0;
@@ -429,8 +431,10 @@ button.xforms-trigger img { margin-right: 10px }
 .fr-grid .xforms-mediatype-image img { display: block }
 
 /*  Buttons */
-.fr-grid .fr-grid-content button.xforms-trigger, .fr-grid .fr-grid-content input.xforms-trigger { margin-top: 1.72em } /* hand-tuned so it appears at about the same pos as input fields*/
-.fr-grid .fr-grid-content button.xforms-trigger, .fr-grid .fr-grid-content .yui-button input.xforms-trigger { margin-top: 0 } /* except YUI buttons don't appear right with top margin! */ 
+.fr-grid .fr-grid-content button.xforms-trigger, .fr-grid .fr-grid-content input.xforms-trigger,
+    .fr-grid .fr-grid-content .xforms-trigger button, .fr-grid .fr-grid-content .xforms-trigger input { margin-top: 1.72em } /* hand-tuned so it appears at about the same pos as input fields*/
+.fr-grid .fr-grid-content button.xforms-trigger, .fr-grid .fr-grid-content .yui-button input.xforms-trigger,
+    .fr-grid .fr-grid-content .xforms-trigger button, .fr-grid .fr-grid-content .yui-button .xforms-trigger input { margin-top: 0 } /* except YUI buttons don't appear right with top margin! */
 
 /* Cell widths */
 .fr-grid-td { width: auto; vertical-align: top; overflow: hidden }

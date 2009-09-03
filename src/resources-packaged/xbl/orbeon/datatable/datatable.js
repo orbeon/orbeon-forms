@@ -38,7 +38,9 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
     this.nbRows = this.bodyRows.length;
 	this.bodyColumns = this.bodyRows[2].getElementsByTagName('td');
 	var plainId = this.table.getAttribute('id');
-	this.id = plainId.substring(0, plainId.length - '-table'.length);
+    //the following doesn't work in all the cases!
+	//this.id = plainId.substring(0, plainId.length - '-table'.length);
+    this.id = plainId;
 	var width = ORBEON.widgets.datatable.utils.getStyle(this.table, 'width', 'auto');
 	this.height = ORBEON.widgets.datatable.utils.getStyle(this.table, 'height', 'auto');
 	this.scrollV = YAHOO.util.Dom.hasClass(this.table, 'fr-scrollV');

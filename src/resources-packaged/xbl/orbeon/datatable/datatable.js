@@ -553,6 +553,18 @@ ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
 
 }
 
+ORBEON.widgets.datatable.update = function (target) {
+	// Updates a datatable when the xforms:repeat nodeset has been changed
+	var container = target.parentNode.parentNode;
+	var id = container.id;
+    if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled') ) {
+        if (ORBEON.widgets.datatable.datatables[id] != undefined) {
+            ORBEON.widgets.datatable.datatables[id].rewriteColumnsWidths();
+        }
+    }
+
+}
+
 // Comment/uncomment in normal/debug mode...
 //var myLogReader = new YAHOO.widget.LogReader();
 

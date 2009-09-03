@@ -131,99 +131,101 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
     @Override
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
         if (XFormsEvents.XXFORMS_DND.equals(event.getEventName())) {
-
-            // Only support this on DnD-enabled controls
-            if (!isDnD())
-                throw new ValidationException("Attempt to process xxforms-dnd event on non-DnD-enabled control: " + getEffectiveId(), getLocationData());
-
-            // Perform DnD operation on node data
-            final XXFormsDndEvent dndEvent = (XXFormsDndEvent) event;
-
-            // Get all repeat iteration details
-            final String[] dndStart = StringUtils.split(dndEvent.getDndStart(), '-');
-            final String[] dndEnd = StringUtils.split(dndEvent.getDndEnd(), '-');
-
-            // Find source information
-            final List<Item> sourceNodeset;
-            final int requestedSourceIndex;
-            {
-                sourceNodeset = getBindingContext().getNodeset();
-                requestedSourceIndex = Integer.parseInt(dndStart[dndStart.length - 1]);
-
-                if (requestedSourceIndex < 1 || requestedSourceIndex > sourceNodeset.size())
-                    throw new ValidationException("Out of range Dnd start iteration: " + requestedSourceIndex, getLocationData());
-            }
-
-            // Find destination
-            final List<Item> destinationNodeset;
-            final int requestedDestinationIndex;
-            {
-                final XFormsRepeatControl destinationControl;
-                if (dndEnd.length > 1) {
-                    // DnD destination is a different repeat control
-                    final String containingRepeatEffectiveId
-                            = getPrefixedId() + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1
-                                + StringUtils.join(dndEnd, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2, 0, dndEnd.length - 1);
-
-                    destinationControl = (XFormsRepeatControl) containingDocument.getObjectByEffectiveId(containingRepeatEffectiveId);
-                } else {
-                    // DnD destination is the current repeat control
-                    destinationControl = this;
-                }
-
-                destinationNodeset = new ArrayList<Item>(destinationControl.getBindingContext().getNodeset());
-                requestedDestinationIndex = Integer.parseInt(dndEnd[dndEnd.length - 1]);
-            }
-
-            // TODO: Detect DnD over repeat boundaries, and throw if not explicitly enabled
-
-            // Delete node from source
-            // NOTE: don't dispatch event, because one call to updateRepeatNodeset() is enough
-            final List deletedNodes = XFormsDeleteAction.doDelete(propertyContext, containingDocument,
-                    containingDocument.getControls().getIndentedLogger(), sourceNodeset, requestedSourceIndex, false);
-            final NodeInfo deletedNodeInfo = (NodeInfo) deletedNodes.get(0);
-
-            // Adjust destination collection to reflect new state
-            final int deletedNodePosition = destinationNodeset.indexOf(deletedNodeInfo);
-            final int actualDestinationIndex;
-            final String destinationPosition;
-            if (deletedNodePosition != -1) {
-                // Deleted node was part of the destination nodeset
-                // NOTE: This removes from our copy of the nodeset, not from the control's nodeset, which must not be touched until control bindings are updated
-                destinationNodeset.remove(deletedNodePosition);
-                // If the insertion position is after the delete node, must adjust it
-                if (requestedDestinationIndex <= deletedNodePosition + 1) {
-                    // Insertion point is before or on (degenerate case) deleted node
-                    actualDestinationIndex = requestedDestinationIndex;
-                    destinationPosition = "before";
-                } else {
-                    // Insertion point is after deleted node
-                    actualDestinationIndex = requestedDestinationIndex - 1;
-                    destinationPosition = "after";
-                }
-            } else {
-                // Deleted node was not part of the destination nodeset
-                if (requestedDestinationIndex <= destinationNodeset.size()) {
-                    // Position within nodeset
-                    actualDestinationIndex = requestedDestinationIndex;
-                    destinationPosition = "before";
-                } else {
-                    // Position at the end of the nodeset
-                    actualDestinationIndex = requestedDestinationIndex - 1;
-                    destinationPosition = "after";
-                }
-            }
-
-            // Insert nodes into destination
-            final NodeInfo insertContextNodeInfo = deletedNodeInfo.getParent();
-            // NOTE: Tell insert to not clone the node, as we know it is ready for insertion
-            XFormsInsertAction.doInsert(propertyContext, containingDocument, containingDocument.getControls().getIndentedLogger(),
-                    destinationPosition, destinationNodeset, insertContextNodeInfo, deletedNodes, actualDestinationIndex, false, true);
-
-            // TODO: should dispatch xxforms-move instead of xforms-insert?
-
+            doDnD(propertyContext, event);
         }
         super.performDefaultAction(propertyContext, event);
+    }
+
+    private void doDnD(PropertyContext propertyContext, XFormsEvent event) {
+        // Only support this on DnD-enabled controls
+        if (!isDnD())
+            throw new ValidationException("Attempt to process xxforms-dnd event on non-DnD-enabled control: " + getEffectiveId(), getLocationData());
+
+        // Perform DnD operation on node data
+        final XXFormsDndEvent dndEvent = (XXFormsDndEvent) event;
+
+        // Get all repeat iteration details
+        final String[] dndStart = StringUtils.split(dndEvent.getDndStart(), '-');
+        final String[] dndEnd = StringUtils.split(dndEvent.getDndEnd(), '-');
+
+        // Find source information
+        final List<Item> sourceNodeset;
+        final int requestedSourceIndex;
+        {
+            sourceNodeset = getBindingContext().getNodeset();
+            requestedSourceIndex = Integer.parseInt(dndStart[dndStart.length - 1]);
+
+            if (requestedSourceIndex < 1 || requestedSourceIndex > sourceNodeset.size())
+                throw new ValidationException("Out of range Dnd start iteration: " + requestedSourceIndex, getLocationData());
+        }
+
+        // Find destination
+        final List<Item> destinationNodeset;
+        final int requestedDestinationIndex;
+        {
+            final XFormsRepeatControl destinationControl;
+            if (dndEnd.length > 1) {
+                // DnD destination is a different repeat control
+                final String containingRepeatEffectiveId
+                        = getPrefixedId() + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1
+                            + StringUtils.join(dndEnd, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2, 0, dndEnd.length - 1);
+
+                destinationControl = (XFormsRepeatControl) containingDocument.getObjectByEffectiveId(containingRepeatEffectiveId);
+            } else {
+                // DnD destination is the current repeat control
+                destinationControl = this;
+            }
+
+            destinationNodeset = new ArrayList<Item>(destinationControl.getBindingContext().getNodeset());
+            requestedDestinationIndex = Integer.parseInt(dndEnd[dndEnd.length - 1]);
+        }
+
+        // TODO: Detect DnD over repeat boundaries, and throw if not explicitly enabled
+
+        // Delete node from source
+        // NOTE: don't dispatch event, because one call to updateRepeatNodeset() is enough
+        final List deletedNodes = XFormsDeleteAction.doDelete(propertyContext, containingDocument,
+                containingDocument.getControls().getIndentedLogger(), sourceNodeset, requestedSourceIndex, false);
+        final NodeInfo deletedNodeInfo = (NodeInfo) deletedNodes.get(0);
+
+        // Adjust destination collection to reflect new state
+        final int deletedNodePosition = destinationNodeset.indexOf(deletedNodeInfo);
+        final int actualDestinationIndex;
+        final String destinationPosition;
+        if (deletedNodePosition != -1) {
+            // Deleted node was part of the destination nodeset
+            // NOTE: This removes from our copy of the nodeset, not from the control's nodeset, which must not be touched until control bindings are updated
+            destinationNodeset.remove(deletedNodePosition);
+            // If the insertion position is after the delete node, must adjust it
+            if (requestedDestinationIndex <= deletedNodePosition + 1) {
+                // Insertion point is before or on (degenerate case) deleted node
+                actualDestinationIndex = requestedDestinationIndex;
+                destinationPosition = "before";
+            } else {
+                // Insertion point is after deleted node
+                actualDestinationIndex = requestedDestinationIndex - 1;
+                destinationPosition = "after";
+            }
+        } else {
+            // Deleted node was not part of the destination nodeset
+            if (requestedDestinationIndex <= destinationNodeset.size()) {
+                // Position within nodeset
+                actualDestinationIndex = requestedDestinationIndex;
+                destinationPosition = "before";
+            } else {
+                // Position at the end of the nodeset
+                actualDestinationIndex = requestedDestinationIndex - 1;
+                destinationPosition = "after";
+            }
+        }
+
+        // Insert nodes into destination
+        final NodeInfo insertContextNodeInfo = deletedNodeInfo.getParent();
+        // NOTE: Tell insert to not clone the node, as we know it is ready for insertion
+        XFormsInsertAction.doInsert(propertyContext, containingDocument, containingDocument.getControls().getIndentedLogger(),
+                destinationPosition, destinationNodeset, insertContextNodeInfo, deletedNodes, actualDestinationIndex, false, true);
+
+        // TODO: should dispatch xxforms-move instead of xforms-insert?
     }
 
     public boolean isDnD() {

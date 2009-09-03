@@ -847,7 +847,7 @@ public class XFormsStaticState {
      */
     private boolean isEventObserver(Element element) {
 
-        // Whether this is a built-in cointrol or a component
+        // Whether this is a built-in control or a component
         if (XFormsControlFactory.isBuiltinControl(element.getNamespaceURI(), element.getName()) || xblBindings.isComponent(element.getQName())) {
             return true;
         }
@@ -862,8 +862,8 @@ public class XFormsStaticState {
     }
 
     public void analyzeComponentTree(final PropertyContext propertyContext, final Configuration xpathConfiguration,
-                                      final String prefix, Element startElement, final FastStringBuffer repeatHierarchyStringBuffer,
-                                      final Stack<String> repeatAncestorsStack, boolean excludeModelEventHandlers) {
+                                     final String prefix, Element startElement, final FastStringBuffer repeatHierarchyStringBuffer,
+                                     final Stack<String> repeatAncestorsStack, boolean excludeModelEventHandlers) {
 
         final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(startElement.getDocument(), null, xpathConfiguration);
 

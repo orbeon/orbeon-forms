@@ -335,7 +335,7 @@ public class XFormsContextStack {
 
                     final BindingContext contextBindingContext = getCurrentBindingContext();
                     if (contextBindingContext != null && contextBindingContext.getNodeset().size() > 0) {
-                        // Evaluate new XPath in context if the current contex is not empty
+                        // Evaluate new XPath in context if the current context is not empty
 
                         pushTemporaryContext(contextBindingContext.getSingleItem());// provide context information for the context() function
                         newNodeset = XPathCache.evaluateKeepItems(propertyContext, contextBindingContext.getNodeset(), contextBindingContext.getPosition(),

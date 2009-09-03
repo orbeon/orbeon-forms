@@ -35,15 +35,13 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
     this.headerRow = this.header.getElementsByTagName('thead')[0].getElementsByTagName('tr')[0];
 	this.headerColumns = this.headerRow.getElementsByTagName('th');
 	this.bodyRows = this.table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    this.nbRows = this.bodyRows.length;
 	this.bodyColumns = this.bodyRows[2].getElementsByTagName('td');
 	var plainId = this.table.getAttribute('id');
-	this.id = plainId.substring(0, plainId.length - '-table'.length);
+    //the following doesn't work in all the cases!
+	//this.id = plainId.substring(0, plainId.length - '-table'.length);
+    this.id = plainId;
 	var width = ORBEON.widgets.datatable.utils.getStyle(this.table, 'width', 'auto');
-	var pxWidth = this.table.clientWidth;
-	if (width.indexOf('%') != - 1) {
-		// Convert % into px...
-		width = pxWidth + 'px';
-	}
 	this.height = ORBEON.widgets.datatable.utils.getStyle(this.table, 'height', 'auto');
 	this.scrollV = YAHOO.util.Dom.hasClass(this.table, 'fr-scrollV');
 	this.scrollH = YAHOO.util.Dom.hasClass(this.table, 'fr-scrollH');
@@ -51,6 +49,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 	this.headBodySplit = this.scroll;
 	this.hasFixedWidthContainer = width != 'auto';
 	this.hasFixedWidthTable = this.hasFixedWidthContainer && ! this.scrollH;
+    this.adjustHeightForIE = false;
 
 	// Create a global container
 	this.container = document.createElement('div');
@@ -66,6 +65,17 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 	this.table.parentNode.replaceChild(this.container, this.table);
 	this.container.appendChild(this.headerContainer);
 	this.headerContainer.appendChild(this.header);
+
+    // the following block is required to calculate the width in a way that works for IE 6.0 :(
+    this.headerContainer.style.overflow="hidden";
+    this.headerContainer.style.width=width;
+    var pxWidth = this.headerContainer.clientWidth;
+    if (width.indexOf('%') != - 1) {
+        // Convert % into px...
+        width = pxWidth + 'px';
+    }
+    this.headerContainer.style.overflow="";
+    this.headerContainer.style.width="";
 
 	// See how big the table would be without its size restriction
 	if (this.scrollH) {
@@ -105,6 +115,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 
 	if (this.scrollH && ! this.scrollV && this.height == 'auto' && YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8) {
 		this.height = (this.tableHeight + 22) + 'px';
+        this.adjustHeightForIE = true;
 	}
 
 	this.thead = YAHOO.util.Selector.query('thead', this.table, true);
@@ -203,8 +214,15 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
             var rule;
             // See _setColumnWidth in YUI datatable.js...
             if (YAHOO.env.ua.ie == 0) {
-                // This is a hack! We need to remove the prefix to match classes added in XSLT!
-                var className = '.dt-' + this.id.substring(this.id.lastIndexOf('$') + 1) + '-col-' + (j + 1);
+                var  className = 'dt-' + this.id + '-col-' + (j + 1);
+                className = className.replace('\$', '-', 'g');
+                YAHOO.util.Dom.addClass(childDiv, className);
+                for (var k = 0; k < this.bodyRows.length; k++) {
+                    var row = this.bodyRows[k];
+                    if (row.cells.length > j && ! YAHOO.util.Dom.hasClass(row, 'xforms-repeat-template')) {
+                        YAHOO.util.Dom.addClass(YAHOO.util.Selector.query('div', row.cells[j], true), className);
+                    }
+                }
                 if (! this.styleElt) {
                     this.styleElt = document.createElement('style');
                     this.styleElt.type = 'text/css';
@@ -212,10 +230,10 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
                 }
                 if (this.styleElt) {
                     if (this.styleElt.styleSheet && this.styleElt.styleSheet.addRule) {
-                        this.styleElt.styleSheet.addRule(classname, 'width:' + width);
+                        this.styleElt.styleSheet.addRule('.' + className, 'width:' + width);
                         rule = this.styleElt.styleSheet.rules[ this.styleElt.styleSheet.rules.length - 1];
                     } else if (this.styleElt.sheet && this.styleElt.sheet.insertRule) {
-                        this.styleElt.sheet.insertRule(className + ' {width:' + width + ';}', this.styleElt.sheet.cssRules.length);
+                        this.styleElt.sheet.insertRule('.' + className + ' {width:' + width + ';}', this.styleElt.sheet.cssRules.length);
                         rule = this.styleElt.sheet.cssRules[ this.styleElt.sheet.cssRules.length - 1];
                     }
                 }
@@ -270,9 +288,13 @@ ORBEON.widgets.datatable.prototype.getTableHeightForWidth = function (width) {
 ORBEON.widgets.datatable.prototype.optimizeWidth = function (minWidth) {
     this.headerContainer.style.position="absolute";
     this.headerContainer.style.width="2500px";
+    var savedWidth =  this.table.style.width;
+    this.table.style.width = "auto";
     var width = this.table.clientWidth;
+    this.tableHeight = this.table.clientHeight;
     this.headerContainer.style.position="";
     this.headerContainer.style.width="";
+    this.table.style.width = savedWidth;
     if (minWidth > width) {
         return minWidth;
     }
@@ -299,37 +321,79 @@ ORBEON.widgets.datatable.prototype.adjustWidth = function (deltaX, index) {
 	}
 }
 
-ORBEON.widgets.datatable.prototype.rewriteColumnsWidths = function () {
-    for (var icol = 0; icol < this.headerColumns.length; icol++) {
-        var headerColumn = this.headerColumns[icol];
-        var divs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', headerColumn);
-        if (divs.length > 0) {
-            var div = divs[0];
-            if (div != undefined && div.style.width != "") {
-                var width = div.style.width;
-                var styles =[div.style];
-                for (var irow = 0; irow < this.bodyRows.length; irow++) {
-                    var row = this.bodyRows[irow];
-                    if (row.cells.length > icol) {
-                        var cell = row.cells[icol];
-                        var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
-                        if (cellDivs.length > 0) {
-                            var cellDiv = cellDivs[0];
-                            if (cellDiv != undefined) {
-                                cellDiv.style.width = width;
-                                styles[styles.length] = cellDiv.style;
+ORBEON.widgets.datatable.prototype.update = function () {
+    // This method is called when the xforms:repeat nodeset has been changed
+    // this.nbRows is the number of rows memorized during the last run of this method...
+    if (this.nbRows == undefined) {
+        this.nbRows = -1;
+    }
+    var nbRows = this.bodyRows.length;
+    if (nbRows > this.nbRows) {
+        // If we have new rows, we need to (re)write their cells width
+        for (var icol = 0; icol < this.headerColumns.length; icol++) {
+            var headerColumn = this.headerColumns[icol];
+            var divs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', headerColumn);
+            if (divs.length > 0) {
+                var div = divs[0];
+                if (div != undefined ) {
+                    if (div.style.width != "") {
+                        // Resizing is supported through width attributes
+                        var width = div.style.width;
+                        var styles =[div.style];
+                        for (var irow = 0; irow < this.bodyRows.length; irow++) {
+                            var row = this.bodyRows[irow];
+                            if (row.cells.length > icol) {
+                                var cell = row.cells[icol];
+                                var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
+                                if (cellDivs.length > 0) {
+                                    var cellDiv = cellDivs[0];
+                                    if (cellDiv != undefined) {
+                                        cellDiv.style.width = width;
+                                        styles[styles.length] = cellDiv.style;
+                                    }
+                                }
                             }
                         }
+                        var colResizer = this.colResizers[icol];
+                        if (colResizer != undefined) {
+                            colResizer.setStyleArray(styles);
+                        }
+                    } else {
+                        // Resizing is supported through dynamic styles
+                        var  className = 'dt-' + this.id + '-col-' + (icol + 1);
+                        className = className.replace('\$', '-', 'g');
+                        for (var irow = 0; irow < this.bodyRows.length; irow++) {
+                            var row = this.bodyRows[irow];
+                            if (row.cells.length > icol) {
+                                var cell = row.cells[icol];
+                                var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
+                                if (cellDivs.length > 0) {
+                                    var cellDiv = cellDivs[0];
+                                    if (cellDiv != undefined) {
+                                        YAHOO.util.Dom.addClass(cellDiv, className);
+                                    }
+                                }
+                            }
+                        }
+
                     }
-                }
-                var colResizer = this.colResizers[icol];
-                if (colResizer != undefined) {
-                    colResizer.setStyleArray(styles);
                 }
             }
         }
-
     }
+
+    this.nbRows = nbRows;
+
+    if (this.adjustHeightForIE) {
+        // We need to update the container height for old broken versions of IE :( ...
+        this.tableHeight = this.table.clientHeight;
+        var bodyHeight =  this.tableHeight + 22;
+        this.height = bodyHeight + 'px';
+        this.bodyContainer.style.height = this.height;
+        var height = bodyHeight + this.headerContainer.clientHeight;
+        this.container.style.height = height + 'px';
+    }
+
 }
 
 ORBEON.widgets.datatable.scrollHandler = function (e) {
@@ -497,12 +561,31 @@ ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
 	// Initializes a datatable (called by xforms-enabled events)
 	var container = target.parentNode.parentNode;
 	var id = container.id;
-    if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled')) {
+    if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled') ) {
         if (ORBEON.widgets.datatable.datatables[id] == undefined) {
             var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
-            ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id, innerTableWidth);
+            var region = YAHOO.util.Region.getRegion(table);
+            if (region.left >= 0 && region.top >= 0) {
+                ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id, innerTableWidth);
+            } else {
+                //Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
+                var cmd = "ORBEON.widgets.datatable.init(document.getElementById('" + target.id + "'), " + innerTableWidth + ");";
+                setTimeout(cmd, 100);
+            }
         } else {
-            ORBEON.widgets.datatable.datatables[id].rewriteColumnsWidths();
+            ORBEON.widgets.datatable.datatables[id].update();
+        }
+    }
+
+}
+
+ORBEON.widgets.datatable.update = function (target) {
+	// Updates a datatable when the xforms:repeat nodeset has been changed
+	var container = target.parentNode.parentNode;
+	var id = container.id;
+    if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled') ) {
+        if (ORBEON.widgets.datatable.datatables[id] != undefined) {
+            ORBEON.widgets.datatable.datatables[id].update();
         }
     }
 

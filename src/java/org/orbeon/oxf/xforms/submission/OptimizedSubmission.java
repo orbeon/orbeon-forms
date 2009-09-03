@@ -42,6 +42,10 @@ public class OptimizedSubmission extends BaseSubmission {
         super(submission);
     }
 
+    public String getType() {
+        return "optimized";
+    }
+
     /**
      * Check whether optimized submission is allowed, depending on a series of conditions.
      *
@@ -51,7 +55,7 @@ public class OptimizedSubmission extends BaseSubmission {
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
         final ExternalContext.Request request = getExternalContext(propertyContext).getRequest();
-        final IndentedLogger indentedLogger = getIndentedLogger();
+        final IndentedLogger indentedLogger = getDetailsLogger(p, p2);
 
         final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
         if (isDebugEnabled) {
@@ -156,10 +160,6 @@ public class OptimizedSubmission extends BaseSubmission {
         // a new document so we don't dispatch xforms-submit-done and pass a null XFormsModelSubmission
         // in that case
 
-        final IndentedLogger indentedLogger = getIndentedLogger();
-        if (indentedLogger.isDebugEnabled())
-            indentedLogger.logDebug("", "starting optimized submission", "id", submission.getEffectiveId());
-
         // NOTE about headers forwarding: forward user-agent header for replace="all", since that *usually*
         // simulates a request from the browser! Useful in particular when the target URL renders XForms
         // in noscript mode, where some browser sniffing takes place for handling the <button> vs. <submit>
@@ -172,8 +172,8 @@ public class OptimizedSubmission extends BaseSubmission {
 
         final ConnectionResult connectionResult
                 = openOptimizedConnection(propertyContext, getExternalContext(propertyContext),
-                containingDocument, indentedLogger, p.isDeferredSubmissionSecondPassReplaceAll ? null : submission, p.actualHttpMethod,
-                resolvedURI.toString(), submission.isURLNorewrite(), sp.actualRequestMediatype, sp.messageBody,
+                containingDocument, getDetailsLogger(p, p2), p.isDeferredSubmissionSecondPassReplaceAll ? null : submission,
+                p.actualHttpMethod, resolvedURI.toString(), submission.isURLNorewrite(), sp.actualRequestMediatype, sp.messageBody,
                 sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues);
 
         if (connectionResult.dontHandleResponse) {

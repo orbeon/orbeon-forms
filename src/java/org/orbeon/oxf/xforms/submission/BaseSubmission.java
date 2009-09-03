@@ -45,10 +45,6 @@ public abstract class BaseSubmission implements Submission {
         return (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
     }
 
-    protected IndentedLogger getIndentedLogger() {
-        return containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
-    }
-
     protected URL getResolvedSubmissionURL(PropertyContext propertyContext, ExternalContext externalContext, String resolvedActionOrResource, String queryString) {
 
         final ExternalContext.Request request = externalContext.getRequest();
@@ -181,7 +177,11 @@ public abstract class BaseSubmission implements Submission {
     /**
      * Submit the Callable for synchronous or asynchronous execution.
      *
+     * @param p         parameters
+     * @param p2        parameters
+     * @param callable  callable performing the submission
      * @return ConnectionResult or null if asynchronous
+     * @throws Exception
      */
     protected SubmissionResult submitCallable(XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2, final Callable<SubmissionResult> callable) throws Exception {
         if (p2.isAsynchronous) {
@@ -201,14 +201,12 @@ public abstract class BaseSubmission implements Submission {
         }
     }
 
-    protected IndentedLogger getConnectionLogger(final XFormsModelSubmission.SubmissionParameters p, final XFormsModelSubmission.SecondPassParameters p2) {
-        if (p2.isAsynchronous && !p.isReplaceNone) {
-            // Background asynchronous submission creates a new logger with its own indentation
-            return new IndentedLogger(getIndentedLogger());
-        } else {
-            // Synchronous submission or foreground asynchronous submission uses current logger
-            return getIndentedLogger();
-        }
+    protected IndentedLogger getDetailsLogger(final XFormsModelSubmission.SubmissionParameters p, final XFormsModelSubmission.SecondPassParameters p2) {
+        return submission.getDetailsLogger(p, p2);
+    }
+
+    protected IndentedLogger getTimingLogger(final XFormsModelSubmission.SubmissionParameters p, final XFormsModelSubmission.SecondPassParameters p2) {
+        return submission.getTimingLogger(p, p2);
     }
 
     public static boolean isLogBody() {

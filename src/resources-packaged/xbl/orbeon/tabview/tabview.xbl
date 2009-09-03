@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+
+ 	<xbl:script type="text/javascript" src="/ops/yui/element/element-beta.js"/>
+    <xbl:script src="/ops/yui/tabview/tabview-min.js"/>
+
+    <xbl:binding id="fr-tabview" element="fr|tabview">
+        <xbl:resources>
+            <xbl:style src="/ops/yui/tabview/assets/skins/sam/tabview.css"/>
+        </xbl:resources>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xsl:transform version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+
+                <xsl:template match="/*">
+
+                    <!-- Initialization event -->
+                    <xforms:group ref="." id="fr-tabview-group" appearanc="xxforms:internal">
+
+                        <!-- TODO: This should not be necessary, but we need it until this bug is fixed:
+                             http://forge.ow2.org/tracker/index.php?func=detail&aid=313850&group_id=168&atid=350207 -->
+                        <xsl:copy-of select="namespace::*"/>
+                        <xsl:copy-of select="@class"/>
+
+                        <!-- Event handlers -->
+                        <xxforms:script ev:event="xforms-enabled" ev:target="fr-tabview-group">new YAHOO.widget.TabView(YAHOO.util.Dom.getElementsByClassName("yui-navset", null, this)[0]);</xxforms:script>
+
+                        <xhtml:div class="yui-navset">
+                            <xhtml:ul class="yui-nav">
+                                <xsl:for-each select="fr:tab">
+                                    <xhtml:li>
+                                        <xsl:if test="position() = 1">
+                                            <xsl:attribute name="class">selected</xsl:attribute>
+                                        </xsl:if>
+                                        <xhtml:a href="#tab{position()}"><xhtml:em><xsl:value-of select="xforms:label"/></xhtml:em></xhtml:a>
+                                    </xhtml:li>
+                                </xsl:for-each>
+                            </xhtml:ul>
+                            <xhtml:div class="yui-content">
+                                <xsl:for-each select="fr:tab">
+                                    <xhtml:div>
+                                        <xsl:apply-templates select="node() except xforms:label"/>
+                                    </xhtml:div>
+                                </xsl:for-each>
+                            </xhtml:div>
+                        </xhtml:div>
+                    </xforms:group>
+                </xsl:template>
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

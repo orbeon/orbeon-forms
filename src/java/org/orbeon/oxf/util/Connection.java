@@ -22,7 +22,6 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.resources.handler.HTTPURLConnection;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.FastStringBuffer;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -157,7 +156,7 @@ public class Connection {
                 final HttpServletRequest httpServletRequest = (HttpServletRequest) nativeRequest;
                 final Cookie[] cookies = httpServletRequest.getCookies();
 
-                StringBuffer sb = new StringBuffer();
+                final StringBuilder sb = new StringBuilder();
 
                 if (cookies != null) {
                     for (final Cookie cookie: cookies) {
@@ -545,7 +544,7 @@ public class Connection {
                 // SOAP POST
 
                 final Map<String, String> parameters = NetUtils.getContentTypeParameters(contentType);
-                final FastStringBuffer sb = new FastStringBuffer("text/xml");
+                final StringBuilder sb = new StringBuilder("text/xml");
 
                 // Extract charset parameter if present
                 // TODO: We have the body as bytes already, using the xforms:submission/@encoding attribute, so this is not right.
@@ -585,7 +584,7 @@ public class Connection {
                 // SOAP GET
 
                 final Map<String, String> parameters = NetUtils.getContentTypeParameters(contentType);
-                final FastStringBuffer sb = new FastStringBuffer(NetUtils.APPLICATION_SOAP_XML);
+                final StringBuilder sb = new StringBuilder(NetUtils.APPLICATION_SOAP_XML);
 
                 // Extract charset parameter if present
                 if (parameters != null) {

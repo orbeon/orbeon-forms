@@ -120,7 +120,9 @@ html body .xforms-form tr.xforms-disabled,
 
 .xforms-trigger-appearance-minimal img, .xforms-submit-appearance-minimal img { border: 0 }
 
-.xforms-trigger-appearance-xxforms-minimal, .xforms-submit-appearance-xxforms-minimal {
+.xforms-trigger-appearance-xxforms-minimal, .xforms-submit-appearance-xxforms-minimal,
+    .xforms-trigger-appearance-xxforms-minimal button, .xforms-submit-appearance-xxforms-minimal button {
+
     border: none;
     background: transparent;
     cursor: hand;
@@ -151,12 +153,12 @@ html body .xforms-form tr.xforms-disabled,
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
-.xforms-textarea {
+.xforms-textarea, .xforms-textarea textarea {
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
     font-family: Arial,Helvetica,Geneva,sans-serif
 }
 
-.xforms-secret {
+.xforms-secret, .xforms-secret input {
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
@@ -221,10 +223,13 @@ fieldset.xforms-select-appearance-full { margin: 0; border: none } /* when field
 .xforms-dialog-appearance-minimal .bd2 { padding: 3px; background-color: #fff }
 
 /* Reasonable defaults for alignment of button content */
-button.xforms-trigger img { vertical-align: middle }
-button.xforms-trigger span { vertical-align: middle }
-button.xforms-submit img { vertical-align: middle }
-button.xforms-submit span { vertical-align: middle }
+button.xforms-trigger img, .xforms-trigger button img,
+    button.xforms-trigger span, .xforms-trigger button span,
+    button.xforms-submit img, .xforms-submit button img,
+    button.xforms-submit span, .xforms-submit button span {
+
+    vertical-align: middle
+}
 
 /* Reasonable defaults for alignment of anchor content */
 a.xforms-trigger img { vertical-align: middle; cursor: pointer }

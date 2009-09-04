@@ -110,7 +110,13 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 			YAHOO.util.Dom.setStyle(this.table, 'width', this.innerTableWidth);
 			this.tableWidth = this.table.clientWidth;
 		} else {
-            this.tableWidth = this.optimizeWidth(this.tableWidth - 19);
+            var minWidth;
+            if (this.scrollV) {
+                minWidth = this.tableWidth - 19;
+            } else {
+                minWidth = this.tableWidth + 1;   // Adding one to be sure there is a scrollbar
+            }
+            this.tableWidth = this.optimizeWidth(minWidth);
 		}
 	} else if (this.scrollV) {
 		if (this.hasFixedWidthTable) {

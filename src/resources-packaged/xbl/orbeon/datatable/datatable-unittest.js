@@ -22,22 +22,20 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     toggleAccordionCase: function (targetId) {
         var dt = YAHOO.util.Dom.get('my-accordion$t-' + targetId);
-        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-            YAHOO.util.UserAction.click(dt, {clientX: 1});
-        }, function() {
-            return;
-        });
+        YAHOO.util.UserAction.click(dt, {clientX: 1});
      },
 
     openAccordionCase: function (targetId) {
         if (!this.isOpenAccordionCase(targetId)) {
             this.toggleAccordionCase(targetId);
+            this.wait(function(){this.openAccordionCase(targetId);}, 500);
         }
     },
 
     closeAccordionCase: function (targetId) {
         if (this.isOpenAccordionCase(targetId)) {
             this.toggleAccordionCase(targetId);
+            this.wait(function(){this.closeAccordionCase(targetId);}, 500);
         }
     },
 

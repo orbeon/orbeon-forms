@@ -31,6 +31,7 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 	YAHOO.log("Creating datatable index " + index, "info")
 	// Store useful stuff as properties
 	this.table = element;
+    this.index = index;
     this.innerTableWidth =innerTableWidth;
 	this.header = this.table;
     this.headerRow = this.header.getElementsByTagName('thead')[0].getElementsByTagName('tr')[0];
@@ -294,7 +295,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 
 }
 
-ORBEON.widgets.datatable.prototype.resize = function () {
+ORBEON.widgets.datatable.prototype.reset = function () {
     // undo the split so that the size can be computed accurately
     if (this.headBodySplit) {
         var body = this.table.tBodies[0];
@@ -302,18 +303,6 @@ ORBEON.widgets.datatable.prototype.resize = function () {
         this.header.appendChild(body);
         this.table = this.header;
     }
-    // remove the dynamic style sheet if it exists
-    if (this.styleElt != undefined) {
-        this.styleElt.parentNode.removeChild(this.styleElt);
-        this.styleElt = undefined;
-    }
-    // Remove style rules from containers
-    this.container.style.width = "";
-    this.container.style.height = "";
-    this.container.style.overflow = "";
-    this.headerContainer.style.width = "";
-    this.headerContainer.style.height = "";
-    this.headerContainer.style.overflow = "";
     // Restore styles rules to the table
     this.table.style.width = this.originalWidth;
     this.table.style.height = this.originalHeight;
@@ -343,11 +332,14 @@ ORBEON.widgets.datatable.prototype.resize = function () {
             }
         }
     }
-    // Reset the scrolling
-    this.headerContainer.scrollLeft = 0;
-
-
-    this.finish();
+    // Remove the containers
+    var parent = this.container.parentNode;
+    parent.replaceChild(this.table, this.container);
+    // remove the dynamic style sheet if it exists
+    if (this.styleElt != undefined) {
+        this.styleElt.parentNode.removeChild(this.styleElt);
+        this.styleElt = undefined;
+    }
 }
 
 ORBEON.widgets.datatable.prototype.getTableHeightForWidth = function (width) {
@@ -707,9 +699,17 @@ ORBEON.widgets.datatable.resizeWhenStabilized = function () {
         return;
     }
 
+    var oldDatatables = [];
     ORBEON.widgets.datatable.bodyWidthWhenResized = width;
 	for (table in ORBEON.widgets.datatable.datatables) {
-        ORBEON.widgets.datatable.datatables[table].resize();
+        var datatable =  ORBEON.widgets.datatable.datatables[table];
+        oldDatatables.push(datatable);
+        datatable.reset();
+    }
+    ORBEON.widgets.datatable.datatables = {};
+    for (table in oldDatatables) {
+        var datatable =  oldDatatables[table];
+        ORBEON.widgets.datatable.init(datatable.table.parentNode, datatable.innerTableWidth);
     }
 }
 

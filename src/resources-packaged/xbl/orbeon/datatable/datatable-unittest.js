@@ -46,13 +46,20 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         this.closeAccordionCase('_314211');
     },
 
+    test314174: function() {
+        this.openAccordionCase('_314174');
+        //TODO: test something here!
+        this.closeAccordionCase('_314174');
+    },
+    
     test314210: function() {
         this.openAccordionCase('_314210');
         var headerTable = YAHOO.util.Dom.get('my-accordion$table-314210$table-314210-table');
         YAHOO.util.Assert.isTrue(headerTable.clientWidth > headerTable.parentNode.clientWidth, 'The table header width (' + headerTable.clientWidth + 'px) should be larger than its container width (' + headerTable.parentNode.clientWidth + 'px).');
         this.closeAccordionCase('_314210');
-    }
+    },
 
+    EOS: ""
 }));
 
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {

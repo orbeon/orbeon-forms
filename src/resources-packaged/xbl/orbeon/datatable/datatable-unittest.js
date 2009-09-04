@@ -41,11 +41,11 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         }
     },
 
-    testSimplistic: function() {
-        this.openAccordionCase('simplistic');
-        var table = YAHOO.util.Dom.get('my-accordion$table-simplistic$table-simplistic-table');
+    test314211: function() {
+        this.openAccordionCase('_314211');
+        var table = YAHOO.util.Dom.get('my-accordion$table-314211$table-314211-table');
         YAHOO.util.Assert.isTrue(table.clientWidth < 300, 'The table width (' + table.clientWidth + "px) should be small, let's say < 300px...");
-        this.closeAccordionCase('simplistic');
+        this.closeAccordionCase('_314211');
     },
 
     test314210: function() {

@@ -32,6 +32,10 @@ public class EchoSubmission extends BaseSubmission {
         super(submission);
     }
 
+    public String getType() {
+        return "echo";
+    }
+
     public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
@@ -46,9 +50,8 @@ public class EchoSubmission extends BaseSubmission {
             throw new XFormsSubmissionException(submission, "Action 'test:': no message body.", "processing submission response");
         } else {
             // Log message body for debugging purposes
-            // TODO: complete logging
-            final IndentedLogger indentedLogger = getIndentedLogger();
-            if (indentedLogger.isDebugEnabled()) {
+            final IndentedLogger indentedLogger = getDetailsLogger(p, p2);
+            if (indentedLogger.isDebugEnabled() && isLogBody()) {
                 try {
                     Connection.logRequestBody(indentedLogger, sp.actualRequestMediatype, sp.messageBody);
                 } catch (UnsupportedEncodingException e) {

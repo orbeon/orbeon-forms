@@ -553,7 +553,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
                 // Find affected repeats and update their node-sets and indexes
                 final XFormsControls controls = container.getContainingDocument().getControls();
-                updateRepeatNodeset(propertyContext, controls, insertedNodeInfos);
+                updateRepeatNodesets(propertyContext, controls, insertedNodeInfos);
             }
         } else if (XFormsEvents.XFORMS_DELETE.equals(eventName)) {
             // New nodes were just deleted
@@ -564,20 +564,20 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             if (didDeleteNodes) {
                 // Find affected repeats and update them
                 final XFormsControls controls = container.getContainingDocument().getControls();
-                updateRepeatNodeset(propertyContext, controls, null);
+                updateRepeatNodesets(propertyContext, controls, null);
             }
         }
     }
 
-    private void updateRepeatNodeset(PropertyContext propertyContext, XFormsControls controls, List<Item> insertedNodeInfos) {
+    private void updateRepeatNodesets(PropertyContext propertyContext, XFormsControls controls, List<Item> insertedNodeInfos) {
         final Map<String, XFormsControl> repeatControlsMap = controls.getCurrentControlTree().getRepeatControls();
         if (repeatControlsMap != null) {
             // NOTE: Read in a list as the list of repeat controls may change within updateNodeset()
             final List<XFormsControl> repeatControls = new ArrayList<XFormsControl>(repeatControlsMap.values());
-            for (XFormsControl control: repeatControls) {
+            for (XFormsControl repeatControl: repeatControls) {
                 // Get a new reference to the control, in case it is no longer present in the tree due to earlier updates
                 // TODO: is this needed with new clone/update mechanism?
-                final XFormsRepeatControl newRepeatControl = (XFormsRepeatControl) controls.getObjectByEffectiveId(control.getEffectiveId());
+                final XFormsRepeatControl newRepeatControl = (XFormsRepeatControl) controls.getObjectByEffectiveId(repeatControl.getEffectiveId());
                 // Update node-set
                 if (newRepeatControl != null) {
 

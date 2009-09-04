@@ -1,22 +1,16 @@
 <!--
-    This example is based on a tutorial by Mark Birbeck, available at:
+  Copyright (C) 2009 Orbeon, Inc.
 
-        http://skimstone.x-port.net/index.php?q=node/89
-        
-    For the rest of the code:
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    Copyright (C) 2006 Orbeon, Inc.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
-
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
             xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -59,10 +53,12 @@
             #wsrp_rewrite_flickr-main-body, #flickr-main-body {
                 background-color : #eee;
                 border : 5px solid #333;
-                margin: 0px;
+                margin: 0;
                 padding : 10px;
                 display : block;
             }
+
+            .flickr-image div { display: inline }
 
             .flickr-image img {
                 border : 1px solid black;
@@ -75,8 +71,8 @@
             }
 
             .flicker-slider-table {
-                padding: 0px;
-                margin: 0px;
+                padding: 0;
+                margin: 0;
             }
 
             .flicker-slider-table th {

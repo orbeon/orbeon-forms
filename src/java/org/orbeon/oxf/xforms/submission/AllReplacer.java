@@ -35,8 +35,6 @@ public class AllReplacer extends BaseReplacer {
         // NOP
     }
 
-    //private void doReplaceAll(PipelineContext pipelineContext, ConnectionResult connectionResult, boolean deferredSubmissionSecondPassReplaceAll) throws IOException {
-
     public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
 
         // When we get here, we are in a mode where we need to send the reply directly to an external context, if any.

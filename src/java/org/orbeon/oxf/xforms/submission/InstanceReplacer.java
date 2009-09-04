@@ -48,7 +48,8 @@ public class InstanceReplacer extends BaseReplacer {
         // Deserialize here so it can run in parallel
         if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
             // XML media type
-            resultingDocument = deserializeInstance(propertyContext, p2.isReadonly, p2.isHandleXInclude, connectionResult);
+            final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
+            resultingDocument = deserializeInstance(propertyContext, detailsLogger, p2.isReadonly, p2.isHandleXInclude, connectionResult);
         } else {
             // Other media type is not allowed
             throw new XFormsSubmissionException(submission, "Body received with non-XML media type for replace=\"instance\": " + connectionResult.getResponseMediaType(), "processing instance replacement",
@@ -56,14 +57,13 @@ public class InstanceReplacer extends BaseReplacer {
         }
     }
 
-    private Object deserializeInstance(PropertyContext propertyContext, boolean isReadonly, boolean isHandleXInclude, ConnectionResult connectionResult) throws Exception {
+    private Object deserializeInstance(PropertyContext propertyContext, IndentedLogger indentedLogger, boolean isReadonly, boolean isHandleXInclude, ConnectionResult connectionResult) throws Exception {
         final Object resultingDocument;
 
         // Create resulting instance whether entire instance is replaced or not, because this:
         // 1. Wraps a Document within a DocumentInfo if needed
         // 2. Performs text nodes adjustments if needed
         try {
-            final IndentedLogger indentedLogger = getIndentedLogger();
             if (!isReadonly) {
                 // Resulting instance must not be read-only
 
@@ -137,7 +137,7 @@ public class InstanceReplacer extends BaseReplacer {
                         new XFormsSubmitErrorEvent(containingDocument, propertyContext, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult));
             }
 
-            final IndentedLogger indentedLogger = getIndentedLogger();
+            final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
 
             // Obtain root element to insert
             final NodeInfo newDocumentRootElement;
@@ -149,8 +149,8 @@ public class InstanceReplacer extends BaseReplacer {
                 if (!p2.isReadonly) {
                     // Resulting instance must not be read-only
 
-                    if (indentedLogger.isDebugEnabled())
-                        indentedLogger.logDebug("", "replacing instance with mutable instance",
+                    if (detailsLogger.isDebugEnabled())
+                        detailsLogger.logDebug("", "replacing instance with mutable instance",
                             "instance", updatedInstance.getEffectiveId());
 
                     newInstance = new XFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
@@ -159,8 +159,8 @@ public class InstanceReplacer extends BaseReplacer {
                 } else {
                     // Resulting instance must be read-only
 
-                    if (indentedLogger.isDebugEnabled())
-                        indentedLogger.logDebug("", "replacing instance with read-only instance",
+                    if (detailsLogger.isDebugEnabled())
+                        detailsLogger.logDebug("", "replacing instance with read-only instance",
                             "instance", updatedInstance.getEffectiveId());
 
                     newInstance = new ReadonlyXFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
@@ -204,7 +204,7 @@ public class InstanceReplacer extends BaseReplacer {
 
                 // Insert before the target node, so that the position of the inserted node
                 // wrt its parent does not change after the target node is removed
-                final List insertedNode = XFormsInsertAction.doInsert(propertyContext, containingDocument, indentedLogger, "before",
+                final List insertedNode = XFormsInsertAction.doInsert(propertyContext, containingDocument, detailsLogger, "before",
                         destinationCollection, destinationNodeInfo.getParent(),
                         Collections.singletonList(newDocumentRootElement), 1, false, true);
 
@@ -212,7 +212,7 @@ public class InstanceReplacer extends BaseReplacer {
                     // The node to replace is NOT a root element
 
                     // Perform the deletion of the selected node
-                    XFormsDeleteAction.doDelete(propertyContext, containingDocument, indentedLogger, destinationCollection, 1, true);
+                    XFormsDeleteAction.doDelete(propertyContext, containingDocument, detailsLogger, destinationCollection, 1, true);
                 }
 
                 // Perform model instance update

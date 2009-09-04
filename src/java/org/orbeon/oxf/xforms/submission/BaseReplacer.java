@@ -29,8 +29,8 @@ public abstract class BaseReplacer implements Replacer {
         this.containingDocument = containingDocument;
     }
 
-    protected IndentedLogger getIndentedLogger() {
-        return containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+    protected IndentedLogger getDetailsLogger(final XFormsModelSubmission.SubmissionParameters p, final XFormsModelSubmission.SecondPassParameters p2) {
+        return submission.getDetailsLogger(p, p2);
     }
 
     protected void dispatchSubmitDone(PropertyContext propertyContext, ConnectionResult connectionResult) {

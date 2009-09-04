@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.DocumentInfo;
@@ -64,8 +63,8 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     public XFormsSubmitErrorEvent(XFormsContainingDocument containingDocument, PropertyContext propertyContext, XFormsEventTarget targetObject, ErrorType errorType, ConnectionResult connectionResult) {
         super(containingDocument, XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, connectionResult);
         this.errorType = errorType;
-        
-        final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+
+        final IndentedLogger indentedLogger = getIndentedLogger();
 
         if (connectionResult != null) {
 
@@ -146,10 +145,9 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     public void setThrowable(Throwable throwable) {
         this.throwable = throwable;
 
-        final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
         if (errorType != ErrorType.VALIDATION_ERROR) {
             // Don't log validation errors as actual errors
-            indentedLogger.logError("xforms-submit-error", "setting throwable", "throwable", throwableToString(throwable));
+            getIndentedLogger().logError("xforms-submit-error", "setting throwable", "throwable", throwableToString(throwable));
         }
     }
 
@@ -164,9 +162,8 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     }
 
     private void setBodyDocument(DocumentInfo bodyDocument) {
-        final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
         if (XFormsProperties.getErrorLogging().contains("submission-error-body"))
-            indentedLogger.logError("xforms-submit-error", "setting body document", "body", "\n" + TransformerUtils.tinyTreeToString(bodyDocument));
+            getIndentedLogger().logError("xforms-submit-error", "setting body document", "body", "\n" + TransformerUtils.tinyTreeToString(bodyDocument));
         this.bodyDocument = bodyDocument;
     }
 
@@ -175,9 +172,8 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     }
 
     private void setBodyString(String bodyString) {
-        final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
         if (XFormsProperties.getErrorLogging().contains("submission-error-body"))
-            indentedLogger.logError("xforms-submit-error", "setting body string", "body", "\n" + bodyString);
+            getIndentedLogger().logError("xforms-submit-error", "setting body string", "body", "\n" + bodyString);
         this.bodyString = bodyString;
     }
 
@@ -187,8 +183,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
             // Return the body of the response if possible
 
             if ("body".equals(name)) {
-                final IndentedLogger indentedLogger = getContainingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
-                indentedLogger.logWarning("xforms-submit-error", "event('body') is deprecated. Use event('response-body') instead.");
+                getIndentedLogger().logWarning("xforms-submit-error", "event('body') is deprecated. Use event('response-body') instead.");
             }
 
             // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is

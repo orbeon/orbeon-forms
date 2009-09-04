@@ -632,6 +632,9 @@
                 </xsl:choose>
             </xsl:attribute>
         </xxforms:variable>
+        <xxforms:script ev:event="xxforms-nodeset-changed" ev:target="fr-datatable-repeat">
+                 ORBEON.widgets.datatable.update(this);     
+        </xxforms:script>
         <xforms:repeat id="fr-datatable-repeat" nodeset="$nodeset">
             <xsl:apply-templates select="@*[not(name()=('nodeset', 'id'))]|node()" mode="YUI"/>
         </xforms:repeat>

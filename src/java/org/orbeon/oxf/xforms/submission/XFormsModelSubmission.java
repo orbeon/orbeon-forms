@@ -294,7 +294,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     private void doSubmit(PropertyContext propertyContext, XFormsEvent event) {
         containingDocument.setGotSubmission();
 
-        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+        final IndentedLogger indentedLogger = getIndentedLogger();
 
         // Variables declared here as they are used in a catch/finally block
         SubmissionParameters p = null;
@@ -433,33 +433,25 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             SubmissionResult submissionResult = null;
 
             /* ***** Submission connection ************************************************************************** */
-            try {
-                if (indentedLogger.isDebugEnabled())
-                    indentedLogger.startHandleOperation("", "connection");
 
-                // Iterate through submissions and run the first match
-                for (Submission submission: submissions) {
-                    if (submission.isMatch(propertyContext, p, p2, sp)) {
+            // Iterate through submissions and run the first match
+            for (Submission submission: submissions) {
+                if (submission.isMatch(propertyContext, p, p2, sp)) {
+                    if (indentedLogger.isDebugEnabled())
+                        indentedLogger.startHandleOperation("", "connecting", "type", submission.getType());
+                    try {
                         submissionResult = submission.connect(propertyContext, p, p2, sp);
                         break;
+                    } finally {
+                        if (indentedLogger.isDebugEnabled())
+                            indentedLogger.endHandleOperation("submitted asynchronously", Boolean.toString(submissionResult == null));
                     }
                 }
-            } finally {
-                if (indentedLogger.isDebugEnabled())
-                    indentedLogger.endHandleOperation("submitted asynchronously", Boolean.toString(submissionResult == null));
             }
-            /* ***** Submission result processing ******************************************************************* */
-            if (submissionResult != null) {// submissionResult is null in case the submission is running asynchronously
-                try {
-                    if (indentedLogger.isDebugEnabled())
-                        indentedLogger.startHandleOperation("", "handling result");
 
-                    handleSubmissionResult(propertyContext, p, p2, submissionResult);
-                } finally {
-                    if (indentedLogger.isDebugEnabled())
-                        indentedLogger.endHandleOperation();
-                }
-            }
+            /* ***** Submission result processing ******************************************************************* */
+            handleSubmissionResult(propertyContext, p, p2, submissionResult);
+
         } catch (Throwable throwable) {
             /* ***** Handle errors ********************************************************************************** */
             if (p != null && p.isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument)) {
@@ -488,27 +480,26 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     }
 
     private void handleSubmissionResult(PropertyContext propertyContext, SubmissionParameters p, SecondPassParameters p2, SubmissionResult submissionResult) {
-        if (submissionResult != null) { // nothing to do if it is null
+        if (submissionResult != null) { // submissionResult is null in case the submission is running asynchronously
             try {
+                final IndentedLogger indentedLogger = getIndentedLogger();
+                if (indentedLogger.isDebugEnabled())
+                    indentedLogger.startHandleOperation("", "handling result");
                 try {
                     // Process the different types of response
-                    final Replacer replacer;
                     if (submissionResult.getReplacer() != null) {
-                        // Replacer provided
-                        replacer = submissionResult.getReplacer();
+                        // Replacer provided, perform replacement
+                        submissionResult.getReplacer().replace(propertyContext, submissionResult.getConnectionResult(), p, p2);
                     } else if (submissionResult.getThrowable() != null) {
                         // Propagate throwable, which might have come from a separate thread
                         sendSubmitError(propertyContext, submissionResult.getThrowable(), submissionResult);
-                        replacer = null;
                     } else {
-                        replacer = null;
+                        // Should not happen
                     }
-
-                    // Perform replacement
-                    if (replacer != null)
-                        replacer.replace(propertyContext, submissionResult.getConnectionResult(), p, p2);
-
                 } finally {
+                    if (indentedLogger.isDebugEnabled())
+                        indentedLogger.endHandleOperation();
+
                     // Clean-up result
                     submissionResult.close();
                 }
@@ -587,7 +578,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     if (p.isReplaceInstance || p.isReplaceText) {
                         // XForms 1.1 says it is fine not to have a body, but in most cases you will want to know that
                         // no instance replacement took place
-                        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+                        final IndentedLogger indentedLogger = getIndentedLogger();
                         indentedLogger.logWarning("", "instance or text replacement did not take place upon successful response because no body was provided.",
                                 "submission id", getEffectiveId());
                     }
@@ -1141,5 +1132,37 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             }
         }
         return documentToSubmit;
+    }
+
+    public IndentedLogger getIndentedLogger() {
+        return containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+    }
+
+    public IndentedLogger getDetailsLogger(final XFormsModelSubmission.SubmissionParameters p, final XFormsModelSubmission.SecondPassParameters p2) {
+        return getNewLogger(p, p2, getIndentedLogger(), isLogDetails());
+    }
+
+    public IndentedLogger getTimingLogger(final XFormsModelSubmission.SubmissionParameters p, final XFormsModelSubmission.SecondPassParameters p2) {
+        final IndentedLogger indentedLogger = getIndentedLogger();
+        return getNewLogger(p, p2, indentedLogger, indentedLogger.isDebugEnabled());
+    }
+
+    private static IndentedLogger getNewLogger(final XFormsModelSubmission.SubmissionParameters p, final XFormsModelSubmission.SecondPassParameters p2,
+                                        IndentedLogger indentedLogger, boolean newDebugEnabled) {
+        if (p2.isAsynchronous && !p.isReplaceNone) {
+            // Background asynchronous submission creates a new logger with its own independent indentation
+            final IndentedLogger.Indentation newIndentation = new IndentedLogger.Indentation(indentedLogger.getIndentation().indentation);
+            return new IndentedLogger(indentedLogger, newIndentation, newDebugEnabled);
+        } else if (indentedLogger.isDebugEnabled() != newDebugEnabled) {
+            // Keep shared indentation but use new debug setting
+            return new IndentedLogger(indentedLogger, indentedLogger.getIndentation(), newDebugEnabled);
+        } else {
+            // Synchronous submission or foreground asynchronous submission uses current logger
+            return indentedLogger;
+        }
+    }
+
+    private static boolean isLogDetails() {
+        return XFormsProperties.getDebugLogging().contains("submission-details");
     }
 }

@@ -556,7 +556,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
         if (XFormsEvents.XXFORMS_REPEAT_FOCUS.equals(event.getEventName()) || XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
 
-            // Try to update xforms:repeat indices based on this
+            // Try to update xforms:repeat indexes based on this
             {
                 // Find current path through ancestor xforms:repeat elements, if any
                 final List<String> repeatIterationsToModify = new ArrayList<String>();

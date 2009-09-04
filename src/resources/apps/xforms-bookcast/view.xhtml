@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2007 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:xforms="http://www.w3.org/2002/xforms"
@@ -176,7 +176,7 @@
         <style type="text/css">
             .xforms-label { font-weight: bold }
             .books-label { display: -moz-inline-box; display: inline-block; width: expression('9em'); min-width: 9em; }
-            .xforms-textarea-appearance-xxforms-autosize { width: 20em; margin-bottom: 2px  }
+            .xforms-textarea-appearance-xxforms-autosize, .xforms-textarea-appearance-xxforms-autosize textarea { width: 20em; margin-bottom: 2px  }
             .xforms-input input { width: 20em; margin-bottom: 2px }
             .xforms-select1 { margin-bottom: 2px }
             .xforms-select1 input { margin-bottom: 2px }
@@ -200,17 +200,17 @@
             <tr>
                 <td>
                     <xforms:submit submission="save-submission" appearance="minimal">
-                        <xforms:label><img src="../apps/xforms-bookcast/images/save.gif" alt="Save"/> Save</xforms:label>
+                        <xforms:label><img src="/apps/xforms-bookcast/images/save.gif" alt="Save"/> Save</xforms:label>
                     </xforms:submit>
                 </td>
                 <td>
                     <xforms:submit submission="list-submission" appearance="minimal">
-                        <xforms:label><img src="../apps/xforms-bookcast/images/recycle-green.png" alt="Revert"/> Revert</xforms:label>
+                        <xforms:label><img src="/apps/xforms-bookcast/images/recycle-green.png" alt="Revert"/> Revert</xforms:label>
                     </xforms:submit>
                 </td>
                 <td>
                     <xforms:submit submission="sample-data-submission" appearance="minimal">
-                        <xforms:label><img src="../apps/xforms-bookcast/images/add-all.gif" alt="Load Sample Data"/> Load Sample Data</xforms:label>
+                        <xforms:label><img src="/apps/xforms-bookcast/images/add-all.gif" alt="Load Sample Data"/> Load Sample Data</xforms:label>
                     </xforms:submit>
                 </td>
             </tr>
@@ -221,7 +221,7 @@
             <tr>
                 <td>
                     <xforms:trigger appearance="minimal">
-                        <xforms:label><img src="../apps/xforms-bookcast/images/add.gif"/></xforms:label>
+                        <xforms:label><img src="/apps/xforms-bookcast/images/add.gif"/></xforms:label>
                         <xforms:insert ev:event="DOMActivate" context="instance('books-instance')" nodeset="book" at="1" position="before" origin="instance('book-template')"/>
                     </xforms:trigger>
                 </td>
@@ -237,7 +237,7 @@
                     <td>
                         <xforms:trigger appearance="minimal">
                             <xforms:delete ev:event="DOMActivate" context="instance('books-instance')" nodeset="book" at="index('book-repeat')"/>
-                            <xforms:label><img src="../apps/xforms-bookcast/images/remove.gif"/></xforms:label>
+                            <xforms:label><img src="/apps/xforms-bookcast/images/remove.gif"/></xforms:label>
                         </xforms:trigger>
                     </td>
                     <td class="form-td">

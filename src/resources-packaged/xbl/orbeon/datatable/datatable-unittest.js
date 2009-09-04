@@ -13,7 +13,40 @@
  */
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "datatable"
+    name: "datatable",
+
+    isOpenAccordionCase: function(targetId) {
+        var dd = YAHOO.util.Dom.get('my-accordion$d-' + targetId);
+        return YAHOO.util.Dom.hasClass(dd, 'a-m-d-expand');
+    },
+
+    toggleAccordionCase: function (targetId) {
+        var dt = YAHOO.util.Dom.get('my-accordion$t-' + targetId);
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            YAHOO.util.UserAction.click(dt, {clientX: 1});
+        }, function() {
+            return;
+        });
+     },
+
+    openAccordionCase: function (targetId) {
+        if (!this.isOpenAccordionCase(targetId)) {
+            this.toggleAccordionCase(targetId);
+        }
+    },
+
+    closeAccordionCase: function (targetId) {
+        if (this.isOpenAccordionCase(targetId)) {
+            this.toggleAccordionCase(targetId);
+        }
+    },
+
+    test314210: function() {
+        this.openAccordionCase('_314210');
+        var headerTable = YAHOO.util.Dom.get('my-accordion$table-314210$table-314210-table');
+        YAHOO.util.Assert.isTrue(headerTable.clientWidth > headerTable.parentNode.clientWidth, 'The table header width (' + headerTable.clientWidth + 'px) should be larger than its container width (' + headerTable.parentNode.clientWidth + 'px).');
+        this.closeAccordionCase('_314210');
+    }
 
 /*
     getDl: function() {

@@ -92,6 +92,28 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
          }
     },
 
+    test314216: function() {
+        var thiss = this;
+        this.openAccordionCase('_314216', function(){
+            var th = YAHOO.util.Dom.get('my-accordion$table-314216$th-314216-2');
+            var resizerliner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(th, 'div', 'yui-dt-resizerliner');
+            var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-liner');
+            var resizer = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-resizer');
+            var region = YAHOO.util.Region.getRegion(resizer);
+            YAHOO.util.UserAction.mousedown(resizer, {clientX: region.right, clientY: region.top});
+            var x;
+            for (x=region.right; x > region.right - 100; x = x -5) {
+                YAHOO.util.UserAction.mousemove(resizer, {clientX: x, clientY: region.top});
+            }
+            YAHOO.util.UserAction.mouseup(resizer, {clientX: x, clientY: region.top});
+            YAHOO.util.Assert.isTrue(th.clientWidth > 0, 'The column width should be greater than 0, not ' + th.clientWidth);
+            var cssWidth = YAHOO.util.Dom.getStyle(liner, 'width');
+            var actualWidth = liner.clientWidth + "px";
+            YAHOO.util.Assert.areEqual(cssWidth, actualWidth);
+            thiss.closeAccordionCase('_314216');
+        });
+    },
+
     test314209: function() {
         var thiss = this;
         this.closeAccordionCase('_314209', function(){
@@ -105,7 +127,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
         });
     },
-    
+
     test314211: function() {
         var thiss = this;
         this.openAccordionCase('_314211', function() {

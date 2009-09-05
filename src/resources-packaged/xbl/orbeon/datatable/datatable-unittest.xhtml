@@ -102,12 +102,40 @@
         </xhtml:fieldset>
 
         <fr:accordion class="fr-accordion-lnf" id="my-accordion">
+            <fr:case selected="true" id="_314216">
+                <fr:label>#314216: reduce the width of the right column</fr:label>
+                <xhtml:div>
+                    <xhtml:p>Bug <xhtml:a
+                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314216&amp;group_id=168&amp;atid=350207"
+                            >314216</xhtml:a>.</xhtml:p>
+                    <fr:datatable id="table-314216">
+                        <xhtml:thead>
+                            <xhtml:tr>
+                                <xhtml:th fr:resizeable="true">Number</xhtml:th>
+                                <xhtml:th id="th-314216-2" fr:resizeable="true">Text</xhtml:th>
+                            </xhtml:tr>
+                        </xhtml:thead>
+                        <xhtml:tbody>
+                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                                <xhtml:tr>
+                                    <xhtml:td>
+                                        <xforms:output value="position()"/>
+                                    </xhtml:td>
+                                    <xhtml:td>
+                                        <xforms:output value="."/>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </xforms:repeat>
+                        </xhtml:tbody>
+                    </fr:datatable>
+                </xhtml:div>
+            </fr:case>
             <fr:case selected="true" id="_314209">
                 <fr:label>#314209: Hide/Show cycle</fr:label>
                 <xhtml:div>
                     <xhtml:p>Bug <xhtml:a
-                        href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314209&amp;group_id=168&amp;atid=350207"
-                        >314209</xhtml:a>.</xhtml:p>
+                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314209&amp;group_id=168&amp;atid=350207"
+                            >314209</xhtml:a>.</xhtml:p>
                     <fr:datatable id="table-314209" scrollable="horizontal" width="100%">
                         <xhtml:thead>
                             <xhtml:tr>

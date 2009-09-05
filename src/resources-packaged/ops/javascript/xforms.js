@@ -2034,6 +2034,9 @@ ORBEON.xforms.Controls = {
         message = ORBEON.util.String.escapeHTMLMinimal(message);
         ORBEON.xforms.Controls._setMessage(control, "help", message);
         ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.helpTooltipForControl);
+        // Enable the help image (it might be disabled if it was just copied from a repeat template)
+        var helpImage = ORBEON.xforms.Controls._getControlLabel(control, "help-image");
+        ORBEON.util.Dom.removeClass(helpImage, "xforms-disabled");
     },
 
     setValid: function(control, newValid) {
@@ -2981,7 +2984,7 @@ ORBEON.xforms.Events = {
                 var control = ORBEON.util.Dom.getElementById(target.htmlFor);
                 if (control) {
                     // The xforms:input is a unique case where the 'for' points to the input field, not the element representing the control
-                    if (YAHOO.util.Dom.hasClass(control, "xforms-input-input"))
+                    if (! YAHOO.util.Dom.hasClass(control, "xforms-control"))
                         control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
                     if (control && ORBEON.xforms.Globals.alertTooltipForControl[control.id] == null) {
                         var message = ORBEON.xforms.Controls.getAlertMessage(control);
@@ -6043,10 +6046,32 @@ ORBEON.xforms.Server = {
                                                 var childElements = YAHOO.util.Dom.getChildren(documentElement);
                                                 for (var childIndex = 0; childIndex < childElements.length; childIndex++) {
                                                     var childElement = childElements[childIndex];
-                                                    if (childElement.tagName.toLowerCase() != "label") {
+                                                    var childTagName = childElement.tagName.toLowerCase();
+                                                    if (childTagName != "label" && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help-image")) {
                                                         documentElement.removeChild(childElement);
                                                         if (lastLabelPosition == -1)
                                                             lastLabelPosition = childIndex - 1;
+                                                    }
+                                                }
+
+                                                function insertIntoDocument(nodes) {
+                                                    if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {
+                                                        // New markup: insert after "last label" (we remembered the position of the label after which there is real content)
+                                                        if (childElements.length == 0) {
+                                                            for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
+                                                                documentElement.appendChild(nodes[nodeIndex]);
+                                                        } else if (lastLabelPosition == -1) {
+                                                            var firstChild = YAHOO.util.Dom.getFirstChild(documentElement);
+                                                            for (var nodeIndex = nodes.length - 1; nodeIndex >= 0; nodeIndex--)
+                                                                YAHOO.util.Dom.insertBefore(nodes[nodeIndex], firstChild);
+                                                        } else {
+                                                            for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
+                                                                YAHOO.util.Dom.insertAfter(nodes[nodeIndex], childElements[lastLabelPosition]);
+                                                        }
+                                                    } else {
+                                                        // Old markup: insert in container, which will be empty
+                                                        for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
+                                                            documentElement.appendChild(nodes[nodeIndex]);
                                                     }
                                                 }
 
@@ -6056,32 +6081,36 @@ ORBEON.xforms.Server = {
                                                     newInputElement.className = "xforms-input-input " + typeClassName;
                                                     newInputElement.name = ORBEON.util.Utils.appendToEffectiveId(controlId, "$xforms-input-" + inputIndex);
                                                     newInputElement.id = newInputElement.name;
-                                                    documentElement.appendChild(newInputElement);
+                                                    return newInputElement;
+                                                }
+
+                                                function insertInputs(inputs) {
+                                                    insertIntoDocument(inputs);
                                                     // For non-W3C compliant browsers we must re-register a listener on the new element we just created
                                                     if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
-                                                        ORBEON.xforms.Init.registerChangeListenerOnFormElement(newInputElement);
+                                                        for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++)
+                                                            ORBEON.xforms.Init.registerChangeListenerOnFormElement(inputs[inputIndex]);
                                                     }
                                                 }
 
                                                 if (isStringType) {
-                                                    createInput("xforms-type-string", 1);
+                                                    insertInputs([createInput("xforms-type-string", 1)]);
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-string");
                                                 } else if (isDateType && !isMinimal) {
-                                                    createInput("xforms-type-date", 1);
+                                                    insertInputs([createInput("xforms-type-date", 1)]);
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
                                                 } else if (isDateType && isMinimal) {
                                                     // Create image element
                                                     var image = document.createElement("img");
                                                     image.setAttribute("src", ORBEON.xforms.Globals.resourcesBaseURL + "/ops/images/xforms/calendar.png");
                                                     image.className = "xforms-input-input xforms-type-date xforms-input-appearance-minimal";
-                                                    documentElement.appendChild(image);
+                                                    insertIntoDocument([image]);
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
                                                 } else if (isTimeType) {
-                                                    createInput("xforms-type-time", 1);
+                                                    insertInputs([createInput("xforms-type-time", 1)]);
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-time");
                                                 } else if (isDateTimeType) {
-                                                    createInput("xforms-type-date", 1);
-                                                    createInput("xforms-type-time", 2);
+                                                    insertInputs([createInput("xforms-type-date", 1), createInput("xforms-type-time", 2)]);
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-dateTime");
                                                 } else if (isBooleanType) {
 
@@ -6094,16 +6123,8 @@ ORBEON.xforms.Server = {
                                                     var templateLabelElement = templateClone.getElementsByTagName("label")[0];
                                                     templateLabelElement.parentNode.removeChild(templateLabelElement);
 
-                                                    // Insert in document
-                                                    if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {
-                                                        // New markup: insert after "last label" (we remembered the position of the label after which there is real content)
-                                                        YAHOO.util.Dom.insertAfter(templateClone, childElements[lastLabelPosition]);
-                                                    } else {
-                                                        // Old markup: insert in container, which will be empty
-                                                        documentElement.appendChild(templateClone);
-                                                    }
-
                                                     // Replace placeholders
+                                                    insertIntoDocument([templateClone]);
                                                     ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", "true");
                                                     var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e0");
                                                     ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-effective-id$", itemEffectiveId);

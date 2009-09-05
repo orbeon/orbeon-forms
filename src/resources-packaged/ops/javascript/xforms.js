@@ -2609,6 +2609,19 @@ ORBEON.xforms.Controls = {
                 return widget;
             }
         }
+    },
+
+    /**
+     * Called when a control is removed from the DOM. We garbage collect all the information we might store about this control.
+     */
+    deleteControl: function(control) {
+        ORBEON.xforms.Globals.serverValue[control.id] = null;
+        ORBEON.xforms.Globals.hintTooltipForControl[control.id] = null;
+        ORBEON.xforms.Globals.alertTooltipForControl[control.id] = null;
+        ORBEON.xforms.Globals.helpTooltipForControl[control.id] = null;
+        ORBEON.xforms.Globals.dialogs[control.id] = null;
+        ORBEON.xforms.Globals.dialogMinimalVisible[control.id] = null;
+        ORBEON.xforms.Globals.dialogMinimalLastMouseOut[control.id] = null;
     }
 };
 
@@ -2983,7 +2996,7 @@ ORBEON.xforms.Events = {
                 // do anything if there is no control found.
                 var control = ORBEON.util.Dom.getElementById(target.htmlFor);
                 if (control) {
-                    // The xforms:input is a unique case where the 'for' points to the input field, not the element representing the control
+                    // The 'for' can point to a form field which is inside the element representing the control
                     if (! YAHOO.util.Dom.hasClass(control, "xforms-control"))
                         control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
                     if (control && ORBEON.xforms.Globals.alertTooltipForControl[control.id] == null) {

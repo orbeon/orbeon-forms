@@ -11,6 +11,9 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
+
+var accordionAccessMethod = "api";
+
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
  
@@ -27,20 +30,29 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
      },
 
     openAccordionCase: function (targetId, callback) {
-//        var dt = YAHOO.util.Dom.get('my-accordion$t-' + targetId);
-//        var dd = YAHOO.util.Dom.get('my-accordion$d-' + targetId);
-//        YAHOO.util.Dom.addClass(dt, 'a-m-d-expand');
-//        YAHOO.util.Dom.addClass(dd, 'a-m-d-expand');
+        if (accordionAccessMethod == 'css') {
 
-//        var dl = YAHOO.util.Dom.get('my-accordion$dl');
-//        var dt = YAHOO.util.Dom.get('my-accordion$t-' + targetId);
-//        var dd = YAHOO.util.Dom.get('my-accordion$d-' + targetId);
-//        AccordionMenu.expandCase(dl, dt,dd);
+            var dt = YAHOO.util.Dom.get('my-accordion$t-' + targetId);
+            var dd = YAHOO.util.Dom.get('my-accordion$d-' + targetId);
+            YAHOO.util.Dom.addClass(dt, 'a-m-d-expand');
+            YAHOO.util.Dom.addClass(dd, 'a-m-d-expand');
 
-        if (!this.isOpenAccordionCase(targetId)) {
-            this.toggleAccordionCase(targetId);
-         }
-         if (this.isOpenAccordionCase(targetId)) {
+        } else if (accordionAccessMethod == 'api') {
+
+            var dl = YAHOO.util.Dom.get('my-accordion$dl');
+            var dt = YAHOO.util.Dom.get('my-accordion$t-' + targetId);
+            var dd = YAHOO.util.Dom.get('my-accordion$d-' + targetId);
+            AccordionMenu.expandCase(dl, dt,dd);
+
+        } else /* click */ {
+
+            if (!this.isOpenAccordionCase(targetId)) {
+                this.toggleAccordionCase(targetId);
+            }
+        }
+
+        // Check if the action has been done and call back
+        if (this.isOpenAccordionCase(targetId)) {
             if (callback) {
                 callback.call();
             }
@@ -50,19 +62,27 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     },
 
     closeAccordionCase: function (targetId, callback) {
-//        var dt = YAHOO.util.Dom.get('my-accordion$t-' + targetId);
-//        var dd = YAHOO.util.Dom.get('my-accordion$d-' + targetId);
-//        YAHOO.util.Dom.removeClass(dt, 'a-m-d-expand');
-//        YAHOO.util.Dom.removeClass(dd, 'a-m-d-expand');
+        if (accordionAccessMethod == 'css') {
 
-//        var dl = YAHOO.util.Dom.get('my-accordion$dl');
-//        var dt = YAHOO.util.Dom.get('my-accordion$t-' + targetId);
-//        var dd = YAHOO.util.Dom.get('my-accordion$d-' + targetId);
-//        AccordionMenu.collapseCase(dl, dt,dd);
+            var dt = YAHOO.util.Dom.get('my-accordion$t-' + targetId);
+            var dd = YAHOO.util.Dom.get('my-accordion$d-' + targetId);
+            YAHOO.util.Dom.removeClass(dt, 'a-m-d-expand');
+            YAHOO.util.Dom.removeClass(dd, 'a-m-d-expand');
 
-        if (this.isOpenAccordionCase(targetId)) {
-            this.toggleAccordionCase(targetId);
+        } else if (accordionAccessMethod == 'api') {
+
+            var dl = YAHOO.util.Dom.get('my-accordion$dl');
+            var dt = YAHOO.util.Dom.get('my-accordion$t-' + targetId);
+            var dd = YAHOO.util.Dom.get('my-accordion$d-' + targetId);
+            AccordionMenu.collapseCase(dl, dt,dd);
+
+        } else /* click */ {
+            if (this.isOpenAccordionCase(targetId)) {
+                this.toggleAccordionCase(targetId);
+            }
         }
+
+        // Check if the action has been done and call back
          if (!this.isOpenAccordionCase(targetId)) {
             if (callback) {
                 callback.call();

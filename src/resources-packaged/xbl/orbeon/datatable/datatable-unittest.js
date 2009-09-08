@@ -169,9 +169,10 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             var width2 = th2.clientWidth;
             thiss.resizeColumn(th2, 100, 10);
             thiss.checkTableAndContainerWidths(table);
-            YAHOO.util.Assert.areEqual(width1, th1.clientWidth, "The wdith of the first column shouldn't change (before: " + width1 + ", after: " + width2 + ").");
+            YAHOO.util.Assert.areEqual(width1, th1.clientWidth, "The width of the first column shouldn't change (before: " + width1 + ", after: " + width2 + ").");
             YAHOO.util.Assert.areEqual(width2 + 100, th2.clientWidth, "The width of the second column should be " + (width2 + 100) + ", not " + th2.clientWidth);
             thiss.checkRowWidth(table.tHead.rows[0]);
+            thiss.closeAccordionCase('widths-resizeable');
         });
     },
 
@@ -188,6 +189,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             YAHOO.util.Assert.areEqual(width1, th1.clientWidth, "The wdith of the first column shouldn't change (before: " + width1 + ", after: " + width2 + ").");
             YAHOO.util.Assert.areEqual(width2 -100, th2.clientWidth, "The width of the second column should be " + (width2 - 100) + ", not " + th2.clientWidth);
             thiss.checkRowWidth(table.tHead.rows[0]);
+            thiss.closeAccordionCase('widths-resizeable');
         });
     },
 
@@ -204,6 +206,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             thiss.checkRowWidth(table.tHead.rows[0]);
             YAHOO.util.Assert.areEqual(width1, th1.clientWidth, "The wdith of the first column shouldn't change (before: " + width1 + ", after: " + width2 + ").");
             YAHOO.util.Assert.areEqual(width2 -10, th2.clientWidth, "The width of the second column should be " + (width2 - 10) + ", not " + th2.clientWidth);
+            thiss.closeAccordionCase('widths-resizeable');
         });
     },
 
@@ -216,7 +219,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             var resizer = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-resizer');
             thiss.resizeColumn(th, -100, 5);
             YAHOO.util.Assert.isTrue(th.clientWidth > 0, 'The column width should be greater than 0, not ' + th.clientWidth);
-            thiss.checkTableAndContainerWidths(table);
+            thiss.checkTableAndContainerWidths(YAHOO.util.Dom.get('my-accordion$table-314216$table-314216-table'));
             thiss.checkCellWidth(th);
             thiss.closeAccordionCase('_314216');
         });

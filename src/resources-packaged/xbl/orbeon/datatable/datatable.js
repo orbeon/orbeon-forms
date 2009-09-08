@@ -28,7 +28,7 @@
  */
 ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 
-	YAHOO.log("Creating datatable index " + index, "info")
+	YAHOO.log("Creating datatable index " + index, "info");
 	// Store useful stuff as properties
 	this.table = element;
     this.index = index;
@@ -216,11 +216,14 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 
 	}
 
-	this.width = this.container.clientWidth;
+
 
 	if (this.scrollH) {
 		YAHOO.util.Event.addListener(this.bodyContainer, 'scroll', ORBEON.widgets.datatable.scrollHandler, this, true);
-	}
+        this.width = this.container.clientWidth;
+	} else {
+        this.width = this.tableWidth;
+    }
 
 	this.colResizers =[];
 	this.colSorters =[];
@@ -301,6 +304,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 		this.hasFixedWidthContainer = false;
 		this.hasFixedWidthTable = false;
 	}
+    YAHOO.log("Datatable index " + this.index + 'created with width: ' + this.width + ', table width: ' + this.tableWidth, "info")
 
 }
 
@@ -373,6 +377,7 @@ ORBEON.widgets.datatable.prototype.optimizeWidth = function (minWidth) {
 }
 
 ORBEON.widgets.datatable.prototype.adjustWidth = function (deltaX, index) {
+    //alert('Before-> this.width: ' + this.width +', this.tableWidth: ' + this.tableWidth);
 	if (! this.hasFixedWidthContainer) {
 		this.width += deltaX;
 		YAHOO.util.Dom.setStyle(this.container, 'width', this.width + 'px');
@@ -383,13 +388,14 @@ ORBEON.widgets.datatable.prototype.adjustWidth = function (deltaX, index) {
 	}
 	if (! this.hasFixedWidthTable) {
 		this.tableWidth += deltaX;
+        YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
         this.headerScrollWidth += deltaX;
 		if (this.headBodySplit) {
             YAHOO.util.Dom.setStyle(this.headerScrollContainer, 'width', this.headerScrollWidth + 'px');
             YAHOO.util.Dom.setStyle(this.header, 'width', this.tableWidth + 'px');
-			YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
 		}
 	}
+    //alert('After-> this.width: ' + this.width +', this.tableWidth: ' + this.tableWidth);
 }
 
 ORBEON.widgets.datatable.prototype.update = function () {

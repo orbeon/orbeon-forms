@@ -1999,7 +1999,8 @@ ORBEON.xforms.Controls = {
     setLabelMessage: function(control, message) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")
                 || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
-            var linkButtonElement = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) ? YAHOO.util.Dom.getFirstChild(control) : control;
+            var linkButtonElement = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                ? YAHOO.util.Dom.getFirstChild(control) : control;
             if (linkButtonElement.tagName.toLowerCase() == "input") {
                 // Image
                 linkButtonElement.alt = message;

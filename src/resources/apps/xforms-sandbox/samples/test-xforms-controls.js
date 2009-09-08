@@ -219,6 +219,31 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
+    name: "xforms:trigger appearance=\"minimal\"",
+
+    triggerId: "trigger-minimal" + XFORMS_SEPARATOR_1 + "1",
+
+    // Test that the control is correctly restored when the iteration is recreated
+    // http://forge.objectweb.org/tracker/index.php?func=detail&aid=313369&group_id=168&atid=350207
+    testRepeatCreate: function() {
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            ORBEON.xforms.Document.setValue("repeat-shown", "false");
+        }, function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                ORBEON.xforms.Document.setValue("repeat-shown", "true");
+            }, function() {
+                var trigger = YAHOO.util.Dom.get(this.triggerId);
+                var link = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) 
+                    ? YAHOO.util.Dom.getFirstChild(trigger) : trigger;
+                YAHOO.util.Assert.areEqual("a", link.tagName.toLowerCase());
+                YAHOO.util.Assert.areEqual("Label", link.innerHTML);
+            });
+        });
+    }
+}));
+
+YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
     name: "xforms:output appearance=\"xxforms:download\"",
 
     outputFileId: "output-file-value" + XFORMS_SEPARATOR_1 + "1",

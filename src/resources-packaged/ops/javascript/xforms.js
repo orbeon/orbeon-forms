@@ -1999,12 +1999,13 @@ ORBEON.xforms.Controls = {
     setLabelMessage: function(control, message) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")
                 || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
-            if (control.tagName.toLowerCase() == "input") {
+            var linkButtonElement = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) ? YAHOO.util.Dom.getFirstChild(control) : control;
+            if (linkButtonElement.tagName.toLowerCase() == "input") {
                 // Image
-                control.alt = message;
+                linkButtonElement.alt = message;
             } else {
                 // Link or button
-                control.innerHTML = message;
+                linkButtonElement.innerHTML = message;
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-dialog")) {
             // Dialog

@@ -41,7 +41,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "xforms:select1 appearance=full",
 
-    dateValueInputId: "date-value$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    dateValueInputId: "date$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
 
     getSelect: function(controlId) {
         var control = YAHOO.util.Dom.get(controlId);
@@ -113,8 +113,8 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "xforms:input type xs:date",
 
-    dateValueControlId: "date-value" + XFORMS_SEPARATOR_1 + "1",
-    dateValueInputId: "date-value$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    dateValueControlId: "date" + XFORMS_SEPARATOR_1 + "1",
+    dateValueInputId: "date$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
 
     testOpenHideCalendar: function() {
         // Click on text field
@@ -162,10 +162,10 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "xforms:input type xs:time",
 
-    timeValueId: "time-value" + XFORMS_SEPARATOR_1 + "1",
-    timeValueInputId: "time-value$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
-    dateValueId: "date-value" + XFORMS_SEPARATOR_1 + "1",
-    dateValueInputId: "date-value$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    timeValueId: "time" + XFORMS_SEPARATOR_1 + "1",
+    timeValueInputId: "time$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    dateValueId: "date" + XFORMS_SEPARATOR_1 + "1",
+    dateValueInputId: "date$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
 
     workerTimeParsing: function(typedValue, expectedValue) {
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {

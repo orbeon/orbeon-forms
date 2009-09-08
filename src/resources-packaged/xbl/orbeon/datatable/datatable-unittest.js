@@ -92,6 +92,121 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
          }
     },
 
+    checkCellWidth: function(cell) {
+        var resizerliner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-resizerliner');
+        var liner;
+        if (resizerliner == null) {
+            var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
+        } else {
+            var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-liner');
+        }
+        var cssWidth = YAHOO.util.Dom.getStyle(liner, 'width');
+        var actualWidth = (liner.clientWidth - 20) + "px";
+        YAHOO.util.Assert.areEqual(cssWidth, actualWidth, 'CSS ('+ cssWidth + ') and actual (' + liner.clientWidth + 'px) width should differ by exactly 20 px.');        
+    },
+
+    checkRowWidth: function(row) {
+        for (var icol = 0; icol < row.cells.length; icol++) {
+            var cell = row.cells[icol];
+            this.checkCellWidth(cell);
+        }
+    },
+
+    checkTableAndContainerWidths: function(table) {
+        var tableWidth = YAHOO.util.Dom.getStyle(table, 'width');
+        var headerContainerWidth = YAHOO.util.Dom.getStyle(table.parentNode, 'width');
+        var mainContainerWidth = YAHOO.util.Dom.getStyle(table.parentNode.parentNode, 'width');
+        YAHOO.util.Assert.areEqual(tableWidth, headerContainerWidth, 'Table (' + tableWidth + ') and header container (' + headerContainerWidth + ') widths should be equal.');
+        YAHOO.util.Assert.areEqual(tableWidth, mainContainerWidth, 'Table (' + tableWidth + ') and main container (' + mainContainerWidth + ') widths should be equal.');
+        YAHOO.util.Assert.areEqual(headerContainerWidth, mainContainerWidth, 'Header (' + headerContainerWidth + ') and main container (' + mainContainerWidth + ') widths should be equal.');
+    },
+
+    resizeColumn: function(th, offset, step) {
+        var resizerliner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(th, 'div', 'yui-dt-resizerliner');
+        var resizer = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-resizer');
+        var region = YAHOO.util.Region.getRegion(resizer);
+        YAHOO.util.UserAction.mousedown(resizer, {clientX: region.right, clientY: region.top});
+        var x;
+        if (step == undefined) {
+            step = offset;
+        } else if (step * offset < 0) {
+            step = -step;
+        }
+        for (x=region.right; (offset < 0 && x >= region.right + offset) || (offset > 0 && x <= region.right + offset); x = x + step) {
+            YAHOO.util.UserAction.mousemove(resizer, {clientX: x, clientY: region.top});
+        }
+        YAHOO.util.UserAction.mouseup(resizer, {clientX: x, clientY: region.top});
+        return x - region.right;
+    },
+
+    testWidths: function() {
+        var thiss = this;
+        this.openAccordionCase('widths', function(){
+            var table = YAHOO.util.Dom.get('my-accordion$table-widths$table-widths-table');
+            thiss.checkRowWidth(table.tHead.rows[0]);
+            thiss.checkTableAndContainerWidths(YAHOO.util.Dom.get('my-accordion$table-widths$table-widths-table'));
+            thiss.closeAccordionCase('widths');
+        });
+    },
+
+    testWidthsResizeable: function() {
+        var thiss = this;
+        this.openAccordionCase('widths-resizeable', function(){
+            var table = YAHOO.util.Dom.get('my-accordion$table-widths-resizeable$table-widths-resizeable-table');
+            thiss.checkRowWidth(table.tHead.rows[0]);
+            thiss.checkTableAndContainerWidths(table);
+            thiss.closeAccordionCase('widths-resizeable');
+        });
+    },
+    
+    testWidthsResizeable100pxRight: function() {
+        var thiss = this;
+        this.openAccordionCase('widths-resizeable', function(){
+            var table = YAHOO.util.Dom.get('my-accordion$table-widths-resizeable$table-widths-resizeable-table');
+            var th1 = table.tHead.rows[0].cells[0];
+            var th2 = table.tHead.rows[0].cells[1];
+            var width1 = th1.clientWidth;
+            var width2 = th2.clientWidth;
+            thiss.resizeColumn(th2, 100, 10);
+            thiss.checkTableAndContainerWidths(table);
+            YAHOO.util.Assert.areEqual(width1, th1.clientWidth, "The wdith of the first column shouldn't change (before: " + width1 + ", after: " + width2 + ").");
+            YAHOO.util.Assert.areEqual(width2 + 100, th2.clientWidth, "The width of the second column should be " + (width2 + 100) + ", not " + th2.clientWidth);
+            thiss.checkRowWidth(table.tHead.rows[0]);
+        });
+    },
+
+    testWidthsResizeable100pxLeft: function() {
+        var thiss = this;
+        this.openAccordionCase('widths-resizeable', function(){
+            var table = YAHOO.util.Dom.get('my-accordion$table-widths-resizeable$table-widths-resizeable-table');
+            var th1 = table.tHead.rows[0].cells[0];
+            var th2 = table.tHead.rows[0].cells[1];
+            var width1 = th1.clientWidth;
+            var width2 = th2.clientWidth;
+            thiss.resizeColumn(th2, -100, 10);
+            thiss.checkTableAndContainerWidths(table);
+            YAHOO.util.Assert.areEqual(width1, th1.clientWidth, "The wdith of the first column shouldn't change (before: " + width1 + ", after: " + width2 + ").");
+            YAHOO.util.Assert.areEqual(width2 -100, th2.clientWidth, "The width of the second column should be " + (width2 - 100) + ", not " + th2.clientWidth);
+            thiss.checkRowWidth(table.tHead.rows[0]);
+        });
+    },
+
+    testWidthsResizeable10MorePxLeft: function() {
+        var thiss = this;
+        this.openAccordionCase('widths-resizeable', function(){
+            var table = YAHOO.util.Dom.get('my-accordion$table-widths-resizeable$table-widths-resizeable-table');
+            var th1 = table.tHead.rows[0].cells[0];
+            var th2 = table.tHead.rows[0].cells[1];
+            var width1 = th1.clientWidth;
+            var width2 = th2.clientWidth;
+            thiss.resizeColumn(th2, -10);
+            thiss.checkTableAndContainerWidths(table);
+            thiss.checkRowWidth(table.tHead.rows[0]);
+            YAHOO.util.Assert.areEqual(width1, th1.clientWidth, "The wdith of the first column shouldn't change (before: " + width1 + ", after: " + width2 + ").");
+            YAHOO.util.Assert.areEqual(width2 -10, th2.clientWidth, "The width of the second column should be " + (width2 - 10) + ", not " + th2.clientWidth);
+        });
+    },
+
     test314216: function() {
         var thiss = this;
         this.openAccordionCase('_314216', function(){
@@ -99,17 +214,10 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             var resizerliner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(th, 'div', 'yui-dt-resizerliner');
             var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-liner');
             var resizer = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-resizer');
-            var region = YAHOO.util.Region.getRegion(resizer);
-            YAHOO.util.UserAction.mousedown(resizer, {clientX: region.right, clientY: region.top});
-            var x;
-            for (x=region.right; x > region.right - 100; x = x -5) {
-                YAHOO.util.UserAction.mousemove(resizer, {clientX: x, clientY: region.top});
-            }
-            YAHOO.util.UserAction.mouseup(resizer, {clientX: x, clientY: region.top});
+            thiss.resizeColumn(th, -100, 5);
             YAHOO.util.Assert.isTrue(th.clientWidth > 0, 'The column width should be greater than 0, not ' + th.clientWidth);
-            var cssWidth = YAHOO.util.Dom.getStyle(liner, 'width');
-            var actualWidth = liner.clientWidth + "px";
-            YAHOO.util.Assert.areEqual(cssWidth, actualWidth);
+            thiss.checkTableAndContainerWidths(table);
+            thiss.checkCellWidth(th);
             thiss.closeAccordionCase('_314216');
         });
     },

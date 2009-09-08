@@ -820,5 +820,76 @@
         </output>
     </test>
 
+    <test description="xxforms-valid/xxforms-invalid" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+
+                                    <xforms:instance id="value" xmlns="">
+                                        <value/>
+                                    </xforms:instance>
+                                    <xforms:bind nodeset="instance('value')" required="true()" />
+
+                                    <xforms:instance id="validity">
+                                        <validity/>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xxforms-valid" ev:observer="value">
+                                        <xforms:insert context="instance('validity')" nodeset="*" origin="xxforms:element('valid')" />
+                                    </xforms:action>
+                                    <xforms:action ev:event="xxforms-invalid" ev:observer="value">
+                                        <xforms:insert context="instance('validity')" nodeset="*" origin="xxforms:element('invalid')" />
+                                    </xforms:action>
+
+                                    <xforms:setvalue ev:event="xforms-ready" ref="instance('value')">42</xforms:setvalue>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:input id="my-input" ref="instance('value')"/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="value" model-id="model">
+                                <value>42</value>
+                            </instance>
+                            <instance id="validity" model-id="model">
+                                <validity>
+                                    <invalid/>
+                                    <valid/>
+                                </validity>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input" required="true">42</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>
 

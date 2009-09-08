@@ -1014,9 +1014,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // algorithm below.
             for (XFormsInstance currentInstance: instances) {
                 if (invalidInstances.contains(currentInstance.getEffectiveId())) {
-                    container.dispatchEvent(propertyContext, new XXFormsValidEvent(containingDocument, currentInstance));
-                } else {
                     container.dispatchEvent(propertyContext, new XXFormsInvalidEvent(containingDocument, currentInstance));
+                } else {
+                    container.dispatchEvent(propertyContext, new XXFormsValidEvent(containingDocument, currentInstance));
                 }
             }
 

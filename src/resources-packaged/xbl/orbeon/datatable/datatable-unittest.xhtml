@@ -1,0 +1,294 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>Datatable</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="lorem">
+                <text>
+                    <line>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</line>
+                    <line>Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing
+                        nec, ultricies sed, dolor</line>. <line>Cras elementum ultrices diam.
+                        Maecenas ligula massa, varius a, semper congue, euismod non, mi.</line>
+                    <line>Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non
+                        fermentum diam nisl sit amet erat.</line>
+                    <line>Duis semper.</line>
+                    <line>Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim.</line>
+                    <line>Pellentesque congue. Ut in risus volutpat libero pharetra tempor.</line>
+                    <line>Cras vestibulum bibendum augue.</line>
+                    <line>Praesent egestas leo in pede. Praesent blandit odio eu enim.</line>
+                    <line>Pellentesque sed dui ut augue blandit sodales.</line>
+                    <line>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere
+                        cubilia Curae; Aliquam nibh.</line>
+                    <line>Mauris ac mauris sed pede pellentesque fermentum.</line>
+                    <line>Maecenas adipiscing ante non diam sodales hendrerit.</line>
+                    <line>Ut velit mauris, egestas sed, gravida nec, ornare <line>ut, mi.</line>
+                        <line>Aenean ut orci vel massa suscipit pulvinar.</line>
+                        <line>Nulla sollicitudin.</line> Fusce varius, ligula non tempus aliquam,
+                        nunc turpis ullamcorper nibh, in tempus sapien eros vitae ligula.</line>
+                    <line>Pellentesque rhoncus nunc et augue.</line>
+                    <line>Integer id felis.</line>
+                    <line>Curabitur aliquet pellentesque diam.</line>
+                    <line>Integer quis metus vitae elit lobortis egestas.</line>
+                    <line>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</line>
+                    <line>Morbi vel erat non mauris convallis vehicula.</line>
+                    <line>Nulla et sapien.</line>
+                    <line>Integer tortor tellus, aliquam faucibus, convallis id, congue eu,
+                        quam.</line>
+                    <line>Mauris ullamcorper felis vitae erat.</line>
+                    <line>Proin feugiat, augue non elementum posuere, metus purus iaculis lectus, et
+                        tristique ligula justo vitae magna.</line>
+                    <line>Aliquam convallis sollicitudin purus.</line>
+                    <line>Praesent aliquam, enim at fermentum mollis, ligula massa adipiscing nisl,
+                        ac euismod nibh nisl eu lectus.</line>
+                    <line>Fusce vulputate sem at sapien.</line>
+                    <line>Vivamus leo.</line>
+                    <line>Aliquam euismod libero eu enim.</line>
+                    <line>Nulla nec felis sed leo placerat imperdiet.</line>
+                    <line>Aenean suscipit nulla in justo.</line>
+                    <line>Suspendisse cursus rutrum augue.</line>
+                    <line>Nulla tincidunt tincidunt mi.</line>
+                    <line> Curabitur iaculis, lorem vel rhoncus faucibus, felis magna fermentum
+                        augue, et ultricies lacus lorem varius purus.</line>
+                    <line>Curabitur eu amet.</line>
+                </text>
+            </xforms:instance>
+        </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-unittest.js"/>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xhtml:fieldset>
+            <xhtml:legend>Datatable test events</xhtml:legend>
+            <xhtml:ol>
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal" id="open-all">
+                        <xforms:label>Open all</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion"
+                            name="fr-accordion-toggle-all">
+                            <xxforms:context name="selected" select="true()"/>
+                        </xforms:dispatch>
+                    </xforms:trigger>
+                </xhtml:li>
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal" id="close-all">
+                        <xforms:label>Close all</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion"
+                            name="fr-accordion-toggle-all">
+                            <xxforms:context name="selected" select="false()"/>
+                        </xforms:dispatch>
+                    </xforms:trigger>
+                </xhtml:li>
+            </xhtml:ol>
+        </xhtml:fieldset>
+
+        <fr:accordion class="fr-accordion-lnf" id="my-accordion">
+            <fr:case selected="true" id="widths">
+                <fr:label>Check column and table widths</fr:label>
+                <xhtml:div>
+                    <xhtml:p>This table is used to check that column and table widths are
+                        consistent</xhtml:p>
+                    <fr:datatable id="table-widths">
+                        <xhtml:thead>
+                            <xhtml:tr>
+                                <xhtml:th>Number</xhtml:th>
+                                <xhtml:th>Text</xhtml:th>
+                            </xhtml:tr>
+                        </xhtml:thead>
+                        <xhtml:tbody>
+                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                                <xhtml:tr>
+                                    <xhtml:td>
+                                        <xforms:output value="position()"/>
+                                    </xhtml:td>
+                                    <xhtml:td>
+                                        <xforms:output value="."/>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </xforms:repeat>
+                        </xhtml:tbody>
+                    </fr:datatable>
+                </xhtml:div>
+            </fr:case>
+            <fr:case selected="true" id="widths-resizeable">
+                <fr:label>Check column and table widths with resizeabled columns</fr:label>
+                <xhtml:div>
+                    <xhtml:p>This table is used to check that column and table widths are
+                        consistent</xhtml:p>
+                    <fr:datatable id="table-widths-resizeable">
+                        <xhtml:thead>
+                            <xhtml:tr>
+                                <xhtml:th fr:resizeable="true" id="th-wr1">Number</xhtml:th>
+                                <xhtml:th fr:resizeable="true" id="th-wr2">Text</xhtml:th>
+                            </xhtml:tr>
+                        </xhtml:thead>
+                        <xhtml:tbody>
+                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                                <xhtml:tr>
+                                    <xhtml:td>
+                                        <xforms:output value="position()"/>
+                                    </xhtml:td>
+                                    <xhtml:td>
+                                        <xforms:output value="."/>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </xforms:repeat>
+                        </xhtml:tbody>
+                    </fr:datatable>
+                </xhtml:div>
+            </fr:case>
+            <fr:case selected="true" id="_314216">
+                <fr:label>#314216: reduce the width of the right column</fr:label>
+                <xhtml:div>
+                    <xhtml:p>Bug <xhtml:a
+                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314216&amp;group_id=168&amp;atid=350207"
+                            >314216</xhtml:a>.</xhtml:p>
+                    <fr:datatable id="table-314216">
+                        <xhtml:thead>
+                            <xhtml:tr>
+                                <xhtml:th fr:resizeable="true">Number</xhtml:th>
+                                <xhtml:th id="th-314216-2" fr:resizeable="true">Text</xhtml:th>
+                            </xhtml:tr>
+                        </xhtml:thead>
+                        <xhtml:tbody>
+                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                                <xhtml:tr>
+                                    <xhtml:td>
+                                        <xforms:output value="position()"/>
+                                    </xhtml:td>
+                                    <xhtml:td>
+                                        <xforms:output value="."/>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </xforms:repeat>
+                        </xhtml:tbody>
+                    </fr:datatable>
+                </xhtml:div>
+            </fr:case>
+            <fr:case selected="true" id="_314209">
+                <fr:label>#314209: Hide/Show cycle</fr:label>
+                <xhtml:div>
+                    <xhtml:p>Bug <xhtml:a
+                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314209&amp;group_id=168&amp;atid=350207"
+                            >314209</xhtml:a>.</xhtml:p>
+                    <fr:datatable id="table-314209" scrollable="horizontal" width="100%">
+                        <xhtml:thead>
+                            <xhtml:tr>
+                                <xhtml:th>Text</xhtml:th>
+                            </xhtml:tr>
+                        </xhtml:thead>
+                        <xhtml:tbody>
+                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                                <xhtml:tr>
+                                    <xhtml:td>
+                                        <xforms:output value="."/>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </xforms:repeat>
+                        </xhtml:tbody>
+                    </fr:datatable>
+                </xhtml:div>
+            </fr:case>
+            <fr:case selected="true" id="_314211">
+                <fr:label>#314211: Most simple datatable</fr:label>
+                <xhtml:div>
+                    <xhtml:p>Bug <xhtml:a
+                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314211&amp;group_id=168&amp;atid=350207"
+                            >314211</xhtml:a>.</xhtml:p>
+                    <fr:datatable id="table-314211">
+                        <xhtml:thead>
+                            <xhtml:tr>
+                                <xhtml:th>Text</xhtml:th>
+                            </xhtml:tr>
+                        </xhtml:thead>
+                        <xhtml:tbody>
+                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                                <xhtml:tr>
+                                    <xhtml:td>
+                                        <xforms:output value="."/>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </xforms:repeat>
+                        </xhtml:tbody>
+                    </fr:datatable>
+                </xhtml:div>
+            </fr:case>
+            <fr:case selected="true" id="_314174">
+                <fr:label>#314174: External pagination</fr:label>
+                <xhtml:div>
+                    <xhtml:p>Bug <xhtml:a
+                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314174&amp;group_id=168&amp;atid=350207"
+                            >314174</xhtml:a>.</xhtml:p>
+                    <xhtml:p>The pagination isn't supposed to work, the purpose of this test is just
+                        to display the table.</xhtml:p>
+                    <fr:datatable id="table-314174" paginated="true"
+                        sortAndPaginationMode="external" nbPages="5" page="2">
+                        <xhtml:thead>
+                            <xhtml:tr>
+                                <xhtml:th>Text</xhtml:th>
+                            </xhtml:tr>
+                        </xhtml:thead>
+                        <xhtml:tbody>
+                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                                <xhtml:tr>
+                                    <xhtml:td>
+                                        <xforms:output value="."/>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </xforms:repeat>
+                        </xhtml:tbody>
+                    </fr:datatable>
+                </xhtml:div>
+            </fr:case>
+            <fr:case selected="true" id="_314210">
+                <fr:label>#314210: 100% width, horizontal scroll, short lines</fr:label>
+                <xhtml:div>
+                    <xhtml:p>Bug <xhtml:a
+                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314210&amp;group_id=168&amp;atid=350207"
+                            >314210</xhtml:a>.</xhtml:p>
+                    <fr:datatable width="100%" scrollable="horizontal" id="table-314210">
+                        <xhtml:thead>
+                            <xhtml:tr>
+                                <xhtml:th>Number</xhtml:th>
+                                <xhtml:th>Text</xhtml:th>
+                            </xhtml:tr>
+                        </xhtml:thead>
+                        <xhtml:tbody>
+                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                                <xhtml:tr>
+                                    <xhtml:td>
+                                        <xforms:output value="position()"/>
+                                    </xhtml:td>
+                                    <xhtml:td>
+                                        <xforms:output value="."/>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </xforms:repeat>
+                        </xhtml:tbody>
+                    </fr:datatable>
+                </xhtml:div>
+            </fr:case>
+
+        </fr:accordion>
+
+    </xhtml:body>
+</xhtml:html>

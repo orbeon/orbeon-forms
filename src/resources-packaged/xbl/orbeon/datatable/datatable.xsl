@@ -49,10 +49,10 @@
         select="if (/fr:datatable/@id) then /fr:datatable/@id else generate-id(/fr:datatable)"/>
     <xsl:variable name="paginated" select="/fr:datatable/@paginated = 'true'"/>
     <xsl:variable name="rowsPerPage"
-         select="if (/fr:datatable/@rowsPerPage castable as xs:integer) then /fr:datatable/@rowsPerPage cast as xs:integer else 10"/>
+        select="if (/fr:datatable/@rowsPerPage castable as xs:integer) then /fr:datatable/@rowsPerPage cast as xs:integer else 10"/>
     <xsl:variable name="maxNbPagesToDisplay"
-         select="if (/fr:datatable/@maxNbPagesToDisplay castable as xs:integer) then /fr:datatable/@maxNbPagesToDisplay cast as xs:integer else -1"/>
-     <xsl:variable name="sortAndPaginationMode" select="/fr:datatable/@sortAndPaginationMode"/>
+        select="if (/fr:datatable/@maxNbPagesToDisplay castable as xs:integer) then /fr:datatable/@maxNbPagesToDisplay cast as xs:integer else -1"/>
+    <xsl:variable name="sortAndPaginationMode" select="/fr:datatable/@sortAndPaginationMode"/>
     <xsl:variable name="innerTableWidth"
         select="if (/fr:datatable/@innerTableWidth) then concat(&quot;'&quot;, /fr:datatable/@innerTableWidth, &quot;'&quot;) else 'null'"/>
     <xsl:variable name="hasLoadingFeature" select="count(/fr:datatable/@loading) = 1"/>
@@ -194,10 +194,12 @@
                     select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th[@fr:sortable='true' and not(@fr:sortType)]">
                     <xsl:variable name="position" select="count(preceding-sibling::xhtml:th) + 1"/>
                     <xxforms:variable name="node{$position}"
-                    select="$nodeset[1]/{$sort-instance/xforms:instance/sort/key[position() = $position]}"/>
+                        select="$nodeset[1]/{$sort-instance/xforms:instance/sort/key[position() = $position]}"/>
                     <!--Note: the following expression filters out values (for which . instance of node() is false) since xxforms:type doesn't work for them -->
-                    <xxforms:variable name="isNode{$position}" select="$node{$position} instance of node()"/>
-                    <xxforms:variable name="type{$position}" select="if ($isNode{$position}) then xxforms:type($node{$position}) else ()"/>
+                    <xxforms:variable name="isNode{$position}"
+                        select="$node{$position} instance of node()"/>
+                    <xxforms:variable name="type{$position}"
+                        select="if ($isNode{$position}) then xxforms:type($node{$position}) else ()"/>
                     <xsl:variable name="numberTypes">
                         <type>xs:decimal</type>
                         <type>xs:integer</type>
@@ -259,23 +261,25 @@
                     />
                 </xsl:when>
                 <xsl:when test="$paginated">
-                    <xxforms:variable name="maxNbPagesToDisplay" select="{$maxNbPagesToDisplay} cast as xs:integer"/>
-                    <xxforms:variable name="radix" select="floor(($maxNbPagesToDisplay - 2) div 2) cast as xs:integer"/>
-                    <xxforms:variable name="minPage" select="
+                    <xxforms:variable name="maxNbPagesToDisplay"
+                        select="{$maxNbPagesToDisplay} cast as xs:integer"/>
+                    <xxforms:variable name="radix"
+                        select="floor(($maxNbPagesToDisplay - 2) div 2) cast as xs:integer"/>
+                    <xxforms:variable name="minPage"
+                        select="
                         (if ($page > $radix)
                             then if ($nbPages >= $page + $radix)
                                 then ($page - $radix)
                                 else max((1, $nbPages - $maxNbPagesToDisplay + 1))
                             else 1) cast as xs:integer"/>
-                                        <xxforms:variable name="pages"
-                        select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"
-                    />
+                    <xxforms:variable name="pages"
+                        select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"/>
                     <!--<xxforms:variable name="pages"
                         select="for $p in $minPage to min(($nbPages, $minPage + $maxNbPagesToDisplay - 1)) cast as xs:integer return xxforms:element('page', $p)"
                     />-->
                 </xsl:when>
             </xsl:choose>
-            
+
             <xsl:variable name="pagination">
                 <xsl:if test="$paginated">
                     <xhtml:div class="yui-dt-paginator yui-pg-container" style="">
@@ -312,7 +316,7 @@
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xxforms:variable name="display"
-                                                select="
+                                            select="
                                                     if ($page &lt; $maxNbPagesToDisplay -2)
                                                     then if (. &lt;= $maxNbPagesToDisplay - 2 or . = $nbPages)
                                                         then 'page'
@@ -331,12 +335,13 @@
                                                                 then 'ellipses'
                                                                 else 'none'
                                                  "
-                                                />
+                                        />
                                     </xsl:otherwise>
                                 </xsl:choose>
                                 <xforms:group ref=".[. = $page and $display = 'page']">
-                                    <xforms:output class="yui-pg-page" ref="$page">
-                                        <xforms:hint>Current page (edit to move to another page)</xforms:hint>
+                                    <xforms:output class="yui-pg-page" value="$page">
+                                        <xforms:hint>Current page (edit to move to another
+                                            page)</xforms:hint>
                                     </xforms:output>
                                 </xforms:group>
                                 <xforms:group ref=".[. != $page and $display = 'page']">
@@ -397,7 +402,7 @@
                     <xsl:text>xxforms:component-context()</xsl:text>
                     <xsl:if test="$hasLoadingFeature">[not($loading = true())]</xsl:if>
                 </xsl:attribute>
-                
+
                 <xforms:action ev:event="xforms-enabled" ev:target="fr-datatable-group">
                     <xxforms:script> YAHOO.log("Enabling datatable id <xsl:value-of select="$id"
                         />","info"); ORBEON.widgets.datatable.init(this, <xsl:value-of
@@ -405,7 +410,7 @@
                 </xforms:action>
 
                 <xsl:apply-templates select="$pass1" mode="YUI"/>
-                
+
             </xforms:group>
 
             <xsl:if test="$hasLoadingFeature">
@@ -633,8 +638,7 @@
             </xsl:attribute>
         </xxforms:variable>
         <xxforms:script ev:event="xxforms-nodeset-changed" ev:target="fr-datatable-repeat">
-                 ORBEON.widgets.datatable.update(this);     
-        </xxforms:script>
+            ORBEON.widgets.datatable.update(this); </xxforms:script>
         <xforms:repeat id="fr-datatable-repeat" nodeset="$nodeset">
             <xsl:apply-templates select="@*[not(name()=('nodeset', 'id'))]|node()" mode="YUI"/>
         </xforms:repeat>
@@ -701,4 +705,3 @@
 
 
 </xsl:transform>
-

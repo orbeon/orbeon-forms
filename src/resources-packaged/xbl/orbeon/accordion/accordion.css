@@ -38,17 +38,14 @@ html.fr-accordion-lnf-js dt.a-m-t{
 html.accordion-menu-js dd.a-m-d {
     top: -10000px;
     left: -10000px;
-    visibility: hidden;
     position: absolute;
 }
 html.accordion-menu-js dd.a-m-d-expand {
-    visibility: visible;
     position: static;
 }
 
 html.accordion-menu-js dd.a-m-d-anim {
 	overflow: hidden;
-    visibility: visible;
     position: relative;
     top: 0;
     left: 0;

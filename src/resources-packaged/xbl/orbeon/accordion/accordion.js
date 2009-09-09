@@ -7,10 +7,12 @@ YAHOO.xbl.fr.Accordion = {
         if (! YAHOO.xbl.fr.Accordion._instances[container.id]) {
             var dlElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-accordion-dl", null, container)[0];
             var selectedElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-accordion-selected", null, container)[0];
+            var openClosesOthersElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-accordion-open-closes-others", null, container)[0];
+            var openClosesOthers = ORBEON.xforms.Document.getValue(openClosesOthersElement.id);
 
             // Create accordion menu
             new AccordionMenu.setting(dlElement.id, {
-                dependent:  false,
+                dependent:  openClosesOthers == "true",
                 openedIds:  [],
                 easeOut:    false,
                 animation:  true,

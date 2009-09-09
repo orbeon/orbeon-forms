@@ -1,6 +1,6 @@
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "Accordion",
+    name: "Accordion main test",
 
     getDl: function() {
         return YAHOO.util.Dom.getElementsByClassName("xbl-fr-accordion-dl")[0];
@@ -94,6 +94,38 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         });
     }
 }));
+
+YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+    name: "Accordion open-closes-others",
+
+    checkOpen: function(first, second) {
+        var dts = YAHOO.util.Dom.getElementsByClassName("a-m-t", "dt", "open-closes-others-accordion");
+        YAHOO.util.Assert.areEqual(first, YAHOO.util.Dom.hasClass(dts[0], "a-m-t-expand"));
+        YAHOO.util.Assert.areEqual(second, YAHOO.util.Dom.hasClass(dts[1], "a-m-t-expand"));
+    },
+
+    testBothClosed: function() {
+        this.checkOpen(false, false);
+    },
+
+    testOnlyFirstOpen: function() {
+        var dts = YAHOO.util.Dom.getElementsByClassName("a-m-t", "dt", "open-closes-others-accordion");
+        YAHOO.util.UserAction.click(dts[0], { clientX: 1 });
+        this.wait(function() {
+            this.checkOpen(true, false);
+        }, 500);
+    },
+
+    testOnlySecondOpen: function() {
+        var dts = YAHOO.util.Dom.getElementsByClassName("a-m-t", "dt", "open-closes-others-accordion");
+        YAHOO.util.UserAction.click(dts[1], { clientX: 1 });
+        this.wait(function() {
+            this.checkOpen(false, true);
+        }, 500);
+    }
+}));
+
 
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
     if (parent && parent.TestManager) {

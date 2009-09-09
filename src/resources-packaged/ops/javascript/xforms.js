@@ -3230,7 +3230,7 @@ ORBEON.xforms.Events = {
         // Adjust position of loading indicators
         for (var formID in ORBEON.xforms.Globals.formLoadingLoadingOverlay) {
             var overlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID];
-            if (overlay && overlay.cfg.getProperty("visible"))
+            if (overlay)
                 ORBEON.xforms.Controls.updateLoadingPosition(formID);
         }
         // Adjust position of dialogs with "constraintoviewport" since YUI doesn't do it automatically

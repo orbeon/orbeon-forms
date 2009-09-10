@@ -221,6 +221,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 	if (this.scrollH) {
 		YAHOO.util.Event.addListener(this.bodyContainer, 'scroll', ORBEON.widgets.datatable.scrollHandler, this, true);
         this.width = this.container.clientWidth;
+        this.bodyContainer.style.overflowX = "scroll";
 	} else {
         this.width = this.tableWidth;
     }

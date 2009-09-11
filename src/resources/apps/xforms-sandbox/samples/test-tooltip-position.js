@@ -19,16 +19,20 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     testPosition: function() {
         var thiss = this;
         window.resizeBy(200, 0);
-        var target =  YAHOO.util.Dom.get('my-trigger');
-        var region = YAHOO.util.Region.getRegion(target);
-        YAHOO.util.UserAction.mouseover(target, {clientX: region.right, clientY: region.top});
-        thiss.wait (function() {
-            YAHOO.util.UserAction.mouseout(target, {clientX: region.right - 10 , clientY: region.top});
-            thiss.wait(function() {
-                window.resizeBy(-200, 0);
-                YAHOO.util.Assert.areEqual(document.documentElement.clientWidth, document.documentElement.scrollWidth, "There shouldn't be an horizontal scrollbar (clientWidth: " + document.documentElement.clientWidth + ', scrollWidth: ' + document.documentElement.scrollWidth + ').');
-            }, 500);
-        }, 500);
+        thiss.wait( function() {
+            var target =  YAHOO.util.Dom.get('my-trigger');
+            var region = YAHOO.util.Region.getRegion(target);
+            YAHOO.util.UserAction.mouseover(target, {clientX: region.right, clientY: region.top});
+            thiss.wait (function() {
+                YAHOO.util.UserAction.mouseout(target, {clientX: region.right - 10 , clientY: region.top});
+                thiss.wait(function() {
+                    window.resizeBy(-200, 0);
+                    thiss.wait(function() {
+                        YAHOO.util.Assert.areEqual(document.documentElement.clientWidth, document.documentElement.scrollWidth, "There shouldn't be an horizontal scrollbar (clientWidth: " + document.documentElement.clientWidth + ', scrollWidth: ' + document.documentElement.scrollWidth + ').');
+                    }, 300);
+                }, 300);
+            }, 300);
+        }, 300);
 
     }
 }));

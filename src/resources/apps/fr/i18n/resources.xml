@@ -46,16 +46,24 @@
                 <created>Created</created>
                 <last-modified>Last Modified</last-modified>
                 <selected>Selected</selected>
-                <search-1>Search returned</search-1>
-                <search-2>documents.</search-2>
-                <to>to</to>
-                <of>of</of>
                 <refresh>This operation will refresh the page</refresh>
                 <toc>Table of Contents</toc>
                 <help>Help</help>
                 <error-count>Error in Your Form</error-count>
                 <errors-count>Errors in Your Form</errors-count>
             </titles>
+            <search>
+                <search>Search</search>
+                <search-forms>Search forms</search-forms>
+                <show-options>Show search options</show-options>
+                <close-options>Close search options</close-options>
+                <returned-1>Search returned</returned-1>
+                <returned-2>documents.</returned-2>
+            </search>
+            <paging>
+                <to>to</to>
+                <of>of</of>
+            </paging>
             <messages>
                 <intro><i>Please select a document in order to perform an operation, or select "New" to create a new blank document.</i></intro>
                 <no-form-found><i>No form data was found.</i></no-form-found>
@@ -193,16 +201,24 @@
                 <created>Création</created>
                 <last-modified>Dernière modification</last-modified>
                 <selected>Sélection</selected>
-                <search-1>La recherche a retourné</search-1>
-                <search-2>documents.</search-2>
-                <to>à</to>
-                <of>sur</of>
                 <refresh>Cette opération rafraichit la page</refresh>
                 <toc>Table des matières</toc>
                 <help>Aide</help>
                 <error-count>erreur de saisie dans votre formulaire</error-count>
                 <errors-count>erreurs de saisie dans votre formulaire</errors-count>
             </titles>
+            <search>
+                <search>Recherche</search>
+                <search-forms>Rechercher</search-forms>
+                <show-options>Montrer les options de recherche</show-options>
+                <close-options>Cacher les options de recherche</close-options>
+                <returned-1>La recherche a retourné</returned-1>
+                <returned-2>documents.</returned-2>
+            </search>
+            <paging>
+                <to>à</to>
+                <of>sur</of>
+            </paging>
             <messages>
                 <intro><i>Veuillez sélectionner un document avant d'effectuer une opération, ou sélectionnez "Nouveau" pour créer un nouveau document.</i></intro>
                 <no-form-found><i>Aucun formulaire trouvé.</i></no-form-found>
@@ -342,16 +358,24 @@
                 <created>Creado</created>
                 <last-modified>Fecha de modificación</last-modified>
                 <selected>Seleccionado</selected>
-                <search-1>Resultado de la búsqueda</search-1>
-                <search-2>documentos.</search-2>
-                <to>al</to>
-                <of>de</of>
                 <refresh>Este botón actualizará la página</refresh>
                 <toc>Tabla de contenidos</toc>
                 <help>Ayuda</help>
                 <error-count>Errores en su formulario</error-count>
                 <errors-count>Errores en su formulario</errors-count>
             </titles>
+            <search>
+                <search>Buscar</search>
+                <search-forms>Buscar formulario</search-forms>
+                <show-options>Mostrar opciones de búsqueda</show-options>
+                <close-options>Cerrar opciones de búsqueda</close-options>
+                <returned-1>Resultado de la búsqueda</returned-1>
+                <returned-2>documentos.</returned-2>
+            </search>
+            <paging>
+                <to>al</to>
+                <of>de</of>
+            </paging>
             <messages>
                 <intro><i>Por favor, seleccione un documento para llevar a cabo una operación, o seleccione "Nuevo" para crear un nuevo documento en blanco.</i></intro>
                 <no-form-found><i>No se encontró el formulario.</i></no-form-found>

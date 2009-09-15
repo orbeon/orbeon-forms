@@ -723,7 +723,7 @@ ORBEON.widgets.datatable.resizeWhenStabilized = function () {
         datatable.reset();
     }
     ORBEON.widgets.datatable.datatables = {};
-    for (var itable in oldDatatables) {
+    for (var itable = 0; itable < oldDatatables.length; itable ++) {
         var datatable =  oldDatatables[itable];
         ORBEON.widgets.datatable.init(datatable.table.parentNode, datatable.innerTableWidth);
     }

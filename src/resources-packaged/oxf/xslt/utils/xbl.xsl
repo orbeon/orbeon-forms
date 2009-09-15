@@ -28,7 +28,7 @@
 
         <xsl:choose>
             <xsl:when test="exists($context/*[local-name() = $property and namespace-uri() = $namespace])">
-                <xforms:input class="xbl-{$prefix}-{$component}-{$property}" xxbl:attr="{$prefix}:{$property}/@*" style="display: none">
+                <xforms:input class="xbl-{$prefix}-{$component}-{$property} xforms-initially-hidden" xxbl:attr="{$prefix}:{$property}/@*">
                     <xxforms:script ev:event="xforms-value-changed">
                         <xsl:text>YAHOO.xbl.</xsl:text>
                         <xsl:value-of select="$prefix"/>
@@ -43,7 +43,7 @@
             <xsl:otherwise>
                 <!-- We have a "default" value in the variable so we can detect the difference between the attribute value being the empty string vs. the attribute not being there -->
                 <xxforms:variable name="{$property}" xbl:attr="xbl:text={$property}">&#xb7;</xxforms:variable>
-                <xforms:output class="xbl-{$prefix}-{$component}-{$property}" style="display: none"
+                <xforms:output class="xbl-{$prefix}-{$component}-{$property} xforms-initially-hidden"
                     value="if (${$property} != '&#xb7;') then ${$property} else xxforms:property('oxf.xforms.xbl.{$prefix}.{$component}.{$property}')"/>
             </xsl:otherwise>
         </xsl:choose>

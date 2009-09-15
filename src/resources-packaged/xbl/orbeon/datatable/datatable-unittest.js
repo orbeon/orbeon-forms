@@ -139,6 +139,20 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         return x - region.right;
     },
 
+    checkHorizontalScrollbar: function (elt) {
+        YAHOO.util.Assert.isTrue(elt.clientHeight + 15 < elt.offsetHeight, 'Element has no horizontal scroll bar (clientHeight: ' + elt.clientHeight + ', offsetHeight: ' + elt.offsetHeight + ')');     
+    },
+
+    test314217: function() {
+        var thiss = this;
+        thiss.openAccordionCase('_314217', function() {
+            var tbody = YAHOO.util.Dom.get('my-accordion$table-314217$table-314217-tbody');
+            var bodyContainer = tbody.parentNode.parentNode;
+            thiss.checkHorizontalScrollbar(bodyContainer);
+            thiss.closeAccordionCase('_314217');
+        });
+    },
+
     testWidths: function() {
         var thiss = this;
         this.openAccordionCase('widths', function(){
@@ -233,7 +247,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 var visibility = YAHOO.util.Dom.getStyle(table, 'visibility');
                 YAHOO.util.Assert.isTrue(visibility == 'visible' || visibility == 'inherit', 'Visibility should be visible or inherit, not ' + visibility );
                 // unfortunately, I haven't found any way to check that the table is actually visible!
-                //thiss.closeAccordionCase('_314209');
+                thiss.closeAccordionCase('_314209');
             });
 
         });

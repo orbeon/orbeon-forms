@@ -3224,15 +3224,34 @@ ORBEON.xforms.Events = {
     },
 
     /**
+     * Called upon resizing.
+     */
+    _resize: function() {
+        // destroy the tooltips since they could justify a scrollbar
+        var collections = [ORBEON.xforms.Globals.hintTooltipForControl, ORBEON.xforms.Globals.helpTooltipForControl, ORBEON.xforms.Globals.alertTooltipForControl];
+        for (var i = 0; i < 3; i++) {
+            var collection = collections[i];
+            for (var control in collection) {
+                var tooltip = collection[control];
+                if (tooltip && tooltip != true) {
+                    collection[control] = null;
+                    tooltip.destroy();
+                }
+            }
+        }
+    },
+    
+    /**
      * Called upon scrolling or resizing.
      */
     scrollOrResize: function() {
         // Adjust position of loading indicators
         for (var formID in ORBEON.xforms.Globals.formLoadingLoadingOverlay) {
             var overlay = ORBEON.xforms.Globals.formLoadingLoadingOverlay[formID];
-            if (overlay && overlay.cfg.getProperty("visible"))
+            if (overlay)
                 ORBEON.xforms.Controls.updateLoadingPosition(formID);
         }
+        ORBEON.xforms.Events._resize();
         // Adjust position of dialogs with "constraintoviewport" since YUI doesn't do it automatically
         // NOTE: comment this one out for now, as that causes issues like unreachable buttons for large dialogs, and funny scrolling
 //        for (var yuiDialogId in ORBEON.xforms.Globals.dialogs) {

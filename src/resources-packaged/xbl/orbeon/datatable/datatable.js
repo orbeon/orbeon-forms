@@ -221,6 +221,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 	if (this.scrollH) {
 		YAHOO.util.Event.addListener(this.bodyContainer, 'scroll', ORBEON.widgets.datatable.scrollHandler, this, true);
         this.width = this.container.clientWidth;
+        this.bodyContainer.style.overflowX = "scroll";
 	} else {
         this.width = this.tableWidth;
     }
@@ -716,14 +717,14 @@ ORBEON.widgets.datatable.resizeWhenStabilized = function () {
 
     var oldDatatables = [];
     ORBEON.widgets.datatable.bodyWidthWhenResized = width;
-	for (table in ORBEON.widgets.datatable.datatables) {
-        var datatable =  ORBEON.widgets.datatable.datatables[table];
+	for (var tableId in ORBEON.widgets.datatable.datatables) {
+        var datatable =  ORBEON.widgets.datatable.datatables[tableId];
         oldDatatables.push(datatable);
         datatable.reset();
     }
     ORBEON.widgets.datatable.datatables = {};
-    for (table in oldDatatables) {
-        var datatable =  oldDatatables[table];
+    for (var itable in oldDatatables) {
+        var datatable =  oldDatatables[itable];
         ORBEON.widgets.datatable.init(datatable.table.parentNode, datatable.innerTableWidth);
     }
 }

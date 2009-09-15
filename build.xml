@@ -20,7 +20,6 @@
     <!-- set global build.root to be dir containing this file. -->
     <dirname property="build.root" file="${ant.file}"/>
     <property name="lib.dir" location="lib"/>
-    <property name='local-repos' value=':local:/home/cvs/objectweb-src' />
     <property name="build.dir" location="build"/>
     <property name="project.name" value="orbeon"/>
     <property name="war.dir" value="${build.dir}/${project.name}-war"/>
@@ -30,7 +29,7 @@
 
     <property name="src.dir" location="src"/>
 
-    <fileset id='war.libs' dir="${lib.dir}">
+    <fileset id="war.libs" dir="${lib.dir}">
         <include name="dom4j-1_6_1.jar"/>
         <include name="log4j-1_2_15.jar"/>
         <include name="jaxen-1_1_beta_9.jar"/>
@@ -113,9 +112,9 @@
         <include name="pdfbox-0_7_1.jar"/>
         <include name="ant-1_6_5.jar"/>
     </fileset>
-    <fileset id='war.libs.private' dir="${lib.dir}">
+    <fileset id="war.libs.private" dir="${lib.dir}">
         <include name="xerces-xercesImpl-2_9_orbeon_20070711.jar"/>
-        <include name='commons-logging-1_0_4.jar' />
+        <include name="commons-logging-1_0_4.jar"/>
     </fileset>
 
     <target name="init">
@@ -130,20 +129,20 @@
          -->
         <property name="version.number" value="dev-post-3.7.1"/>
         <tstamp>
-            <format property='time' pattern='yyyyMMddHHmm' timezone='GMT'/>
+            <format property="time" pattern="yyyyMMddHHmm" timezone="GMT"/>
         </tstamp>
-        <property name='release.number' value='${version.number}.${time}'/>
+        <property name="release.number" value="${version.number}.${time}"/>
 
         <!-- User-friendly message -->
         <echo message="Building Orbeon Forms ${release.number}"/>
 
         <!-- dump version string with dots in into a file, then read that file convert -->
-        <!-- the dots to underscores while reeading.   i.e. convert 2.5.4-3234 to      -->
+        <!-- the dots to underscores while reading.   i.e. convert 2.5.4-3234 to      -->
         <!-- 2_5_4_3234                                                                -->
-        <tempfile property='ops-temp-version-file'/>
-        <echo message='${project.name}-version=${release.number}' file='${ops-temp-version-file}'/>
+        <tempfile property="ops-temp-version-file"/>
+        <echo message="${project.name}-version=${release.number}" file="${ops-temp-version-file}"/>
 
-        <loadproperties srcFile='${ops-temp-version-file}'>
+        <loadproperties srcFile="${ops-temp-version-file}">
             <filterchain>
                 <tokenfilter>
                     <!-- Cannot seem to be able to tell ant to replace "-" here! -->
@@ -168,8 +167,8 @@
         <property name="build.temp.dir" value="${build.dir}/temp"/>
         <property name="build.doc.dir" value="${build.dir}/doc"/>
 
-        <property name="test.tmp.dir" location="${build.temp.dir}/test" />
-        <property name="test.exist-db.dir" location="${src.dir}/resources-packaged/ops/unit-tests/exist-data" />
+        <property name="test.tmp.dir" location="${build.temp.dir}/test"/>
+        <property name="test.exist-db.dir" location="${src.dir}/resources-packaged/ops/unit-tests/exist-data"/>
 
         <property name="jar.file" value="${build.lib.dir}/${project.name}.jar"/>
         <property name="xforms-filter.jar.file" value="${build.lib.dir}/${project.name}-xforms-filter.jar"/>
@@ -233,24 +232,24 @@
         </javac>
     </target>
 
-    <target name='transform' depends='prepare' >
-      <property name='xsd-prefix' value='/org/orbeon/oxf/xml/schemas/page-flow-controller' />
+    <target name="transform" depends="prepare">
+      <property name="xsd-prefix" value="/org/orbeon/oxf/xml/schemas/page-flow-controller"/>
       <xslt
-        style='src/xslt/page-flow-controller-xsd.xslt'
-        in='${java-src.dir}${xsd-prefix}.xsd'
-        out='${build.classes.dir}${xsd-prefix}-runtime.xsd'
+        style="src/xslt/page-flow-controller-xsd.xslt"
+        in="${java-src.dir}${xsd-prefix}.xsd"
+        out="${build.classes.dir}${xsd-prefix}-runtime.xsd"
       />
     </target>
 
     <!-- JARs -->
     <target name="jars" depends="classes,transform,orbeon-css-templates,orbeon-minify-js">
-      <pathconvert dirsep='/' pathsep=' ' property='jar.mf.cp' refid='war.libs.private' >
-        <map from='${lib.dir}' to='private' />
+      <pathconvert dirsep="/" pathsep=" " property="jar.mf.cp" refid="war.libs.private">
+        <map from="${lib.dir}" to="private"/>
       </pathconvert>
 
-      <jar destfile='${jar.file}' compress='false' >
+      <jar destfile="${jar.file}" compress="false">
           <manifest>
-              <attribute name='Class-Path' value='${jar.mf.cp}'/>
+              <attribute name="Class-Path" value="${jar.mf.cp}"/>
           </manifest>
           <fileset dir="${java-src.dir}">
               <include name="**/*.xml"/>
@@ -271,7 +270,7 @@
               <include name="*.xml"/>
           </fileset>
           <!-- WHY DO WE NEED THIS? WE DON'T WANT ANYBODY TO TOUCH OUR XERCES, RIGHT? -->
-          <!--<zipfileset dir="descriptors/jar" prefix="META-INF" >-->
+          <!--<zipfileset dir="descriptors/jar" prefix="META-INF">-->
             <!--<exclude name='*.MF' />-->
           <!--</zipfileset>-->
         </jar>
@@ -283,16 +282,16 @@
           </fileset>
         </jar>
 
-        <pathconvert dirsep='/' pathsep=' ' property='cli.jar.mf.cp' refid='war.libs' >
-          <map from='${lib.dir}' to='lib' />
+        <pathconvert dirsep="/" pathsep=" " property="cli.jar.mf.cp" refid="war.libs">
+          <map from="${lib.dir}" to="lib"/>
         </pathconvert>
 
-        <basename file='${jar.file}' property='jar.name' />
+        <basename file="${jar.file}" property="jar.name"/>
 
-        <jar destfile='${cli.jar.file}' compress='false'  >
+        <jar destfile="${cli.jar.file}" compress="false"  >
           <manifest>
-            <attribute name='Main-Class' value='org.orbeon.oxf.main.OPS' />
-            <attribute name='Class-Path' value='lib/${jar.name} lib/${project.name}-resources-private.jar commons-cli-1_0.jar ${cli.jar.mf.cp}' />
+            <attribute name="Main-Class" value="org.orbeon.oxf.main.OPS"/>
+            <attribute name="Class-Path" value="lib/${jar.name} lib/${project.name}-resources-private.jar commons-cli-1_0.jar ${cli.jar.mf.cp}"/>
           </manifest>
         </jar>
 
@@ -383,7 +382,7 @@
         <echo message="war.dir: ${war.dir}"/>
 
         <copy todir="${war.lib}">
-          <fileset refid='war.libs' />
+          <fileset refid="war.libs"/>
         </copy>
 
         <copy file="${jar.file}" todir="${war.lib}"/>
@@ -393,8 +392,8 @@
         <copy file="${form-runner.jar.file}" todir="${war.lib}"/>
         <copy file="${form-builder.jar.file}" todir="${war.lib}"/>
 
-        <copy todir='${war.lib}/private' >
-          <fileset refid='war.libs.private' />
+        <copy todir="${war.lib}/private">
+          <fileset refid="war.libs.private"/>
         </copy>
 
         <copy todir="${war.inf}">
@@ -402,8 +401,8 @@
                 <include name="commons-cli-1_0.jar"/>
             </fileset>
         </copy>
-        <copy file='${cli.jar.file}' todir='${war.inf}' />
-        <copy todir="${war.dir}/xforms-jsp" >
+        <copy file="${cli.jar.file}" todir="${war.inf}"/>
+        <copy todir="${war.dir}/xforms-jsp">
             <fileset dir="${src.dir}/examples-jsp">
                 <include name="**"/>
             </fileset>
@@ -584,10 +583,10 @@
     </target>
 
     <target name="orbeon-minify-maybe-js">
-        <echo message='srcfile: ${resources-packaged.dir}/ops/${name}.js'/>
-        <echo message='targetfile: ${war.dir}/WEB-INF/resources/ops/${name}-min.js'/>
+        <echo message="srcfile: ${resources-packaged.dir}/ops/${name}.js"/>
+        <echo message="targetfile: ${war.dir}/WEB-INF/resources/ops/${name}-min.js"/>
         <uptodate property="min.uptodate" srcfile="${resources-packaged.dir}/ops/${name}.js" targetfile="${war.dir}/WEB-INF/resources/ops/${name}-min.js"/>
-        <echo message='Uptodate: ${min.uptodate}'/>
+        <echo message="Uptodate: ${min.uptodate}"/>
         <antcall target="orbeon-minify-one-js">
             <param name="name" value="${name}"/>
         </antcall>
@@ -616,7 +615,7 @@
     </target>
 
     <target name="test" depends="jars, test-classes, debug-enabled, debug-disabled">
-    	<!-- 11/14/2004 d : Found Processor was sorta invalid cause once it ran successully
+    	<!-- 11/14/2004 d : Found Processor was sorta invalid cause once it ran successfully
     	     				it would leave behind .class files in java.io.tmpdir.  This
     	     				meant that on subsequent runs of the test it wouldn't try to
     	     				compile anything.
@@ -660,7 +659,7 @@
             <!-- Other properties -->
             <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
             <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>
-        	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}" />
+        	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}"/>
 
             <classpath>
                 <path refid="class.path"/>
@@ -685,10 +684,13 @@
 
         <!--<copy file='${deployDir}/buildLogs/ops-${version}-build.log' tofile='${deployDir}/${release.number}/build.log'/>-->
 
+        <property name="artifact.name" value="${project.name}${artifact.suffix}"/>
+        <echo message="Using artifact name: ${artifact.name}"/>
+
         <!-- Move to generic file name so that rsync overwrites -->
-        <move file="${deployDir}/${project.name}-${release.number}.zip" tofile="${deployDir}/${project.name}${artifact-suffix}.zip"/>
-        <move file="${deployDir}/${project.name}.war" tofile="${deployDir}/${project.name}${artifact-suffix}.war"/>
-        <move file="${deployDir}/${project.name}-src.zip" tofile="${deployDir}/${project.name}-src${artifact-suffix}.zip"/>
+        <move file="${deployDir}/${project.name}-${release.number}.zip" tofile="${deployDir}/${artifact.name}.zip"/>
+        <move file="${deployDir}/${project.name}.war" tofile="${deployDir}/${artifact.name}.war"/>
+        <move file="${deployDir}/${project.name}-src.zip" tofile="${deployDir}/${artifact.name}-src.zip"/>
 
         <!-- Create md5 for all files -->
         <checksum algorithm="MD5">
@@ -698,18 +700,17 @@
         </checksum>
 
         <!-- Post the unstable build -->
-        <exec executable='rsync' failonerror='true' dir='${deployDir}'>
-            <arg value='-vv'/>
-            <arg value='--stats'/>
-            <arg value='-z'/>
-            <arg value='-c'/>
-            <arg value='--rsh=/usr/bin/ssh'/>
-            <arg value='--bwlimit=50'/>
-            <!--<arg value='build.log'/>-->
-            <arg value='${project.name}.war'/>
-            <arg value='${project.name}.zip'/>
-            <arg value='${project.name}-src.zip'/>
-            <arg value='orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops'/>
+        <exec executable="rsync" failonerror="true" dir="${deployDir}">
+            <arg value="-vv"/>
+            <arg value="--stats"/>
+            <arg value="-z"/>
+            <arg value="-c"/>
+            <arg value="--rsh=/usr/bin/ssh"/>
+            <arg value="--bwlimit=50"/>
+            <arg value="${artifact.name}.war"/>
+            <arg value="${artifact.name}.zip"/>
+            <arg value="${artifact.name}-src.zip"/>
+            <arg value="orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops"/>
         </exec>
 
     </target>

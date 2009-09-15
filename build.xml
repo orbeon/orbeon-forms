@@ -683,14 +683,12 @@
             </fileset>
         </copy>
 
-        <!-- 2/27/2005 d : This triggers the taginfo synch script. -->
-        <!--<cvs command='tag -d TAG_Dummy_For_OW_Sync'-->
-            <!--cvsRoot='${local-repos}' failonerror='true'/>-->
-
         <!--<copy file='${deployDir}/buildLogs/ops-${version}-build.log' tofile='${deployDir}/${release.number}/build.log'/>-->
 
         <!-- Move to generic file name so that rsync overwrites -->
-        <move file="${deployDir}/${project.name}-${release.number}.zip" tofile="${deployDir}/${project.name}.zip"/>
+        <move file="${deployDir}/${project.name}-${release.number}.zip" tofile="${deployDir}/${project.name}${artifact-suffix}.zip"/>
+        <move file="${deployDir}/${project.name}.war" tofile="${deployDir}/${project.name}${artifact-suffix}.war"/>
+        <move file="${deployDir}/${project.name}-src.zip" tofile="${deployDir}/${project.name}-src${artifact-suffix}.zip"/>
 
         <!-- Create md5 for all files -->
         <checksum algorithm="MD5">

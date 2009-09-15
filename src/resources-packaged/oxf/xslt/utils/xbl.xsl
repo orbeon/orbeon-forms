@@ -41,9 +41,10 @@
                 </xforms:input>
             </xsl:when>
             <xsl:otherwise>
-                <xxforms:variable name="{$property}" xbl:attr="xbl:text={$property}"/>
+                <!-- We have a "default" value in the variable so we can detect the difference between the attribute value being the empty string vs. the attribute not being there -->
+                <xxforms:variable name="{$property}" xbl:attr="xbl:text={$property}">&#xb7;</xxforms:variable>
                 <xforms:output class="xbl-{$prefix}-{$component}-{$property}" style="display: none"
-                    value="if (${$property}) then ${$property} else xxforms:property('oxf.xforms.xbl.{$prefix}.{$component}.{$property}')"/>
+                    value="if (${$property} != '&#xb7;') then ${$property} else xxforms:property('oxf.xforms.xbl.{$prefix}.{$component}.{$property}')"/>
             </xsl:otherwise>
         </xsl:choose>
 

@@ -126,7 +126,12 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             }, function() {
                 YAHOO.util.Assert.areEqual("42", ORBEON.xforms.Controls.getCurrentValue(valueOutput));
             });
+        },
+        testNoPrefix: function() {
+            var noPrefixInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "no-prefix")[0];
+            YAHOO.util.Assert.areEqual("42.00", noPrefixInput.value);
         }
+
     }));
 
     if (parent && parent.TestManager) {

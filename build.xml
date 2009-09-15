@@ -631,6 +631,9 @@
     	<mkdir dir="${test.exist-db.dir}"/>
 
         <junit fork="true" haltonerror="yes" haltonfailure="yes">
+            <!-- Enable assertions -->
+            <jvmarg value="-ea"/>
+
             <batchtest>
                 <fileset dir="${test-src.dir}">
                     <include name="org/orbeon/oxf/**/*Test.java"/>

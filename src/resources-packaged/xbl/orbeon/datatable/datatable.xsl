@@ -36,26 +36,43 @@
         <parameter>loading</parameter>
     </xsl:variable>
 
+    <!-- Perform pass 1 to 4 to support simplified syntaxes -->
+    <xsl:variable name="pass1">
+        <xsl:apply-templates select="/" mode="pass1"/>
+    </xsl:variable>
+
+    <xsl:variable name="pass2">
+        <xsl:apply-templates select="$pass1" mode="pass2"/>
+    </xsl:variable>
+
+    <xsl:variable name="pass3">
+        <xsl:apply-templates select="$pass2" mode="pass3"/>
+    </xsl:variable>
+
+    <xsl:variable name="pass4">
+        <xsl:apply-templates select="$pass3" mode="pass4"/>
+    </xsl:variable>
+
     <!-- Set some variables that will dictate the geometry of the widget -->
     <xsl:variable name="scrollH"
-        select="/fr:datatable/@scrollable = ('horizontal', 'both') and /fr:datatable/@width"/>
+        select="$pass4/fr:datatable/@scrollable = ('horizontal', 'both') and $pass4/fr:datatable/@width"/>
     <xsl:variable name="scrollV"
-        select="/fr:datatable/@scrollable = ('vertical', 'both') and /fr:datatable/@height"/>
+        select="$pass4/fr:datatable/@scrollable = ('vertical', 'both') and $pass4/fr:datatable/@height"/>
     <xsl:variable name="height"
-        select="if ($scrollV) then concat('height: ', /fr:datatable/@height, ';') else ''"/>
+        select="if ($scrollV) then concat('height: ', $pass4/fr:datatable/@height, ';') else ''"/>
     <xsl:variable name="width"
-        select="if (/fr:datatable/@width) then concat('width: ', /fr:datatable/@width, ';') else ''"/>
+        select="if ($pass4/fr:datatable/@width) then concat('width: ', $pass4/fr:datatable/@width, ';') else ''"/>
     <xsl:variable name="id"
-        select="if (/fr:datatable/@id) then /fr:datatable/@id else generate-id(/fr:datatable)"/>
-    <xsl:variable name="paginated" select="/fr:datatable/@paginated = 'true'"/>
+        select="if ($pass4/fr:datatable/@id) then $pass4/fr:datatable/@id else generate-id($pass4/fr:datatable)"/>
+    <xsl:variable name="paginated" select="$pass4/fr:datatable/@paginated = 'true'"/>
     <xsl:variable name="rowsPerPage"
-        select="if (/fr:datatable/@rowsPerPage castable as xs:integer) then /fr:datatable/@rowsPerPage cast as xs:integer else 10"/>
+        select="if ($pass4/fr:datatable/@rowsPerPage castable as xs:integer) then $pass4/fr:datatable/@rowsPerPage cast as xs:integer else 10"/>
     <xsl:variable name="maxNbPagesToDisplay"
-        select="if (/fr:datatable/@maxNbPagesToDisplay castable as xs:integer) then /fr:datatable/@maxNbPagesToDisplay cast as xs:integer else -1"/>
-    <xsl:variable name="sortAndPaginationMode" select="/fr:datatable/@sortAndPaginationMode"/>
+        select="if ($pass4/fr:datatable/@maxNbPagesToDisplay castable as xs:integer) then $pass4/fr:datatable/@maxNbPagesToDisplay cast as xs:integer else -1"/>
+    <xsl:variable name="sortAndPaginationMode" select="$pass4/fr:datatable/@sortAndPaginationMode"/>
     <xsl:variable name="innerTableWidth"
-        select="if (/fr:datatable/@innerTableWidth) then concat(&quot;'&quot;, /fr:datatable/@innerTableWidth, &quot;'&quot;) else 'null'"/>
-    <xsl:variable name="hasLoadingFeature" select="count(/fr:datatable/@loading) = 1"/>
+        select="if ($pass4/fr:datatable/@innerTableWidth) then concat(&quot;'&quot;, $pass4/fr:datatable/@innerTableWidth, &quot;'&quot;) else 'null'"/>
+    <xsl:variable name="hasLoadingFeature" select="count($pass4/fr:datatable/@loading) = 1"/>
 
     <!--
         Pagination...
@@ -85,6 +102,10 @@
         </xsl:copy>
     </xsl:template>
 
+    <xsl:template match="/">
+        <xsl:apply-templates select="$pass4/fr:datatable"/>
+    </xsl:template>
+
     <xsl:template match="fr:datatable">
         <!-- Matches the bound element -->
 
@@ -94,13 +115,13 @@
 
 
 
-            <xsl:variable name="pass1">
+            <xsl:variable name="pass5">
+                
                 <!--
                 This pass generates the XHTML structure .
                 and uses the default mode.
 
                 -->
-
 
                 <xhtml:table id="{$id}-table"
                     class="datatable datatable-{$id} yui-dt-table {@class} {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
@@ -155,11 +176,11 @@
                 <xsl:variable name="sort-instance">
                     <xforms:instance id="sort">
                         <xsl:variable name="sorted"
-                            select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th[@fr:sorted = ('descending', 'ascending')][1]/@fr:sorted"/>
+                            select="$pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th[@fr:sorted = ('descending', 'ascending')][1]/@fr:sorted"/>
                         <sort
                             currentId="{if ($sorted) then count($sorted/../preceding-sibling::xhtml:th) + 1 else -1}"
                             currentOrder="{$sorted}" xmlns="">
-                            <xsl:for-each select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th">
+                            <xsl:for-each select="$pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th">
                                 <key
                                     type="{if (@fr:sortType) then if (@fr:sortType = 'number') then 'number' else 'text' else ''}">
                                     <xsl:variable name="position"
@@ -167,7 +188,7 @@
                                     <xsl:if test="@fr:sortable='true'">
                                         <xsl:variable name="sortKeys">
                                             <xsl:apply-templates
-                                                select="$pass1/xhtml:table/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td[position() = $position]"
+                                                select="$pass5/xhtml:table/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td[position() = $position]"
                                                 mode="sortKey"/>
                                         </xsl:variable>
                                         <xsl:choose>
@@ -187,11 +208,11 @@
                     </xforms:instance>
                 </xsl:variable>
                 <xsl:copy-of select="$sort-instance"/>
-                <xsl:variable name="repeat-nodeset" select="$pass1//xforms:repeat[1]/@nodeset"/>
+                <xsl:variable name="repeat-nodeset" select="$pass5//xforms:repeat[1]/@nodeset"/>
                 <xxforms:variable name="nodeset"
-                    select="xxforms:component-context()/{$pass1//xforms:repeat/@nodeset}"/>
+                    select="xxforms:component-context()/{$pass5//xforms:repeat/@nodeset}"/>
                 <xsl:for-each
-                    select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th[@fr:sortable='true' and not(@fr:sortType)]">
+                    select="$pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th[@fr:sortable='true' and not(@fr:sortType)]">
                     <xsl:variable name="position" select="count(preceding-sibling::xhtml:th) + 1"/>
                     <xxforms:variable name="node{$position}"
                         select="$nodeset[1]/{$sort-instance/xforms:instance/sort/key[position() = $position]}"/>
@@ -241,7 +262,7 @@
                 <xsl:when test="$paginated and not($sortAndPaginationMode='external')">
                     <xxforms:variable name="page" model="datatable" select="instance('page')"/>
                     <xxforms:variable name="nbRows"
-                        select="count({$pass1//xforms:repeat[1]/@nodeset})"/>
+                        select="count({$pass5//xforms:repeat[1]/@nodeset})"/>
                     <xxforms:variable name="nbPages"
                         select="ceiling($nbRows div {$rowsPerPage}) cast as xs:integer"/>
                 </xsl:when>
@@ -409,7 +430,7 @@
                             select="$innerTableWidth"/>); </xxforms:script>
                 </xforms:action>
 
-                <xsl:apply-templates select="$pass1" mode="YUI"/>
+                <xsl:apply-templates select="$pass5" mode="YUI"/>
 
             </xforms:group>
 
@@ -422,14 +443,14 @@
                                 <xhtml:thead>
                                     <xhtml:tr class="yui-dt-first yui-dt-last">
                                         <xsl:apply-templates
-                                            select="$pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th"
+                                            select="$pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th"
                                             mode="YUI"/>
                                     </xhtml:tr>
                                 </xhtml:thead>
                                 <xhtml:tbody>
                                     <xhtml:tr>
                                         <xhtml:td
-                                            colspan="{count($pass1/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th)}"
+                                            colspan="{count($pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th)}"
                                             class="fr-datatable-is-loading"/>
                                     </xhtml:tr>
                                 </xhtml:tbody>
@@ -464,31 +485,6 @@
         </xsl:choose>
     </xsl:template>
 
-    <!--
-
-        Default mode (pass1)
-
-    -->
-
-    <xsl:template match="xhtml:tr/@repeat-nodeset">
-        <!-- Remove  repeat-nodeset attributes -->
-    </xsl:template>
-
-    <xsl:template match="xhtml:tr[@repeat-nodeset]">
-        <!-- Generate xforms:repeat for  repeat-nodeset attributes-->
-        <!-- The ID is added here as a work-around to a bug in Orbeon Forms that happens when the same ID is used
-             (here generated if this is missing) inside an XBL control and outside.
-             http://forge.ow2.org/tracker/index.php?func=detail&aid=313628&group_id=168&atid=350207 -->
-        <xforms:repeat nodeset="{@repeat-nodeset}">
-            <xhtml:tr>
-                <xsl:apply-templates select="@*|node()"/>
-            </xhtml:tr>
-        </xforms:repeat>
-    </xsl:template>
-
-    <xsl:template match="xhtml:td/xforms:output/xforms:label">
-        <!-- Remove xforms:label since they are used as headers -->
-    </xsl:template>
 
     <!--
 
@@ -637,7 +633,7 @@
                 </xsl:choose>
             </xsl:attribute>
         </xxforms:variable>
-        <xxforms:script ev:event="xxforms-nodeset-changed" ev:target="fr-datatable-repeat">
+        <xxforms:script ev:event="xrepeat-nodeset-changed" ev:target="fr-datatable-repeat">
             ORBEON.widgets.datatable.update(this); </xxforms:script>
         <xforms:repeat id="fr-datatable-repeat" nodeset="$nodeset">
             <xsl:apply-templates select="@*[not(name()=('nodeset', 'id'))]|node()" mode="YUI"/>
@@ -703,5 +699,121 @@
         </xpath>
     </xsl:template>
 
+    <!-- 
+    
+    Pass 1 : create a body element if missing
+    
+    Note (common to pass 1, 2, 3, 4): replace xsl:copy-of by xsl:apply-templates if needed! 
+    
+    -->
+
+    <xsl:template match="/fr:datatable" mode="pass1">
+        <xsl:copy>
+            <xsl:copy-of select="@*"/>
+            <xsl:copy-of select="xhtml:colgroup|xhtml:thead|xhtml:tbody"/>
+            <xsl:if test="not(xhtml:tbody)">
+                <xhtml:tbody>
+                    <xsl:copy-of select="*[not(self::tcolgroup|self::thead)]"/>
+                </xhtml:tbody>
+            </xsl:if>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- 
+        
+        Pass 2 : expand /fr:datatable/xhtml:tbody/xhtml:tr[@repeat-nodeset]
+        
+    -->
+
+    <xsl:template match="/fr:datatable/xhtml:tbody/xhtml:tr[@repeat-nodeset]" mode="pass2">
+        <xforms:repeat nodeset="{@repeat-nodeset}">
+            <xsl:copy>
+                <xsl:copy-of select="@*[name() != 'repeat-nodeset']|node()"/>
+            </xsl:copy>
+        </xforms:repeat>
+    </xsl:template>
+
+    <!-- 
+        
+        Pass 3 : expand /fr:datatable/xhtml:tbody/xforms:repeat/xhtml:tr/td[@repeat-nodeset]
+        and /fr:datatable/xhtml:thead/xhtml:tr/th[@repeat-nodeset]
+        
+        Note: do not merge with pass 2 unless you update these XPath expressions to work with 
+        xhtml:tr[@repeat-nodeset]
+        
+    -->
+
+    <xsl:template
+        match="/fr:datatable/xhtml:tbody/xforms:repeat/xhtml:tr/td[@repeat-nodeset]|/fr:datatable/xhtml:thead/xhtml:tr/th[@repeat-nodeset]"
+        mode="pass3">
+        <xforms:repeat nodeset="{@repeat-nodeset}">
+            <xsl:copy>
+                <xsl:copy-of select="@*[name() != 'repeat-nodeset']|node()"/>
+            </xsl:copy>
+        </xforms:repeat>
+    </xsl:template>
+
+    <!-- 
+        
+        Pass 4 : create a header element if missing
+        
+    -->
+
+    <xsl:template match="/fr:datatable" mode="pass4">
+        <xsl:copy>
+            <xsl:copy-of select="@*"/>
+            <xsl:copy-of select="xhtml:colgroup|xhtml:thead"/>
+            <xsl:if test="not(xhtml:thead)">
+                <xhtml:thead>
+                    <xhtml:tr>
+                        <xsl:apply-templates
+                            select="/fr:datatable/xhtml:tbody/xforms:repeat/xhtml:tr/*"
+                            mode="pass4-header"/>
+                    </xhtml:tr>
+                </xhtml:thead>
+            </xsl:if>
+            <xsl:copy-of select="xhtml:tbody"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- 
+        
+        Pass 4-header : populate the a header element if missing
+        (called by pass4)
+        
+    -->
+
+    <xsl:template match="*" mode="pass4-header"/>
+
+    <xsl:template match="/fr:datatable/xhtml:tbody/xforms:repeat/xhtml:tr/xforms:repeat"
+        mode="pass4-header">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()" mode="pass4-header"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template
+        match="/fr:datatable/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td|/fr:datatable/xhtml:tbody/xforms:repeat/xhtml:tr/xforms:repeat/xhtml:td"
+        mode="pass4-header">
+        <xhtml:th>
+            <xsl:apply-templates select="@*" mode="pass4-header"/>
+            <xsl:apply-templates select="xforms:output[xforms:label][1]" mode="pass4-header"/>
+        </xhtml:th>
+    </xsl:template>
+
+    <xsl:template
+        match="/fr:datatable/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td/xforms:output[@ref]|/fr:datatable/xhtml:tbody/xforms:repeat/xhtml:tr/xforms:repeat/xhtml:td/xforms:output[@ref]"
+        mode="pass4-header">
+        <xforms:group>
+            <xsl:copy-of select="@*"/>
+            <xsl:copy-of select="xforms:label/*"/>
+        </xforms:group>
+    </xsl:template>
+
+    <xsl:template
+        match="/fr:datatable/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td/xforms:output|/fr:datatable/xhtml:tbody/xforms:repeat/xhtml:tr/xforms:repeat/xhtml:td/xforms:output"
+        mode="pass4-header">
+        <xsl:value-of select="xforms:label"/>
+    </xsl:template>
 
 </xsl:transform>

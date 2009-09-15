@@ -1,12 +1,25 @@
+/**
+ * Copyright (C) 2009 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.LastPositionFinder;
@@ -25,15 +38,19 @@ import java.util.List;
  */
 public class Variable {
 
-    private XBLContainer container;
-    private XFormsContextStack contextStack;
-    private Element variableElement;
+    private final XBLContainer container;
+    private final XFormsContextStack contextStack;
+    private final Element variableElement;
+    private final Element valueElement;
 
     private String variableName;
     private String selectAttribute;
 
     private boolean evaluated;
     private ValueRepresentation variableValue;
+
+    private final boolean isNameOuterScope;
+    private final boolean isValueOuterScope;
 
     public Variable(XBLContainer container, XFormsContextStack contextStack, Element variableElement) {
         this.container = container;
@@ -44,29 +61,42 @@ public class Variable {
         if (variableName == null)
             throw new ValidationException("xxforms:variable or exforms:variable element must have a \"name\" attribute", getLocationData());
 
-        this.selectAttribute = variableElement.attributeValue("select");
-//        if (selectAttribute == null)
-//            throw new ValidationException("xxforms:variable or exforms:variable element must have a \"select\" attribute", getLocationData());
+        // Scope of the variable declaration
+        this.isNameOuterScope = XFormsConstants.XXBLScope.outer.name().equals(variableElement.attributeValue(XFormsConstants.XXBL_SCOPE_QNAME));
+
+        // Handle xxforms:sequence
+        final Element sequenceElement = variableElement.element(XFormsConstants.XXFORMS_SEQUENCE_QNAME);
+        if (sequenceElement == null) {
+            this.valueElement = variableElement;
+            this.isValueOuterScope = false;
+        } else {
+            this.valueElement = sequenceElement;
+            this.isValueOuterScope = XFormsConstants.XXBLScope.outer.name().equals(sequenceElement.attributeValue(XFormsConstants.XXBL_SCOPE_QNAME));
+        }
+
+        this.selectAttribute = valueElement.attributeValue("select");
     }
 
     private void evaluate(PropertyContext pipelineContext, boolean useCache) {
 
         if (selectAttribute == null) {
             // Inline constructor (for now, only textual content, but in the future, we could allow xforms:output in it? more?)
-            variableValue = new StringValue(variableElement.getStringValue());
+            variableValue = new StringValue(valueElement.getStringValue());
         } else {
             // There is a select attribute
 
             // Push binding for evaluation, so that @context and @model are evaluated
-            contextStack.pushBinding(pipelineContext, variableElement);
+            contextStack.pushBinding(pipelineContext, valueElement);
             {
                 final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
                 final List<Item> currentNodeset = bindingContext.getNodeset();
                 if (currentNodeset != null && currentNodeset.size() > 0) {
                     // TODO: in the future, we should allow null context for expressions that do not depend on the context
+
+                    // TODO: does static state store ns mapping for xxf:sequence? 
                     variableValue = XPathCache.evaluateAsExtent(pipelineContext,
                             currentNodeset, bindingContext.getPosition(),
-                            selectAttribute, container.getNamespaceMappings(variableElement), bindingContext.getInScopeVariables(useCache),
+                            selectAttribute, container.getNamespaceMappings(valueElement), bindingContext.getInScopeVariables(useCache),
                             XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null, getLocationData());
                 } else {
                     variableValue = EmptySequence.getInstance();
@@ -78,6 +108,14 @@ public class Variable {
 
     public String getVariableName() {
         return variableName;
+    }
+
+    public boolean isNameOuterScope() {
+        return isNameOuterScope;
+    }
+
+    public boolean isValueOuterScope() {
+        return isValueOuterScope;
     }
 
     public ValueRepresentation getVariableValue(PropertyContext pipelineContext, boolean useCache) {
@@ -104,7 +142,7 @@ public class Variable {
     }
 
     public LocationData getLocationData() {
-        return (variableElement != null) ? (LocationData) variableElement.getData() : null;
+        return (LocationData) variableElement.getData();
     }
 
     public void testAs() {
@@ -113,7 +151,7 @@ public class Variable {
     }
 
     /**
-     * This iterator rewrapps NodeWrapper elements so that the original NodeWrapper is discarded and a new one created.
+     * This iterator rewraps NodeWrapper elements so that the original NodeWrapper is discarded and a new one created.
      * The reason we do this is that when we keep variables around, we don't want NodeWrapper.index to be set to
      * anything but -1. If we did that, then upon insertions of nodes in the DOM, the index would be out of date.
      */

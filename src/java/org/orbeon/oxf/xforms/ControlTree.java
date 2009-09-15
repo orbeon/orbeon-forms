@@ -16,10 +16,14 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.control.*;
+import org.orbeon.oxf.xforms.control.XFormsContainerControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsControlFactory;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 
@@ -39,6 +43,8 @@ public class ControlTree implements Cloneable {
 
     private final IndentedLogger indentedLogger;
 
+    private final XFormsStaticState staticState;
+
     // Top-level controls
     private List<XFormsControl> children;   // top-level controls
 
@@ -48,13 +54,14 @@ public class ControlTree implements Cloneable {
     private boolean isBindingsDirty;    // whether the bindings must be reevaluated
 
     public ControlTree(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger) {
+
         this.indentedLogger = indentedLogger;
+
+        staticState = containingDocument.getStaticState();
         controlIndex = new ControlIndex(XFormsProperties.isNoscript(containingDocument));
 
         // Obtain global information about event handlers. This is a rough optimization so we can avoid sending certain
         // types of events below.
-
-        final XFormsStaticState staticState = containingDocument.getStaticState();
 
         isAllowSendingValueChangedEvents = staticState.hasHandlerForEvent(XFormsEvents.XFORMS_VALUE_CHANGED);
         isAllowSendingRequiredEvents = staticState.hasHandlerForEvent(XFormsEvents.XFORMS_REQUIRED) || staticState.hasHandlerForEvent(XFormsEvents.XFORMS_OPTIONAL);
@@ -566,85 +573,90 @@ public class ControlTree implements Cloneable {
     }
 
     /**
-     * Find an effective control id based on a control id, following the branches of the
-     * current indexes of the repeat elements. age$age.1 - xforms-element-10
+     * Find an effective control id based on a source and a control static id, following XBL scoping and the repeat
+     * structure.
+     *
+     * @param sourceControlEffectiveId  reference to source control, e.g. "list$age.3"
+     * @param targetControlStaticId     reference to target control, e.g. "xf-10"
+     * @return                          effective control id, or null if not found
      */
-    public String findEffectiveControlId(String sourceControlEffectiveId, String targetId) {
-        // Don't iterate if we don't have controls
+    public String findEffectiveControlId(String sourceControlEffectiveId, String targetControlStaticId) {
+
+        // NOTE: The implementation tries to do a maximum using the static state. One reason is that the source
+        // control's effective id might not yet have an associated control during construction. E.g.:
+        //
+        // <xf:group id="my-group" ref="employee[index('employee-repeat')]">
+        //
+        // In that case, the XFormsGroupControl does not yet exist when its binding is evaluated. However, its
+        // effective id is known and passed as source, and can be used for resolving the id passed to the index()
+        // function.
+        //
+        // We trust the caller to pass a valid source effective id. That value is always internal, i.e. not created by a
+        // form author. On the other hand, the target id cannot be trusted as it is typically specified by the form
+        // author.
+
+        // Don't do anything if there are no controls
         if (this.children == null)
             return null;
 
-        if (sourceControlEffectiveId != null && XFormsUtils.getEffectiveIdPrefix(sourceControlEffectiveId).length() > 0) {
-            // The source is within a particular component, so search only within that component
+        // 1: Check preconditions
+        if (sourceControlEffectiveId == null)
+            throw new IllegalArgumentException("Source control effective id is required.");
 
-            // Start from source control
-            XFormsControl componentControl = controlIndex.getControl(sourceControlEffectiveId);
-            if (componentControl != null) {
-                // Source is an existing control, go down parents until component is found
-                while (componentControl != null && !(componentControl instanceof XFormsComponentControl)) {
-                    componentControl =  componentControl.getParent();
+        final XBLBindings bindings = staticState.getXBLBindings();
+
+        // 2: Obtain target prefixed id
+        final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceControlEffectiveId);
+        final String scopeId = bindings.getResolutionScopeId(sourcePrefixedId);
+        final String targetPrefixedId = bindings.getPrefixedIdInScope(scopeId, targetControlStaticId);
+
+        // 3: Implement XForms 1.1 "4.7.1 References to Elements within a repeat Element" algorithm
+
+        // Find closest common ancestor repeat
+
+        final StringBuilder targetIndexBuilder = new StringBuilder();
+
+        final String closestCommonAncestorRepeatPrefixedId = staticState.findClosestCommonAncestorRepeat(sourcePrefixedId, targetPrefixedId);
+        if (closestCommonAncestorRepeatPrefixedId != null) {
+            // There is a common ancestor repeat, use the current iteration as starting point
+
+            final int ancestorCount = staticState.getAncestorRepeats(closestCommonAncestorRepeatPrefixedId, null).size() + 1;
+            if (ancestorCount > 0) {
+                final Integer[] parts = XFormsUtils.getEffectiveIdSuffixParts(sourceControlEffectiveId);
+                for (int i = 0; i < ancestorCount; i ++) {
+                    appendIterationToSuffix(targetIndexBuilder, parts[i]);
                 }
-            } else {
-                // Source is not a control, it is likely a model or nested model element
-
-                // NOTE: This is kind of hacky due to the fact that we handle models differently from controls. In the
-                // future this should be changed, see:
-                // http://www.orbeon.com/forms/projects/xforms-model-scoping-rules
-                // Also, this manipulation of prefix/suffix has the potential to be wrong with repeat iterations, e.g.
-                // if the component is within repeats, and the control is within repeats within the component.
-                final String componentEffectiveId = XFormsUtils.getEffectiveIdPrefixNoSeparator(sourceControlEffectiveId) + XFormsUtils.getEffectiveIdSuffixWithSeparator(sourceControlEffectiveId);
-                componentControl = controlIndex.getControl(componentEffectiveId);
             }
+        }
 
-            // Can't keep going if the source control or one of its ancestors is not found
-            if (componentControl == null)
+        // Find list of ancestor repeats for destination WITHOUT including the closest ancestor repeat if any
+        final List<String> targetAncestorRepeats = staticState.getAncestorRepeats(targetPrefixedId, closestCommonAncestorRepeatPrefixedId);
+        Collections.reverse(targetAncestorRepeats); // go from trunk to leaf
+
+        // Follow repeat indexes towards target
+        for (final String repeatPrefixedId: targetAncestorRepeats) {
+            // Get repeat control
+            final XFormsRepeatControl repeatIterationControl = (XFormsRepeatControl) getControl(repeatPrefixedId + targetIndexBuilder);
+
+            // Controls might not exist
+            if (repeatIterationControl == null)
                 return null;
 
-            // Search from the root of the component
-            return findEffectiveControlId(sourceControlEffectiveId, targetId, ((XFormsComponentControl) componentControl).getChildren());
-        } else {
-            // Search from the root
-            return findEffectiveControlId(sourceControlEffectiveId, targetId, this.children);
+            // Update iteration suffix
+            appendIterationToSuffix(targetIndexBuilder, repeatIterationControl.getIndex());
         }
+
+        // Return target
+        return targetPrefixedId + targetIndexBuilder;
     }
 
-    private String findEffectiveControlId(String sourceControlEffectiveId, String targetId, List<XFormsControl> children) {
-        // TODO: use sourceId properly as defined in XForms 1.1 under 4.7.1 References to Elements within a repeat Element
-        if (children != null && children.size() > 0) {
-            for (XFormsControl currentControl: children) {
-                final String staticControlId = currentControl.getId();
+    private void appendIterationToSuffix(StringBuilder suffix, int iteration) {
+        if (suffix.length() == 0)
+            suffix.append(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+        else if (suffix.length() != 1)
+            suffix.append(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2);
 
-                if (targetId.equals(staticControlId)) {
-                    // Found control
-                    return currentControl.getEffectiveId();
-                } else if (currentControl instanceof XFormsRepeatControl) {
-                    // Handle repeat
-                    final XFormsRepeatControl currentRepeatControl = (XFormsRepeatControl) currentControl;
-
-                    // Find index and try to follow the current repeat index
-                    final int index = currentRepeatControl.getIndex();
-                    if (index > 0) {
-                        final List<XFormsControl> newChildren = currentRepeatControl.getChildren();
-                        if (newChildren != null && newChildren.size() > 0) {
-                            final String result = findEffectiveControlId(sourceControlEffectiveId, targetId, Collections.singletonList(newChildren.get(index - 1)));
-                            if (result != null)
-                                return result;
-                        }
-                    }
-
-                } else if (currentControl instanceof XFormsContainerControl) {
-                    // Handle container control
-                    final List<XFormsControl> newChildren = ((XFormsContainerControl) currentControl).getChildren();
-                    if (newChildren != null && newChildren.size() > 0) {
-                        final String result = findEffectiveControlId(sourceControlEffectiveId, targetId, newChildren);
-                        if (result != null)
-                            return result;
-                    }
-                }
-            }
-        }
-        // Not found
-        return null;
+        suffix.append(Integer.toString(iteration));
     }
 
     /**
@@ -885,129 +897,5 @@ public class ControlTree implements Cloneable {
         public int getIterationCount() {
             return iterationCount;
         }
-    }
-}
-
-class ControlIndex {
-
-    private final boolean isNoscript;   // whether we are in noscript mode
-
-    // Index of all controls in the tree by effective id
-    // Order is desired so we iterate controls in the order they were added
-    private Map<String, XFormsControl> effectiveIdsToControls = new LinkedHashMap<String, XFormsControl>();
-
-    // Map<String type, LinkedHashMap<String effectiveId, XFormsControl control>>
-    // No need for order here
-    private Map<String, Map<String, XFormsControl>> controlTypes = new HashMap<String, Map<String, XFormsControl>>();
-
-    ControlIndex(boolean noscript) {
-        isNoscript = noscript;
-    }
-
-    public void addAll(ControlIndex other) {
-        for (XFormsControl control: other.effectiveIdsToControls.values()) {
-            indexControl(control);
-        }
-    }
-
-    /**
-     * Index a single controls.
-     *
-     * @param control           control to index
-     */
-    public void indexControl(XFormsControl control) {
-        // Remember by effective id
-
-        effectiveIdsToControls.put(control.getEffectiveId(), control);
-
-        // Remember by control type (for certain controls we know we need)
-        if (mustMapControl(control)) {
-            Map<String, XFormsControl> controlsMap = controlTypes.get(control.getName());
-            if (controlsMap == null) {
-                controlsMap = new LinkedHashMap<String, XFormsControl>(); // need for order here!
-                controlTypes.put(control.getName(), controlsMap);
-            }
-
-            controlsMap.put(control.getEffectiveId(), control);
-        }
-    }
-
-    /**
-     * Deindex a single control.
-     *
-     * @param control           control to deindex
-     */
-    public void deindexControl(XFormsControl control) {
-
-        // Remove by effective id
-        if (effectiveIdsToControls != null) {
-            effectiveIdsToControls.remove(control.getEffectiveId());
-        }
-
-        // Remove by control type (for certain controls we know we need)
-        if (mustMapControl(control)) {
-            if (controlTypes != null) {
-                final Map controlsMap = controlTypes.get(control.getName());
-                if (controlsMap != null) {
-                    controlsMap.remove(control.getEffectiveId());
-                }
-            }
-        }
-    }
-
-    private boolean mustMapControl(XFormsControl control) {
-
-        // Remember:
-        // xforms:upload
-        // xforms:repeat
-        // xforms:select[@appearance = 'full'] in noscript mode
-        return control instanceof XFormsUploadControl
-                || control instanceof XFormsRepeatControl
-                || (isNoscript && control instanceof XFormsSelectControl && ((XFormsSelectControl) control).isFullAppearance());
-    }
-
-    public void evaluateAll(IndentedLogger indentedLogger, PropertyContext propertyContext) {
-        evaluateAll(indentedLogger, propertyContext, getEffectiveIdsToControls().values());
-    }
-
-    public static void evaluateAll(IndentedLogger indentedLogger, PropertyContext propertyContext, Collection<XFormsControl> effectiveIdsToControls) {
-        indentedLogger.startHandleOperation("controls", "evaluating");
-        {
-            // Evaluate all controls
-            for (final XFormsControl currentControl: effectiveIdsToControls) {
-                currentControl.evaluateIfNeeded(propertyContext, false);
-            }
-        }
-        indentedLogger.endHandleOperation();
-    }
-
-    public XFormsControl getControl(String effectiveId) {
-        return effectiveIdsToControls.get(effectiveId);
-    }
-
-    public Map<String, XFormsControl> getEffectiveIdsToControls() {
-        return effectiveIdsToControls;
-    }
-
-    public Map<String, XFormsControl> getUploadControls() {
-        return (controlTypes != null) ? controlTypes.get("upload") : null;
-    }
-
-    public Map<String, XFormsControl> getRepeatControls() {
-        return (controlTypes != null) ? controlTypes.get("repeat") : null;
-    }
-
-    /**
-     * Return the list of xforms:select[@appearance = 'full'] in noscript mode.
-     *
-     * @return LinkedHashMap
-     */
-    public Map<String, XFormsControl> getSelectFullControls() {
-        return (controlTypes != null) ? controlTypes.get("select") : null;
-    }
-
-    public void clear() {
-        effectiveIdsToControls = null;
-        controlTypes = null;
     }
 }

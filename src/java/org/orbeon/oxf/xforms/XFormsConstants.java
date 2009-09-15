@@ -19,10 +19,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.Item;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Constants useful for the XForms engine. 
@@ -32,32 +29,34 @@ public class XFormsConstants {
     public static final List<Item> EMPTY_ITEM_LIST = Collections.emptyList();
     public static final Map<String, String> EMPTY_NAMESPACE_MAPPING = Collections.emptyMap();
 
-    public static final Map<String, String> ALLOWED_XXFORMS_ELEMENTS = new HashMap<String, String>();
-    public static final Map<String, String> ALLOWED_EXFORMS_ELEMENTS = new HashMap<String, String>();
-    public static final Map<String, String> ALLOWED_XBL_ELEMENTS = new HashMap<String, String>();
-    public static final Map<String, String> LABEL_HINT_HELP_ALERT_ELEMENT = new HashMap<String, String>();
+    public static final Set<String> ALLOWED_XXFORMS_ELEMENTS = new HashSet<String>();
+    public static final Set<String> ALLOWED_EXFORMS_ELEMENTS = new HashSet<String>();
+    public static final Set<String> ALLOWED_XBL_ELEMENTS = new HashSet<String>();
+    public static final Set<String> LABEL_HINT_HELP_ALERT_ELEMENT = new HashSet<String>();
         
     static {
         // TODO: Keeping this static list is not ideal
-        ALLOWED_XXFORMS_ELEMENTS.put("dialog", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("variable", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("attribute", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("text", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("context", "");
-        ALLOWED_XXFORMS_ELEMENTS.put("size", "");//xforms:upload/xxforms:size
+        ALLOWED_XXFORMS_ELEMENTS.add("dialog");
+        ALLOWED_XXFORMS_ELEMENTS.add("variable");
+        ALLOWED_XXFORMS_ELEMENTS.add("sequence");
+        ALLOWED_XXFORMS_ELEMENTS.add("attribute");
+        ALLOWED_XXFORMS_ELEMENTS.add("text");
+        ALLOWED_XXFORMS_ELEMENTS.add("context");
+        ALLOWED_XXFORMS_ELEMENTS.add("size");//xforms:upload/xxforms:size
 
-        ALLOWED_EXFORMS_ELEMENTS.put("variable", "");
+        ALLOWED_EXFORMS_ELEMENTS.add("variable");
 
-        ALLOWED_XBL_ELEMENTS.put("xbl", "");
-        ALLOWED_XBL_ELEMENTS.put("binding", "");
-        ALLOWED_XBL_ELEMENTS.put("handlers", "");
-        ALLOWED_XBL_ELEMENTS.put("implementation", "");
-        ALLOWED_XBL_ELEMENTS.put("template", "");
+        ALLOWED_XBL_ELEMENTS.add("xbl");
+        ALLOWED_XBL_ELEMENTS.add("binding");
+        ALLOWED_XBL_ELEMENTS.add("handlers");
+        ALLOWED_XBL_ELEMENTS.add("handler");// just for the case of top-level <xbl:handler>
+        ALLOWED_XBL_ELEMENTS.add("implementation");
+        ALLOWED_XBL_ELEMENTS.add("template");
 
-        XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.put("label", "");
-        XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.put("hint", "");
-        XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.put("help", "");
-        XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.put("alert", "");
+        XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.add("label");
+        XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.add("hint");
+        XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.add("help");
+        XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.add("alert");
     }
 
     public static final String XFORMS_PREFIX = "xforms";
@@ -125,6 +124,12 @@ public class XFormsConstants {
     public static final Namespace XXBL_NAMESPACE = new Namespace(XXBL_PREFIX, XXBL_NAMESPACE_URI);
     public static final QName XXBL_ATTR_QNAME = new QName("attr", XXBL_NAMESPACE);
     public static final QName XXBL_TRANSFORM_QNAME = new QName("transform", XXBL_NAMESPACE);
+    public static final QName XXBL_SCOPE_QNAME = new QName("scope", XXBL_NAMESPACE);
+    public enum XXBLScope { inner, outer }
+    
+    // Variables
+    public static final String XXFORMS_VARIABLE_NAME = "variable"; // don't use QName so we can support exforms/xxforms/xforms
+    public static final QName XXFORMS_SEQUENCE_QNAME = new QName("sequence", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_ITERATE_ATTRIBUTE_QNAME = new QName("iterate", XXFORMS_NAMESPACE);
 

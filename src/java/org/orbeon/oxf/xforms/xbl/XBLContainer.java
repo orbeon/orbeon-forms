@@ -55,11 +55,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     public static final String XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES = "xforms-dynamic-state-instances";
     protected static final String XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS = "xforms-dynamic-state-controls";
 
-    // Static id of the control containing this container, e.g. my-foo-bar
+    // Static id of the control containing this container, e.g. "$containing-document$" for root container, "my-foo-bar", etc.
     private String staticId;
-    // Effective id of the control containing this container, e.g. my-stuff$my-foo-bar.1-2
+    // Effective id of the control containing this container, e.g. "$containing-document$" for root container, "my-stuff$my-foo-bar.1-2", etc.
     private String effectiveId;
-    // Prefixed id of the control containing this container, e.g. my-stuff$my-foo-bar
+    // Prefixed id of the control containing this container, e.g. "$containing-document$" for root container, "my-stuff$my-foo-bar", etc.
     private String prefixedId;
     // Prefix of controls and models within this container, e.g. "" for the root container, "my-stuff$my-foo-bar$", etc.
     private String fullPrefix;
@@ -74,6 +74,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     private XFormsContextStack.BindingContext bindingContext;
 
     private XFormsContainingDocument containingDocument;
+    private XBLBindings xblBindings;
     private final XFormsContextStack contextStack;  // for controls under this container
 
     private List<XFormsModel> models = new ArrayList<XFormsModel>();
@@ -90,8 +91,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     }
 
     protected XBLContainer(String effectiveId, XBLContainer parentXBLContainer) {
-        this(XFormsUtils.getStaticIdFromId(effectiveId), effectiveId, XFormsUtils.getEffectiveIdNoSuffix(effectiveId),
-                XFormsUtils.getEffectiveIdNoSuffix(effectiveId) + XFormsConstants.COMPONENT_SEPARATOR, parentXBLContainer);
+        this(XFormsUtils.getStaticIdFromId(effectiveId), effectiveId, XFormsUtils.getPrefixedId(effectiveId),
+                XFormsUtils.getPrefixedId(effectiveId) + XFormsConstants.COMPONENT_SEPARATOR, parentXBLContainer);
     }
 
     protected XBLContainer(String staticId, String effectiveId, String prefixedId, String fullPrefix, XBLContainer parentXBLContainer) {
@@ -119,6 +120,12 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         this.contextStack = new XFormsContextStack(this);
     }
 
+    protected XBLBindings getXBLBindings() {
+        if (xblBindings == null)
+            xblBindings = containingDocument.getStaticState().getXBLBindings();
+        return xblBindings;
+    }
+
     /**
      * Update the effective id when repeat iterations change.
      *
@@ -134,7 +141,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         // Update all ids
         this.staticId = XFormsUtils.getStaticIdFromId(effectiveId);
         this.effectiveId = effectiveId;
-        this.prefixedId = XFormsUtils.getEffectiveIdNoSuffix(effectiveId);
+        this.prefixedId = XFormsUtils.getPrefixedId(effectiveId);
         this.fullPrefix = this.prefixedId + XFormsConstants.COMPONENT_SEPARATOR;
 
         // Add back to parent after updating id
@@ -149,7 +156,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         // Update effective ids of all nested models
         for (XFormsModel currentModel: models) {
             // E.g. foo$bar$my-model.1-2 => foo$bar$my-model.1-3
-            final String newModelEffectiveId = XFormsUtils.getEffectiveIdNoSuffix(currentModel.getEffectiveId()) + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
+            final String newModelEffectiveId = XFormsUtils.getPrefixedId(currentModel.getEffectiveId()) + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
             currentModel.updateEffectiveId(newModelEffectiveId);
 
             // Put in map
@@ -202,7 +209,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     /**
      * Return the namespace mappings associated with the given element. The element must be part of this container.
      *
-     * @param element       Element to get namsepace mapping for
+     * @param element       Element to get namespace mapping for
      * @return              Map<String prefix, String uri>
      */
     public Map<String, String> getNamespaceMappings(Element element) {
@@ -224,6 +231,30 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     public XFormsContextStack getContextStack() {
         return contextStack;
+    }
+
+    /**
+     * Find the resolution scope of a given prefixed id. The id must belong to the current container.
+     *
+     * @param prefixedId    prefixed id of XForms element
+     * @return              container corresponding to the scope
+     */
+    public XBLContainer findResolutionScope(String prefixedId) {
+        final String xblScopeIdFullPrefix; {
+            final String xblScopeId = getXBLBindings().getResolutionScopeId(prefixedId); // e.g. "" or "my-tab$my-component"
+            xblScopeIdFullPrefix = xblScopeId.length() == 0 ? xblScopeId : xblScopeId + '$';
+        }
+
+        XBLContainer currentContainer = this;
+        while (currentContainer != null) {
+
+            if (currentContainer.getFullPrefix().equals(xblScopeIdFullPrefix))
+                return currentContainer;
+
+            currentContainer = currentContainer.getParentXBLContainer();
+        }
+
+        throw new OXFException("XBL resolution scope not found for id: " + prefixedId);
     }
 
     /**
@@ -296,8 +327,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     protected void addModel(XFormsModel model) {// move to private once legacy caller is gone
         this.models.add(model);
-        if (model.getEffectiveId() != null)// TODO: how can this be null?
-            this.modelsMap.put(model.getEffectiveId(), model);
+        this.modelsMap.put(model.getEffectiveId(), model);
     }
 
     public XFormsModel getDefaultModel() {
@@ -357,52 +387,16 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     }
 
     /**
-     * Resolve an object. This optionally depends on a source, and involves resolving whether the source is within a
-     * repeat or a component.
-     *
-     * @param sourceEffectiveId  effective id of the source, or null
-     * @param targetStaticId     static id of the target
-     * @return                   object, or null if not found
-     */
-//    public Object resolveObjectById(String sourceEffectiveId, String targetStaticId) {
-//
-//        if (targetStaticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1 || targetStaticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1)
-//            throw new OXFException("Target id must be static id: " + targetStaticId);
-//
-//        // Check if requesting the binding id. If so, we interpret this as requesting the bound element
-//        // and return the control associated with the bound element.
-//        final String bindingId = containingDocument.getStaticState().getBindingId(prefixedId);
-//        if (targetStaticId.equals(bindingId))
-//            return containingDocument.getControls().getObjectByEffectiveId(effectiveId);
-//
-//        // Search in models
-//        for (Iterator i = models.iterator(); i.hasNext();) {
-//            final XFormsModel model = (XFormsModel) i.next();
-//            final Object resultObject = model.resolveObjectById(sourceEffectiveId, targetStaticId);
-//            if (resultObject != null)
-//                return resultObject;
-//        }
-//
-//        // Search in children
-//        if (childrenXBLContainers != null) {
-//            for (Iterator i = childrenXBLContainers.values().iterator(); i.hasNext();) {
-//                final XBLContainer currentContainer = (XBLContainer) i.next();
-//                final Object resultObject = currentContainer.resolveObjectById(sourceEffectiveId, targetStaticId);
-//                if (resultObject != null)
-//                    return resultObject;
-//            }
-//        }
-//
-//        return null;
-//    }
-
-    /**
      * Return the current repeat index for the given xforms:repeat id, -1 if the id is not found.
      *
-     * The repeat must be within this container.
+     * The repeat must be in the scope of this container.
+     *
+     * @param sourceEffectiveId effective id of the source (control, model, instance, submission, ...), or null
+     * @param repeatStaticId    static id of the target
+     * @return                  repeat index, -1 if repeat is not found
      */
-    public int getRepeatIndex(String sourceControlEffectiveId, String repeatStaticId) {
-        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) resolveObjectById(sourceControlEffectiveId, repeatStaticId);
+    public int getRepeatIndex(String sourceEffectiveId, String repeatStaticId) {
+        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) resolveObjectById(sourceEffectiveId, repeatStaticId);
         if (repeatControl != null) {
             // 1. Found concrete control
             return repeatControl.getIndex();
@@ -418,76 +412,104 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     }
 
     /**
-     * Resolve an object strictly contained within this container.
+     * Resolve an object in the scope of this container.
      *
-     * @param sourceControlEffectiveId  effective id of the source control, or null
-     * @param targetStaticId            object, or null if not found 
-     * @return
+     * @param sourceEffectiveId effective id of the source (control, model, instance, submission, ...), or null
+     * @param targetStaticId    static id of the target
+     * @return                  object, or null if not found
      */
-    public Object resolveObjectById(String sourceControlEffectiveId, String targetStaticId) {
+    public Object resolveObjectById(String sourceEffectiveId, String targetStaticId) {
 
         // Make sure the static id passed is actually a static id
-        if (targetStaticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1 || targetStaticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1)
+        if (!XFormsUtils.isStaticId(targetStaticId))
             throw new OXFException("Target id must be static id: " + targetStaticId);
 
         // 1. Check if requesting the binding id. If so, we interpret this as requesting the bound element
         //    and return the control associated with the bound element.
-        final String bindingId = containingDocument.getStaticState().getXblBindings().getBindingId(prefixedId);
+        // TODO: should this use sourceControlEffectiveId?
+        final String bindingId = getXBLBindings().getBindingId(prefixedId);
         if (targetStaticId.equals(bindingId))
             return containingDocument.getControls().getObjectByEffectiveId(effectiveId);
 
         // 2. Search in directly contained models
-        for (XFormsModel model: models) {
-            final Object resultObject = model.resolveObjectById(sourceControlEffectiveId, targetStaticId);
-            if (resultObject != null)
-                return resultObject;
-        }
+        final Object resultModelObject = searchContainedModels(sourceEffectiveId, targetStaticId);
+        if (resultModelObject != null)
+            return resultModelObject;
+
+        // TODO: move this to top once e.g. XFormsActionInterpreter() is fixed
+        if (sourceEffectiveId == null)
+            throw new OXFException("Source id must be specified.");
+
+        // Check that source is resolvable within this container
+        if (!isEffectiveIdResolvableByThisContainer(sourceEffectiveId))
+            throw new OXFException("Source not resolvable in container: " + sourceEffectiveId);
 
         // 3. Search in controls
 
-        // Determine source
-        final String newSourceEffectiveId;
-        if (sourceControlEffectiveId != null) {
-            // Id of source control is passed so use it
-
-            // Check that source is within this container
-            if (!isEffectiveIdWithinThisContainer(sourceControlEffectiveId))
-                return null;
-
-            newSourceEffectiveId = sourceControlEffectiveId;
-        } else if (!isRootXBLContainer()) {
-            // This XBL container is NOT the root container, so use the id of the XBL control
-            newSourceEffectiveId = getEffectiveId();
-        } else {
-            // This XBL container is the root container, just pass null
-            newSourceEffectiveId = null;
-        }
-        // TODO: in the future, sub-tree of components might be rooted in this class
+        // NOTE: in the future, sub-tree of components might be rooted in this class
         final XFormsControls controls = containingDocument.getControls();
-        final XFormsControl result = (XFormsControl) controls.resolveObjectById(newSourceEffectiveId, targetStaticId);
 
-        // If result is provided, make sure it is within the scope if this container
-        if (result != null && !isEffectiveIdWithinThisContainer(result.getEffectiveId())) {
-            return null;
+        // Find closest control
+        final String sourceControlEffectiveId;
+        {
+            final Object tempModelObject = searchContainedModels(null, XFormsUtils.getStaticIdFromId(sourceEffectiveId));
+            if (tempModelObject != null) {
+                // Source is a model object
+                final List<XFormsControl> children = getChildrenControls(controls);
+                if (children != null && children.size() > 0) {
+                    // We currently don't have a real notion of a "root" control, so we resolve against the first control if any
+                    final XFormsControl firstControl = children.get(0);
+                    sourceControlEffectiveId = firstControl.getEffectiveId();
+                } else {
+                    // There are no controls, therefore resolution will not find anything
+                    return null;
+                }
+            } else {
+                // Assume the source is a control
+                sourceControlEffectiveId = sourceEffectiveId;
+            }
+        }
+
+        // Resolve on controls
+        final XFormsControl result = (XFormsControl) controls.resolveObjectById(sourceControlEffectiveId, targetStaticId);
+
+        // If result is provided, make sure it is within the resolution scope of this container
+        if (result != null && !isEffectiveIdResolvableByThisContainer(result.getEffectiveId())) {
+            // This should not happen!
+            throw new OXFException("Resulting control is no in proper scope: " + result.getEffectiveId());
         } else {
             return result;
         }
     }
 
-    private boolean isRootXBLContainer() {
-        // Only the root container doesn't have a parent
-        return getParentXBLContainer() == null;
+    protected List<XFormsControl> getChildrenControls(XFormsControls controls) {
+        // We are a nested container so there must be an associated XFormsComponentControl
+        final XFormsComponentControl componentControl = (XFormsComponentControl) controls.getCurrentControlTree().getControl(effectiveId);
+        return componentControl.getChildren();
     }
 
-    private boolean isEffectiveIdWithinThisContainer(String effectiveId) {
-        if (fullPrefix.equals("")) {
-            // Case of root container
-            return XFormsUtils.getEffectiveIdPrefixNoSeparator(effectiveId).equals("");
-        } else {
-            // Nested container
-            // This matches elements within this container, but also the container itself
-            return effectiveId.equals(this.effectiveId) ||  fullPrefix.equals(XFormsUtils.getEffectiveIdPrefix(effectiveId));
+    private Object searchContainedModels(String sourceEffectiveId, String targetStaticId) {
+        for (XFormsModel model: models) {
+            final Object resultObject = model.resolveObjectById(sourceEffectiveId, targetStaticId);
+            if (resultObject != null)
+                return resultObject;
         }
+        return null;
+    }
+
+//    private boolean isEffectiveIdWithinThisContainer(String effectiveId) {
+//        if (fullPrefix.equals("")) {
+//            // Case of root container
+//            return XFormsUtils.getEffectiveIdPrefixNoSeparator(effectiveId).equals("");
+//        } else {
+//            // Nested container
+//            // This matches elements within this container, but also the container itself
+//            return effectiveId.equals(this.effectiveId) ||  fullPrefix.equals(XFormsUtils.getEffectiveIdPrefix(effectiveId));
+//        }
+//    }
+
+    private boolean isEffectiveIdResolvableByThisContainer(String effectiveId) {
+        return this == findResolutionScope(XFormsUtils.getPrefixedId(effectiveId));
     }
 
     /**
@@ -785,7 +807,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                         // Process event handlers
                         for (Object currentEventHandler: currentEventHandlers) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) currentEventHandler;
-                            // TODO: handler isTargetPhase()
+                            // TODO: handle isTargetPhase()
                             if (!eventHandler.isBubblingPhase()
                                     && eventHandler.isMatchEventName(retargetedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
@@ -878,7 +900,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     if (currentEventHandlers != null) {
                         for (Object currentEventHandler: currentEventHandlers) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) currentEventHandler;
-                            // TODO: handler isTargetPhase()
+                            // TODO: handle isTargetPhase()
                             if (eventHandler.isBubblingPhase()
                                     && eventHandler.isMatchEventName(retargetedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
@@ -955,7 +977,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             final XFormsModel.DeferredActionContext deferredActionContext = currentModel.getDeferredActionContext();
             deferredActionContext.recalculate = true;
             deferredActionContext.revalidate = true;
-            currentModel.getXBLContainer().requireRefresh();
         }
+        // This container requires refresh
+        requireRefresh();
     }
 }

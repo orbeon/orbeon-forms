@@ -401,7 +401,7 @@
                                                 <!-- Local controls -->
                                                 <xforms:group model="super-control-model" id="component-controls-group">
 
-                                                    <xforms:input ref="value"/>
+                                                    <xforms:input ref="value" id="my-input"/>
 
                                                     <!-- React to update to local controls -->
                                                     <xforms:action ev:event="xforms-value-changed">
@@ -464,9 +464,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="fr-super-control-1$component-group" label="Internal value 1: "/>
-                        <xxf:control id="fr-super-control-1$xf-13">foo-value</xxf:control>
+                        <xxf:control id="fr-super-control-1$my-input">foo-value</xxf:control>
                         <xxf:control id="fr-super-control-2$component-group" label="Internal value 2: "/>
-                        <xxf:control id="fr-super-control-2$xf-13">bar-value</xxf:control>
+                        <xxf:control id="fr-super-control-2$my-input">bar-value</xxf:control>
                         <xxf:control id="input-1" label="External value 1: ">foo-value</xxf:control>
                         <xxf:control id="input-2" label="External value 2: ">bar-value</xxf:control>
                     </xxf:control-values>
@@ -737,18 +737,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="fr-super-control-1$xf-3" for="fr-super-control-1$my-div" name="style">color: red</xxf:attribute>
-                        <xxf:attribute id="fr-super-control-2$xf-3" for="fr-super-control-2$my-div" name="style">font-weight: bold</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-1$xf-4" for="fr-super-control-1$my-div" name="style">color: red</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-2$xf-6" for="fr-super-control-2$my-div" name="style">font-weight: bold</xxf:attribute>
                         <xxf:copy-repeat-template id="repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                        <xxf:attribute id="fr-super-control-3$xf-3·1" for="fr-super-control-3$my-div·1" name="style">color: red</xxf:attribute>
-                        <xxf:attribute id="fr-super-control-3$xf-3·2" for="fr-super-control-3$my-div·2" name="style">font-weight: bold</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-3$xf-8·1" for="fr-super-control-3$my-div·1" name="style">color: red</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-3$xf-8·2" for="fr-super-control-3$my-div·2" name="style">font-weight: bold</xxf:attribute>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
     </test>
 
-    <test description="XBL event retargetting and dispatch to bound node" name="oxf:pipeline">
+    <test description="XBL event retargeting and dispatch to bound node" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -1273,8 +1273,8 @@
                     <xxf:control-values>
                         <xxf:control id="clash" label="NOP"/>
                         <xxf:copy-repeat-template id="my-foobar$clash" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                        <xxf:control id="my-foobar$xf-2·1">1</xxf:control>
-                        <xxf:control id="my-foobar$xf-2·2">1</xxf:control>
+                        <xxf:control id="my-foobar$xf-4·1">1</xxf:control>
+                        <xxf:control id="my-foobar$xf-4·2">1</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1323,10 +1323,10 @@
                             </xhtml:head>
                             <xhtml:body>
 
-                                <fr:foobar/>
+                                <fr:foobar id="my-foobar"/>
 
                                 <xforms:group id="my-group" context="instance('global-instance-2')">
-                                    <fr:foobar/>
+                                    <fr:foobar id="my-foobar2"/>
                                 </xforms:group>
 
                             </xhtml:body>
@@ -1348,10 +1348,10 @@
                             <instance id="global-instance-2" model-id="model">
                                 <global-instance-2/>
                             </instance>
-                            <instance id="local-instance" model-id="xf-5$local-model">
+                            <instance id="local-instance" model-id="my-foobar$local-model">
                                 <local-instance/>
                             </instance>
-                            <instance id="local-instance" model-id="xf-7$local-model">
+                            <instance id="local-instance" model-id="my-foobar2$local-model">
                                 <local-instance/>
                             </instance>
                         </instances>
@@ -1359,18 +1359,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xf-5$output-1">global-instance-1</xxf:control>
-                        <xxf:control id="xf-5$output-2">local-instance</xxf:control>
-                        <xxf:control id="xf-5$output-3">local-instance</xxf:control>
-                        <xxf:control id="xf-5$output-4">local-instance</xxf:control>
-                        <xxf:control id="xf-5$output-5">global-instance-1</xxf:control>
-                        <xxf:control id="xf-5$output-6">global-instance-2</xxf:control>
-                        <xxf:control id="xf-7$output-1">global-instance-2</xxf:control>
-                        <xxf:control id="xf-7$output-2">local-instance</xxf:control>
-                        <xxf:control id="xf-7$output-3">local-instance</xxf:control>
-                        <xxf:control id="xf-7$output-4">local-instance</xxf:control>
-                        <xxf:control id="xf-7$output-5">global-instance-1</xxf:control>
-                        <xxf:control id="xf-7$output-6">global-instance-2</xxf:control>
+                        <xxf:control id="my-foobar$output-1">global-instance-1</xxf:control>
+                        <xxf:control id="my-foobar$output-2">local-instance</xxf:control>
+                        <xxf:control id="my-foobar$output-3">local-instance</xxf:control>
+                        <xxf:control id="my-foobar$output-4">local-instance</xxf:control>
+                        <xxf:control id="my-foobar$output-5">global-instance-1</xxf:control>
+                        <xxf:control id="my-foobar$output-6">global-instance-2</xxf:control>
+                        <xxf:control id="my-foobar2$output-1">global-instance-2</xxf:control>
+                        <xxf:control id="my-foobar2$output-2">local-instance</xxf:control>
+                        <xxf:control id="my-foobar2$output-3">local-instance</xxf:control>
+                        <xxf:control id="my-foobar2$output-4">local-instance</xxf:control>
+                        <xxf:control id="my-foobar2$output-5">global-instance-1</xxf:control>
+                        <xxf:control id="my-foobar2$output-6">global-instance-2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1595,13 +1595,13 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo$xf-1$xf-1" label="Life, etc.: ">42</xxf:control>
-                        <xxf:control id="my-foo$xf-1$xf-3" label="Life, etc.: ">42</xxf:control>
-                        <xxf:control id="my-foo$xf-2$xf-1" label="Life, etc.: ">42</xxf:control>
-                        <xxf:control id="my-foo$xf-2$xf-3" label="Life, etc.: ">42</xxf:control>
+                        <xxf:control id="my-foo$xf-4$xf-7" label="Life, etc.: ">42</xxf:control>
+                        <xxf:control id="my-foo$xf-4$xf-9" label="Life, etc.: ">42</xxf:control>
+                        <xxf:control id="my-foo$xf-5$xf-12" label="Life, etc.: ">42</xxf:control>
+                        <xxf:control id="my-foo$xf-5$xf-14" label="Life, etc.: ">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
-            </xxf:event-response>
+            </xxf:event-response>            
         </output>
     </test>
 
@@ -1744,7 +1744,6 @@
                                     <!-- Top-level component -->
                                     <fr:level1 id="level1-component"/>
                                 </xforms:group>
-                                <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
                             </xhtml:body>
                         </xhtml:html>
                     </p:input>
@@ -1768,10 +1767,10 @@
                                     <event observer="fr-level1-binding" type="up-value1" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
                                     <event observer="fr-level2-binding" type="up-value2" target="level2-component" phase="bubbling" original-target="level2-component" indexes=""/>
                                     <event observer="fr-level3-binding" type="up-value3" target="level3-component" phase="bubbling" original-target="level3-component" indexes=""/>
+                                    <event observer="fr-level3-binding" type="down-3" target="level3-component" phase="bubbling" original-target="level3-component" indexes=""/>
+                                    <event observer="fr-level2-binding" type="down-2" target="level2-component" phase="bubbling" original-target="level2-component" indexes=""/>
                                     <event observer="fr-level1-binding" type="down-1" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
                                     <event observer="main-group" type="down-1" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
-                                    <event observer="fr-level2-binding" type="down-2" target="level2-component" phase="bubbling" original-target="level2-component" indexes=""/>
-                                    <event observer="fr-level3-binding" type="down-3" target="level3-component" phase="bubbling" original-target="level3-component" indexes=""/>
                                     <event observer="fr-level3-binding" type="DOMFocusIn" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="fr-level2-binding" type="DOMFocusIn" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="fr-level1-binding" type="DOMFocusIn" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>

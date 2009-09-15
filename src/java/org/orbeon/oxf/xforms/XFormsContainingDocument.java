@@ -66,7 +66,7 @@ public class XFormsContainingDocument extends XBLContainer {
     public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";
 
     // Per-document current logging indentation
-    private static final IndentedLogger.Indentation indentation = new IndentedLogger.Indentation();
+    private final IndentedLogger.Indentation indentation = new IndentedLogger.Indentation();
 
     private static final String LOGGING_CATEGORY = "document";
     private static final Logger logger = LoggerFactory.createLogger(XFormsContainingDocument.class);
@@ -1584,7 +1584,7 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     public List getEventHandlers(XBLContainer container) {
-        return getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
+        return getStaticState().getEventHandlers(XFormsUtils.getPrefixedId(getEffectiveId()));
     }
 
     public static void logWarningStatic(String type, String message, String... parameters) {
@@ -1639,5 +1639,10 @@ public class XFormsContainingDocument extends XBLContainer {
         STATIC_LOGGERS_MAP.put(category, indentedLogger);
 
         return indentedLogger;
+    }
+
+    @Override
+    protected List<XFormsControl> getChildrenControls(XFormsControls controls) {
+        return controls.getCurrentControlTree().getChildren();
     }
 }

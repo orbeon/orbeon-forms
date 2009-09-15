@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsInstance;
@@ -27,8 +26,6 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XXFormsValueChanged;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -46,28 +43,25 @@ public class XFormsSetvalueAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
-        final String value = actionElement.attributeValue("value");
+        final String valueExpression = actionElement.attributeValue("value");
         final String content = actionElement.getStringValue();
 
         final String valueToSet;
-        if (value != null) {
+        if (valueExpression != null) {
             // Value to set is computed with an XPath expression
 
             final List<Item> currentNodeset = contextStack.getCurrentNodeset();
             {
                 if (currentNodeset != null && currentNodeset.size() > 0) {
-                    // @ref points to something
-                    valueToSet = XPathCache.evaluateAsString(propertyContext,
-                        currentNodeset, contextStack.getCurrentPosition(),
-                        value, actionInterpreter.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
-                        XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null,
-                        (LocationData) actionElement.getData());
+                    // Evaluate
+                    valueToSet = actionInterpreter.evaluateStringExpression(propertyContext, actionElement,
+                            currentNodeset, contextStack.getCurrentPosition(), valueExpression);
                 } else {
                     // If @ref doesn't point to anything, don't even try to compute the value
                     valueToSet = null;
                 }
 
-                // TODO: this note is out of date:
+                // TODO: this note is most likely out of date:
                 // NOTE: The above is actually not correct: the context should not become null or empty. This is
                 // therefore just a workaround for a bug we hit:
 
@@ -142,9 +136,10 @@ public class XFormsSetvalueAction extends XFormsAction {
                     deferredActionContext.revalidate = true;
                     modifiedContainer.requireRefresh();
                 }
+            } else {
+                // NOTE: Is this the right thing to do if the value modified is not an instance value? Might not be needed!
+                containingDocument.getControls().markDirtySinceLastRequest(true);
             }
-
-            containingDocument.getControls().markDirtySinceLastRequest(true);
 
             return true;
         } else {

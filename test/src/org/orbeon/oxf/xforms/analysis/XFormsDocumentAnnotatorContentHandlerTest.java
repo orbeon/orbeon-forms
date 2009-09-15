@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.processor;
+package org.orbeon.oxf.xforms.analysis;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -20,6 +20,7 @@ import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -45,7 +46,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
     public void testFormNamespaceElements() {
 
         final Map<String, Map<String, String>> mappings = new HashMap<String, Map<String, String>>();
-        final XFormsDocumentAnnotatorContentHandler ch = new XFormsDocumentAnnotatorContentHandler(mappings);
+        final XFormsAnnotatorContentHandler ch = new XFormsAnnotatorContentHandler(mappings);
         XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", ch, false, false);
 
         // Test that ns information is provided for those elements
@@ -105,7 +106,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
 
         final Map<String, Map<String, String>> mappings = new HashMap<String, Map<String, String>>();
         final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);
-        final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.getLogger(), ""), null, null, null).annotateShadowTree(document, mappings, "");
+        final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.getLogger(), ""), null, null, mappings, null).annotateShadowTree(document, "", new IdGenerator());
         final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, new Configuration());
 
         // Check there is an xxforms:attribute for "html" with correct name

@@ -109,7 +109,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     public void handleMIPClasses(StringBuilder sb, String controlPrefixedId, XFormsSingleNodeControl xformsControl) {
 
         // Output MIP classes only having a binding
-        final boolean hasBinding = containingDocument.getStaticState().getControlInfoMap().get(controlPrefixedId).hasBinding();
+        final boolean hasBinding = containingDocument.getStaticState().getControlInfoMap().get(controlPrefixedId).hasBinding;
         if (hasBinding) {
             if (xformsControl != null) {
                 // The case of a concrete control
@@ -382,7 +382,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             // Statically obtain attributes information
             final XFormsStaticState staticState = containingDocument.getStaticState();
             final Element lhhaElement;
-            final String forPrefixedId = XFormsUtils.getEffectiveIdNoSuffix(controlEffectiveId);
+            final String forPrefixedId = XFormsUtils.getPrefixedId(controlEffectiveId);
             if (isLabel) {
                 elementName = handlerContext.getLabelElementName();
                 lhhaElement = staticState.getLabelElement(forPrefixedId);

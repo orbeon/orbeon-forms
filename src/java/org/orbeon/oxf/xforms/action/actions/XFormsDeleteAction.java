@@ -20,13 +20,11 @@ import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -89,12 +87,8 @@ public class XFormsDeleteAction extends XFormsAction {
                     // position is 1."
 
                     // "2. The return value is processed according to the rules of the XPath function round()"
-                    final String insertionIndexString = XPathCache.evaluateAsString(propertyContext,
-                            collectionToUpdate, 1,
-                            "round(" + atAttribute + ")",
-                            actionInterpreter.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
-                            XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null,
-                            (LocationData) actionElement.getData());
+                    final String insertionIndexString = actionInterpreter.evaluateStringExpression(propertyContext,
+                            actionElement, collectionToUpdate, 1, "round(" + atAttribute + ")");
 
                     // "3. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
                     // location is equal to the result. If the result is non-positive, then the insert location is
@@ -164,7 +158,6 @@ public class XFormsDeleteAction extends XFormsAction {
                 
                 // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
                 modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);
-                containingDocument.getControls().markDirtySinceLastRequest(true);
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
                 if (doDispatch)

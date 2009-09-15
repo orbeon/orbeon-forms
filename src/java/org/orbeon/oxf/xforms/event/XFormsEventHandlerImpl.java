@@ -47,10 +47,11 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * Initialize an action handler based on an action element.
      *
      * @param eventHandlerElement       action element e.g. xforms:action
+     * @param parentStaticId            static id of the parent element, or null
      * @param ancestorObserverStaticId  static id of the closest ancestor observer, or null
      */
-    public XFormsEventHandlerImpl(Element eventHandlerElement, String ancestorObserverStaticId) {
-        this(eventHandlerElement, ancestorObserverStaticId, false,
+    public XFormsEventHandlerImpl(Element eventHandlerElement, String parentStaticId, String ancestorObserverStaticId) {
+        this(eventHandlerElement, parentStaticId, ancestorObserverStaticId, false,
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME),
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME),
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME),
@@ -63,6 +64,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * Initialize an action handler based on a handler element and individual parameters.
      *
      * @param eventHandlerElement       event handler element (e.g. xbl:handler or xforms:action)
+     * @param parentStaticId            static id of the parent element, or null
      * @param ancestorObserverStaticId  static id of the closest ancestor observer, or null
      * @param isXBLHandler              whether the handler is an XBL handler (i.e. xbl:handler)
      * @param observersStaticIds        space-separated list of observers static ids, or null if parent element
@@ -72,9 +74,9 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * @param propagate                 whether event must propagate ("stop" | "continue")
      * @param defaultAction             whether default action must run ("cancel" | "perform")
      */
-    public XFormsEventHandlerImpl(Element eventHandlerElement, String ancestorObserverStaticId, boolean isXBLHandler,
-                                  String observersStaticIds, String eventNamesAttribute, String targets, String phase,
-                                  String propagate, String defaultAction) {
+    public XFormsEventHandlerImpl(Element eventHandlerElement, String parentStaticId, String ancestorObserverStaticId,
+                                  boolean isXBLHandler, String observersStaticIds, String eventNamesAttribute, String targets,
+                                  String phase, String propagate, String defaultAction) {
 
         this.eventHandlerElement = eventHandlerElement;
         this.ancestorObserverStaticId = ancestorObserverStaticId;
@@ -82,13 +84,12 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
 
         // Gather observers
         // NOTE: Supporting space-separated handlers is an extension, which may make it into XML Events 2
-        final Element parentElement = eventHandlerElement.getParent();
         if (observersStaticIds != null) {
             // ev:observer attribute specifies observers
             observerStaticIds = StringUtils.split(observersStaticIds);
-        } else if (parentElement != null && parentElement.attributeValue("id") != null) {
+        } else if (parentStaticId != null) {
             // Observer is parent
-            observerStaticIds = new String[] { parentElement.attributeValue("id")};
+            observerStaticIds = new String[] { parentStaticId };
         } else {
             // No observer
             observerStaticIds = new String[0];
@@ -139,20 +140,17 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
                             XFormsEventObserver eventObserver, XFormsEvent event) {
         // Create a new top-level action interpreter to handle this event
 
+        final XBLContainer contextContainer;
         if (isXBLHandler) {
             // Run within context of nested container
-
-            // Find nested container
-            final XBLContainer nestedContainer = ((XFormsComponentControl) eventObserver).getNestedContainer();
-
-            // Run action
-            new XFormsActionInterpreter(propertyContext, nestedContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId)
-                    .runAction(propertyContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
+            contextContainer = ((XFormsComponentControl) eventObserver).getNestedContainer();
         } else {
             // Run normally
-            new XFormsActionInterpreter(propertyContext, container, eventObserver, eventHandlerElement, ancestorObserverStaticId)
-                    .runAction(propertyContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
+            contextContainer = container;
         }
+
+        new XFormsActionInterpreter(propertyContext, contextContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId, isXBLHandler)
+                    .runAction(propertyContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
     }
 
     public String[] getObserversStaticIds() {

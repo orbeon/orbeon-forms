@@ -95,6 +95,15 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
      * @param index  new repeat index
      */
     public void setIndex(int index) {
+        // Set index
+        setIndexInternal(index);
+
+        // Handle rebuild flags for container affected by changes to this repeat
+        final XBLContainer resolutionScopeContainer = getXBLContainer().findResolutionScope(getPrefixedId());
+        resolutionScopeContainer.setDeferredFlagsForSetindex();
+    }
+
+    private void setIndexInternal(int index) {
         final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getLocalForUpdate();
         local.index = ensureIndexBounds(index);
     }
@@ -444,7 +453,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                                     "id", getEffectiveId(), "new index", Integer.toString(newRepeatIndex));
                         }
 
-                        setIndex(newRepeatIndex);
+                        setIndexInternal(newRepeatIndex);
                         didSetIndex = true;
                         break;
                     }
@@ -467,7 +476,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                                    "new index", Integer.toString(newRepeatIndex));
                         }
 
-                        setIndex(newRepeatIndex);
+                        setIndexInternal(newRepeatIndex);
                     }
                 } else if (oldRepeatIndex > 0 && oldRepeatIndex <= newIndexes.length) {
                     // The index was pointing to a node which has been removed
@@ -482,7 +491,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                                     "id", getEffectiveId(), "new index", Integer.toString(newRepeatNodeset.size()));
                         }
 
-                        setIndex(newRepeatNodeset.size());
+                        setIndexInternal(newRepeatNodeset.size());
                     } else {
                         // "if the new size of the collection is equal to or greater than the index, the index is not
                         // changed"
@@ -491,7 +500,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 } else {
                     // Old index was out of bounds?
 
-                    setIndex(getStartIndex());
+                    setIndexInternal(getStartIndex());
 
                     if (isDebugEnabled) {
                         indentedLogger.logDebug("xforms:repeat", "resetting index",
@@ -531,7 +540,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             }
 
             setChildren(null);
-            setIndex(0);
+            setIndexInternal(0);
 
             newIterations = Collections.emptyList();
         }

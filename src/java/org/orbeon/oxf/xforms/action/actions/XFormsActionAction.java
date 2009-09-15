@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.Variable;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -43,20 +44,22 @@ public class XFormsActionAction extends XFormsAction {
             final Element currentActionElement = (Element) i.next();
             final String currentActionName = currentActionElement.getName();
 
-            if (currentActionName.equals("variable")) {
+            if (currentActionName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
                 // Create variable object
                 final Variable variable = new Variable(container, contextStack, currentActionElement);
 
                 // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the following controls and variables.
                 // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
+                contextStack.getFunctionContext().setSourceEffectiveId(actionInterpreter.getSourceEffectiveId());
                 contextStack.pushVariable(currentActionElement, variable.getVariableName(), variable.getVariableValue(propertyContext, true));
+                contextStack.getFunctionContext().setSourceEffectiveId(null);
 
                 variablesCount++;
             } else {
                 // NOTE: We execute children actions, even if they happen to have ev:observer or ev:target attributes
 
                 // Set context on action element
-                contextStack.pushBinding(propertyContext, currentActionElement);
+                contextStack.pushBinding(propertyContext, currentActionElement, actionInterpreter.getSourceEffectiveId());
 
                 // Run action
                 actionInterpreter.runAction(propertyContext, targetId, eventObserver, currentActionElement);

@@ -318,7 +318,7 @@ public class XFormsItemUtils {
         
         final Itemset result = new Itemset();
 
-        final Element controlElement = containingDocument.getStaticState().getControlInfoMap().get(prefixedId).getElement();
+        final Element controlElement = containingDocument.getStaticState().getControlInfoMap().get(prefixedId).element;
         final boolean isEncryptItemValues = XFormsSelect1Control.isEncryptItemValues(containingDocument, controlElement);
 
         Dom4jUtils.visitSubtree(controlElement, new Dom4jUtils.VisitorListener() {

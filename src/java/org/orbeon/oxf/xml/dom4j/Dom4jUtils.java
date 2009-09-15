@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xml.dom4j;
 
@@ -24,7 +24,6 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -33,13 +32,11 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * Collection of util routines for working with DOM4J.  In particular offers many methods found
- * in DocumentHelper.  The difference between these 'copied' methods and the orginals is that
- * our copies use our NonLazyUserData* classes. ( As opposed to DOM4J's defaults or whatever
- * happens to be specied in DOM4J's system property. )
+ * Collection of utility routines for working with DOM4J. In particular offers many methods found in DocumentHelper.
+ * The difference between these 'copied' methods and the originals is that our copies use our NonLazyUserData* classes.
+ * (As opposed to DOM4J's defaults or whatever happens to be specified in DOM4J's system property.)
  */
 public class Dom4jUtils {
-
 
     /**
      * 03/30/2005 d : Currently DOM4J doesn't really support read only documents.  ( No real
@@ -278,27 +275,27 @@ public class Dom4jUtils {
         return ldSid == null ? DOMGenerator.DefaultContext : ldSid;
     }
 
-    /*
-        *  Convert the result of XPathUtils.selectObjectValue() to a string
-        */
+    /**
+     *  Convert the result of XPathUtils.selectObjectValue() to a string
+     */
     public static String objectToString(Object o) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
         if (o instanceof List) {
             for (Iterator i = ((List) o).iterator(); i.hasNext();) {
                 // this will be a node
-                buff.append(objectToString(i.next()));
+                builder.append(objectToString(i.next()));
             }
         } else if (o instanceof Element) {
-            buff.append(((Element) o).asXML());
+            builder.append(((Element) o).asXML());
         } else if (o instanceof Node) {
-            buff.append(((Node) o).asXML());
+            builder.append(((Node) o).asXML());
         } else if (o instanceof String)
-            buff.append((String) o);
+            builder.append((String) o);
         else if (o instanceof Number)
-            buff.append(o);
+            builder.append(o);
         else
             throw new OXFException("Should never happen");
-        return buff.toString();
+        return builder.toString();
     }
 
     /**
@@ -306,27 +303,27 @@ public class Dom4jUtils {
      * XPath expressions run correctly. As per XPath 1.0 (http://www.w3.org/TR/xpath):
      *
      * "As much character data as possible is grouped into each text node: a text node never has an immediately
-     * following or preceding sibling that is a text node. "
+     * following or preceding sibling that is a text node."
      *
-     * @param nodeToNormalize Node hiearchy to normalize
+     * @param nodeToNormalize Node hierarchy to normalize
      * @return                the input node, normalized
      */
     public static Node normalizeTextNodes(Node nodeToNormalize) {
-        final List<Node> nodesToDetatch = new ArrayList<Node>();
+        final List<Node> nodesToDetach = new ArrayList<Node>();
         nodeToNormalize.accept(new VisitorSupport() {
             public void visit(Element element) {
                 final List children = element.content();
                 Node previousNode = null;
-                StringBuffer sb = null;
+                StringBuilder sb = null;
                 for (Iterator i = children.iterator(); i.hasNext();) {
                     final Node currentNode = (Node) i.next();
                     if (previousNode != null) {
                         if (previousNode instanceof Text && currentNode instanceof Text) {
                             final Text previousNodeText = (Text) previousNode;
                             if (sb == null)
-                                sb = new StringBuffer(previousNodeText.getText());
+                                sb = new StringBuilder(previousNodeText.getText());
                             sb.append(currentNode.getText());
-                            nodesToDetatch.add(currentNode);
+                            nodesToDetach.add(currentNode);
                         } else if (previousNode instanceof Text) {
                             // Update node if needed
                             if (sb != null) {
@@ -350,8 +347,7 @@ public class Dom4jUtils {
             }
         });
         // Detach nodes only in the end so as to not confuse the acceptor above
-        for (Iterator<Node> i = nodesToDetatch.iterator(); i.hasNext();) {
-            final Node currentNode = i.next();
+        for (final Node currentNode: nodesToDetach) {
             currentNode.detach();
         }
 
@@ -361,7 +357,7 @@ public class Dom4jUtils {
     public static DocumentSource getDocumentSource(final Document d) {
         /*
          * Saxon's error handler is expensive for the service it provides so we just use our 
-         * singeton intead. 
+         * singleton instead.
          * 
          * Wrt expensive, delta in heap dump info below is amount of bytes allocated during the 
          * handling of a single request to '/' in the examples app. i.e. The trace below was 
@@ -600,7 +596,7 @@ public class Dom4jUtils {
      * @return          copy of Node
      */
     public static Node createCopy(Node source) {
-        return (source instanceof Element) ? ((Node) ((Element) source).createCopy()) : (Node) source.clone();
+        return (source instanceof Element) ? ((Element) source).createCopy() : (Node) source.clone();
     }
 
     /**
@@ -654,8 +650,7 @@ public class Dom4jUtils {
         final Map<String, String> parentNamespaceContext = Dom4jUtils.getNamespaceContext(parentElement);
         final Map<String, String> rootElementNamespaceContext = Dom4jUtils.getNamespaceContext(rootElement);
 
-        for (Iterator<String> k = parentNamespaceContext.keySet().iterator(); k.hasNext();) {
-            final String prefix = k.next();
+        for (final String prefix: parentNamespaceContext.keySet()) {
             // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
             // namespace even if there are no namespace nodes
             if (rootElementNamespaceContext.get(prefix) == null) {
@@ -679,8 +674,7 @@ public class Dom4jUtils {
         final Map<String, String> parentNamespaceContext = Dom4jUtils.getNamespaceContext(parentElement);
         final Map<String, String> rootElementNamespaceContext = Dom4jUtils.getNamespaceContext(rootElement);
 
-        for (Iterator<String> k = parentNamespaceContext.keySet().iterator(); k.hasNext();) {
-            final String prefix = k.next();
+        for (final String prefix: parentNamespaceContext.keySet()) {
             // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
             // namespace even if there are no namespace nodes
             if (rootElementNamespaceContext.get(prefix) == null && prefixesToFilter.get(prefix) == null) {
@@ -746,9 +740,9 @@ public class Dom4jUtils {
         // Compute stack trace and extract useful information
         final Exception e = new Exception();
         final StackTraceElement[] stkTrc = e.getStackTrace();
-        final int dpthToUse = depth + 1;
-        final String sysID = stkTrc[dpthToUse].getFileName();
-        final int line = stkTrc[dpthToUse].getLineNumber();
+        final int depthToUse = depth + 1;
+        final String sysID = stkTrc[depthToUse].getFileName();
+        final int line = stkTrc[depthToUse].getLineNumber();
         return new LocationData(sysID, line, -1);
     }
 
@@ -793,7 +787,7 @@ public class Dom4jUtils {
 
     public static String elementToString(Element element) {
         // Open start tag
-        final FastStringBuffer sb = new FastStringBuffer("<");
+        final StringBuilder sb = new StringBuilder("<");
         sb.append(element.getQualifiedName());
 
         // Attributes if any
@@ -831,7 +825,7 @@ public class Dom4jUtils {
     }
 
     public static String attributeToString(Attribute attribute) {
-        final FastStringBuffer sb = new FastStringBuffer(attribute.getQualifiedName());
+        final StringBuilder sb = new StringBuilder(attribute.getQualifiedName());
         sb.append("=\"");
         sb.append(attribute.getValue());
         sb.append('\"');

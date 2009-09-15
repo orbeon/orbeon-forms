@@ -930,7 +930,7 @@ public class XFormsUtils {
      * @param contextItems       context items
      * @param contextPosition    context position
      * @param variableToValueMap variables
-     * @param functionLibrary    XPath function libary to use
+     * @param functionLibrary    XPath function library to use
      * @param functionContext    context object to pass to the XForms function
      * @param prefixToURIMap     namespace mappings
      * @param locationData       LocationData for error reporting
@@ -1562,14 +1562,14 @@ public class XFormsUtils {
     }
 
     /**
-     * Return an effective id without its suffix, e.g.:
+     * Return an effective id's prefixed id, i.e. the effective id without its suffix, e.g.:
      *
      * o foo$bar$my-input.1-2 => foo$bar$my-input
      *
      * @param effectiveId   effective id to check
      * @return              effective id without its suffix, null if effectiveId was null
      */
-    public static String getEffectiveIdNoSuffix(String effectiveId) {
+    public static String getPrefixedId(String effectiveId) {
         if (effectiveId == null)
             return null;
 
@@ -1689,7 +1689,7 @@ public class XFormsUtils {
      * @return      static id, or null if anyId was null
      */
     public static String getStaticIdFromId(String anyId) {
-        return getEffectiveIdNoSuffix(getEffectiveIdNoPrefix(anyId));
+        return getPrefixedId(getEffectiveIdNoPrefix(anyId));
     }
 
     /**
@@ -1702,7 +1702,17 @@ public class XFormsUtils {
      * @return              effective id
      */
     public static String appendToEffectiveId(String effectiveId, String ending) {
-        final String prefixedId = getEffectiveIdNoSuffix(effectiveId);
+        final String prefixedId = getPrefixedId(effectiveId);
         return prefixedId + ending + getEffectiveIdSuffixWithSeparator(effectiveId);
+    }
+
+    /**
+     * Check if an id is a static id, i.e. if it does not contain component/hierarchy separators.
+     *
+     * @param staticId  static id to check
+     * @return          true if the id is a static id
+     */
+    public static boolean isStaticId(String staticId) {
+        return staticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) == -1 && staticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) == -1;
     }
 }

@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.processor;
+package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.ForwardingContentHandler;

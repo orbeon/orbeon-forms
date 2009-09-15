@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.processor;
+package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -41,14 +41,12 @@ import java.util.Map;
  * o finds title information and produces xxforms:text elements
  *
  * NOTE: There was a thought of merging this with XFormsExtractorContentHandler but we need a separate annotated
- * document in XFormsToXHTML to produce the output. Since the handlers use the XForms and XHTML element ids, it doesn't
- * seem that we can separate the steps.
+ * document in XFormsToXHTML to produce the output. So if we modify this, we should modify it so that two separate
+ * ContentHandler (at least two separate outputs) are produced, one for the annotated output, another for the extracted
+ * output.
  */
-public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHandler {
+public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
 
-    private static final String AUTOMATIC_ID_PREFIX = "xf-";
-
-    private int currentId = 1;
     private int level = 0;
     private boolean inHead;
     private boolean inTitle;
@@ -58,12 +56,12 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
     private final String containerNamespace;
     private final boolean portlet;
 
+    private final IdGenerator idGenerator;
     private final Map<String, Map<String, String>> namespaceMappings;
     private final boolean isGenerateIds;
 
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
-    private final Map<String, String> ids = new HashMap<String, String>();
     private final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
     private final AttributesImpl reusableAttributes = new AttributesImpl();
     private final String[] reusableStringArray = new String[1];
@@ -81,37 +79,51 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
     private Map<String, Map<String, String>> xblBindings;   // Map<String uri, Map<String localname, "">>
 
     /**
-     * This constructor just computes the namespace mappings and AVT elements
+     * This constructor just computes the namespace mappings and AVT elements.
      *
-     * @param namespaceMappings     Map<String, Map<String, String>> of control id to Map of namespace mappings
+     * @param namespaceMappings     namespace mappings
      */
-    public XFormsDocumentAnnotatorContentHandler(Map<String, Map<String, String>> namespaceMappings) {
+    public XFormsAnnotatorContentHandler(Map<String, Map<String, String>> namespaceMappings) {
 
         // In this mode, all elements that need to have ids already have them, so set safe defaults
         this.containerNamespace = "";
         this.portlet = false;
 
+        this.idGenerator = null;
         this.namespaceMappings = namespaceMappings;
         this.isGenerateIds = false;
     }
 
     /**
-     * This constructor just computes the namespace mappings and AVT elements
+     * This constructor just computes the namespace mappings and AVT elements.
      *
-     * @param contentHandler        ContentHandler
+     * @param contentHandler        output of transformation
      * @param externalContext       ExternalContext
-     * @param namespaceMappings     Map<String, Map<String, String>> of control id to Map of namespace mappings
+     * @param idGenerator           id generator
+     * @param namespaceMappings     namespace mappings
      */
-    public XFormsDocumentAnnotatorContentHandler(ContentHandler contentHandler, ExternalContext externalContext, Map<String, Map<String, String>> namespaceMappings) {
-        this(contentHandler, externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), namespaceMappings);
+    public XFormsAnnotatorContentHandler(ContentHandler contentHandler, ExternalContext externalContext,
+                                         IdGenerator idGenerator, Map<String, Map<String, String>> namespaceMappings) {
+        this(contentHandler, externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), idGenerator, namespaceMappings);
     }
 
-    public XFormsDocumentAnnotatorContentHandler(ContentHandler contentHandler, String containerNamespace, boolean portlet, Map<String, Map<String, String>> namespaceMappings) {
+    /**
+     *
+     *
+     * @param contentHandler        output of transformation
+     * @param containerNamespace    container namespace for portlets
+     * @param portlet               whether we are in portlet mode
+     * @param idGenerator           id generator
+     * @param namespaceMappings     namespace mappings
+     */
+    public XFormsAnnotatorContentHandler(ContentHandler contentHandler, String containerNamespace, boolean portlet,
+                                         IdGenerator idGenerator, Map<String, Map<String, String>> namespaceMappings) {
         super(contentHandler, contentHandler != null);
 
         this.containerNamespace = containerNamespace;
         this.portlet = portlet;
 
+        this.idGenerator = idGenerator;
         this.namespaceMappings = namespaceMappings;
         this.isGenerateIds = true;
     }
@@ -268,7 +280,9 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
                 super.startElement(uri, localname, qName, attributes);
             }
         } else {
-            // XBL element doesn't support AVTs
+            // Non-XBL element doesn't support AVTs
+            // NOTE: Still process attributes, because the annotator is used to process top-level <xbl:handler> as well.
+            attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
             super.startElement(uri, localname, qName, attributes);
         }
 
@@ -278,7 +292,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
                 // Preserve as is the content of labels, etc., instances, and schemas
                 // Within other XForms: check for labels, xforms:instance, and xs:schema
                 if (isXForms) {
-                    inLHHA = XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null; // labels, etc. may contain XHTML
+                    inLHHA = XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.contains(localname); // labels, etc. may contain XHTML
                     if (inLHHA || "instance".equals(localname)) {                                  // xforms:instance
                         inPreserve = true;
                         preserveLevel = level;
@@ -292,7 +306,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
                 // At the top-level: check for labels and xbl:xbl
                 final boolean isXBLXBL = isXBL && "xbl".equals(localname);
                 if (isXForms) {
-                    inLHHA = XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.get(localname) != null; // labels, etc. may contain XHTML
+                    inLHHA = XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.contains(localname); // labels, etc. may contain XHTML
                     if (inLHHA) {
                         inPreserve = true;
                         preserveLevel = level;
@@ -432,7 +446,7 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             if (idIndex == -1) {
                 // Create a new "id" attribute, prefixing if needed
                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                newIdAttributeUnprefixed = getNextId();
+                newIdAttributeUnprefixed = idGenerator.getNextId();
                 newIdAttribute[0] = containerNamespace + newIdAttributeUnprefixed;
                 newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newIdAttribute[0]);
                 attributes = newAttributes;
@@ -449,14 +463,14 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
             }
 
             // Check for duplicate ids
-            if (ids.get(newIdAttribute[0]) != null) // TODO: create Element to provide more location info?
+            if (idGenerator.isDuplicate(newIdAttribute[0])) // TODO: create Element to provide more location info?
                 throw new ValidationException("Duplicate id for XForms element: " + newIdAttributeUnprefixed,
                         new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", new String[] { "id", newIdAttributeUnprefixed }, false));
 
             // Remember that this id was used
-            ids.put(newIdAttribute[0], "");
+            idGenerator.add(newIdAttribute[0]);
 
-            // Prefix observer ID
+            // Prefix observer id
             if (portlet) {
                 final int observerIndex = attributes.getIndex(XFormsConstants.XML_EVENTS_NAMESPACE_URI, "observer");
                 if (observerIndex != -1) {
@@ -467,7 +481,6 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
                 }
             }
 
-            currentId++;
         } else {
             // Don't process ids
             newIdAttribute[0] = attributes.getValue(idIndex);
@@ -479,18 +492,5 @@ public class XFormsDocumentAnnotatorContentHandler extends ForwardingContentHand
         }
 
         return attributes;
-    }
-
-    private String getNextId() {
-        // Skip existing ids to handle these cases:
-        // o user uses attribute of the form xforms-element-*
-        // o XBL copies id attributes from bound element, so within template the id may be of the form xforms-element-*
-        String newId = AUTOMATIC_ID_PREFIX + currentId;
-        while (ids.get(newId) != null) {
-            currentId++;
-            newId = AUTOMATIC_ID_PREFIX + currentId;
-        }
-
-        return newId;
     }
 }

@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -117,8 +118,7 @@ public class XFormsContextStack {
         // TODO: Check dirty flag to prevent needless re-evaluation
 
         List<BindingContext.VariableInfo> variableInfos = null;
-        for (Object o: xformsModel.getModelDocument().getRootElement().elements("variable")) {
-            final Element currentVariableElement = (Element) o;
+        for (final Element currentVariableElement: Dom4jUtils.elements(xformsModel.getModelDocument().getRootElement(), XFormsConstants.XXFORMS_VARIABLE_NAME)) {
 
             // All variables in the model are in scope for the nested binds and actions.
             // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
@@ -129,7 +129,9 @@ public class XFormsContextStack {
             // because BindingContext caches variables in scope, after a first request for in-scope variables, further
             // variables values could not be added. The method below temporarily adds more elements on the stack but it
             // is safer.
+            functionContext.setSourceEffectiveId(xformsModel.getEffectiveId());
             pushVariable(currentVariableElement, variable.getVariableName(), variable.getVariableValue(propertyContext, true));
+            functionContext.setSourceEffectiveId(null);
 
             // Add VariableInfo created during above pushVariable(). There must be only one!
             if (variableInfos == null)
@@ -215,29 +217,6 @@ public class XFormsContextStack {
             // Should not happen
             throw new OXFException("Invalid XFormsEventObserver type: " + eventObserver.getClass());
         }
-
-        // TODO: Some code here which attempts to set iteration context for handlers within repeats. Check if needed.
-            // If in the iteration, then it may be in no context if there is no iteration.
-//            if (eventObserver instanceof XFormsRepeatControl) {
-//                final XFormsRepeatControl repeatControl = (XFormsRepeatControl) eventObserver;
-//                final List children = repeatControl.getChildren();
-//
-//                final Integer repeatIndexInteger = (Integer) xformsControls.getCurrentControlsState().getRepeatIdToIndex().get(eventObserverId);
-//                if (repeatIndexInteger != null && children != null && children.size() > 0) {
-//                    final int index = repeatIndexInteger.intValue();
-//                    final int childrenSize = children.size();
-//                    if (index > 0 && index < childrenSize) {
-//                        final RepeatIterationControl repeatIteration = (RepeatIterationControl) children.get(index);
-//                        xformsControls.setBinding(propertyContext, repeatIteration);
-//                    } else {
-//                        xformsControls.setBinding(propertyContext, (XFormsControl) eventObserver);
-//                    }
-//                } else {
-//                    xformsControls.setBinding(propertyContext, (XFormsControl) eventObserver);
-//                }
-//            } else {
-//                contextStack.setBinding((XFormsControl) eventObserver);
-//            }
     }
 
     public void restoreBinding(BindingContext bindingContext) {
@@ -247,6 +226,7 @@ public class XFormsContextStack {
 
         contextStack.push(bindingContext);
     }
+
     /**
      * Push an element containing either single-node or nodeset binding attributes.
      *
@@ -254,14 +234,34 @@ public class XFormsContextStack {
      * @param bindingElement    current element containing node binding attributes
      */
     public void pushBinding(PropertyContext propertyContext, Element bindingElement) {
+        // TODO: check usages of this method, since the source id is not passed
+        pushBinding(propertyContext, bindingElement, null);
+    }
+
+    /**
+     * Push an element containing either single-node or nodeset binding attributes.
+     *
+     * @param propertyContext   current PropertyContext
+     * @param bindingElement    current element containing node binding attributes
+     * @param effectiveSourceId effective id of source control for id resolution
+     */
+    public void pushBinding(PropertyContext propertyContext, Element bindingElement, String effectiveSourceId) {
         final String ref = bindingElement.attributeValue("ref");
         final String context = bindingElement.attributeValue("context");
         final String nodeset = bindingElement.attributeValue("nodeset");
         final String model = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
         final String bind = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
 
+        // Set context
+        if (effectiveSourceId != null)
+            functionContext.setSourceEffectiveId(effectiveSourceId);
+
         final Map<String, String> bindingElementNamespaceContext = container.getNamespaceMappings(bindingElement);
         pushBinding(propertyContext, ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceContext);
+
+        // Restore context
+        if (effectiveSourceId != null)
+            functionContext.setSourceEffectiveId(null);
     }
 
     public void pushBinding(PropertyContext propertyContext, String ref, String context, String nodeset, String modelId, String bindId,

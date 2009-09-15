@@ -611,7 +611,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     }
 
     public List getEventHandlers(XBLContainer container) {
-        return container.getContainingDocument().getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
+        return container.getContainingDocument().getStaticState().getEventHandlers(XFormsUtils.getPrefixedId(getEffectiveId()));
     }
 
     public void logInstance(IndentedLogger indentedLogger, String message) {

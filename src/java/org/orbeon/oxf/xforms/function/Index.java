@@ -41,7 +41,7 @@ public class Index extends XFormsFunction {
     }
 
     protected Item findIndexForRepeatId(XPathContext xpathContext, String repeatStaticId) {
-        // TODO: as of 2009-05-21, getSourceEffectiveId() is not returned in all situations. Might need to find better way.
+
         final int index = getXBLContainer(xpathContext).getRepeatIndex(getSourceEffectiveId(xpathContext), repeatStaticId);
 
         if (index == -1) {

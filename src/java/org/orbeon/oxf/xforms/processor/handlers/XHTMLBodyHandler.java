@@ -284,7 +284,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert");
 
         // Add handlers for custom components
-        final Map<QName, Element> componentBindings = staticState.getXblBindings().getComponentBindings();
+        final Map<QName, Element> componentBindings = staticState.getXBLBindings().getComponentBindings();
         if (componentBindings != null) {
             for (final QName currentQName: componentBindings.keySet()) {
                 controller.registerHandler(XXFormsComponentHandler.class.getName(), currentQName.getNamespaceURI(), currentQName.getName());

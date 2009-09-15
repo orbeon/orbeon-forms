@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2009 Orbeon, Inc.
 
@@ -14,8 +14,6 @@
   -->
 <group description="XForms Repeat" xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
-    xmlns:d="http://orbeon.org/oxf/xml/document"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -39,7 +37,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model xxforms:state-handling="client">
+                                <xforms:model>
                                     <xforms:instance>
                                         <form>
                                             <departments>
@@ -121,9 +119,9 @@
                         </instances>
                         <controls>
                         <control effective-id="id123" index="1"/>
-                            <control effective-id="id124·1" index="2"/>
-                            <control effective-id="id124·2" index="1"/>
-                            <control effective-id="id124·3" index="2"/>
+                            <control effective-id="id124Â·1" index="2"/>
+                            <control effective-id="id124Â·2" index="1"/>
+                            <control effective-id="id124Â·3" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -131,21 +129,21 @@
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="id123" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:copy-repeat-template id="id124" parent-indexes="1" start-suffix="2" end-suffix="2"/>
-                        <xxf:control id="id125·1-1">f11</xxf:control>
-                        <xxf:control id="id126·1-1">l11</xxf:control>
-                        <xxf:control id="id125·1-2">f12</xxf:control>
-                        <xxf:control id="id126·1-2">l12</xxf:control>
-                        <xxf:control id="id125·2-1">f21</xxf:control>
-                        <xxf:control id="id126·2-1">l21</xxf:control>
+                        <xxf:control id="id125Â·1-1">f11</xxf:control>
+                        <xxf:control id="id126Â·1-1">l11</xxf:control>
+                        <xxf:control id="id125Â·1-2">f12</xxf:control>
+                        <xxf:control id="id126Â·1-2">l12</xxf:control>
+                        <xxf:control id="id125Â·2-1">f21</xxf:control>
+                        <xxf:control id="id126Â·2-1">l21</xxf:control>
                         <xxf:copy-repeat-template id="id124" parent-indexes="3" start-suffix="2" end-suffix="4"/>
-                        <xxf:control id="id125·3-1">f31</xxf:control>
-                        <xxf:control id="id126·3-1">l31</xxf:control>
-                        <xxf:control id="id125·3-2">f32</xxf:control>
-                        <xxf:control id="id126·3-2">l32</xxf:control>
-                        <xxf:control id="id125·3-3">f33</xxf:control>
-                        <xxf:control id="id126·3-3">l33</xxf:control>
-                        <xxf:control id="id125·3-4">f34</xxf:control>
-                        <xxf:control id="id126·3-4">l34</xxf:control>
+                        <xxf:control id="id125Â·3-1">f31</xxf:control>
+                        <xxf:control id="id126Â·3-1">l31</xxf:control>
+                        <xxf:control id="id125Â·3-2">f32</xxf:control>
+                        <xxf:control id="id126Â·3-2">l32</xxf:control>
+                        <xxf:control id="id125Â·3-3">f33</xxf:control>
+                        <xxf:control id="id126Â·3-3">l33</xxf:control>
+                        <xxf:control id="id125Â·3-4">f34</xxf:control>
+                        <xxf:control id="id126Â·3-4">l34</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -153,46 +151,33 @@
     </test>
 
     <test description="xforms:repeat insert action" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
-                <p:param name="response" type="output"/>
-
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="action">
-                        <xxforms:action>
-                            <xxforms:event name="DOMActivate" source-control-id="id127·1-1"/>
-                        </xxforms:action>
-                    </p:input>
-                    <p:input name="controls">
-                        <controls
-                            xmlns:xforms="http://www.w3.org/2002/xforms"
-                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                            xmlns:ev="http://www.w3.org/2001/xml-events">
-                                <xforms:repeat nodeset="/form/departments/department" id="id123">
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:insert nodeset="../department" at="2" position="after"/>
-                                    </xforms:action>
-                                    <xforms:repeat nodeset="employee" id="id124" startindex="2">
-                                        <xforms:trigger id="id127">
-                                            <xforms:label>Insert</xforms:label>
-                                            <xforms:action ev:event="DOMActivate">
-                                                <xforms:insert nodeset="../../department[index('id123')]/employee" at="2" position="after"/>
-                                            </xforms:action>
-                                        </xforms:trigger>
-                                        <xforms:output ref="@first" id="id125"/>
-                                        <xforms:output ref="@last" id="id126"/>
-                                    </xforms:repeat>
-                                </xforms:repeat>
-                        </controls>
-                    </p:input>
-                    <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
-                    <p:input name="instances">
-                        <instances/>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-            </p:config>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xi:include href="repeat-model.xml" xxi:omit-xml-base="true"/>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="my-dummy-group">
+                        <xforms:dispatch ev:observer="main-model" ev:event="xforms-ready" name="DOMActivate" targetid="id127" xxforms:repeat-indexes="1 1"/>
+                    </xforms:group>
+                    <xforms:repeat nodeset="departments/department" id="id123">
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:insert nodeset="../department" at="2" position="after"/>
+                        </xforms:action>
+                        <xforms:repeat nodeset="employee" id="id124" startindex="2">
+                            <xforms:trigger id="id127">
+                                <xforms:label>Insert</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:insert nodeset="../../department[index('id123')]/employee" at="2" position="after"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                            <xforms:output ref="@first" id="id125"/>
+                            <xforms:output ref="@last" id="id126"/>
+                        </xforms:repeat>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -228,81 +213,86 @@
                         </instances>
                         <controls>
                             <control effective-id="id123" index="3"/>
-                            <control effective-id="id124·1" index="3"/>
-                            <control effective-id="id124·2" index="1"/>
-                            <control effective-id="id124·3" index="2"/>
-                            <control effective-id="id124·4" index="2"/>
+                            <control effective-id="id124Â·1" index="3"/>
+                            <control effective-id="id124Â·2" index="1"/>
+                            <control effective-id="id124Â·3" index="2"/>
+                            <control effective-id="id124Â·4" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="id123" parent-indexes="" start-suffix="4" end-suffix="4"/>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="1" start-suffix="3" end-suffix="3"/>
-                        <xxf:control id="id127·1-3" label="Insert"/>
-                        <xxf:control id="id125·1-3">f12</xxf:control>
-                        <xxf:control id="id126·1-3">l12</xxf:control>
+                        <xxf:copy-repeat-template id="id123" parent-indexes="" start-suffix="2" end-suffix="4"/>
+                        <xxf:copy-repeat-template id="id124" parent-indexes="1" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="id127Â·1-1" label="Insert"/>
+                        <xxf:control id="id125Â·1-1">f11</xxf:control>
+                        <xxf:control id="id126Â·1-1">l11</xxf:control>
+                        <xxf:control id="id127Â·1-2" label="Insert"/>
+                        <xxf:control id="id125Â·1-2">f12</xxf:control>
+                        <xxf:control id="id126Â·1-2">l12</xxf:control>
+                        <xxf:control id="id127Â·1-3" label="Insert"/>
+                        <xxf:control id="id125Â·1-3">f12</xxf:control>
+                        <xxf:control id="id126Â·1-3">l12</xxf:control>
+                        <xxf:control id="id127Â·2-1" label="Insert"/>
+                        <xxf:control id="id125Â·2-1">f21</xxf:control>
+                        <xxf:control id="id126Â·2-1">l21</xxf:control>
+                        <xxf:copy-repeat-template id="id124" parent-indexes="3" start-suffix="2" end-suffix="4"/>
+                        <xxf:control id="id127Â·3-1" label="Insert"/>
+                        <xxf:control id="id125Â·3-1">f31</xxf:control>
+                        <xxf:control id="id126Â·3-1">l31</xxf:control>
+                        <xxf:control id="id127Â·3-2" label="Insert"/>
+                        <xxf:control id="id125Â·3-2">f32</xxf:control>
+                        <xxf:control id="id126Â·3-2">l32</xxf:control>
+                        <xxf:control id="id127Â·3-3" label="Insert"/>
+                        <xxf:control id="id125Â·3-3">f33</xxf:control>
+                        <xxf:control id="id126Â·3-3">l33</xxf:control>
+                        <xxf:control id="id127Â·3-4" label="Insert"/>
+                        <xxf:control id="id125Â·3-4">f34</xxf:control>
+                        <xxf:control id="id126Â·3-4">l34</xxf:control>
                         <xxf:copy-repeat-template id="id124" parent-indexes="4" start-suffix="2" end-suffix="4"/>
-                        <xxf:control id="id127·4-1" label="Insert"/>
-                        <xxf:control id="id125·4-1">f31</xxf:control>
-                        <xxf:control id="id126·4-1">l31</xxf:control>
-                        <xxf:control id="id127·4-2" label="Insert"/>
-                        <xxf:control id="id125·4-2">f32</xxf:control>
-                        <xxf:control id="id126·4-2">l32</xxf:control>
-                        <xxf:control id="id127·4-3" label="Insert"/>
-                        <xxf:control id="id125·4-3">f33</xxf:control>
-                        <xxf:control id="id126·4-3">l33</xxf:control>
-                        <xxf:control id="id127·4-4" label="Insert"/>
-                        <xxf:control id="id125·4-4">f34</xxf:control>
-                        <xxf:control id="id126·4-4">l34</xxf:control>
+                        <xxf:control id="id127Â·4-1" label="Insert"/>
+                        <xxf:control id="id125Â·4-1">f31</xxf:control>
+                        <xxf:control id="id126Â·4-1">l31</xxf:control>
+                        <xxf:control id="id127Â·4-2" label="Insert"/>
+                        <xxf:control id="id125Â·4-2">f32</xxf:control>
+                        <xxf:control id="id126Â·4-2">l32</xxf:control>
+                        <xxf:control id="id127Â·4-3" label="Insert"/>
+                        <xxf:control id="id125Â·4-3">f33</xxf:control>
+                        <xxf:control id="id126Â·4-3">l33</xxf:control>
+                        <xxf:control id="id127Â·4-4" label="Insert"/>
+                        <xxf:control id="id125Â·4-4">f34</xxf:control>
+                        <xxf:control id="id126Â·4-4">l34</xxf:control>
                     </xxf:control-values>
-                    <xxf:repeat-indexes>
-                        <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
-                    </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>
         </output>
     </test>
 
-    <test description="xforms:repeat delete action" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
-                <p:param name="response" type="output"/>
-
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="action">
-                        <xxforms:action>
-                            <xxforms:event name="DOMActivate" source-control-id="id127·1-1"/>
-                        </xxforms:action>
-                    </p:input>
-                    <p:input name="controls">
-                        <controls
-                            xmlns:xforms="http://www.w3.org/2002/xforms"
-                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                            xmlns:ev="http://www.w3.org/2001/xml-events">
-                            <xforms:repeat nodeset="/form/departments/department" id="id123">
-                                <xforms:repeat nodeset="employee" id="id124" startindex="2">
-                                    <xforms:trigger id="id127">
-                                        <xforms:label>Delete</xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:delete nodeset="../../department[index('id123')]/employee" at="2"/>
-    <!--                                        <xforms:delete nodeset="../../department" at="2"/>-->
-                                        </xforms:action>
-                                    </xforms:trigger>
-                                    <xforms:output ref="@first" id="id125"/>
-                                    <xforms:output ref="@last" id="id126"/>
-                                </xforms:repeat>
-                            </xforms:repeat>
-                        </controls>
-                    </p:input>
-                    <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
-                    <p:input name="instances">
-                        <instances/>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-            </p:config>
+     <test description="xforms:repeat delete action" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xi:include href="repeat-model.xml" xxi:omit-xml-base="true"/>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="my-dummy-group">
+                        <xforms:dispatch ev:observer="main-model" ev:event="xforms-ready" name="DOMActivate" targetid="id127" xxforms:repeat-indexes="1 1"/>
+                    </xforms:group>
+                    <xforms:repeat nodeset="departments/department" id="id123">
+                        <xforms:repeat nodeset="employee" id="id124" startindex="2">
+                            <xforms:trigger id="id127">
+                                <xforms:label>Delete</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:delete nodeset="../../department[index('id123')]/employee" at="2"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                            <xforms:output ref="@first" id="id125"/>
+                            <xforms:output ref="@last" id="id126"/>
+                        </xforms:repeat>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -330,63 +320,157 @@
                         </instances>
                         <controls>
                             <control effective-id="id123" index="1"/>
-                            <control effective-id="id124·1" index="1"/>
-                            <control effective-id="id124·2" index="1"/>
-                            <control effective-id="id124·3" index="2"/>
+                            <control effective-id="id124Â·1" index="1"/>
+                            <control effective-id="id124Â·2" index="1"/>
+                            <control effective-id="id124Â·3" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:delete-repeat-elements id="id124" parent-indexes="1" count="1"/>
+                        <xxf:copy-repeat-template id="id123" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="id127Â·1-1" label="Delete"/>
+                        <xxf:control id="id125Â·1-1">f11</xxf:control>
+                        <xxf:control id="id126Â·1-1">l11</xxf:control>
+                        <xxf:control id="id127Â·2-1" label="Delete"/>
+                        <xxf:control id="id125Â·2-1">f21</xxf:control>
+                        <xxf:control id="id126Â·2-1">l21</xxf:control>
+                        <xxf:copy-repeat-template id="id124" parent-indexes="3" start-suffix="2" end-suffix="4"/>
+                        <xxf:control id="id127Â·3-1" label="Delete"/>
+                        <xxf:control id="id125Â·3-1">f31</xxf:control>
+                        <xxf:control id="id126Â·3-1">l31</xxf:control>
+                        <xxf:control id="id127Â·3-2" label="Delete"/>
+                        <xxf:control id="id125Â·3-2">f32</xxf:control>
+                        <xxf:control id="id126Â·3-2">l32</xxf:control>
+                        <xxf:control id="id127Â·3-3" label="Delete"/>
+                        <xxf:control id="id125Â·3-3">f33</xxf:control>
+                        <xxf:control id="id126Â·3-3">l33</xxf:control>
+                        <xxf:control id="id127Â·3-4" label="Delete"/>
+                        <xxf:control id="id125Â·3-4">f34</xxf:control>
+                        <xxf:control id="id126Â·3-4">l34</xxf:control>
                     </xxf:control-values>
-                    <xxf:repeat-indexes>
-                        <xxf:repeat-index id="id124" old-index="2" new-index="1"/>
-                    </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>
         </output>
     </test>
 
-    <test description="xforms:repeat setindex action" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
-                <p:param name="response" type="output"/>
-
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="action">
-                        <xxforms:action>
-                            <xxforms:event name="DOMActivate" source-control-id="id127·1-1"/>
-                        </xxforms:action>
-                    </p:input>
-                    <p:input name="controls">
-                        <controls
-                            xmlns:xforms="http://www.w3.org/2002/xforms"
-                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                            xmlns:ev="http://www.w3.org/2001/xml-events">
-                            <xforms:repeat nodeset="/form/departments/department" id="id123">
-                                <xforms:repeat nodeset="employee" id="id124" startindex="2">
-                                    <xforms:trigger id="id127">
-                                        <xforms:label>Delete</xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <xforms:setindex repeat="id123" index="7 - 4"/>
-                                            <xforms:setindex repeat="id124" index="4"/>
-                                        </xforms:action>
-                                    </xforms:trigger>
-                                    <xforms:output ref="@first" id="id125"/>
-                                    <xforms:output ref="@last" id="id126"/>
-                                </xforms:repeat>
-                            </xforms:repeat>
+    <test description="Simple xforms:repeat startindex" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <departments>
+                                <department>
+                                    <employee/>
+                                    <employee/>
+                                </department>
+                                <department>
+                                    <employee/>
+                                </department>
+                                <department>
+                                    <employee/>
+                                    <employee/>
+                                    <employee/>
+                                    <employee/>
+                                </department>
+                            </departments>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat nodeset="department" id="department-repeat" startindex="4">
+                        <xforms:repeat nodeset="employee" id="employee-repeat" startindex="2">
+                        </xforms:repeat>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <departments>
+                                    <department>
+                                        <employee/>
+                                        <employee/>
+                                    </department>
+                                    <department>
+                                        <employee/>
+                                    </department>
+                                    <department>
+                                        <employee/>
+                                        <employee/>
+                                        <employee/>
+                                        <employee/>
+                                    </department>
+                                </departments>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="department-repeat" index="3"/>
+                            <control effective-id="employee-repeatÂ·1" index="2"/>
+                            <control effective-id="employee-repeatÂ·2" index="1"/>
+                            <control effective-id="employee-repeatÂ·3" index="2"/>
                         </controls>
-                    </p:input>
-                    <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
-                    <p:input name="instances">
-                        <instances/>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-            </p:config>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="department-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="1" start-suffix="2" end-suffix="2"/>
+                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="3" start-suffix="2" end-suffix="4"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xforms:repeat setindex action in reaction to event dispatched to nested repeat" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="main-model">
+                        <xforms:instance id="main-instance">
+                            <departments>
+                                <department>
+                                    <employee/>
+                                    <employee/>
+                                </department>
+                                <department>
+                                    <employee/>
+                                </department>
+                                <department>
+                                    <employee/>
+                                    <employee/>
+                                    <employee/>
+                                    <employee/>
+                                </department>
+                            </departments>
+                        </xforms:instance>
+
+                        <!-- Initial indexes are all "1"; dispatching will cause the nested repeat in position 3 to change, not that in position 2 -->
+                        <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="my-trigger" xxforms:repeat-indexes="3 2"/>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat nodeset="department" id="department-repeat">
+                        <xforms:repeat nodeset="employee" id="employee-repeat">
+                            <xforms:trigger id="my-trigger">
+                                <xforms:action id="a1" ev:event="DOMActivate">
+                                    <xforms:setindex id="a2" repeat="department-repeat" index="2"/>
+                                    <xforms:setindex id="a3" repeat="employee-repeat" index="4"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xforms:repeat>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -394,39 +478,37 @@
                     <dynamic-state>
                         <instances>
                             <instance id="main-instance" model-id="main-model">
-                                <form>
-                                    <departments>
-                                        <department>
-                                            <employee first="f11" last="l11"/>
-                                            <employee first="f12" last="l12"/>
-                                        </department>
-                                        <department>
-                                            <employee first="f21" last="l21"/>
-                                        </department>
-                                        <department>
-                                            <employee first="f31" last="l31"/>
-                                            <employee first="f32" last="l32"/>
-                                            <employee first="f33" last="l33"/>
-                                            <employee first="f34" last="l34"/>
-                                        </department>
-                                    </departments>
-                                </form>
+                                <departments>
+                                    <department>
+                                        <employee/>
+                                        <employee/>
+                                    </department>
+                                    <department>
+                                        <employee/>
+                                    </department>
+                                    <department>
+                                        <employee/>
+                                        <employee/>
+                                        <employee/>
+                                        <employee/>
+                                    </department>
+                                </departments>
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="id123" index="3"/>
-                            <control effective-id="id124·1" index="1"/>
-                            <control effective-id="id124·2" index="1"/>
-                            <control effective-id="id124·3" index="4"/>
+                            <control effective-id="department-repeat" index="2"/><!-- changed by first setindex -->
+                            <control effective-id="employee-repeatÂ·1" index="1"/>
+                            <control effective-id="employee-repeatÂ·2" index="1"/>
+                            <control effective-id="employee-repeatÂ·3" index="4"/><!-- changed by second setindex -->
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values/>
-                    <xxf:repeat-indexes>
-                        <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
-                        <xxf:repeat-index id="id124" old-index="2" new-index="4"/>
-                    </xxf:repeat-indexes>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="department-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="1" start-suffix="2" end-suffix="2"/>
+                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="3" start-suffix="2" end-suffix="4"/>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -441,7 +523,7 @@
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
                     <p:input name="action">
                         <xxforms:action>
-                            <xxforms:event name="DOMFocusIn" source-control-id="id125·3-2"/>
+                            <xxforms:event name="DOMFocusIn" source-control-id="id125Â·3-2"/>
                         </xxforms:action>
                     </p:input>
                     <p:input name="controls">
@@ -492,9 +574,9 @@
                         </instances>
                         <controls>
                             <control effective-id="id123" index="3"/>
-                            <control effective-id="id124·1" index="1"/>
-                            <control effective-id="id124·2" index="1"/>
-                            <control effective-id="id124·3" index="2"/>
+                            <control effective-id="id124Â·1" index="1"/>
+                            <control effective-id="id124Â·2" index="1"/>
+                            <control effective-id="id124Â·3" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -508,77 +590,52 @@
             </xxf:event-response>
         </output>
     </test>
-
+    xxx
     <test description="xforms:insert with @context and @origin" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="main-model">
+                        <xforms:instance id="instance">
+                            <form>
+                                <employees/>
+                            </form>
+                        </xforms:instance>
+                        <xforms:instance id="template">
+                            <employee>
+                                <first-name/>
+                            </employee>
+                        </xforms:instance>
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="action">
-                        <xxforms:action>
-                            <xxforms:event name="DOMActivate" source-control-id="test-trigger"/>
-                        </xxforms:action>
-                    </p:input>
-                    <p:input name="controls">
-                        <controls>
-                            <xforms:trigger id="test-trigger">
-                                <xforms:label id="test-trigger-label">Add</xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <!-- For the first insert, there is no employee element yet -->
-                                    <xforms:setvalue ref="instance('template')/first-name">Joe</xforms:setvalue>
-                                    <xforms:insert context="employees" nodeset="employee"
-                                                   origin="instance('template')"/>
-                                    <!-- For the second insert, there is an employee element, and we insert after that element -->
-                                    <xforms:setvalue ref="instance('template')/first-name">Mary</xforms:setvalue>
-                                    <xforms:insert context="employees" nodeset="employee"
-                                                   origin="instance('template')"/>
-                                    <!-- This should insert between the two existing employees -->
-                                    <xforms:setvalue ref="instance('template')/first-name">Billy</xforms:setvalue>
-                                    <xforms:insert context="employees" nodeset="employee" at="index('employee-repeat')" position="before"
-                                                   origin="instance('template')"/>
-                                </xforms:action>
+                        <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="test-trigger"/>
 
-                            </xforms:trigger>
-                            <xforms:repeat nodeset="employees/employee" id="employee-repeat">
-                                <xforms:input id="first-name-input" ref="first-name"/>
-                            </xforms:repeat>
-                        </controls>
-                    </p:input>
-                    <p:input name="models">
-                        <models>
-                            <xforms:model id="main-model">
-                                <xforms:instance id="instance">
-                                    <form>
-                                        <employees/>
-                                    </form>
-                                </xforms:instance>
-                                <xforms:instance id="template">
-                                    <employee>
-                                        <first-name/>
-                                    </employee>
-                                </xforms:instance>
-                            </xforms:model>
-                        </models>
-                    </p:input>
-                    <p:input name="instances">
-                        <instances>
-                            <instance id="instance" model-id="main-model">
-                                <form>
-                                    <employees/>
-                                </form>
-                            </instance>
-                            <instance id="template" model-id="main-model">
-                                <employee>
-                                    <first-name/>
-                                </employee>
-                            </instance>
-                        </instances>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-            </p:config>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:trigger id="test-trigger">
+                        <xforms:label id="test-trigger-label">Add</xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <!-- For the first insert, there is no employee element yet -->
+                            <xforms:setvalue ref="instance('template')/first-name">Joe</xforms:setvalue>
+                            <xforms:insert context="employees" nodeset="employee"
+                                           origin="instance('template')"/>
+                            <!-- For the second insert, there is an employee element, and we insert after that element -->
+                            <xforms:setvalue ref="instance('template')/first-name">Mary</xforms:setvalue>
+                            <xforms:insert context="employees" nodeset="employee"
+                                           origin="instance('template')"/>
+                            <!-- This should insert between the two existing employees -->
+                            <xforms:setvalue ref="instance('template')/first-name">Billy</xforms:setvalue>
+                            <xforms:insert context="employees" nodeset="employee" at="index('employee-repeat')" position="before"
+                                           origin="instance('template')"/>
+                        </xforms:action>
+
+                    </xforms:trigger>
+                    <xforms:repeat nodeset="employees/employee" id="employee-repeat">
+                        <xforms:input id="first-name-input" ref="first-name"/>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -613,14 +670,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="" start-suffix="1" end-suffix="3"/>
-                        <xxf:control id="first-name-input·1">Joe</xxf:control>
-                        <xxf:control id="first-name-input·2">Billy</xxf:control>
-                        <xxf:control id="first-name-input·3">Mary</xxf:control>
+                        <xxf:control id="test-trigger" label="Add"/>
+                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="first-name-inputÂ·1">Joe</xxf:control>
+                        <xxf:control id="first-name-inputÂ·2">Billy</xxf:control>
+                        <xxf:control id="first-name-inputÂ·3">Mary</xxf:control>
                     </xxf:control-values>
-                    <xxf:repeat-indexes>
-                        <xxf:repeat-index id="employee-repeat" old-index="0" new-index="2"/>
-                    </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -635,7 +690,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                <xforms:model id="main-model">
                                     <xforms:instance>
                                        <instance model-id="main-model">
                                            <r1/>
@@ -690,14 +745,14 @@
         <output name="response">
             <controls>
                 <control effective-id="repeat1" index="2"/>
-                <control effective-id="repeat2·1" index="0"/>
-                <control effective-id="repeat2·2" index="2"/>
-                <control effective-id="repeat2·3" index="0"/>
+                <control effective-id="repeat2Â·1" index="0"/>
+                <control effective-id="repeat2Â·2" index="2"/>
+                <control effective-id="repeat2Â·3" index="0"/>
                 <control effective-id="repeat3" index="1"/>
                 <control effective-id="repeat4" index="1"/>
-                <control effective-id="repeat5·1" index="0"/>
-                <control effective-id="repeat5·2" index="1"/>
-                <control effective-id="repeat5·3" index="0"/>
+                <control effective-id="repeat5Â·1" index="0"/>
+                <control effective-id="repeat5Â·2" index="1"/>
+                <control effective-id="repeat5Â·3" index="0"/>
             </controls>
         </output>
     </test>
@@ -712,7 +767,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model id="main-model" xxforms:state-handling="client">
+                                <xforms:model id="main-model">
                                     <xforms:instance id="main-instance">
                                         <instance xmlns="">
                                             <book>
@@ -720,7 +775,7 @@
                                                 <author>Miguel de Cervantes Saavedra</author>
                                             </book>
                                             <book>
-                                                <title>Jacques le fataliste et son maître</title>
+                                                <title>Jacques le fataliste et son maÃ®tre</title>
                                                 <author>Denis Diderot</author>
                                             </book>
                                             <book>
@@ -737,7 +792,7 @@
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body>
-                                <xforms:repeat nodeset="book">
+                                <xforms:repeat nodeset="book" id="book-repeat">
                                     <xforms:input id="title-control" bind="title-bind">
                                         <xforms:label>Title</xforms:label>
                                     </xforms:input>
@@ -765,7 +820,7 @@
                                         <author>Miguel de Cervantes Saavedra</author>
                                     </book>
                                     <book>
-                                        <title>Jacques le fataliste et son maître</title>
+                                        <title>Jacques le fataliste et son maÃ®tre</title>
                                         <author>Denis Diderot</author>
                                     </book>
                                     <book>
@@ -776,19 +831,19 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="xf-6" index="1"/>
+                            <control effective-id="book-repeat" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="xf-6" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="title-control·1" required="true" label="Title">Don Quixote de la Mancha</xxf:control>
-                        <xxf:control id="author-control·1" required="true" label="Author">Miguel de Cervantes Saavedra</xxf:control>
-                        <xxf:control id="title-control·2" required="true" label="Title">Jacques le fataliste et son maître</xxf:control>
-                        <xxf:control id="author-control·2" required="true" label="Author">Denis Diderot</xxf:control>
-                        <xxf:control id="title-control·3" required="true" label="Title">Childhood's End</xxf:control>
-                        <xxf:control id="author-control·3" required="true" label="Author">Arthur C. Clarke</xxf:control>
+                        <xxf:copy-repeat-template id="book-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="title-controlÂ·1" required="true" label="Title">Don Quixote de la Mancha</xxf:control>
+                        <xxf:control id="author-controlÂ·1" required="true" label="Author">Miguel de Cervantes Saavedra</xxf:control>
+                        <xxf:control id="title-controlÂ·2" required="true" label="Title">Jacques le fataliste et son maÃ®tre</xxf:control>
+                        <xxf:control id="author-controlÂ·2" required="true" label="Author">Denis Diderot</xxf:control>
+                        <xxf:control id="title-controlÂ·3" required="true" label="Title">Childhood's End</xxf:control>
+                        <xxf:control id="author-controlÂ·3" required="true" label="Author">Arthur C. Clarke</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -805,7 +860,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model xxforms:state-handling="client">
+                                <xforms:model>
                                     <xforms:instance id="cities-instance" xxforms:readonly="true">
                                         <cities>
                                             <city>San Francisco</city>
@@ -816,11 +871,11 @@
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body>
-                                <xforms:repeat nodeset="city">
-                                    <xforms:input ref=".">
+                                <xforms:repeat nodeset="city" id="city-repeat">
+                                    <xforms:input id="my-input" ref=".">
                                         <xforms:label>City: </xforms:label>
                                     </xforms:input>
-                                    <xforms:output value="position()">
+                                    <xforms:output id="my-output" value="position()">
                                         <xforms:label>Position: </xforms:label>
                                     </xforms:output>
                                 </xforms:repeat>
@@ -838,19 +893,19 @@
                     <dynamic-state>
                         <instances/>
                         <controls>
-                            <control effective-id="xf-3" index="1"/>
+                            <control effective-id="city-repeat" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="xf-3" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="xf-4·1" readonly="true" label="City: ">San Francisco</xxf:control>
-                        <xxf:control id="xf-6·1" label="Position: ">1</xxf:control>
-                        <xxf:control id="xf-4·2" readonly="true" label="City: ">Los Angeles</xxf:control>
-                        <xxf:control id="xf-6·2" label="Position: ">2</xxf:control>
-                        <xxf:control id="xf-4·3" readonly="true" label="City: ">San Diego</xxf:control>
-                        <xxf:control id="xf-6·3" label="Position: ">3</xxf:control>
+                        <xxf:copy-repeat-template id="city-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="my-inputÂ·1" readonly="true" label="City: ">San Francisco</xxf:control>
+                        <xxf:control id="my-outputÂ·1" label="Position: ">1</xxf:control>
+                        <xxf:control id="my-inputÂ·2" readonly="true" label="City: ">Los Angeles</xxf:control>
+                        <xxf:control id="my-outputÂ·2" label="Position: ">2</xxf:control>
+                        <xxf:control id="my-inputÂ·3" readonly="true" label="City: ">San Diego</xxf:control>
+                        <xxf:control id="my-outputÂ·3" label="Position: ">3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -868,7 +923,7 @@
                         <xhtml:html>
                             <xhtml:head>
                                 <xhtml:title>UI events upon insert</xhtml:title>
-                                <xforms:model xxforms:state-handling="client" xxforms:server.events.initial-refresh-events="true">
+                                <xforms:model xxforms:server.events.initial-refresh-events="true">
 
                                     <!-- Insert new iteration -->
                                     <xforms:insert ev:event="xforms-ready"
@@ -942,9 +997,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="my-input·1">bloody</xxf:control>
-                        <xxf:control id="my-input·2">yellow</xxf:control>
-                        <xxf:control id="my-input·3">green</xxf:control>
+                        <xxf:control id="my-inputÂ·1">bloody</xxf:control>
+                        <xxf:control id="my-inputÂ·2">yellow</xxf:control>
+                        <xxf:control id="my-inputÂ·3">green</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -960,7 +1015,7 @@
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
                     <p:input name="action">
                         <xxforms:action>
-                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="approvalStatus-input·2">bbb</xxforms:event>
+                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="approvalStatus-inputÂ·2">bbb</xxforms:event>
                         </xxforms:action>
                     </p:input>
                     <p:input name="controls">
@@ -1096,18 +1151,18 @@
                         </instances>
                         <controls>
                             <control effective-id="authorization-repeat" index="2"/>
-                            <control effective-id="condition-repeat·1" index="1"/>
-                            <control effective-id="condition-repeat·2" index="1"/>
+                            <control effective-id="condition-repeatÂ·1" index="1"/>
+                            <control effective-id="condition-repeatÂ·2" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="approvalStatus-input·2">bbb</xxf:control>
-                        <xxf:repeat-iteration id="condition-repeat·2" relevant="true" iteration="1"/>
-                        <xxf:control id="description-textarea·2-1" relevant="true" label="Condition:"/>
-                        <xxf:repeat-iteration id="condition-repeat·2" relevant="true" iteration="2"/>
-                        <xxf:control id="description-textarea·2-2" relevant="true" label="Condition:"/>
+                        <xxf:control id="approvalStatus-inputÂ·2">bbb</xxf:control>
+                        <xxf:repeat-iteration id="condition-repeatÂ·2" relevant="true" iteration="1"/>
+                        <xxf:control id="description-textareaÂ·2-1" relevant="true" label="Condition:"/>
+                        <xxf:repeat-iteration id="condition-repeatÂ·2" relevant="true" iteration="2"/>
+                        <xxf:control id="description-textareaÂ·2-2" relevant="true" label="Condition:"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="authorization-repeat" old-index="1" new-index="2"/>
@@ -1127,8 +1182,8 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model xxforms:state-handling="client">
-                                    <xforms:instance>
+                                <xforms:model id="model">
+                                    <xforms:instance id="instance">
                                         <oranges>
                                             <orange><type>Persian</type><id>1</id></orange>
                                             <orange><type>Navel</type><id>2</id></orange>
@@ -1145,7 +1200,7 @@
                                 </xforms:repeat>
 
                                 <!-- This is the key of this test: index() here must return 1, not 0 -->
-                                <xforms:group ref="orange[index('orange-repeat')]">
+                                <xforms:group ref="orange[index('orange-repeat')]" id="my-group">
                                     <xforms:input ref="type" id="detail-type">
                                         <xforms:label>Orange type:</xforms:label>
                                     </xforms:input>
@@ -1167,7 +1222,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="xf-2" model-id="xf-1">
+                            <instance id="instance" model-id="model">
                                 <oranges>
                                     <orange>
                                         <type>Persian</type>
@@ -1188,8 +1243,8 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="orange-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                        <xxf:control id="orange-repeat-output·1" label="Orange type:">Persian</xxf:control>
-                        <xxf:control id="orange-repeat-output·2" label="Orange type:">Navel</xxf:control>
+                        <xxf:control id="orange-repeat-outputÂ·1" label="Orange type:">Persian</xxf:control>
+                        <xxf:control id="orange-repeat-outputÂ·2" label="Orange type:">Navel</xxf:control>
                         <xxf:control id="detail-type" label="Orange type:">Persian</xxf:control>
                         <xxf:control id="detail-id" label="Orange id:">1</xxf:control>
                     </xxf:control-values>
@@ -1208,7 +1263,7 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xforms:model xxforms:state-handling="client">
+                                <xforms:model>
                                     <xforms:instance id="books-instance">
                                         <books/>
                                     </xforms:instance>
@@ -1270,8 +1325,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-title·1">T3</xxf:control>
-                        <xxf:control id="my-author·1">A3</xxf:control>
+                        <xxf:control id="my-titleÂ·1">T3</xxf:control>
+                        <xxf:control id="my-authorÂ·1">A3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1351,10 +1406,10 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="4"/>
-                        <xxf:control id="my-input·1">1</xxf:control>
-                        <xxf:control id="my-input·2">2</xxf:control>
-                        <xxf:control id="my-input·3">3</xxf:control>
-                        <xxf:control id="my-input·4">4</xxf:control>
+                        <xxf:control id="my-inputÂ·1">1</xxf:control>
+                        <xxf:control id="my-inputÂ·2">2</xxf:control>
+                        <xxf:control id="my-inputÂ·3">3</xxf:control>
+                        <xxf:control id="my-inputÂ·4">4</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1441,10 +1496,10 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="4"/>
-                        <xxf:control id="my-output·1">5</xxf:control>
-                        <xxf:control id="my-output·2">4</xxf:control>
-                        <xxf:control id="my-output·3">3</xxf:control>
-                        <xxf:control id="my-output·4">2</xxf:control>
+                        <xxf:control id="my-outputÂ·1">5</xxf:control>
+                        <xxf:control id="my-outputÂ·2">4</xxf:control>
+                        <xxf:control id="my-outputÂ·3">3</xxf:control>
+                        <xxf:control id="my-outputÂ·4">2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

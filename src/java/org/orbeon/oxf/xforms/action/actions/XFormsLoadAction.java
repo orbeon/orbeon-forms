@@ -1,27 +1,27 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -39,16 +39,16 @@ public class XFormsLoadAction extends XFormsAction {
 
         final String showAttribute;
         {
-            final String rawShowAttribute = resolveAVT(actionInterpreter, propertyContext, actionElement, "show", false);
+            final String rawShowAttribute = actionInterpreter.resolveAVT(propertyContext, actionElement, "show", false);
             showAttribute = (rawShowAttribute == null) ? "replace" : rawShowAttribute;
             if (!("replace".equals(showAttribute) || "new".equals(showAttribute)))
                 throw new OXFException("Invalid value for 'show' attribute on xforms:load element: " + showAttribute);
         }
         final boolean doReplace = "replace".equals(showAttribute);
-        final String target = resolveAVT(actionInterpreter, propertyContext, actionElement, XFormsConstants.XXFORMS_TARGET_QNAME, false);
-        final String urlType = resolveAVT(actionInterpreter, propertyContext, actionElement, XMLConstants.FORMATTING_URL_TYPE_QNAME, false);
+        final String target = actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_TARGET_QNAME, false);
+        final String urlType = actionInterpreter.resolveAVT(propertyContext, actionElement, XMLConstants.FORMATTING_URL_TYPE_QNAME, false);
         final boolean urlNorewrite = XFormsUtils.resolveUrlNorewrite(actionElement);
-        final boolean isShowProgress = !"false".equals(resolveAVT(actionInterpreter, propertyContext, actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME, false));
+        final boolean isShowProgress = !"false".equals(actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME, false));
 
         // "If both are present, the action has no effect."
         final XFormsContextStack.BindingContext bindingContext = actionInterpreter.getContextStack().getCurrentBindingContext();
@@ -74,7 +74,7 @@ public class XFormsLoadAction extends XFormsAction {
                 return;
 
             // Resolve AVT
-            final String resolvedResource = resolveAVT(actionInterpreter, propertyContext, actionElement, "resource", false);
+            final String resolvedResource = actionInterpreter.resolveAVT(propertyContext, actionElement, "resource", false);
             final String encodedResource = XFormsUtils.encodeHRRI(resolvedResource, true);
             resolveStoreLoadValue(containingDocument, propertyContext, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?

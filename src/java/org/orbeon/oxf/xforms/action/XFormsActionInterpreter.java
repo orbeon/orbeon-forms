@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.xforms.action;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
@@ -46,8 +48,13 @@ public class XFormsActionInterpreter {
     private final XFormsControls xformsControls;
     private final XFormsContextStack contextStack;
 
-    public XFormsActionInterpreter(PropertyContext propertyContext, XBLContainer container,
-                                   XFormsEventObserver eventObserver, Element actionElement, String ancestorObserverStaticId) {
+    private final XFormsEventObserver xpathContextObserver;
+
+    private final Element outerActionElement;
+    private final boolean isXBLHandler;
+
+    public XFormsActionInterpreter(PropertyContext propertyContext, XBLContainer container, XFormsEventObserver eventObserver,
+                                   Element outerActionElement, String ancestorObserverStaticId, boolean isXBLHandler) {
 
         this.container = container;
         this.containingDocument = container.getContainingDocument();
@@ -57,49 +64,42 @@ public class XFormsActionInterpreter {
         this.xformsControls = containingDocument.getControls();
         this.contextStack = new XFormsContextStack(container);
 
+        this.outerActionElement = outerActionElement;
+        this.isXBLHandler = isXBLHandler;
+
         // Set XPath context based on lexical location
-        final String eventContainerEffectiveId;
+        final XFormsEventObserver xpathContextObserver;
         if (eventObserver.getId().equals(ancestorObserverStaticId)) {
             // Observer is parent of action, so we have easily access to the effective context
-            eventContainerEffectiveId = eventObserver.getEffectiveId();
+            xpathContextObserver = eventObserver;
         } else {
-            // Observer is not parent of action, try to find effective id of parent
-
-            // Try to find effective parent object
-            // TODO: this resolution doesn't look right!
-            final Object o = container.resolveObjectById(null, ancestorObserverStaticId);
-            eventContainerEffectiveId = (o != null) ? ((XFormsEventObserver) o).getEffectiveId() : ancestorObserverStaticId;
-
-            // TODO: The logic above is not quite right at the moment because the parent might be in a repeat.
-            // Should work for outer controls, models, instances and submissions
+            // Observer is not parent of action, must resolve effective id of parent
+            xpathContextObserver = (XFormsEventObserver) container.resolveObjectById(eventObserver.getEffectiveId(), ancestorObserverStaticId);
         }
 
-        setActionBindingContext(propertyContext, containingDocument, actionElement, eventContainerEffectiveId);
+        this.xpathContextObserver = xpathContextObserver;
+        setActionBindingContext(propertyContext, outerActionElement, xpathContextObserver);
     }
 
-    private void setActionBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument,
-                                         Element actionElement, String effectiveEventContainerId) {
-
-        // Get "fresh" observer
-        final XFormsEventObserver eventObserver = (XFormsEventObserver) containingDocument.getObjectByEffectiveId(effectiveEventContainerId);
+    private void setActionBindingContext(PropertyContext propertyContext, Element actionElement, XFormsEventObserver xpathContextObserver) {
 
         // Set context on container element
-        contextStack.setBinding(propertyContext, eventObserver);
+        contextStack.setBinding(propertyContext, xpathContextObserver);
 
         // Check variables in scope for action handlers within controls
 
         // NOTE: This is not optimal, as variable values are re-evaluated and may have values different from the ones
         // used by the controls during refresh. Contemplate handling this differently, e.g. see
-        // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements
-        if (eventObserver instanceof XFormsControl) {
+        // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements "Representation of outer actions"
+        if (xpathContextObserver instanceof XFormsControl) {
             int variablesCount = 0;
 
-            final List<Element> actionPrecedingElements = Dom4jUtils.findPrecedingElements(actionElement, ((XFormsControl) eventObserver).getControlElement());
+            final List<Element> actionPrecedingElements = Dom4jUtils.findPrecedingElements(actionElement, ((XFormsControl) xpathContextObserver).getControlElement());
             if (actionPrecedingElements.size() > 0) {
                 Collections.reverse(actionPrecedingElements);
                 for (Element currentElement: actionPrecedingElements) {
                     final String currentElementName = currentElement.getName();
-                    if (currentElementName.equals("variable")) {
+                    if (currentElementName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
                         // Create variable object
                         final Variable variable = new Variable(container, contextStack, currentElement);
 
@@ -142,14 +142,10 @@ public class XFormsActionInterpreter {
         return contextStack;
     }
 
-    public XFormsFunction.Context getFunctionContext() {
-        return contextStack.getFunctionContext();
-    }
-
     /**
      * Return the namespace mappings for the given action element.
      *
-     * @param actionElement Element to get namsepace mapping for
+     * @param actionElement Element to get namespace mapping for
      * @return              Map<String prefix, String uri>
      */
     public Map<String, String> getNamespaceMappings(Element actionElement) {
@@ -342,11 +338,8 @@ public class XFormsActionInterpreter {
             }
         }
 
-        final List conditionResult = XPathCache.evaluate(propertyContext,
-                contextNodeset, contextPosition, "boolean(" + conditionAttribute + ")",
-            container.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-            contextStack.getFunctionContext(), null, (LocationData) actionElement.getData());
-
+        final List conditionResult = evaluateExpression(propertyContext, actionElement,
+                contextNodeset, contextPosition, "boolean(" + conditionAttribute + ")");
         if (!(Boolean) conditionResult.get(0)) {
             // Don't execute action
 
@@ -357,6 +350,210 @@ public class XFormsActionInterpreter {
         } else {
             // Condition is true
             return true;
+        }
+    }
+
+    /**
+     * Return the source against which id resolutions are made.
+     *
+     * @return  effective id of source
+     */
+    public String getSourceEffectiveId() {
+        if (isXBLHandler) {
+            // Get the effective id of the <xbl:handler> element as source
+            return container.getFullPrefix() + outerActionElement.attributeValue("id") + XFormsUtils.getEffectiveIdSuffixWithSeparator(container.getEffectiveId());
+        } else {
+            // Effective id of the XPath observer
+            return xpathContextObserver.getEffectiveId();
+        }
+    }
+
+    public String evaluateStringExpression(PropertyContext propertyContext, Element actionElement,
+                                           List<Item> nodeset, int position, String xpathExpression) {
+
+        // Setup function context
+        final XFormsFunction.Context functionContext = contextStack.getFunctionContext();
+        functionContext.setSourceEffectiveId(getSourceEffectiveId());
+
+        // @ref points to something
+        final String result = XPathCache.evaluateAsString(propertyContext,
+            nodeset, position,
+            xpathExpression, getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
+            XFormsContainingDocument.getFunctionLibrary(), functionContext, null,
+            (LocationData) actionElement.getData());
+
+        // Restore function context
+        functionContext.setSourceEffectiveId(null);
+
+        return result;
+    }
+
+    public List evaluateExpression(PropertyContext propertyContext, Element actionElement,
+                                   List<Item> nodeset, int position, String xpathExpression) {
+
+
+        // Setup function context
+        final XFormsFunction.Context functionContext = contextStack.getFunctionContext();
+        functionContext.setSourceEffectiveId(getSourceEffectiveId());
+
+        // @ref points to something
+        final List result = XPathCache.evaluate(propertyContext,
+            nodeset, position,
+            xpathExpression, getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
+            XFormsContainingDocument.getFunctionLibrary(), functionContext, null,
+            (LocationData) actionElement.getData());
+
+        // Restore function context
+        functionContext.setSourceEffectiveId(null);
+
+        return result;
+    }
+
+    /**
+     * Resolve a value which may be an AVT.
+     *
+     * @param propertyContext   current context
+     * @param actionElement     action element
+     * @param attributeValue    raw value to resolve
+     * @param isNamespace       whether to namespace the resulting value
+     * @return                  resolved attribute value
+     */
+    public String resolveAVTProvideValue(PropertyContext propertyContext, Element actionElement, String attributeValue, boolean isNamespace) {
+
+        if (attributeValue == null)
+            return null;
+
+        // Whether this can't be an AVT
+        final boolean maybeAvt = attributeValue.indexOf('{') != -1;
+
+        final String resolvedAVTValue;
+        if (maybeAvt) {
+            // We have to go through AVT evaluation
+            final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
+
+            // We don't have an evaluation context so return
+            // CHECK: In the future we want to allow an empty evaluation context so do we really want this check?
+            if (bindingContext.getSingleNode() == null)
+                return null;
+
+            final Map<String, String> prefixToURIMap = getNamespaceMappings(actionElement);
+            final LocationData locationData = (LocationData) actionElement.getData();
+
+            // Setup function context
+            final XFormsFunction.Context functionContext = contextStack.getFunctionContext();
+            functionContext.setSourceEffectiveId(getSourceEffectiveId());
+
+            resolvedAVTValue = XFormsUtils.resolveAttributeValueTemplates(propertyContext, bindingContext.getNodeset(),
+                        bindingContext.getPosition(), contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                        functionContext, prefixToURIMap, locationData, attributeValue);
+
+            // Restore function context
+            functionContext.setSourceEffectiveId(null);
+        } else {
+            // We optimize as this doesn't need AVT evaluation
+            resolvedAVTValue = attributeValue;
+        }
+
+        return isNamespace ? XFormsUtils.namespaceId(containingDocument, resolvedAVTValue) : resolvedAVTValue;
+    }
+
+    /**
+     * Resolve the value of an attribute which may be an AVT.
+     *
+     * @param propertyContext   current context
+     * @param actionElement     action element
+     * @param attributeName     QName of the attribute containing the value
+     * @param isNamespace       whether to namespace the resulting value
+     * @return                  resolved attribute value
+     */
+    public String resolveAVT(PropertyContext propertyContext, Element actionElement, QName attributeName, boolean isNamespace) {
+        // Get raw attribute value
+        final String attributeValue = actionElement.attributeValue(attributeName);
+        if (attributeValue == null)
+            return null;
+
+        return resolveAVTProvideValue(propertyContext, actionElement, attributeValue, isNamespace);
+    }
+
+    /**
+     * Resolve the value of an attribute which may be an AVT.
+     *
+     * @param propertyContext   current context
+     * @param actionElement     action element
+     * @param attributeName     name of the attribute containing the value
+     * @param isNamespace       whether to namespace the resulting value
+     * @return                  resolved attribute value
+     */
+    public String resolveAVT(PropertyContext propertyContext, Element actionElement, String attributeName, boolean isNamespace) {
+        // Get raw attribute value
+        final String attributeValue = actionElement.attributeValue(attributeName);
+        if (attributeValue == null)
+            return null;
+
+        return resolveAVTProvideValue(propertyContext, actionElement, attributeValue, isNamespace);
+    }
+
+    /**
+     * Find an effective object based on either the xxforms:repeat-indexes attribute, or on the current repeat indexes.
+     *
+     * @param propertyContext       current context
+     * @param actionElement         current action element
+     * @param targetStaticId        static id of the target to resolve
+     * @return                      effective control if found
+     */
+    public Object resolveEffectiveControl(PropertyContext propertyContext, Element actionElement, String targetStaticId) {
+
+        final XFormsControls controls = getXFormsControls();
+        final XBLContainer container = getXBLContainer();
+
+        final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement, container);
+
+        // Get indexes as space-separated list
+        final String repeatIndexes = resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME, false);
+        if (StringUtils.isBlank(repeatIndexes)) {
+            // Most common case: resolve effective id based on source and target
+            return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(), targetStaticId);
+        } else {
+            // Extension: effective id is provided through repeat indexes, modify appropriately and directly reach control
+            final Integer[] containerParts = XFormsUtils.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId());
+            final String[] additionalParts = StringUtils.split(repeatIndexes);
+
+            final String[] parts = new String[containerParts.length + additionalParts.length];
+            for (int i = 0; i < containerParts.length; i++) {
+                parts[i] = Integer.toString(containerParts[i]);
+            }
+            System.arraycopy(additionalParts, 0, parts, containerParts.length, additionalParts.length);
+
+            return controls.getObjectByEffectiveId(container.getFullPrefix() + targetStaticId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(parts, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
+        }
+    }
+
+    private XBLContainer findResolutionScopeContainer(Element actionElement, XBLContainer container) {
+        final String actionStaticId = actionElement.attributeValue("id");
+        assert actionStaticId != null;
+        final String actionPrefixedId = container.getFullPrefix() + actionStaticId;
+        return container.findResolutionScope(actionPrefixedId);
+    }
+
+    /**
+     * Resolve an effective object.
+     *
+     * @param propertyContext   current context
+     * @param actionElement     current action element
+     * @param targetStaticId    target to resolve
+     * @return                  effective control if found
+     */
+    public Object resolveEffectiveObject(PropertyContext propertyContext, Element actionElement, String targetStaticId) {
+        // First try controls as we want to check on explicit repeat indexes first
+        final Object tempXFormsEventTarget = resolveEffectiveControl(propertyContext, actionElement, targetStaticId);
+        if (tempXFormsEventTarget != null) {
+            // Object with this id exists
+            return tempXFormsEventTarget;
+        } else {
+            // Otherwise, try container
+            final XBLContainer container = getXBLContainer();
+            final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement, container);
+            return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(), targetStaticId);
         }
     }
 }

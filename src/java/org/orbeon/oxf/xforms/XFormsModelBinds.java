@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent;
+import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -554,11 +555,7 @@ public class XFormsModelBinds {
             // Compute default value
             try {
                 final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
-
-                final String stringResult = XPathCache.evaluateAsString(propertyContext, nodeset, position, bind.getXXFormsDefault(),
-                        container.getNamespaceMappings(bind.getBindElement()), getVariables(currentNodeInfo),
-                        XFormsContainingDocument.getFunctionLibrary(), model.getContextStack().getFunctionContext(),
-                        bind.getLocationData().getSystemID(), bind.getLocationData());
+                final String stringResult = evaluateStringExpression(propertyContext, nodeset, position, bind, bind.getXXFormsDefault(), getVariables(currentNodeInfo));
 
                 // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
                 // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
@@ -579,11 +576,7 @@ public class XFormsModelBinds {
             // Compute calculated value
             try {
                 final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
-
-                final String stringResult = XPathCache.evaluateAsString(propertyContext, nodeset, position, bind.getCalculate(),
-                        container.getNamespaceMappings(bind.getBindElement()), getVariables(currentNodeInfo),
-                        XFormsContainingDocument.getFunctionLibrary(), model.getContextStack().getFunctionContext(),
-                        bind.getLocationData().getSystemID(), bind.getLocationData());
+                final String stringResult = evaluateStringExpression(propertyContext, nodeset, position, bind, bind.getCalculate(), getVariables(currentNodeInfo));
 
                 // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
                 // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
@@ -630,7 +623,7 @@ public class XFormsModelBinds {
             // Evaluate "required" XPath expression on this node
             try {
                 // Get MIP value
-                final boolean required = evaluateBooleanExpression1(propertyContext, bind, bind.getRequired(), nodeset, position, currentVariables);
+                final boolean required = evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getRequired(), currentVariables);
 
                 // Update node with MIP value
                 InstanceData.setRequired(currentNodeInfo, required);
@@ -646,7 +639,7 @@ public class XFormsModelBinds {
         if (bind.getRelevant() != null) {
             // Evaluate "relevant" XPath expression on this node
             try {
-                final boolean relevant = evaluateBooleanExpression1(propertyContext, bind, bind.getRelevant(), nodeset, position, currentVariables);
+                final boolean relevant = evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getRelevant(), currentVariables);
                 // Mark node
                 InstanceData.setRelevant(currentNodeInfo, relevant);
             } catch (Exception e) {
@@ -662,7 +655,7 @@ public class XFormsModelBinds {
             // The bind has a readonly attribute
             // Evaluate "readonly" XPath expression on this node
             try {
-                final boolean readonly = evaluateBooleanExpression1(propertyContext, bind, bind.getReadonly(), nodeset, position, currentVariables);
+                final boolean readonly = evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getReadonly(), currentVariables);
 
                 // Mark node
                 InstanceData.setReadonly(currentNodeInfo, readonly);
@@ -686,11 +679,7 @@ public class XFormsModelBinds {
                 final String expression = entry.getValue();
 
                 try {
-                    final String stringResult = XPathCache.evaluateAsString(propertyContext, nodeset, position, expression,
-                            container.getNamespaceMappings(bind.getBindElement()), getVariables(currentNodeInfo),
-                            XFormsContainingDocument.getFunctionLibrary(), model.getContextStack().getFunctionContext(),
-                            bind.getLocationData().getSystemID(), bind.getLocationData());
-
+                    final String stringResult = evaluateStringExpression(propertyContext, nodeset, position, bind, expression, getVariables(currentNodeInfo));
                     InstanceData.setCustom(currentNodeInfo, key, stringResult);
                 } catch (Exception e) {
                     final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms custom bind",
@@ -702,12 +691,40 @@ public class XFormsModelBinds {
         }
     }
 
-    private boolean evaluateBooleanExpression1(PropertyContext propertyContext, Bind bind, String xpathExpression,
-                                               List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
+    private String evaluateStringExpression(PropertyContext propertyContext, List<Item> nodeset, int position, Bind bind,
+                                            String xpathExpression, Map<String, ValueRepresentation> currentVariables) {
+
+        // Setup function context
+        final XFormsFunction.Context functionContext = model.getContextStack().getFunctionContext();
+        functionContext.setSourceEffectiveId(model.getEffectiveId()); // TODO: when binds are able to receive events, source should be bind id
+
+        final String result = XPathCache.evaluateAsString(propertyContext, nodeset, position, xpathExpression,
+                        container.getNamespaceMappings(bind.getBindElement()), currentVariables,
+                        XFormsContainingDocument.getFunctionLibrary(), model.getContextStack().getFunctionContext(),
+                        bind.getLocationData().getSystemID(), bind.getLocationData());
+
+        // Restore function context
+        functionContext.setSourceEffectiveId(null);
+
+        return result;
+    }
+
+    private boolean evaluateBooleanExpression1(PropertyContext propertyContext, List<Item> nodeset, int position, Bind bind,
+                                               String xpathExpression, Map<String, ValueRepresentation> currentVariables) {
+
+        // Setup function context
+        final XFormsFunction.Context functionContext = model.getContextStack().getFunctionContext();
+        functionContext.setSourceEffectiveId(model.getEffectiveId()); // TODO: when binds are able to receive events, source should be bind id
+
         final String xpath = "boolean(" + xpathExpression + ")";
-        return (Boolean) XPathCache.evaluateSingle(propertyContext,
+        final boolean result = (Boolean) XPathCache.evaluateSingle(propertyContext,
                 nodeset, position, xpath, container.getNamespaceMappings(bind.getBindElement()), currentVariables,
-                XFormsContainingDocument.getFunctionLibrary(), model.getContextStack().getFunctionContext(), bind.getLocationData().getSystemID(), bind.getLocationData());
+                XFormsContainingDocument.getFunctionLibrary(), functionContext, bind.getLocationData().getSystemID(), bind.getLocationData());
+
+        // Restore function context
+        functionContext.setSourceEffectiveId(null);
+
+        return result;
     }
 
 //    private boolean evaluateBooleanExpression2(PropertyContext propertyContext, Bind bind, String xpathExpression, List<Item> nodeset, int position, Map currentVariables) {
@@ -918,7 +935,7 @@ public class XFormsModelBinds {
             // Evaluate constraint
             try {
                 // Get MIP value
-                final boolean valid = evaluateBooleanExpression1(propertyContext, bind, bind.getConstraint(), nodeset, position, getVariables(currentNodeInfo));
+                final boolean valid = evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getConstraint(), getVariables(currentNodeInfo));
 
                 // Update node with MIP value
                 isValid &= valid;

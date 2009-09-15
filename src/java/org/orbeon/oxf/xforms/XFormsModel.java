@@ -149,7 +149,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public String getPrefixedId() {
         if (prefixedId == null) {
-            prefixedId = XFormsUtils.getEffectiveIdNoSuffix(effectiveId);
+            prefixedId = XFormsUtils.getPrefixedId(effectiveId);
         }
         return prefixedId;
     }
@@ -949,7 +949,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // TODO: rebuild computational dependency data structures
 
             // Controls may have @bind or xxforms:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
-            containingDocument.getControls().markDirtySinceLastRequest(true);
+            containingDocument.getControls().requireRefresh();
         }
 
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
@@ -1057,9 +1057,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         if (xformsControls.isInitialized()) {
             // Controls exist, otherwise there is no point in doing anything controls-related
 
-            // The controls will be dirty
-            containingDocument.getControls().markDirtySinceLastRequest(true);
-
             // As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
             // performing RRRR directly
             deferredActionContext.setAllDeferredFlags(true);
@@ -1128,7 +1125,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public XFormsEventObserver getParentEventObserver(XBLContainer container) {
         // There is no point for events to propagate beyond the model
-        // TODO: This could change in the future once models are more integrated in the components hierarchy
+        // NOTE: This could change in the future once models are more integrated in the components hierarchy
         return null;
     }
 
@@ -1136,6 +1133,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      * Return the List of XFormsEventHandler objects within this object.
      */
     public List getEventHandlers(XBLContainer container) {
-        return containingDocument.getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
+        return containingDocument.getStaticState().getEventHandlers(XFormsUtils.getPrefixedId(getEffectiveId()));
     }
 }

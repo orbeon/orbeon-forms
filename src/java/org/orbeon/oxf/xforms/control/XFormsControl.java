@@ -55,11 +55,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             //XFormsConstants.CLASS_QNAME, TODO: handle @class specially as it is now copied as is in XFormsBaseHandler
     };
 
-    private XBLContainer container;
-    protected XFormsContainingDocument containingDocument;
+    private final XBLContainer container;
+    protected final XFormsContainingDocument containingDocument;
 
     // Static information (never changes for the lifetime of the containing document)
-    private Element controlElement;
+    private final Element controlElement;
     private String id;
     private String name;
     private String appearance;// could become more dynamic in the future
@@ -160,7 +160,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         if (!parentSuffix.equals("")) {
             // Update effective id
-            effectiveId = XFormsUtils.getEffectiveIdNoSuffix(effectiveId) + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + parentSuffix;
+            effectiveId = XFormsUtils.getPrefixedId(effectiveId) + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + parentSuffix;
         } else {
             // Nothing to do as we are not in repeated content
         }
@@ -172,7 +172,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public String getPrefixedId() {
         if (prefixedId == null) {
-            prefixedId = XFormsUtils.getEffectiveIdNoSuffix(effectiveId);
+            prefixedId = XFormsUtils.getPrefixedId(effectiveId);
         }
         return prefixedId;
     }
@@ -664,12 +664,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                         }
 
                         repeatControl.setIndex(newRepeatIndex);
-
-                        // NOTE: Affected controls might be in different XBL containers. All XBL containers touched must be flagged.
-                        repeatControl.getXBLContainer().setDeferredFlagsForSetindex();
                     }
-                    
-                    controls.markDirtySinceLastRequest(true);
                 }
 
                 // Store new focus information for client

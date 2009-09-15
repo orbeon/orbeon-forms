@@ -45,13 +45,13 @@ public class XFormsSendAction extends XFormsAction {
         final String resolvedSubmissionStaticId;
         {
             // Resolve AVT
-            resolvedSubmissionStaticId = resolveAVTProvideValue(actionInterpreter, propertyContext, actionElement, submissionId, true);
+            resolvedSubmissionStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, submissionId, true);
             if (resolvedSubmissionStaticId == null)
                 return;
         }
 
         // Find actual target
-        final Object submission = resolveEffectiveObject(actionInterpreter, propertyContext, eventObserver, resolvedSubmissionStaticId, actionElement);
+        final Object submission = actionInterpreter.resolveEffectiveObject(propertyContext, actionElement, resolvedSubmissionStaticId);
         if (submission instanceof XFormsModelSubmission) {
             // Dispatch event to submission object
             final XFormsEvent newEvent = new XFormsSubmitEvent(container.getContainingDocument(), (XFormsEventTarget) submission);

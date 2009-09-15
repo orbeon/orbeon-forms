@@ -38,15 +38,14 @@ public class XXFormsHideAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Resolve attribute as AVTs
-        final String dialogStaticId = resolveAVT(actionInterpreter, propertyContext, actionElement, "dialog", true);
+        final String dialogStaticId = actionInterpreter.resolveAVT(propertyContext, actionElement, "dialog", true);
         if (dialogStaticId == null) {
             // TODO: Should we try to find the dialog containing the action, of the dialog containing the observer or the target causing this event?
         }
 
         if (dialogStaticId != null) {
             // Dispatch xxforms-dialog-close event to dialog
-            // TODO: use container.getObjectByEffectiveId() once XBLContainer is able to have local controls
-            final Object controlObject = resolveEffectiveControl(actionInterpreter, propertyContext, eventObserver.getEffectiveId(), dialogStaticId, actionElement);
+            final Object controlObject = actionInterpreter.resolveEffectiveControl(propertyContext, actionElement, dialogStaticId);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XFormsEventTarget eventTarget = (XFormsEventTarget) controlObject;
                 final XFormsEvent newEvent = new XXFormsDialogCloseEvent(containingDocument, eventTarget);

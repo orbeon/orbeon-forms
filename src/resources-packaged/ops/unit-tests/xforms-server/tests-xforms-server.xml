@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2009 Orbeon, Inc.
 
@@ -27,51 +27,30 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <test description="Calculator" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="main-model">
+                        <xforms:instance id="main-instance">
+                            <equation xmlns="">
+                                <screen>0</screen>
+                                <screenbuffer>0</screenbuffer>
+                                <first>0</first>
+                                <second>0</second>
+                                <memory>0</memory>
+                                <result/>
+                            </equation>
+                        </xforms:instance>
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="action">
-                        <xxforms:action>
-                            <xxforms:event name="DOMActivate" source-control-id="5"/>
-                        </xxforms:action>
-                    </p:input>
-                    <p:input name="controls" href="xforms-server/xforms-calculator-controls.xml"/>
-                    <p:input name="models">
-                        <models>
-                            <xforms:model id="main-model">
-                                <xforms:instance id="main-instance">
-                                    <equation xmlns="">
-                                        <screen>0</screen>
-                                        <screenbuffer>0</screenbuffer>
-                                        <first>0</first>
-                                        <second>0</second>
-                                        <memory>0</memory>
-                                        <result/>
-                                    </equation>
-                                </xforms:instance>
-                            </xforms:model>
-                        </models>
-                    </p:input>
-                    <p:input name="instances">
-                        <instances>
-                            <instance model-id="main-model" id="main-instance">
-                                <equation xmlns="">
-                                    <screen>0</screen>
-                                    <screenbuffer>0</screenbuffer>
-                                    <first>0</first>
-                                    <second>0</second>
-                                    <memory>0</memory>
-                                    <result/>
-                                </equation>
-                            </instance>
-                        </instances>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-            </p:config>
+                        <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="5"/>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xi:include href="xforms-calculator-controls.xml" xxi:omit-xml-base="true"/>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -97,48 +76,67 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="1">7</xxf:control>
+                        <xxf:control id="2" label="M:">0</xxf:control>
+                        <xxf:control id="3" label="Clear"/>
+                        <xxf:control id="4" label="MC"/>
+                        <xxf:control id="5" label="7"/>
+                        <xxf:control id="6" label="8"/>
+                        <xxf:control id="7" label="9"/>
+                        <xxf:control id="8" label="/"/>
+                        <xxf:control id="9" label="MR"/>
+                        <xxf:control id="10" label="4"/>
+                        <xxf:control id="11" label="5"/>
+                        <xxf:control id="12" label="6"/>
+                        <xxf:control id="13" label="*"/>
+                        <xxf:control id="14" label="MS"/>
+                        <xxf:control id="15" label="1"/>
+                        <xxf:control id="16" label="2"/>
+                        <xxf:control id="17" label="3"/>
+                        <xxf:control id="18" label="-"/>
+                        <xxf:control id="19" label="1/x"/>
+                        <xxf:control id="20" label="M+"/>
+                        <xxf:control id="21" label="0"/>
+                        <xxf:control id="22" label="+/-"/>
+                        <xxf:control id="23" label="+"/>
+                        <xxf:div id="add" visibility="visible"/>
+                        <xxf:div id="subtract" visibility="hidden"/>
+                        <xxf:div id="multiply" visibility="hidden"/>
+                        <xxf:div id="divide" visibility="hidden"/>
+                        <xxf:control id="24" label="="/>
+                        <xxf:control id="25" label="="/>
+                        <xxf:control id="26" label="="/>
+                        <xxf:control id="27" label="="/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
     </test>
 
-    <test description="Default Instances" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+    <test description="Default instances" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="main-model">
+                        <xforms:instance id="main-instance">
+                            <equation xmlns="">
+                                <screen>0</screen>
+                                <screenbuffer>0</screenbuffer>
+                                <first>0</first>
+                                <second>0</second>
+                                <memory>12</memory>
+                                <result/>
+                            </equation>
+                        </xforms:instance>
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="action">
-                        <xxforms:action>
-                            <xxforms:event name="DOMActivate" source-control-id="5"/>
-                        </xxforms:action>
-                    </p:input>
-                    <p:input name="controls" href="xforms-server/xforms-calculator-controls.xml"/>
-                    <p:input name="models">
-                        <models>
-                            <xforms:model id="main-model">
-                                <xforms:instance id="main-instance">
-                                    <equation xmlns="">
-                                        <screen>0</screen>
-                                        <screenbuffer>0</screenbuffer>
-                                        <first>0</first>
-                                        <second>0</second>
-                                        <memory>12</memory>
-                                        <result/>
-                                    </equation>
-                                </xforms:instance>
-                            </xforms:model>
-                        </models>
-                    </p:input>
-                    <p:input name="instances">
-                        <instances/>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
+                        <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="5"/>
 
-            </p:config>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xi:include href="xforms-calculator-controls.xml" xxi:omit-xml-base="true"/>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -164,6 +162,36 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="1">7</xxf:control>
+                        <xxf:control id="2" label="M:">12</xxf:control>
+                        <xxf:control id="3" label="Clear"/>
+                        <xxf:control id="4" label="MC"/>
+                        <xxf:control id="5" label="7"/>
+                        <xxf:control id="6" label="8"/>
+                        <xxf:control id="7" label="9"/>
+                        <xxf:control id="8" label="/"/>
+                        <xxf:control id="9" label="MR"/>
+                        <xxf:control id="10" label="4"/>
+                        <xxf:control id="11" label="5"/>
+                        <xxf:control id="12" label="6"/>
+                        <xxf:control id="13" label="*"/>
+                        <xxf:control id="14" label="MS"/>
+                        <xxf:control id="15" label="1"/>
+                        <xxf:control id="16" label="2"/>
+                        <xxf:control id="17" label="3"/>
+                        <xxf:control id="18" label="-"/>
+                        <xxf:control id="19" label="1/x"/>
+                        <xxf:control id="20" label="M+"/>
+                        <xxf:control id="21" label="0"/>
+                        <xxf:control id="22" label="+/-"/>
+                        <xxf:control id="23" label="+"/>
+                        <xxf:div id="add" visibility="visible"/>
+                        <xxf:div id="subtract" visibility="hidden"/>
+                        <xxf:div id="multiply" visibility="hidden"/>
+                        <xxf:div id="divide" visibility="hidden"/>
+                        <xxf:control id="24" label="="/>
+                        <xxf:control id="25" label="="/>
+                        <xxf:control id="26" label="="/>
+                        <xxf:control id="27" label="="/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -368,7 +396,7 @@
                             <xhtml:head>
                                 <xforms:model id="main-model">
                                     <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" target="3"/>
-                                    <xforms:instance>
+                                    <xforms:instance id="instance">
                                         <equation xmlns="">
                                             <screen>0</screen>
                                             <screenbuffer>0</screenbuffer>
@@ -418,7 +446,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="xf-3" model-id="main-model">
+                            <instance id="instance" model-id="main-model">
                                 <equation>
                                     <screen>0</screen>
                                     <screenbuffer>0</screenbuffer>
@@ -449,74 +477,59 @@
     </test>
 
     <test description="call-xpl() function" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="main-model">
+                        <xforms:instance id="instance1">
+                            <equation xmlns="">
+                                <screen>0</screen>
+                                <screenbuffer/>
+                                <first>123</first>
+                                <second>456</second>
+                                <memory>12</memory>
+                                <result/>
+                            </equation>
+                        </xforms:instance>
+                        <xforms:instance id="instance2">
+                            <other-instance>
+                                <first>2222</first>
+                                <second>3333</second>
+                                <third/>
+                                <fourth/>
+                            </other-instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="instance('instance2')/first"
+                            calculate="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
+                        <xforms:bind nodeset="instance('instance2')/second"
+                            calculate="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance1'), 'result')/*/second"/>
+                        <xforms:bind nodeset="/*/screen"
+                            constraint="false()"/>
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="action">
-                        <xxforms:action>
-                            <xxforms:event name="DOMActivate" source-control-id="3"/>
-                        </xxforms:action>
-                    </p:input>
-                    <p:input name="controls">
-                        <controls>
-                            <xforms:group ref="/equation" id="group1">
-                                <xforms:group ref="screen" id="group2">
-                                    <xforms:output ref="." id="1"/>
-                                </xforms:group>
-                                <xforms:output ref="memory" id="2">
-                                    <xforms:label>M:</xforms:label>
-                                </xforms:output>
-                                <xforms:trigger id="3">
-                                    <xforms:label>Clear</xforms:label>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue ref="/*/first" value="'3.141592'"/>
-                                        <xforms:setvalue ref="instance('instance2')/third" value="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
-                                        <xforms:setvalue ref="instance('instance2')/fourth" value="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance1')/memory, 'result')"/>
-                                    </xforms:action>
-                                </xforms:trigger>
-                            </xforms:group>
-                        </controls>
-                    </p:input>
-                    <p:input name="models">
-                        <models>
-                            <xforms:model id="main-model">
-                                <xforms:instance id="instance1">
-                                    <equation xmlns="">
-                                        <screen>0</screen>
-                                        <screenbuffer/>
-                                        <first>123</first>
-                                        <second>456</second>
-                                        <memory>12</memory>
-                                        <result/>
-                                    </equation>
-                                </xforms:instance>
-                                <xforms:instance id="instance2">
-                                    <other-instance>
-                                        <first>2222</first>
-                                        <second>3333</second>
-                                        <third/>
-                                        <fourth/>
-                                    </other-instance>
-                                </xforms:instance>
-                                <xforms:bind nodeset="instance('instance2')/first"
-                                    calculate="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
-                                <xforms:bind nodeset="instance('instance2')/second"
-                                    calculate="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance1'), 'result')/*/second"/>
-                                <xforms:bind nodeset="/*/screen"
-                                    constraint="false()"/>
-                            </xforms:model>
-                        </models>
-                    </p:input>
-                    <p:input name="instances">
-                        <instances/>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
+                        <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="3"/>
 
-            </p:config>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group ref="." id="group1">
+                        <xforms:group ref="screen" id="group2">
+                            <xforms:output ref="." id="1"/>
+                        </xforms:group>
+                        <xforms:output ref="memory" id="2">
+                            <xforms:label>M:</xforms:label>
+                        </xforms:output>
+                        <xforms:trigger id="3">
+                            <xforms:label>Clear</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="/*/first" value="'3.141592'"/>
+                                <xforms:setvalue ref="instance('instance2')/third" value="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
+                                <xforms:setvalue ref="instance('instance2')/fourth" value="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance1')/memory, 'result')"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -545,7 +558,12 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values/>
+                    <xxf:control-values>
+                        <xxf:control id="group2" valid="false"/>
+                        <xxf:control id="1" valid="false">0</xxf:control>
+                        <xxf:control id="2" label="M:">12</xxf:control>
+                        <xxf:control id="3" label="Clear"/>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -716,7 +734,7 @@
                                         <instance xmlns="">
                                             <title>Don Quixote de la Mancha</title>
                                             <author>Miguel de Cervantes Saavedra</author>
-                                            <title>Jacques le fataliste et son maître</title>
+                                            <title>Jacques le fataliste et son maÃ®tre</title>
                                             <author>Denis Diderot</author>
                                             <title>Childhood's End</title>
                                             <author>Arthur C. Clarke</author>
@@ -756,7 +774,7 @@
                                         <author>Miguel de Cervantes Saavedra</author>
                                     </book>
                                     <book>
-                                        <title>Jacques le fataliste et son maître</title>
+                                        <title>Jacques le fataliste et son maÃ®tre</title>
                                         <author>Denis Diderot</author>
                                     </book>
                                     <book>
@@ -984,9 +1002,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="items-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="my-count·1" label="One:">4</xxf:control>
-                        <xxf:control id="my-count·2" label="Two:">5</xxf:control>
-                        <xxf:control id="my-count·3" label="Three:">6</xxf:control>
+                        <xxf:control id="my-countÂ·1" label="One:">4</xxf:control>
+                        <xxf:control id="my-countÂ·2" label="Two:">5</xxf:control>
+                        <xxf:control id="my-countÂ·3" label="Three:">6</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1043,7 +1061,7 @@
                             </xhtml:head>
                             <xhtml:body>
 
-                                <xforms:select1 ref=".">
+                                <xforms:select1 ref="." id="my-select">
                                     <xforms:item>
                                         <xforms:label>Select...</xforms:label>
                                         <xforms:value/>
@@ -1098,10 +1116,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xf-8">+s85RSYyKV8=</xxf:control>
+                        <xxf:control id="my-select">+s85RSYyKV8=</xxf:control>
                     </xxf:control-values>
                     <xxf:itemsets>
-                        <xxf:itemset id="xf-8">[["Select...",""],["One","A21R1qCnPIg="],["Two","+s85RSYyKV8="],["Three","PAIYFi0+row="]]</xxf:itemset>
+                        <xxf:itemset id="my-select">[["Select...",""],["One","A21R1qCnPIg="],["Two","+s85RSYyKV8="],["Three","PAIYFi0+row="]]</xxf:itemset>
                     </xxf:itemsets>
                 </xxf:action>
             </xxf:event-response>
@@ -1225,62 +1243,62 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="8"/>
-                        <xxf:control id="my-group·1" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·1">bloody</xxf:control>
-                        <xxf:control id="repeat-current-output-2·1">bloody</xxf:control>
-                        <xxf:control id="repeat-index-1·1">5</xxf:control>
-                        <xxf:control id="repeat-index-2·1">5</xxf:control>
-                        <xxf:control id="repeat-context-1·1">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·1">bloody</xxf:control>
-                        <xxf:control id="my-group·2" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·2">valencia</xxf:control>
-                        <xxf:control id="repeat-current-output-2·2">valencia</xxf:control>
-                        <xxf:control id="repeat-index-1·2">5</xxf:control>
-                        <xxf:control id="repeat-index-2·2">5</xxf:control>
-                        <xxf:control id="repeat-context-1·2">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·2">valencia</xxf:control>
-                        <xxf:control id="my-group·3" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·3">green</xxf:control>
-                        <xxf:control id="repeat-current-output-2·3">green</xxf:control>
-                        <xxf:control id="repeat-index-1·3">5</xxf:control>
-                        <xxf:control id="repeat-index-2·3">5</xxf:control>
-                        <xxf:control id="repeat-context-1·3">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·3">green</xxf:control>
-                        <xxf:control id="my-group·4" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·4">red</xxf:control>
-                        <xxf:control id="repeat-current-output-2·4">red</xxf:control>
-                        <xxf:control id="repeat-index-1·4">5</xxf:control>
-                        <xxf:control id="repeat-index-2·4">5</xxf:control>
-                        <xxf:control id="repeat-context-1·4">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·4">red</xxf:control>
-                        <xxf:control id="my-group·5" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·5">iPod</xxf:control>
-                        <xxf:control id="repeat-current-output-2·5">iPod</xxf:control>
-                        <xxf:control id="repeat-index-1·5">5</xxf:control>
-                        <xxf:control id="repeat-index-2·5">5</xxf:control>
-                        <xxf:control id="repeat-context-1·5">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·5">iPod</xxf:control>
-                        <xxf:control id="my-group·6" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·6">green</xxf:control>
-                        <xxf:control id="repeat-current-output-2·6">green</xxf:control>
-                        <xxf:control id="repeat-index-1·6">5</xxf:control>
-                        <xxf:control id="repeat-index-2·6">5</xxf:control>
-                        <xxf:control id="repeat-context-1·6">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·6">green</xxf:control>
-                        <xxf:control id="my-group·7" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·7">williams</xxf:control>
-                        <xxf:control id="repeat-current-output-2·7">williams</xxf:control>
-                        <xxf:control id="repeat-index-1·7">5</xxf:control>
-                        <xxf:control id="repeat-index-2·7">5</xxf:control>
-                        <xxf:control id="repeat-context-1·7">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·7">williams</xxf:control>
-                        <xxf:control id="my-group·8" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·8">yellow</xxf:control>
-                        <xxf:control id="repeat-current-output-2·8">yellow</xxf:control>
-                        <xxf:control id="repeat-index-1·8">5</xxf:control>
-                        <xxf:control id="repeat-index-2·8">5</xxf:control>
-                        <xxf:control id="repeat-context-1·8">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·8">yellow</xxf:control>
+                        <xxf:control id="my-groupÂ·1" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1Â·1">bloody</xxf:control>
+                        <xxf:control id="repeat-current-output-2Â·1">bloody</xxf:control>
+                        <xxf:control id="repeat-index-1Â·1">5</xxf:control>
+                        <xxf:control id="repeat-index-2Â·1">5</xxf:control>
+                        <xxf:control id="repeat-context-1Â·1">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2Â·1">bloody</xxf:control>
+                        <xxf:control id="my-groupÂ·2" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1Â·2">valencia</xxf:control>
+                        <xxf:control id="repeat-current-output-2Â·2">valencia</xxf:control>
+                        <xxf:control id="repeat-index-1Â·2">5</xxf:control>
+                        <xxf:control id="repeat-index-2Â·2">5</xxf:control>
+                        <xxf:control id="repeat-context-1Â·2">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2Â·2">valencia</xxf:control>
+                        <xxf:control id="my-groupÂ·3" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1Â·3">green</xxf:control>
+                        <xxf:control id="repeat-current-output-2Â·3">green</xxf:control>
+                        <xxf:control id="repeat-index-1Â·3">5</xxf:control>
+                        <xxf:control id="repeat-index-2Â·3">5</xxf:control>
+                        <xxf:control id="repeat-context-1Â·3">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2Â·3">green</xxf:control>
+                        <xxf:control id="my-groupÂ·4" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1Â·4">red</xxf:control>
+                        <xxf:control id="repeat-current-output-2Â·4">red</xxf:control>
+                        <xxf:control id="repeat-index-1Â·4">5</xxf:control>
+                        <xxf:control id="repeat-index-2Â·4">5</xxf:control>
+                        <xxf:control id="repeat-context-1Â·4">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2Â·4">red</xxf:control>
+                        <xxf:control id="my-groupÂ·5" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1Â·5">iPod</xxf:control>
+                        <xxf:control id="repeat-current-output-2Â·5">iPod</xxf:control>
+                        <xxf:control id="repeat-index-1Â·5">5</xxf:control>
+                        <xxf:control id="repeat-index-2Â·5">5</xxf:control>
+                        <xxf:control id="repeat-context-1Â·5">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2Â·5">iPod</xxf:control>
+                        <xxf:control id="my-groupÂ·6" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1Â·6">green</xxf:control>
+                        <xxf:control id="repeat-current-output-2Â·6">green</xxf:control>
+                        <xxf:control id="repeat-index-1Â·6">5</xxf:control>
+                        <xxf:control id="repeat-index-2Â·6">5</xxf:control>
+                        <xxf:control id="repeat-context-1Â·6">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2Â·6">green</xxf:control>
+                        <xxf:control id="my-groupÂ·7" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1Â·7">williams</xxf:control>
+                        <xxf:control id="repeat-current-output-2Â·7">williams</xxf:control>
+                        <xxf:control id="repeat-index-1Â·7">5</xxf:control>
+                        <xxf:control id="repeat-index-2Â·7">5</xxf:control>
+                        <xxf:control id="repeat-context-1Â·7">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2Â·7">williams</xxf:control>
+                        <xxf:control id="my-groupÂ·8" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1Â·8">yellow</xxf:control>
+                        <xxf:control id="repeat-current-output-2Â·8">yellow</xxf:control>
+                        <xxf:control id="repeat-index-1Â·8">5</xxf:control>
+                        <xxf:control id="repeat-index-2Â·8">5</xxf:control>
+                        <xxf:control id="repeat-context-1Â·8">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2Â·8">yellow</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1320,8 +1338,8 @@
                                     </xforms:action>
 
                                     <xhtml:div>
-                                        <xforms:output value="$test-variable-1"/>,
-                                        <xforms:output value="$test-variable-2"/>
+                                        <xforms:output id="my-output-1" value="$test-variable-1"/>,
+                                        <xforms:output id="my-output-2" value="$test-variable-2"/>
                                     </xhtml:div>
                                 </xforms:group>
 
@@ -1351,8 +1369,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xf-10">42</xxf:control>
-                        <xxf:control id="xf-11">101</xxf:control>
+                        <xxf:control id="my-output-1">42</xxf:control>
+                        <xxf:control id="my-output-2">101</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1441,21 +1459,21 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="exforms-sort-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="exforms-sort-output·1">3-AAA</xxf:control>
-                        <xxf:control id="exforms-sort-output·2">2-BBB</xxf:control>
-                        <xxf:control id="exforms-sort-output·3">1-CCC</xxf:control>
+                        <xxf:control id="exforms-sort-outputÂ·1">3-AAA</xxf:control>
+                        <xxf:control id="exforms-sort-outputÂ·2">2-BBB</xxf:control>
+                        <xxf:control id="exforms-sort-outputÂ·3">1-CCC</xxf:control>
                         <xxf:copy-repeat-template id="xxforms-sort-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="xxforms-sort-output·1">3-AAA</xxf:control>
-                        <xxf:control id="xxforms-sort-output·2">2-BBB</xxf:control>
-                        <xxf:control id="xxforms-sort-output·3">1-CCC</xxf:control>
+                        <xxf:control id="xxforms-sort-outputÂ·1">3-AAA</xxf:control>
+                        <xxf:control id="xxforms-sort-outputÂ·2">2-BBB</xxf:control>
+                        <xxf:control id="xxforms-sort-outputÂ·3">1-CCC</xxf:control>
                         <xxf:copy-repeat-template id="exforms-sort-v-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="exforms-sort-v-output·1">3-AAA</xxf:control>
-                        <xxf:control id="exforms-sort-v-output·2">2-BBB</xxf:control>
-                        <xxf:control id="exforms-sort-v-output·3">1-CCC</xxf:control>
+                        <xxf:control id="exforms-sort-v-outputÂ·1">3-AAA</xxf:control>
+                        <xxf:control id="exforms-sort-v-outputÂ·2">2-BBB</xxf:control>
+                        <xxf:control id="exforms-sort-v-outputÂ·3">1-CCC</xxf:control>
                         <xxf:copy-repeat-template id="xxforms-sort-v-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="xxforms-sort-v-output·1">3-AAA</xxf:control>
-                        <xxf:control id="xxforms-sort-v-output·2">2-BBB</xxf:control>
-                        <xxf:control id="xxforms-sort-v-output·3">1-CCC</xxf:control>
+                        <xxf:control id="xxforms-sort-v-outputÂ·1">3-AAA</xxf:control>
+                        <xxf:control id="xxforms-sort-v-outputÂ·2">2-BBB</xxf:control>
+                        <xxf:control id="xxforms-sort-v-outputÂ·3">1-CCC</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>            
@@ -1603,8 +1621,8 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                        <xxf:control id="my-trigger·1" label="Do Stuff"/>
-                        <xxf:control id="my-trigger·2" readonly="true" label="Do Stuff"/>
+                        <xxf:control id="my-triggerÂ·1" label="Do Stuff"/>
+                        <xxf:control id="my-triggerÂ·2" readonly="true" label="Do Stuff"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1784,29 +1802,29 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="repeat1" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="output1·1">row2</xxf:control>
-                        <xxf:control id="output1·2">row1</xxf:control>
-                        <xxf:control id="output1·3">row3</xxf:control>
+                        <xxf:control id="output1Â·1">row2</xxf:control>
+                        <xxf:control id="output1Â·2">row1</xxf:control>
+                        <xxf:control id="output1Â·3">row3</xxf:control>
                         <xxf:copy-repeat-template id="repeat2" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="output2·1">row2</xxf:control>
-                        <xxf:control id="output2·2">row3</xxf:control>
-                        <xxf:control id="output2·3">row1</xxf:control>
+                        <xxf:control id="output2Â·1">row2</xxf:control>
+                        <xxf:control id="output2Â·2">row3</xxf:control>
+                        <xxf:control id="output2Â·3">row1</xxf:control>
                         <xxf:copy-repeat-template id="repeat3" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="output3·1">row2</xxf:control>
-                        <xxf:control id="output3·2">row1</xxf:control>
-                        <xxf:control id="output3·3">row3</xxf:control>
+                        <xxf:control id="output3Â·1">row2</xxf:control>
+                        <xxf:control id="output3Â·2">row1</xxf:control>
+                        <xxf:control id="output3Â·3">row3</xxf:control>
                         <xxf:copy-repeat-template id="repeat4" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="output4·1">row1</xxf:control>
-                        <xxf:control id="output4·2">row3</xxf:control>
-                        <xxf:control id="output4·3">row2</xxf:control>
+                        <xxf:control id="output4Â·1">row1</xxf:control>
+                        <xxf:control id="output4Â·2">row3</xxf:control>
+                        <xxf:control id="output4Â·3">row2</xxf:control>
                         <xxf:copy-repeat-template id="repeat5" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="output5·1">row3</xxf:control>
-                        <xxf:control id="output5·2">row1</xxf:control>
-                        <xxf:control id="output5·3">row2</xxf:control>
+                        <xxf:control id="output5Â·1">row3</xxf:control>
+                        <xxf:control id="output5Â·2">row1</xxf:control>
+                        <xxf:control id="output5Â·3">row2</xxf:control>
                         <xxf:copy-repeat-template id="repeat6" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="output6·1">row1</xxf:control>
-                        <xxf:control id="output6·2">row3</xxf:control>
-                        <xxf:control id="output6·3">row2</xxf:control>
+                        <xxf:control id="output6Â·1">row1</xxf:control>
+                        <xxf:control id="output6Â·2">row3</xxf:control>
+                        <xxf:control id="output6Â·3">row2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

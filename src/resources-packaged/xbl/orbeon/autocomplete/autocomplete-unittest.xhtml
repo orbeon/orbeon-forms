@@ -46,64 +46,25 @@
                 method="post" resource="/xforms-controls/services/countries" replace="instance" instance="selected-countries"/>
 
         </xforms:model>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <!--<xhtml:script type="text/javascript" src="http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js"/>-->
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript">
-            <![CDATA[
-//                YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
-//
-//                    name: "Map",
-//
-//                    testInitialLogitudeNotSet: function() {
-//
-//                        YAHOO.util.Assert.areEqual("", ORBEON.xforms.Document.getValue("map-longitude"));
-//                        YAHOO.util.Assert.areEqual("", ORBEON.xforms.Document.getValue("map-latitude"));
-//                    }
-//
-//                }));
-//
-//                ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-//                    if (parent && parent.TestManager) {
-//                        parent.TestManager.load();
-//                    } else {
-//                        new YAHOO.tool.TestLogger();
-//                        YAHOO.tool.TestRunner.run();
-//                    }
-//                });
-            ]]>
-        </xhtml:script>
     </xhtml:head>
     <xhtml:body>
 
-        <fr:autocomplete ref="instance('instance-static')/country-name" id="country-name-static"
-                         incremental="false" dynamic-itemset="false"
-                         max-results-displayed="100"
-                         style="width: 15em; float: left">
-            <xforms:itemset nodeset="instance('all-countries')/country">
+        <fr:autocomplete ref="instance('instance-dynamic')/country-name" id="country-name-dynamic"
+                         incremental="true" dynamic-itemset="true"
+                         style="width: 15em">
+            <xxforms:script ev:event="xforms-value-changed">console.log("value-changed");</xxforms:script>
+            <xxforms:script ev:event="DOMActivate">console.log("DOMActivate");</xxforms:script>
+            <xforms:label>Dynamic itemset: </xforms:label>
+            <xforms:itemset nodeset="instance('selected-countries')/country">
                 <xforms:label ref="name"/>
                 <xforms:value ref="name"/>
             </xforms:itemset>
-            <fr:max-results-displayed>2</fr:max-results-displayed>
-            <xforms:help>Country name</xforms:help>
-            <xforms:alert>Invalid!</xforms:alert>
+            <xforms:action ev:event="xforms-value-changed">
+                <xxforms:variable name="make-suggestion" select="string-length(instance('instance-dynamic')/country-name) >= 3"/>
+                <xforms:send if="$make-suggestion" submission="update-countries"/>
+                <xforms:delete if="not($make-suggestion)" nodeset="instance('selected-countries')/country"/>
+            </xforms:action>
         </fr:autocomplete>
-
-        <!--<fr:autocomplete ref="instance('instance-dynamic')/country-name" id="country-name-dynamic"-->
-                         <!--incremental="true" dynamic-itemset="true"-->
-                         <!--style="width: 15em">-->
-            <!--<xforms:label>Dynamic itemset: </xforms:label>-->
-            <!--<xforms:itemset nodeset="instance('selected-countries')/country">-->
-                <!--<xforms:label ref="name"/>-->
-                <!--<xforms:value ref="name"/>-->
-            <!--</xforms:itemset>-->
-            <!--<xforms:action ev:event="xforms-value-changed">-->
-                <!--<xxforms:variable name="make-suggestion" select="string-length(instance('instance-dynamic')/country-name) >= 3"/>-->
-                <!--<xforms:send if="$make-suggestion" submission="update-countries"/>-->
-                <!--<xforms:delete if="not($make-suggestion)" nodeset="instance('selected-countries')/country"/>-->
-            <!--</xforms:action>-->
-        <!--</fr:autocomplete>-->
 
     </xhtml:body>
 </xhtml:html>

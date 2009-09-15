@@ -60,7 +60,8 @@ YAHOO.xbl.fr.Currency = {
                             while (regExp.test(parts[0])) {
                                 parts[0] = parts[0].replace(regExp, "$1" + "," + "$2");
                             }
-                            var result = prefix + " " + parts[0];
+                            var result = prefix == "" ? "" : prefix + " ";
+                            result += parts[0];
                             if (parts.length > 1)
                                 result += "." + parts[1];
                             return result;

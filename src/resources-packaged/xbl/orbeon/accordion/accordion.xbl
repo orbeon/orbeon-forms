@@ -49,6 +49,7 @@
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
 
                 <xsl:template match="/*">
                     <!-- Initialization event -->
@@ -58,6 +59,9 @@
                              http://forge.ow2.org/tracker/index.php?func=detail&aid=313850&group_id=168&atid=350207 -->
                         <xsl:copy-of select="namespace::*"/>
                         <xsl:copy-of select="@class"/>
+
+                        <!-- Access to parameters -->
+                        <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'accordion', 'open-closes-others')"/>
 
                         <!-- Local model -->
                         <xforms:model id="accordion-model">

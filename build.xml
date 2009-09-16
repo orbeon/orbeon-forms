@@ -340,6 +340,7 @@
                 <include name="xbl/**/*.png"/>
                 <include name="xbl/**/*.jpg"/>
                 <include name="xbl/**/*.html"/>
+                <include name="xbl/**/*.xhtml"/>
                 <include name="xbl/**/*.htc"/>
                 <include name="ops/**/*.css"/>
                 <include name="ops/**/*.js"/>

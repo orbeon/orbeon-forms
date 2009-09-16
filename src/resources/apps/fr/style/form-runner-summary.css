@@ -57,30 +57,33 @@
 .fr-summary-welcome-message { display: block; margin-top: .5em; margin-bottom: .5em; clear: both }
 .fr-summary-search-count {  display: block; margin-top: 1em; margin-bottom: 1em }
 
-.fr-summary-search { display: block; margin-bottom: .5em }
-.fr-summary-search-items { display: block; clear: both }
+.fr-summary-search { display: block; margin: 2em 0 2em 0; }
 .fr-summary-search-item { float: left; margin-right: .5em }
 .fr-summary-search-item select {
     width: 100%;
     *width: auto;/* HACK: IE 7 misbehaves here, so don't use 100% */
 }
 
-.fr-summary-search .fr-search-button-td { vertical-align: bottom }
-.fr-summary-search .xbl-fr-button { margin-left: 1em }
-
+.fr-summary-search .fr-search-button-td { vertical-align: bottom; padding-left: 1em; }
+.fr-summary-search .fr-search-options-td { vertical-align: middle; font-size: 77%; padding-left: 1em; }
 .fr-summary-search p { margin-bottom: 0 }
+.fr-summary-search .fr-search-options-div { float: left; border: 1px solid #99C; padding: .5em 1em 1em 1em; background: #F8F8F8 url(logo-bg.gif) repeat-x scroll center top; }
+.fr-summary-search .fr-search-options-title { font-weight: bold; padding: .2em 0 1em 0; }
+.fr-summary-search .fr-search-options-buttons { clear: both; padding: 1em 0 0 0; }
+.fr-summary-search .fr-search-options-buttons .yui-button { margin: 0; }
+.fr-summary-search .fr-search-options-buttons a { vertical-align: middle; font-size: 77%; padding: 0em 0 1em 1em; }
+.fr-summary-search .xforms-label { font-weight: normal; }
 
 .fr-paging-buttons { padding-top: .5em }
 .fr-paging-buttons button { vertical-align: middle }
 .fr-paging-buttons button img { margin: 0 } /* as other buttons set an img margin */
 .fr-paging-numbers { vertical-align: middle; margin-left: .5em; margin-right: .5em }
 
-/*.fr-search-input input {*/
-    /*background-image: url(search.gif);*/
-    /*background-position: right center;*/
-    /*background-repeat: no-repeat;*/
-    /*padding-right: 16px;*/
-/*}*/
+.fr-search-input input {
+    padding: 3px 0 3px 3px; /* Make the input a bit bigger to look more proportional to the search button */
+    margin: 2px 0 0 0;
+    width: 25em; /* Wider text field, inspired by Gmail */
+}
 
 /* Controls added just to expose instance nodes to JavaScript */
 .fr-expose-to-javascript { display: none }

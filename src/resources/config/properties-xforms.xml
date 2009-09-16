@@ -119,6 +119,7 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.prefix"                      value="$"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.digits-after-decimal"        value="2"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.fusion-charts.uri-to-swf"             value=""/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.accordion.open-closes-others"         value="false"/>
 
     <property as="xs:boolean" name="oxf.epilogue.xforms.preprocessing"                      value="false"/>
     <property as="xs:anyURI"  name="oxf.epilogue.xforms.preprocessing.uri"                  value=""/>

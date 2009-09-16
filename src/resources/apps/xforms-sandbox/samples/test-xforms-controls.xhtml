@@ -30,37 +30,27 @@
         <xforms:model>
             <xforms:instance id="main-instance">
                 <instance repeat-shown="true" readonly="" relevant="true">
-                    <input>
-                        <label>Label</label>
-                        <value>true</value>
-                    </input>
-                    <textarea>
-                        <label>Label</label>
-                        <value>true</value>
-                    </textarea>
-                    <secret>
-                        <label>Label</label>
-                        <value>true</value>
-                    </secret>
-                    <input-boolean>
-                        <label>Label</label>
-                        <value>true</value>
-                    </input-boolean>
+                    <label>Label</label>
+                    <help>Help</help>
+                    <hint>Hint</hint>
+                    <alert>Alert</alert>
+                    <input>true</input>
+                    <textarea>true</textarea>
+                    <secret>true</secret>
+                    <input-boolean>true</input-boolean>
                     <select>
                         <flavor>s</flavor>
                         <carrier>f</carrier>
                     </select>
-                    <date>
-                        <value>2009-03-19</value>
-                    </date>
-                    <time>
-                        <value>15:00:00</value>
-                    </time>
+                    <date>2009-03-19</date>
+                    <time>15:00:00</time>
+                    <date-time>2009-03-19T15:00:00</date-time>
                     <output-file>
                         <uri>file:///tmp/dummy</uri>
                     </output-file>                    
                 </instance>
             </xforms:instance>
+            <xforms:bind nodeset="input | textarea | secret | input-boolean | date | time | date-time" constraint="false()"/>
             <xforms:instance id="flavors">
                 <flavors>
                     <flavor name="a">Apple</flavor>
@@ -78,11 +68,15 @@
             <!-- Global MIPS that apply to all the controls -->
             <xforms:bind nodeset="*" readonly="context()/@readonly = 'true'" relevant="context()/@relevant = 'true'"/>
             <xforms:bind nodeset="@*" type="xs:boolean"/>
-            <xforms:bind nodeset="input-boolean/value" type="xs:boolean"/>
-            <xforms:bind nodeset="date/value" type="xs:date"/>
-            <xforms:bind nodeset="time/value" type="xs:time"/>
+            <xforms:bind nodeset="input-boolean" type="xs:boolean"/>
+            <xforms:bind nodeset="date" type="xs:date"/>
+            <xforms:bind nodeset="time" type="xs:time"/>
+            <xforms:bind nodeset="date-time" type="xs:dateTime"/>
             <xforms:bind nodeset="output-file/uri" type="xs:anyURI"/>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-repeat-selected-item-1 { background-color: transparent; }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
 
@@ -115,43 +109,47 @@
 
             <!-- Input -->
             <xhtml:h2>Input</xhtml:h2>
-            <xforms:group ref="input">
-                <xhtml:p>
-                    <xforms:input ref="value" id="input">
-                        <xforms:label ref="../label"/>
-                    </xforms:input>
-                </xhtml:p>
-            </xforms:group>
+            <xhtml:p>
+                <xforms:input ref="input" id="input">
+                    <xforms:label ref="../label"/>
+                    <xforms:help ref="../help"/>
+                    <xforms:hint ref="../hint"/>
+                    <xforms:alert ref="../alert"/>
+                </xforms:input>
+            </xhtml:p>
 
             <!-- Text area -->
             <xhtml:h2>Text area</xhtml:h2>
-            <xforms:group ref="textarea">
-                <xhtml:p>
-                    <xforms:textarea ref="value" id="textarea">
-                        <xforms:label ref="../label"/>
-                    </xforms:textarea>
-                </xhtml:p>
-            </xforms:group>
+            <xhtml:p>
+                <xforms:textarea ref="textarea" id="textarea">
+                    <xforms:label ref="../label"/>
+                    <xforms:help ref="../help"/>
+                    <xforms:hint ref="../hint"/>
+                    <xforms:alert ref="../alert"/>
+                </xforms:textarea>
+            </xhtml:p>
 
             <!-- Secret -->
             <xhtml:h2>Secret</xhtml:h2>
-            <xforms:group ref="secret">
-                <xhtml:p>
-                    <xforms:secret ref="value" id="secret">
-                        <xforms:label ref="../label"/>
-                    </xforms:secret>
-                </xhtml:p>
-            </xforms:group>
+            <xhtml:p>
+                <xforms:secret ref="secret" id="secret">
+                    <xforms:label ref="../label"/>
+                    <xforms:help ref="../help"/>
+                    <xforms:hint ref="../hint"/>
+                    <xforms:alert ref="../alert"/>
+                </xforms:secret>
+            </xhtml:p>
 
             <!-- Boolean input -->
             <xhtml:h2>xforms:input boolean</xhtml:h2>
-            <xforms:group ref="input-boolean">
-                <xhtml:p>
-                    <xforms:input ref="value" id="input-boolean">
-                        <xforms:label ref="../label"/>
-                    </xforms:input>
-                </xhtml:p>
-            </xforms:group>
+            <xhtml:p>
+                <xforms:input ref="input-boolean" id="input-boolean">
+                    <xforms:label ref="../label"/>
+                    <xforms:help ref="../help"/>
+                    <xforms:hint ref="../hint"/>
+                    <xforms:alert ref="../alert"/>
+                </xforms:input>
+            </xhtml:p>
 
             <!-- Select and Select1 -->
             <xhtml:h2>xforms:select and xforms:select1</xhtml:h2>
@@ -232,24 +230,54 @@
             </xforms:group>
 
             <!-- Date -->
-            <xhtml:h2>xforms:input type xs:date</xhtml:h2>
-            <xforms:group ref="date">
-                <xhtml:p>
-                    <xforms:input ref="value" id="date-value">
-                        <xforms:label>Date: </xforms:label>
-                    </xforms:input>
-                </xhtml:p>
-            </xforms:group>
+            <xhtml:h2>xforms:input type xs:date (default appearance)</xhtml:h2>
+            <xhtml:p>
+                <xforms:input ref="date" id="date">
+                    <xforms:label ref="../label"/>
+                    <xforms:help ref="../help"/>
+                    <xforms:hint ref="../hint"/>
+                    <xforms:alert ref="../alert"/>
+                </xforms:input>
+            </xhtml:p>
+            <xhtml:h2>xforms:input type xs:date (minimal appearance)</xhtml:h2>
+            <xhtml:p>
+                <xforms:input ref="date" appearance="minimal" id="date-minimal">
+                    <xforms:label ref="../label"/>
+                    <xforms:help ref="../help"/>
+                    <xforms:hint ref="../hint"/>
+                    <xforms:alert ref="../alert"/>
+                </xforms:input>
+            </xhtml:p>
 
             <!-- Time -->
-            <xhtml:h2>xforms:input type xs:date</xhtml:h2>
-            <xforms:group ref="time">
-                <xhtml:p>
-                    <xforms:input ref="value" id="time-value">
-                        <xforms:label>Time: </xforms:label>
-                    </xforms:input>
-                </xhtml:p>
-            </xforms:group>
+            <xhtml:h2>xforms:input type xs:time</xhtml:h2>
+            <xhtml:p>
+                <xforms:input ref="time" id="time">
+                    <xforms:label ref="../label"/>
+                    <xforms:help ref="../help"/>
+                    <xforms:hint ref="../hint"/>
+                    <xforms:alert ref="../alert"/>
+                </xforms:input>
+            </xhtml:p>
+
+            <!-- Date and time -->
+            <xhtml:h2>xforms:input type xs:dateTime</xhtml:h2>
+            <xhtml:p>
+                <xforms:input ref="date-time" id="date-time">
+                    <xforms:label ref="../label"/>
+                    <xforms:help ref="../help"/>
+                    <xforms:hint ref="../hint"/>
+                    <xforms:alert ref="../alert"/>
+                </xforms:input>
+            </xhtml:p>
+            
+            <!-- Link -->
+            <xhtml:h2>xforms:trigger appearance minimal</xhtml:h2>
+            <xhtml:p>
+                <xforms:trigger ref="." id="trigger-minimal" appearance="minimal">
+                    <xforms:label ref="label"/>
+                </xforms:trigger>
+            </xhtml:p>
 
             <!-- Download -->
             <xhtml:h2>xforms:output type xs:anyURI</xhtml:h2>
@@ -261,7 +289,5 @@
                 </xhtml:p>
             </xforms:group>
         </xforms:repeat>
-
-        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
     </xhtml:body>
 </xhtml:html>

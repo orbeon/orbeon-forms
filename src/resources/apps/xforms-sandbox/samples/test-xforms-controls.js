@@ -41,7 +41,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "xforms:select1 appearance=full",
 
-    dateValueInputId: "date-value$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    dateValueInputId: "date$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
 
     getSelect: function(controlId) {
         var control = YAHOO.util.Dom.get(controlId);
@@ -113,8 +113,8 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "xforms:input type xs:date",
 
-    dateValueControlId: "date-value" + XFORMS_SEPARATOR_1 + "1",
-    dateValueInputId: "date-value$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    dateValueControlId: "date" + XFORMS_SEPARATOR_1 + "1",
+    dateValueInputId: "date$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
 
     testOpenHideCalendar: function() {
         // Click on text field
@@ -162,10 +162,10 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "xforms:input type xs:time",
 
-    timeValueId: "time-value" + XFORMS_SEPARATOR_1 + "1",
-    timeValueInputId: "time-value$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
-    dateValueId: "date-value" + XFORMS_SEPARATOR_1 + "1",
-    dateValueInputId: "date-value$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    timeValueId: "time" + XFORMS_SEPARATOR_1 + "1",
+    timeValueInputId: "time$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    dateValueId: "date" + XFORMS_SEPARATOR_1 + "1",
+    dateValueInputId: "date$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
 
     workerTimeParsing: function(typedValue, expectedValue) {
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
@@ -214,6 +214,31 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             }, XFORMS_INTERNAL_SHORT_DELAY_IN_MS);
         });
 
+    }
+}));
+
+YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+    name: "xforms:trigger appearance=\"minimal\"",
+
+    triggerId: "trigger-minimal" + XFORMS_SEPARATOR_1 + "1",
+
+    // Test that the control is correctly restored when the iteration is recreated
+    // http://forge.objectweb.org/tracker/index.php?func=detail&aid=313369&group_id=168&atid=350207
+    testRepeatCreate: function() {
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            ORBEON.xforms.Document.setValue("repeat-shown", "false");
+        }, function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                ORBEON.xforms.Document.setValue("repeat-shown", "true");
+            }, function() {
+                var trigger = YAHOO.util.Dom.get(this.triggerId);
+                var link = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) 
+                    ? YAHOO.util.Dom.getFirstChild(trigger) : trigger;
+                YAHOO.util.Assert.areEqual("a", link.tagName.toLowerCase());
+                YAHOO.util.Assert.areEqual("Label", link.innerHTML);
+            });
+        });
     }
 }));
 

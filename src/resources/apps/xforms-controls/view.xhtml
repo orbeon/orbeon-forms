@@ -207,8 +207,8 @@
                     </xforms:input>
                 </xhtml:p>
                 <xhtml:p>
-                    <fr:date-picker ref="date" id="data-picker">
-                        <xforms:label class="fixed-width">Date picker:</xforms:label>
+                    <xforms:input ref="date" class="datafield" appearance="minimal" id="minimal-date">
+                        <xforms:label class="fixed-width">Date minimal:</xforms:label>
                         <xforms:alert>Invalid date</xforms:alert>
                         <xforms:help>
                             <div>
@@ -221,7 +221,24 @@
                                 </ul>
                             </div>
                         </xforms:help>
-					</fr:date-picker>
+                    </xforms:input>
+                </xhtml:p>
+                <xhtml:p>
+                    <fr:date-picker ref="date" id="data-picker">
+                        <xforms:label class="fixed-width">Date picker (XBL):</xforms:label>
+                        <xforms:alert>Invalid date</xforms:alert>
+                        <xforms:help>
+                            <div>
+                                <p>
+                                    This field must contain:
+                                </p>
+                                <ul>
+                                    <li>a valid date</li>
+                                    <li>which is at most one day in the future</li>
+                                </ul>
+                            </div>
+                        </xforms:help>
+                    </fr:date-picker>
                 </xhtml:p>
                 <xhtml:p>
                     <xforms:output ref="date" xxforms:format="." id="date-output-native">

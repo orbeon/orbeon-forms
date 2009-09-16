@@ -1,0 +1,54 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XForms Controls</xhtml:title>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript"
+            src="/apps/xforms-sandbox/samples/test-loading-indicator.js"/>
+
+        <xforms:model id="model" xxforms:external-events="load-initial-data">
+
+            <xforms:instance id="main-instance">
+                <instance/>
+            </xforms:instance>
+
+            <xforms:submission id="sleep" method="post"
+                action="/xforms-sandbox/service/sleep?delay=1" replace="none"/>
+
+            <xxforms:script ev:event="xforms-model-construct-done">
+                ORBEON.xforms.Document.dispatchEvent("model", "load-initial-data"); </xxforms:script>
+
+            <xforms:action ev:event="load-initial-data">
+                <xforms:send submission="sleep"/>
+                <xxforms:script>initTestLoadingIndicator();</xxforms:script>
+            </xforms:action>
+
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xhtml:h2>Bug <a href="">##314235</a></xhtml:h2>
+        <xhtml:p>There must not be an horizontal scrollbar on this window.</xhtml:p>
+
+
+    </xhtml:body>
+</xhtml:html>

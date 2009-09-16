@@ -58,6 +58,7 @@
                                         <xsl:if test="position() = 1">
                                             <xsl:attribute name="class">selected</xsl:attribute>
                                         </xsl:if>
+                                        <!-- TODO: use XForms control for label value -->
                                         <xhtml:a href="#tab{position()}"><xhtml:em><xsl:value-of select="xforms:label"/></xhtml:em></xhtml:a>
                                     </xhtml:li>
                                 </xsl:for-each>
@@ -65,7 +66,10 @@
                             <xhtml:div class="yui-content">
                                 <xsl:for-each select="fr:tab">
                                     <xhtml:div>
-                                        <xsl:apply-templates select="node() except xforms:label"/>
+                                        <!-- Tab content has outer scope -->
+                                        <xforms:group appearance="xxforms:internal" xxbl:scope="outer">
+                                            <xsl:apply-templates select="node() except xforms:label"/>
+                                        </xforms:group>
                                     </xhtml:div>
                                 </xsl:for-each>
                             </xhtml:div>

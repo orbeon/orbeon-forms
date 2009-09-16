@@ -2106,7 +2106,7 @@ ORBEON.xforms.Controls = {
             // Update classes on "children"
             // Case where we don't do any updating of the children: becomes enabled, but we have a parent who is disabled
             if (!(isRelevant && parentDisabled)) {
-                var depth = 0;
+                var depth = 1;
                 var disabledChildrenDepth = 0;
                 var current = control;
                 while (true) {

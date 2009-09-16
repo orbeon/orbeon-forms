@@ -31,7 +31,13 @@
         <xbl:resources>
             <xbl:style src="/ops/yui/button/assets/skins/sam/button.css"/>
             <xbl:style>
-                .xbl-fr-button { display: inline }
+                .xbl-fr-button {
+                    display: -moz-inline-box;
+                    display: inline-block;
+                    *zoom: 1;
+                    *display: inline;
+                    vertical-align: middle;
+                }
             </xbl:style>
         </xbl:resources>
         <xbl:template>

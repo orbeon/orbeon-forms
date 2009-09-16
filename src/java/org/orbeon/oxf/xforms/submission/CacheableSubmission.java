@@ -117,6 +117,11 @@ public class CacheableSubmission extends BaseSubmission {
             return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
         } else {
 
+            // NOTE: technically, somebody else could put an instance in cache between now and the Callable execution
+            if (detailsLogger.isDebugEnabled())
+                detailsLogger.logDebug("", "did not find instance in cache",
+                        "id", instanceStaticId, "URI", absoluteResolvedURLString, "request hash", requestBodyHash);
+
             final IndentedLogger timingLogger = getTimingLogger(p, p2);
 
             // Create callable for synchronous or asynchronous loading

@@ -1506,4 +1506,347 @@
         </output>
     </test>
 
+    <test description="Simple event dispatch to nested repeats following correct id resolution" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <outer>
+                                    <value/>
+                                    <inner>
+                                        <value/>
+                                    </inner>
+                                    <inner>
+                                        <value/>
+                                    </inner>
+                                </outer>
+                            </instance>
+                        </xforms:instance>
+
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:dispatch name="my-event-1" targetid="my-outer-input" xxforms:repeat-indexes="1"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="my-group">
+                        <!-- TEST: Gather events. Insert on capture phase so we have sensible order -->
+                        <xforms:insert ev:event="my-event-1 my-event-2 my-event-3 my-event-4" ev:phase="capture"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:target')),
+                                                 xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
+
+                        <!-- Outer repeat -->
+                        <xforms:repeat id="my-outer-repeat" nodeset="outer">
+                            <!-- This receives the event on xforms-ready -->
+                            <xforms:input id="my-outer-input" ref="value">
+                                <xforms:action ev:event="my-event-1">
+                                    <!-- Dispatch to inner control following indexes -->
+                                    <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                    <!-- Move inner index -->
+                                    <xforms:setindex repeat="my-inner-repeat" index="2"/>
+                                    <!-- Event must reach new index -->
+                                    <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                    <!-- Dispatch to next control -->
+                                    <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                                </xforms:action>
+                            </xforms:input>
+                            <xforms:output id="my-outer-output" ref="value"/>
+
+                            <!-- Inner repeat -->
+                            <xforms:repeat id="my-inner-repeat" nodeset="inner">
+                                <xforms:input id="my-inner-input" ref="value"/>
+                                <xforms:output id="my-inner-output" ref="value"/>
+                            </xforms:repeat>
+                        </xforms:repeat>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <outer>
+                                        <value/>
+                                        <inner>
+                                            <value/>
+                                        </inner>
+                                        <inner>
+                                            <value/>
+                                        </inner>
+                                    </outer>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="my-event-1" target="my-outer-input" indexes="1"/>
+                                    <event type="my-event-2" target="my-inner-output" indexes="1 1"/>
+                                    <event type="my-event-2" target="my-inner-output" indexes="1 2"/>
+                                    <event type="my-event-3" target="my-outer-output" indexes="1"/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-outer-repeat" index="1"/>
+                            <control effective-id="my-inner-repeat·1" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="my-inner-repeat" parent-indexes="1" start-suffix="2" end-suffix="2"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Complex dispatch to nested repeats following correct id resolution" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <value/>
+                                <outer>
+                                    <value/>
+                                    <inner>
+                                        <value/>
+                                    </inner>
+                                    <inner>
+                                        <value/>
+                                    </inner>
+                                </outer>
+                                <outer><!-- Event #2 reaches associated input -->
+                                    <value/>
+                                    <inner>
+                                        <value/>
+                                    </inner>
+                                    <inner>
+                                        <value/>
+                                    </inner>
+                                </outer>
+                                <outer>
+                                    <value/>
+                                    <inner>
+                                        <value/>
+                                    </inner>
+                                    <inner><!-- Event #1 reaches associated input -->
+                                        <value/>
+                                    </inner>
+                                    <inner>
+                                        <value/>
+                                    </inner>
+                                </outer>
+                            </instance>
+                        </xforms:instance>
+
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <!-- Event #1 -->
+                            <xforms:setindex repeat="my-inner-repeat" index="1"/>
+                            <xforms:setindex repeat="my-outer-repeat" index="1"/>
+                            <xforms:dispatch name="my-event-1" targetid="my-inner-input" xxforms:repeat-indexes="3 2"/>
+
+                            <!-- Event #2 -->
+                            <xforms:setindex repeat="my-inner-repeat" index="1"/>
+                            <xforms:setindex repeat="my-outer-repeat" index="1"/>
+                            <xforms:dispatch name="my-event-1" targetid="my-outer-input" xxforms:repeat-indexes="2"/>
+
+                            <!-- Event #3 -->
+                            <xforms:setindex repeat="my-inner-repeat" index="1"/>
+                            <xforms:setindex repeat="my-outer-repeat" index="1"/>
+                            <xforms:dispatch name="my-event-1" targetid="my-top-level-input"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="my-group">
+                        <!-- TEST: Gather events. Insert on capture phase so we have sensible order -->
+                        <xforms:insert ev:event="my-event-1 my-event-2 my-event-3 my-event-4" ev:phase="capture"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:target')),
+                                                 xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
+
+                        <!-- Top-level -->
+
+                        <!-- This receives event #3 -->
+                        <xforms:input id="my-top-level-input" ref="value">
+                            <xforms:action ev:event="my-event-1">
+                                <!-- Dispatch to inner control following indexes -->
+                                <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                <!-- Move inner index -->
+                                <xforms:setindex repeat="my-inner-repeat" index="2"/>
+                                <!-- Event must reach new index -->
+                                <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                <!-- Dispatch to outer control following indexes -->
+                                <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                                <!-- Move outer index  -->
+                                <xforms:setindex repeat="my-outer-repeat" index="3"/>
+                                <!-- Event must reach new index -->
+                                <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                                <!-- Dispatch to top-level -->
+                                <xforms:dispatch name="my-event-4" targetid="my-top-level-output"/>
+                            </xforms:action>
+                        </xforms:input>
+                        <xforms:output id="my-top-level-output" ref="value"/>
+
+                        <!-- Outer repeat -->
+                        <xforms:repeat id="my-outer-repeat" nodeset="outer">
+                            <!-- This receives event #2 -->
+                            <xforms:input id="my-outer-input" ref="value">
+                                <xforms:action ev:event="my-event-1">
+                                    <!-- Dispatch to inner control following indexes -->
+                                    <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                    <!-- Move inner index -->
+                                    <xforms:setindex repeat="my-inner-repeat" index="2"/>
+                                    <!-- Event must reach new index -->
+                                    <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                    <!-- Dispatch to next control -->
+                                    <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                                    <!-- Move outer index  -->
+                                    <xforms:setindex repeat="my-outer-repeat" index="3"/>
+                                    <!-- Even though the index moved, event must reach the same outer control -->
+                                    <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                                    <!-- Dispatch to top-level -->
+                                    <xforms:dispatch name="my-event-4" targetid="my-top-level-output"/>
+                                </xforms:action>
+                            </xforms:input>
+                            <xforms:output id="my-outer-output" ref="value"/>
+
+                            <!-- Inner repeat -->
+                            <xforms:repeat id="my-inner-repeat" nodeset="inner">
+                                <!-- This receives event #1 -->
+                                <xforms:input id="my-inner-input" ref="value">
+                                    <xforms:action ev:event="my-event-1">
+                                        <!-- Dispatch to next control -->
+                                        <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                        <!-- Move inner index -->
+                                        <xforms:setindex repeat="my-inner-repeat" index="2"/>
+                                        <!-- Even though the index moved, event must reach the same inner control -->
+                                        <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                        <!-- Dispatch to outer -->
+                                        <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                                        <!-- Move outer index  -->
+                                        <xforms:setindex repeat="my-outer-repeat" index="2"/>
+                                        <!-- Even though the index moved, event must reach the same outer control -->
+                                        <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                                        <!-- Dispatch to top-level -->
+                                        <xforms:dispatch name="my-event-4" targetid="my-top-level-output"/>
+                                    </xforms:action>
+                                </xforms:input>
+                                <xforms:output id="my-inner-output" ref="value"/>
+                            </xforms:repeat>
+                        </xforms:repeat>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value/>
+                                    <outer>
+                                        <value/>
+                                        <inner>
+                                            <value/>
+                                        </inner>
+                                        <inner>
+                                            <value/>
+                                        </inner>
+                                    </outer>
+                                    <outer>
+                                        <value/>
+                                        <inner>
+                                            <value/>
+                                        </inner>
+                                        <inner>
+                                            <value/>
+                                        </inner>
+                                    </outer>
+                                    <outer>
+                                        <value/>
+                                        <inner>
+                                            <value/>
+                                        </inner>
+                                        <inner>
+                                            <value/>
+                                        </inner>
+                                        <inner>
+                                            <value/>
+                                        </inner>
+                                    </outer>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="my-event-1" target="my-inner-input" indexes="3 2"/>
+                                    <event type="my-event-2" target="my-inner-output" indexes="3 2"/>
+                                    <event type="my-event-2" target="my-inner-output" indexes="3 2"/>
+                                    <event type="my-event-3" target="my-outer-output" indexes="3"/>
+                                    <event type="my-event-3" target="my-outer-output" indexes="3"/>
+                                    <event type="my-event-4" target="my-top-level-output" indexes=""/>
+                                    <event type="my-event-1" target="my-outer-input" indexes="2"/>
+                                    <event type="my-event-2" target="my-inner-output" indexes="2 1"/>
+                                    <event type="my-event-2" target="my-inner-output" indexes="2 2"/>
+                                    <event type="my-event-3" target="my-outer-output" indexes="2"/>
+                                    <event type="my-event-3" target="my-outer-output" indexes="2"/>
+                                    <event type="my-event-4" target="my-top-level-output" indexes=""/>
+                                    <event type="my-event-1" target="my-top-level-input" indexes=""/>
+                                    <event type="my-event-2" target="my-inner-output" indexes="1 1"/>
+                                    <event type="my-event-2" target="my-inner-output" indexes="1 2"/>
+                                    <event type="my-event-3" target="my-outer-output" indexes="1"/>
+                                    <event type="my-event-3" target="my-outer-output" indexes="3"/>
+                                    <event type="my-event-4" target="my-top-level-output" indexes=""/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-outer-repeat" index="3"/>
+                            <control effective-id="my-inner-repeat·1" index="2"/>
+                            <control effective-id="my-inner-repeat·2" index="2"/>
+                            <control effective-id="my-inner-repeat·3" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="my-outer-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:copy-repeat-template id="my-inner-repeat" parent-indexes="1" start-suffix="2" end-suffix="2"/>
+                        <xxf:copy-repeat-template id="my-inner-repeat" parent-indexes="2" start-suffix="2" end-suffix="2"/>
+                        <xxf:copy-repeat-template id="my-inner-repeat" parent-indexes="3" start-suffix="2" end-suffix="3"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

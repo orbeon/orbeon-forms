@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -32,9 +33,7 @@ import org.orbeon.saxon.value.BooleanValue;
 import org.orbeon.saxon.value.SequenceExtent;
 import org.orbeon.saxon.value.StringValue;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -46,6 +45,9 @@ public abstract class XFormsEvent implements Cloneable {
     private static final String XXFORMS_TARGET_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "target");
     private static final String XXFORMS_BUBBLES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "bubbles");
     private static final String XXFORMS_CANCELABLE_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "cancelable");
+
+    private static final String XXFORMS_REPEAT_INDEXES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
+    private static final String XXFORMS_TARGET_PREFIXES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "target-prefixes");
 
     // Properties that change as the event propagates
     // TODO
@@ -146,6 +148,38 @@ public abstract class XFormsEvent implements Cloneable {
         } else if (XFormsConstants.NO_INDEX_ADJUSTMENT.equals(name)) {
             // NOP (this is related to a temporary offline performance hack)
             return EmptyIterator.getInstance();
+        } else if ("repeat-indexes".equals(name) || XXFORMS_REPEAT_INDEXES_ATTRIBUTE.equals(name)) {
+
+            if ("repeat-indexes".equals(name)) {
+                getIndentedLogger().logWarning("", "event('repeat-indexes') is deprecated. Use event('xxforms:repeat-indexes') instead.");
+            }
+
+            final String effectiveTargetId = targetObject.getEffectiveId();
+            final Integer[] parts = XFormsUtils.getEffectiveIdSuffixParts(effectiveTargetId);
+
+            if (parts.length > 0) {
+                final List<StringValue> tokens = new ArrayList<StringValue>(parts.length);
+                for (final Integer currentIndex: parts) {
+                    tokens.add(new StringValue(currentIndex.toString()));
+                }
+                return new ListIterator(tokens);
+            } else {
+                return EmptyIterator.getInstance();
+            }
+        } else if (XXFORMS_TARGET_PREFIXES_ATTRIBUTE.equals(name)) {
+
+            final String effectiveTargetId = targetObject.getEffectiveId();
+            final String[] parts = XFormsUtils.getEffectiveIdPrefixParts(effectiveTargetId);
+
+            if (parts.length > 0) {
+                final List<StringValue> tokens = new ArrayList<StringValue>(parts.length);
+                for (final String currentPart: parts) {
+                    tokens.add(new StringValue(currentPart));
+                }
+                return new ListIterator(tokens);
+            } else {
+                return EmptyIterator.getInstance();
+            }
         } else {
             // "If the event context information does not contain the property indicated by the string argument, then an
             // empty node-set is returned."

@@ -1765,10 +1765,10 @@
                                     <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="fr-level1-binding" type="up-value1" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
-                                    <event observer="fr-level2-binding" type="up-value2" target="level2-component" phase="bubbling" original-target="level2-component" indexes=""/>
-                                    <event observer="fr-level3-binding" type="up-value3" target="level3-component" phase="bubbling" original-target="level3-component" indexes=""/>
-                                    <event observer="fr-level3-binding" type="down-3" target="level3-component" phase="bubbling" original-target="level3-component" indexes=""/>
-                                    <event observer="fr-level2-binding" type="down-2" target="level2-component" phase="bubbling" original-target="level2-component" indexes=""/>
+                                    <event observer="fr-level2-binding" type="up-value2" target="level2-component" phase="bubbling" original-target="level2-component" indexes="1"/>
+                                    <event observer="fr-level3-binding" type="up-value3" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="fr-level3-binding" type="down-3" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="fr-level2-binding" type="down-2" target="level2-component" phase="bubbling" original-target="level2-component" indexes="1"/>
                                     <event observer="fr-level1-binding" type="down-1" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
                                     <event observer="main-group" type="down-1" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
                                     <event observer="fr-level3-binding" type="DOMFocusIn" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>

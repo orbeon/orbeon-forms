@@ -71,7 +71,7 @@
 .fr-summary-search .fr-search-options-title { font-weight: bold; padding: .2em 0 1em 0; }
 .fr-summary-search .fr-search-options-buttons { clear: both; padding: 1em 0 0 0; }
 .fr-summary-search .fr-search-options-buttons .yui-button { margin: 0; }
-.fr-summary-search .fr-search-options-buttons a { vertical-align: middle; font-size: 77%; padding: 0em 0 1em 1em; }
+.fr-summary-search .fr-search-options-buttons a { vertical-align: middle; font-size: 77%; margin: 0 0 0 1em; }
 .fr-summary-search .xforms-label { font-weight: normal; }
 
 .fr-paging-buttons { padding-top: .5em }

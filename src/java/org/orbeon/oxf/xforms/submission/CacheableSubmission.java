@@ -36,7 +36,7 @@ import java.util.concurrent.Callable;
 /**
  * Cacheable remote submission going through a protocol handler.
  *
- * TODO: This should be made to work as well for optimized submissions.
+ * NOTE: This could possibly be made to work as well for optimized submissions, but currently this is not the case.
  */
 public class CacheableSubmission extends BaseSubmission {
 
@@ -117,6 +117,11 @@ public class CacheableSubmission extends BaseSubmission {
             return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
         } else {
 
+            // NOTE: technically, somebody else could put an instance in cache between now and the Callable execution
+            if (detailsLogger.isDebugEnabled())
+                detailsLogger.logDebug("", "did not find instance in cache",
+                        "id", instanceStaticId, "URI", absoluteResolvedURLString, "request hash", requestBodyHash);
+
             final IndentedLogger timingLogger = getTimingLogger(p, p2);
 
             // Create callable for synchronous or asynchronous loading
@@ -161,7 +166,7 @@ public class CacheableSubmission extends BaseSubmission {
 
                                             // Create new shared instance
                                             return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, instanceSourceURI,
-                                                    updatedP2.username, updatedP2.password, true, timeToLive, validation, handleXInclude,
+                                                    requestBodyHash, updatedP2.username, updatedP2.password, true, timeToLive, validation, handleXInclude,
                                                     XFormsProperties.isExposeXPathTypes(containingDocument));
                                         }
                                     } catch (ThrowableWrapper throwableWrapper) {

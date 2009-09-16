@@ -306,10 +306,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         {
             if (instanceDocument instanceof Document) {
                 newInstance = new XFormsInstance(modelEffectiveId, instanceStaticId, (Document) instanceDocument, instanceSourceURI,
-                        username, password, cached, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+                        null, username, password, cached, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
             } else if (instanceDocument instanceof DocumentInfo) {
                 newInstance = new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, (DocumentInfo) instanceDocument, instanceSourceURI,
-                        username, password, cached, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+                        null, username, password, cached, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
             } else {
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
             }
@@ -633,9 +633,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                         "id", newInstance.getEffectiveId());
 
             // NOTE: No XInclude supported to read instances with @src for now
+            // TODO: must pass method and request body in case of POST/PUT
             final XFormsInstance cachedInstance
                     = XFormsServerSharedInstancesCache.instance().findConvert(propertyContext, indentedLogger,
-                        newInstance.getId(), newInstance.getEffectiveModelId(), newInstance.getSourceURI(), null, readonlyHint, false,
+                        newInstance.getId(), newInstance.getEffectiveModelId(), newInstance.getSourceURI(), newInstance.getRequestBodyHash(), readonlyHint, false,
                         XFormsProperties.isExposeXPathTypes(containingDocument), newInstance.getTimeToLive(), newInstance.getValidation(), INSTANCE_LOADER);
 
             setInstance(cachedInstance, newInstance.isReplaced());
@@ -789,7 +790,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     // TODO: Use XFormsModelSubmission instead of duplicating code here
     private class InstanceLoader implements XFormsServerSharedInstancesCache.Loader {
-        public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId, String modelEffectiveId, String instanceSourceURI, boolean handleXInclude, long timeToLive, String validation) {
+        public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId, String modelEffectiveId,
+                                           String instanceSourceURI, boolean handleXInclude, long timeToLive, String validation) {
             final URL sourceURL;
             try {
                 sourceURL = URLFactory.createURL(instanceSourceURI);
@@ -816,7 +818,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // TODO: Handle validating?
                 final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude);
                 return new ReadonlyXFormsInstance(effectiveId, instanceStaticId, documentInfo, instanceSourceURI,
-                        null, null, true, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+                        null, null, null, true, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
             } catch (Exception e) {
                 throw new OXFException("Got exception while loading instance from URI: " + instanceSourceURI, e);
             } finally {

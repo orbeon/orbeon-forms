@@ -61,6 +61,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     protected String modelEffectiveId;
 
     private String sourceURI;
+    private String requestBodyHash;
 
     private boolean readonly;
     private boolean cache;
@@ -96,6 +97,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.modelEffectiveId = containerElement.attributeValue("model-id");
 
         this.sourceURI = containerElement.attributeValue("source-uri");
+        this.requestBodyHash = containerElement.attributeValue("request-body-hash");
 
         this.readonly = "true".equals(containerElement.attributeValue("readonly"));
         this.cache = "true".equals(containerElement.attributeValue("cache"));
@@ -140,7 +142,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.documentInfo = documentInfo;
     }
 
-    public XFormsInstance(String modelEffectiveId, String instanceStaticId, Document instanceDocument, String instanceSourceURI,
+    public XFormsInstance(String modelEffectiveId, String instanceStaticId, Document instanceDocument, String instanceSourceURI, String requestBodyHash,
                           String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude, boolean exposeXPathTypes) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
         // NOTE: Make a typed document wrapper
@@ -148,10 +150,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                 exposeXPathTypes
                         ? new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration())
                         : new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()),
-                instanceSourceURI, username, password, cache, timeToLive, validation, handleXInclude, exposeXPathTypes);
+                instanceSourceURI, requestBodyHash, username, password, cache, timeToLive, validation, handleXInclude, exposeXPathTypes);
     }
 
-    protected XFormsInstance(String modelEffectiveId, String instanceStaticId, DocumentInfo instanceDocumentInfo, String instanceSourceURI,
+    protected XFormsInstance(String modelEffectiveId, String instanceStaticId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String requestBodyHash,
                              String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude, boolean exposeXPathTypes) {
 
         if (cache && instanceSourceURI == null)
@@ -165,6 +167,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.timeToLive = timeToLive;
 
         this.sourceURI = instanceSourceURI;
+        this.requestBodyHash = requestBodyHash;
 
         this.username = username;
         this.password = password;
@@ -201,6 +204,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         instanceElement.addAttribute("model-id", modelEffectiveId);
         if (sourceURI != null)
             instanceElement.addAttribute("source-uri", sourceURI);
+        if (requestBodyHash != null)
+            instanceElement.addAttribute("request-body-hash", requestBodyHash);
         if (username != null)
             instanceElement.addAttribute("username", username);
         if (password != null)
@@ -288,6 +293,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
     public String getSourceURI() {
         return sourceURI;
+    }
+
+    public String getRequestBodyHash() {
+        return requestBodyHash;
     }
 
     public String getUsername() {

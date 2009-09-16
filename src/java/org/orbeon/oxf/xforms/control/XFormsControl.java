@@ -308,7 +308,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @param propertyContext       current context
      * @param lhhaElement           element associated to the control (either as child or using @for)
      * @param acceptHTML            whether the result may contain HTML
-     * @param containsHTML          whether the result actually contains HTML (null allowed)    @return                      string containing the result of the evaluation, null if evaluation failed
+     * @param containsHTML          whether the result actually contains HTML (null allowed)
+     * @return                      string containing the result of the evaluation, null if evaluation failed
      */
     private String getLabelHelpHintAlertValue(PropertyContext propertyContext, Element lhhaElement, boolean acceptHTML, boolean[] containsHTML) {
 
@@ -1104,19 +1105,19 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Compare two nodesets.
      *
-     * @param nodeset1  List<NodeInfo> first nodeset
-     * @param nodeset2  List<NodeInfo> second nodeset
-     * @return  true iif the nodesets point to the same nodes
+     * @param nodeset1  first nodeset
+     * @param nodeset2  second nodeset
+     * @return          true iif the nodesets point to the same nodes
      */
-    protected boolean compareNodesets(List nodeset1, List nodeset2) {
+    protected boolean compareNodesets(List<Item> nodeset1, List<Item> nodeset2) {
 
         // Can't be the same if the size has changed
         if (nodeset1.size() != nodeset2.size())
             return false;
 
-        final Iterator j = nodeset2.iterator();
-        for (Object aNodeset1: nodeset1) {
-            final NodeInfo currentNodeInfo1 = (NodeInfo) aNodeset1;
+        final Iterator<Item> j = nodeset2.iterator();
+        for (Item item1: nodeset1) {
+            final NodeInfo currentNodeInfo1 = (NodeInfo) item1;
             final NodeInfo currentNodeInfo2 = (NodeInfo) j.next();
 
             // Found a difference

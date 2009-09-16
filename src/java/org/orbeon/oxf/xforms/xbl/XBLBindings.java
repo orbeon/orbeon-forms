@@ -326,7 +326,9 @@ public class XBLBindings {
                                 // Register xbl:handler as an action handler
 
                                 // Annotate handler and gather scope information
-                                final Element currentHandlerAnnotatedElement = annotateHandler(currentHandlerElement, newPrefix, controlPrefixedId).getRootElement();
+                                final String outerScopeId = prefixedIdToXBLScopeMap.get(controlPrefixedId);
+                                final Element currentHandlerAnnotatedElement
+                                        = annotateHandler(currentHandlerElement, newPrefix, controlPrefixedId, outerScopeId, XFormsConstants.XXBLScope.inner).getRootElement();
 
                                 // NOTE: <xbl:handler> has similar attributes as XForms actions, in particular @event, @phase, etc.
                                 final String controlStaticId = XFormsUtils.getStaticIdFromId(controlPrefixedId);
@@ -343,18 +345,17 @@ public class XBLBindings {
                         }
                     }
 
-                    // NOTE: Say we don't want to exclude gathering event handlers within nested models
                     staticState.analyzeComponentTree(propertyContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(),
-                            repeatHierarchyStringBuffer, repeatAncestorsStack, false);
+                            repeatHierarchyStringBuffer, repeatAncestorsStack, true);
                 }
             }
         }
     }
 
-    public Document annotateHandler(Element currentHandlerElement, String newPrefix, String controlPrefixedId) {
+    public Document annotateHandler(Element currentHandlerElement, String newPrefix, String innerScopeId, String outerScopeId, XFormsConstants.XXBLScope startScope) {
         final Document handlerDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentHandlerElement, false);// for now, don't detach because element can be processed by multiple bindings
         final Document annotatedDocument = annotateShadowTree(handlerDocument, newPrefix, idGenerator);
-        gatherScopeMappings(annotatedDocument, newPrefix, controlPrefixedId, null, false);
+        gatherScopeMappings(annotatedDocument, newPrefix, innerScopeId, outerScopeId, startScope, null, false);
         return annotatedDocument;
     }
 
@@ -479,6 +480,9 @@ public class XBLBindings {
                     element.detach();
 
                     resultingNodes = contentToInsert;
+
+                    // Set xxbl:scope="outer" on resulting elements
+                    setAttribute(resultingNodes, XFormsConstants.XXBL_SCOPE_QNAME, "outer");
                 } else {
                     // Element is simply kept
                     resultingNodes = Collections.singletonList((Node) element);
@@ -656,6 +660,7 @@ public class XBLBindings {
         identity.setResult(documentResult);
 
         // Write the document through the annotator
+        // TODO: this adds xml:base on root element, must fix
         TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsAnnotatorContentHandler(identity, "", false, idGenerator, namespacesMap) {
             @Override
             protected void addNamespaces(String id) {
@@ -763,25 +768,30 @@ public class XBLBindings {
         identity.setResult(result);
 
         // Run transformation and gather scope mappings
-        gatherScopeMappings(fullShadowTree, prefix, controlPrefixedId, identity, true);
+        // Get ids of the two scopes
+        final String innerScopeId = (prefix.length() == 0) ? "" : prefix.substring(0, prefix.length() - 1); // if at top-level, prefix is ""
+        final String outerScopeId = prefixedIdToXBLScopeMap.get(controlPrefixedId);
+        gatherScopeMappings(fullShadowTree, prefix, innerScopeId, outerScopeId, XFormsConstants.XXBLScope.inner, identity, true);
 
         return result;
     }
 
-    private void gatherScopeMappings(Document document, String prefix, String controlPrefixedId, ContentHandler result, boolean ignoreRootElement) {
-        // Get ids of the two scopes
-        final String innerScopeId = (prefix.length() == 0) ? "" : prefix.substring(0, prefix.length() - 1); // if at top-level, prefix is ""
-        final String outerScopeId = prefixedIdToXBLScopeMap.get(controlPrefixedId);
-
+    private void gatherScopeMappings(Document document, String prefix, String innerScopeId, String outerScopeId, XFormsConstants.XXBLScope startScope, ContentHandler result, boolean ignoreRootElement) {
         // Run transformation which gathers scope information and extracts compact tree into the output ContentHandler
-        TransformerUtils.writeDom4j(document, new ScopeExtractorContentHandler(result, prefix, innerScopeId, outerScopeId, ignoreRootElement));
+        TransformerUtils.writeDom4j(document, new ScopeExtractorContentHandler(result, prefix, innerScopeId, outerScopeId, ignoreRootElement, startScope));
     }
+
+    private static final String scopeURI = XFormsConstants.XXBL_SCOPE_QNAME.getNamespaceURI();
+    private static final String scopeLocalname = XFormsConstants.XXBL_SCOPE_QNAME.getName();
 
     private class ScopeExtractorContentHandler extends XFormsExtractorContentHandler {
 
         private final String prefix;
         private final String innerScopeId;
         private final String outerScopeId;
+
+        // TODO: Stack is synchronized, what other collection can we use?
+        final Stack<XFormsConstants.XXBLScope> scopeStack = new Stack<XFormsConstants.XXBLScope>();
 
         /**
          *
@@ -790,23 +800,17 @@ public class XBLBindings {
          * @param innerScopeId          inner scope id
          * @param outerScopeId          outer scope id, i.e. scope id of the bound element, "" if top-level scope
          * @param ignoreRootElement     whether root element must just be skipped
+         * @param startScope            scope of root element
          */
-        public ScopeExtractorContentHandler(ContentHandler contentHandler, String prefix, String innerScopeId, String outerScopeId, boolean ignoreRootElement) {
+        public ScopeExtractorContentHandler(ContentHandler contentHandler, String prefix, String innerScopeId, String outerScopeId,
+                                            boolean ignoreRootElement, XFormsConstants.XXBLScope startScope) {
             super(contentHandler, ignoreRootElement);
             this.prefix = prefix;
             this.innerScopeId = innerScopeId;
             this.outerScopeId = outerScopeId;
-        }
 
-        // TODO: Stack is synchronized, what other collection can we use?
-        final Stack<XFormsConstants.XXBLScope> scopeStack = new Stack<XFormsConstants.XXBLScope>();
-        {
-            // Start with inner scope
-            scopeStack.push(XFormsConstants.XXBLScope.inner);
+            scopeStack.push(startScope);
         }
-
-        private final String scopeURI = XFormsConstants.XXBL_SCOPE_QNAME.getNamespaceURI();
-        private final String scopeLocalname = XFormsConstants.XXBL_SCOPE_QNAME.getName();
 
         @Override
         protected void startXFormsOrExtension(String uri, String localname, String qName, Attributes attributes) {
@@ -1034,8 +1038,8 @@ public class XBLBindings {
      * @return          prefixed id corresponding to the static id passed
      */
     public String getPrefixedIdInScope(String scopeId, String staticId) {
-        if (scopeId.length() == 0) {
-            // In top-level scope, id == prefixedId
+        if (scopeToIdMap.size() == 0) {
+            // If there are no XBL controls the map is empty
             return staticId;
         } else {
             // Otherwise use map
@@ -1045,7 +1049,6 @@ public class XBLBindings {
 
     public void freeTransientState() {
         // Not needed after analysis
-//        scopeToUsedIds = null;
         idGenerator = null;
     }
 }

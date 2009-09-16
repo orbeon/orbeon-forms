@@ -217,15 +217,12 @@ public class XFormsStaticState {
             }
         }
 
-        // Recompute if needed
-        if (idGenerator == null) {
-           // TODO
-        }
-
         // Recompute namespace mappings if needed
         final Element htmlElement = staticStateElement.element(XMLConstants.XHTML_HTML_QNAME);
         if (namespacesMap == null) {
+            assert idGenerator == null : "idGenerator must be null if namespacesMap is null";
             this.namespacesMap = new HashMap<String, Map<String, String>>();
+            idGenerator = new IdGenerator();
             try {
 //                if (xhtmlDocument == null) {
                     // Recompute from staticStateDocument
@@ -236,7 +233,7 @@ public class XFormsStaticState {
                     if (htmlElement != null)
                         htmlElement.detach();
                     // Compute namespaces map
-                    identity.transform(new DocumentSource(staticStateDocument), new SAXResult(new XFormsAnnotatorContentHandler(this.namespacesMap)));
+                    identity.transform(new DocumentSource(staticStateDocument), new SAXResult(new XFormsAnnotatorContentHandler(this.namespacesMap, idGenerator)));
                     // Re-attach xhtml element
                     if (htmlElement != null)
                         staticStateElement.add(htmlElement);
@@ -811,10 +808,13 @@ public class XFormsStaticState {
         }
     }
 
-    private void extractEventHandlers(PropertyContext pipelineContext, DocumentInfo documentInfo, String prefix, boolean excludeModels) {
+    private void extractEventHandlers(PropertyContext pipelineContext, DocumentInfo documentInfo, String prefix, boolean isControls) {
 
-        // Register event handlers on any element which has an id or an observer attribute.
-        // This also allows registering event handlers on XBL components. This follows the semantics of XML Events.
+        // Register event handlers on any element which has an id or an observer attribute. This also allows
+        // registering event handlers on XBL components. This follows the semantics of XML Events.
+
+        // NOTE: Special work is done to annotate handlers children of bound nodes, because that annotation is not done
+        // in XFormsAnnotatorContentHandler. Maybe it should be done there?
 
         // NOTE: Placing a listener on say a <div> element won't work at this point. Listeners have to be placed within
         // elements which have a representation in the compact component tree.
@@ -822,7 +822,7 @@ public class XFormsStaticState {
         // compact tree ancestor element. Will not work for top-level handlers without @ev:observer though. Check more!
 
         // Two expressions depending on whether handlers within models are excluded or not
-        final String xpathExpression = excludeModels ?
+        final String xpathExpression = isControls ?
                 "//*[@ev:event and not(ancestor::xforms:instance) and not(ancestor::xforms:model) and (parent::*/@id or ev:observer)]" :
                 "//*[@ev:event and not(ancestor::xforms:instance) and (parent::*/@id or ev:observer)]";
 
@@ -840,27 +840,45 @@ public class XFormsStaticState {
                 if (XFormsActions.isActionName(actionElement.getNamespaceURI(), actionElement.getName())) {
                     // This is a known action name
 
-                    final String parentStaticId = actionElement.getParent().attributeValue("id");
-
+                    // Determine if the action is a child of a bound element. If so, we must annotate it here.
                     final Element newActionElement;
-                    if (actionElement.attributeValue("id") == null) {
-                        // Action doesn't have an id, which means that it must be within an XBL bound element. We only
-                        // consider element without id that are just under a bound node.
-                        if (parentStaticId != null) {
-                            final String parentPrefixedId = prefix + parentStaticId;
-                            if (xblBindings.hasBinding(parentPrefixedId)) {
-                                // Parent has a binding, so we found an action handler which is a child of a bound element
+                    final String observerStaticId = actionElement.attributeValue(XFormsConstants.XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME);
 
-                                // Annotate handler
-                                newActionElement = xblBindings.annotateHandler(actionElement, prefix, parentPrefixedId).getRootElement();
+                    final String parentStaticId = actionElement.getParent().attributeValue("id");
+                    if (isControls) {
+                        // Analyzing controls
+                        if (observerStaticId == null) {
+                            // Observer is containing element
+                            if (parentStaticId != null) {
+                                final String parentPrefixedId = prefix + parentStaticId;
+                                if (xblBindings.hasBinding(parentPrefixedId)) {
+                                    // Parent is a bound node, so we found an action handler which is a child of a bound element
+
+                                    // Annotate handler
+                                    final String innerScopeId = (prefix.length() == 0) ? "" : prefix.substring(0, prefix.length() - 1); // if at top-level, prefix is ""
+                                    final String outerScopeId = (prefix.length() == 0) ? "" : xblBindings.getResolutionScopeId(innerScopeId);
+                                    final String bindingScope = xblBindings.getResolutionScopeId(parentPrefixedId);
+                                    final XFormsConstants.XXBLScope startScope = innerScopeId.equals(bindingScope) ? XFormsConstants.XXBLScope.inner : XFormsConstants.XXBLScope.outer;
+                                    newActionElement = xblBindings.annotateHandler(actionElement, prefix, innerScopeId, outerScopeId, startScope).getRootElement();
+                                } else if (controlInfoMap.containsKey(parentPrefixedId)) {
+                                    // Parent is a control but not a bound node
+                                    newActionElement = actionElement;
+                                } else {
+                                    // Neither
+                                    newActionElement = null;
+                                }
                             } else {
+                                // No parent id: we ignore the handler
                                 newActionElement = null;
                             }
+
                         } else {
-                            newActionElement = null;
+                            // Observer is specified with ev:observer
+                            // TODO: if the element is a descendant of a bound node, it must be ignored
+                            newActionElement = actionElement;
                         }
                     } else {
-                        // Already has an id
+                        // Analyzing models
                         newActionElement = actionElement;
                     }
 
@@ -1076,7 +1094,7 @@ public class XFormsStaticState {
 
         // Extract event handlers for this tree of controls
         // NOTE: Do this after analysing controls above so that XBL bindings are available for detection of nested event handlers.
-        extractEventHandlers(propertyContext, controlsDocumentInfo, prefix, excludeModelEventHandlers);
+        extractEventHandlers(propertyContext, controlsDocumentInfo, prefix, true);
 
         // Gather label, hint, help, alert information
         {

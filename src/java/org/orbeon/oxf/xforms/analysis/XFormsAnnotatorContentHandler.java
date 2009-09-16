@@ -79,17 +79,18 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
     private Map<String, Map<String, String>> xblBindings;   // Map<String uri, Map<String localname, "">>
 
     /**
-     * This constructor just computes the namespace mappings and AVT elements.
+     * This constructor just computes the namespace mappings and AVT elements and gathers id information.
      *
      * @param namespaceMappings     namespace mappings
+     * @param idGenerator           id generator
      */
-    public XFormsAnnotatorContentHandler(Map<String, Map<String, String>> namespaceMappings) {
+    public XFormsAnnotatorContentHandler(Map<String, Map<String, String>> namespaceMappings, IdGenerator idGenerator) {
 
         // In this mode, all elements that need to have ids already have them, so set safe defaults
         this.containerNamespace = "";
         this.portlet = false;
 
-        this.idGenerator = null;
+        this.idGenerator = idGenerator;
         this.namespaceMappings = namespaceMappings;
         this.isGenerateIds = false;
     }
@@ -381,10 +382,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
             return false;
 
         final Map localnamesMap = xblBindings.get(uri);
-        if (localnamesMap == null)
-            return false;
-
-        return localnamesMap.get(localname) != null;
+        return localnamesMap != null && localnamesMap.get(localname) != null;
     }
 
     public void endElement(String uri, String localname, String qName) throws SAXException {
@@ -467,9 +465,6 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
                 throw new ValidationException("Duplicate id for XForms element: " + newIdAttributeUnprefixed,
                         new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", new String[] { "id", newIdAttributeUnprefixed }, false));
 
-            // Remember that this id was used
-            idGenerator.add(newIdAttribute[0]);
-
             // Prefix observer id
             if (portlet) {
                 final int observerIndex = attributes.getIndex(XFormsConstants.XML_EVENTS_NAMESPACE_URI, "observer");
@@ -482,9 +477,12 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
             }
 
         } else {
-            // Don't process ids
+            // Don't create a new id but remember the existing one
             newIdAttribute[0] = attributes.getValue(idIndex);
         }
+
+        // Remember that this id was used
+        idGenerator.add(newIdAttribute[0]);
 
         // Gather namespace information if there is an id
         if (namespaceMappings != null && (isGenerateIds || idIndex != -1)) {

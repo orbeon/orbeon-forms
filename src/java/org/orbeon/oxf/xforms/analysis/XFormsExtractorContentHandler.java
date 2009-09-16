@@ -379,14 +379,14 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                 super.endElement(uri, localname, qName);
             }
 
-            // Callback for XForms elements
-            if (isXFormsOrExtension && !inPreserve) {
-                endXFormsOrExtension(uri, localname, qName);
-            }
-
             if (inPreserve && level == preserveLevel) {
                 // Leaving preserved content
                 inPreserve = false;
+            }
+
+            // Callback for XForms elements
+            if (isXFormsOrExtension && !inPreserve) {
+                endXFormsOrExtension(uri, localname, qName);
             }
 
             if (inXFormsOrExtension && level == xformsLevel) {

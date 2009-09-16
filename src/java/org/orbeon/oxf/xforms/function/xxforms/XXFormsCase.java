@@ -30,7 +30,7 @@ public class XXFormsCase  extends XFormsFunction {
 
         final String switchStaticId = XFormsUtils.namespaceId(getContainingDocument(xpathContext), argument[0].evaluateAsString(xpathContext));
 
-        final Object switchControl = getXBLContainer(xpathContext).resolveObjectById(getSourceEffectiveId(xpathContext), switchStaticId);
+        final Object switchControl = getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), switchStaticId);
 
         if (switchControl instanceof XFormsSwitchControl) {
             // NOTE: Return the static id, not the effective id

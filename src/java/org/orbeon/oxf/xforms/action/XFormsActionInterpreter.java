@@ -74,7 +74,7 @@ public class XFormsActionInterpreter {
             xpathContextObserver = eventObserver;
         } else {
             // Observer is not parent of action, must resolve effective id of parent
-            xpathContextObserver = (XFormsEventObserver) container.resolveObjectById(eventObserver.getEffectiveId(), ancestorObserverStaticId);
+            xpathContextObserver = (XFormsEventObserver) container.resolveObjectByIdInScope(eventObserver.getEffectiveId(), ancestorObserverStaticId);
         }
 
         this.xpathContextObserver = xpathContextObserver;
@@ -132,10 +132,6 @@ public class XFormsActionInterpreter {
 
     public IndentedLogger getIndentedLogger() {
         return indentedLogger;
-    }
-
-    public XFormsControls getXFormsControls() {
-        return xformsControls;
     }
 
     public XFormsContextStack getContextStack() {
@@ -363,7 +359,7 @@ public class XFormsActionInterpreter {
             // Get the effective id of the <xbl:handler> element as source
             return container.getFullPrefix() + outerActionElement.attributeValue("id") + XFormsUtils.getEffectiveIdSuffixWithSeparator(container.getEffectiveId());
         } else {
-            // Effective id of the XPath observer
+            // Effective id of the XPath observer, which must be a control or model object
             return xpathContextObserver.getEffectiveId();
         }
     }
@@ -503,10 +499,7 @@ public class XFormsActionInterpreter {
      */
     public Object resolveEffectiveControl(PropertyContext propertyContext, Element actionElement, String targetStaticId) {
 
-        final XFormsControls controls = getXFormsControls();
-        final XBLContainer container = getXBLContainer();
-
-        final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement, container);
+        final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement);
 
         // Get indexes as space-separated list
         final String repeatIndexes = resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME, false);
@@ -524,11 +517,11 @@ public class XFormsActionInterpreter {
             }
             System.arraycopy(additionalParts, 0, parts, containerParts.length, additionalParts.length);
 
-            return controls.getObjectByEffectiveId(container.getFullPrefix() + targetStaticId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(parts, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
+            return xformsControls.getObjectByEffectiveId(container.getFullPrefix() + targetStaticId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(parts, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
         }
     }
 
-    private XBLContainer findResolutionScopeContainer(Element actionElement, XBLContainer container) {
+    private XBLContainer findResolutionScopeContainer(Element actionElement) {
         final String actionStaticId = actionElement.attributeValue("id");
         assert actionStaticId != null;
         final String actionPrefixedId = container.getFullPrefix() + actionStaticId;
@@ -551,8 +544,7 @@ public class XFormsActionInterpreter {
             return tempXFormsEventTarget;
         } else {
             // Otherwise, try container
-            final XBLContainer container = getXBLContainer();
-            final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement, container);
+            final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement);
             return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(), targetStaticId);
         }
     }

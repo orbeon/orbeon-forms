@@ -396,19 +396,32 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      * @return                  repeat index, -1 if repeat is not found
      */
     public int getRepeatIndex(String sourceEffectiveId, String repeatStaticId) {
-        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) resolveObjectById(sourceEffectiveId, repeatStaticId);
+        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) resolveObjectByIdInScope(sourceEffectiveId, repeatStaticId);
         if (repeatControl != null) {
             // 1. Found concrete control
             return repeatControl.getIndex();
-        } else if (containingDocument.getStaticState().getControlInfoMap().get(getFullPrefix() + repeatStaticId) != null) {
-            // 2. Found static control
-
-            // NOTE: above we make sure to use prefixed id, e.g. my-stuff$my-foo-bar$my-repeat
-            return 0;
         } else {
-            // 3. No repeat element exists
-            return -1;
+
+            final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId);
+            final String scopeId = getXBLBindings().getResolutionScopeId(sourcePrefixedId);
+            final String repeatPrefixedId = getXBLBindings().getPrefixedIdInScope(scopeId, repeatStaticId);
+
+            if (containingDocument.getStaticState().getControlInfoMap().get(repeatPrefixedId) != null) {
+                // 2. Found static control
+
+                // NOTE: above we make sure to use prefixed id, e.g. my-stuff$my-foo-bar$my-repeat
+                return 0;
+            } else {
+                // 3. No repeat element exists
+                return -1;
+            }
         }
+    }
+
+    public Object resolveObjectByIdInScope(String sourceEffectiveId, String targetStaticId) {
+        final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId);
+        final XBLContainer resolutionScopeContainer = findResolutionScope(sourcePrefixedId);
+        return resolutionScopeContainer.resolveObjectById(sourceEffectiveId, targetStaticId);
     }
 
     /**

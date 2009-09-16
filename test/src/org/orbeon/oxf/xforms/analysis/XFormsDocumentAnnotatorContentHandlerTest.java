@@ -46,7 +46,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
     public void testFormNamespaceElements() {
 
         final Map<String, Map<String, String>> mappings = new HashMap<String, Map<String, String>>();
-        final XFormsAnnotatorContentHandler ch = new XFormsAnnotatorContentHandler(mappings);
+        final XFormsAnnotatorContentHandler ch = new XFormsAnnotatorContentHandler(mappings, new IdGenerator());
         XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", ch, false, false);
 
         // Test that ns information is provided for those elements

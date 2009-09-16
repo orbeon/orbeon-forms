@@ -36,7 +36,7 @@ import java.util.concurrent.Callable;
 /**
  * Cacheable remote submission going through a protocol handler.
  *
- * TODO: This should be made to work as well for optimized submissions.
+ * NOTE: This could possibly be made to work as well for optimized submissions, but currently this is not the case.
  */
 public class CacheableSubmission extends BaseSubmission {
 
@@ -166,7 +166,7 @@ public class CacheableSubmission extends BaseSubmission {
 
                                             // Create new shared instance
                                             return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, instanceSourceURI,
-                                                    updatedP2.username, updatedP2.password, true, timeToLive, validation, handleXInclude,
+                                                    requestBodyHash, updatedP2.username, updatedP2.password, true, timeToLive, validation, handleXInclude,
                                                     XFormsProperties.isExposeXPathTypes(containingDocument));
                                         }
                                     } catch (ThrowableWrapper throwableWrapper) {

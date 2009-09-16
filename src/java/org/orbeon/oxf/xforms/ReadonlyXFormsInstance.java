@@ -28,9 +28,11 @@ public class ReadonlyXFormsInstance extends XFormsInstance {
         super(containerElement);
     }
 
-    public ReadonlyXFormsInstance(String modelId, String instanceStaticId, DocumentInfo instanceDocumentInfo, String instanceSourceURI,
-                                String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude, boolean exposeXPathTypes) {
-        super(modelId, instanceStaticId, instanceDocumentInfo, instanceSourceURI, username, password, cache, timeToLive, validation, handleXInclude, exposeXPathTypes);
+    public ReadonlyXFormsInstance(String modelId, String instanceStaticId, DocumentInfo instanceDocumentInfo,
+                                  String instanceSourceURI, String requestBodyHash,
+                                  String username, String password, boolean cache, long timeToLive, String validation,
+                                  boolean handleXInclude, boolean exposeXPathTypes) {
+        super(modelId, instanceStaticId, instanceDocumentInfo, instanceSourceURI, requestBodyHash, username, password, cache, timeToLive, validation, handleXInclude, exposeXPathTypes);
     }
 
     public void synchronizeInstanceDataEventState() {
@@ -44,7 +46,7 @@ public class ReadonlyXFormsInstance extends XFormsInstance {
      */
     public XFormsInstance createMutableInstance() {
         final Document mutableDocument = TransformerUtils.tinyTreeToDom4j2(getDocumentInfo());
-        return new XFormsInstance(modelEffectiveId, instanceStaticId, mutableDocument, getSourceURI(), getUsername(), getPassword(),
+        return new XFormsInstance(modelEffectiveId, instanceStaticId, mutableDocument, getSourceURI(), getRequestBodyHash(), getUsername(), getPassword(),
                 isCache(), getTimeToLive(), getValidation(), isHandleXInclude(), isExposeXPathTypes());
     }
 }

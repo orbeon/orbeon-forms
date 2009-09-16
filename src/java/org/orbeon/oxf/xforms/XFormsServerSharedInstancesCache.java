@@ -35,7 +35,8 @@ public class XFormsServerSharedInstancesCache {
     private static XFormsServerSharedInstancesCache instance = null;
 
     public interface Loader {
-        public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId, String modelEffectiveId, String instanceSourceURI, boolean handleXInclude, long timeToLive, String validation);
+        public ReadonlyXFormsInstance load(PropertyContext propertyContext, String instanceStaticId, String modelEffectiveId,
+                                           String instanceSourceURI, boolean handleXInclude, long timeToLive, String validation);
     }
 
     public static XFormsServerSharedInstancesCache instance() {
@@ -88,7 +89,8 @@ public class XFormsServerSharedInstancesCache {
                 // amount of time, and the one retrieved last will win and be stored in the cache for a longer time.
 
                 // Load instance through callback
-                final ReadonlyXFormsInstance newInstance = loader.load(propertyContext, instanceStaticId, modelEffectiveId, instanceSourceURI, handleXInclude, timeToLive, validation);
+                final ReadonlyXFormsInstance newInstance = loader.load(propertyContext, instanceStaticId, modelEffectiveId,
+                        instanceSourceURI, handleXInclude, timeToLive, validation);
 
                 // Add result to cache
                 add(propertyContext, indentedLogger, instanceSourceURI, requestBodyHash, newInstance, handleXInclude);
@@ -169,8 +171,8 @@ public class XFormsServerSharedInstancesCache {
 
             // Return a copy because id, etc. can be different
             return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, readonlyInstance.getDocumentInfo(),
-                        instanceSourceURI, null, null, readonlyInstance.isCache(), readonlyInstance.getTimeToLive(),
-                    readonlyInstance.getValidation(), readonlyInstance.isHandleXInclude(), exposeXPathTypes);
+                    instanceSourceURI, readonlyInstance.getRequestBodyHash(), null, null, readonlyInstance.isCache(),
+                    readonlyInstance.getTimeToLive(), readonlyInstance.getValidation(), readonlyInstance.isHandleXInclude(), exposeXPathTypes);
         } else {
             // Not found
             return null;

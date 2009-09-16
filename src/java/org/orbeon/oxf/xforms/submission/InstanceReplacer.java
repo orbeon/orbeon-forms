@@ -37,8 +37,8 @@ import java.util.List;
  */
 public class InstanceReplacer extends BaseReplacer {
 
-    // Document or DocumentInfo
-    private Object resultingDocument;
+    private Object resultingDocument;           // Document or DocumentInfo
+    private String resultingRequestBodyHash;    // can be null
 
     public InstanceReplacer(XFormsModelSubmission submission, XFormsContainingDocument containingDocument) {
         super(submission, containingDocument);
@@ -154,7 +154,7 @@ public class InstanceReplacer extends BaseReplacer {
                             "instance", updatedInstance.getEffectiveId());
 
                     newInstance = new XFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
-                            (Document) resultingDocument, connectionResult.resourceURI, p2.username, p2.password,
+                            (Document) resultingDocument, connectionResult.resourceURI, resultingRequestBodyHash, p2.username, p2.password,
                             p2.isCache, p2.timeToLive, updatedInstance.getValidation(), p2.isHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
                 } else {
                     // Resulting instance must be read-only
@@ -164,7 +164,7 @@ public class InstanceReplacer extends BaseReplacer {
                             "instance", updatedInstance.getEffectiveId());
 
                     newInstance = new ReadonlyXFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
-                            (DocumentInfo) resultingDocument, connectionResult.resourceURI, p2.username, p2.password,
+                            (DocumentInfo) resultingDocument, connectionResult.resourceURI, resultingRequestBodyHash, p2.username, p2.password,
                             p2.isCache, p2.timeToLive, updatedInstance.getValidation(), p2.isHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
                 }
                 newDocumentRootElement = newInstance.getInstanceRootElementInfo();
@@ -232,6 +232,7 @@ public class InstanceReplacer extends BaseReplacer {
 
     public void setInstance(XFormsInstance instance) {
         final Document instanceDocument = instance.getDocument();
+        this.resultingRequestBodyHash = instance.getRequestBodyHash();
         this.resultingDocument = (instanceDocument != null) ? instanceDocument : instance.getDocumentInfo();
     }
 

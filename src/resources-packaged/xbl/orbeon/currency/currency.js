@@ -9,7 +9,8 @@ YAHOO.xbl.fr.Currency = {
 
     init: function(target) {
         var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-currency");
-        if (! this._instances[container.id]) {
+        var instance = this._instances[container.id];
+        if (instance == null || instance.container != container) {
 
             // Get information from the DOM
             var xformsInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-xforms-input", null, container)[0];
@@ -22,6 +23,7 @@ YAHOO.xbl.fr.Currency = {
 
             // Create instance
             var instance = {
+                container: container,
                 focus: function() {
                     hasFocus = true;
                     visibleInputElement.value = instance.currencyToNumber(visibleInputElement.value);

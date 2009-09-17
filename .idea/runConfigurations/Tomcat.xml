@@ -13,6 +13,7 @@
     <ConfigurationWrapper RunnerId="Debug" />
     <method>
       <option name="AntTarget" enabled="false" />
+      <option name="BuildArtifacts" enabled="false" />
       <option name="Maven.BeforeRunTask" enabled="false" />
     </method>
   </configuration>

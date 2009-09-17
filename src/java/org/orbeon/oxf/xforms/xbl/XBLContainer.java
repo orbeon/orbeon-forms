@@ -241,8 +241,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public XBLContainer findResolutionScope(String prefixedId) {
         final String xblScopeIdFullPrefix; {
-            final String xblScopeId = getXBLBindings().getResolutionScopeId(prefixedId); // e.g. "" or "my-tab$my-component"
-            xblScopeIdFullPrefix = xblScopeId.length() == 0 ? xblScopeId : xblScopeId + '$';
+            final XBLBindings.Scope xblScope = getXBLBindings().getResolutionScope(prefixedId);
+            xblScopeIdFullPrefix = xblScope.getFullPrefix();// e.g. "" or "my-tab$my-component" => "" or "my-tab$my-component$"
         }
 
         XBLContainer currentContainer = this;
@@ -403,8 +403,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         } else {
 
             final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId);
-            final String scopeId = getXBLBindings().getResolutionScopeId(sourcePrefixedId);
-            final String repeatPrefixedId = getXBLBindings().getPrefixedIdInScope(scopeId, repeatStaticId);
+            final XBLBindings.Scope scope = getXBLBindings().getResolutionScope(sourcePrefixedId);
+            final String repeatPrefixedId = getXBLBindings().getPrefixedIdInScope(scope, repeatStaticId);
 
             if (containingDocument.getStaticState().getControlInfoMap().get(repeatPrefixedId) != null) {
                 // 2. Found static control

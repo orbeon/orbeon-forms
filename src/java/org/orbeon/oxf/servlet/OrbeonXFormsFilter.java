@@ -1,41 +1,25 @@
 /**
- *  Copyright (C) 2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.servlet;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
+import javax.servlet.*;
+import javax.servlet.http.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * This filter allows forwarding requests from your web app to an separate Orbeon Forms context.
@@ -130,7 +114,7 @@ public class OrbeonXFormsFilter implements Filter {
             return true;
         }
         for (int i = 0; i < strLen; i++) {
-            if ((Character.isWhitespace(str.charAt(i)) == false)) {
+            if ((!Character.isWhitespace(str.charAt(i)))) {
                 return false;
             }
         }
@@ -157,10 +141,8 @@ public class OrbeonXFormsFilter implements Filter {
     }
 
     private boolean isOPSResourceRequest(String requestPath) {
-        if (opsContextPath == null)
-            return false;
+        return opsContextPath != null && requestPath != null && requestPath.startsWith(opsContextPath + "/");
 
-        return requestPath != null && requestPath.startsWith(opsContextPath + "/");
     }
 
     // NOTE: This is borrowed from NetUtils but we don't want the dependency
@@ -212,7 +194,7 @@ public class OrbeonXFormsFilter implements Filter {
 
     private static class MyHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
-        private Enumeration headerNames;
+        private Enumeration<String> headerNames;
 
         public MyHttpServletRequestWrapper(HttpServletRequest httpServletRequest) {
             super(httpServletRequest);
@@ -238,7 +220,7 @@ public class OrbeonXFormsFilter implements Filter {
         public Enumeration getHeaderNames() {
             if (headerNames == null) {
                 // Filter conditional get headers so that we always get content
-                final List newHeaderNames = new ArrayList();
+                final List<String> newHeaderNames = new ArrayList<String>();
                 for (Enumeration e = super.getHeaderNames(); e.hasMoreElements();) {
                     final String currentName = (String) e.nextElement();
                     if (!currentName.toLowerCase().startsWith("if-"))

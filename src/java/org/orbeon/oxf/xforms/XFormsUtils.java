@@ -1399,22 +1399,24 @@ public class XFormsUtils {
                 }
                 contextStack.popBinding();
 
-                if (acceptHTML) {
-                    if ("text/html".equals(outputControl.getMediatype())) {
-                        if (containsHTML != null)
-                            containsHTML[0] = true; // this indicates for sure that there is some nested HTML
-                        sb.append(outputControl.getExternalValue(pipelineContext));
+                if (outputControl.isRelevant()) {
+                    if (acceptHTML) {
+                        if ("text/html".equals(outputControl.getMediatype())) {
+                            if (containsHTML != null)
+                                containsHTML[0] = true; // this indicates for sure that there is some nested HTML
+                            sb.append(outputControl.getExternalValue(pipelineContext));
+                        } else {
+                            // Mediatype is not HTML so we don't escape
+                            sb.append(XMLUtils.escapeXMLMinimal(outputControl.getExternalValue(pipelineContext)));
+                        }
                     } else {
-                        // Mediatype is not HTML so we don't escape
-                        sb.append(XMLUtils.escapeXMLMinimal(outputControl.getExternalValue(pipelineContext)));
-                    }
-                } else {
-                    if ("text/html".equals(outputControl.getMediatype())) {
-                        // HTML is not allowed here, better tell the user
-                        throw new OXFException("HTML not allowed within element: " + childElement.getName());
-                    } else {
-                        // Mediatype is not HTML so we don't escape
-                        sb.append(outputControl.getExternalValue(pipelineContext));
+                        if ("text/html".equals(outputControl.getMediatype())) {
+                            // HTML is not allowed here, better tell the user
+                            throw new OXFException("HTML not allowed within element: " + childElement.getName());
+                        } else {
+                            // Mediatype is not HTML so we don't escape
+                            sb.append(outputControl.getExternalValue(pipelineContext));
+                        }
                     }
                 }
             } else {

@@ -1016,7 +1016,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             } else if (XFormsSubmissionUtils.isGet(submissionMethodAttribute) || XFormsSubmissionUtils.isDelete(submissionMethodAttribute)) {
                 actualSerialization = "application/x-www-form-urlencoded";
             } else {
-                throw new XFormsSubmissionException(this, "xforms:submission: invalid submission methodrequested: " + submissionMethodAttribute, "serializing instance");
+                throw new XFormsSubmissionException(this, "xforms:submission: invalid submission method requested: " + submissionMethodAttribute, "serializing instance");
             }
         } else {
             actualSerialization = submissionSerializationAttribute;

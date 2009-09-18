@@ -12,7 +12,6 @@
     <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     <option name="ENV_VARIABLES" />
     <option name="PASS_PARENT_ENVS" value="true" />
-    <option name="ADDITIONAL_CLASS_PATH" />
     <option name="TEST_SEARCH_SCOPE">
       <value defaultName="singleModule" />
     </option>
@@ -27,6 +26,7 @@
     <ConfigurationWrapper RunnerId="Run" />
     <method>
       <option name="AntTarget" enabled="false" />
+      <option name="BuildArtifacts" enabled="false" />
       <option name="Make" enabled="true" />
       <option name="Maven.BeforeRunTask" enabled="false" />
     </method>

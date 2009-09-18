@@ -1,29 +1,49 @@
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "Group delimiters",
+    counter: 0,
 
-    worker: function(count) {
-        if (count <= 50) {
-            var allEnabled = true;
+    worker: function(count, increment) {
+
+        function setEnabled(count) {
+            this.counter++;
+            ORBEON.xforms.Document.setValue("count", this.counter);
+            var enabled = [];
+            for (var enabledIndex = 0; enabledIndex < 4; enabledIndex++) {
+                var mask = Math.pow(2, enabledIndex);
+                var isEnabled = (count & mask) == mask;
+                enabled[3 - enabledIndex] = isEnabled;
+                ORBEON.xforms.Document.setValue("level-enabled" + XFORMS_SEPARATOR_1 + (3 - enabledIndex + 1), isEnabled ? "true" : "false");
+            }
+            return enabled;
+        }
+
+        if (count < 16*16) {
+            var enabled = [];
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                // Set enabled status of the 3 level to a random value
-                function setEnabled(level) {
-                    var thisEnabled = Math.random() > 0.5;
-                    ORBEON.xforms.Document.setValue("level-enabled" + XFORMS_SEPARATOR_1 + level, thisEnabled);
-                    if (! thisEnabled) allEnabled = false;
-                }
-                ORBEON.xforms.Document.setValue("count", count);
-                setEnabled(1); setEnabled(2); setEnabled(3);
+                // Set first position of enabled
+                setEnabled.call(this, Math.floor(count / 16));
             }, function() {
-                var trIsDisabled = YAHOO.util.Dom.hasClass("tr", "xforms-disabled") || YAHOO.util.Dom.hasClass("tr", "xforms-disabled-subsequent");
-                YAHOO.util.Assert.areEqual(allEnabled, ! trIsDisabled);
-                this.worker(count + 1);
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    // Set second position of enabled
+                    enabled = setEnabled.call(this, count % 16);
+                }, function() {
+                    // Check that the tr visibility is as expected
+                    for (var position = 0; position < 2; position++) {
+                        var trID = "tr-" + (position + 1);
+                        var trIsEnabled = ! YAHOO.util.Dom.hasClass(trID, "xforms-disabled")
+                                       && ! YAHOO.util.Dom.hasClass(trID, "xforms-disabled-subsequent");
+                        var trShouldBeEnabled = enabled[0] && enabled[1] && enabled[2 + position];
+                        YAHOO.util.Assert.areEqual(trShouldBeEnabled, trIsEnabled);
+                    }
+                    this.worker(count + 1);
+                });
             });
         }
     },
 
     testGroupDelimiters: function() {
-        this.worker(1);
+        this.worker(0);
     }
 }));
 

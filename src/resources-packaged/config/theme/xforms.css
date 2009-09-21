@@ -37,6 +37,19 @@ html body .xforms-form .xforms-disabled,
     position: absolute;
 }
 
+html body .xforms-form input.xforms-disabled,
+    html body .xforms-form select.xforms-disabled,
+    html body .xforms-form button.xforms-disabled,
+    html body .xforms-form input.xforms-case-deselected,
+    html body .xforms-form select.xforms-case-deselected,
+    html body .xforms-form button.xforms-case-deselected,
+    html body .xforms-form .xforms-case-deselected input.xforms-case-selected,
+    html body .xforms-form .xforms-case-deselected select.xforms-case-selected,
+    html body .xforms-form .xforms-case-deselected button.xforms-case-selected {
+
+    visibility: hidden; /* Hide disabled form controls, so they can't get the focus (otherwise tabbing will go through the disabled controls) */
+}
+
 /* Special visibility rule for table borders */
 html body .xforms-form tr.xforms-disabled,
     html body .xforms-form .xforms-disabled tr,

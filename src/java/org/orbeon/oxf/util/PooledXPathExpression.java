@@ -76,7 +76,7 @@ public class PooledXPathExpression {
     }
 
     private Item getContextItem() {
-        return (contextItems.size() > contextPosition - 1) ? contextItems.get(contextPosition - 1) : null;
+        return (contextPosition > 0 && contextItems.size() > contextPosition - 1) ? contextItems.get(contextPosition - 1) : null;
     }
 
     /**
@@ -284,27 +284,27 @@ public class PooledXPathExpression {
 
     private static class ListSequenceIterator implements SequenceIterator, Cloneable {
 
-        private List<Item> contextNodeset;
+        private List<Item> contextItems;
         private int currentPosition; // 1-based
 
-        public ListSequenceIterator(List<Item> contextNodeset, int currentPosition) {
-            this.contextNodeset = contextNodeset;
+        public ListSequenceIterator(List<Item> contextItems, int currentPosition) {
+            this.contextItems = contextItems;
             this.currentPosition = currentPosition;
         }
 
         public Item current() {
-            if (currentPosition != -1 && contextNodeset.size() > currentPosition - 1)
-                return contextNodeset.get(currentPosition - 1);
+            if (currentPosition > 0 && contextItems.size() > currentPosition - 1)
+                return contextItems.get(currentPosition - 1);
             else
                 return null;
         }
 
         public SequenceIterator getAnother() {
-            return new ListSequenceIterator(contextNodeset, 0);
+            return new ListSequenceIterator(contextItems, 0);
         }
 
         public Item next() {
-            if (currentPosition < contextNodeset.size()) {
+            if (currentPosition < contextItems.size()) {
                 currentPosition++;
             } else {
                 currentPosition = -1;

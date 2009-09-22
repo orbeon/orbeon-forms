@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -31,7 +32,7 @@ import org.orbeon.saxon.om.NodeInfo;
 public class XFormsLoadAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 

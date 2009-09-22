@@ -16,16 +16,17 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.Variable;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * 10.1.1 The action Element
@@ -33,39 +34,41 @@ import java.util.Iterator;
 public class XFormsActionAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XBLContainer container = actionInterpreter.getXBLContainer();
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
         // Iterate over child actions
         int variablesCount = 0;
+        final List<Element> currentVariableElements = new ArrayList<Element>();
         for (Iterator i = actionElement.elementIterator(); i.hasNext();) {
             final Element currentActionElement = (Element) i.next();
             final String currentActionName = currentActionElement.getName();
 
             if (currentActionName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
-                // Create variable object
-                final Variable variable = new Variable(container, contextStack, currentActionElement);
-
-                // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the following controls and variables.
-                // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
-                contextStack.getFunctionContext().setSourceEffectiveId(actionInterpreter.getSourceEffectiveId());
-                contextStack.pushVariable(currentActionElement, variable.getVariableName(), variable.getVariableValue(propertyContext, true));
-                contextStack.getFunctionContext().setSourceEffectiveId(null);
-
-                variablesCount++;
+                // Remember variable element
+                currentVariableElements.add(currentActionElement);
             } else {
                 // NOTE: We execute children actions, even if they happen to have ev:observer or ev:target attributes
 
+                // Push previous variables if any
+                if (currentVariableElements.size() > 0) {
+                    contextStack.addAndScopeVariables(propertyContext, currentVariableElements, actionInterpreter.getSourceEffectiveId());
+                    variablesCount += currentVariableElements.size();
+                }
+
                 // Set context on action element
-                contextStack.pushBinding(propertyContext, currentActionElement, actionInterpreter.getSourceEffectiveId());
+                contextStack.pushBinding(propertyContext, currentActionElement, actionInterpreter.getSourceEffectiveId(), actionScope);
 
                 // Run action
                 actionInterpreter.runAction(propertyContext, targetId, eventObserver, currentActionElement);
 
                 // Restore context
                 contextStack.popBinding();
+
+
+                // Clear variables
+                currentVariableElements.clear();
             }
         }
 

@@ -147,10 +147,10 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                                 final String formattedValue = inputControl.getFirstValueUseFormat(pipelineContext);
                                 if (!isDateMinimal) {
                                     // Regular case, value goes to input control
-                                    reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, formattedValue);
+                                    reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, formattedValue != null ? formattedValue : "");
                                 } else {
                                     // "Minimal date", value goes to @alt attribute on image
-                                    reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, formattedValue);
+                                    reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, formattedValue != null ? formattedValue : "");
                                 }
 
                                 final String firstType = inputControl.getFirstValueType();

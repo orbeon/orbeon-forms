@@ -45,63 +45,38 @@ abstract public class XFormsFunction extends SystemFunction {
         return this;
     }
 
-    public XFormsModel getContainingModel(XPathContext xpathContext) {
-        final Object functionContext = PooledXPathExpression.getFunctionContext(xpathContext);
-        return (XFormsModel) ((functionContext instanceof XFormsModel) ? functionContext : null);
+    private Context getContext(XPathContext xpathContext) {
+        return (Context) PooledXPathExpression.getFunctionContext(xpathContext);
     }
 
-    public XFormsControls getControls(XPathContext xpathContext) {
-        final Object functionContext = PooledXPathExpression.getFunctionContext(xpathContext);
-        if (functionContext instanceof XFormsControls) {
-            // TODO: Deprecated
-            return (XFormsControls) functionContext;
-        } else if (functionContext instanceof XFormsModel) {
-            // TODO: Deprecated
-            final XFormsModel xformsModel = (XFormsModel) functionContext;
-            return xformsModel.getContainingDocument().getControls();
-        } else if (functionContext instanceof Context) {
-            // The "right" way to do it
-            return ((Context) functionContext).getControls();
-        }
-        return null;
+    protected XFormsControls getControls(XPathContext xpathContext) {
+        return getContext(xpathContext).getControls();
     }
 
-    public XBLContainer getXBLContainer(XPathContext xpathContext) {
+    protected XBLContainer getXBLContainer(XPathContext xpathContext) {
         final Context functionContext = (XFormsFunction.Context) PooledXPathExpression.getFunctionContext(xpathContext);
         return functionContext.getXBLContainer();
     }
 
-    public String getSourceEffectiveId(XPathContext xpathContext) {
+    protected String getSourceEffectiveId(XPathContext xpathContext) {
         final Context functionContext = (XFormsFunction.Context) PooledXPathExpression.getFunctionContext(xpathContext);
         return functionContext.getSourceEffectiveId();
     }
 
-    public XFormsContainingDocument getContainingDocument(XPathContext xpathContext) {
-        final XFormsModel xformsModel = getContainingModel(xpathContext);
-        if (xformsModel != null && xformsModel.getContainingDocument() != null)
-            return xformsModel.getContainingDocument();
-        final XFormsControls xformsControls = getControls(xpathContext);
-        if (xformsControls != null)
-            return xformsControls.getContainingDocument();
-
-        return null;
+    protected XFormsModel getModel(XPathContext xpathContext) {
+        final Context functionContext = (XFormsFunction.Context) PooledXPathExpression.getFunctionContext(xpathContext);
+        return functionContext.getModel();
     }
 
-    public XFormsContextStack getContextStack(XPathContext xpathContext) {
-        final Object functionContext = PooledXPathExpression.getFunctionContext(xpathContext);
-
-        if (functionContext instanceof Context) {
-            // Return specific context
-            return ((Context) functionContext).getContextStack();
-        } else if (functionContext instanceof XFormsControls) {
-            // Return controls context
-            return getControls(xpathContext).getContextStack();
-        } else {
-            return null;
-        }
+    protected XFormsContainingDocument getContainingDocument(XPathContext xpathContext) {
+        return getContext(xpathContext).getXBLContainer().getContainingDocument();
     }
 
-    public PipelineContext getOrCreatePipelineContext() {
+    protected XFormsContextStack getContextStack(XPathContext xpathContext) {
+        return getContext(xpathContext).getContextStack();
+    }
+
+    protected PipelineContext getOrCreatePipelineContext() {
         final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
         PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
 
@@ -114,23 +89,24 @@ abstract public class XFormsFunction extends SystemFunction {
         return new PipelineContext();
     }
 
+    // NOTE: This is always constructed in XFormsContextStack
     public static class Context implements XPathCache.FunctionContext {
 
         private final XBLContainer container;
-        private final XFormsModel containingModel;
         private final XFormsContextStack contextStack;
 
         private String sourceEffectiveId;
+        private XFormsModel model;
 
+        // Constructor for XBLContainer and XFormsActionInterpreter
         public Context(XBLContainer container, XFormsContextStack contextStack) {
             this.container = container;
-            this.containingModel = null;
             this.contextStack = contextStack;
         }
 
+        // Constructor for XFormsModel
         public Context(XFormsModel containingModel, XFormsContextStack contextStack) {
             this.container = containingModel.getXBLContainer();
-            this.containingModel = containingModel;
             this.contextStack = contextStack;
         }
 
@@ -146,8 +122,12 @@ abstract public class XFormsFunction extends SystemFunction {
             return getContainingDocument().getControls();
         }
 
-        public XFormsModel getContainingModel() {
-            return containingModel;
+        public XFormsModel getModel() {
+            return model;
+        }
+
+        public void setModel(XFormsModel model) {
+            this.model = model;
         }
 
         public XFormsContextStack getContextStack() {

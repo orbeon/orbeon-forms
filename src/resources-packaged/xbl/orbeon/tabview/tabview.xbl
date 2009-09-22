@@ -40,15 +40,15 @@
 
                 <xsl:template match="/*">
 
-                    <!-- Initialization event -->
-                    <xforms:group ref="." id="fr-tabview-group" appearanc="xxforms:internal">
+                    <!-- Tab group, cannot be internal because accessed with "this" in TabView JS initialization -->
+                    <xforms:group id="fr-tabview-group">
 
                         <!-- TODO: This should not be necessary, but we need it until this bug is fixed:
                              http://forge.ow2.org/tracker/index.php?func=detail&aid=313850&group_id=168&atid=350207 -->
                         <xsl:copy-of select="namespace::*"/>
                         <xsl:copy-of select="@class"/>
 
-                        <!-- Event handlers -->
+                        <!-- Initialization event -->
                         <xxforms:script ev:event="xforms-enabled" ev:target="fr-tabview-group">new YAHOO.widget.TabView(YAHOO.util.Dom.getElementsByClassName("yui-navset", null, this)[0]);</xxforms:script>
 
                         <xhtml:div class="yui-navset">

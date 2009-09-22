@@ -70,7 +70,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     private final XBLContainer parentXBLContainer;
     private LinkedHashMap<String, XBLContainer> childrenXBLContainers;  // Map<String, XBLContainer> of static id to container
 
-    // Binding context for this container (may be null)
+    // Binding context for this container (may be null for top-level)
+    // This is the binding context of the containing XFormsComponentControl for nested XBL containers
     private XFormsContextStack.BindingContext bindingContext;
 
     private XFormsContainingDocument containingDocument;
@@ -118,6 +119,10 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
 
         this.contextStack = new XFormsContextStack(this);
+    }
+
+    public XBLBindings.Scope getResolutionScope() {
+        return getXBLBindings().getResolutionScopeByPrefix(fullPrefix);
     }
 
     protected XBLBindings getXBLBindings() {
@@ -225,6 +230,10 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return bindingContext;
     }
 
+    public XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+        return getBindingContext();
+    }
+
     public XFormsContainingDocument getContainingDocument() {
         return containingDocument;
     }
@@ -241,8 +250,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public XBLContainer findResolutionScope(String prefixedId) {
         final String xblScopeIdFullPrefix; {
-            final String xblScopeId = getXBLBindings().getResolutionScopeId(prefixedId); // e.g. "" or "my-tab$my-component"
-            xblScopeIdFullPrefix = xblScopeId.length() == 0 ? xblScopeId : xblScopeId + '$';
+            final XBLBindings.Scope xblScope = getXBLBindings().getResolutionScopeByPrefixedId(prefixedId);
+            xblScopeIdFullPrefix = xblScope.getFullPrefix();// e.g. "" or "my-tab$my-component" => "" or "my-tab$my-component$"
         }
 
         XBLContainer currentContainer = this;
@@ -403,8 +412,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         } else {
 
             final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId);
-            final String scopeId = getXBLBindings().getResolutionScopeId(sourcePrefixedId);
-            final String repeatPrefixedId = getXBLBindings().getPrefixedIdInScope(scopeId, repeatStaticId);
+            final XBLBindings.Scope scope = getXBLBindings().getResolutionScopeByPrefixedId(sourcePrefixedId);
+            final String repeatPrefixedId = scope.getPrefixedIdForStaticId(repeatStaticId);
 
             if (containingDocument.getStaticState().getControlInfoMap().get(repeatPrefixedId) != null) {
                 // 2. Found static control

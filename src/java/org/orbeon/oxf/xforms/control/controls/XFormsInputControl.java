@@ -20,6 +20,7 @@ import org.orbeon.oxf.processor.MatchProcessor;
 import org.orbeon.oxf.processor.Perl5MatchProcessor;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -68,6 +69,16 @@ public class XFormsInputControl extends XFormsValueControl {
 
     public String getAutocomplete() {
         return getExtensionAttributeValue(XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME);
+    }
+
+    @Override
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext) {
+        super.setBindingContext(propertyContext, bindingContext);
+    }
+
+    @Override
+    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
+        super.evaluate(propertyContext, isRefresh);
     }
 
     @Override
@@ -389,18 +400,22 @@ public class XFormsInputControl extends XFormsValueControl {
     public String getFirstValueUseFormat(PipelineContext pipelineContext) {
         final String result;
 
-        final String typeName = getBuiltinTypeName();
-        if ("date".equals(typeName) || "time".equals(typeName)) {
-            // Format value specially
-            result = formatSubValue(pipelineContext, getFirstValueType(), getValue(pipelineContext));
-        } else if ("dateTime".equals(typeName)) {
-            // Format value specially
-            // Extract date part
-            final String datePart = getDateTimeDatePart(getValue(pipelineContext), 'T');
-            result = formatSubValue(pipelineContext, getFirstValueType(), datePart);
+        if (isRelevant()) {
+            final String typeName = getBuiltinTypeName();
+            if ("date".equals(typeName) || "time".equals(typeName)) {
+                // Format value specially
+                result = formatSubValue(pipelineContext, getFirstValueType(), getValue(pipelineContext));
+            } else if ("dateTime".equals(typeName)) {
+                // Format value specially
+                // Extract date part
+                final String datePart = getDateTimeDatePart(getValue(pipelineContext), 'T');
+                result = formatSubValue(pipelineContext, getFirstValueType(), datePart);
+            } else {
+                // Regular case, use external value
+                result = getExternalValue(pipelineContext);
+            }
         } else {
-            // Regular case, use external value
-            result = getExternalValue(pipelineContext);
+            result = null;
         }
 
         return (result != null) ? result : "";
@@ -415,14 +430,18 @@ public class XFormsInputControl extends XFormsValueControl {
     public String getSecondValueUseFormat(PipelineContext pipelineContext) {
         final String result;
 
-        final String typeName = getBuiltinTypeName();
-        if ("dateTime".equals(typeName)) {
-            // Format value specially
-            // Extract time part
-            final String timePart = getDateTimeTimePart(getValue(pipelineContext), 'T');
-            result = formatSubValue(pipelineContext, getSecondValueType(), timePart);
+        if (isRelevant()) {
+            final String typeName = getBuiltinTypeName();
+            if ("dateTime".equals(typeName)) {
+                // Format value specially
+                // Extract time part
+                final String timePart = getDateTimeTimePart(getValue(pipelineContext), 'T');
+                result = formatSubValue(pipelineContext, getSecondValueType(), timePart);
+            } else {
+                // N/A
+                result = null;
+            }
         } else {
-            // N/A
             result = null;
         }
 

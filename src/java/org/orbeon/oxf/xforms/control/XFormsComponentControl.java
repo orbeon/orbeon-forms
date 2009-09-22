@@ -71,6 +71,7 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
                 });
                 isInitializeModels = true;
             }
+            nestedContainer.getContextStack().resetBindingContext(propertyContext);
         } else if (isNodesetChange) {
             // Control's binding changed
 

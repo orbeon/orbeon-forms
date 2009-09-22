@@ -18,6 +18,8 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -49,9 +51,6 @@ public class Variable {
     private boolean evaluated;
     private ValueRepresentation variableValue;
 
-    private final boolean isNameOuterScope;
-    private final boolean isValueOuterScope;
-
     public Variable(XBLContainer container, XFormsContextStack contextStack, Element variableElement) {
         this.container = container;
         this.contextStack = contextStack;
@@ -61,23 +60,18 @@ public class Variable {
         if (variableName == null)
             throw new ValidationException("xxforms:variable or exforms:variable element must have a \"name\" attribute", getLocationData());
 
-        // Scope of the variable declaration
-        this.isNameOuterScope = XFormsConstants.XXBLScope.outer.name().equals(variableElement.attributeValue(XFormsConstants.XXBL_SCOPE_QNAME));
-
         // Handle xxforms:sequence
         final Element sequenceElement = variableElement.element(XFormsConstants.XXFORMS_SEQUENCE_QNAME);
         if (sequenceElement == null) {
             this.valueElement = variableElement;
-            this.isValueOuterScope = false;
         } else {
             this.valueElement = sequenceElement;
-            this.isValueOuterScope = XFormsConstants.XXBLScope.outer.name().equals(sequenceElement.attributeValue(XFormsConstants.XXBL_SCOPE_QNAME));
         }
 
         this.selectAttribute = valueElement.attributeValue("select");
     }
 
-    private void evaluate(PropertyContext pipelineContext, boolean useCache) {
+    private void evaluate(PropertyContext pipelineContext, String sourceEffectiveId, boolean useCache) {
 
         if (selectAttribute == null) {
             // Inline constructor (for now, only textual content, but in the future, we could allow xforms:output in it? more?)
@@ -86,18 +80,21 @@ public class Variable {
             // There is a select attribute
 
             // Push binding for evaluation, so that @context and @model are evaluated
-            contextStack.pushBinding(pipelineContext, valueElement);
+            final String variableValuePrefixedId = container.getFullPrefix() + valueElement.attributeValue("id");
+            final XBLBindings.Scope variableValueScope = container.getContainingDocument().getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(variableValuePrefixedId);
+            contextStack.pushBinding(pipelineContext, valueElement, sourceEffectiveId, variableValueScope);
             {
                 final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
                 final List<Item> currentNodeset = bindingContext.getNodeset();
                 if (currentNodeset != null && currentNodeset.size() > 0) {
                     // TODO: in the future, we should allow null context for expressions that do not depend on the context
 
-                    // TODO: does static state store ns mapping for xxf:sequence? 
+                    final XFormsFunction.Context functionContext = contextStack.getFunctionContext(sourceEffectiveId);
                     variableValue = XPathCache.evaluateAsExtent(pipelineContext,
                             currentNodeset, bindingContext.getPosition(),
                             selectAttribute, container.getNamespaceMappings(valueElement), bindingContext.getInScopeVariables(useCache),
-                            XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null, getLocationData());
+                            XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData());
+                    contextStack.returnFunctionContext();
                 } else {
                     variableValue = EmptySequence.getInstance();
                 }
@@ -110,19 +107,11 @@ public class Variable {
         return variableName;
     }
 
-    public boolean isNameOuterScope() {
-        return isNameOuterScope;
-    }
-
-    public boolean isValueOuterScope() {
-        return isValueOuterScope;
-    }
-
-    public ValueRepresentation getVariableValue(PropertyContext pipelineContext, boolean useCache) {
+    public ValueRepresentation getVariableValue(PropertyContext pipelineContext, String sourceEffectiveId, boolean useCache) {
         // Make sure the variable is evaluated
         if (!evaluated) {
             evaluated = true;
-            evaluate(pipelineContext, useCache);
+            evaluate(pipelineContext, sourceEffectiveId, useCache);
         }
 
         // Return value and rewrap if necessary

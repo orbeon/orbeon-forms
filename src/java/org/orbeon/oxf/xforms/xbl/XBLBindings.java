@@ -81,8 +81,79 @@ public class XBLBindings {
     private Map<QName, List<Element>> xblHandlers;          // Map<QName bindingQName, List<Element handlerElement>>
     private Map<QName, List<Document>> xblImplementations;  // Map<QName bindingQName, List<Document>>
 
-    private final Map<String, String> prefixedIdToXBLScopeMap = new HashMap<String, String>();                  // maps element prefixed id => XBL scope id
-    private final Map<String, Map<String, String>> scopeToIdMap = new HashMap<String, Map<String, String>>();   // maps XBL scope id => (map static id => prefixed id)
+    private final Map<String, Scope> prefixedIdToXBLScopeMap = new HashMap<String, Scope>();                // maps element prefixed id => XBL scope
+    private final Map<Scope, Map<String, String>> scopeToIdMap = new HashMap<Scope, Map<String, String>>(); // maps XBL scope => (map static id => prefixed id)
+    private final Map<String, Scope> scopeIds = new HashMap<String, Scope>();                               // all distinct scopes by scope id
+
+    private final Scope TOP_LEVEL_SCOPE = new Scope("");
+
+    public class Scope {
+        public final String scopeId;
+
+        private Scope(String scopeId) {
+            assert !scopeIds.containsKey(scopeId);
+            this.scopeId = scopeId;
+            scopeIds.put(scopeId, this);
+        }
+
+        public String getFullPrefix() {
+            return scopeId.length() == 0 ? scopeId : scopeId + '$';
+        }
+
+        /**
+         * Return the prefixed id of the given control static id within this scope.
+         *
+         * @param staticId  static id to resolve
+         * @return          prefixed id corresponding to the static id passed
+         */
+        public String getPrefixedIdForStaticId(String staticId) {
+            if (scopeToIdMap.size() == 0) {
+                // If there are no XBL controls the map is empty
+                return staticId;
+            } else {
+                // Otherwise use map
+                return scopeToIdMap.get(this).get(staticId);
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return scopeId.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return scopeId;
+        }
+    }
+
+    public Scope getResolutionScopeById(String scopeId) {
+        return scopeIds.get(scopeId);
+    }
+
+    public Scope getResolutionScopeByPrefix(String prefix) {
+        assert prefix.length() == 0 || prefix.charAt(prefix.length() - 1) == XFormsConstants.COMPONENT_SEPARATOR;
+        final String scopeId = (prefix.length() == 0) ? "" : prefix.substring(0, prefix.length() - 1);
+        return getResolutionScopeById(scopeId);
+    }
+
+    /**
+     * Return the resolution scope id for the given prefixed id.
+     *
+     * @param prefixedId    prefixed id of XForms element
+     * @return              resolution scope
+     */
+    public Scope getResolutionScopeByPrefixedId(String prefixedId) {
+        if (scopeToIdMap.size() == 0) {
+            // If there are no XBL controls the map is empty
+            return TOP_LEVEL_SCOPE;
+        } else {
+            // Otherwise use map
+            final Scope result = prefixedIdToXBLScopeMap.get(prefixedId);
+            assert result != null : "cannot find scope in map for prefixed id: " + prefixedId;
+            return result;
+        }
+    }
 
     /*
      * Notes about id generation
@@ -120,11 +191,11 @@ public class XBLBindings {
 
             // Add existing ids to scope map so we can check duplicates
             final Map<String, String> topLevelScopeMap = new HashMap<String, String>();
-            scopeToIdMap.put("", topLevelScopeMap);
+            scopeToIdMap.put(TOP_LEVEL_SCOPE, topLevelScopeMap);
             for (Iterator<String> i = idGenerator.iterator(); i.hasNext();) {
                 final String id = i.next();
                 topLevelScopeMap.put(id, id);
-                prefixedIdToXBLScopeMap.put(id, "");
+                prefixedIdToXBLScopeMap.put(id, TOP_LEVEL_SCOPE);
             }
 
             // Create delegating top-level static id generator which just doesn't check for duplicate ids
@@ -284,7 +355,7 @@ public class XBLBindings {
                     // Register models placed under xbl:implementation
                     if (xblImplementations != null) {
                         final List<Document> implementationModelDocuments = xblImplementations.get(controlElement.getQName());
-                        if (implementationModelDocuments.size() > 0) {
+                        if (implementationModelDocuments != null && implementationModelDocuments.size() > 0) {
                             // Say we DO annotate because these models are outside the template
                             addModelDocuments(controlPrefixedId, implementationModelDocuments, newPrefix, true);
                             if (indentedLogger.isDebugEnabled())
@@ -294,7 +365,8 @@ public class XBLBindings {
                     }
 
                     // Generate compact shadow tree for this static id
-                    final Document compactShadowTreeDocument = filterShadowTree(indentedLogger, fullShadowTreeDocument, controlElement, newPrefix, controlPrefixedId);
+                    final Scope newScope = new Scope(newPrefix.substring(0, newPrefix.length() - 1));
+                    final Document compactShadowTreeDocument = filterShadowTree(indentedLogger, fullShadowTreeDocument, controlElement, newPrefix, newScope, controlPrefixedId);
 
                     // Extract and register models from within the template
                     {
@@ -326,9 +398,10 @@ public class XBLBindings {
                                 // Register xbl:handler as an action handler
 
                                 // Annotate handler and gather scope information
-                                final String outerScopeId = prefixedIdToXBLScopeMap.get(controlPrefixedId);
+                                final Scope innerScope = getResolutionScopeById(controlPrefixedId);
+                                final Scope outerScope = prefixedIdToXBLScopeMap.get(controlPrefixedId);
                                 final Element currentHandlerAnnotatedElement
-                                        = annotateHandler(currentHandlerElement, newPrefix, controlPrefixedId, outerScopeId, XFormsConstants.XXBLScope.inner).getRootElement();
+                                        = annotateHandler(currentHandlerElement, newPrefix, innerScope, outerScope, XFormsConstants.XXBLScope.inner).getRootElement();
 
                                 // NOTE: <xbl:handler> has similar attributes as XForms actions, in particular @event, @phase, etc.
                                 final String controlStaticId = XFormsUtils.getStaticIdFromId(controlPrefixedId);
@@ -352,10 +425,10 @@ public class XBLBindings {
         }
     }
 
-    public Document annotateHandler(Element currentHandlerElement, String newPrefix, String innerScopeId, String outerScopeId, XFormsConstants.XXBLScope startScope) {
+    public Document annotateHandler(Element currentHandlerElement, String newPrefix, Scope innerScope, Scope outerScope, XFormsConstants.XXBLScope startScope) {
         final Document handlerDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentHandlerElement, false);// for now, don't detach because element can be processed by multiple bindings
         final Document annotatedDocument = annotateShadowTree(handlerDocument, newPrefix, idGenerator);
-        gatherScopeMappings(annotatedDocument, newPrefix, innerScopeId, outerScopeId, startScope, null, false);
+        gatherScopeMappings(annotatedDocument, newPrefix, innerScope, outerScope, startScope, null, false);
         return annotatedDocument;
     }
 
@@ -429,6 +502,7 @@ public class XBLBindings {
                 final List<Node> resultingNodes;
                 if (isXBLContent) {
                     final String includesAttribute = element.attributeValue("includes");
+                    final String scopeAttribute = element.attributeValue(XFormsConstants.XXBL_SCOPE_QNAME);
                     final List<Node> contentToInsert;
                     if (includesAttribute == null) {
                         // All bound node content must be copied over
@@ -481,8 +555,13 @@ public class XBLBindings {
 
                     resultingNodes = contentToInsert;
 
-                    // Set xxbl:scope="outer" on resulting elements
-                    setAttribute(resultingNodes, XFormsConstants.XXBL_SCOPE_QNAME, "outer");
+                    if (!StringUtils.isBlank(scopeAttribute)) {
+                        // If author specified scope attribute, use it
+                        setAttribute(resultingNodes, XFormsConstants.XXBL_SCOPE_QNAME, scopeAttribute);
+                    } else {
+                        // By default, set xxbl:scope="outer" on resulting elements
+                        setAttribute(resultingNodes, XFormsConstants.XXBL_SCOPE_QNAME, "outer");
+                    }
                 } else {
                     // Element is simply kept
                     resultingNodes = Collections.singletonList((Node) element);
@@ -740,17 +819,19 @@ public class XBLBindings {
      * @param fullShadowTree        full shadow tree document
      * @param boundElement          bound element
      * @param prefix                prefix of the ids within the new shadow tree, e.g. component1$component2$
+     * @param innerScope            inner scope for the new tree
      * @param controlPrefixedId     prefixed id of the bound element
      * @return                      compact shadow tree document
      */
-    private Document filterShadowTree(IndentedLogger indentedLogger, Document fullShadowTree, Element boundElement, String prefix, String controlPrefixedId) {
+    private Document filterShadowTree(IndentedLogger indentedLogger, Document fullShadowTree, Element boundElement, String prefix, Scope innerScope, String controlPrefixedId) {
+        assert StringUtils.isNotBlank(prefix);
 
         if (indentedLogger.isDebugEnabled()) {
             indentedLogger.startHandleOperation("", "filtering shadow tree", "bound element", Dom4jUtils.elementToString(boundElement));
         }
 
         // Filter the tree
-        final LocationDocumentResult result = filterShadowTree(fullShadowTree, prefix, controlPrefixedId);
+        final LocationDocumentResult result = filterShadowTree(fullShadowTree, prefix, innerScope, controlPrefixedId);
 
         // Extractor produces /static-state/xbl:template, so extract the nested element
         final Document compactShadowTree = Dom4jUtils.createDocumentCopyParentNamespaces(result.getDocument().getRootElement().element(XFormsConstants.XBL_TEMPLATE_QNAME), true);
@@ -762,23 +843,22 @@ public class XBLBindings {
         return compactShadowTree;
     }
 
-    private LocationDocumentResult filterShadowTree(Document fullShadowTree, String prefix, String controlPrefixedId) {
+    private LocationDocumentResult filterShadowTree(Document fullShadowTree, String prefix, Scope innerScope, String controlPrefixedId) {
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
         final LocationDocumentResult result= new LocationDocumentResult();
         identity.setResult(result);
 
         // Run transformation and gather scope mappings
         // Get ids of the two scopes
-        final String innerScopeId = (prefix.length() == 0) ? "" : prefix.substring(0, prefix.length() - 1); // if at top-level, prefix is ""
-        final String outerScopeId = prefixedIdToXBLScopeMap.get(controlPrefixedId);
-        gatherScopeMappings(fullShadowTree, prefix, innerScopeId, outerScopeId, XFormsConstants.XXBLScope.inner, identity, true);
+        final Scope outerScope = prefixedIdToXBLScopeMap.get(controlPrefixedId);
+        gatherScopeMappings(fullShadowTree, prefix, innerScope, outerScope, XFormsConstants.XXBLScope.inner, identity, true);
 
         return result;
     }
 
-    private void gatherScopeMappings(Document document, String prefix, String innerScopeId, String outerScopeId, XFormsConstants.XXBLScope startScope, ContentHandler result, boolean ignoreRootElement) {
+    private void gatherScopeMappings(Document document, String prefix, Scope innerScope, Scope outerScope, XFormsConstants.XXBLScope startScope, ContentHandler result, boolean ignoreRootElement) {
         // Run transformation which gathers scope information and extracts compact tree into the output ContentHandler
-        TransformerUtils.writeDom4j(document, new ScopeExtractorContentHandler(result, prefix, innerScopeId, outerScopeId, ignoreRootElement, startScope));
+        TransformerUtils.writeDom4j(document, new ScopeExtractorContentHandler(result, prefix, innerScope, outerScope, ignoreRootElement, startScope));
     }
 
     private static final String scopeURI = XFormsConstants.XXBL_SCOPE_QNAME.getNamespaceURI();
@@ -787,8 +867,8 @@ public class XBLBindings {
     private class ScopeExtractorContentHandler extends XFormsExtractorContentHandler {
 
         private final String prefix;
-        private final String innerScopeId;
-        private final String outerScopeId;
+        private final Scope innerScope;
+        private final Scope outerScope;
 
         // TODO: Stack is synchronized, what other collection can we use?
         final Stack<XFormsConstants.XXBLScope> scopeStack = new Stack<XFormsConstants.XXBLScope>();
@@ -797,17 +877,20 @@ public class XBLBindings {
          *
          * @param contentHandler        output of transformation
          * @param prefix                prefix of the ids within the new shadow tree, e.g. "my-stuff$my-foo-bar$"
-         * @param innerScopeId          inner scope id
-         * @param outerScopeId          outer scope id, i.e. scope id of the bound element, "" if top-level scope
+         * @param innerScope            inner scope
+         * @param outerScope            outer scope, i.e. scope of the bound element
          * @param ignoreRootElement     whether root element must just be skipped
          * @param startScope            scope of root element
          */
-        public ScopeExtractorContentHandler(ContentHandler contentHandler, String prefix, String innerScopeId, String outerScopeId,
+        public ScopeExtractorContentHandler(ContentHandler contentHandler, String prefix, Scope innerScope, Scope outerScope,
                                             boolean ignoreRootElement, XFormsConstants.XXBLScope startScope) {
             super(contentHandler, ignoreRootElement);
+            assert innerScope != null;
+            assert outerScope != null;
+
             this.prefix = prefix;
-            this.innerScopeId = innerScopeId;
-            this.outerScopeId = outerScopeId;
+            this.innerScope = innerScope;
+            this.outerScope = outerScope;
 
             scopeStack.push(startScope);
         }
@@ -830,25 +913,25 @@ public class XBLBindings {
             final String staticId = attributes.getValue("id");
             assert staticId != null;
             final String prefixedId = prefix + staticId;
-            final String scopeId;
+            final Scope scope;
             {
                 if (prefixedIdToXBLScopeMap.containsKey(prefix)) // enforce constraint that mapping must be unique
                     throw new OXFException("Duplicate id found for effective id: " + prefixedId);
 
                 if (currentScope == XFormsConstants.XXBLScope.inner) {
-                    scopeId = innerScopeId;
+                    scope = innerScope;
                 } else {
-                    scopeId = outerScopeId;
+                    scope = outerScope;
                 }
-                prefixedIdToXBLScopeMap.put(prefixedId, scopeId);
+                prefixedIdToXBLScopeMap.put(prefixedId, scope);
             }
 
             // Index static id => prefixed id by scope
             {
-                Map<String, String> staticIdToPrefixedIdMap = scopeToIdMap.get(scopeId);
+                Map<String, String> staticIdToPrefixedIdMap = scopeToIdMap.get(scope);
                 if (staticIdToPrefixedIdMap == null) {
                     staticIdToPrefixedIdMap = new HashMap<String, String>();
-                    scopeToIdMap.put(scopeId, staticIdToPrefixedIdMap);
+                    scopeToIdMap.put(scope, staticIdToPrefixedIdMap);
                 }
 
                 if (staticIdToPrefixedIdMap.containsKey(staticId)) // enforce constraint that mapping must be unique
@@ -990,7 +1073,7 @@ public class XBLBindings {
      * @return                      true iif id has an associated binding
      */
     public boolean hasBinding(String controlPrefixedId) {
-        return (xblBindingIds == null) ? false : xblBindingIds.get(controlPrefixedId) != null;
+        return (xblBindingIds != null) && xblBindingIds.get(controlPrefixedId) != null;
     }
 
     /**
@@ -1009,42 +1092,6 @@ public class XBLBindings {
      */
     public List<Element> getXBLScripts() {
         return xblScripts;
-    }
-
-    /**
-     * REturn the resolution scope id for the given prefixed id.
-     *
-     * @param prefixedId    prefixed id of XForms element
-     * @return              resolution scope id, "" if top-level scope
-     */
-    public String getResolutionScopeId(String prefixedId) {
-        final String result = prefixedIdToXBLScopeMap.get(prefixedId);
-        // Result found
-        if (result != null)
-            return result;
-        // Result not found but prefixed id is in component so should have been indexed
-        if (prefixedId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1)
-            throw new OXFException("Scope not found for prefixed id: " + prefixedId);
-
-        // Top-level controls are not put in map so return ""
-        return "";
-    }
-
-    /**
-     * Return the prefixed id of the given control static id within the given resolution scope.
-     *
-     * @param scopeId   resolution scope id
-     * @param staticId  static id to resolve
-     * @return          prefixed id corresponding to the static id passed
-     */
-    public String getPrefixedIdInScope(String scopeId, String staticId) {
-        if (scopeToIdMap.size() == 0) {
-            // If there are no XBL controls the map is empty
-            return staticId;
-        } else {
-            // Otherwise use map
-            return scopeToIdMap.get(scopeId).get(staticId);
-        }
     }
 
     public void freeTransientState() {

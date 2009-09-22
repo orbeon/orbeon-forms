@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -40,6 +41,7 @@ import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
 import org.w3c.tidy.Tidy;
@@ -71,6 +73,22 @@ public class XFormsUtils {
     private static final String LOGGING_CATEGORY = "utils";
     private static final Logger logger = LoggerFactory.createLogger(XFormsUtils.class);
     private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
+
+    public static final NodeInfo DUMMY_CONTEXT;
+    static {
+        try {
+            final TinyBuilder treeBuilder = new TinyBuilder();
+            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+            identity.setResult(treeBuilder);
+
+            identity.startDocument();
+            identity.endDocument();
+
+            DUMMY_CONTEXT = treeBuilder.getCurrentRoot();
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+    }
 
     private static final int SRC_CONTENT_BUFFER_SIZE = 1024;
 
@@ -418,13 +436,15 @@ public class XFormsUtils {
      *
      * @param propertyContext       current context
      * @param container             current XFormsContainingDocument
+     * @param sourceEffectiveId     source effective id for id resolution
+     * @param scope                 XBL scope
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getChildElementValue(final PropertyContext propertyContext, final XBLContainer container,
-                                              final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
+    public static String getChildElementValue(final PropertyContext propertyContext, final XBLContainer container, final String sourceEffectiveId,
+                                              final XBLBindings.Scope scope, final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
 
         // Check that there is a current child element
         if (childElement == null)
@@ -432,8 +452,8 @@ public class XFormsUtils {
 
         // Child element becomes the new binding
         final XFormsContextStack contextStack = container.getContextStack();
-        contextStack.pushBinding(propertyContext, childElement);
-        final String result = getElementValue(propertyContext, container, contextStack, childElement, acceptHTML, containsHTML);
+        contextStack.pushBinding(propertyContext, childElement, sourceEffectiveId, scope);
+        final String result = getElementValue(propertyContext, container, contextStack, sourceEffectiveId, childElement, acceptHTML, containsHTML);
         contextStack.popBinding();
         return result;
     }
@@ -447,13 +467,14 @@ public class XFormsUtils {
      * @param propertyContext       current PipelineContext
      * @param container             current XBLContainer
      * @param contextStack          context stack for XPath evaluation
+     * @param sourceEffectiveId     source effective id for id resolution
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
     public static String getElementValue(final PropertyContext propertyContext, final XBLContainer container,
-                                         final XFormsContextStack contextStack,
+                                         final XFormsContextStack contextStack, final String sourceEffectiveId,
                                          final Element childElement, final boolean acceptHTML, final boolean[] containsHTML) {
 
         // No HTML found by default
@@ -489,8 +510,10 @@ public class XFormsUtils {
                             currentNodeset, currentBindingContext.getPosition(),
                             valueAttribute, container.getNamespaceMappings(childElement),
                             contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                            contextStack.getFunctionContext(), null,
+                            contextStack.getFunctionContext(sourceEffectiveId), null,
                             (LocationData) childElement.getData());
+
+                    contextStack.returnFunctionContext();
 
                     return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } else {
@@ -513,7 +536,7 @@ public class XFormsUtils {
                     return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } catch (IOException e) {
                     // Dispatch xforms-link-error to model
-                    final XFormsModel currentModel = currentBindingContext.getModel();
+                    final XFormsModel currentModel = currentBindingContext.model;
                     // NOTE: xforms-link-error is no longer in XForms 1.1 starting 2009-03-10
                     currentModel.getXBLContainer(null).dispatchEvent(propertyContext, new XFormsLinkErrorEvent(container.getContainingDocument(), currentModel, srcAttributeValue, childElement, e));
                     return null;
@@ -1399,22 +1422,24 @@ public class XFormsUtils {
                 }
                 contextStack.popBinding();
 
-                if (acceptHTML) {
-                    if ("text/html".equals(outputControl.getMediatype())) {
-                        if (containsHTML != null)
-                            containsHTML[0] = true; // this indicates for sure that there is some nested HTML
-                        sb.append(outputControl.getExternalValue(pipelineContext));
+                if (outputControl.isRelevant()) {
+                    if (acceptHTML) {
+                        if ("text/html".equals(outputControl.getMediatype())) {
+                            if (containsHTML != null)
+                                containsHTML[0] = true; // this indicates for sure that there is some nested HTML
+                            sb.append(outputControl.getExternalValue(pipelineContext));
+                        } else {
+                            // Mediatype is not HTML so we don't escape
+                            sb.append(XMLUtils.escapeXMLMinimal(outputControl.getExternalValue(pipelineContext)));
+                        }
                     } else {
-                        // Mediatype is not HTML so we don't escape
-                        sb.append(XMLUtils.escapeXMLMinimal(outputControl.getExternalValue(pipelineContext)));
-                    }
-                } else {
-                    if ("text/html".equals(outputControl.getMediatype())) {
-                        // HTML is not allowed here, better tell the user
-                        throw new OXFException("HTML not allowed within element: " + childElement.getName());
-                    } else {
-                        // Mediatype is not HTML so we don't escape
-                        sb.append(outputControl.getExternalValue(pipelineContext));
+                        if ("text/html".equals(outputControl.getMediatype())) {
+                            // HTML is not allowed here, better tell the user
+                            throw new OXFException("HTML not allowed within element: " + childElement.getName());
+                        } else {
+                            // Mediatype is not HTML so we don't escape
+                            sb.append(outputControl.getExternalValue(pipelineContext));
+                        }
                     }
                 }
             } else {

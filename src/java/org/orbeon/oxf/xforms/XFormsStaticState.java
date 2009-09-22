@@ -855,11 +855,11 @@ public class XFormsStaticState {
                                     // Parent is a bound node, so we found an action handler which is a child of a bound element
 
                                     // Annotate handler
-                                    final String innerScopeId = (prefix.length() == 0) ? "" : prefix.substring(0, prefix.length() - 1); // if at top-level, prefix is ""
-                                    final String outerScopeId = (prefix.length() == 0) ? "" : xblBindings.getResolutionScopeId(innerScopeId);
-                                    final String bindingScope = xblBindings.getResolutionScopeId(parentPrefixedId);
-                                    final XFormsConstants.XXBLScope startScope = innerScopeId.equals(bindingScope) ? XFormsConstants.XXBLScope.inner : XFormsConstants.XXBLScope.outer;
-                                    newActionElement = xblBindings.annotateHandler(actionElement, prefix, innerScopeId, outerScopeId, startScope).getRootElement();
+                                    final XBLBindings.Scope innerScope = xblBindings.getResolutionScopeByPrefix(prefix); // if at top-level, prefix is ""
+                                    final XBLBindings.Scope outerScope = (prefix.length() == 0) ? xblBindings.getResolutionScopeByPrefix("") : xblBindings.getResolutionScopeByPrefixedId(innerScope.scopeId);
+                                    final XBLBindings.Scope bindingScope = xblBindings.getResolutionScopeByPrefixedId(parentPrefixedId);
+                                    final XFormsConstants.XXBLScope startScope = innerScope.equals(bindingScope) ? XFormsConstants.XXBLScope.inner : XFormsConstants.XXBLScope.outer;
+                                    newActionElement = xblBindings.annotateHandler(actionElement, prefix, innerScope, outerScope, startScope).getRootElement();
                                 } else if (controlInfoMap.containsKey(parentPrefixedId)) {
                                     // Parent is a control but not a bound node
                                     newActionElement = actionElement;

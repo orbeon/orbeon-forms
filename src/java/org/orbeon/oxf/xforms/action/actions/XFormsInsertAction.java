@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.Item;
@@ -44,7 +45,7 @@ public class XFormsInsertAction extends XFormsAction {
 
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();

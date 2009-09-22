@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 
 /**
@@ -34,7 +35,7 @@ public class XXFormsShowAction extends XFormsAction {
 
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 

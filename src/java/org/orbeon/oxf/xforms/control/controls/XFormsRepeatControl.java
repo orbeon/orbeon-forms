@@ -286,7 +286,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 contextStack.setBinding(this);
                 contextStack.popBinding();
             }
-            contextStack.pushBinding(propertyContext, getControlElement());
+            contextStack.pushBinding(propertyContext, getControlElement(), getEffectiveId(), getResolutionScope());
             setBindingContext(propertyContext, contextStack.getCurrentBindingContext());
 
             newRepeatNodeset = getBindingContext().getNodeset();

@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
 import org.orbeon.oxf.xforms.submission.BaseSubmission;
 import org.orbeon.oxf.xforms.submission.OptimizedSubmission;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -242,9 +243,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      *
      * @return  instance id or null
      */
-    public String getDefaultInstanceId() {
-        return (instanceIds != null && instanceIds.size() > 0) ? instanceIds.get(0) : null;
-    }
+//    public String getDefaultInstanceId() {
+//        return (instanceIds != null && instanceIds.size() > 0) ? instanceIds.get(0) : null;
+//    }
 
     /**
      * Return all XFormsInstance objects for this model, in the order they appear in the model.
@@ -350,6 +351,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public String getEffectiveId() {
         return effectiveId;
+    }
+
+    public XBLBindings.Scope getResolutionScope() {
+        return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getPrefixedId());
     }
 
     public LocationData getLocationData() {
@@ -1038,11 +1043,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     /**
      * Handle an updated instance after a submission with instance replacement/update.
      *
-     * @param propertyContext   current context
      * @param updatedInstance   instance to replace or update (can be new instance object or existing one)
-     * @param updatedTreeRoot   root of the tree which was updated (can be root element or another element)
      */
-    public void handleUpdatedInstance(PropertyContext propertyContext, final XFormsInstance updatedInstance, final NodeInfo updatedTreeRoot) {
+    public void handleUpdatedInstance(final XFormsInstance updatedInstance) {
 
         // Set the instance on this model
         // Instance object might already be there, or might be a new one. In any case, instance needs to be marked as updated.
@@ -1136,5 +1139,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      */
     public List getEventHandlers(XBLContainer container) {
         return containingDocument.getStaticState().getEventHandlers(XFormsUtils.getPrefixedId(getEffectiveId()));
+    }
+
+    public XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+        contextStack.resetBindingContext(propertyContext, this);
+        return contextStack.getCurrentBindingContext();
     }
 }

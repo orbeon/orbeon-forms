@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -259,6 +260,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      */
     public String getId() {
         return instanceStaticId;
+    }
+
+    public String getPrefixedId() {
+        return XFormsUtils.getPrefixedId(getEffectiveId());
     }
 
     public String getEffectiveId() {
@@ -564,6 +569,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     private void updateRepeatNodesets(PropertyContext propertyContext, XFormsControls controls, List<Item> insertedNodeInfos) {
         final Map<String, XFormsControl> repeatControlsMap = controls.getCurrentControlTree().getRepeatControls();
         if (repeatControlsMap != null) {
+
+            final XBLBindings bindings = controls.getContainingDocument().getStaticState().getXBLBindings();
+            final XBLBindings.Scope instanceScope = bindings.getResolutionScopeByPrefixedId(getPrefixedId());
+
             // NOTE: Read in a list as the list of repeat controls may change within updateNodeset()
             final List<XFormsControl> repeatControls = new ArrayList<XFormsControl>(repeatControlsMap.values());
             for (XFormsControl repeatControl: repeatControls) {
@@ -572,13 +581,9 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                 final XFormsRepeatControl newRepeatControl = (XFormsRepeatControl) controls.getObjectByEffectiveId(repeatControl.getEffectiveId());
                 // Update node-set
                 if (newRepeatControl != null) {
-
-                    final String instancePrefix = XFormsUtils.getEffectiveIdPrefix(getEffectiveId());
-                    final String repeatControlPrefix = XFormsUtils.getEffectiveIdPrefix(newRepeatControl.getEffectiveId());
-
-                    // Only update controls within the same container as the instance OR in descendant containers
-                    if (repeatControlPrefix.startsWith(instancePrefix)) {
-                        // TODO: in the future, XBL shadow tree should hold its own subtree of components so this test is no longer needed
+                    // Only update controls within same scope as modified instance
+                    // NOTE: This can clearly break with e.g. xxforms:instance()
+                    if (newRepeatControl.getResolutionScope() == instanceScope) {
                         newRepeatControl.updateNodeset(propertyContext, insertedNodeInfos);
                     }
                 }
@@ -630,5 +635,13 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                     "effective instance id", getEffectiveId(),
                     "instance", TransformerUtils.tinyTreeToString(getInstanceRootElementInfo()));
         }
+    }
+
+    public XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+        final XFormsModel model = getModel(containingDocument);
+        final XFormsContextStack.BindingContext modelBindingContext = model.getBindingContext(propertyContext, containingDocument);
+        // TODO: should push root element of this instance, right? But is this used anywhere?
+        //final XFormsContextStack contextStack = model.getContextStack();
+        return modelBindingContext;
     }
 }

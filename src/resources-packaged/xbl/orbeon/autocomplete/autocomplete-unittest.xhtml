@@ -52,8 +52,8 @@
         <fr:autocomplete ref="instance('instance-dynamic')/country-name" id="country-name-dynamic"
                          incremental="true" dynamic-itemset="true"
                          style="width: 15em">
-            <xxforms:script ev:event="xforms-value-changed">console.log("value-changed");</xxforms:script>
-            <xxforms:script ev:event="DOMActivate">console.log("DOMActivate");</xxforms:script>
+            <xforms:message ev:event="xforms-value-changed" id="dummy-a" level="xxforms:log-info">Got value-changed</xforms:message>
+            <xforms:message ev:event="DOMActivate"          id="dummy-b" level="xxforms:log-info">Got DOMActivate</xforms:message>
             <xforms:label>Dynamic itemset: </xforms:label>
             <xforms:itemset nodeset="instance('selected-countries')/country">
                 <xforms:label ref="name"/>

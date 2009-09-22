@@ -47,6 +47,7 @@
             var inputField = Dom.getChildren(inputSpan)[0];
             var yuiDiv = Dom.getElementsByClassName("fr-autocomplete-yui-div", null, element)[0];
             YAHOO.util.Dom.generateId(yuiDiv); // Generate ID dynamically as our implementation of XBL doesn't rewrite IDs on HTML
+            var valueSelectedButton = Dom.getElementsByClassName("fr-autocomplete-value-selected", null, element)[0];
 
             // Build data source
             var dataSource;
@@ -92,6 +93,7 @@
             autoComplete.yuiAutoComplete.itemSelectEvent.subscribe(function(type, args) {
                 var selectedValue = args[2][0];
                 Document.setValue(inputSpan.id, selectedValue);
+                valueSelectedButton.click();
             });
         },
 

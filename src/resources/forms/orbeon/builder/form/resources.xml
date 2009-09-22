@@ -716,6 +716,10 @@
             <edit-metadata-output>Edit the application name and form name, or click Cancel to return to the builder:</edit-metadata-output>
             <form-buttons>Your form's buttons will be placed here</form-buttons>
         </messages>
+        <template>
+            <untitled-form>Untitled Form</untitled-form>
+            <untitled-section>Untitled Section</untitled-section>
+        </template>
     </resource>
     <resource xml:lang="fr">
         <application-form-name>
@@ -1419,5 +1423,9 @@
             <edit-metadata-output>Modifiez le nom d'application et/ou le nom du formulaire, ou cliquer Annuler pour revenir à l'éditeur:</edit-metadata-output>
             <form-buttons>Les boutons de votre formulaire seront placés ici</form-buttons>
         </messages>
+        <template>
+            <untitled-form>Formulaire sans titre</untitled-form>
+            <untitled-section>Section sans titre</untitled-section>
+        </template>
     </resource>
 </resources>

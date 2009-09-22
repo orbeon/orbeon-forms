@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -33,29 +33,43 @@
             <xbl:style src="/xbl/orbeon/autocomplete/autocomplete.css"/>
         </xbl:resources>
         <xbl:template>
-            <xforms:group id="autocomplete-container" class="fr-autocomplete-container" xbl:attr="model context ref bind">
+            <!-- Outer group -->
+            <xforms:group xxbl:scope="outer" class="fr-autocomplete-container" xbl:attr="model context ref bind">
                 <xbl:content includes="fr|autocomplete > xforms|label"/>
-                <!-- Init event -->
-                <xforms:action ev:event="xforms-enabled" ev:observer="autocomplete-container"><xxforms:script>ORBEON.widget.AutoComplete.containerXFormsEnabled.call(this);</xxforms:script></xforms:action>
-                <xforms:group appearance="xxforms:internal">
-                    <!-- Stop propagation of all local UI events -->
-                    <xforms:action ev:event="#all" ev:propagate="stop"/>
+
+                <!-- Inner group -->
+                <xforms:group id="component-inner-group" xxbl:scope="inner">
+
+                    <!-- Variable pointing to external single-node binding -->
+                    <xxforms:variable name="result" as="node()?">
+                        <xxforms:sequence select="." xxbl:scope="outer"/>
+                    </xxforms:variable>
+
+                    <!-- Init event -->
+                    <xforms:action ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="component-inner-group">
+                        <xxforms:script>ORBEON.widget.AutoComplete.containerXFormsEnabled.call(this);</xxforms:script>
+                    </xforms:action>
+
                     <!-- Configuration -->
-                    <xxforms:variable name="class" xbl:attr="xbl:text=class"/>
                     <xxforms:variable name="dynamic-itemset" xbl:attr="xbl:text=dynamic-itemset"/>
                     <xforms:output class="fr-autocomplete-dynamic-itemset" value="$dynamic-itemset" style="display: none"/>
                     <xxforms:variable name="max-results-displayed" xbl:attr="xbl:text=max-results-displayed"/>
                     <xforms:output class="fr-max-results-displayed" xxbl:attr="fr:max-results-displayed/@*" style="display: none"
                             value="if ($max-results-displayed != '') then $max-results-displayed else xxforms:property('oxf.xforms.xbl.fr.autocomplete.max-results-displayed')"/>
                     <!-- Controls -->
-                    <xforms:select1 id="select1" ref="." class="fr-autocomplete-select1" style="display: none" appearance="minimal" xxforms:encrypt-item-values="false">
+                    <xforms:select1 id="select1" ref="$result" class="fr-autocomplete-select1" style="display: none" appearance="minimal" xxforms:encrypt-item-values="false">
                         <xbl:content includes="xforms|itemset, xforms|item"/>
                     </xforms:select1>
                     <xhtml:div xbl:attr="class style">
-                        <xforms:input ref="." xbl:attr="incremental" id="input" class="fr-autocomplete-input"/>
+                        <xforms:input ref="$result" xbl:attr="incremental" id="input" class="fr-autocomplete-input"/>
                         <xhtml:div class="fr-autocomplete-yui-div"/>
                     </xhtml:div>
+
+                    <!-- Stop propagation of all UI events -->
+                    <xforms:action ev:event="#all" ev:propagate="stop"/>
+
                 </xforms:group>
+
                 <xbl:content includes="fr|autocomplete > xforms|help, fr|autocomplete > xforms|hint, fr|autocomplete > xforms|alert"/>
             </xforms:group>
         </xbl:template>

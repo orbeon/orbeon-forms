@@ -606,6 +606,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         }
     }
 
+    public XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+        model.getBindingContext(propertyContext, containingDocument);
+        final XFormsContextStack contextStack = model.getContextStack();
+        contextStack.pushBinding(propertyContext, getSubmissionElement(), getEffectiveId(), model.getResolutionScope());
+        return contextStack.getCurrentBindingContext();
+    }
+
     public class SubmissionParameters {
 
         // @replace attribute
@@ -614,12 +621,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean isReplaceText = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_TEXT);
         final boolean isReplaceNone = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE);
 
+        final XFormsContextStack contextStack = model.getContextStack();
+
         // Current node for xforms:submission and instance containing the node to submit
         final NodeInfo refNodeInfo;
         final XFormsInstance refInstance;
-
-        // Context stack
-        final XFormsContextStack contextStack = model.getContextStack();
         
         final Item submissionElementContextItem;
     
@@ -653,13 +659,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean isDeferredSubmissionSecondPassReplaceAll;
         
         public SubmissionParameters(PropertyContext propertyContext, String eventName) {
-            contextStack.resetBindingContext(propertyContext);
-            
-            contextStack.setBinding(propertyContext, XFormsModelSubmission.this);
+            final XFormsContextStack.BindingContext bindingContext = getBindingContext(propertyContext, containingDocument);
     
-            refNodeInfo = contextStack.getCurrentSingleNode();
-            functionContext = contextStack.getFunctionContext();
-            submissionElementContextItem = contextStack.getContextItem();
+            refNodeInfo = bindingContext.getSingleNode();
+            functionContext = contextStack.getFunctionContext(getEffectiveId());
+            submissionElementContextItem = bindingContext.getContextItem();
     
             // Check that we have a current node and that it is pointing to a document or an element
             if (refNodeInfo == null)
@@ -672,7 +676,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             }
     
             // Current instance may be null if the document submitted is not part of an instance
-            refInstance = contextStack.getCurrentInstance();
+            refInstance = bindingContext.getInstance();
     
             // Determine if the instance to submit has one or more bound and relevant upload controls
             //
@@ -690,7 +694,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     && serialize && XFormsSubmissionUtils.hasBoundRelevantUploadControls(containingDocument, refInstance);
         
             // Evaluate early AVTs
-            xpathContext = new XPathCache.XPathContext(prefixToURIMap, contextStack.getCurrentVariables(), functionLibrary, functionContext, null, getLocationData());
+            xpathContext = new XPathCache.XPathContext(prefixToURIMap, bindingContext.getInScopeVariables(), functionLibrary, functionContext, null, getLocationData());
             
             {
                 // Resolved method AVT

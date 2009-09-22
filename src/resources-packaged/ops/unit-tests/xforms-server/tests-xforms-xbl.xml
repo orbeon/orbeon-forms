@@ -26,6 +26,93 @@
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
+    <test description="Event handler observing XBL bound element" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <foo1>42</foo1>
+                            </instance>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xforms:model id="model">
+                                    <xforms:instance id="instance">
+                                        <instance/>
+                                    </xforms:instance>
+                                </xforms:model>
+                                <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+                                    <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms:alert"/>
+
+                                    <xforms:group id="component-inner-group" appearance="xxforms:internal" xxbl:scope="inner">
+
+                                        <xxforms:variable name="result" as="node()?">
+                                            <xxforms:sequence select="." xxbl:scope="outer"/>
+                                        </xxforms:variable>
+
+                                        <!--<xxforms:variable name="inner" select="." as="node()?"/>-->
+
+                                        <!-- React to update to bound node -->
+                                        <xforms:group ref="$result" appearance="xxforms:internal" id="component-result-group">
+                                            <xforms:action ev:event="xforms-value-changed xforms-enabled" if="$result castable as xs:integer">
+                                                <xforms:setvalue ref="instance('instance')" value="xs:integer($result) + 1"/>
+                                            </xforms:action>
+                                        </xforms:group>
+
+                                        <!-- Local controls -->
+                                        <xforms:group appearance="xxforms:internal" id="component-controls-group">
+                                            <xforms:input id="my-input" ref="."/>
+                                            <xforms:setvalue ev:event="xforms-value-changed" if="context() castable as xs:integer" ref="$result" value="xs:integer(context()) - 1"/>
+                                        </xforms:group>
+
+                                        <!-- Stop propagation of all UI events -->
+                                        <xforms:action ev:event="#all" ev:propagate="stop"/>
+
+                                    </xforms:group>
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:foo id="my-foo" ref="foo1">
+                        <xforms:label>My label</xforms:label>
+                    </fr:foo>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <foo1>42</foo1>
+                                </instance>
+                            </instance>
+                            <instance id="instance" model-id="my-foo$model">
+                                <instance>43</instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-foo$xf-3" label="My label"/>
+                        <xxf:control id="my-foo$my-input">43</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <test description="XBL Component in Repeat: Events Upon New Iteration" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
@@ -34,7 +121,7 @@
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                             <xhtml:head>
                                 <xforms:model id="main-model" xxforms:encrypt-item-values="false">
                                     <xforms:instance id="main-instance">
@@ -102,62 +189,67 @@
                                                 </xforms:action>
                                             </xforms:model>
                                             <!-- Local controls -->
-                                            <xforms:group xbl:attr="ref bind" id="component-group">
-                                                <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
+                                            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+                                                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
 
-                                                <xxforms:variable name="result" select="." as="node()?"/>
+                                                <xforms:group id="component-inner-group" appearance="xxforms:internal" xxbl:scope="inner">
 
-                                                <!-- React to update to bound node -->
-                                                <xforms:group ref="$result" appearance="xxforms:internal" id="component-result-group">
-                                                    <!-- Only set local values if the bound node is an xs:date -->
-                                                    <xforms:action ev:event="xforms-value-changed xforms-enabled" if="$result castable as xs:date">
-                                                        <xforms:setvalue model="date-model" ref="year" value="year-from-date($result)"/>
-                                                        <xforms:setvalue model="date-model" ref="month" value="month-from-date($result)"/>
-                                                        <xforms:setvalue model="date-model" ref="day" value="day-from-date($result)"/>
-                                                    </xforms:action>
-                                                </xforms:group>
+                                                    <xxforms:variable name="result" as="node()?">
+                                                        <xxforms:sequence select="." xxbl:scope="outer"/>
+                                                    </xxforms:variable>
 
-                                                <xforms:group model="date-model" id="component-controls-group">
-                                                    <xforms:select1 ref="year" xxforms:refresh-items="false" id="year-select">
-                                                        <xforms:item>
-                                                            <xforms:label>Year</xforms:label>
-                                                            <xforms:value/>
-                                                        </xforms:item>
-                                                        <xforms:itemset nodeset="instance('years-itemset')/year">
-                                                            <xforms:label ref="."/>
-                                                            <xforms:value ref="."/>
-                                                        </xforms:itemset>
-                                                    </xforms:select1>
-                                                    <xforms:select1 ref="month" xxforms:refresh-items="false" id="month-select">
-                                                        <xforms:item>
-                                                            <xforms:label>Month</xforms:label>
-                                                            <xforms:value/>
-                                                        </xforms:item>
-                                                        <xforms:itemset nodeset="instance('months-itemset')/month">
-                                                            <xforms:label ref="."/>
-                                                            <xforms:value ref="."/>
-                                                        </xforms:itemset>
-                                                    </xforms:select1>
-                                                    <xforms:select1 ref="day" xxforms:refresh-items="true" id="day-select">
-                                                        <xforms:item>
-                                                            <xforms:label>Day</xforms:label>
-                                                            <xforms:value/>
-                                                        </xforms:item>
-                                                        <xforms:itemset nodeset="instance('days-itemset')/day">
-                                                            <xforms:label ref="."/>
-                                                            <xforms:value ref="."/>
-                                                        </xforms:itemset>
-                                                    </xforms:select1>
-
-                                                    <!-- React to update to local values -->
-                                                    <xforms:action ev:event="xforms-value-changed">
-                                                        <!-- Only proceed if all parts are integers -->
-                                                        <xforms:action if="year castable as xs:integer and month castable as xs:integer and day castable as xs:integer">
-                                                            <xxforms:variable name="date-string" select="concat(year, '-', format-number(xs:integer(month), '00'), '-', format-number(xs:integer(day), '00'))" as="xs:string"/>
-                                                            <!-- Only set value if the result is castable as a date -->
-                                                            <xforms:setvalue if="$date-string castable as xs:date" ref="$result" value="$date-string"/>
+                                                    <!-- React to update to bound node -->
+                                                    <xforms:group ref="$result" appearance="xxforms:internal" id="component-result-group">
+                                                        <!-- Only set local values if the bound node is an xs:date -->
+                                                        <xforms:action ev:event="xforms-value-changed xforms-enabled" if="$result castable as xs:date" context="instance('date-instance')">
+                                                            <xforms:setvalue ref="year" value="year-from-date($result)"/>
+                                                            <xforms:setvalue ref="month" value="month-from-date($result)"/>
+                                                            <xforms:setvalue ref="day" value="day-from-date($result)"/>
                                                         </xforms:action>
-                                                    </xforms:action>
+                                                    </xforms:group>
+
+                                                    <xforms:group model="date-model" id="component-controls-group">
+                                                        <xforms:select1 ref="year" xxforms:refresh-items="false" id="year-select">
+                                                            <xforms:item>
+                                                                <xforms:label>Year</xforms:label>
+                                                                <xforms:value/>
+                                                            </xforms:item>
+                                                            <xforms:itemset nodeset="instance('years-itemset')/year">
+                                                                <xforms:label ref="."/>
+                                                                <xforms:value ref="."/>
+                                                            </xforms:itemset>
+                                                        </xforms:select1>
+                                                        <xforms:select1 ref="month" xxforms:refresh-items="false" id="month-select">
+                                                            <xforms:item>
+                                                                <xforms:label>Month</xforms:label>
+                                                                <xforms:value/>
+                                                            </xforms:item>
+                                                            <xforms:itemset nodeset="instance('months-itemset')/month">
+                                                                <xforms:label ref="."/>
+                                                                <xforms:value ref="."/>
+                                                            </xforms:itemset>
+                                                        </xforms:select1>
+                                                        <xforms:select1 ref="day" xxforms:refresh-items="true" id="day-select">
+                                                            <xforms:item>
+                                                                <xforms:label>Day</xforms:label>
+                                                                <xforms:value/>
+                                                            </xforms:item>
+                                                            <xforms:itemset nodeset="instance('days-itemset')/day">
+                                                                <xforms:label ref="."/>
+                                                                <xforms:value ref="."/>
+                                                            </xforms:itemset>
+                                                        </xforms:select1>
+
+                                                        <!-- React to update to local values -->
+                                                        <xforms:action ev:event="xforms-value-changed">
+                                                            <!-- Only proceed if all parts are integers -->
+                                                            <xforms:action if="year castable as xs:integer and month castable as xs:integer and day castable as xs:integer">
+                                                                <xxforms:variable name="date-string" select="concat(year, '-', format-number(xs:integer(month), '00'), '-', format-number(xs:integer(day), '00'))" as="xs:string"/>
+                                                                <!-- Only set value if the result is castable as a date -->
+                                                                <xforms:setvalue if="$date-string castable as xs:date" ref="$result" value="$date-string"/>
+                                                            </xforms:action>
+                                                        </xforms:action>
+                                                    </xforms:group>
                                                 </xforms:group>
 
                                             </xforms:group>
@@ -215,7 +307,8 @@
                             </instance>
                             <instance id="events" model-id="main-model">
                                 <events>
-                                    <event type="xforms-enabled" target="component-group" indexes="2"/>
+                                    <event type="xforms-enabled" target="xf-25" indexes="2"/>
+                                    <event type="xforms-enabled" target="component-inner-group" indexes="2"/>
                                     <event type="xforms-enabled" target="component-result-group" indexes="2"/>
                                     <event type="xforms-enabled" target="component-controls-group" indexes="2"/>
                                     <event type="xforms-enabled" target="year-select" indexes="2"/>
@@ -319,15 +412,15 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="date-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:control id="fr-dropdown-date$component-group·1" label="Date: "/>
+                        <xxf:control id="fr-dropdown-date$xf-25·1" label="Date: "/>
                         <xxf:control id="fr-dropdown-date$year-select·1">2009</xxf:control>
                         <xxf:control id="fr-dropdown-date$month-select·1">1</xxf:control>
                         <xxf:control id="fr-dropdown-date$day-select·1">2</xxf:control>
-                        <xxf:control id="fr-dropdown-date$component-group·2" label="Date: "/>
+                        <xxf:control id="fr-dropdown-date$xf-25·2" label="Date: "/>
                         <xxf:control id="fr-dropdown-date$year-select·2">2008</xxf:control>
                         <xxf:control id="fr-dropdown-date$month-select·2">2</xxf:control>
                         <xxf:control id="fr-dropdown-date$day-select·2">1</xxf:control>
-                        <xxf:control id="fr-dropdown-date$component-group·3" label="Date: "/>
+                        <xxf:control id="fr-dropdown-date$xf-25·3" label="Date: "/>
                         <xxf:control id="fr-dropdown-date$year-select·3">2008</xxf:control>
                         <xxf:control id="fr-dropdown-date$month-select·3">2</xxf:control>
                         <xxf:control id="fr-dropdown-date$day-select·3">1</xxf:control>
@@ -358,7 +451,7 @@
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:exforms="http://www.exforms.org/exf/1-0">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:exforms="http://www.exforms.org/exf/1-0" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                             <xhtml:head>
                                 <xforms:model id="main-model">
                                     <xforms:instance id="main-instance">
@@ -386,27 +479,32 @@
                                                 <xforms:bind nodeset="name" calculate="name($ctx[1])"/>
                                             </xforms:model>
 
-                                            <xforms:group xbl:attr="ref bind" id="component-group">
-                                                <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
+                                            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+                                                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms:alert"/>
 
-                                                <xxforms:variable name="result" select="." as="node()?"/>
+                                                <xforms:group id="component-inner-group" appearance="xxforms:internal" xxbl:scope="inner">
 
-                                                <!-- React to update to bound node -->
-                                                <xforms:group ref="$result" appearance="xxforms:internal" id="component-result-group">
-                                                    <xforms:action ev:event="xforms-value-changed xforms-enabled">
-                                                        <xforms:setvalue model="super-control-model" ref="value" value="$result"/>
-                                                    </xforms:action>
-                                                </xforms:group>
+                                                    <xxforms:variable name="result" as="node()?">
+                                                        <xxforms:sequence select="." xxbl:scope="outer"/>
+                                                    </xxforms:variable>
 
-                                                <!-- Local controls -->
-                                                <xforms:group model="super-control-model" id="component-controls-group">
+                                                    <!-- React to update to bound node -->
+                                                    <xforms:group ref="$result" appearance="xxforms:internal" id="component-result-group">
+                                                        <xforms:action ev:event="xforms-value-changed xforms-enabled">
+                                                            <xforms:setvalue ref="instance('super-control-instance')/value" value="$result"/>
+                                                        </xforms:action>
+                                                    </xforms:group>
 
-                                                    <xforms:input ref="value" id="my-input"/>
+                                                    <!-- Local controls -->
+                                                    <xforms:group model="super-control-model" id="component-controls-group">
 
-                                                    <!-- React to update to local controls -->
-                                                    <xforms:action ev:event="xforms-value-changed">
-                                                        <xforms:setvalue ref="$result" value="context()/value"/>
-                                                    </xforms:action>
+                                                        <xforms:input ref="value" id="my-input"/>
+
+                                                        <!-- React to update to local controls -->
+                                                        <xforms:action ev:event="xforms-value-changed">
+                                                            <xforms:setvalue ref="$result" value="context()/value"/>
+                                                        </xforms:action>
+                                                    </xforms:group>
                                                 </xforms:group>
 
                                             </xforms:group>
@@ -463,9 +561,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="fr-super-control-1$component-group" label="Internal value 1: "/>
+                        <xxf:control id="fr-super-control-1$xf-9" label="Internal value 1: "/>
                         <xxf:control id="fr-super-control-1$my-input">foo-value</xxf:control>
-                        <xxf:control id="fr-super-control-2$component-group" label="Internal value 2: "/>
+                        <xxf:control id="fr-super-control-2$xf-21" label="Internal value 2: "/>
                         <xxf:control id="fr-super-control-2$my-input">bar-value</xxf:control>
                         <xxf:control id="input-1" label="External value 1: ">foo-value</xxf:control>
                         <xxf:control id="input-2" label="External value 2: ">bar-value</xxf:control>
@@ -675,7 +773,7 @@
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                             <xhtml:head>
                                 <xforms:model id="model">
                                     <xforms:instance id="instance">
@@ -689,7 +787,7 @@
                                 <xbl:xbl>
                                     <xbl:binding id="fr-super-control-binding" element="fr|super-control">
                                         <xbl:template>
-                                            <xforms:group xbl:attr="ref" id="component-group">
+                                            <xforms:group xbl:attr="ref" xxbl:scope="outer">
                                                 <xhtml:div id="my-div" style="{.}">
                                                     Div 3
                                                 </xhtml:div>
@@ -737,11 +835,11 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="fr-super-control-1$xf-4" for="fr-super-control-1$my-div" name="style">color: red</xxf:attribute>
-                        <xxf:attribute id="fr-super-control-2$xf-6" for="fr-super-control-2$my-div" name="style">font-weight: bold</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-1$xf-5" for="fr-super-control-1$my-div" name="style">color: red</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-2$xf-8" for="fr-super-control-2$my-div" name="style">font-weight: bold</xxf:attribute>
                         <xxf:copy-repeat-template id="repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                        <xxf:attribute id="fr-super-control-3$xf-8·1" for="fr-super-control-3$my-div·1" name="style">color: red</xxf:attribute>
-                        <xxf:attribute id="fr-super-control-3$xf-8·2" for="fr-super-control-3$my-div·2" name="style">font-weight: bold</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-3$xf-11·1" for="fr-super-control-3$my-div·1" name="style">color: red</xxf:attribute>
+                        <xxf:attribute id="fr-super-control-3$xf-11·2" for="fr-super-control-3$my-div·2" name="style">font-weight: bold</xxf:attribute>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -894,7 +992,7 @@
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                             <xhtml:head>
                                 <xforms:model id="model">
                                     <xforms:instance id="instance">
@@ -905,10 +1003,15 @@
                                 <xbl:xbl xmlns:exf="http://www.exforms.org/exf/1-0">
                                     <xbl:binding id="foo-component" element="fr|foo">
                                         <xbl:template>
-                                            <!-- Use prefix exf declared only in this XBL binding, and use on element with id "clash" -->
-                                            <xforms:output id="clash" value="exf:readonly()">
-                                                <xforms:label>Read-only: </xforms:label>
-                                            </xforms:output>
+                                            <xforms:group xxbl:scope="outer">
+                                                <xxforms:variable name="result" as="node()?" xxbl:scope="inner">
+                                                    <xxforms:sequence select="." xxbl:scope="outer"/>
+                                                </xxforms:variable>
+                                                <!-- Use prefix exf declared only in this XBL binding, and use on element with id "clash" -->
+                                                <xforms:output id="clash" value="exf:readonly($result)" xxbl:scope="inner">
+                                                    <xforms:label>Read-only: </xforms:label>
+                                                </xforms:output>
+                                            </xforms:group>
                                         </xbl:template>
                                     </xbl:binding>
                                 </xbl:xbl>
@@ -916,10 +1019,15 @@
                                 <xbl:xbl>
                                     <xbl:binding id="bar-component" element="fr|bar">
                                         <xbl:template>
-                                            <!-- Element with id "clash" doesn't have the exf prefix used by the other component -->
-                                            <xforms:output id="clash" ref=".">
-                                                <xforms:label>Message: </xforms:label>
-                                            </xforms:output>
+                                            <xforms:group xxbl:scope="outer">
+                                                <xxforms:variable name="result" as="node()?" xxbl:scope="inner">
+                                                    <xxforms:sequence select="." xxbl:scope="outer"/>
+                                                </xxforms:variable>
+                                                <!-- Element with id "clash" doesn't have the exf prefix used by the other component -->
+                                                <xforms:output id="clash" ref="$result" xxbl:scope="inner">
+                                                    <xforms:label>Message: </xforms:label>
+                                                </xforms:output>
+                                            </xforms:group>
                                         </xbl:template>
                                     </xbl:binding>
                                 </xbl:xbl>
@@ -984,9 +1092,7 @@
                                 <xbl:xbl script-type="application/xhtml+xml">
                                     <xbl:binding id="fr-foo" element="fr|foo">
                                         <xbl:template>
-                                            <table>
-                                                <xbl:content/>
-                                            </table>
+                                            <xbl:content/>
                                         </xbl:template>
                                     </xbl:binding>
                                 </xbl:xbl>
@@ -1131,11 +1237,12 @@
                                                 </xforms:action>
                                                 <xforms:action ev:event="xforms-enabled" ev:observer="bar-group" ev:target="bar-group">
                                                     <!-- Dispatch repeat focus to change the index back to 2 -->
-                                                    <xforms:dispatch xxbl:focus="outer" name="xxforms-repeat-focus" target="my-output-bar" xxforms:repeat-indexes="2"/>
+                                                    <xforms:dispatch name="xxforms-repeat-focus" target="my-output-bar" xxforms:repeat-indexes="2"/>
                                                 </xforms:action>
                                             </xforms:model>
                                             <xforms:group id="bar-group" model="model" appearance="xxforms:internal">
-                                                <xbl:content/>
+                                                <!-- You wouldn't usually set back the scope to "inner", but this is for testing only -->
+                                                <xbl:content xxbl:scope="inner"/>
                                             </xforms:group>
                                         </xbl:template>
                                     </xbl:binding>
@@ -1212,74 +1319,74 @@
         </output>
     </test>
 
-    <test description="Id clash between repeat in XBL with same id as non-repeat control outside XBL" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+    <!-- NOTE: This was testing for id clash, but it is no longer possible use the same static id within a given scope. Remove? -->
+    <!--<test description="Id clash between repeat in XBL with same id as non-repeat control outside XBL" name="oxf:pipeline">-->
+        <!--<input name="config">-->
+            <!--<p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">-->
+                <!--<p:param name="response" type="output"/>-->
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-                            <xhtml:head>
-                                <xforms:model id="model">
-                                    <xforms:instance id="instance">
-                                        <values>
-                                            <value/><value/>
-                                        </values>
-                                    </xforms:instance>
-                                </xforms:model>
-                                <xbl:xbl>
-                                    <xbl:binding id="foobar-component" element="fr|foobar">
-                                        <xbl:template>
-                                            <xforms:repeat nodeset="value" id="clash">
-                                                <xforms:output value="xxforms:index()"/>
-                                            </xforms:repeat>
-                                        </xbl:template>
-                                    </xbl:binding>
-                                </xbl:xbl>
-                            </xhtml:head>
-                            <xhtml:body>
-                                <xforms:trigger id="clash">
-                                    <xforms:label>NOP</xforms:label>
-                                </xforms:trigger>
-                                <fr:foobar id="my-foobar" ref="."/>
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
-        </input>
-        <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <values>
-                                    <value/>
-                                    <value/>
-                                </values>
-                            </instance>
-                        </instances>
-                        <controls>
-                            <control effective-id="my-foobar$clash" index="1"/>
-                        </controls>
-                    </dynamic-state>
-                </xxf:dynamic-state>
-                <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="clash" label="NOP"/>
-                        <xxf:copy-repeat-template id="my-foobar$clash" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                        <xxf:control id="my-foobar$xf-4·1">1</xxf:control>
-                        <xxf:control id="my-foobar$xf-4·2">1</xxf:control>
-                    </xxf:control-values>
-                </xxf:action>
-            </xxf:event-response>
-        </output>
-    </test>
+                <!--<p:processor name="oxf:pipeline">-->
+                    <!--<p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>-->
+                    <!--<p:input name="document">-->
+                        <!--<xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">-->
+                            <!--<xhtml:head>-->
+                                <!--<xforms:model id="model">-->
+                                    <!--<xforms:instance id="instance">-->
+                                        <!--<values>-->
+                                            <!--<value/><value/>-->
+                                        <!--</values>-->
+                                    <!--</xforms:instance>-->
+                                <!--</xforms:model>-->
+                                <!--<xbl:xbl>-->
+                                    <!--<xbl:binding id="foobar-component" element="fr|foobar">-->
+                                        <!--<xbl:template>-->
+                                            <!--<xforms:repeat xxbl:scope="outer" nodeset="value" id="clash">-->
+                                                <!--<xforms:output value="xxforms:index()"/>-->
+                                            <!--</xforms:repeat>-->
+                                        <!--</xbl:template>-->
+                                    <!--</xbl:binding>-->
+                                <!--</xbl:xbl>-->
+                            <!--</xhtml:head>-->
+                            <!--<xhtml:body>-->
+                                <!--<xforms:trigger id="clash">-->
+                                    <!--<xforms:label>NOP</xforms:label>-->
+                                <!--</xforms:trigger>-->
+                                <!--<fr:foobar id="my-foobar" ref="."/>-->
+                            <!--</xhtml:body>-->
+                        <!--</xhtml:html>-->
+                    <!--</p:input>-->
+                    <!--<p:output name="response" ref="response"/>-->
+                <!--</p:processor>-->
+            <!--</p:config>-->
+        <!--</input>-->
+        <!--<output name="response">-->
+            <!--<xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">-->
+                <!--<xxf:dynamic-state>-->
+                    <!--<dynamic-state>-->
+                        <!--<instances>-->
+                            <!--<instance id="instance" model-id="model">-->
+                                <!--<values>-->
+                                    <!--<value/>-->
+                                    <!--<value/>-->
+                                <!--</values>-->
+                            <!--</instance>-->
+                        <!--</instances>-->
+                        <!--<controls>-->
+                            <!--<control effective-id="my-foobar$clash" index="1"/>-->
+                        <!--</controls>-->
+                    <!--</dynamic-state>-->
+                <!--</xxf:dynamic-state>-->
+                <!--<xxf:action>-->
+                    <!--<xxf:control-values>-->
+                        <!--<xxf:control id="clash" label="NOP"/>-->
+                        <!--<xxf:copy-repeat-template id="my-foobar$clash" parent-indexes="" start-suffix="2" end-suffix="2"/>-->
+                        <!--<xxf:control id="my-foobar$xf-4·1">1</xxf:control>-->
+                        <!--<xxf:control id="my-foobar$xf-4·2">1</xxf:control>-->
+                    <!--</xxf:control-values>-->
+                <!--</xxf:action>-->
+            <!--</xxf:event-response>-->
+        <!--</output>-->
+    <!--</test>-->
 
     <test description="XBL xxforms:instance() scoping" name="oxf:pipeline">
         <input name="config">
@@ -1289,7 +1396,7 @@
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                             <xhtml:head>
                                 <xforms:model id="model">
                                     <xforms:instance id="global-instance-1">
@@ -1309,11 +1416,11 @@
                                                 </xforms:instance>
                                             </xforms:model>
 
-                                            <xforms:output id="output-1" value="name()"/>
-                                            <xforms:group model="local-model">
+                                            <xforms:output value="name()" xxbl:scope="outer"/>
+                                            <xforms:group>
                                                 <xforms:output id="output-2" value="name()"/>
                                             </xforms:group>
-                                            <xforms:output id="output-3" model="local-model" value="name(instance('local-instance'))"/>
+                                            <xforms:output id="output-3" value="name(instance('local-instance'))"/>
                                             <xforms:output id="output-4" value="name(xxforms:instance('local-instance'))"/>
                                             <xforms:output id="output-5" value="name(xxforms:instance('global-instance-1'))"/>
                                             <xforms:output id="output-6" value="name(xxforms:instance('global-instance-2'))"/>
@@ -1359,13 +1466,13 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foobar$output-1">global-instance-1</xxf:control>
+                        <xxf:control id="my-foobar$xf-3">global-instance-1</xxf:control>
                         <xxf:control id="my-foobar$output-2">local-instance</xxf:control>
                         <xxf:control id="my-foobar$output-3">local-instance</xxf:control>
                         <xxf:control id="my-foobar$output-4">local-instance</xxf:control>
                         <xxf:control id="my-foobar$output-5">global-instance-1</xxf:control>
                         <xxf:control id="my-foobar$output-6">global-instance-2</xxf:control>
-                        <xxf:control id="my-foobar2$output-1">global-instance-2</xxf:control>
+                        <xxf:control id="my-foobar2$xf-6">global-instance-2</xxf:control>
                         <xxf:control id="my-foobar2$output-2">local-instance</xxf:control>
                         <xxf:control id="my-foobar2$output-3">local-instance</xxf:control>
                         <xxf:control id="my-foobar2$output-4">local-instance</xxf:control>
@@ -1613,7 +1720,7 @@
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
                             <xhtml:head>
                                 <xforms:model id="model">
                                     <xforms:dispatch ev:event="xforms-ready" name="up-value1" targetid="level1-component">
@@ -1641,7 +1748,7 @@
                                 <xbl:xbl>
                                     <xbl:binding id="fr-level1-binding" element="fr|level1">
                                         <xbl:handlers>
-                                            <xbl:handler event="#all" phase="target">
+                                            <xbl:handler event="#all" phase="target" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
                                                 <xforms:insert context="xxforms:instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
@@ -1652,16 +1759,16 @@
                                                              xxforms:attribute('original-target', xxforms:event('xxforms:target')),
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
-                                            <xbl:handler event="up-value1" phase="target">
+                                            <xbl:handler event="up-value1" phase="target" xxbl:scope="outer">
                                                 <xforms:dispatch name="up-value2" targetid="level2-component">
                                                     <xxforms:context name="title-value2" select="event('title-value1')"/>
                                                 </xforms:dispatch>
                                             </xbl:handler>
                                         </xbl:handlers>
                                         <xbl:template>
-                                            <xforms:repeat id="level1-repeat" nodeset="level1">
+                                            <xforms:repeat id="level1-repeat" nodeset="level1" xxbl:scope="outer">
                                                 <fr:level2 id="level2-component">
-                                                    <xforms:dispatch ev:event="down-2" name="down-1" targetid="fr-level1-binding"/>
+                                                    <xforms:dispatch ev:event="down-2" name="down-1" targetid="fr-level1-binding" xxbl:scope="inner"/>
                                                 </fr:level2>
                                             </xforms:repeat>
                                         </xbl:template>
@@ -1670,7 +1777,7 @@
                                 <xbl:xbl>
                                     <xbl:binding id="fr-level2-binding" element="fr|level2">
                                         <xbl:handlers>
-                                            <xbl:handler event="#all" phase="target">
+                                            <xbl:handler event="#all" phase="target" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
                                                 <xforms:insert context="xxforms:instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
@@ -1681,16 +1788,16 @@
                                                              xxforms:attribute('original-target', xxforms:event('xxforms:target')),
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
-                                            <xbl:handler event="up-value2" phase="target">
+                                            <xbl:handler event="up-value2" phase="target" xxbl:scope="outer">
                                                 <xforms:dispatch name="up-value3" targetid="level3-component">
                                                     <xxforms:context name="title-value3" select="event('title-value2')"/>
                                                 </xforms:dispatch>
                                             </xbl:handler>
                                         </xbl:handlers>
                                         <xbl:template>
-                                            <xforms:repeat id="level2-repeat" nodeset="level2">
+                                            <xforms:repeat id="level2-repeat" nodeset="level2" xxbl:scope="outer">
                                                 <fr:level3 id="level3-component">
-                                                    <xforms:dispatch ev:event="down-3" name="down-2" targetid="fr-level2-binding"/>
+                                                    <xforms:dispatch ev:event="down-3" name="down-2" targetid="fr-level2-binding" xxbl:scope="inner"/>
                                                 </fr:level3>
                                             </xforms:repeat>
                                         </xbl:template>
@@ -1699,7 +1806,7 @@
                                 <xbl:xbl>
                                     <xbl:binding id="fr-level3-binding" element="fr|level3">
                                         <xbl:handlers>
-                                            <xbl:handler event="#all" phase="target">
+                                            <xbl:handler event="#all" phase="target" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
                                                 <xforms:insert context="xxforms:instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
@@ -1710,7 +1817,7 @@
                                                              xxforms:attribute('original-target', xxforms:event('xxforms:target')),
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
-                                            <xbl:handler event="up-value3" phase="target">
+                                            <xbl:handler event="up-value3" phase="target" xxbl:scope="outer">
                                                 <!-- Set title value -->
                                                 <xforms:setvalue ref="level3/title" value="event('title-value3')"/>
 
@@ -1719,9 +1826,9 @@
                                             </xbl:handler>
                                         </xbl:handlers>
                                         <xbl:template>
-                                            <xforms:repeat id="level3-repeat" nodeset="level3">
+                                            <xforms:repeat id="level3-repeat" nodeset="level3" xxbl:scope="outer">
                                                 <xforms:input id="title-control" ref="title">
-                                                    <xforms:dispatch ev:event="DOMFocusIn" name="down-3" targetid="fr-level3-binding"/>
+                                                    <xforms:dispatch ev:event="DOMFocusIn" name="down-3" targetid="fr-level3-binding" xxbl:scope="inner"/>
                                                 </xforms:input>
                                             </xforms:repeat>
                                         </xbl:template>
@@ -1997,7 +2104,7 @@
         </output>
     </test>
 
-    <test description="Separation of inner/outer scope" name="oxf:pipeline">
+    <test description="Separation of inner/outer scope for id resolution" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -2238,6 +2345,262 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Simple variable/sequence inner/outer scoping" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <foo>42</foo>
+                                <bar>43</bar>
+                            </instance>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <!-- Outer group -->
+                                <xforms:group xxbl:scope="outer" xbl:attr="model context ref bind">
+                                    <xforms:output ref="."/>
+                                    <!-- Inner group -->
+                                    <xforms:group id="component-inner-group" appearance="xxforms:internal" xxbl:scope="inner">
+
+                                        <!-- Variable pointing to external single-node binding -->
+                                        <xxforms:variable name="result" as="node()?">
+                                            <xxforms:sequence select="." xxbl:scope="outer"/>
+                                        </xxforms:variable>
+
+                                        <xforms:output id="my-inner-output" ref="$result"/>
+
+                                    </xforms:group>
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:foo id="my-foo-1" ref="foo"/>
+                    <fr:foo id="my-foo-2" ref="bar"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <foo>42</foo>
+                                    <bar>43</bar>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-foo-1$xf-4">42</xxf:control>
+                        <xxf:control id="my-foo-1$my-inner-output">42</xxf:control>
+                        <xxf:control id="my-foo-2$xf-9">43</xxf:control>
+                        <xxf:control id="my-foo-2$my-inner-output">43</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Copied items have access to outer scope" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model" xxforms:encrypt-item-values="false">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <foo>42</foo>
+                                <bar>43</bar>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:instance id="items">
+                            <items>
+                                <item label="Apple" value="apple"/>
+                                <item label="Orange" value="orange"/>
+                                <item label="Banana" value="banana"/>
+                                <item label="Kiwi" value="kiwi"/>
+                            </items>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <!-- Outer group -->
+                                <xforms:group xxbl:scope="outer" xbl:attr="model context ref bind">
+                                    <xforms:output ref="."/>
+                                    <!-- Inner group -->
+                                    <xforms:group id="component-inner-group" appearance="xxforms:internal" xxbl:scope="inner">
+
+                                        <!-- Variable pointing to external single-node binding -->
+                                        <xxforms:variable name="result" as="node()?">
+                                            <xxforms:sequence select="." xxbl:scope="outer"/>
+                                        </xxforms:variable>
+
+                                        <xforms:select1 id="my-inner-select1" ref="$result">
+                                            <xbl:content includes="fr|foo > xforms|itemset, fr|foo > xforms|choices, fr|foo > xforms:item"/>
+                                        </xforms:select1>
+
+                                    </xforms:group>
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <!-- Itemset -->
+                    <fr:foo id="my-foo-1" ref="foo">
+                        <xforms:itemset nodeset="instance('items')/item[position() mod 2 = 1]">
+                            <xforms:label ref="@label"/>
+                            <xforms:value ref="@value"/>
+                        </xforms:itemset>
+                    </fr:foo>
+                    <!-- Choices and item -->
+                    <fr:foo id="my-foo-2" ref="bar">
+                        <xforms:choices>
+                            <xforms:label ref="."/>
+                            <xforms:item>
+                                <xforms:label>Pear</xforms:label>
+                                <xforms:value>pear</xforms:value>
+                            </xforms:item>
+                        </xforms:choices>
+                        <xforms:choices>
+                            <xforms:label ref="../foo"/>
+                            <xforms:itemset nodeset="instance('items')/item[position() mod 2 = 0]">
+                                <xforms:label ref="@label"/>
+                                <xforms:value ref="@value"/>
+                            </xforms:itemset>
+                        </xforms:choices>
+                        <xforms:item>
+                            <xforms:label ref="instance('items')/item[1]/@label"/>
+                            <xforms:value ref="instance('items')/item[1]/@value"/>
+                        </xforms:item>
+                    </fr:foo>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <foo>42</foo>
+                                    <bar>43</bar>
+                                </instance>
+                            </instance>
+                            <instance id="items" model-id="model">
+                                <items>
+                                    <item label="Apple" value="apple"/>
+                                    <item label="Orange" value="orange"/>
+                                    <item label="Banana" value="banana"/>
+                                    <item label="Kiwi" value="kiwi"/>
+                                </items>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-foo-1$xf-4">42</xxf:control>
+                        <xxf:control id="my-foo-1$my-inner-select1">42</xxf:control>
+                        <xxf:control id="my-foo-2$xf-12">43</xxf:control>
+                        <xxf:control id="my-foo-2$my-inner-select1">43</xxf:control>
+                    </xxf:control-values>
+                    <xxf:itemsets>
+                        <xxf:itemset id="my-foo-1$my-inner-select1">[["Apple","apple"],["Banana","banana"]]</xxf:itemset>
+                        <xxf:itemset id="my-foo-2$my-inner-select1">[["43","",["Pear","pear"]],["42","",["Orange","orange"],["Kiwi","kiwi"]],["Apple","apple"]]</xxf:itemset>
+                    </xxf:itemsets>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Variable scoping doesn't affect following controls scoping" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <foo>42</foo>
+                                <bar>43</bar>
+                            </instance>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xforms:group xxbl:scope="outer" xbl:attr="model context ref bind">
+
+                                    <xforms:output value="."/>
+
+                                    <xxforms:variable name="result" as="node()?" xxbl:scope="inner">
+                                        <xxforms:sequence select="." xxbl:scope="outer"/>
+                                    </xxforms:variable>
+
+                                    <xforms:group>
+                                        <xxforms:variable name="result" as="node()?" select="."/>
+                                        <xforms:output value="."/>
+                                        <xforms:output value="$result"/>
+                                    </xforms:group>
+
+                                    <xforms:group id="my-inner-group" xxbl:scope="inner">
+                                        <xforms:output id="my-output-1" value="."/>
+                                        <xforms:output id="my-output-2" value="$result"/>
+                                    </xforms:group>
+
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:foo id="my-foo-1" ref="foo"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <foo>42</foo>
+                                    <bar>43</bar>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-foo-1$xf-4">42</xxf:control>
+                        <xxf:control id="my-foo-1$xf-9">42</xxf:control>
+                        <xxf:control id="my-foo-1$xf-10">42</xxf:control>
+                        <xxf:control id="my-foo-1$my-output-2">42</xxf:control>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>

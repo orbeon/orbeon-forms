@@ -100,20 +100,59 @@ public class XBLBindings {
             return scopeId.length() == 0 ? scopeId : scopeId + '$';
         }
 
+        /**
+         * Return the prefixed id of the given control static id within this scope.
+         *
+         * @param staticId  static id to resolve
+         * @return          prefixed id corresponding to the static id passed
+         */
+        public String getPrefixedIdForStaticId(String staticId) {
+            if (scopeToIdMap.size() == 0) {
+                // If there are no XBL controls the map is empty
+                return staticId;
+            } else {
+                // Otherwise use map
+                return scopeToIdMap.get(this).get(staticId);
+            }
+        }
+
         @Override
         public int hashCode() {
             return scopeId.hashCode();
         }
+
+        @Override
+        public String toString() {
+            return scopeId;
+        }
     }
 
-    public Scope getScope(String scopeId) {
+    public Scope getResolutionScopeById(String scopeId) {
         return scopeIds.get(scopeId);
     }
 
-    public Scope getScopeByPrefix(String prefix) {
+    public Scope getResolutionScopeByPrefix(String prefix) {
         assert prefix.length() == 0 || prefix.charAt(prefix.length() - 1) == XFormsConstants.COMPONENT_SEPARATOR;
         final String scopeId = (prefix.length() == 0) ? "" : prefix.substring(0, prefix.length() - 1);
-        return getScope(scopeId);
+        return getResolutionScopeById(scopeId);
+    }
+
+    /**
+     * Return the resolution scope id for the given prefixed id.
+     *
+     * @param prefixedId    prefixed id of XForms element
+     * @return              resolution scope
+     */
+    public Scope getResolutionScopeByPrefixedId(String prefixedId) {
+        if (scopeToIdMap.size() == 0) {
+            // If there are no XBL controls the map is empty
+            return TOP_LEVEL_SCOPE;
+        } else {
+            // Otherwise use map
+            final Scope result = prefixedIdToXBLScopeMap.get(prefixedId);
+            assert result != null : "cannot find scope in map for prefixed id: " + prefixedId;
+            return result;
+        }
     }
 
     /*
@@ -316,7 +355,7 @@ public class XBLBindings {
                     // Register models placed under xbl:implementation
                     if (xblImplementations != null) {
                         final List<Document> implementationModelDocuments = xblImplementations.get(controlElement.getQName());
-                        if (implementationModelDocuments.size() > 0) {
+                        if (implementationModelDocuments != null && implementationModelDocuments.size() > 0) {
                             // Say we DO annotate because these models are outside the template
                             addModelDocuments(controlPrefixedId, implementationModelDocuments, newPrefix, true);
                             if (indentedLogger.isDebugEnabled())
@@ -359,7 +398,7 @@ public class XBLBindings {
                                 // Register xbl:handler as an action handler
 
                                 // Annotate handler and gather scope information
-                                final Scope innerScope = getScope(controlPrefixedId);
+                                final Scope innerScope = getResolutionScopeById(controlPrefixedId);
                                 final Scope outerScope = prefixedIdToXBLScopeMap.get(controlPrefixedId);
                                 final Element currentHandlerAnnotatedElement
                                         = annotateHandler(currentHandlerElement, newPrefix, innerScope, outerScope, XFormsConstants.XXBLScope.inner).getRootElement();
@@ -463,6 +502,7 @@ public class XBLBindings {
                 final List<Node> resultingNodes;
                 if (isXBLContent) {
                     final String includesAttribute = element.attributeValue("includes");
+                    final String scopeAttribute = element.attributeValue(XFormsConstants.XXBL_SCOPE_QNAME);
                     final List<Node> contentToInsert;
                     if (includesAttribute == null) {
                         // All bound node content must be copied over
@@ -515,8 +555,13 @@ public class XBLBindings {
 
                     resultingNodes = contentToInsert;
 
-                    // Set xxbl:scope="outer" on resulting elements
-                    setAttribute(resultingNodes, XFormsConstants.XXBL_SCOPE_QNAME, "outer");
+                    if (!StringUtils.isBlank(scopeAttribute)) {
+                        // If author specified scope attribute, use it
+                        setAttribute(resultingNodes, XFormsConstants.XXBL_SCOPE_QNAME, scopeAttribute);
+                    } else {
+                        // By default, set xxbl:scope="outer" on resulting elements
+                        setAttribute(resultingNodes, XFormsConstants.XXBL_SCOPE_QNAME, "outer");
+                    }
                 } else {
                     // Element is simply kept
                     resultingNodes = Collections.singletonList((Node) element);
@@ -1047,41 +1092,6 @@ public class XBLBindings {
      */
     public List<Element> getXBLScripts() {
         return xblScripts;
-    }
-
-    /**
-     * REturn the resolution scope id for the given prefixed id.
-     *
-     * @param prefixedId    prefixed id of XForms element
-     * @return              resolution scope
-     */
-    public Scope getResolutionScope(String prefixedId) {
-        if (scopeToIdMap.size() == 0) {
-            // If there are no XBL controls the map is empty
-            return TOP_LEVEL_SCOPE;
-        } else {
-            // Otherwise use map
-            final Scope result = prefixedIdToXBLScopeMap.get(prefixedId);
-            assert result != null : "cannot find scope in map for prefixed id: " + prefixedId;
-            return result;
-        }
-    }
-
-    /**
-     * Return the prefixed id of the given control static id within the given resolution scope.
-     *
-     * @param scope     resolution scope
-     * @param staticId  static id to resolve
-     * @return          prefixed id corresponding to the static id passed
-     */
-    public String getPrefixedIdInScope(Scope scope, String staticId) {
-        if (scopeToIdMap.size() == 0) {
-            // If there are no XBL controls the map is empty
-            return staticId;
-        } else {
-            // Otherwise use map
-            return scopeToIdMap.get(scope).get(staticId);
-        }
     }
 
     public void freeTransientState() {

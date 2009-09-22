@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -33,7 +34,7 @@ import org.orbeon.saxon.value.SequenceExtent;
 public abstract class XFormsAction {
     public abstract void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext,
                                  String targetEffectiveId, XFormsEventObserver eventObserver, Element actionElement,
-                                 boolean hasOverriddenContext, Item overriddenContext);
+                                 XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext);
 
     /**
      * Add event context attributes based on nested xxforms:context elements.
@@ -64,8 +65,10 @@ public abstract class XFormsAction {
                     actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
                     select, actionInterpreter.getNamespaceMappings(actionElement),
                     contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                    contextStack.getFunctionContext(), null,
+                    contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId()), null,
                     (LocationData) actionElement.getData());
+
+            contextStack.returnFunctionContext();
 
             event.setAttribute(name, value);
         }

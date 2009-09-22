@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.itemset.Itemset;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -158,7 +159,7 @@ public class XFormsControls implements XFormsObjectResolver {
             }
         }
 
-        rootContainer.getContextStack().resetBindingContext(propertyContext);// not sure we actually need to do this
+//        rootContainer.getContextStack().resetBindingContext(propertyContext);// not sure we actually need to do this here
 
         initialized = true;
     }
@@ -425,16 +426,18 @@ public class XFormsControls implements XFormsObjectResolver {
             final String currentControlURI = currentControlElement.getNamespaceURI();
             final String currentControlName = currentControlElement.getName();
 
-            final String staticControlId = currentControlElement.attributeValue("id");
-            final String effectiveControlId
-                    = idPrefix + staticControlId + (idPostfix.equals("") ? "" : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + idPostfix);
+            final String controlStaticId = currentControlElement.attributeValue("id");
+            final String controlPrefixedId = idPrefix + controlStaticId;
+            final String controlEffectiveId = controlPrefixedId + (idPostfix.equals("") ? "" : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + idPostfix);
+
+            final XBLBindings.Scope newScope = staticState.getXBLBindings().getResolutionScopeByPrefixedId(controlPrefixedId);
 
             if (currentControlName.equals("repeat")) {
                 // Handle xforms:repeat
-                currentContextStack.pushBinding(propertyContext, currentControlElement, effectiveControlId);
+                currentContextStack.pushBinding(propertyContext, currentControlElement, controlEffectiveId, newScope);
 
                 // Visit xforms:repeat element
-                controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
+                controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, controlEffectiveId);
 
                 // Iterate over current xforms:repeat nodeset
                 final List currentNodeSet = currentContextStack.getCurrentNodeset();
@@ -447,7 +450,7 @@ public class XFormsControls implements XFormsObjectResolver {
                             // TODO: handle isOptimizeRelevance()
 
                             // Compute repeat iteration id
-                            final String iterationEffectiveId = XFormsUtils.getIterationEffectiveId(effectiveControlId, iterationIndex);
+                            final String iterationEffectiveId = XFormsUtils.getIterationEffectiveId(controlEffectiveId, iterationIndex);
 
                             final boolean recurse = controlElementVisitorListener.startRepeatIteration(currentContainer, iterationIndex, iterationEffectiveId);
                             if (recurse) {
@@ -463,12 +466,12 @@ public class XFormsControls implements XFormsObjectResolver {
                     }
                 }
 
-                controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
+                controlElementVisitorListener.endVisitControl(currentControlElement, controlEffectiveId);
                 currentContextStack.popBinding();
             } else if (XFormsControlFactory.isContainerControl(currentControlURI, currentControlName)) {
                 // Handle XForms grouping controls
-                currentContextStack.pushBinding(propertyContext, currentControlElement, effectiveControlId);
-                final XFormsControl newControl = controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
+                currentContextStack.pushBinding(propertyContext, currentControlElement, controlEffectiveId, newScope);
+                final XFormsControl newControl = controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, controlEffectiveId);
                 final XFormsContextStack.BindingContext currentBindingContext = currentContextStack.getCurrentBindingContext();
                 {
                     // Recurse into grouping control and components if we don't optimize relevance, OR if we do
@@ -495,13 +498,13 @@ public class XFormsControls implements XFormsObjectResolver {
                         }
                     }
                 }
-                controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
+                controlElementVisitorListener.endVisitControl(currentControlElement, controlEffectiveId);
                 currentContextStack.popBinding();
             } else if (XFormsControlFactory.isCoreControl(currentControlURI, currentControlName)) {
                 // Handle leaf control
-                currentContextStack.pushBinding(propertyContext, currentControlElement, effectiveControlId);
-                controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
-                controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
+                currentContextStack.pushBinding(propertyContext, currentControlElement, controlEffectiveId, newScope);
+                controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, controlEffectiveId);
+                controlElementVisitorListener.endVisitControl(currentControlElement, controlEffectiveId);
                 currentContextStack.popBinding();
             } else if (currentControlName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
                 // Handle xxforms:variable specifically
@@ -511,21 +514,21 @@ public class XFormsControls implements XFormsObjectResolver {
 
                 // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the following controls and variables.
                 // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
-                currentContextStack.pushVariable(currentControlElement, variable.getVariableName(), variable.getVariableValue(propertyContext, true));
+                currentContextStack.pushVariable(currentControlElement, variable.getVariableName(), variable.getVariableValue(propertyContext, controlEffectiveId, true), newScope);
 
                 variablesCount++;
             } else if (staticState.getXBLBindings().isComponent(currentControlElement.getQName())) {
                 // Handle components
 
                 // NOTE: don't push the binding here, this is handled if necessary by the component implementation
-                final XFormsComponentControl newControl = (XFormsComponentControl) controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, effectiveControlId);
+                final XFormsComponentControl newControl = (XFormsComponentControl) controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, controlEffectiveId);
 
                 // Recurse into the shadow component tree
-                final Element shadowTreeDocumentElement = staticState.getXBLBindings().getCompactShadowTree(idPrefix + staticControlId);
+                final Element shadowTreeDocumentElement = staticState.getXBLBindings().getCompactShadowTree(idPrefix + controlStaticId);
                 visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                         staticState, newControl.getNestedContainer(), shadowTreeDocumentElement, newControl.getNestedContainer().getFullPrefix(), idPostfix);
 
-                controlElementVisitorListener.endVisitControl(currentControlElement, effectiveControlId);
+                controlElementVisitorListener.endVisitControl(currentControlElement, controlEffectiveId);
 
             } else {
                 // Ignore, this is not a control

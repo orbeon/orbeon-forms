@@ -181,7 +181,7 @@ public class InstanceReplacer extends BaseReplacer {
 
                 // Handle new instance and associated event markings
                 final XFormsModel replaceModel = newInstance.getModel(containingDocument);
-                replaceModel.handleUpdatedInstance(propertyContext, newInstance, newDocumentRootElement);
+                replaceModel.handleUpdatedInstance(newInstance);
 
                 // Dispatch xforms-delete event
                 // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement
@@ -204,7 +204,7 @@ public class InstanceReplacer extends BaseReplacer {
 
                 // Insert before the target node, so that the position of the inserted node
                 // wrt its parent does not change after the target node is removed
-                final List insertedNode = XFormsInsertAction.doInsert(propertyContext, containingDocument, detailsLogger, "before",
+                XFormsInsertAction.doInsert(propertyContext, containingDocument, detailsLogger, "before",
                         destinationCollection, destinationNodeInfo.getParent(),
                         Collections.singletonList(newDocumentRootElement), 1, false, true);
 
@@ -222,7 +222,7 @@ public class InstanceReplacer extends BaseReplacer {
                 // * doDelete() does as well
                 // Does this mean that we should check that the node is still where it should be?
                 final XFormsModel updatedModel = updatedInstance.getModel(containingDocument);
-                updatedModel.handleUpdatedInstance(propertyContext, updatedInstance, (NodeInfo) insertedNode.get(0));
+                updatedModel.handleUpdatedInstance(updatedInstance);
             }
 
             // Dispatch xforms-submit-done

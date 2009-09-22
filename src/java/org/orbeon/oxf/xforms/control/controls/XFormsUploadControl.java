@@ -417,7 +417,7 @@ class FileInfo implements Cloneable {
 
     private String getInfoValue(PropertyContext propertyContext, Element element) {
         contextStack.setBinding(control);
-        contextStack.pushBinding(propertyContext, element);
+        contextStack.pushBinding(propertyContext, element, control.getEffectiveId(), control.getChildElementScope(element));
         final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
         if (currentSingleNode == null) {
             return null;
@@ -452,7 +452,7 @@ class FileInfo implements Cloneable {
             return;
 
         contextStack.setBinding(control);
-        contextStack.pushBinding(propertyContext, element);
+        contextStack.pushBinding(propertyContext, element, control.getEffectiveId(), control.getChildElementScope(element));
         final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
         if (currentSingleNode != null) {
             XFormsSetvalueAction.doSetValue(propertyContext, control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(), control, currentSingleNode, value, null, false);

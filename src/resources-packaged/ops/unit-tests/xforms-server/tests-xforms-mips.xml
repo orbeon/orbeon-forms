@@ -587,7 +587,7 @@
                                     <xforms:instance id="form-instance">
                                         <first-name xmlns=""/>
                                     </xforms:instance>
-                                    <!-- Value is always invaoid -->
+                                    <!-- Value is always invalid -->
                                     <xforms:bind nodeset="." constraint="false()"/>
                                 </xforms:model>
 

@@ -44,8 +44,9 @@ public class Instance extends XFormsFunction {
         // current context node, this function returns a node-set containing just the root element node (also called the
         // document element node) of the referenced instance data. In all other cases, an empty node-set is returned."
 
-        final XFormsModel model = (getContainingModel(xpathContext) != null) ? getContainingModel(xpathContext) : getContextStack(xpathContext).getCurrentModel();
-        final XFormsInstance instance = model.getInstance(instanceId);
+        // NOTE: Model can be null when there is no model in scope at all
+        final XFormsModel model = getModel(xpathContext);
+        final XFormsInstance instance = (model != null) ? model.getInstance(instanceId) : null;
 
         // Return instance document if found
         if (instance != null) {

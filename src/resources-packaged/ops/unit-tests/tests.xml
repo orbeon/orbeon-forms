@@ -30,6 +30,7 @@
     <xi:include href="xforms-server/tests-xforms-mips.xml"/>
     <xi:include href="xforms-server/tests-xforms-submission.xml"/>
     <xi:include href="xforms-server/tests-xforms-xbl.xml"/>
+    <xi:include href="xforms-server/tests-xforms-components.xml"/>
     <xi:include href="xforms-server/tests-xforms-itemset.xml"/>
     <xi:include href="xforms-server/tests-xforms-layout.xml"/>
     <xi:include href="xforms-server/tests-xforms-repeat.xml"/>

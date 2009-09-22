@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
@@ -145,6 +146,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public void iterationRemoved(PropertyContext propertyContext) {
         // NOP, can be overridden
+    }
+
+    public XBLBindings.Scope getResolutionScope() {
+        return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getPrefixedId());
     }
 
     public String getId() {
@@ -321,8 +326,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         } else if (lhhaElement.getParent() == getControlElement()) {
             // LHHA is direct child of control, evaluate within context
             contextStack.setBinding(this);
-            contextStack.pushBinding(propertyContext, lhhaElement);
-            value = XFormsUtils.getElementValue(propertyContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
+            contextStack.pushBinding(propertyContext, lhhaElement, getEffectiveId(), getResolutionScope());
+            value = XFormsUtils.getElementValue(propertyContext, container, contextStack, getEffectiveId(), lhhaElement, acceptHTML, containsHTML);
             contextStack.popBinding();
         } else {
             // LHHA is somewhere else, assumed as a child of xforms:* or xxforms:*
@@ -350,7 +355,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
             // Push binding relative to context established above and evaluate
             contextStack.pushBinding(propertyContext, lhhaElement);
-            value = XFormsUtils.getElementValue(propertyContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
+            value = XFormsUtils.getElementValue(propertyContext, container, contextStack, getEffectiveId(), lhhaElement, acceptHTML, containsHTML);
             contextStack.popBinding();
         }
         return value;
@@ -522,6 +527,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      */
     public XFormsContextStack.BindingContext getBindingContext() {
         return bindingContext;
+    }
+
+    public XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+        return getBindingContext();
     }
 
     public final void evaluateIfNeeded(PropertyContext propertyContext, boolean isRefresh) {
@@ -880,7 +889,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                         bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData());
 
                 // Restore function context to prevent leaks caused by context pointing to removed controls
-                restoreFunctionContext(functionContext);
+                returnFunctionContext();
 
                 return result;
             }
@@ -916,7 +925,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                                 getFunctionContext(), null, getLocationData());
 
             // Restore function context to prevent leaks caused by context pointing to removed controls
-            restoreFunctionContext(functionContext);
+            returnFunctionContext();
 
             return result;
         }
@@ -954,7 +963,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                                 getFunctionContext(), null, getLocationData());
 
             // Restore function context to prevent leaks caused by context pointing to removed controls
-            restoreFunctionContext(functionContext);
+            returnFunctionContext();
 
             return result;
         }
@@ -966,13 +975,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @return XPath function context
      */
     private XFormsFunction.Context getFunctionContext() {
-        final XFormsFunction.Context context = getContextStack().getFunctionContext();
-        context.setSourceEffectiveId(getEffectiveId());
-        return context;
+        return getContextStack().getFunctionContext(getEffectiveId());
     }
 
-    private void restoreFunctionContext(XFormsFunction.Context functionContext) {
-        functionContext.setSourceEffectiveId(null);
+    private void returnFunctionContext() {
+        getContextStack().returnFunctionContext();
     }
 
     /**

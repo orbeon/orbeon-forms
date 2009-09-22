@@ -695,16 +695,16 @@ public class XFormsModelBinds {
                                             String xpathExpression, Map<String, ValueRepresentation> currentVariables) {
 
         // Setup function context
-        final XFormsFunction.Context functionContext = model.getContextStack().getFunctionContext();
-        functionContext.setSourceEffectiveId(model.getEffectiveId()); // TODO: when binds are able to receive events, source should be bind id
+         // TODO: when binds are able to receive events, source should be bind id
+        final XFormsFunction.Context functionContext = model.getContextStack().getFunctionContext(model.getEffectiveId());
 
         final String result = XPathCache.evaluateAsString(propertyContext, nodeset, position, xpathExpression,
                         container.getNamespaceMappings(bind.getBindElement()), currentVariables,
-                        XFormsContainingDocument.getFunctionLibrary(), model.getContextStack().getFunctionContext(),
+                        XFormsContainingDocument.getFunctionLibrary(), functionContext,
                         bind.getLocationData().getSystemID(), bind.getLocationData());
 
         // Restore function context
-        functionContext.setSourceEffectiveId(null);
+        model.getContextStack().returnFunctionContext();
 
         return result;
     }
@@ -713,8 +713,8 @@ public class XFormsModelBinds {
                                                String xpathExpression, Map<String, ValueRepresentation> currentVariables) {
 
         // Setup function context
-        final XFormsFunction.Context functionContext = model.getContextStack().getFunctionContext();
-        functionContext.setSourceEffectiveId(model.getEffectiveId()); // TODO: when binds are able to receive events, source should be bind id
+        // TODO: when binds are able to receive events, source should be bind id
+        final XFormsFunction.Context functionContext = model.getContextStack().getFunctionContext(model.getEffectiveId());
 
         final String xpath = "boolean(" + xpathExpression + ")";
         final boolean result = (Boolean) XPathCache.evaluateSingle(propertyContext,
@@ -722,7 +722,7 @@ public class XFormsModelBinds {
                 XFormsContainingDocument.getFunctionLibrary(), functionContext, bind.getLocationData().getSystemID(), bind.getLocationData());
 
         // Restore function context
-        functionContext.setSourceEffectiveId(null);
+        model.getContextStack().returnFunctionContext();
 
         return result;
     }
@@ -1006,7 +1006,7 @@ public class XFormsModelBinds {
             }
 
             // Compute nodeset for this bind
-            model.getContextStack().pushBinding(propertyContext, bindElement);
+            model.getContextStack().pushBinding(propertyContext, bindElement, model.getEffectiveId(), model.getResolutionScope());
             {
                 // NOTE: This should probably go into XFormsContextStack
                 if (model.getContextStack().getCurrentBindingContext().isNewBind()) {

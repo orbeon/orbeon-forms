@@ -19,7 +19,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.StringUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -119,7 +118,8 @@ public abstract class BaseSubmission implements Submission {
      * @param headerNameValues      LinkedHashMap<String headerName, String[] headerValues> to update
      * @param currentHeaderElement  <xforms:header> element to evaluate
      */
-    private void handleHeaderElement(PropertyContext propertyContext, XFormsContextStack contextStack, Map<String, String[]> headerNameValues, Element currentHeaderElement) {
+    private void handleHeaderElement(PropertyContext propertyContext, XFormsContextStack contextStack, Map<String, String[]> headerNameValues,
+                                     Element currentHeaderElement) {
         final String headerName;
         {
             final Element headerNameElement = currentHeaderElement.element("name");
@@ -127,7 +127,7 @@ public abstract class BaseSubmission implements Submission {
                 throw new XFormsSubmissionException(submission, "Missing <name> child element of <header> element", "processing <header> elements");
 
             contextStack.pushBinding(propertyContext, headerNameElement);
-            headerName = XFormsUtils.getElementValue(propertyContext, containingDocument, contextStack, headerNameElement, false, null);
+            headerName = XFormsUtils.getElementValue(propertyContext, containingDocument, contextStack, submission.getEffectiveId(), headerNameElement, false, null);
             contextStack.popBinding();
         }
 
@@ -137,7 +137,7 @@ public abstract class BaseSubmission implements Submission {
             if (headerValueElement == null)
                 throw new XFormsSubmissionException(submission, "Missing <value> child element of <header> element", "processing <header> elements");
             contextStack.pushBinding(propertyContext, headerValueElement);
-            headerValue = XFormsUtils.getElementValue(propertyContext, containingDocument, contextStack, headerValueElement, false, null);
+            headerValue = XFormsUtils.getElementValue(propertyContext, containingDocument, contextStack, submission.getEffectiveId(), headerValueElement, false, null);
             contextStack.popBinding();
         }
 
@@ -147,8 +147,10 @@ public abstract class BaseSubmission implements Submission {
         	final String avtCombine = currentHeaderElement.attributeValue("combine", "append");
         	combine = XFormsUtils.resolveAttributeValueTemplates(propertyContext, contextStack.getCurrentBindingContext().getNodeset(),
         			contextStack.getCurrentBindingContext().getPosition(), contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-        			contextStack.getFunctionContext(), containingDocument.getNamespaceMappings(currentHeaderElement), 
+        			contextStack.getFunctionContext(submission.getEffectiveId()), containingDocument.getNamespaceMappings(currentHeaderElement),
         			(LocationData)currentHeaderElement.getData(), avtCombine);
+
+            contextStack.returnFunctionContext();
         	
         	if (!("append".equals(combine) || "prepend".equals(combine) || "replace".equals(combine))) {
         		throw new XFormsSubmissionException(submission, "Invalid value '" + combine + "' for attribute combine.", "processing <header> elements");
@@ -156,7 +158,7 @@ public abstract class BaseSubmission implements Submission {
         }
         
         // add value to string Array Map respecting the optional combine attribute
-        final String[] currentValue = (String[]) headerNameValues.get(headerName);
+        final String[] currentValue = headerNameValues.get(headerName);
         if (currentValue == null || "replace".equals(combine)) {
         	headerNameValues.put(headerName, new String[] { headerValue });
         } else {

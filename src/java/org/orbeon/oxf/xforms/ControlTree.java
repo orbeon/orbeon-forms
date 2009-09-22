@@ -607,8 +607,8 @@ public class ControlTree implements Cloneable {
 
         // 2: Obtain target prefixed id
         final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceControlEffectiveId);
-        final XBLBindings.Scope scope = bindings.getResolutionScope(sourcePrefixedId);
-        final String targetPrefixedId = bindings.getPrefixedIdInScope(scope, targetControlStaticId);
+        final XBLBindings.Scope scope = bindings.getResolutionScopeByPrefixedId(sourcePrefixedId);
+        final String targetPrefixedId = scope.getPrefixedIdForStaticId(targetControlStaticId);
 
         // 3: Implement XForms 1.1 "4.7.1 References to Elements within a repeat Element" algorithm
 

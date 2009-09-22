@@ -25,6 +25,7 @@
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:xbl="http://www.w3.org/ns/xbl"
 
+      xxforms:external-events="show-fb-editor-create-dialog"
       id="fr-form-model">
 
     <xforms:action ev:event="xforms-model-construct-done">
@@ -93,15 +94,17 @@
     <xforms:action ev:event="xforms-ready">
         <!-- Show editor case if mode is not new -->
         <xxforms:variable name="is-new" select="xxforms:instance('fr-parameters-instance')/mode = 'new'" as="xs:boolean"/>
+        <xforms:action if="$is-new">
+            <xxforms:script>ORBEON.xforms.Document.dispatchEvent("fr-form-model", "show-fb-editor-create-dialog");</xxforms:script>
+            <xforms:message level="xxforms:log-info">Showing dialog</xforms:message>
+        </xforms:action>
         <xforms:action if="not($is-new)">
             <xforms:toggle case="fb-editor-open-case"/>
             <xforms:toggle case="fb-metadata-view-case"/>
         </xforms:action>
-        <!-- Set focus -->
-        <xforms:action if="$is-new">
-            <xforms:setfocus control="fb-application-name-input"/>
-        </xforms:action>
     </xforms:action>
+
+    <xxforms:show ev:event="show-fb-editor-create-dialog" dialog="fb-editor-metadata-dialog"/>
 
     <!-- Variable pointing to the current language -->
     <xxforms:variable name="fb-lang" select="instance('fb-language-instance')"/>

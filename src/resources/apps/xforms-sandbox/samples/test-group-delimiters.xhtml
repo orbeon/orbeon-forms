@@ -26,9 +26,10 @@
             <xforms:instance id="instance">
                 <instance>
                     <count>0</count>
-                    <enabled level="1">true</enabled>
+                    <enabled level="1">false</enabled>
                     <enabled level="2">false</enabled>
-                    <enabled level="3">true</enabled>
+                    <enabled level="3" position="1">false</enabled>
+                    <enabled level="3" position="2">false</enabled>
                 </instance>
             </xforms:instance>
         </xforms:model>
@@ -42,18 +43,23 @@
         <xforms:repeat nodeset="enabled">
             <xhtml:div>
                 <fr:button>
-                    <xforms:label>Toggle level <xforms:output value="@level"/></xforms:label>
+                    <xforms:label>Toggle level <xforms:output value="@level"/><xforms:output value="if (@position) then concat(' position ', @position) else ''"/></xforms:label>
                     <xforms:setvalue ev:event="DOMActivate" ref="." value="if (. = 'true') then 'false' else 'true'"/>
                 </fr:button>
-                Level <xforms:output value="@level"/> is <xforms:output value="if (. = 'true') then 'shown' else 'hidden'"/>
+                <xforms:output value="if (. = 'true') then 'Shown' else 'Hidden'"/>
                 <xforms:input id="level-enabled" ref="."/>
             </xhtml:div>
         </xforms:repeat>
         <xhtml:table>
             <xforms:group ref=".[enabled[@level = '1'] = 'true']" id="level-1">
                 <xforms:group ref=".[enabled[@level = '2'] = 'true']" id="level-2">
-                    <xforms:group ref=".[enabled[@level = '3'] = 'true']" id="level-3">
-                        <xhtml:tr id="tr">
+                    <xforms:group ref=".[enabled[@level = '3' and @position = '1'] = 'true']" id="level-3-1">
+                        <xhtml:tr id="tr-1">
+                            <xhtml:td>Shown</xhtml:td>
+                        </xhtml:tr>
+                    </xforms:group>
+                    <xforms:group ref=".[enabled[@level = '3' and @position = '2'] = 'true']" id="level-3-2">
+                        <xhtml:tr id="tr-2">
                             <xhtml:td>Shown</xhtml:td>
                         </xhtml:tr>
                     </xforms:group>

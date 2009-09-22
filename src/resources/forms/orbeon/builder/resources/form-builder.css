@@ -95,6 +95,8 @@ h1.fr-form-title {
 
 #fb-toolbox .fb-metadata-settings select { width: 100% }
 
+#fb-toolbox .xbl-fr-button { display: block; } /* Otherwise inline-block buttons don't take the full width of the toolbox */
+
 .fb-toolbox-inside .fb-toolbox-controls-section { text-align: center }
 .fb-toolbox-inside dt { text-align: center }
 
@@ -102,6 +104,14 @@ h1.fr-form-title {
 
 /* ***** Dialogs **************************************************************************************************** */
 
+/* Metadata editor dialog */
+#fb-editor-metadata-dialog { width: 30em; }
+#fb-editor-metadata-dialog img { float: left; margin: 1em 2em 0 1em; }
+#fb-editor-metadata-dialog .xforms-label { display: block; }
+#fb-editor-metadata-dialog .xforms-hint { width: 25em; margin-bottom: 1em; }
+#fb-editor-metadata-dialog .xforms-alert { width: 25em; }
+#fb-editor-metadata-dialog .fb-editor-metadata-dialog-fields { display: inline-block; }
+#fb-editor-metadata-dialog .fb-editor-metadata-dialog-buttons { margin-top: 1em; }
 /* Itemset editor dialog */
 #fb-itemset-editor-dialog { width: 35em }
 #fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input { width: 13em }
@@ -333,7 +343,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fb-grid-column-toolbar-td {
     text-align: center;
     padding-bottom: 2px;    /* padding so that the icon doesn't touch the table border */
-    height: 22px            /* tall enough so that FF doesn't do funny things when the icons are shown upon hover*/
+    height: 22px;           /* tall enough so that FF doesn't do funny things when the icons are shown upon hover */
 }
 .fb-grid-column-toolbar-td .fb-insert-left { float: left }
 .fb-grid-column-toolbar-td .fb-insert-right { float: right }
@@ -513,21 +523,6 @@ html.accordion-menu-js dd.a-m-d-anim {
 
 .fb-top .fr-messages .fr-message-success {
     background-color: green;
-}
-
-/* ***** Welcome page *********************************************************************************************** */
-#doc {
-    margin: 1em auto auto auto;
-}
-
-#doc .fb-welcome-body {
-    background-color: white;
-    padding: 0.5em 1em 1em;
-}
-
-#doc .fb-welcome-buttons {
-    background-color: white;
-    padding: 1em;
 }
 
 /* ***** YUI Layout ************************************************************************************************* */

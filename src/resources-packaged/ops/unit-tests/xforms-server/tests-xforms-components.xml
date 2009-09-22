@@ -69,7 +69,7 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="my-inplace-input$xf-5" case-id="fr-inplace-view"/>
+                            <control effective-id="my-inplace-input$xf-4" case-id="fr-inplace-view"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>

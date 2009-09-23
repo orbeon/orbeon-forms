@@ -20,8 +20,6 @@
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events">
 
-    <!-- TODO: this should be part of FB not FR -> move there at some point -->
-
     <!-- Extract page detail (app, form, document, and mode) from URL -->
     <p:processor name="oxf:request">
         <p:input name="config">

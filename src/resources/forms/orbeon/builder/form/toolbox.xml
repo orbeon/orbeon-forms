@@ -344,8 +344,7 @@
                                             <xforms:setvalue ref="instance('fb-metadata-instance')/allow-cancel">true</xforms:setvalue>
 
                                             <!-- Show and focus -->
-                                            <xforms:toggle case="fb-editor-closed-case"/>
-                                            <xforms:setfocus control="fb-application-name-input"/>
+                                            <xxforms:show dialog="fb-editor-metadata-dialog"/>
                                         </xforms:action>
                                     </xforms:trigger>
                                 </xhtml:div>

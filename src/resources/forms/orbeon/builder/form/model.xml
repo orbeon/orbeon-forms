@@ -25,7 +25,29 @@
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:xbl="http://www.w3.org/ns/xbl"
 
+      xxforms:external-events="show-fb-editor-create-dialog"
       id="fr-form-model">
+
+    <!-- Variable pointing to the current language -->
+    <xxforms:variable name="fb-lang" select="instance('fb-language-instance')"/>
+    <xxforms:variable name="form-resources" select="xxforms:instance('fr-current-form-resources')"/>
+
+    <!-- Other variables -->
+    <xxforms:variable name="model" select="xhtml:head/xforms:model[@id = 'fr-form-model']"/>
+    <xxforms:variable name="form-instance" select="$model/xforms:instance[@id = 'fr-form-instance']/*"/>
+    <xxforms:variable name="metadata-instance" select="$model/xforms:instance[@id = 'fr-form-metadata']/*"/>
+    <xxforms:variable name="resources" select="$model/xforms:instance[@id = 'fr-form-resources']/*"/>
+    <xxforms:variable name="current-resources" select="$resources/resource[@xml:lang = $fb-lang]"/>
+    <xxforms:variable name="body" select="xhtml:body/fr:view/fr:body"/>
+
+    <xxforms:variable name="component-bindings" select="instance('fb-components-instance')//xbl:binding" as="element(xbl:binding)*"/>
+    <xxforms:variable name="components-qnames" select="for $t in $component-bindings//fb:template/*[1] return resolve-QName(name($t), $t)" as="xs:QName*"/>
+
+    <xxforms:variable name="current-top-level-block" select="$body/fr:*[index('fb-top-level-repeat')]"/>
+    <xxforms:variable name="current-td" select="xxforms:binding('fb-section-content-grid-td-repeat')[index('fb-section-content-grid-td-repeat')]" as="element()?"/>
+
+    <!-- Main instance -->
+    <xforms:instance id="fr-form-instance" src="oxf:/forms/orbeon/builder/form/template.xml"/>
 
     <xforms:action ev:event="xforms-model-construct-done">
 
@@ -76,8 +98,23 @@
             <xforms:setvalue ref="instance('fb-user-agent-instance')/is-supported-ie" value="$ie-version = (7, 8)"/>
         </xforms:action>
 
-        <!-- Set current language based on first resources available in loaded form -->
-        <xforms:setvalue ref="$fb-lang" value="$resources/resource[1]/@xml:lang"/>
+        <!--  I18n -->
+
+        <!-- Set current language: for new forms, use current FR language;
+             for existing form, use language based on first resources available in loaded form -->
+        <xforms:setvalue ref="$fb-lang" value="if (xxforms:instance('fr-parameters-instance')/mode = 'new') 
+                then xxforms:instance('fr-language-instance')
+                else $resources/resource[1]/@xml:lang"/>
+        <!-- For new forms -->
+        <xforms:action if="xxforms:instance('fr-parameters-instance')/mode = 'new'">
+            <!-- Set language in all @xml:lang  -->
+            <xforms:action xxforms:iterate="instance('fr-form-instance')//@xml:lang">
+                <xforms:setvalue ref="." value="$fb-lang"/>
+            </xforms:action>
+            <!-- Set initial form and first section titles -->
+            <xforms:setvalue ref="$metadata-instance/title" value="$form-resources/template/untitled-form"/>
+            <xforms:setvalue ref="$resources/resource/section-1/label" value="$form-resources/template/untitled-section"/>
+        </xforms:action>
 
         <!-- Tasks when mode is not new -->
         <xforms:action if="not(xxforms:instance('fr-parameters-instance')/mode = 'new')">
@@ -93,35 +130,17 @@
     <xforms:action ev:event="xforms-ready">
         <!-- Show editor case if mode is not new -->
         <xxforms:variable name="is-new" select="xxforms:instance('fr-parameters-instance')/mode = 'new'" as="xs:boolean"/>
+        <xforms:action if="$is-new">
+            <!-- HACK: workaround for lack of support for xxforms:show in xforms-ready -->
+            <xxforms:script>ORBEON.xforms.Document.dispatchEvent("fr-form-model", "show-fb-editor-create-dialog");</xxforms:script>
+            <xforms:message level="xxforms:log-info">Showing dialog</xforms:message>
+        </xforms:action>
         <xforms:action if="not($is-new)">
             <xforms:toggle case="fb-editor-open-case"/>
             <xforms:toggle case="fb-metadata-view-case"/>
         </xforms:action>
-        <!-- Set focus -->
-        <xforms:action if="$is-new">
-            <xforms:setfocus control="fb-application-name-input"/>
-        </xforms:action>
     </xforms:action>
-
-    <!-- Variable pointing to the current language -->
-    <xxforms:variable name="fb-lang" select="instance('fb-language-instance')"/>
-
-    <!-- Other variables -->
-    <xxforms:variable name="model" select="xhtml:head/xforms:model[@id = 'fr-form-model']"/>
-    <xxforms:variable name="form-instance" select="$model/xforms:instance[@id = 'fr-form-instance']/*"/>
-    <xxforms:variable name="metadata-instance" select="$model/xforms:instance[@id = 'fr-form-metadata']/*"/>
-    <xxforms:variable name="resources" select="$model/xforms:instance[@id = 'fr-form-resources']/*"/>
-    <xxforms:variable name="current-resources" select="$resources/resource[@xml:lang = $fb-lang]"/>
-    <xxforms:variable name="body" select="xhtml:body/fr:view/fr:body"/>
-
-    <xxforms:variable name="component-bindings" select="instance('fb-components-instance')//xbl:binding" as="element(xbl:binding)*"/>
-    <xxforms:variable name="components-qnames" select="for $t in $component-bindings//fb:template/*[1] return resolve-QName(name($t), $t)" as="xs:QName*"/>
-
-    <xxforms:variable name="current-top-level-block" select="$body/fr:*[index('fb-top-level-repeat')]"/>
-    <xxforms:variable name="current-td" select="xxforms:binding('fb-section-content-grid-td-repeat')[index('fb-section-content-grid-td-repeat')]" as="element()?"/>
-
-    <!-- Main instance -->
-    <xforms:instance id="fr-form-instance" src="oxf:/forms/orbeon/builder/form/template.xml"/>
+    <xxforms:show ev:event="show-fb-editor-create-dialog" dialog="fb-editor-metadata-dialog"/>
 
     <!-- Binds on main instance -->
     <xforms:bind nodeset=".">

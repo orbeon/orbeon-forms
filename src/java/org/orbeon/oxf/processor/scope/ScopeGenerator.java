@@ -119,7 +119,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                                 } else {
                                     mapping = readMapping(pipelineContext);
                                 }
-
+                                
                                 state.saxStore = getSAXStore(value, mapping, config);
                             }
                         } else {
@@ -148,10 +148,8 @@ public class ScopeGenerator extends ScopeProcessorBase {
     }
 
     public static SAXStore getSAXStore(Object value, Mapping mapping, ContextConfig config) throws SAXException, TransformerException, IOException, MappingException {
-        final SAXStore result;
-        
-        if (config.getContentType() == ScopeProcessorBase.TEXT_PLAIN) {
-        	result = new SAXStore();
+    	if (config.getContentType() == ScopeProcessorBase.TEXT_PLAIN) {
+        	final SAXStore result = new SAXStore();
         	if (value instanceof String) {
         		//Creating a stream from the String! Better to extend the ProcessorUtils class to support String or StringReader or something...
         		ProcessorUtils.readText(new ByteArrayInputStream(((String)value).getBytes()), null, result, config.getContentType(), ISODateUtils.getCurrentTimeMillis());
@@ -159,35 +157,42 @@ public class ScopeGenerator extends ScopeProcessorBase {
         		logger.error("Content-type: "+ScopeProcessorBase.TEXT_PLAIN+" not applicable for key: "+config.getKey());
         		XMLUtils.streamNullDocument(result);
         	}
+        	return result;
         } else {
-        	if (value instanceof ScopeStore) {
-	            final ScopeStore contextStore = (ScopeStore) value;
-	            result = contextStore.getSaxStore();
-	        } else {
-	            if (value instanceof SAXStore) {
-	                result = (SAXStore) value;
-	            } else {
-	                // Write "foreign" object to new SAX store
-	                result = new SAXStore();
-	                if (value instanceof Document) {
-	                    // dom4j document
-	                    final LocationSAXWriter saxWriter = new LocationSAXWriter();
-	                    saxWriter.setContentHandler(result);
-	                    saxWriter.write((Document) value);
-	                } else if (value instanceof org.w3c.dom.Document) {
-	                    // W3C DOM document
-	                    final Transformer identity = TransformerUtils.getIdentityTransformer();
-	                    identity.transform(new DOMSource((org.w3c.dom.Document) value), new SAXResult(result));
-	                } else if (value instanceof String) {
-	                    // Consider the String containing a document to parse
-	                    XMLUtils.stringToSAX((String) value, "", result, false, false);
-	                } else {
-	                    // Consider the object a JavaBean
-	                    readBean(value, mapping, result);
-	                }
-	            }
-	        }
+        	return getSAXStore(value, mapping);
         }
+    }
+    
+    public static SAXStore getSAXStore(Object value, Mapping mapping) throws SAXException, TransformerException, IOException, MappingException {
+        final SAXStore result;
+    	if (value instanceof ScopeStore) {
+            final ScopeStore contextStore = (ScopeStore) value;
+            result = contextStore.getSaxStore();
+        } else {
+            if (value instanceof SAXStore) {
+                result = (SAXStore) value;
+            } else {
+                // Write "foreign" object to new SAX store
+                result = new SAXStore();
+                if (value instanceof Document) {
+                    // dom4j document
+                    final LocationSAXWriter saxWriter = new LocationSAXWriter();
+                    saxWriter.setContentHandler(result);
+                    saxWriter.write((Document) value);
+                } else if (value instanceof org.w3c.dom.Document) {
+                    // W3C DOM document
+                    final Transformer identity = TransformerUtils.getIdentityTransformer();
+                    identity.transform(new DOMSource((org.w3c.dom.Document) value), new SAXResult(result));
+                } else if (value instanceof String) {
+                    // Consider the String containing a document to parse
+                    XMLUtils.stringToSAX((String) value, "", result, false, false);
+                } else {
+                    // Consider the object a JavaBean
+                    readBean(value, mapping, result);
+                }
+            }
+        }
+        
         return result;
     }
 

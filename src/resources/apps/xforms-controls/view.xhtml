@@ -48,8 +48,10 @@
                     <preference>false</preference>
                     <name/>
                     <secret>42</secret>
+                    <amount/>
                     <textarea>The world is but a canvas for the imagination.</textarea>
                     <label>Hello, World!</label>
+                    <us-phone/>
                     <date/>
                     <time/>
                     <date-time/>
@@ -118,6 +120,8 @@
                 <xforms:bind nodeset="secret" constraint=". = '42'"/>
                 <!-- Text must be longer than 10 characters -->
                 <xforms:bind nodeset="textarea" constraint="string-length(.) > 10"/>
+                <!-- Phone type is just a string of digits -->
+                <xforms:bind nodeset="us-phone" type="xforms:nonNegativeInteger"/>
                 <!-- Value must be a date and at most 2 days in the future. It is initialized to 2 days in the future. -->
                 <xforms:bind nodeset="date"
                              type="xs:date" constraint=". le (current-date() + xdt:dayTimeDuration('P2D'))"
@@ -152,7 +156,7 @@
             <fr:tab id="text-controls" selected="true">
                 <xforms:label>Text Controls</xforms:label>
                 <xhtml:p>
-                    <xforms:input id="age" ref="age" incremental="true" class="input" xxforms:maxlength="3" navindex="1">
+                    <xforms:input id="age" ref="age" incremental="true" class="input" xxforms:maxlength="3">
                         <xforms:label class="fixed-width">Age:</xforms:label>
                         <xforms:hint>Positive number</xforms:hint>
                         <xforms:alert>Invalid age</xforms:alert>
@@ -166,7 +170,7 @@
                     </xforms:input>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:secret ref="secret" incremental="true" class="password" navindex="2" id="secret">
+                    <xforms:secret ref="secret" incremental="true" class="password" id="secret">
                         <xforms:label class="fixed-width">Password:</xforms:label>
                         <xforms:hint>The password is 42 ;)</xforms:hint>
                         <xforms:alert>Invalid password</xforms:alert>
@@ -174,7 +178,15 @@
                     </xforms:secret>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:textarea ref="textarea" class="textarea" navindex="3" id="textarea">
+                    <fr:currency ref="amount" id="currency">
+                        <xforms:label class="fixed-width">Amount:</xforms:label>
+                        <xforms:hint>Please enter an amount</xforms:hint>
+                        <xforms:alert>Invalid amount</xforms:alert>
+                        <xforms:help>This control allows you to enter a currency amount</xforms:help>
+                    </fr:currency>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:textarea ref="textarea" class="textarea" id="textarea">
                         <xforms:label class="fixed-width">Wisdom:</xforms:label>
                         <xforms:hint>Enter at least 11 characters</xforms:hint>
                         <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
@@ -182,7 +194,7 @@
                     </xforms:textarea>
                 </xhtml:p>
                 <xhtml:p>
-                    <fr:inplace-input id="inplace-input" class="inplace-input" ref="name" navindex="4">
+                    <fr:inplace-input id="inplace-input" class="inplace-input" ref="name">
                         <xforms:label class="fixed-width">Name:</xforms:label>
                         <xforms:hint>Click here to enter your name</xforms:hint>
                         <xforms:alert>Invalid name</xforms:alert>
@@ -190,7 +202,15 @@
                     </fr:inplace-input>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:input ref="date" navindex="4" class="datafield" id="regular-date">
+                    <fr:us-phone id="us-phone" ref="us-phone">
+                        <xforms:label class="fixed-width">Phone:</xforms:label>
+                        <xforms:hint>US phone hint</xforms:hint>
+                        <xforms:alert>Invalid phone number</xforms:alert>
+                        <xforms:help>Phone help</xforms:help>
+                    </fr:us-phone>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:input ref="date" class="datafield" id="regular-date">
                         <xforms:label class="fixed-width">Date field:</xforms:label>
                         <xforms:alert>Invalid date</xforms:alert>
                         <xforms:help>
@@ -241,6 +261,22 @@
                     </fr:date-picker>
                 </xhtml:p>
                 <xhtml:p>
+                    <fr:dropdown-date ref="date" id="dropdown-date">
+                        <xforms:label class="fixed-width">Date dropdowns (XBL):</xforms:label>
+                        <xforms:alert>Invalid date</xforms:alert>
+                        <xforms:hint>Date hint</xforms:hint>
+                        <xforms:help>Date help</xforms:help>
+                    </fr:dropdown-date>
+                </xhtml:p>
+                <xhtml:p>
+                    <fr:fields-date ref="date" id="fields-date">
+                        <xforms:label class="fixed-width">Date fields (XBL):</xforms:label>
+                        <xforms:alert>Invalid date</xforms:alert>
+                        <xforms:hint>Date hint</xforms:hint>
+                        <xforms:help>Date help</xforms:help>
+                    </fr:fields-date>
+                </xhtml:p>
+                <xhtml:p>
                     <xforms:output ref="date" xxforms:format="." id="date-output-native">
                         <xforms:label class="fixed-width">Date (native XML):</xforms:label>
                         <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/date/output/xml/*, 'html')"/></xforms:help>
@@ -253,22 +289,26 @@
                     </xforms:output>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:input ref="time" tabindex="5" id="time">
+                    <xforms:input ref="time" id="time">
                         <xforms:label class="fixed-width">Time:</xforms:label>
                     </xforms:input>
                 </xhtml:p>
                 <xhtml:p>
-                    <xforms:input ref="date-time" tabindex="6" id="date-time">
+                    <xforms:input ref="date-time" id="date-time">
                         <xforms:label class="fixed-width">Date-time:</xforms:label>
                     </xforms:input>
                 </xhtml:p>
+            </fr:tab>
+            <fr:tab id="typed-controls">
+                <xforms:label>Typed Controls</xforms:label>
+                xxx
             </fr:tab>
             <fr:tab id="selection-controls">
                 <xforms:label>Selection Controls</xforms:label>
                 <xforms:group appearance="xxforms:fieldset">
                     <xforms:label>Single Value Selection</xforms:label>
                     <xhtml:p>
-                        <xforms:select1 ref="carrier" appearance="full" navindex="5" xxforms:encrypt-item-values="false">
+                        <xforms:select1 ref="carrier" appearance="full" xxforms:encrypt-item-values="false">
                             <xforms:label class="fixed-width">Carrier:</xforms:label>
                             <xforms:itemset nodeset="instance('carriers-instance')/carrier">
                                 <xforms:label ref="label"/>
@@ -278,7 +318,7 @@
                         </xforms:select1>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:select1 ref="carrier" appearance="compact" navindex="6">
+                        <xforms:select1 ref="carrier" appearance="compact">
                             <xforms:label class="fixed-width"/>
                             <xforms:itemset nodeset="instance('carriers-instance')/carrier">
                                 <xforms:label ref="label"/>
@@ -288,7 +328,7 @@
                         </xforms:select1>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:select1 ref="carrier" appearance="minimal" navindex="7">
+                        <xforms:select1 ref="carrier" appearance="minimal">
                             <xforms:label class="fixed-width"/>
                             <xforms:itemset nodeset="instance('carriers-instance')/carrier">
                                 <xforms:label ref="label"/>
@@ -301,9 +341,9 @@
                         <xforms:group>
                             <xforms:label class="fixed-width">Label/value:</xforms:label>
 
-                            <xforms:input ref="new-carrier/label" navindex="8"/>
-                            <xforms:input ref="new-carrier/value" navindex="9"/>
-                            <xforms:trigger navindex="10">
+                            <xforms:input ref="new-carrier/label"/>
+                            <xforms:input ref="new-carrier/value"/>
+                            <xforms:trigger>
                                 <xforms:label>Add carrier</xforms:label>
                                 <xforms:hint>Add a carrier to the list of carriers</xforms:hint>
                                 <xforms:action  ev:event="DOMActivate">
@@ -321,7 +361,7 @@
                 <xforms:group appearance="xxforms:fieldset">
                     <xforms:label>Multiple Value Selection</xforms:label>
                     <xhtml:p>
-                        <xforms:select ref="flavor" appearance="full" navindex="11">
+                        <xforms:select ref="flavor" appearance="full">
                             <xforms:label class="fixed-width">Flavor:</xforms:label>
                             
                             <xforms:itemset nodeset="instance('flavors-instance')/flavor">
@@ -332,7 +372,7 @@
                         </xforms:select>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:select ref="flavor" appearance="compact" navindex="12">
+                        <xforms:select ref="flavor" appearance="compact">
                             <xforms:label class="fixed-width"/>
                             <xforms:itemset nodeset="instance('flavors-instance')/flavor">
                                 <xforms:label ref="label"/>
@@ -353,9 +393,9 @@
                         <xforms:group>
                             <xforms:label class="fixed-width">Label/value:</xforms:label>
 
-                            <xforms:input ref="new-flavor/label" navindex="13"/>
-                            <xforms:input ref="new-flavor/value" navindex="14"/>
-                            <xforms:trigger navindex="15">
+                            <xforms:input ref="new-flavor/label"/>
+                            <xforms:input ref="new-flavor/value"/>
+                            <xforms:trigger>
                                 <xforms:label>Add flavor</xforms:label>
                                 <xforms:hint>Add a flavor to the list of flavors</xforms:hint>
                                 <xforms:action ev:event="DOMActivate">
@@ -430,6 +470,3 @@
 
     </xhtml:body>
 </xhtml:html>
-
-
-        

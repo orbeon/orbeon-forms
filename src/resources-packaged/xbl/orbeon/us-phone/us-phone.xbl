@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -21,7 +21,8 @@
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
-         xmlns:xbl="http://www.w3.org/ns/xbl">
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
     <!--
         Component to represent a US phone number split into area code and the rest of the number.
 
@@ -50,12 +51,14 @@
 
         <xbl:resources>
             <xbl:style>
+                .xbl-fr-us-phone .fr-us-phone-area input.xforms-input-input { width: 3em }
+                .xbl-fr-us-phone .fr-us-phone-local input.xforms-input-input { width: 8em }
                 <!-- This is not very elegant but we need a strong rule to override the FR defaults -->
                 #doc4 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-us-phone .fr-us-phone-area input.xforms-input-input { width: 3em }
                 #doc4 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-us-phone .fr-us-phone-local input.xforms-input-input { width: 8em }
             </xbl:style>
         </xbl:resources>
-        <xbl:template>
+        <xbl:implementation>
             <!-- Local model -->
             <xforms:model id="number-model">
                 <xforms:instance id="number-instance">
@@ -71,33 +74,42 @@
                 <!-- Make instance read-only when the form must be read-only -->
                 <xforms:bind nodeset="." readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
             </xforms:model>
+        </xbl:implementation>
+        <xbl:template>
             <!-- Local controls -->
-            <xforms:group xbl:attr="model context ref bind">
+            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
 
-                <xxforms:variable name="result" select="." as="node()?"/>
+                <!-- Inner group -->
+                <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
+                    <!-- Variable pointing to external single-node binding -->
+                    <xxforms:variable name="result" as="node()?">
+                        <xxforms:sequence select="." xxbl:scope="outer"/>
+                    </xxforms:variable>
 
-                <!-- React to update to bound node -->
-                <xforms:group ref="$result" appearance="xxforms:internal">
-                    <!-- Only set local values if the bound node is an xs:date -->
-                    <xforms:action ev:event="xforms-value-changed xforms-enabled" if="$result castable as xs:positiveInteger">
-                        <xforms:setvalue model="number-model" ref="area" value="substring($result, 1, 3)"/>
-                        <xforms:setvalue model="number-model" ref="local" value="concat(substring($result, 4, 3), ' ', substring($result, 7, 4))"/>
-                    </xforms:action>
-                </xforms:group>
+                    <!-- React to update to bound node -->
+                    <xforms:group ref="$result" appearance="xxforms:internal">
+                        <!-- Only set local values if the bound node is an xs:date -->
+                        <xforms:action ev:event="xforms-value-changed xforms-enabled" if="$result castable as xs:positiveInteger">
+                            <xforms:setvalue ref="instance('number-instance')/area" value="substring($result, 1, 3)"/>
+                            <xforms:setvalue ref="instance('number-instance')/local" value="concat(substring($result, 4, 3), ' ', substring($result, 7, 4))"/>
+                        </xforms:action>
+                    </xforms:group>
 
-                <xforms:group model="number-model" class="fr-component-group">
-                    (<xforms:input ref="area" class="fr-us-phone-area"><xforms:alert class="xforms-disabled"/></xforms:input>)
-                    <xforms:input ref="local" class="fr-us-phone-local"><xforms:alert class="xforms-disabled"/></xforms:input>
+                    <xforms:group class="fr-component-group">
+                        <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
+                        (<xforms:input ref="area" class="fr-us-phone-area" xbl:attr="navindex navindex=tabindex"><xforms:alert class="xforms-disabled"/></xforms:input>)
+                        <xforms:input ref="local" class="fr-us-phone-local"><xforms:alert class="xforms-disabled"/></xforms:input>
 
-                    <!-- React to update to local values -->
-                    <xforms:action ev:event="xforms-value-changed">
-                        <xxforms:variable name="phone-string" select="translate(concat(area, local), ' ', '')" as="xs:string"/>
-                        <xxforms:variable name="is-valid-phone-string" as="xs:boolean"
-                                          select="$phone-string castable as xs:positiveInteger and string-length($phone-string) = 10"/>
-                        <xforms:setvalue if="$is-valid-phone-string" ref="$result" value="$phone-string"/>
-                        <xforms:setvalue if="not($is-valid-phone-string)" ref="$result" value="if ($phone-string = '') then '' else 'INVALID_NUMBER'"/>
-                    </xforms:action>
+                        <!-- React to update to local values -->
+                        <xforms:action ev:event="xforms-value-changed">
+                            <xxforms:variable name="phone-string" select="translate(concat(area, local), ' ', '')" as="xs:string"/>
+                            <xxforms:variable name="is-valid-phone-string" as="xs:boolean"
+                                              select="$phone-string castable as xs:positiveInteger and string-length($phone-string) = 10"/>
+                            <xforms:setvalue if="$is-valid-phone-string" ref="$result" value="$phone-string"/>
+                            <xforms:setvalue if="not($is-valid-phone-string)" ref="$result" value="if ($phone-string = '') then '' else 'INVALID_NUMBER'"/>
+                        </xforms:action>
+                    </xforms:group>
 
                     <!-- Stop propagation of all UI events -->
                     <xforms:action ev:event="#all" ev:propagate="stop"/>

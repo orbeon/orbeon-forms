@@ -94,7 +94,7 @@ public class XFormsActionInterpreter {
                 if (actionPrecedingElements.size() > 0) {
                     Collections.reverse(actionPrecedingElements);
                     final List<XFormsContextStack.BindingContext.VariableInfo> variableInfos
-                            = actionBlockContextStack.addAndScopeVariables(propertyContext, actionPrecedingElements, xpathContextObserver.getEffectiveId());
+                            = actionBlockContextStack.addAndScopeVariables(propertyContext, container, actionPrecedingElements, xpathContextObserver.getEffectiveId());
                     if (variableInfos != null && variableInfos.size() > 0 && indentedLogger.isDebugEnabled()) {
                         indentedLogger.logDebug("interpreter", "evaluated variables for outer action",
                                 "count", Integer.toString(variableInfos.size()));
@@ -534,5 +534,30 @@ public class XFormsActionInterpreter {
             final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement);
             return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(), targetStaticId);
         }
+    }
+
+    /**
+     * Search a model given a static id and/or the current action element.
+     *
+     * @param propertyContext   current context
+     * @param actionElement     current action element
+     * @param modelStaticId     static id of the model searched, or null if current model
+     * @return                  model
+     */
+    public XFormsModel resolveModel(PropertyContext propertyContext, Element actionElement, String modelStaticId) {
+        final XFormsModel model;
+        if (modelStaticId != null) {
+            // Id is specified, resolve the effective object
+            final Object o = resolveEffectiveObject(propertyContext, actionElement, modelStaticId);
+            if (!(o instanceof XFormsModel))
+                throw new ValidationException("Invalid model id: " + modelStaticId, (LocationData) actionElement.getData());
+            model = (XFormsModel) o;
+        } else {
+            // Id is not specified
+            model = actionBlockContextStack.getCurrentModel();
+        }
+        if (model == null)
+            throw new ValidationException("Invalid model id: " + modelStaticId, (LocationData) actionElement.getData());
+        return model;
     }
 }

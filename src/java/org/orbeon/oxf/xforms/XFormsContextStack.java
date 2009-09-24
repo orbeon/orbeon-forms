@@ -138,7 +138,7 @@ public class XFormsContextStack {
         // All variables in the model are in scope for the nested binds and actions.
         final List<Element> elements = Dom4jUtils.elements(xformsModel.getModelDocument().getRootElement(), XFormsConstants.XXFORMS_VARIABLE_NAME);
         final List<BindingContext.VariableInfo> variableInfos
-                = addAndScopeVariables(propertyContext, elements, xformsModel.getEffectiveId());
+                = addAndScopeVariables(propertyContext, xformsModel.getXBLContainer(), elements, xformsModel.getEffectiveId());
 
         if (variableInfos != null && variableInfos.size() > 0) {
             // Some variables added
@@ -157,7 +157,7 @@ public class XFormsContextStack {
         }
     }
 
-    public List<BindingContext.VariableInfo> addAndScopeVariables(PropertyContext propertyContext, List<Element> elements, String sourceEffectiveId) {
+    public List<BindingContext.VariableInfo> addAndScopeVariables(PropertyContext propertyContext, XBLContainer container, List<Element> elements, String sourceEffectiveId) {
         List<BindingContext.VariableInfo> variableInfos = null;
         final XBLBindings bindings = containingDocument.getStaticState().getXBLBindings();
         for (Element currentElement: elements) {
@@ -325,10 +325,12 @@ public class XFormsContextStack {
             final XFormsModel newModel;
             final boolean isNewModel;
             if (modelId != null) {
-                newModel = container.findModelByStaticId(modelId);
+                final XBLContainer resolutionScopeContainer = container.findResolutionScope(scope);
+                final Object o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId);
                 // TODO: dispatch xforms-binding-exception
-                if (newModel == null)
+                if (!(o instanceof XFormsModel))
                     throw new ValidationException("Invalid model id: " + modelId, locationData);
+                newModel = (XFormsModel) o;
                 isNewModel = newModel != baseBindingContext.model;// don't say it's a new model unless it has really changed
             } else {
                 newModel = baseBindingContext.model;

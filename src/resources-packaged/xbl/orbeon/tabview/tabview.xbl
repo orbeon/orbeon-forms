@@ -49,7 +49,7 @@
                         <xsl:copy-of select="@class"/>
 
                         <!-- Initialization event -->
-                        <xxforms:script ev:event="xforms-enabled" ev:target="fr-tabview-group">new YAHOO.widget.TabView(YAHOO.util.Dom.getElementsByClassName("yui-navset", null, this)[0]);</xxforms:script>
+                        <xxforms:script id="xf-en" ev:event="xforms-enabled" ev:target="fr-tabview-group">new YAHOO.widget.TabView(YAHOO.util.Dom.getElementsByClassName("yui-navset", null, this)[0]);</xxforms:script>
 
                         <xhtml:div class="yui-navset">
                             <xhtml:ul class="yui-nav">

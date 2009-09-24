@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -21,7 +21,8 @@
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
-         xmlns:xbl="http://www.w3.org/ns/xbl">
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <!--
         Component to represent a US currency with 3 digits after the decimal point (e.g. value is in thousands).
@@ -53,39 +54,45 @@
                 #doc4 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-us-currency-thousands .fr-component-group .xforms-input input { width: 6em }
             </xbl:style>
         </xbl:resources>
-        <xbl:template>
+        <xbl:implementation>
             <!-- Local model -->
             <xforms:model id="currency-model">
                 <xforms:instance id="currency-instance">
                     <value/>
                 </xforms:instance>
                 <xforms:bind nodeset="." constraint="substring-after(., '$') castable as xs:decimal"/>
-                <!-- Make instance read-only when the form must be read-only -->
+                <!-- FR HACK: Make instance read-only when the form must be read-only -->
                 <xforms:bind nodeset="." readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
             </xforms:model>
+        </xbl:implementation>
+        <xbl:template>
             <!-- Local controls -->
-            <xforms:group xbl:attr="model context ref bind">
+            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
 
-                <xxforms:variable name="result" select="." as="node()?"/>
+                <!-- Inner group -->
+                <xforms:group class="fr-component-group" xxbl:scope="inner">
+                    <!-- Variable pointing to external single-node binding -->
+                    <xxforms:variable name="result" as="node()?">
+                        <xxforms:sequence select="." xxbl:scope="outer"/>
+                    </xxforms:variable>
 
-                <!-- React to update to bound node -->
-                <xforms:group ref="$result" appearance="xxforms:internal">
-                    <!-- Only set local values if the bound node is an xs:decimal -->
-                    <xforms:action ev:event="xforms-value-changed xforms-enabled">
-                        <xforms:setvalue model="currency-model" ref="." value="if ($result castable as xs:decimal) then format-number($result, '$ #.000') else $result"/>
-                    </xforms:action>
-                </xforms:group>
+                    <!-- React to update to bound node -->
+                    <xforms:group ref="$result" appearance="xxforms:internal">
+                        <!-- Only set local values if the bound node is an xs:decimal -->
+                        <xforms:action ev:event="xforms-value-changed xforms-enabled">
+                            <xforms:setvalue ref="instance('currency-instance')" value="if ($result castable as xs:decimal) then format-number($result, '$ #.000') else $result"/>
+                        </xforms:action>
+                    </xforms:group>
 
-                <xforms:group model="currency-model" class="fr-component-group">
-                    <xforms:input ref="." id="currency-input"/>
-
-                    <!-- React to update to local values -->
-                    <xforms:action ev:event="xforms-value-changed">
-                        <xxforms:variable name="currency-normalized" select="normalize-space(.)" as="xs:string"/>
-                        <xxforms:variable name="currency-no-dollar" select="if (starts-with($currency-normalized, '$')) then substring-after($currency-normalized, '$') else $currency-normalized" as="xs:string"/>
-                        <xforms:setvalue ref="$result" value="if ($currency-no-dollar castable as xs:decimal) then xs:decimal($currency-no-dollar) else $currency-no-dollar"/>
-                    </xforms:action>
+                    <xforms:input ref="$result" id="currency-input" xbl:attr="navindex navindex=tabindex">
+                        <!-- React to update to local values -->
+                        <xforms:action ev:event="xforms-value-changed">
+                            <xxforms:variable name="currency-normalized" select="normalize-space(.)" as="xs:string"/>
+                            <xxforms:variable name="currency-no-dollar" select="if (starts-with($currency-normalized, '$')) then substring-after($currency-normalized, '$') else $currency-normalized" as="xs:string"/>
+                            <xforms:setvalue ref="$result" value="if ($currency-no-dollar castable as xs:decimal) then xs:decimal($currency-no-dollar) else $currency-no-dollar"/>
+                        </xforms:action>
+                    </xforms:input>
 
                     <!-- Stop propagation of all UI events -->
                     <xforms:action ev:event="#all" ev:propagate="stop"/>

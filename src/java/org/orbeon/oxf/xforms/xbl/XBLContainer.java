@@ -255,15 +255,26 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
 
         XBLContainer currentContainer = this;
-        while (currentContainer != null) {
-
+        do {
             if (currentContainer.getFullPrefix().equals(xblScopeIdFullPrefix))
                 return currentContainer;
 
             currentContainer = currentContainer.getParentXBLContainer();
-        }
+        } while (currentContainer != null);
 
         throw new OXFException("XBL resolution scope not found for id: " + prefixedId);
+    }
+
+    public XBLContainer findResolutionScope(XBLBindings.Scope scope) {
+        XBLContainer currentContainer = this;
+        do {
+            if (currentContainer.getResolutionScope() == scope)
+                return currentContainer;
+
+            currentContainer = currentContainer.getParentXBLContainer();
+        } while (currentContainer != null);
+
+        throw new OXFException("XBL resolution scope not found for scope id: " + scope.scopeId);
     }
 
     /**

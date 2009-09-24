@@ -53,7 +53,7 @@ public class XFormsActionAction extends XFormsAction {
 
                 // Push previous variables if any
                 if (currentVariableElements.size() > 0) {
-                    contextStack.addAndScopeVariables(propertyContext, currentVariableElements, actionInterpreter.getSourceEffectiveId());
+                    contextStack.addAndScopeVariables(propertyContext, actionInterpreter.getXBLContainer(), currentVariableElements, actionInterpreter.getSourceEffectiveId());
                     variablesCount += currentVariableElements.size();
                 }
 

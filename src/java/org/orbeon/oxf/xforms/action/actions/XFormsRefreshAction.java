@@ -40,7 +40,7 @@ public class XFormsRefreshAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
-        final XFormsModel model = (modelId != null) ? container.findModelByStaticId(modelId) : actionInterpreter.getContextStack().getCurrentModel();
+        final XFormsModel model = actionInterpreter.resolveModel(propertyContext, actionElement, modelId);
 
         if (model == null)
             throw new ValidationException("Invalid model id: " + modelId, (LocationData) actionElement.getData());

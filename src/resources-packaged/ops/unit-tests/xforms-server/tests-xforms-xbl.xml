@@ -2606,4 +2606,210 @@
         </output>
     </test>
 
+    <test description="Scoping of model variables upon model change" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                        <xforms:instance id="instance1">
+                            <instance>
+                                <foo>42</foo>
+                                <bar>43</bar>
+                            </instance>
+                        </xforms:instance>
+                        <xxforms:variable name="foo" select="foo"/>
+                        <xxforms:variable name="bar" select="bar"/>
+                    </xforms:model>
+                    <xforms:model id="model2">
+                        <xforms:instance id="instance2">
+                            <instance>
+                                <foo>44</foo>
+                                <bar>45</bar>
+                            </instance>
+                        </xforms:instance>
+                        <xxforms:variable name="foo" select="foo"/>
+                        <xxforms:variable name="bar" select="bar"/>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xbl:content/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <!-- Top-level -->
+                    <xforms:output id="output1" value="string-join((foo, bar, $foo, $bar), ', ')"/>
+                    <xforms:group model="model2">
+                        <xforms:output id="output2" value="string-join((foo, bar, $foo, $bar), ', ')"/>
+                        <xforms:group model="model1">
+                            <xforms:output id="output3" value="string-join((foo, bar, $foo, $bar), ', ')"/>
+                        </xforms:group>
+                    </xforms:group>
+                    <xforms:group model="model2" context="bar">
+                        <xforms:output id="output4" value="string-join((../foo, ., $foo, $bar), ', ')"/>
+                        <xforms:group model="model1" context="foo">
+                            <xforms:output id="output5" value="string-join((., ../bar, $foo, $bar), ', ')"/>
+                        </xforms:group>
+                    </xforms:group>
+                    <!-- Nested within XBL -->
+                    <fr:foo id="my-foo">
+                        <xforms:output id="output6" value="string-join((foo, bar, $foo, $bar), ', ')"/>
+                        <xforms:group model="model2">
+                            <xforms:output id="output7" value="string-join((foo, bar, $foo, $bar), ', ')"/>
+                            <xforms:group model="model1">
+                                <xforms:output id="output8" value="string-join((foo, bar, $foo, $bar), ', ')"/>
+                            </xforms:group>
+                        </xforms:group>
+                        <xforms:group model="model2" context="bar">
+                            <xforms:output id="output9" value="string-join((../foo, ., $foo, $bar), ', ')"/>
+                            <xforms:group model="model1" context="foo">
+                                <xforms:output id="output10" value="string-join((., ../bar, $foo, $bar), ', ')"/>
+                            </xforms:group>
+                        </xforms:group>
+                    </fr:foo>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance1" model-id="model1">
+                                <instance>
+                                    <foo>42</foo>
+                                    <bar>43</bar>
+                                </instance>
+                            </instance>
+                            <instance id="instance2" model-id="model2">
+                                <instance>
+                                    <foo>44</foo>
+                                    <bar>45</bar>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1">42, 43, 42, 43</xxf:control>
+                        <xxf:control id="output2">44, 45, 44, 45</xxf:control>
+                        <xxf:control id="output3">42, 43, 44, 45</xxf:control>
+                        <xxf:control id="output4">44, 45, 42, 43</xxf:control>
+                        <xxf:control id="output5">42, 43, 42, 43</xxf:control>
+                        <xxf:control id="my-foo$output6">42, 43, 42, 43</xxf:control>
+                        <xxf:control id="my-foo$output7">44, 45, 44, 45</xxf:control>
+                        <xxf:control id="my-foo$output8">42, 43, 42, 43</xxf:control>
+                        <xxf:control id="my-foo$output9">44, 45, 42, 43</xxf:control>
+                        <xxf:control id="my-foo$output10">42, 43, 42, 43</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="XBL outer group binding attributes" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                        <xforms:instance id="instance1">
+                            <instance>
+                                <foo>42</foo>
+                                <bar>43</bar>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:bind id="foo-bind1" nodeset="foo"/>
+                        <xforms:bind id="bar-bind1" nodeset="bar"/>
+                        <xxforms:variable name="foo" select="foo"/>
+                        <xxforms:variable name="bar" select="bar"/>
+                    </xforms:model>
+                    <xforms:model id="model2">
+                        <xforms:instance id="instance2">
+                            <instance>
+                                <foo>44</foo>
+                                <bar>45</bar>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:bind id="foo-bind2" nodeset="foo"/>
+                        <xforms:bind id="bar-bind2" nodeset="bar"/>
+                        <xxforms:variable name="foo" select="foo"/>
+                        <xxforms:variable name="bar" select="bar"/>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+                                    <xforms:output value="."/>
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:foo id="foo10"/>
+                    <fr:foo id="foo11" ref="bar"/>
+                    <fr:foo id="foo12" ref="$bar"/>
+                    <fr:foo id="foo13" bind="foo-bind1"/>
+                    <fr:foo id="foo14" bind="bar-bind1"/>
+                    <!-- TODO: we handle this wrong by restricting by model! -->
+                    <!--<fr:foo id="foo15" bind="foo-bind2"/>-->
+                    <!--<fr:foo id="foo16" bind="bar-bind2"/>-->
+
+                    <fr:foo id="foo20" model="model2"/>
+                    <fr:foo id="foo21" model="model2" ref="bar"/>
+                    <fr:foo id="foo22" model="model2" ref="$bar"/>
+                    <!-- TODO: we handle this wrong by restricting by model! -->
+                    <!--<fr:foo id="foo23" model="model2" bind="foo-bind1"/>-->
+                    <!--<fr:foo id="foo24" model="model2" bind="bar-bind1"/>-->
+                    <fr:foo id="foo25" model="model2" bind="foo-bind2"/>
+                    <fr:foo id="foo26" model="model2" bind="bar-bind2"/>
+
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance1" model-id="model1">
+                                <instance>
+                                    <foo>42</foo>
+                                    <bar>43</bar>
+                                </instance>
+                            </instance>
+                            <instance id="instance2" model-id="model2">
+                                <instance>
+                                    <foo>44</foo>
+                                    <bar>45</bar>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="foo10$xf-8">42 43</xxf:control>
+                        <xxf:control id="foo11$xf-11">43</xxf:control>
+                        <xxf:control id="foo12$xf-14">43</xxf:control>
+                        <xxf:control id="foo13$xf-17">42</xxf:control>
+                        <xxf:control id="foo14$xf-20">43</xxf:control>
+                        <xxf:control id="foo20$xf-23">44 45</xxf:control>
+                        <xxf:control id="foo21$xf-26">45</xxf:control>
+                        <xxf:control id="foo22$xf-29">45</xxf:control>
+                        <xxf:control id="foo25$xf-32">44</xxf:control>
+                        <xxf:control id="foo26$xf-35">45</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

@@ -146,4 +146,122 @@
         </output>
     </test>
 
+    <test description="fr:tabview id and XPath references" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <value>42</value>
+                            </instance>
+                        </xforms:instance>
+
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+
+                        <!-- Dispatch initial event -->
+                        <xforms:dispatch ev:event="xforms-ready" targetid="group1" name="my-event"/>
+                    </xforms:model>
+                    <xi:include href="oxf:/xbl/orbeon/tabview/tabview.xbl" xxi:omit-xml-base="true"/>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="group1">
+                        <xforms:action ev:event="my-event" ev:target="group1">
+                            <!-- TEST: Event listener -->
+                            <xforms:insert context="instance('events')" nodeset="*"
+                                           origin="xxforms:element('event',
+                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                     xxforms:attribute('target', xxforms:event('xxforms:target')),
+                                                     xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+
+                            <xforms:dispatch targetid="group2" name="my-event"/>
+                        </xforms:action>
+                    </xforms:group>
+                    <fr:tabview id="my-tabview">
+                        <xforms:setvalue ev:event="my-event" ev:target="group1" ref="event2">44</xforms:setvalue>
+                        <fr:tab id="tab1">
+                            <xforms:group id="group2">
+                                <xforms:action ev:event="my-event" ev:target="group2">
+                                    <!-- TEST: Event listener -->
+                                    <xforms:insert context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                             xxforms:attribute('target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+
+                                    <xforms:dispatch targetid="group3" name="my-event"/>
+                                </xforms:action>
+                                <xforms:output id="output1" ref="instance('instance')/value"/>
+                                <xforms:output id="output2" ref="value"/>
+                            </xforms:group>
+                        </fr:tab>
+                        <fr:tab id="tab2">
+                            <xforms:group id="group3">
+                                <xforms:action ev:event="my-event" ev:target="group3">
+                                    <!-- TEST: Event listener -->
+                                    <xforms:insert context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                             xxforms:attribute('target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+
+                                    <xforms:dispatch targetid="group4" name="my-event"/>
+                                </xforms:action>
+                                <xforms:output id="output3" ref="instance('instance')/value"/>
+                                <xforms:output id="output4" ref="value"/>
+                            </xforms:group>
+                        </fr:tab>
+                    </fr:tabview>
+                    <xforms:group id="group4">
+                        <xforms:action ev:event="my-event" ev:target="group4">
+                            <!-- TEST: Event listener -->
+                            <xforms:insert context="instance('events')" nodeset="*"
+                                           origin="xxforms:element('event',
+                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                     xxforms:attribute('target', xxforms:event('xxforms:target')),
+                                                     xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                        </xforms:action>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value>42</value>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="my-event" target="group1" indexes=""/>
+                                    <event type="my-event" target="group2" indexes=""/>
+                                    <event type="my-event" target="group3" indexes=""/>
+                                    <event type="my-event" target="group4" indexes=""/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-tabview$output1">42</xxf:control>
+                        <xxf:control id="my-tabview$output2">42</xxf:control>
+                        <xxf:control id="my-tabview$output3">42</xxf:control>
+                        <xxf:control id="my-tabview$output4">42</xxf:control>
+                    </xxf:control-values>
+                    <xxf:script name="my_tabview_xf_en_xforms_function" target-id="my-tabview$fr-tabview-group" observer-id="my-tabview$fr-tabview-group"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

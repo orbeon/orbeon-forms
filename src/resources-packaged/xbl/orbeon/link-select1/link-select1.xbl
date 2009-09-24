@@ -64,7 +64,6 @@
             <xforms:group xbl:attr="model context ref bind" xsl:version="2.0" xxbl:scope="outer">
                 <xbl:content includes="fr|link-select1 > xforms|label, fr|link-select1 > xforms|help, fr|link-select1 > xforms|hint, fr|link-select1 > xforms|alert"/>
 
-                <!-- Inner group -->
                 <xforms:group  class="fr-component-group">
 
                     <!-- Variable pointing to external single-node binding -->

@@ -39,6 +39,7 @@ public class XXFormsListInstances extends XFormsFunction {
         final Expression modelIdExpression = argument[0];
         final String modelId = XFormsUtils.namespaceId(containingDocument, modelIdExpression.evaluateAsString(xpathContext));
 
+        // TODO: This only returns top-level model. Need function for all models.
         final XFormsModel model = containingDocument.findModelByStaticId(modelId);
 
         if (model != null) {

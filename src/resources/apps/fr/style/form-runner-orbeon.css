@@ -54,7 +54,7 @@ h1 { font-size: 197% }
 
 h2 {
     font-size: 160%;
-    margin: .25em 0 .5em 0;/* try smaller margins */
+    margin: 1em 0 .5em 0;/* try smaller margins */
 }
 
 h3, h4 {
@@ -237,11 +237,6 @@ p, fieldset, table { margin-bottom: 1em }
 .fr-error-label, .fr-error-row { font-weight: bold }
 
 .fr-error-alert { color: #DF731B }
-
-/* Sections */
-.fr-section-container div.fr-collapsible {
-    border-bottom: 1px dotted #004B92;
-}
 
 .fr-section-title, .fr-section-title .xforms-label { font-weight: normal }
 

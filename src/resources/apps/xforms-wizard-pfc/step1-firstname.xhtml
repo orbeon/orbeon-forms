@@ -20,7 +20,7 @@
         <xhtml:title>XForms Wizard - Step 1</xhtml:title>
         <xforms:model>
             <xforms:instance src="input:instance"/>
-            <xforms:submission id="main" ref="/" action="/xforms-wizard-pfc/" method="post"/>
+            <xforms:submission id="next-submission" resource="/xforms-wizard-pfc/lastname" method="post" replace="all"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -40,10 +40,7 @@
                 <xhtml:td>
                     <xforms:trigger>
                         <xforms:label>Next ></xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="action">next</xforms:setvalue>
-                            <xforms:send submission="main"/>
-                        </xforms:action>
+                        <xforms:send ev:event="DOMActivate" submission="next-submission"/>
                     </xforms:trigger>
                 </xhtml:td>
             </xhtml:tr>

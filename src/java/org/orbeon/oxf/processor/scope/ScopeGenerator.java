@@ -53,8 +53,6 @@ public class ScopeGenerator extends ScopeProcessorBase {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
-    
-    
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.DigestTransformerOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext pipelineContext, final ContentHandler contentHandler) {
@@ -119,7 +117,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                                 } else {
                                     mapping = readMapping(pipelineContext);
                                 }
-                                
+
                                 state.saxStore = getSAXStore(value, mapping, config);
                             }
                         } else {
@@ -148,24 +146,24 @@ public class ScopeGenerator extends ScopeProcessorBase {
     }
 
     public static SAXStore getSAXStore(Object value, Mapping mapping, ContextConfig config) throws SAXException, TransformerException, IOException, MappingException {
-    	if (config.getContentType() == ScopeProcessorBase.TEXT_PLAIN) {
-        	final SAXStore result = new SAXStore();
-        	if (value instanceof String) {
-        		//Creating a stream from the String! Better to extend the ProcessorUtils class to support String or StringReader or something...
-        		ProcessorUtils.readText(new ByteArrayInputStream(((String)value).getBytes()), null, result, config.getContentType(), ISODateUtils.getCurrentTimeMillis());
-        	} else {
-        		logger.error("Content-type: "+ScopeProcessorBase.TEXT_PLAIN+" not applicable for key: "+config.getKey());
-        		XMLUtils.streamNullDocument(result);
-        	}
-        	return result;
+        if (config.getContentType() == ScopeProcessorBase.TEXT_PLAIN) {
+            final SAXStore result = new SAXStore();
+            if (value instanceof String) {
+                // Creating a stream from the String! Better to extend the ProcessorUtils class to support String or StringReader or something...
+                ProcessorUtils.readText((String) value, result, config.getContentType(), ISODateUtils.getCurrentTimeMillis());
+            } else {
+                logger.error("Content-type: " + ScopeProcessorBase.TEXT_PLAIN + " not applicable for key: " + config.getKey());
+                XMLUtils.streamNullDocument(result);
+            }
+            return result;
         } else {
-        	return getSAXStore(value, mapping);
+            return getSAXStore(value, mapping);
         }
     }
-    
+
     public static SAXStore getSAXStore(Object value, Mapping mapping) throws SAXException, TransformerException, IOException, MappingException {
         final SAXStore result;
-    	if (value instanceof ScopeStore) {
+        if (value instanceof ScopeStore) {
             final ScopeStore contextStore = (ScopeStore) value;
             result = contextStore.getSaxStore();
         } else {
@@ -192,7 +190,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                 }
             }
         }
-        
+
         return result;
     }
 

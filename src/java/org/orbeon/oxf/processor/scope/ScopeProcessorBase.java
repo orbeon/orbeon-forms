@@ -29,7 +29,7 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
 
     public static final String APPLICATION_XML = "application/xml";
     public static final String TEXT_PLAIN = "text/plain";
-    
+
     public static final String SCOPE_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/schemas/scope-config";
 
     protected ContextConfig readConfig(PipelineContext context) {
@@ -82,11 +82,11 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
         public String getKey() {
             return key;
         }
-        
+
         public String getContentType() {
             return contentType;
         }
-        
+
         public boolean isTestIgnoreStoredKeyValidity() {
             return testIgnoreStoredKeyValidity;
         }

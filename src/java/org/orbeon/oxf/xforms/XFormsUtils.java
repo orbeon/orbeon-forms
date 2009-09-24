@@ -409,11 +409,11 @@ public class XFormsUtils {
 
         // Try to get inline value
         {
-            final FastStringBuffer sb = new FastStringBuffer(20);
+            final StringBuilder sb = new StringBuilder(20);
 
             // Visit the subtree and serialize
 
-            // NOTE: It is a litte funny to do our own serialization here, but the alternative is to build a DOM and
+            // NOTE: It is a little funny to do our own serialization here, but the alternative is to build a DOM and
             // serialize it, which is not trivial because of the possible interleaved xforms:output's. Furthermore, we
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
@@ -546,7 +546,7 @@ public class XFormsUtils {
 
         // Try to get inline value
         {
-            final FastStringBuffer sb = new FastStringBuffer(20);
+            final StringBuilder sb = new StringBuilder(20);
 
             // Visit the subtree and serialize
 
@@ -554,7 +554,8 @@ public class XFormsUtils {
             // serialize it, which is not trivial because of the possible interleaved xforms:output's. Furthermore, we
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
-            Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(propertyContext, container, contextStack, acceptHTML, containsHTML, sb, childElement));
+            Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(propertyContext, container, contextStack,
+                    sourceEffectiveId, acceptHTML, containsHTML, sb, childElement));
             if (acceptHTML && containsHTML != null && !containsHTML[0]) {
                 // We went through the subtree and did not find any HTML
                 // If the caller supports the information, return a non-escaped string so we can optimize output later
@@ -1369,17 +1370,19 @@ public class XFormsUtils {
         private final PropertyContext pipelineContext;
         private final XBLContainer container;
         private final XFormsContextStack contextStack;
+        private final String sourceEffectiveId;
         private final boolean acceptHTML;
         private final boolean[] containsHTML;
-        private final FastStringBuffer sb;
+        private final StringBuilder sb;
         private final Element childElement;
         private final boolean hostLanguageAVTs;
 
         // Constructor for "static" case, i.e. when we know the child element cannot have dynamic content
-        public LHHAElementVisitorListener(boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
+        public LHHAElementVisitorListener(boolean acceptHTML, boolean[] containsHTML, StringBuilder sb, Element childElement) {
             this.pipelineContext = null;
             this.container = null;
             this.contextStack = null;
+            this.sourceEffectiveId = null;
             this.acceptHTML = acceptHTML;
             this.containsHTML = containsHTML;
             this.sb = sb;
@@ -1388,10 +1391,12 @@ public class XFormsUtils {
         }
 
         // Constructor for "dynamic" case, i.e. when we know the child element can have dynamic content
-        public LHHAElementVisitorListener(PropertyContext pipelineContext, XBLContainer container, XFormsContextStack contextStack, boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
+        public LHHAElementVisitorListener(PropertyContext pipelineContext, XBLContainer container, XFormsContextStack contextStack,
+                                          String sourceEffectiveId, boolean acceptHTML, boolean[] containsHTML, StringBuilder sb, Element childElement) {
             this.pipelineContext = pipelineContext;
             this.container = container;
             this.contextStack = contextStack;
+            this.sourceEffectiveId = sourceEffectiveId;
             this.acceptHTML = acceptHTML;
             this.containsHTML = containsHTML;
             this.sb = sb;
@@ -1415,7 +1420,7 @@ public class XFormsUtils {
                         return LHHAElementVisitorListener.this.contextStack;
                     }
                 };
-                contextStack.pushBinding(pipelineContext, element);
+                contextStack.pushBinding(pipelineContext, element, sourceEffectiveId, outputControl.getChildElementScope(element));
                 {
                     outputControl.setBindingContext(pipelineContext, contextStack.getCurrentBindingContext());
                     outputControl.evaluateIfNeeded(pipelineContext, false);
@@ -1468,7 +1473,7 @@ public class XFormsUtils {
                             final XXFormsAttributeControl attributeControl
                                     = new XXFormsAttributeControl(container, element, currentAttributeValue);
 
-                            contextStack.pushBinding(pipelineContext, element);
+                            contextStack.pushBinding(pipelineContext, element, sourceEffectiveId, attributeControl.getChildElementScope(element));
                             {
                                 attributeControl.setBindingContext(pipelineContext, contextStack.getCurrentBindingContext());
                                 attributeControl.evaluateIfNeeded(pipelineContext, false);

@@ -480,7 +480,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         // 3. Search in controls
 
         // NOTE: in the future, sub-tree of components might be rooted in this class
-        final XFormsControls controls = containingDocument.getControls();
 
         // Find closest control
         final String sourceControlEffectiveId;
@@ -488,15 +487,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             final Object tempModelObject = searchContainedModels(null, XFormsUtils.getStaticIdFromId(sourceEffectiveId));
             if (tempModelObject != null) {
                 // Source is a model object
-                final List<XFormsControl> children = getChildrenControls(controls);
-                if (children != null && children.size() > 0) {
-                    // We currently don't have a real notion of a "root" control, so we resolve against the first control if any
-                    final XFormsControl firstControl = children.get(0);
-                    sourceControlEffectiveId = firstControl.getEffectiveId();
-                } else {
-                    // There are no controls, therefore resolution will not find anything
+                sourceControlEffectiveId = getFirstControlEffectiveId();
+                if (sourceControlEffectiveId == null)
                     return null;
-                }
             } else {
                 // Assume the source is a control
                 sourceControlEffectiveId = sourceEffectiveId;
@@ -504,6 +497,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
 
         // Resolve on controls
+        final XFormsControls controls = containingDocument.getControls();
         final XFormsControl result = (XFormsControl) controls.resolveObjectById(sourceControlEffectiveId, targetStaticId);
 
         // If result is provided, make sure it is within the resolution scope of this container
@@ -513,6 +507,20 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         } else {
             return result;
         }
+    }
+
+    public String getFirstControlEffectiveId() {
+        final List<XFormsControl> children = getChildrenControls(containingDocument.getControls());
+        String sourceControlEffectiveId;
+        if (children != null && children.size() > 0) {
+            // We currently don't have a real notion of a "root" control, so we resolve against the first control if any
+            final XFormsControl firstControl = children.get(0);
+            sourceControlEffectiveId = firstControl.getEffectiveId();
+        } else {
+            // There are no controls, therefore resolution will not find anything
+            sourceControlEffectiveId = null;
+        }
+        return sourceControlEffectiveId;
     }
 
     protected List<XFormsControl> getChildrenControls(XFormsControls controls) {

@@ -617,7 +617,9 @@ public class XBLBindings {
                                 rightSideValue = boundElement.getText();// must use getText() and not stringValue()
                             }
 
-                            if (rightSideValue != null) {// not sure if XBL says what should happen if the source attribute is not found
+                            if (rightSideValue != null) {
+                                // NOTE: XBL doesn't seem to says what should happen if the source attribute is not
+                                // found! We assume the rule is ignored in this case.
                                 if (!isLeftSideXBLText) {
                                      // Set attribute value
                                     setAttribute(resultingNodes, leftSideQName, rightSideValue);

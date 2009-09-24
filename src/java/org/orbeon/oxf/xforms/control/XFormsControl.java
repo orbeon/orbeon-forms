@@ -128,6 +128,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         }
     }
 
+    public String getId() {
+        return id;
+    }
+
     public XBLContainer getXBLContainer() {
         return container;
     }
@@ -152,8 +156,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getPrefixedId());
     }
 
-    public String getId() {
-        return id;
+    public XBLBindings.Scope getChildElementScope(Element element) {
+        return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getXBLContainer().getFullPrefix() + element.attributeValue("id"));
     }
 
     /**
@@ -326,37 +330,43 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         } else if (lhhaElement.getParent() == getControlElement()) {
             // LHHA is direct child of control, evaluate within context
             contextStack.setBinding(this);
-            contextStack.pushBinding(propertyContext, lhhaElement, getEffectiveId(), getResolutionScope());
+            contextStack.pushBinding(propertyContext, lhhaElement, getEffectiveId(), getChildElementScope(lhhaElement));
             value = XFormsUtils.getElementValue(propertyContext, container, contextStack, getEffectiveId(), lhhaElement, acceptHTML, containsHTML);
             contextStack.popBinding();
         } else {
             // LHHA is somewhere else, assumed as a child of xforms:* or xxforms:*
 
             // Find context object for XPath evaluation
-            final Element parentElement = lhhaElement.getParent();
-
-            final String parentStaticId = parentElement.attributeValue("id");
-            if (parentStaticId == null) {
+            final Element contextElement = lhhaElement.getParent();
+            final String contextStaticId = contextElement.attributeValue("id");
+            final String contextEffectiveId;
+            if (contextStaticId == null) {
                 // Assume we are at the top-level
                 contextStack.resetBindingContext(propertyContext);
+                contextEffectiveId = container.getFirstControlEffectiveId();
             } else {
                 // Not at top-level, find containing object
-
-                // TODO: this resolution doesn't look right!
-                final Object contextObject = container.resolveObjectById(getEffectiveId(), parentStaticId);
+                final Object contextObject = container.resolveObjectById(getEffectiveId(), contextStaticId);
                 if (contextObject instanceof XFormsControl) {
                     // Found context, evaluate relative to that
-                    contextStack.setBinding((XFormsControl) contextObject);
+                    final XFormsControl contextControl = (XFormsControl) contextObject;
+                    contextStack.setBinding(contextControl);
+                    contextEffectiveId = contextControl.getEffectiveId();
                 } else {
-                    // No context, don't evaluate (not sure why this should happen!)
-                    contextStack.resetBindingContext(propertyContext);
+                    // No context, don't evaluate (probably a misplaced LHHA element?)
+                    contextEffectiveId = null;
                 }
             }
 
-            // Push binding relative to context established above and evaluate
-            contextStack.pushBinding(propertyContext, lhhaElement);
-            value = XFormsUtils.getElementValue(propertyContext, container, contextStack, getEffectiveId(), lhhaElement, acceptHTML, containsHTML);
-            contextStack.popBinding();
+            if (contextEffectiveId != null) {
+                // Push binding relative to context established above and evaluate
+                contextStack.pushBinding(propertyContext, lhhaElement, contextEffectiveId, getChildElementScope(lhhaElement));
+                value = XFormsUtils.getElementValue(propertyContext, container, contextStack, getEffectiveId(), lhhaElement, acceptHTML, containsHTML);
+                contextStack.popBinding();
+            } else {
+                // Do as if there was no LHHA
+                value = null;
+            }
         }
         return value;
     }

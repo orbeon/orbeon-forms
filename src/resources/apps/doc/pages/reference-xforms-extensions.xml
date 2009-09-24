@@ -918,9 +918,11 @@
         <a name="xforms-javascript"/>
         <section>
             <title>JavaScript Integration</title>
-            <section>
-                This section on <a href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-extensions#TOC-JavaScript-Integration">JavaScript integration has moved</a> to the Wiki.
-            </section>
+            <p>
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-extensions#TOC-JavaScript-Integration">migrated
+                to the wiki</a>.
+            </p>
         </section>
         <a name="avts"/>
         <section>
@@ -1241,154 +1243,9 @@
         <section>
             <title>Variables</title>
             <p>
-                Orbeon Forms supports declaring variables which look and behave very much like XSLT variables.
-                Variables are extremely useful, for example to avoid repeating long XPath expressions, or to give an
-                XPath expression unambiguous access to data computed in enclosing <code>&lt;xforms:group></code> or
-                <code>&lt;xforms:repeat></code> elements.
+                This section has <a href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-variables">migrated
+                to the wiki</a>.
             </p>
-            <p>
-                You define variables with the extension element <code>&lt;xxforms:variable></code>. You can also use
-                <code>&lt;exforms:variable></code> in the eXforms namespace. Either element supports the
-                following attributes:
-            </p>
-            <table>
-                <tr>
-                    <th><code>name</code></th>
-                    <td>Mandatory</td>
-                    <td>
-                        Name of the variable.
-                    </td>
-                </tr>
-                <tr>
-                    <th><code>model</code></th>
-                    <td>Optional</td>
-                    <td>
-                        Id of the model used for the evaluation of the <code>select</code> attribute. This works like
-                        the standard XForms <code>model</code> attribute.
-                    </td>
-                </tr>
-                <tr>
-                    <th><code>context</code></th>
-                    <td>Optional</td>
-                    <td>
-                        Overridden evaluation context for the evaluation of the <code>select</code> attribute. If a
-                        <code>model</code> attribute is present, the model is resolved first, and then
-                        <code>context</code> is evaluated. This works like the standard XForms <code>context</code>
-                        attribute.
-                    </td>
-                </tr>
-                <tr>
-                    <th><code>select</code></th>
-                    <td>Optional</td>
-                    <td>
-                        XPath 2.0 expression determining the value of the variable. If the attribute is omitted, the
-                        text content of the <code>&lt;xxforms:variable></code> or <code>&lt;exforms:variable></code>
-                        element is used as the value.
-                    </td>
-                </tr>
-            </table>
-            <p>
-                Once a variable is declared, you can use it from XPath expressions for which the variable is
-                visible:
-            </p>
-            <xml-source  xmlns:exforms="http://www.exforms.org/exf/1-0">
-                <xhtml:body>
-                    <comment> Variable pointing to the default instance's root element </comment>
-                    <xxforms:variable name="instance" select="."/>
-                    <comment> variable pointing to all the item children (using the "exforms" prefix this time) </comment>
-                    <comment> It uses the variable declared above </comment>
-                    <exforms:variable name="items" select="$instance/item"/>
-
-                    <comment> The code below uses the variables in scope </comment>
-                    <xforms:repeat nodeset="$items" id="items-repeat">
-                        <exforms:variable name="current-item" select="."/>
-                        <xxforms:variable name="current-position" select="position()"/>
-                        <xforms:output id="my-count" ref="$current-item/value">
-                            <xforms:label value="concat($current-item/label, ':')"/>
-                            <xforms:setvalue ev:event="my-event" ref="$current-item/value" value="count($items) + $current-position"/>
-                        </xforms:output>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xml-source>
-            <p>
-                Under the <code>&lt;xhtml:body></code> element, the following rules apply:
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        You can declare XPath variables anywhere an XForms control can be declared, as well as
-                        within <code>&lt;xforms:action></code>.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        A variable is visible to any XPath expression on a following sibling element or on a
-                        following sibling element's descendant element.
-                    </p>
-                </li>
-            </ul>
-            <p>
-                In addition, variables are supported within <code>&lt;xforms:model></code>, as well as within
-                <code>&lt;xforms:action></code> in a model. Under the <code>&lt;xforms:model></code> element, the
-                following rules apply:
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        Variables have to be declared as direct children of an <code>&lt;xforms:model></code>
-                        element.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Variables defined within a given model are also visible from XPath expression under the
-                        <code>&lt;xhtml:body></code> element whenever that model is in scope:
-                    </p>
-                </li>
-            </ul>
-            <xml-source  xmlns:exforms="http://www.exforms.org/exf/1-0">
-                <xhtml:head>
-                    <xforms:model id="my-model">
-                        <xforms:instance id="my-instance">...</xforms:instance>
-                        <xxforms:variable name="my" select="."/>
-                    </xforms:model>
-                    <xforms:model id="her-model">
-                        <xforms:instance id="her-instance">...</xforms:instance>
-                        <xxforms:variable name="her" select="instance('her-instance')"/>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <comment> $my is visible from here, but not $her </comment>
-                    <xforms:output value="$my">
-                        <xforms:label>My stuff:</xforms:label>
-                    </xforms:output>
-                    <xforms:group model="her-model">
-                        <comment> $her is visible from here, but not $my </comment>
-                        <xforms:output value="$her">
-                        <xforms:label>Her stuff:</xforms:label>
-                    </xforms:output>
-                    </xforms:group>
-                </xhtml:body>
-            </xml-source>
-            <p>
-                Currently you cannot declare variables in these locations:
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        Within XForms core controls such as <code>&lt;xforms:input></code>, including within nested
-                        items or itemsets (except within <code>&lt;xforms:action></code> elements, where they are
-                        allowed).
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Within nested model elements, including <code>&lt;xforms:bind></code> or
-                        <code>&lt;xforms:submission></code> (except within <code>&lt;xforms:action></code>
-                        elements, where they are allowed).
-                    </p>
-                </li>
-            </ul>
         </section>
         <a name="dialog"/>
         <section>

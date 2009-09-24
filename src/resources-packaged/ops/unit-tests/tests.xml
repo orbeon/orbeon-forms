@@ -35,6 +35,7 @@
     <xi:include href="xforms-server/tests-xforms-layout.xml"/>
     <xi:include href="xforms-server/tests-xforms-repeat.xml"/>
     <xi:include href="xforms-server/tests-xforms-events.xml"/>
+    <xi:include href="xforms-server/tests-xforms-variable.xml"/>
     
     <xi:include href="tests-qname-converter.xml"/>
     <xi:include href="tests-xupdate.xml"/>

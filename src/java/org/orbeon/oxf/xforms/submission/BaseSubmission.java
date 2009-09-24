@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -77,13 +78,21 @@ public abstract class BaseSubmission implements Submission {
      * @return                  LinkedHashMap<String headerName, String[] headerValues>, or null if no header elements
      */
     protected Map<String, String[]> evaluateHeaders(PropertyContext propertyContext, XFormsContextStack contextStack) {
+
+        // Used for XBL scope resolution
+        final XBLBindings bindings = containingDocument.getStaticState().getXBLBindings();
+        final String fullPrefix = submission.getXBLContainer(containingDocument).getFullPrefix();
+
         final List<Element> headerElements = Dom4jUtils.elements(submission.getSubmissionElement(), XFormsConstants.XFORMS_HEADER_QNAME);
         if (headerElements.size() > 0) {
             final Map<String, String[]> headerNameValues = new LinkedHashMap<String, String[]>();
 
             // Iterate over all <xforms:header> elements
-            for (Element currentHeaderElement: headerElements) {
-                contextStack.pushBinding(propertyContext, currentHeaderElement);
+            for (Element headerElement: headerElements) {
+                // Find scope of header element
+                final XBLBindings.Scope headerScope = bindings.getResolutionScopeByPrefixedId(fullPrefix + headerElement.attributeValue("id"));
+
+                contextStack.pushBinding(propertyContext, headerElement, submission.getEffectiveId(), headerScope);
                 final XFormsContextStack.BindingContext currentHeaderBindingContext = contextStack.getCurrentBindingContext();
                 if (currentHeaderBindingContext.isNewBind()) {
                     // This means there was @nodeset or @bind so we must iterate
@@ -93,13 +102,13 @@ public abstract class BaseSubmission implements Submission {
                         // Push all iterations in turn
                         for (int position = 1; position <= currentSize; position++) {
                             contextStack.pushIteration(position);
-                            handleHeaderElement(propertyContext, contextStack, headerNameValues, currentHeaderElement);
+                            handleHeaderElement(propertyContext, contextStack, bindings, fullPrefix, headerNameValues, headerElement);
                             contextStack.popBinding();
                         }
                     }
                 } else {
                     // This means there is just a single header
-                    handleHeaderElement(propertyContext, contextStack, headerNameValues, currentHeaderElement);
+                    handleHeaderElement(propertyContext, contextStack, bindings, fullPrefix, headerNameValues, headerElement);
                 }
                 contextStack.popBinding();
             }
@@ -113,42 +122,45 @@ public abstract class BaseSubmission implements Submission {
     /**
      * Evaluate a single <xforms:header> element. It may have a node-set binding.
      *
-     * @param propertyContext       pipeline context
+     * @param propertyContext       current context
      * @param contextStack          context stack set to <xforms:header> (or element iteration)
+     * @param bindings              XBL bindings
+     * @param fullPrefix            container prefix
      * @param headerNameValues      LinkedHashMap<String headerName, String[] headerValues> to update
-     * @param currentHeaderElement  <xforms:header> element to evaluate
+     * @param headerElement         <xforms:header> element to evaluate
      */
-    private void handleHeaderElement(PropertyContext propertyContext, XFormsContextStack contextStack, Map<String, String[]> headerNameValues,
-                                     Element currentHeaderElement) {
+    private void handleHeaderElement(PropertyContext propertyContext, XFormsContextStack contextStack, XBLBindings bindings,
+                                     String fullPrefix, Map<String, String[]> headerNameValues, Element headerElement) {
         final String headerName;
         {
-            final Element headerNameElement = currentHeaderElement.element("name");
+            final Element headerNameElement = headerElement.element("name");
             if (headerNameElement == null)
                 throw new XFormsSubmissionException(submission, "Missing <name> child element of <header> element", "processing <header> elements");
 
-            contextStack.pushBinding(propertyContext, headerNameElement);
+            final XBLBindings.Scope nameScope = bindings.getResolutionScopeByPrefixedId(fullPrefix + headerNameElement.attributeValue("id"));
+            contextStack.pushBinding(propertyContext, headerNameElement, submission.getEffectiveId(), nameScope);
             headerName = XFormsUtils.getElementValue(propertyContext, containingDocument, contextStack, submission.getEffectiveId(), headerNameElement, false, null);
             contextStack.popBinding();
         }
 
         final String headerValue;
         {
-            final Element headerValueElement = currentHeaderElement.element("value");
+            final Element headerValueElement = headerElement.element("value");
             if (headerValueElement == null)
                 throw new XFormsSubmissionException(submission, "Missing <value> child element of <header> element", "processing <header> elements");
-            contextStack.pushBinding(propertyContext, headerValueElement);
+            final XBLBindings.Scope valueScope = bindings.getResolutionScopeByPrefixedId(fullPrefix + headerValueElement.attributeValue("id"));
+            contextStack.pushBinding(propertyContext, headerValueElement, submission.getEffectiveId(), valueScope);
             headerValue = XFormsUtils.getElementValue(propertyContext, containingDocument, contextStack, submission.getEffectiveId(), headerValueElement, false, null);
             contextStack.popBinding();
         }
-
         
         final String combine;
         {
-        	final String avtCombine = currentHeaderElement.attributeValue("combine", "append");
+        	final String avtCombine = headerElement.attributeValue("combine", "append");
         	combine = XFormsUtils.resolveAttributeValueTemplates(propertyContext, contextStack.getCurrentBindingContext().getNodeset(),
         			contextStack.getCurrentBindingContext().getPosition(), contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-        			contextStack.getFunctionContext(submission.getEffectiveId()), containingDocument.getNamespaceMappings(currentHeaderElement),
-        			(LocationData)currentHeaderElement.getData(), avtCombine);
+        			contextStack.getFunctionContext(submission.getEffectiveId()), containingDocument.getNamespaceMappings(headerElement),
+        			(LocationData)headerElement.getData(), avtCombine);
 
             contextStack.returnFunctionContext();
         	

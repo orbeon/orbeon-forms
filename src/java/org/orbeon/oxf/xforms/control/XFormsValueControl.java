@@ -21,7 +21,6 @@ import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
-import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.NodeInfo;
@@ -217,9 +216,5 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
             return false;
 
         return super.equalsExternal(pipelineContext, obj);
-    }
-    
-    public XBLBindings.Scope getChildElementScope(Element element) {
-        return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getXBLContainer().getFullPrefix() + element.attributeValue("id"));
     }
 }

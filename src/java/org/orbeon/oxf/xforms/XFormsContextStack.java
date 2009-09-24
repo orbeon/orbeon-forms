@@ -234,17 +234,6 @@ public class XFormsContextStack {
      *
      * @param propertyContext   current PropertyContext
      * @param bindingElement    current element containing node binding attributes
-     */
-    public void pushBinding(PropertyContext propertyContext, Element bindingElement) {
-        // TODO: check usages of this method, since the source id is not passed
-        pushBinding(propertyContext, bindingElement, null, null);
-    }
-
-    /**
-     * Push an element containing either single-node or nodeset binding attributes.
-     *
-     * @param propertyContext   current PropertyContext
-     * @param bindingElement    current element containing node binding attributes
      * @param sourceEffectiveId effective id of source control for id resolution
      * @param scope             XBL scope
      */
@@ -276,18 +265,6 @@ public class XFormsContextStack {
             return bindingContext;
         }
     }
-
-//    private XBLBindings.Scope getScope(XBLBindings.Scope scope) {
-//        if (scope == null) {
-//            // Keep existing scope
-//            final BindingContext currentBindingContext = getCurrentBindingContext();
-//            return currentBindingContext.scope;
-//            // TODO: remove this once no caller can pass a null scope
-//        } else {
-//            // Use scope passed
-//            return scope;
-//        }
-//    }
 
     public void pushBinding(PropertyContext propertyContext, String ref, String context, String nodeset, String modelId, String bindId,
                             Element bindingElement, Map<String, String> bindingElementNamespaceContext, String sourceEffectiveId, XBLBindings.Scope scope) {
@@ -476,20 +453,8 @@ public class XFormsContextStack {
             }
 
             // Push new context
-            final String id = (bindingElement == null) ? null : bindingElement.attributeValue("id");
-
-//        DEBUG
-//            {
-//                if (newNodeset != null && newNodeset.size() > 0) {
-//                    final Item item = (Item) newNodeset.get(0);
-//
-//                    if (item instanceof NodeInfo && containingDocument.getInstanceForNode((NodeInfo) item) == null) {
-//                        System.out.println("Dangling node: " + ((NodeInfo) item).getDisplayName());
-//                    }
-//                }
-//            }
-
-            contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, newPosition, id, isNewBind,
+            final String bindingElementStaticId = (bindingElement == null) ? null : bindingElement.attributeValue("id");
+            contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, newPosition, bindingElementStaticId, isNewBind,
                     bindingElement, locationData, hasOverriddenContext, contextItem, newScope));
 
             // Add new model variables if needed

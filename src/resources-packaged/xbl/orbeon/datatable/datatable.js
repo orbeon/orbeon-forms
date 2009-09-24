@@ -129,7 +129,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 			width = (this.tableWidth + 19) + 'px';
 		}
 	} else {
-		width = this.tableWidth + 'px';
+		width = (this.tableWidth + 2) + 'px';
 	}
 	YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
 
@@ -149,11 +149,11 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 	}
 
 	// Resize the header container
-	YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
+	//YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
 	if (this.height != 'auto' && this.headBodySplit) {
 		YAHOO.util.Dom.setStyle(this.headerContainer, 'height', this.thead.rows[0].clientHeight + 'px');
 	} else if (! this.headBodySplit && this.height == 'auto') {
-		YAHOO.util.Dom.setStyle(this.headerContainer, 'border', '1px solid #7F7F7F')
+	//	YAHOO.util.Dom.setStyle(this.headerContainer, 'border', '1px solid #7F7F7F')
 	}
 
 	// Store the column widths before any split
@@ -167,7 +167,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 
     this.headerScrollWidth = this.tableWidth;
 	if (this.headBodySplit) {
-
+        YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
 		// Create a container for the body
 		this.bodyContainer = document.createElement('div');
 		YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', width);
@@ -381,11 +381,16 @@ ORBEON.widgets.datatable.prototype.adjustWidth = function (deltaX, index) {
     //alert('Before-> this.width: ' + this.width +', this.tableWidth: ' + this.tableWidth);
 	if (! this.hasFixedWidthContainer) {
 		this.width += deltaX;
-		YAHOO.util.Dom.setStyle(this.container, 'width', this.width + 'px');
-		YAHOO.util.Dom.setStyle(this.headerContainer, 'width', this.width + 'px');
 		if (this.headBodySplit) {
+            YAHOO.util.Dom.setStyle(this.container, 'width', this.width + 'px');
+            YAHOO.util.Dom.setStyle(this.headerContainer, 'width', this.width + 'px');
 			YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', this.width + 'px');
-		}
+		} else {
+            YAHOO.util.Dom.setStyle(this.container, 'width', (this.width + 2) + 'px');
+            //YAHOO.util.Dom.setStyle(this.headerContainer, 'width', this.width + 'px');
+			YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', this.width + 'px');
+            
+        }
 	}
 	if (! this.hasFixedWidthTable) {
 		this.tableWidth += deltaX;

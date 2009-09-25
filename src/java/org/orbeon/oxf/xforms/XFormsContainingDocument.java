@@ -1641,6 +1641,10 @@ public class XFormsContainingDocument extends XBLContainer {
         return indentedLogger;
     }
 
+    public IndentedLogger getIndentedLogger() {
+        return indentedLogger;
+    }
+
     @Override
     protected List<XFormsControl> getChildrenControls(XFormsControls controls) {
         return controls.getCurrentControlTree().getChildren();

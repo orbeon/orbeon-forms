@@ -43,5 +43,13 @@
                 <data type="boolean"/>
             </element>
         </optional>
+        <optional>
+            <element name="content-type">
+                <choice>
+                    <value>text/plain</value>
+                    <value>application/xml</value>
+                </choice>
+            </element>
+        </optional>
     </interleave>
 </element>

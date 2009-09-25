@@ -72,15 +72,18 @@ public class XFormsConstants {
     // XForms controls
     public static final QName GROUP_QNAME = new QName("group", XFORMS_NAMESPACE);
     public static final QName REPEAT_QNAME = new QName("repeat", XFORMS_NAMESPACE);
+    public static final String REPEAT_NAME = REPEAT_QNAME.getName();
     public static final QName SWITCH_QNAME = new QName("switch", XFORMS_NAMESPACE);
     public static final QName CASE_QNAME = new QName("case", XFORMS_NAMESPACE);
     public static final QName XXFORMS_DIALOG_QNAME = new QName("dialog", XXFORMS_NAMESPACE);
+    public static final String XXFORMS_DIALOG_NAME = XXFORMS_DIALOG_QNAME.getName();
 
     public static final QName INPUT_QNAME = new QName("input", XFORMS_NAMESPACE);
     public static final QName SECRET_QNAME = new QName("secret", XFORMS_NAMESPACE);
     public static final QName TEXTAREA_QNAME = new QName("textarea", XFORMS_NAMESPACE);
     public static final QName OUTPUT_QNAME = new QName("output", XFORMS_NAMESPACE);
     public static final QName UPLOAD_QNAME = new QName("upload", XFORMS_NAMESPACE);
+    public static final String UPLOAD_NAME = UPLOAD_QNAME.getName();
     public static final QName RANGE_QNAME = new QName("range", XFORMS_NAMESPACE);
     public static final QName SELECT_QNAME = new QName("select", XFORMS_NAMESPACE);
     public static final QName SELECT1_QNAME = new QName("select1", XFORMS_NAMESPACE);

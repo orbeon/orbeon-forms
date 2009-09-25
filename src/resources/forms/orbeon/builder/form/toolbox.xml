@@ -100,8 +100,7 @@
                                     <xforms:insert context="." nodeset="fr:section | fr:repeat | fr:grid"
                                                    at="index('fb-top-level-repeat')" position="after"
                                                    origin="instance('fb-section-template')"/>
-
-                                    <xxforms:variable name="new-section" select="*[index('fb-top-level-repeat')]" as="element(fr:section)"/>
+                                    <xxforms:variable name="new-section" select="(fr:section | fr:repeat | fr:grid)[index('fb-top-level-repeat')]" as="element(fr:section)"/>
 
                                     <!-- Compute next section id -->
                                     <xforms:dispatch target="fr-form-model" name="fb-compute-section-id"/>
@@ -126,15 +125,14 @@
                                         <xforms:insert context="." nodeset="*"
                                                        at="index('fb-top-level-repeat')" position="after"
                                                        origin="xxforms:element($new-section-name)"/>
-
                                     </xforms:action>
 
                                     <!-- Insert resources placeholders for all languages -->
                                     <xforms:action xxforms:iterate="$resources/resource">
                                         <xforms:insert context="." nodeset="*"
                                                        origin="xxforms:element($new-section-name)"/>
-
                                         <xforms:insert context="*[last()]" origin="instance('fb-resource-template')/(label | help)"/>
+                                        <xforms:setvalue ref="*[last()]/label" value="$form-resources/template/untitled-section"/>
                                     </xforms:action>
 
                                     <!-- Make sure the bind is created -->

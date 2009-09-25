@@ -203,13 +203,13 @@ public class ExecuteProcessor extends ProcessorImpl {
 
             if (contentHandler != null) {
                 // Output or remember stdout
-                state.outputBytes = project.getProperty(OUTPUT_PROPERTY).getBytes("utf-8");
+                state.outputString = project.getProperty(OUTPUT_PROPERTY);
                 if (outputName.equals(OUTPUT_STDOUT)) {
                     outputStdout(contentHandler, state);
                 }
 
                 // Output or remember stderr
-                state.errorBytes = project.getProperty(ERROR_PROPERTY).getBytes("utf-8");
+                state.errorString = project.getProperty(ERROR_PROPERTY);
                 if (outputName.equals(OUTPUT_STDERR)) {
                     outputStderr(contentHandler, state);
                 }
@@ -228,13 +228,13 @@ public class ExecuteProcessor extends ProcessorImpl {
     }
 
     private void outputStdout(ContentHandler contentHandler, State state) {
-        ProcessorUtils.readText(new ByteArrayInputStream(state.outputBytes), "utf-8", contentHandler, "text/plain", null);
-        state.outputBytes = null;
+        ProcessorUtils.readText(state.outputString, contentHandler, "text/plain", null);
+        state.outputString = null;
     }
 
     private void outputStderr(ContentHandler contentHandler, State state) {
-        ProcessorUtils.readText(new ByteArrayInputStream(state.errorBytes), "utf-8", contentHandler, "text/plain", null);
-        state.errorBytes = null;
+        ProcessorUtils.readText(state.errorString, contentHandler, "text/plain", null);
+        state.errorString = null;
     }
 
     private void outputResult(ContentHandler contentHandler, State state) {
@@ -285,8 +285,8 @@ public class ExecuteProcessor extends ProcessorImpl {
 
     private static class State {
         public boolean isRead;
-        public byte[] outputBytes;
-        public byte[] errorBytes;
+        public String outputString;
+        public String errorString;
         public String result;
     }
 }

@@ -27,6 +27,9 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
     public static final int SESSION_CONTEXT = 1;
     public static final int APPLICATION_CONTEXT = 2;
 
+    public static final String APPLICATION_XML = "application/xml";
+    public static final String TEXT_PLAIN = "text/plain";
+
     public static final String SCOPE_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/schemas/scope-config";
 
     protected ContextConfig readConfig(PipelineContext context) {
@@ -37,6 +40,8 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
                 final Element rootElement = readInputAsDOM4J(context, input).getRootElement();
                 final String contextName = rootElement.element("scope").getStringValue();
                 final Element sessionScopeElement = rootElement.element("session-scope");
+                final Element contentTypeEl = rootElement.element("content-type");
+                final String contentType = (contentTypeEl == null) ? APPLICATION_XML : (TEXT_PLAIN.equals(contentTypeEl.getStringValue())) ? TEXT_PLAIN : null ;
                 final String sessionScopeValue = (sessionScopeElement == null) ? null : sessionScopeElement.getStringValue();
                 return new ContextConfig("request".equals(contextName) ? REQUEST_CONTEXT
                         : "session".equals(contextName) ? SESSION_CONTEXT
@@ -44,6 +49,7 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
                         : -1,
                         "application".equals(sessionScopeValue) ? ExternalContext.Session.APPLICATION_SCOPE : "portlet".equals(sessionScopeValue) ? ExternalContext.Session.PORTLET_SCOPE : -1,
                         rootElement.element("key").getStringValue(),
+                        contentType,
                         ProcessorUtils.selectBooleanValue(rootElement, "/*/test-ignore-stored-key-validity", false));
             }
         });
@@ -55,11 +61,13 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
         private int sessionScope;
         private String key;
         private boolean testIgnoreStoredKeyValidity;
+        private String contentType;
 
-        public ContextConfig(int contextType, int sessionScope, String key, boolean testIgnoreInternalKeyValidity) {
+        public ContextConfig(int contextType, int sessionScope, String key, String contentType, boolean testIgnoreInternalKeyValidity) {
             this.contextType = contextType;
             this.sessionScope = sessionScope;
             this.key = key;
+            this.contentType = contentType;
             this.testIgnoreStoredKeyValidity = testIgnoreInternalKeyValidity;
         }
 
@@ -73,6 +81,10 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
 
         public String getKey() {
             return key;
+        }
+
+        public String getContentType() {
+            return contentType;
         }
 
         public boolean isTestIgnoreStoredKeyValidity() {

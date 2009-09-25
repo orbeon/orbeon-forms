@@ -20,7 +20,7 @@
         <xhtml:title>XForms Wizard - Summary</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance src="input:instance"/>
-            <xforms:submission id="main" ref="/" action="/xforms-wizard-pfc/summary" method="post"/>
+            <xforms:submission id="start-submission" resource="/xforms-wizard-pfc/" method="post" replace="all"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -53,10 +53,7 @@
                 <xhtml:td>
                     <xforms:trigger>
                         <xforms:label>Go back to start</xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="action">start</xforms:setvalue>
-                            <xforms:send submission="main"/>
-                        </xforms:action>
+                        <xforms:send ev:event="DOMActivate" submission="start-submission"/>
                     </xforms:trigger>
                 </xhtml:td>
             </xhtml:tr>

@@ -20,7 +20,8 @@
         <xhtml:title>XForms Wizard - Step 3</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance src="input:instance"/>
-            <xforms:submission id="main" ref="/" action="/xforms-wizard-pfc/age" method="post"/>
+            <xforms:submission id="previous-submission" resource="/xforms-wizard-pfc/lastname" method="post" replace="all"/>
+            <xforms:submission id="next-submission" resource="/xforms-wizard-pfc/summary" method="post" replace="all"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -40,17 +41,11 @@
                 <xhtml:td>
                     <xforms:trigger>
                         <xforms:label>&lt; Previous</xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="action">previous</xforms:setvalue>
-                            <xforms:send submission="main"/>
-                        </xforms:action>
+                        <xforms:send ev:event="DOMActivate" submission="previous-submission"/>
                     </xforms:trigger>
                     <xforms:trigger>
                         <xforms:label>Finish ></xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="action">finish</xforms:setvalue>
-                            <xforms:send submission="main"/>
-                        </xforms:action>
+                        <xforms:send ev:event="DOMActivate" submission="next-submission"/>
                     </xforms:trigger>
                 </xhtml:td>
             </xhtml:tr>

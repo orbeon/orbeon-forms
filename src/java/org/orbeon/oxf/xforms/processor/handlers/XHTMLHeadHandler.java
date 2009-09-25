@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsFeatures;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
@@ -28,7 +29,6 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -69,7 +69,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
         // Gather information about appearances of controls which use Script
         // Map<String controlName, Map<String appearanceOrMediatype, List<String effectiveId>>>
         // TODO: This would probably be done better, and more correctly, based on statically-gathered information in XFormsStaticState
-        final Map javaScriptControlsAppearancesMap = new HashMap();
+        final Map<String, Map<String, List<String>>> javaScriptControlsAppearancesMap = new HashMap<String, Map<String, List<String>>>();
         {
             final XFormsControls xformsControls = containingDocument.getControls();
             xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
@@ -80,9 +80,9 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                     // future if some static readonly controls require JS initialization)
                     final boolean hasJavaScriptInitialization = control.hasJavaScriptInitialization() && !control.isStaticReadonly();
                     if (hasJavaScriptInitialization) {
-                        Map listForControlNameMap = (Map) javaScriptControlsAppearancesMap.get(controlName);
+                        Map<String, List<String>> listForControlNameMap = javaScriptControlsAppearancesMap.get(controlName);
                         if (listForControlNameMap == null) {
-                            listForControlNameMap = new HashMap();
+                            listForControlNameMap = new HashMap<String, List<String>>();
                             javaScriptControlsAppearancesMap.put(control.getName(), listForControlNameMap);
                         }
                         final String controlAppearanceOrMediatype;
@@ -91,9 +91,9 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                             controlAppearanceOrMediatype = (controlAppearance != null) ? controlAppearance : control.getMediatype();
                         }
 
-                        List idsForAppearanceOrMediatypeList = (List) listForControlNameMap.get(controlAppearanceOrMediatype);
+                        List<String> idsForAppearanceOrMediatypeList = listForControlNameMap.get(controlAppearanceOrMediatype);
                         if (idsForAppearanceOrMediatypeList == null) {
-                            idsForAppearanceOrMediatypeList = new ArrayList();
+                            idsForAppearanceOrMediatypeList = new ArrayList<String>();
                             listForControlNameMap.put(controlAppearanceOrMediatype, idsForAppearanceOrMediatypeList);
                         }
                         idsForAppearanceOrMediatypeList.add(control.getEffectiveId());
@@ -278,11 +278,11 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 //                        }
                     }
 
-                    final Map nonDefaultProperties = containingDocument.getStaticState().getNonDefaultProperties();
+                    final Map<String, Object> nonDefaultProperties = containingDocument.getStaticState().getNonDefaultProperties();
                     clientPropertiesMap = new CompositeMap(new Map[] { nonDefaultProperties, dynamicProperties });
                 }
                 
-                FastStringBuffer sb = null;
+                StringBuilder sb = null;
                 if (clientPropertiesMap.size() > 0) {
 
                     for (Object o: clientPropertiesMap.entrySet()) {
@@ -299,7 +299,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                                 // First property found
                                 helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[]{
                                         "type", "text/javascript"});
-                                sb = new FastStringBuffer("var opsXFormsProperties = {");
+                                sb = new StringBuilder("var opsXFormsProperties = {");
                             } else {
                                 // Subsequent property found
                                 sb.append(',');
@@ -333,7 +333,18 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
             final Map<String, String> scriptsToDeclare = containingDocument.getScripts();
             final String focusElementId = containingDocument.getClientFocusEffectiveControlId();
             final List<XFormsContainingDocument.Message> messagesToRun = containingDocument.getMessagesToRun();
-            if (scriptsToDeclare != null || focusElementId != null || messagesToRun != null) {
+            final List<XXFormsDialogControl> dialogsToOpen = new ArrayList<XXFormsDialogControl>(); {
+                final Map<String, XFormsControl> dialogsMap = containingDocument.getControls().getCurrentControlTree().getDialogControls();
+                if (dialogsMap != null && dialogsMap.size() > 0) {
+                    for (final XFormsControl control: dialogsMap.values()) {
+                        final XXFormsDialogControl dialogControl = (XXFormsDialogControl) control;
+                        if (dialogControl.isVisible()) {
+                            dialogsToOpen.add(dialogControl);
+                        }
+                    }
+                }
+            }
+            if (scriptsToDeclare != null || focusElementId != null || messagesToRun != null || dialogsToOpen.size() > 0) {
                 helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                     "type", "text/javascript"});
 
@@ -347,8 +358,8 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                 final List<XFormsContainingDocument.Script> scriptsToRun = containingDocument.getScriptsToRun();
 
-                if (focusElementId != null || scriptsToRun != null || messagesToRun != null) {
-                    final FastStringBuffer sb = new FastStringBuffer("\nfunction xformsPageLoadedServer() { ");
+                if (scriptsToRun != null || focusElementId != null || messagesToRun != null || dialogsToOpen.size() > 0) {
+                    final StringBuilder sb = new StringBuilder("\nfunction xformsPageLoadedServer() { ");
 
                     // Initial setfocus if present
                     if (focusElementId != null) {
@@ -382,6 +393,23 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         }
                     }
 
+                    // Initial dialogs to open
+                    if (dialogsToOpen.size() > 0) {
+                        for (final XXFormsDialogControl dialogControl: dialogsToOpen) {
+                            sb.append("ORBEON.xforms.Controls.showDialog(\"");
+                            sb.append(dialogControl.getEffectiveId());
+                            sb.append("\", ");
+                            if (dialogControl.getNeighborControlId() != null) {
+                                sb.append('"');
+                                sb.append(dialogControl.getNeighborControlId());
+                                sb.append('"');
+                            } else {
+                                sb.append("null");
+                            }
+                            sb.append(");");
+                        }
+                    }
+
                     sb.append(" }");
 
                     helper.text(sb.toString());
@@ -397,28 +425,28 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                 // Produce JSON output
                 if (javaScriptControlsAppearancesMap.size() > 0) {
-                    final FastStringBuffer sb = new FastStringBuffer("var opsXFormsControls = {\"controls\":{");
+                    final StringBuilder sb = new StringBuilder("var opsXFormsControls = {\"controls\":{");
 
-                    for (Iterator i = javaScriptControlsAppearancesMap.entrySet().iterator(); i.hasNext();) {
-                        final Map.Entry currentEntry1 = (Map.Entry) i.next();
-                        final String controlName = (String) currentEntry1.getKey();
-                        final Map controlMap = (Map) currentEntry1.getValue();
+                    for (Iterator<Map.Entry<String,Map<String,List<String>>>> i = javaScriptControlsAppearancesMap.entrySet().iterator(); i.hasNext();) {
+                        final Map.Entry<String,Map<String,List<String>>> currentEntry1 = i.next();
+                        final String controlName = currentEntry1.getKey();
+                        final Map<String, List<String>> controlMap = currentEntry1.getValue();
 
                         sb.append("\"");
                         sb.append(controlName);
                         sb.append("\":{");
 
-                        for (Iterator j = controlMap.entrySet().iterator(); j.hasNext();) {
-                            final Map.Entry currentEntry2 = (Map.Entry) j.next();
-                            final String controlAppearance = (String) currentEntry2.getKey();
-                            final List idsForAppearanceList = (List) currentEntry2.getValue();
+                        for (Iterator<Map.Entry<String,List<String>>> j = controlMap.entrySet().iterator(); j.hasNext();) {
+                            final Map.Entry<String,List<String>> currentEntry2 = j.next();
+                            final String controlAppearance = currentEntry2.getKey();
+                            final List<String> idsForAppearanceList = currentEntry2.getValue();
 
                             sb.append('"');
                             sb.append(controlAppearance != null ? controlAppearance : "");
                             sb.append("\":[");
 
-                            for (Iterator k = idsForAppearanceList.iterator(); k.hasNext();) {
-                                final String controlId = (String) k.next();
+                            for (Iterator<String> k = idsForAppearanceList.iterator(); k.hasNext();) {
+                                final String controlId = k.next();
                                 sb.append('"');
                                 sb.append(controlId);
                                 sb.append('"');

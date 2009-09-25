@@ -1665,4 +1665,8 @@ public class XFormsContainingDocument extends XBLContainer {
 
         return indentedLogger;
     }
+
+    public IndentedLogger getIndentedLogger() {
+        return indentedLogger;
+    }
 }

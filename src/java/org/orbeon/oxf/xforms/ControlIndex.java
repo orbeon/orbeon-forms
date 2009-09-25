@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -97,9 +98,11 @@ public class ControlIndex {
         // Remember:
         // xforms:upload
         // xforms:repeat
+        // xxforms:dialog
         // xforms:select[@appearance = 'full'] in noscript mode
         return control instanceof XFormsUploadControl
                 || control instanceof XFormsRepeatControl
+                || control instanceof XXFormsDialogControl
                 || (isNoscript && control instanceof XFormsSelectControl && ((XFormsSelectControl) control).isFullAppearance());
     }
 
@@ -127,11 +130,15 @@ public class ControlIndex {
     }
 
     public Map<String, XFormsControl> getUploadControls() {
-        return (controlTypes != null) ? controlTypes.get("upload") : null;
+        return (controlTypes != null) ? controlTypes.get(XFormsConstants.UPLOAD_NAME) : null;
     }
 
     public Map<String, XFormsControl> getRepeatControls() {
-        return (controlTypes != null) ? controlTypes.get("repeat") : null;
+        return (controlTypes != null) ? controlTypes.get(XFormsConstants.REPEAT_NAME) : null;
+    }
+
+    public Map<String, XFormsControl> getDialogControls() {
+        return (controlTypes != null) ? controlTypes.get(XFormsConstants.XXFORMS_DIALOG_NAME) : null;
     }
 
     /**

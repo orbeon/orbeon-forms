@@ -530,6 +530,11 @@ public class ControlTree implements Cloneable {
         return controlIndex.getRepeatControls();
     }
 
+    public Map<String, XFormsControl> getDialogControls() {
+        // Delegate
+        return controlIndex.getDialogControls();
+    }
+
     /**
      * Return the list of xforms:select[@appearance = 'full'] in noscript mode.
      *

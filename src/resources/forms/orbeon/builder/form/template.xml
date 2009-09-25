@@ -37,8 +37,8 @@
                 <metadata>
                     <application-name/>
                     <form-name/>
-                    <title xml:lang="en">Untitled Form</title>
-                    <description xml:lang="en"/>
+                    <title xml:lang=""/>
+                    <description xml:lang=""/>
                     <author/>
                     <logo mediatype="" filename="" size=""/>
                 </metadata>
@@ -55,7 +55,7 @@
             <!-- All form resources -->
             <xforms:instance id="fr-form-resources" xxforms:readonly="true">
                 <resources>
-                    <resource xml:lang="en">
+                    <resource xml:lang="">
                         <section-1>
                             <label/>
                             <help/>

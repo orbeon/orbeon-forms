@@ -60,7 +60,8 @@ import java.util.concurrent.*;
  * o Contains XForms controls
  * o Handles event handlers hierarchy
  */
-public class XFormsContainingDocument extends XBLContainer {
+public class
+        XFormsContainingDocument extends XBLContainer {
 
     // Special id name for the top-level containing document
     public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";

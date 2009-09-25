@@ -199,30 +199,29 @@ public class ProcessorUtils {
      * @param contentType           optional content type to set as attribute on the root element
      */
     public static void readText(InputStream is, String encoding, ContentHandler output, String contentType, Long lastModified) {
-
-        if (encoding == null)
-            encoding = DEFAULT_TEXT_READING_ENCODING;
-
         try {
-            // Create attributes for root element: xsi:type, and optional content-type
-            final AttributesImpl attributes = new AttributesImpl();
-            attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME.getQualifiedName());
-            if (contentType != null)
-                attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
-            if (lastModified != null)
-                attributes.addAttribute("", "last-modified", "last-modified", "CDATA", ISODateUtils.getRFC1123Date(lastModified.longValue()));
-
-            // Write document
-            output.startDocument();
-            output.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-            output.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-            output.startElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT, attributes);
+            if (encoding == null)
+                encoding = DEFAULT_TEXT_READING_ENCODING;
+            outputStartDocument(output, contentType, lastModified, XMLConstants.XS_STRING_QNAME, DEFAULT_TEXT_DOCUMENT_ELEMENT);
             XMLUtils.readerToCharacters(new InputStreamReader(is, encoding), output);
-            output.endElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT);
-            output.endPrefixMapping(XMLConstants.XSD_PREFIX);
-            output.endPrefixMapping(XMLConstants.XSI_PREFIX);
-            output.endDocument();
+            outputEndDocument(output, DEFAULT_TEXT_DOCUMENT_ELEMENT);
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
 
+    /**
+     * Generate a "standard" Orbeon text document.
+     *
+     * @param text                  String to read from
+     * @param output                output ContentHandler to write text document to
+     * @param contentType           optional content type to set as attribute on the root element
+     */
+    public static void readText(String text, ContentHandler output, String contentType, Long lastModified) {
+        try {
+            outputStartDocument(output, contentType, lastModified, XMLConstants.XS_STRING_QNAME, DEFAULT_TEXT_DOCUMENT_ELEMENT);
+            output.characters(text.toCharArray(), 0, text.length());
+            outputEndDocument(output, DEFAULT_TEXT_DOCUMENT_ELEMENT);
         } catch (Exception e) {
             throw new OXFException(e);
         }
@@ -237,26 +236,41 @@ public class ProcessorUtils {
      */
     public static void readBinary(InputStream is, ContentHandler output, String contentType, Long lastModified) {
         try {
+            outputStartDocument(output, contentType, lastModified, XMLConstants.XS_BASE64BINARY_QNAME, DEFAULT_BINARY_DOCUMENT_ELEMENT);
+            XMLUtils.inputStreamToBase64Characters(new BufferedInputStream(is), output);
+            outputEndDocument(output, DEFAULT_BINARY_DOCUMENT_ELEMENT);
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
+    private static void outputStartDocument(ContentHandler output, String contentType, Long lastModified, QName type, String documentElement) {
+        try {
             // Create attributes for root element: xsi:type, and optional content-type
-            AttributesImpl attributes = new AttributesImpl();
-            attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
+            final AttributesImpl attributes = new AttributesImpl();
+            attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", type.getQualifiedName());
             if (contentType != null)
                 attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
             if (lastModified != null)
-                attributes.addAttribute("", "last-modified", "last-modified", "CDATA",  ISODateUtils.getRFC1123Date(lastModified.longValue()));
+                attributes.addAttribute("", "last-modified", "last-modified", "CDATA", ISODateUtils.getRFC1123Date(lastModified.longValue()));
 
             // Write document
             output.startDocument();
             output.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
             output.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-            output.startElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
-            XMLUtils.inputStreamToBase64Characters(new BufferedInputStream(is), output);
-            output.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
+            output.startElement("", documentElement, documentElement, attributes);
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
+    private static void outputEndDocument(ContentHandler output, String documentElement) {
+        try {
+            output.endElement("", documentElement, documentElement);
             output.endPrefixMapping(XMLConstants.XSD_PREFIX);
             output.endPrefixMapping(XMLConstants.XSI_PREFIX);
             output.endDocument();
-
-        } catch (SAXException e) {
+        } catch (Exception e) {
             throw new OXFException(e);
         }
     }

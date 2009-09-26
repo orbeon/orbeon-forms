@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.function;
 
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -50,8 +49,7 @@ public class Index extends XFormsFunction {
             final RuntimeException exception = new ValidationException(message, null);
 
             // This function is always called from controls so PipelineContext should be present
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            final PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
+            final PipelineContext pipelineContext = getOrCreatePipelineContext();
 
             final XFormsModel currentModel = getContextStack(xpathContext).getCurrentModel();
             final XBLContainer container = currentModel.getXBLContainer();

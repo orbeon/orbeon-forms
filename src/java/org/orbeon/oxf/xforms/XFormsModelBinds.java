@@ -312,8 +312,9 @@ public class XFormsModelBinds {
             final String result = evaluateXXFormsDefaultBind(propertyContext, bind, nodeset, position);
             return (result != null) ? new StringValue(result) : null;
         } else {
-            // TODO: custom MIPs
-            return null;
+            // Try custom MIPs
+            final String result = evaluateCustomMIP(propertyContext, bind, buildCustomMIPName(mipType.getQualifiedName()), nodeset, position, currentVariables);
+            return (result != null) ? new StringValue(result) : null;
         }
     }
 
@@ -684,34 +685,45 @@ public class XFormsModelBinds {
         final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
         final Map<String, ValueRepresentation> currentVariables = getVariables(currentNodeInfo);
 
-        // Handle required MIP
+        // Handle required, relevant, readonly, and custom MIPs
         handleRequiredMIP(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
-
-        // Handle relevant MIP
         handleRelevantMIP(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
-
-        // Handle readonly MIP
         handleReadonlyMIP(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
+        handleCustomMIPs(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
+    }
 
+    private void handleCustomMIPs(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, NodeInfo currentNodeInfo, Map<String, ValueRepresentation> currentVariables) {
         final Map<String, String> customMips = bind.getCustomMips();
         if (customMips != null && customMips.size() > 0) {
-            for (Map.Entry<String, String> entry: customMips.entrySet()) {
-                final String key = entry.getKey();
-                final String expression = entry.getValue();
+            for (String propertyName: customMips.keySet()) {
+                final String stringResult = evaluateCustomMIP(propertyContext, bind, propertyName, nodeset, position, currentVariables);
+                InstanceData.setCustom(currentNodeInfo, propertyName, stringResult);
+            }
+        }
+    }
 
+    private String evaluateCustomMIP(PropertyContext propertyContext, Bind bind, String propertyName, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
+        final Map<String, String> customMips = bind.getCustomMips();
+        if (customMips != null && customMips.size() > 0) {
+            final String expression = customMips.get(propertyName);
+            if (expression != null) {
                 try {
-                    final String stringResult = XPathCache.evaluateAsString(propertyContext, nodeset, position, expression,
-                            container.getNamespaceMappings(bind.getBindElement()), getVariables(currentNodeInfo),
+                    return XPathCache.evaluateAsString(propertyContext, nodeset, position, expression,
+                            container.getNamespaceMappings(bind.getBindElement()), currentVariables,
                             XFormsContainingDocument.getFunctionLibrary(), model.getContextStack().getFunctionContext(),
                             bind.getLocationData().getSystemID(), bind.getLocationData());
-                    InstanceData.setCustom(currentNodeInfo, key, stringResult);
                 } catch (Exception e) {
                     final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms custom bind",
-                            bind.getBindElement(), new String[] { "name", key, "expression", expression }));
+                            bind.getBindElement(), new String[] { "name", propertyName, "expression", expression }));
 
                     container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
+                    throw new IllegalStateException(); // event above throw an exception anyway
                 }
+            } else {
+                return null;
             }
+        } else {
+            return null;
         }
     }
 
@@ -1105,7 +1117,7 @@ public class XFormsModelBinds {
                         if (customMips == null)
                             customMips = new HashMap<String, String>();
                         // E.g. foo:bar="true()" => "foo-bar" -> "true()"
-                        customMips.put(attribute.getQualifiedName().replace(':', '-'), attribute.getValue());
+                        customMips.put(buildCustomMIPName(attribute.getQualifiedName()), attribute.getValue());
                     }
                 }
             }
@@ -1269,5 +1281,9 @@ public class XFormsModelBinds {
             }
             return null;
         }
+    }
+
+    private static String buildCustomMIPName(String qualifiedName) {
+        return qualifiedName.replace(':', '-');
     }
 }

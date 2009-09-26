@@ -891,7 +891,7 @@
         </output>
     </test>
 
-    <test description="xxforms:bind-property function" name="oxf:pipeline">
+    <test description="Simple use of xxforms:bind-property function" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -945,6 +945,113 @@
                         <xxf:control id="output-type">xs:integer</xxf:control>
                         <xxf:control id="output-calculate">86</xxf:control>
                         <xxf:control id="output-default">42</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xxforms:bind-property function within nested nested binds with repeat" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                        xmlns:foo="http://orbeon.org/oxf/xml/foo">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <foo bar=""/>
+                                <foo bar=""/>
+                                <foo bar=""/>
+                                <foo bar=""/>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:bind id="foo-bind" nodeset="foo">
+                            <xforms:bind id="value-bind" nodeset="."
+                                         xxforms:default="count(preceding-sibling::foo) + 42"
+                                         relevant="count(preceding-sibling::foo) mod 2 = 0"
+                                         readonly="count(preceding-sibling::foo) mod 3 = 0"
+                                         required="count(preceding-sibling::foo) mod 4 = 0"
+                                         type="xs:integer"
+                                         constraint="xs:integer(.) le 43"
+                                         foo:bar="string-join((., @bar), ', ')"
+                                         />
+                            <xforms:bind id="bar-bind" nodeset="@bar" calculate=".. + 1"/>
+
+                        </xforms:bind>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat bind="foo-bind" id="repeat">
+                        <xforms:output id="output-relevant" value="xxforms:bind-property('value-bind', 'relevant')"/>
+                        <xforms:output id="output-readonly" value="xxforms:bind-property('value-bind', 'readonly')"/>
+                        <xforms:output id="output-required" value="xxforms:bind-property('value-bind', 'required')"/>
+                        <xforms:output id="output-type" value="xxforms:bind-property('value-bind', 'type')"/>
+                        <xforms:output id="output-constraint" value="xxforms:bind-property('value-bind', 'constraint')"/>
+                        <xforms:output id="output-default" value="xxforms:bind-property('value-bind', 'xxforms:default')"/>
+                        <xforms:output id="output-custom" value="xxforms:bind-property('value-bind', 'foo:bar')"/>
+
+                        <xforms:output id="output-calculate" value="xxforms:bind-property('bar-bind', 'calculate')"/>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <foo bar="43">42</foo>
+                                    <foo bar="44">43</foo>
+                                    <foo bar="45">44</foo>
+                                    <foo bar="46">45</foo>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="repeat" parent-indexes="" start-suffix="2" end-suffix="4"/>
+                        <xxf:control id="output-relevant·1">true</xxf:control>
+                        <xxf:control id="output-readonly·1">true</xxf:control>
+                        <xxf:control id="output-required·1">true</xxf:control>
+                        <xxf:control id="output-type·1">xs:integer</xxf:control>
+                        <xxf:control id="output-constraint·1">true</xxf:control>
+                        <xxf:control id="output-default·1">42</xxf:control>
+                        <xxf:control id="output-custom·1">42, 43</xxf:control>
+                        <xxf:control id="output-calculate·1">43</xxf:control>
+                        <xxf:repeat-iteration id="repeat" relevant="false" iteration="2"/>
+                        <xxf:control id="output-relevant·2" relevant="false">false</xxf:control>
+                        <xxf:control id="output-readonly·2" relevant="false">false</xxf:control>
+                        <xxf:control id="output-required·2" relevant="false">false</xxf:control>
+                        <xxf:control id="output-type·2" relevant="false">xs:integer</xxf:control>
+                        <xxf:control id="output-constraint·2" relevant="false">true</xxf:control>
+                        <xxf:control id="output-default·2" relevant="false">43</xxf:control>
+                        <xxf:control id="output-custom·2" relevant="false">43, 44</xxf:control>
+                        <xxf:control id="output-calculate·2" relevant="false">44</xxf:control>
+                        <xxf:control id="output-relevant·3">true</xxf:control>
+                        <xxf:control id="output-readonly·3">false</xxf:control>
+                        <xxf:control id="output-required·3">false</xxf:control>
+                        <xxf:control id="output-type·3">xs:integer</xxf:control>
+                        <xxf:control id="output-constraint·3">false</xxf:control>
+                        <xxf:control id="output-default·3">44</xxf:control>
+                        <xxf:control id="output-custom·3">44, 45</xxf:control>
+                        <xxf:control id="output-calculate·3">45</xxf:control>
+                        <xxf:repeat-iteration id="repeat" relevant="false" iteration="4"/>
+                        <xxf:control id="output-relevant·4" relevant="false">false</xxf:control>
+                        <xxf:control id="output-readonly·4" relevant="false">true</xxf:control>
+                        <xxf:control id="output-required·4" relevant="false">false</xxf:control>
+                        <xxf:control id="output-type·4" relevant="false">xs:integer</xxf:control>
+                        <xxf:control id="output-constraint·4" relevant="false">false</xxf:control>
+                        <xxf:control id="output-default·4" relevant="false">45</xxf:control>
+                        <xxf:control id="output-custom·4" relevant="false">45, 46</xxf:control>
+                        <xxf:control id="output-calculate·4" relevant="false">46</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

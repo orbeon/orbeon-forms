@@ -891,5 +891,64 @@
         </output>
     </test>
 
-</group>
+    <test description="xxforms:bind-property function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <foo/>
+                                <bar>43</bar>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:bind id="foo-bind" nodeset="foo"
+                                     xxforms:default="42"
+                                     relevant=". = 86"
+                                     calculate="xs:integer(../bar) * 2"
+                                     readonly="false()"
+                                     required="true()"
+                                     type="xs:integer"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output-relevant" value="xxforms:bind-property('foo-bind', 'relevant')"/>
+                    <xforms:output id="output-readonly" value="xxforms:bind-property('foo-bind', 'readonly')"/>
+                    <xforms:output id="output-required" value="xxforms:bind-property('foo-bind', 'required')"/>
+                    <xforms:output id="output-type" value="xxforms:bind-property('foo-bind', 'type')"/>
+                    <xforms:output id="output-constraint" value="xxforms:bind-property('foo-bind', 'constraint')"/>
+                    <xforms:output id="output-calculate" value="xxforms:bind-property('foo-bind', 'calculate')"/>
+                    <xforms:output id="output-default" value="xxforms:bind-property('foo-bind', 'xxforms:default')"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <foo>86</foo>
+                                    <bar>43</bar>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output-relevant">true</xxf:control>
+                        <xxf:control id="output-readonly">false</xxf:control>
+                        <xxf:control id="output-required">true</xxf:control>
+                        <xxf:control id="output-type">xs:integer</xxf:control>
+                        <xxf:control id="output-calculate">86</xxf:control>
+                        <xxf:control id="output-default">42</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 
+</group>

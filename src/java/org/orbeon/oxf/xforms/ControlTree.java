@@ -177,7 +177,7 @@ public class ControlTree implements Cloneable {
         effectiveIdsToControls.put(control.getEffectiveId(), control);
 
         // Remember by control type (for certain controls we know we need)
-        if (mustMapControl(control)) {
+        if (mustMapControlByType(control)) {
             if (controlTypes == null)
                 controlTypes = new HashMap<String, Map<String, XFormsControl>>();// no need for order here
 
@@ -217,7 +217,7 @@ public class ControlTree implements Cloneable {
         }
 
         // Remove by control type (for certain controls we know we need)
-        if (mustMapControl(control)) {
+        if (mustMapControlByType(control)) {
             if (controlTypes != null) {
                 final Map controlsMap = controlTypes.get(control.getName());
                 if (controlsMap != null) {
@@ -239,14 +239,16 @@ public class ControlTree implements Cloneable {
         }
     }
 
-    private boolean mustMapControl(XFormsControl control) {
+    private boolean mustMapControlByType(XFormsControl control) {
 
         // Remember:
         // xforms:upload
         // xforms:repeat
+        // xxforms:dialog
         // xforms:select[@appearance = 'full'] in noscript mode
         return control instanceof XFormsUploadControl
                 || control instanceof XFormsRepeatControl
+                || control instanceof XXFormsDialogControl
                 || (isNoscript && control instanceof XFormsSelectControl && ((XFormsSelectControl) control).isFullAppearance());
     }
 
@@ -396,11 +398,15 @@ public class ControlTree implements Cloneable {
     }
 
     public Map<String, XFormsControl> getUploadControls() {
-        return (controlTypes != null) ? controlTypes.get("upload") : null;
+        return (controlTypes != null) ? controlTypes.get(XFormsConstants.UPLOAD_NAME) : null;
     }
 
     public Map<String, XFormsControl> getRepeatControls() {
-        return (controlTypes != null) ? controlTypes.get("repeat") : null;
+        return (controlTypes != null) ? controlTypes.get(XFormsConstants.REPEAT_NAME) : null;
+    }
+
+    public Map<String, XFormsControl> getDialogControls() {
+        return (controlTypes != null) ? controlTypes.get(XFormsConstants.XXFORMS_DIALOG_NAME) : null;
     }
 
     /**

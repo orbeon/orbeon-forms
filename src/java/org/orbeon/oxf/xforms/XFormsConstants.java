@@ -73,15 +73,18 @@ public class XFormsConstants {
     // XForms controls
     public static final QName GROUP_QNAME = new QName("group", XFORMS_NAMESPACE);
     public static final QName REPEAT_QNAME = new QName("repeat", XFORMS_NAMESPACE);
+    public static final String REPEAT_NAME = REPEAT_QNAME.getName();
     public static final QName SWITCH_QNAME = new QName("switch", XFORMS_NAMESPACE);
     public static final QName CASE_QNAME = new QName("case", XFORMS_NAMESPACE);
     public static final QName XXFORMS_DIALOG_QNAME = new QName("dialog", XXFORMS_NAMESPACE);
+    public static final String XXFORMS_DIALOG_NAME = XXFORMS_DIALOG_QNAME.getName();
 
     public static final QName INPUT_QNAME = new QName("input", XFORMS_NAMESPACE);
     public static final QName SECRET_QNAME = new QName("secret", XFORMS_NAMESPACE);
     public static final QName TEXTAREA_QNAME = new QName("textarea", XFORMS_NAMESPACE);
     public static final QName OUTPUT_QNAME = new QName("output", XFORMS_NAMESPACE);
     public static final QName UPLOAD_QNAME = new QName("upload", XFORMS_NAMESPACE);
+    public static final String UPLOAD_NAME = UPLOAD_QNAME.getName();
     public static final QName RANGE_QNAME = new QName("range", XFORMS_NAMESPACE);
     public static final QName SELECT_QNAME = new QName("select", XFORMS_NAMESPACE);
     public static final QName SELECT1_QNAME = new QName("select1", XFORMS_NAMESPACE);
@@ -164,12 +167,14 @@ public class XFormsConstants {
     public static final String REQUIRED_ATTRIBUTE_NAME = "required";
     public static final String READONLY_ATTRIBUTE_NAME = "readonly";
 
-    public static final QName RELEVANT_QNAME = new QName("relevant");
+    // MIPs
+    public static final QName RELEVANT_QNAME = new QName(RELEVANT_ATTRIBUTE_NAME);
     public static final QName CALCULATE_QNAME = new QName("calculate");
-    public static final QName READONLY_QNAME = new QName("readonly");
-    public static final QName REQUIRED_QNAME = new QName("required");
+    public static final QName READONLY_QNAME = new QName(READONLY_ATTRIBUTE_NAME);
+    public static final QName REQUIRED_QNAME = new QName(REQUIRED_ATTRIBUTE_NAME);
     public static final QName TYPE_QNAME = new QName("type");
     public static final QName CONSTRAINT_QNAME = new QName("constraint");
+    public static final QName XXFORMS_DEFAULT_QNAME = new QName("default", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_READONLY_ATTRIBUTE_QNAME = new QName(READONLY_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
 
@@ -247,7 +252,6 @@ public class XFormsConstants {
 
     public static final QName XXFORMS_ORDER_QNAME = new QName("order", XXFORMS_NAMESPACE);
 
-    public static final QName XXFORMS_DEFAULT_QNAME = new QName("default", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_OFFLINE_QNAME = new QName("offline", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_USERNAME_QNAME = new QName("username", XXFORMS_NAMESPACE);

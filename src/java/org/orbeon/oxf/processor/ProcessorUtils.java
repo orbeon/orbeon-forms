@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
@@ -29,7 +29,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.BufferedInputStream;
@@ -63,7 +62,7 @@ public class ProcessorUtils {
 
     public static int selectIntValue(Node node, String expr, int defaultValue) {
         Integer result = XPathUtils.selectIntegerValue(node, expr);
-        return (result == null) ? defaultValue : result.intValue();
+        return (result == null) ? defaultValue : result;
     }
 
     public static Processor createProcessorWithInputs(Element testNode) {
@@ -161,21 +160,21 @@ public class ProcessorUtils {
         Set<String> newAlreadyDeclaredPrefixes = new HashSet<String>(alreadyDeclaredPrefixes);
 
         // Add namespaces declared on this element
-        for (Iterator i = copyElement.declaredNamespaces().iterator(); i.hasNext();) {
-            Namespace namespace = (Namespace) i.next();
+        for (Object o: copyElement.declaredNamespaces()) {
+            Namespace namespace = (Namespace) o;
             newAlreadyDeclaredPrefixes.add(namespace.getPrefix());
         }
 
         // Add element prefix if needed
         String elementPrefix = copyElement.getNamespace().getPrefix();
         if (elementPrefix != null && !newAlreadyDeclaredPrefixes.contains(elementPrefix)) {
-            copyElement.addNamespace(elementPrefix, originalElement.getNamespaceForPrefix(elementPrefix).getURI());;
+            copyElement.addNamespace(elementPrefix, originalElement.getNamespaceForPrefix(elementPrefix).getURI());
             newAlreadyDeclaredPrefixes.add(elementPrefix);
         }
 
         // Add attribute prefixes if needed
-        for (Iterator i = copyElement.attributes().iterator(); i.hasNext();) {
-            Attribute attribute = (Attribute) i.next();
+        for (Object o: copyElement.attributes()) {
+            Attribute attribute = (Attribute) o;
             String attributePrefix = attribute.getNamespace().getPrefix();
             if (attributePrefix != null && !newAlreadyDeclaredPrefixes.contains(attribute.getNamespace().getPrefix())) {
                 copyElement.addNamespace(attributePrefix, originalElement.getNamespaceForPrefix(attributePrefix).getURI());
@@ -184,8 +183,8 @@ public class ProcessorUtils {
         }
 
         // Get needed namespace declarations for children
-        for (Iterator i = copyElement.elements().iterator(); i.hasNext();) {
-            Element child = (Element) i.next();
+        for (Object o: copyElement.elements()) {
+            Element child = (Element) o;
             addNeededNamespaceDeclarations(originalElement, child, newAlreadyDeclaredPrefixes);
         }
     }
@@ -197,6 +196,7 @@ public class ProcessorUtils {
      * @param encoding              character encoding to use, or null for default
      * @param output                output ContentHandler to write text document to
      * @param contentType           optional content type to set as attribute on the root element
+     * @param lastModified          optional last modified timestamp
      */
     public static void readText(InputStream is, String encoding, ContentHandler output, String contentType, Long lastModified) {
         try {
@@ -216,6 +216,7 @@ public class ProcessorUtils {
      * @param text                  String to read from
      * @param output                output ContentHandler to write text document to
      * @param contentType           optional content type to set as attribute on the root element
+     * @param lastModified          optional last modified timestamp
      */
     public static void readText(String text, ContentHandler output, String contentType, Long lastModified) {
         try {
@@ -233,6 +234,7 @@ public class ProcessorUtils {
      * @param is            InputStream to read from
      * @param output        output ContentHandler to write binary document to
      * @param contentType   optional content type to set as attribute on the root element
+     * @param lastModified  optional last modified timestamp
      */
     public static void readBinary(InputStream is, ContentHandler output, String contentType, Long lastModified) {
         try {
@@ -252,7 +254,7 @@ public class ProcessorUtils {
             if (contentType != null)
                 attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
             if (lastModified != null)
-                attributes.addAttribute("", "last-modified", "last-modified", "CDATA", ISODateUtils.getRFC1123Date(lastModified.longValue()));
+                attributes.addAttribute("", "last-modified", "last-modified", "CDATA", ISODateUtils.getRFC1123Date(lastModified));
 
             // Write document
             output.startDocument();

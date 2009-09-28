@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 
@@ -83,16 +82,15 @@ public class XFormsMessageAction extends XFormsAction {
             if (LOG_APPEARANCES.get(levelQName) != null) {
                 // Special log appearance
 
-                final String messagePrefix = "XForms - log message - ";
-                final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), XFormsServer.getLogger(), XFormsServer.LOGGING_CATEGORY);
+                final IndentedLogger indentedLogger = containingDocument.getIndentedLogger();
                 if (XFormsConstants.XXFORMS_LOG_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    indentedLogger.logDebug("xforms:message", messagePrefix + messageValue);
+                    indentedLogger.logDebug("xforms:message", messageValue);
                 } else if (XFormsConstants.XXFORMS_LOG_INFO_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    indentedLogger.logInfo("xforms:message", messagePrefix + messageValue);
+                    indentedLogger.logInfo("xforms:message", messageValue);
                 } else if (XFormsConstants.XXFORMS_LOG_WARN_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    indentedLogger.logWarning("xforms:message", messagePrefix + messageValue);
+                    indentedLogger.logWarning("xforms:message", messageValue);
                 } else if (XFormsConstants.XXFORMS_LOG_ERROR_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    indentedLogger.logError("xforms:message", messagePrefix + messageValue);
+                    indentedLogger.logError("xforms:message", messageValue);
                 }
 
             } else if (SUPPORTED_APPEARANCES.get(levelQName) != null) {

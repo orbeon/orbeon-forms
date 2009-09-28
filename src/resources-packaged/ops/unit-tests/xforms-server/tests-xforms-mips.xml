@@ -890,7 +890,7 @@
             </xxf:event-response>
         </output>
     </test>
-
+    
     <test description="Simple use of xxforms:bind-property function" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
@@ -1057,5 +1057,4 @@
             </xxf:event-response>
         </output>
     </test>
-
 </group>

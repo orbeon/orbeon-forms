@@ -58,7 +58,8 @@ public class XFormsActionAction extends XFormsAction {
                 }
 
                 // Set context on action element
-                contextStack.pushBinding(propertyContext, currentActionElement, actionInterpreter.getSourceEffectiveId(), actionScope);
+                final XBLBindings.Scope currentActionScope = actionInterpreter.getActionScope(currentActionElement);
+                contextStack.pushBinding(propertyContext, currentActionElement, actionInterpreter.getSourceEffectiveId(), currentActionScope);
 
                 // Run action
                 actionInterpreter.runAction(propertyContext, targetId, eventObserver, currentActionElement);

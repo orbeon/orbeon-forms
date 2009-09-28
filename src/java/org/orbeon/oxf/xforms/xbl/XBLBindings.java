@@ -414,6 +414,10 @@ public class XBLBindings {
                                         currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME));
 
                                 staticState.registerActionHandler(eventHandler, prefix);
+
+                                // Extract scripts in the handler
+                                final DocumentWrapper handlerWrapper = new DocumentWrapper(currentHandlerAnnotatedElement.getDocument(), null, xpathConfiguration);
+                                staticState.extractXFormsScripts(propertyContext, handlerWrapper, newPrefix);
                             }
                         }
                     }

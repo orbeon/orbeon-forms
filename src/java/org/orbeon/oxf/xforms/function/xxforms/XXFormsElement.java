@@ -1,23 +1,22 @@
 /**
- *  Copyright (C) 2007 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.dom4j.QName;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
@@ -30,9 +29,6 @@ import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.AtomicValue;
-import org.orbeon.saxon.value.QNameValue;
-
-import java.util.Map;
 
 /**
  * xxforms:element(xs:string) as element()
@@ -50,41 +46,7 @@ public class XXFormsElement extends XFormsFunction {
 
         // Element QName
         final Expression qNameExpression = (argument == null || argument.length < 1) ? null : argument[0];
-        final String qNameString;
-        final String qNameURI;
-        {
-            final Object qNameObject = (qNameExpression == null) ? null : qNameExpression.evaluateItem(xpathContext);
-            if (qNameObject instanceof QNameValue) {
-                // Directly got a QName
-                final QNameValue qName = (QNameValue) qNameObject;
-                qNameString = qName.getStringValue();
-                qNameURI = qName.getNamespaceURI();
-            } else if (qNameObject != null) {
-                // Another atomic value
-                final AtomicValue qName = (AtomicValue) qNameObject;
-                qNameString = qName.getStringValue();
-
-                final int colonIndex = qNameString.indexOf(':');
-                if (colonIndex == -1) {
-                    // NCName
-                    qNameURI = null;
-                } else {
-                    // QName-but-not-NCName
-                    final String prefix = qNameString.substring(0, colonIndex);
-
-                    final XFormsContextStack contextStack = getContextStack(xpathContext);
-                    final Map namespaceMappings = getXBLContainer(xpathContext).getNamespaceMappings(contextStack.getCurrentBindingContext().getControlElement());
-
-                    // Get QName URI
-                    qNameURI = (String) namespaceMappings.get(prefix);
-                    if (qNameURI == null)
-                        throw new OXFException("Namespace prefix not in space for QName: " + qNameString);
-                }
-            } else {
-                // Just don't return anything if no QName was passed
-                return null;
-            }
-        }
+        final QName qName = getQNameFromExpression(xpathContext, qNameExpression);
 
 //        final String qNameString;
 //        final String qNameURI;
@@ -99,7 +61,8 @@ public class XXFormsElement extends XFormsFunction {
         final Expression contextExpression = (argument == null || argument.length < 2) ? null : argument[1];
         final SequenceIterator content = (contextExpression == null) ? null : contextExpression.iterate(xpathContext);
 
-        final Element element = Dom4jUtils.createElement(qNameString, (qNameURI != null) ? qNameURI : "");// createElement() doesn't like a null namespace
+        final String qNameURI = qName.getNamespaceURI();
+        final Element element = Dom4jUtils.createElement(qName.getQualifiedName(), (qNameURI != null) ? qNameURI : "");// createElement() doesn't like a null namespace
 
         // Iterate over content if passed
         if (content != null) {

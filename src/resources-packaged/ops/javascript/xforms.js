@@ -1660,6 +1660,27 @@ ORBEON.xforms.Controls = {
                     : control;
                 return ORBEON.util.Dom.getStringValue(spanWithValue);
             }
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-xxforms-tree")
+                || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-tree")) {
+            // Select/Select tree
+            var oneValue = ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-tree");
+            var yuiTree = ORBEON.xforms.Globals.treeYui[control.id];
+            var result = "";
+            for (var nodeIndex in yuiTree._nodes) {
+                var node = yuiTree._nodes[nodeIndex];
+                if (oneValue) {
+                    // Select1
+                    if (YAHOO.util.Dom.hasClass(node.getLabelEl(), "xforms-tree-label-selected"))
+                        return node.data.value;
+                } else {
+                    // Select
+                    if (node.checked) {
+                        if (result != "") result += " ";
+                        result += node.data.value;
+                    }
+                }
+            }
+            return result;
         }
     },
 
@@ -1848,24 +1869,19 @@ ORBEON.xforms.Controls = {
                     if (checked) node.check(); else node.uncheck();
                 }
             }
-            control.value = newControlValue;
-            control.previousValue = newControlValue;
-
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-tree")) {
             // Select1 tree
             // Make sure the tree is open enough so the node with the new value is visible
             var yuiTree = ORBEON.xforms.Globals.treeYui[control.id];
             ORBEON.xforms.Controls.treeOpenSelectedVisible(yuiTree, [newControlValue]);
             // Deselect old value, select new value
-            var oldNode = yuiTree.getNodeByProperty("value", control.value);
+            var currentValue = ORBEON.xforms.Controls.getCurrentValue(control);
+            var oldNode = yuiTree.getNodeByProperty("value", currentValue);
             var newNode = yuiTree.getNodeByProperty("value", newControlValue);
             if (oldNode != null)
                 YAHOO.util.Dom.removeClass(oldNode.getLabelEl(), "xforms-tree-label-selected");
             if (newNode != null)
                 YAHOO.util.Dom.addClass(newNode.getLabelEl(), "xforms-tree-label-selected");
-                    // Update value
-            control.value = newControlValue;
-            control.previousValue = newControlValue;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-upload")) {
             // Upload
 
@@ -3343,8 +3359,10 @@ ORBEON.xforms.Events = {
 
     treeClickValueUpdated: function(control) {
         // If we are in incremental mode, send value to the server on every click
-        if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
-            xformsValueChanged(control);
+        if (ORBEON.util.Dom.hasClass(control, "xforms-incremental")) {
+            var event = new ORBEON.xforms.Server.Event(null, control.id, null, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value-change-with-focus-change");
+            ORBEON.xforms.Server.fireEvents([event], false);
+        }
     },
 
     /**
@@ -3383,7 +3401,8 @@ ORBEON.xforms.Events = {
             node.onCheckClick();
         } else {
             // Unselect the old node and select the new node
-            var oldNode = yuiTree.getNodeByProperty("value", control.value);
+            var currentValue = ORBEON.xforms.Controls.getCurrentValue(control);
+            var oldNode = yuiTree.getNodeByProperty("value", currentValue);
             if (oldNode != null)
                 YAHOO.util.Dom.removeClass(oldNode.getLabelEl(), "xforms-tree-label-selected");
             if (node != null)
@@ -4774,7 +4793,7 @@ ORBEON.xforms.Init = {
         // Build the tree
         ORBEON.xforms.Init._initTreeDivFromArray(treeDiv, yuiTree, treeArray);
         // Save value in tree
-        treeDiv.previousValue = treeDiv.value;
+        ORBEON.xforms.Globals.serverValue[treeDiv.id] = treeDiv.value
         // Show the currently selected value
         if (!treeDiv.xformsAllowMultipleSelection) {
             var selectedNode = yuiTree.getNodeByProperty("value", treeDiv.value);
@@ -5177,7 +5196,8 @@ ORBEON.xforms.Server = {
 
             if (foundActivatingEvent) {
 
-                // Collapse value change for the same control, and filter events as specified by property
+                // Collapse value change for the same control, filter events as specified by property,
+                // and remove value change events if the server already knows about that value
                 {
                     var seenControlValue = {};
                     var newEvents = [];

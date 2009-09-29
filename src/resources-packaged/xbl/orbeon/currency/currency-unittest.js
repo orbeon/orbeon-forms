@@ -130,8 +130,19 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         testNoPrefix: function() {
             var noPrefixInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "no-prefix")[0];
             YAHOO.util.Assert.areEqual("42.00", noPrefixInput.value);
+        },
+        testInRepeat: function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                YAHOO.util.UserAction.click(YAHOO.util.Dom.get("repeat-show-hide"));
+            }, function() {
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    YAHOO.util.UserAction.click(YAHOO.util.Dom.get("repeat-show-hide"));
+                }, function() {
+                    var repeatInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "in-repeat" + XFORMS_SEPARATOR_1 + "1")[0];
+                    YAHOO.util.Assert.areEqual("$ 42.00", repeatInput.value);
+                });
+            });
         }
-
     }));
 
     if (parent && parent.TestManager) {

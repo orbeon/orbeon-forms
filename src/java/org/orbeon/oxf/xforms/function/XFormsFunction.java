@@ -13,6 +13,9 @@
  */
 package org.orbeon.oxf.xforms.function;
 
+import org.dom4j.Namespace;
+import org.dom4j.QName;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PooledXPathExpression;
@@ -26,9 +29,17 @@ import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.functions.SystemFunction;
+import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.AtomicValue;
+import org.orbeon.saxon.value.QNameValue;
+
+import java.util.Map;
 
 /**
  * Base class for all XForms functions.
+ *
+ * TODO: context should contain PropertyContext directly
+ * TODO: context should contain BindingContext directly if any
  */
 abstract public class XFormsFunction extends SystemFunction {
 
@@ -140,6 +151,60 @@ abstract public class XFormsFunction extends SystemFunction {
 
         public void setSourceEffectiveId(String sourceEffectiveId) {
             this.sourceEffectiveId = sourceEffectiveId;
+        }
+    }
+
+    protected QName getQNameFromExpression(XPathContext xpathContext, Expression qNameExpression) throws XPathException {
+        final Object qNameObject = (qNameExpression == null) ? null : qNameExpression.evaluateItem(xpathContext);
+        if (qNameObject instanceof QNameValue) {
+            // Directly got a QName
+            final QNameValue qName = (QNameValue) qNameObject;
+
+            final String qNameString = qName.getStringValue();
+            final String qNameURI = qName.getNamespaceURI();
+
+            final int colonIndex = qNameString.indexOf(':');
+            final String prefix = qNameString.substring(0, colonIndex);
+            return createQName(qNameString, qNameURI, colonIndex, prefix);
+
+        } else if (qNameObject != null) {
+            // Another atomic value
+            final AtomicValue qName = (AtomicValue) qNameObject;
+            final String qNameString = qName.getStringValue();
+
+            final int colonIndex = qNameString.indexOf(':');
+            if (colonIndex == -1) {
+                // NCName
+                return createQName(qNameString, null, colonIndex, null);
+            } else {
+                // QName-but-not-NCName
+                final String prefix = qNameString.substring(0, colonIndex);
+
+                final XFormsContextStack contextStack = getContextStack(xpathContext);
+                // TODO: function context should directly provide BindingContext
+                final Map namespaceMappings = getXBLContainer(xpathContext).getNamespaceMappings(contextStack.getCurrentBindingContext().getControlElement());
+
+                // Get QName URI
+                final String qNameURI = (String) namespaceMappings.get(prefix);
+                if (qNameURI == null)
+                    throw new OXFException("Namespace prefix not in space for QName: " + qNameString);
+
+                return createQName(qNameString, qNameURI, colonIndex, prefix);
+            }
+        } else {
+            // Just don't return anything if no QName was passed
+            return null;
+        }
+    }
+
+    private QName createQName(String qNameString, String qNameURI, int colonIndex, String prefix) {
+        if (colonIndex == -1) {
+            // NCName
+            // NOTE: This assumes that if there is no prefix, the QName is in no namespace
+            return new QName(qNameString);
+        } else {
+            // QName-but-not-NCName
+            return new QName(qNameString.substring(colonIndex + 1), new Namespace(prefix, qNameURI));
         }
     }
 }

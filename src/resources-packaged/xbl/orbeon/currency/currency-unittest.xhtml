@@ -34,6 +34,7 @@
                     <float>123.456</float>
                     <readonly is-readonly="true">42</readonly>
                     <no-prefix>42</no-prefix>
+                    <repeat show="true">42</repeat>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="double" readonly="false()" calculate="for $value in ../value return if ($value castable as xs:decimal) then ../value * 2 else ''"/>
@@ -119,6 +120,17 @@
             <fr:currency ref="no-prefix" id="no-prefix" prefix="">
                 <xforms:label>No prefix</xforms:label>
             </fr:currency>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:repeat nodeset="repeat[@show = 'true']">
+                <fr:currency ref="." id="in-repeat">
+                    <xforms:label>In repeat</xforms:label>
+                </fr:currency>
+            </xforms:repeat>
+            <xforms:trigger id="repeat-show-hide" appearance="minimal">
+                <xforms:label>Show/hide</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="repeat/@show" value="if (. = 'true') then 'false' else 'true'"/>
+            </xforms:trigger>
         </xhtml:div>
     </xhtml:body>
 </xhtml:html>

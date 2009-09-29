@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.apache.commons.collections.map.CompositeMap;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
+import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -45,10 +46,8 @@ import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.BuiltInAtomicType;
 import org.orbeon.saxon.type.BuiltInSchemaFactory;
-import org.orbeon.saxon.value.AtomicValue;
-import org.orbeon.saxon.value.SequenceExtent;
+import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
-import org.orbeon.saxon.value.ValidationErrorValue;
 
 import java.util.*;
 
@@ -67,7 +66,7 @@ public class XFormsModelBinds {
     private final List<Element> bindElements;
     private List<Bind> topLevelBinds = new ArrayList<Bind>();
     private Map<String, Bind> singleNodeContextBinds = new HashMap<String, Bind>();
-    private Map<NodeInfo, List<BindIteration>> iterationsForContextNodeInfo = new HashMap<NodeInfo, List<BindIteration>>();
+    private Map<Item, List<BindIteration>> iterationsForContextNodeInfo = new HashMap<Item, List<BindIteration>>();
     private List<Bind> offlineBinds = new ArrayList<Bind>();
     private Map<String, String> variableNamesToIds = new HashMap<String, String>();
 
@@ -247,10 +246,16 @@ public class XFormsModelBinds {
      */
     public List<Item> getBindNodeset(String bindId, Item contextItem) {
 
+        final Bind bind = resolveBind(bindId, contextItem);
+        return (bind != null) ? bind.getNodeset() : XFormsConstants.EMPTY_ITEM_LIST;
+    }
+
+    public Bind resolveBind(String bindId, Item contextItem) {
+
         final Bind singleNodeContextBind = singleNodeContextBinds.get(bindId);
         if (singleNodeContextBind != null) {
             // This bind has a single-node context (incl. top-level bind), so ignore context item and just return the bind nodeset
-            return singleNodeContextBind.getNodeset();
+            return singleNodeContextBind;
         } else {
             // Nested bind, context item will be used
 
@@ -262,7 +267,7 @@ public class XFormsModelBinds {
                         final Bind currentBind = currentIteration.getBind(bindId);
                         if (currentBind != null) {
                             // Found
-                            return currentBind.getNodeset();
+                            return currentBind;
                         }
                     }
                 }
@@ -270,7 +275,48 @@ public class XFormsModelBinds {
         }
 
         // Nothing found
-        return XFormsConstants.EMPTY_ITEM_LIST;
+        return null;
+    }
+
+    public Item evaluateBindByType(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, QName mipType) throws XPathException {
+
+        final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
+        final Map<String, ValueRepresentation> currentVariables = getVariables(currentNodeInfo);
+
+        if (mipType.equals(XFormsConstants.RELEVANT_QNAME)) {
+            // Relevant
+            final Boolean relevant = evaluateRelevantMIP(propertyContext, bind, nodeset, position, currentVariables);
+            return (relevant != null) ? BooleanValue.get(relevant) : null;
+        } else if (mipType.equals(XFormsConstants.READONLY_QNAME)) {
+            // Readonly
+            final Boolean readonly = evaluateReadonlyMIP(propertyContext, bind, nodeset, position, currentVariables);
+            return (readonly != null) ? BooleanValue.get(readonly) : null;
+        } else if (mipType.equals(XFormsConstants.REQUIRED_QNAME)) {
+            // Required
+            final Boolean required = evaluateRequiredMIP(propertyContext, bind, nodeset, position, currentVariables);
+            return (required != null) ? BooleanValue.get(required) : null;
+        } else if (mipType.equals(XFormsConstants.TYPE_QNAME)) {
+            // Type
+            final Map<String, String> namespaceMap = container.getNamespaceMappings(bind.getBindElement());
+            final QName type = evaluateTypeQName(bind, namespaceMap);
+            return (type != null) ? new QNameValue(type.getNamespacePrefix(), type.getNamespaceURI(), type.getName(), null) : null;
+        } else if (mipType.equals(XFormsConstants.CONSTRAINT_QNAME)) {
+            // Constraint
+            final Boolean constraint = evaluateConstraintMIP(propertyContext, bind, nodeset, position, currentNodeInfo);
+            return (constraint != null) ? BooleanValue.get(constraint) : null;
+        } else if (mipType.equals(XFormsConstants.CALCULATE_QNAME)) {
+            // Calculate
+            final String result = evaluateCalculateBind(propertyContext, bind, nodeset, position);
+            return (result != null) ? new StringValue(result) : null;
+        } else if (mipType.equals(XFormsConstants.XXFORMS_DEFAULT_QNAME)) {
+            // xxforms:default
+            final String result = evaluateXXFormsDefaultBind(propertyContext, bind, nodeset, position);
+            return (result != null) ? new StringValue(result) : null;
+        } else {
+            // Try custom MIPs
+            final String result = evaluateCustomMIP(propertyContext, bind, buildCustomMIPName(mipType.getQualifiedName()), nodeset, position, currentVariables);
+            return (result != null) ? new StringValue(result) : null;
+        }
     }
 
     /**
@@ -299,7 +345,7 @@ public class XFormsModelBinds {
      *     }
      * };
      *
-     * @param containingDocument
+     * @param containingDocument    containing document
      * @return  JSON string
      */
     public static String getOfflineBindMappings(XFormsContainingDocument containingDocument) {
@@ -312,7 +358,7 @@ public class XFormsModelBinds {
         final Map<String, XFormsControl> effectiveIdsToControls = containingDocument.getControls().getCurrentControlTree().getEffectiveIdsToControls();
         final FastStringBuffer sb = new FastStringBuffer('{');
 
-        final Map<NodeInfo, Object> nodesToControlsMapping = getNodesToControlsMapping(effectiveIdsToControls);
+        final Map<Item, Object> nodesToControlsMapping = getNodesToControlsMapping(effectiveIdsToControls);
 
         // Handle MIPs
         sb.append("\"mips\": {");
@@ -368,9 +414,9 @@ public class XFormsModelBinds {
                                 // Output MIPs
                                 boolean mipFound = false;
                                 mipFound = appendNameValue(sb, mipFound, "calculate", currentBind.getCalculate(), null);
-                                mipFound = appendNameValue(sb, mipFound, "relevant", relevant, controlsInheritingMIPs);
-                                mipFound = appendNameValue(sb, mipFound, "readonly", readonly, controlsInheritingMIPs);
-                                mipFound = appendNameValue(sb, mipFound, "required", currentBind.getRequired(), null);
+                                mipFound = appendNameValue(sb, mipFound, XFormsConstants.RELEVANT_ATTRIBUTE_NAME, relevant, controlsInheritingMIPs);
+                                mipFound = appendNameValue(sb, mipFound, XFormsConstants.READONLY_ATTRIBUTE_NAME, readonly, controlsInheritingMIPs);
+                                mipFound = appendNameValue(sb, mipFound, XFormsConstants.REQUIRED_ATTRIBUTE_NAME, currentBind.getRequired(), null);
                                 mipFound = appendNameValue(sb, mipFound, "constraint", currentBind.getConstraint(), null);
 
                                 // Output type MIP as an exploded QName
@@ -445,7 +491,7 @@ public class XFormsModelBinds {
         }
     }
 
-    private static List<XFormsControl> getBoundControls(Map<NodeInfo, Object> nodesToControlsMapping, List<Item> nodeset) {
+    private static List<XFormsControl> getBoundControls(Map<Item, Object> nodesToControlsMapping, List<Item> nodeset) {
         final List<XFormsControl> result = new ArrayList<XFormsControl>();
 
         // Iterate through nodeset
@@ -464,8 +510,8 @@ public class XFormsModelBinds {
         return result;
     }
 
-    private static Map<NodeInfo, Object> getNodesToControlsMapping(Map<String, XFormsControl> idsToXFormsControls) {
-        final Map<NodeInfo, Object> result = new HashMap<NodeInfo, Object>();
+    private static Map<Item, Object> getNodesToControlsMapping(Map<String, XFormsControl> idsToXFormsControls) {
+        final Map<Item, Object> result = new HashMap<Item, Object>();
 
         // Iterate through controls
         for (Map.Entry<String,XFormsControl> currentEntry: idsToXFormsControls.entrySet()) {
@@ -535,7 +581,7 @@ public class XFormsModelBinds {
      * Iterate over all binds and for each one do the callback.
      *
      * @param propertyContext   current context
-     * @param bindRunner
+     * @param bindRunner        bind runner
      */
     private void iterateBinds(PropertyContext propertyContext, BindRunner bindRunner) {
         // Iterate over top-level binds
@@ -548,46 +594,62 @@ public class XFormsModelBinds {
         }
     }
 
-    private void handleXXFormsDefaultBind(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
-
+    private String evaluateXXFormsDefaultBind(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
         // Handle xxforms:default MIP
         if (bind.getXXFormsDefault() != null) {
             // Compute default value
             try {
                 final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
-                final String stringResult = evaluateStringExpression(propertyContext, nodeset, position, bind, bind.getXXFormsDefault(), getVariables(currentNodeInfo));
-
-                // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
-                // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
-                XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, true);
-
+                return evaluateStringExpression(propertyContext, nodeset, position, bind, bind.getXXFormsDefault(), getVariables(currentNodeInfo));
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms calculate bind",
                         bind.getBindElement(), new String[] { "expression", bind.getCalculate() }));
 
                 container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
+                throw new IllegalStateException(); // event above throw an exception anyway
             }
+        } else {
+            return null;
         }
     }
 
-    private void handleCalculateBind(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+    private void handleXXFormsDefaultBind(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+
+        final String stringResult = evaluateXXFormsDefaultBind(propertyContext, bind, nodeset, position);
+        if (stringResult != null) {
+            // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
+            // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
+            final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
+            XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, true);
+        }
+    }
+
+    public void handleCalculateBind(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+        final String stringResult = evaluateCalculateBind(propertyContext, bind, nodeset, position);
+        if (stringResult != null) {
+            // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
+            // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
+            final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
+            XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, true);
+        }
+    }
+
+    public String evaluateCalculateBind(final PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
         // Handle calculate MIP
         if (bind.getCalculate() != null) {
             // Compute calculated value
             try {
                 final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
-                final String stringResult = evaluateStringExpression(propertyContext, nodeset, position, bind, bind.getCalculate(), getVariables(currentNodeInfo));
-
-                // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
-                // TODO: doSetValue may dispatch an xforms-binding-exception. It should reach the bind, but we don't support that yet so pass the model.
-                XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, true);
-
+                return evaluateStringExpression(propertyContext, nodeset, position, bind, bind.getCalculate(), getVariables(currentNodeInfo));
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms calculate bind",
                         bind.getBindElement(), new String[] { "expression", bind.getCalculate() }));
 
                 container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
+                throw new IllegalStateException(); // event above throw an exception anyway
             }
+        } else {
+            return null;
         }
     }
 
@@ -618,76 +680,126 @@ public class XFormsModelBinds {
         final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
         final Map<String, ValueRepresentation> currentVariables = getVariables(currentNodeInfo);
 
-        // Handle required MIP
+        // Handle required, relevant, readonly, and custom MIPs
+        handleRequiredMIP(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
+        handleRelevantMIP(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
+        handleReadonlyMIP(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
+        handleCustomMIPs(propertyContext, bind, nodeset, position, currentNodeInfo, currentVariables);
+    }
+
+    private void handleCustomMIPs(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, NodeInfo currentNodeInfo, Map<String, ValueRepresentation> currentVariables) {
+        final Map<String, String> customMips = bind.getCustomMips();
+        if (customMips != null && customMips.size() > 0) {
+            for (String propertyName: customMips.keySet()) {
+                final String stringResult = evaluateCustomMIP(propertyContext, bind, propertyName, nodeset, position, currentVariables);
+                InstanceData.setCustom(currentNodeInfo, propertyName, stringResult);
+            }
+        }
+    }
+
+    private String evaluateCustomMIP(PropertyContext propertyContext, Bind bind, String propertyName, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
+        final Map<String, String> customMips = bind.getCustomMips();
+        if (customMips != null && customMips.size() > 0) {
+            final String expression = customMips.get(propertyName);
+            if (expression != null) {
+                try {
+                    return XPathCache.evaluateAsString(propertyContext, nodeset, position, expression,
+                            container.getNamespaceMappings(bind.getBindElement()), currentVariables,
+                            XFormsContainingDocument.getFunctionLibrary(), model.getContextStack().getFunctionContext(model.getEffectiveId()),
+                            bind.getLocationData().getSystemID(), bind.getLocationData());
+                } catch (Exception e) {
+                    final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms custom bind",
+                            bind.getBindElement(), new String[] { "name", propertyName, "expression", expression }));
+
+                    container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
+                    throw new IllegalStateException(); // event above throw an exception anyway
+                }
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private void handleRequiredMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, NodeInfo currentNodeInfo, Map<String, ValueRepresentation> currentVariables) {
+        final Boolean required = evaluateRequiredMIP(propertyContext, bind, nodeset, position, currentVariables);
+        if (required != null) {
+            // Update node with MIP value
+            InstanceData.setRequired(currentNodeInfo, required);
+        }
+    }
+
+    private Boolean evaluateRequiredMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
         if (bind.getRequired() != null) {
             // Evaluate "required" XPath expression on this node
             try {
                 // Get MIP value
-                final boolean required = evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getRequired(), currentVariables);
-
-                // Update node with MIP value
-                InstanceData.setRequired(currentNodeInfo, required);
+                return evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getRequired(), currentVariables);
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms required bind",
                         bind.getBindElement(), new String[] { "expression", bind.getRequired() }));
 
                 container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
+                throw new IllegalStateException(); // event above throw an exception anyway
             }
+        } else {
+            return null;
         }
+    }
 
-        // Handle relevant MIP
-        if (bind.getRelevant() != null) {
-            // Evaluate "relevant" XPath expression on this node
-            try {
-                final boolean relevant = evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getRelevant(), currentVariables);
-                // Mark node
-                InstanceData.setRelevant(currentNodeInfo, relevant);
-            } catch (Exception e) {
-                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms relevant bind",
-                        bind.getBindElement(), new String[] { "expression", bind.getRelevant() }));
-
-                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
-            }
+    private void handleReadonlyMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, NodeInfo currentNodeInfo, Map<String, ValueRepresentation> currentVariables) {
+        final Boolean readonly = evaluateReadonlyMIP(propertyContext, bind, nodeset, position, currentVariables);
+        if (readonly != null) {
+            // Mark node
+            InstanceData.setReadonly(currentNodeInfo, readonly);
+        } else if (bind.getCalculate() != null) {
+            // The bind doesn't have a readonly attribute, but has a calculate: set readonly to true()
+            InstanceData.setReadonly(currentNodeInfo, true);
         }
+    }
 
-        // Handle readonly MIP
+    private Boolean evaluateReadonlyMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
         if (bind.getReadonly() != null) {
             // The bind has a readonly attribute
             // Evaluate "readonly" XPath expression on this node
             try {
-                final boolean readonly = evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getReadonly(), currentVariables);
-
-                // Mark node
-                InstanceData.setReadonly(currentNodeInfo, readonly);
+                return evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getReadonly(), currentVariables);
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms readonly bind",
                         bind.getBindElement(), new String[] { "expression", bind.getReadonly() }));
 
 
                 container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
+                throw new IllegalStateException(); // event above throw an exception anyway
             }
-        } else if (bind.getCalculate() != null) {
-            // The bind doesn't have a readonly attribute, but has a calculate: set readonly to true()
-            // Mark node
-            InstanceData.setReadonly(currentNodeInfo, true);
+        } else {
+            return null;
         }
+    }
 
-        final Map<String, String> customMips = bind.getCustomMips();
-        if (customMips != null && customMips.size() > 0) {
-            for (Map.Entry<String, String> entry: customMips.entrySet()) {
-                final String key = entry.getKey();
-                final String expression = entry.getValue();
+    private void handleRelevantMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, NodeInfo currentNodeInfo, Map<String, ValueRepresentation> currentVariables) {
+        final Boolean relevant = evaluateRelevantMIP(propertyContext, bind, nodeset, position, currentVariables);
+        if (relevant != null) {
+            // Mark node
+            InstanceData.setRelevant(currentNodeInfo, relevant);
+        }
+    }
 
-                try {
-                    final String stringResult = evaluateStringExpression(propertyContext, nodeset, position, bind, expression, getVariables(currentNodeInfo));
-                    InstanceData.setCustom(currentNodeInfo, key, stringResult);
-                } catch (Exception e) {
-                    final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms custom bind",
-                            bind.getBindElement(), new String[] { "name", key, "expression", expression }));
+    private Boolean evaluateRelevantMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, Map<String, ValueRepresentation> currentVariables) {
+        if (bind.getRelevant() != null) {
+            // Evaluate "relevant" XPath expression on this node
+            try {
+                return evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getRelevant(), currentVariables);
+            } catch (Exception e) {
+                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms relevant bind",
+                        bind.getBindElement(), new String[] { "expression", bind.getRelevant() }));
 
-                    container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
-                }
+                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
+                throw new IllegalStateException(); // event above throw an exception anyway
             }
+        } else {
+            return null;
         }
     }
 
@@ -772,26 +884,10 @@ public class XFormsModelBinds {
 
                 {
                     // Get type namespace and local name
-                    final String typeQName = bind.getType();
-                    final String typeNamespaceURI;
-                    final String typeLocalname;
-                    {
-                        final int prefixPosition = typeQName.indexOf(':');
-                        if (prefixPosition > 0) {
-                            final String prefix = typeQName.substring(0, prefixPosition);
-                            typeNamespaceURI = namespaceMap.get(prefix);
-                            if (typeNamespaceURI == null)
-                                throw new ValidationException("Namespace not declared for prefix '" + prefix + "'",
-                                        bind.getLocationData());
+                    final QName typeQName = evaluateTypeQName(bind, namespaceMap);
 
-                            // TODO: xxx check what XForms event must be dispatched
-
-                            typeLocalname = typeQName.substring(prefixPosition + 1);
-                        } else {
-                            typeNamespaceURI = "";
-                            typeLocalname = typeQName;
-                        }
-                    }
+                    final String typeNamespaceURI = typeQName.getNamespaceURI();
+                    final String typeLocalname = typeQName.getName();
 
                     // Get value to validate if not already computed above
                     if (nodeValue == null)
@@ -815,7 +911,7 @@ public class XFormsModelBinds {
                         }
 
                         final String validationError =
-                            xformsValidator.validateDatatype(currentNodeInfo, nodeValue, typeNamespaceURI, typeLocalname, typeQName, bind.getLocationData(), bind.getId());
+                            xformsValidator.validateDatatype(currentNodeInfo, nodeValue, typeNamespaceURI, typeLocalname, typeQName.getQualifiedName(), bind.getLocationData(), bind.getId());
 
                         if (validationError != null) {
                             isValid = false;
@@ -879,7 +975,7 @@ public class XFormsModelBinds {
 
                         // There are possibly types defined in the schema
                         final String validationError
-                                = model.getSchemaValidator().validateDatatype(currentNodeInfo, nodeValue, typeNamespaceURI, typeLocalname, typeQName, bind.getLocationData(), bind.getId());
+                                = model.getSchemaValidator().validateDatatype(currentNodeInfo, nodeValue, typeNamespaceURI, typeLocalname, typeQName.getQualifiedName(), bind.getLocationData(), bind.getId());
 
                         // Set error on node if necessary
                         if (validationError != null) {
@@ -931,23 +1027,7 @@ public class XFormsModelBinds {
 
         // NOTE: We evaluate the constraint here, so that if the type is not respected the constraint is not evaluated.
         // This can also prevent XPath errors, e.g.: <xforms:bind nodeset="foobar" type="xs:integer" constraint=". > 10"/>
-        if (bind.getConstraint() != null) {
-            // Evaluate constraint
-            try {
-                // Get MIP value
-                final boolean valid = evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getConstraint(), getVariables(currentNodeInfo));
-
-                // Update node with MIP value
-                isValid &= valid;
-                // TODO: why do we allow calling this with valid == true?
-                InstanceData.updateValueValid(currentNodeInfo, valid, bind.getId());
-            } catch (Exception e) {
-                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms constraint bind",
-                        bind.getBindElement(), new String[] { "expression", bind.getConstraint() }));
-
-                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
-            }
-        }
+        isValid &= handleConstraintMIP(propertyContext, bind, nodeset, position, currentNodeInfo);
 
         // Remember invalid instances
         if (!isValid) {
@@ -956,11 +1036,71 @@ public class XFormsModelBinds {
         }
     }
 
+    private Boolean handleConstraintMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, NodeInfo currentNodeInfo) {
+        final Boolean constraint = evaluateConstraintMIP(propertyContext, bind, nodeset, position, currentNodeInfo);
+        if (constraint != null) {
+            // Update node with MIP value
+            // TODO: why do we allow calling this with valid == true?
+            InstanceData.updateValueValid(currentNodeInfo, constraint, bind.getId());
+            return constraint;
+        } else {
+            return true;
+        }
+    }
+
+    private Boolean evaluateConstraintMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, NodeInfo currentNodeInfo) {
+        if (bind.getConstraint() != null) {
+            // Evaluate constraint
+            try {
+                // Get MIP value
+                return evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getConstraint(), getVariables(currentNodeInfo));
+            } catch (Exception e) {
+                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms constraint bind",
+                        bind.getBindElement(), new String[] { "expression", bind.getConstraint() }));
+
+                container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
+                throw new IllegalStateException(); // event above throw an exception anyway
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private QName evaluateTypeQName(Bind bind, Map<String, String> namespaceMap) {
+        final String typeQName = bind.getType();
+        if (typeQName != null) {
+            final String typeNamespacePrefix;
+            final String typeNamespaceURI;
+            final String typeLocalname;
+
+            final int prefixPosition = typeQName.indexOf(':');
+            if (prefixPosition > 0) {
+                typeNamespacePrefix = typeQName.substring(0, prefixPosition);
+                typeNamespaceURI = namespaceMap.get(typeNamespacePrefix);
+                if (typeNamespaceURI == null)
+                    throw new ValidationException("Namespace not declared for prefix '" + typeNamespacePrefix + "'",
+                            bind.getLocationData());
+
+                // TODO: xxx check what XForms event must be dispatched
+
+                typeLocalname = typeQName.substring(prefixPosition + 1);
+            } else {
+                typeNamespacePrefix = "";
+                typeNamespaceURI = "";
+                typeLocalname = typeQName;
+            }
+
+            return new QName(typeLocalname, new Namespace(typeNamespacePrefix, typeNamespaceURI));
+        } else {
+            return null;
+        }
+    }
+
     private static interface BindRunner {
         public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position);
     }
 
-    private class Bind {
+    public class Bind {
 
         private Element bindElement;
         private String id;          // bind id
@@ -1000,7 +1140,7 @@ public class XFormsModelBinds {
                         if (customMips == null)
                             customMips = new HashMap<String, String>();
                         // E.g. foo:bar="true()" => "foo-bar" -> "true()"
-                        customMips.put(attribute.getQualifiedName().replace(':', '-'), attribute.getValue());
+                        customMips.put(buildCustomMIPName(attribute.getQualifiedName()), attribute.getValue());
                     }
                 }
             }
@@ -1164,5 +1304,9 @@ public class XFormsModelBinds {
             }
             return null;
         }
+    }
+
+    private static String buildCustomMIPName(String qualifiedName) {
+        return qualifiedName.replace(':', '-');
     }
 }

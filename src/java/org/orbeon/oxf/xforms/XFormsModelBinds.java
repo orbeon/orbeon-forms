@@ -703,10 +703,7 @@ public class XFormsModelBinds {
             final String expression = customMips.get(propertyName);
             if (expression != null) {
                 try {
-                    return XPathCache.evaluateAsString(propertyContext, nodeset, position, expression,
-                            container.getNamespaceMappings(bind.getBindElement()), currentVariables,
-                            XFormsContainingDocument.getFunctionLibrary(), model.getContextStack().getFunctionContext(model.getEffectiveId()),
-                            bind.getLocationData().getSystemID(), bind.getLocationData());
+                    return evaluateStringExpression(propertyContext, nodeset, position, bind, expression, currentVariables);
                 } catch (Exception e) {
                     final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms custom bind",
                             bind.getBindElement(), new String[] { "name", propertyName, "expression", expression }));

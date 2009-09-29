@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2009 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "Accordion main test",
@@ -28,7 +41,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 this.checkIsOpened(1, true);
                 this.checkIsOpened(2, true);
                 this.checkIsOpened(5, true);
-            }, 500);
+            }, 750);
         });
     },
     testCloseAll: function() {
@@ -39,7 +52,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 this.checkIsOpened(1, false);
                 this.checkIsOpened(2, false);
                 this.checkIsOpened(5, false);
-            }, 500);
+            }, 750);
         });
     },
     testOpenThird: function() {
@@ -48,7 +61,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         }, function() {
             this.wait(function() {
                 this.checkIsOpened(3, true);
-            }, 500);
+            }, 750);
         });
     },
     testCloseThird: function() {
@@ -57,7 +70,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         }, function() {
             this.wait(function() {
                 this.checkIsOpened(3, false);
-            }, 500);
+            }, 750);
         });
     },
     testOpenStates: function() {
@@ -66,7 +79,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         }, function() {
             this.wait(function() {
                 this.checkIsOpened(5, true);
-            }, 500);
+            }, 750);
         });
     },
     testCloseStates: function() {
@@ -75,7 +88,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         }, function() {
             this.wait(function() {
                 this.checkIsOpened(5, false);
-            }, 500);
+            }, 750);
         });
     },
     testAddState: function() {
@@ -114,7 +127,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         YAHOO.util.UserAction.click(dts[0], { clientX: 1 });
         this.wait(function() {
             this.checkOpen(true, false);
-        }, 500);
+        }, 750);
     },
 
     testOnlySecondOpen: function() {
@@ -122,7 +135,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         YAHOO.util.UserAction.click(dts[1], { clientX: 1 });
         this.wait(function() {
             this.checkOpen(false, true);
-        }, 500);
+        }, 750);
     }
 }));
 

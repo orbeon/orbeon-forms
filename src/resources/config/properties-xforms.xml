@@ -131,7 +131,7 @@
     <property as="xs:string"  name="oxf.epilogue.xforms.widgets.fr-elements-to-skip"        value="fr:back-button fr:body fr:buttons fr:component fr:dateTime fr:foobar fr:grid fr:metadata
                                                                                                fr:repeat fr:save-button fr:section fr:super-control fr:td fr:tr fr:view fr:dialogs
                                                                                                fr:max-results-displayed fr:mindate fr:prefix fr:digits-after-decimal fr:case fr:label
-                                                                                               fr:mindate fr:maxdate fr:tab"/>
+                                                                                               fr:mindate fr:maxdate fr:tab fr:dependency"/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                          value="false"/>
 
 </properties>

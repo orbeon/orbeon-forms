@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -21,7 +21,8 @@
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
-         xmlns:xbl="http://www.w3.org/ns/xbl">
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <!--
         Component to show a map, using Google Maps
@@ -47,30 +48,33 @@
                 </fr:map>
             </template>
         </metadata>
+
         <xbl:template>
-            <xforms:group id="map-container" ref=".">
+            <xforms:group xxbl:scope="outer">
 
-                <!-- Variables for attributes on the control -->
-                <xxforms:variable name="class" xbl:attr="xbl:text=class"/>
+                <xforms:group xbl:attr="model context ref bind">
 
-                <!-- Local model -->
-                <xforms:model id="map-model">
-                    <xforms:instance id="map-instance">
-                        <value/>
-                    </xforms:instance>
-                </xforms:model>
+                    <!-- Constructor -->
+                    <xforms:group xxbl:scope="inner">
+                        <xxforms:script id="xf-en" ev:event="xforms-enabled">ORBEON.widget.MapEvents.mapContainerXFormsEnabled.call(this, event.target);</xxforms:script>
+                    </xforms:group>
 
-                <!-- Event listeners -->
-                <xforms:action ev:event="xforms-enabled" ev:observer="map-container"><xxforms:script>ORBEON.widget.MapEvents.mapContainerXFormsEnabled.call(this);</xxforms:script></xforms:action>
-                <xforms:action ev:event="xforms-value-changed" ev:observer="address"><xxforms:script>ORBEON.widget.MapEvents.addressXFormsValueChanged.call(this);</xxforms:script></xforms:action>
+                    <!-- Variables for attributes on the control -->
+                    <xxforms:variable name="class" xbl:attr="xbl:text=class"/>
 
+                    <!-- Div in which Google Maps does its rendering -->
+                    <xhtml:div class="fb-map-gmap-div{if ($class = '') then '' else concat(' ', $class)}" id="gmap-div" xbl:attr="style"/>
+
+                </xforms:group>
+
+                <!-- Evaluate other @*-ref attributes in same context as @ref -->
                 <!-- XForms controls to expose XForms values to JavaScript -->
-                <xforms:output class="fb-map-address" xbl:attr="ref=address-ref" id="address" style="display: none"/>
-                <xforms:input class="fb-map-longitude" xbl:attr="ref=longitude-ref" id="longitude" style="display: none"/>
-                <xforms:input class="fb-map-latitude" xbl:attr="ref=latitude-ref" id="latitude" style="display: none"/>
-                <!-- Div in which Google Maps does its rendering -->
-                <xhtml:div class="fb-map-gmap-div{if ($class = '') then '' else concat(' ', $class)}" id="gmap-div" xbl:attr="style"/>
-
+                <xforms:output class="fb-map-address" xbl:attr="context model ref=address-ref bind=address-bind" style="display: none">
+                    <!-- React to change of address -->
+                    <xxforms:script id="xf-vc" ev:event="xforms-value-changed">ORBEON.widget.MapEvents.addressXFormsValueChanged.call(this, event.target);</xxforms:script>
+                </xforms:output>
+                <xforms:input class="fb-map-longitude" xbl:attr="context model ref=longitude-ref bind=longitude-bind" style="display: none"/>
+                <xforms:input class="fb-map-latitude" xbl:attr="context model ref=latitude-ref bind=latitude-bind" style="display: none"/>
             </xforms:group>
 
             <xhtml:script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={xxforms:property('oxf.xforms.xbl.fr.map.key')}" type="text/javascript"/>

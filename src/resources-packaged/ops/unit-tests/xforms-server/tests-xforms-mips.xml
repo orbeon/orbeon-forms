@@ -890,7 +890,7 @@
             </xxf:event-response>
         </output>
     </test>
-
+    
     <test description="Simple use of xxforms:bind-property function" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
@@ -1027,14 +1027,14 @@
                         <xxf:control id="output-custom·1">42, 43</xxf:control>
                         <xxf:control id="output-calculate·1">43</xxf:control>
                         <xxf:repeat-iteration id="repeat" relevant="false" iteration="2"/>
-                        <xxf:control id="output-relevant·2" relevant="false">false</xxf:control>
-                        <xxf:control id="output-readonly·2" relevant="false">false</xxf:control>
-                        <xxf:control id="output-required·2" relevant="false">false</xxf:control>
-                        <xxf:control id="output-type·2" relevant="false">xs:integer</xxf:control>
-                        <xxf:control id="output-constraint·2" relevant="false">true</xxf:control>
-                        <xxf:control id="output-default·2" relevant="false">43</xxf:control>
-                        <xxf:control id="output-custom·2" relevant="false">43, 44</xxf:control>
-                        <xxf:control id="output-calculate·2" relevant="false">44</xxf:control>
+                        <xxf:control id="output-relevant·2" relevant="false"/>
+                        <xxf:control id="output-readonly·2" relevant="false"/>
+                        <xxf:control id="output-required·2" relevant="false"/>
+                        <xxf:control id="output-type·2" relevant="false"/>
+                        <xxf:control id="output-constraint·2" relevant="false"/>
+                        <xxf:control id="output-default·2" relevant="false"/>
+                        <xxf:control id="output-custom·2" relevant="false"/>
+                        <xxf:control id="output-calculate·2" relevant="false"/>
                         <xxf:control id="output-relevant·3">true</xxf:control>
                         <xxf:control id="output-readonly·3">false</xxf:control>
                         <xxf:control id="output-required·3">false</xxf:control>
@@ -1044,18 +1044,17 @@
                         <xxf:control id="output-custom·3">44, 45</xxf:control>
                         <xxf:control id="output-calculate·3">45</xxf:control>
                         <xxf:repeat-iteration id="repeat" relevant="false" iteration="4"/>
-                        <xxf:control id="output-relevant·4" relevant="false">false</xxf:control>
-                        <xxf:control id="output-readonly·4" relevant="false">true</xxf:control>
-                        <xxf:control id="output-required·4" relevant="false">false</xxf:control>
-                        <xxf:control id="output-type·4" relevant="false">xs:integer</xxf:control>
-                        <xxf:control id="output-constraint·4" relevant="false">false</xxf:control>
-                        <xxf:control id="output-default·4" relevant="false">45</xxf:control>
-                        <xxf:control id="output-custom·4" relevant="false">45, 46</xxf:control>
-                        <xxf:control id="output-calculate·4" relevant="false">46</xxf:control>
+                        <xxf:control id="output-relevant·4" relevant="false"/>
+                        <xxf:control id="output-readonly·4" relevant="false"/>
+                        <xxf:control id="output-required·4" relevant="false"/>
+                        <xxf:control id="output-type·4" relevant="false"/>
+                        <xxf:control id="output-constraint·4" relevant="false"/>
+                        <xxf:control id="output-default·4" relevant="false"/>
+                        <xxf:control id="output-custom·4" relevant="false"/>
+                        <xxf:control id="output-calculate·4" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
     </test>
-
 </group>

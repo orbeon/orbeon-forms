@@ -154,7 +154,7 @@
     <xhtml:body>
         <fr:tabview id="my-tabview">
             <fr:tab id="text-controls" selected="true">
-                <xforms:label>Text Controls</xforms:label>
+                <fr:label>Text Controls</fr:label>
                 <xhtml:p>
                     <xforms:input id="age" ref="age" incremental="true" class="input" xxforms:maxlength="3">
                         <xforms:label class="fixed-width">Age:</xforms:label>
@@ -300,11 +300,11 @@
                 </xhtml:p>
             </fr:tab>
             <fr:tab id="typed-controls">
-                <xforms:label>Typed Controls</xforms:label>
-                xxx
+                <fr:label>Typed Controls</fr:label>
+                [TODO]
             </fr:tab>
             <fr:tab id="selection-controls">
-                <xforms:label>Selection Controls</xforms:label>
+                <fr:label>Selection Controls</fr:label>
                 <xforms:group appearance="xxforms:fieldset">
                     <xforms:label>Single Value Selection</xforms:label>
                     <xhtml:p>
@@ -412,7 +412,7 @@
                 </xforms:group>
             </fr:tab>
             <fr:tab>
-                <xforms:label>Autocompletion</xforms:label>
+                <fr:label>Autocompletion</fr:label>
                 <xforms:group appearance="xxforms:fieldset">
                     <xforms:label>Auto-Complete</xforms:label>
                     <xhtml:p>
@@ -438,7 +438,7 @@
 
             </fr:tab>
             <fr:tab id="slider">
-                <xforms:label>Range</xforms:label>
+                <fr:label>Range</fr:label>
                 <xforms:range ref="range/value" start="1" end="26">
                     <xforms:action ev:event="xforms-value-changed">
                         <xforms:recalculate/>

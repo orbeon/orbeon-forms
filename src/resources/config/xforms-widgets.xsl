@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2004-2007 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -95,7 +95,7 @@
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <xforms:label>
-                                                    <xsl:value-of select="widget:label"/>
+                                                    <xsl:copy-of select="widget:label/node()"/>
                                                 </xforms:label>
                                             </xsl:otherwise>
                                         </xsl:choose>
@@ -120,7 +120,7 @@
                                             <xforms:output value="{widget:label/@ref}"/>
                                         </xsl:when>
                                         <xsl:otherwise>
-                                            <xsl:value-of select="widget:label"/>
+                                            <xsl:copy-of select="widget:label/node()"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </xhtml:div>

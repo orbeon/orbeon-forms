@@ -112,14 +112,14 @@
                         <xsl:if test="$case-id"><xsl:attribute name="id" select="concat('t-', $case-id)"/></xsl:if>
                         <xsl:choose>
                             <!-- Static label, just copy content -->
-                            <xsl:when test="empty(($label/@ref, $label/@bind, $label/@value))">
+                            <xsl:when test="empty($label/(@ref | @bind | @value))">
                                 <xsl:copy-of select="$label/node()"/>
                             </xsl:when>
                             <!-- Dynamic label, generate xforms:output -->
                             <xsl:otherwise>
                                 <!-- Put content in outer scope -->
                                 <xforms:output xxbl:scope="outer">
-                                    <xsl:copy-of select="$label/@* | $label/node()"/>
+                                    <xsl:copy-of select="$label/(@model | @context | @ref | @bind | @value | node())"/>
                                 </xforms:output>
                             </xsl:otherwise>
                         </xsl:choose>

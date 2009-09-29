@@ -91,6 +91,64 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             }, 750);
         });
     },
+    testOpenAllNew: function() {
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            YAHOO.util.UserAction.click(YAHOO.util.Dom.get("open-all-new"));
+        }, function() {
+            this.wait(function() {
+                this.checkIsOpened(1, true);
+                this.checkIsOpened(2, true);
+                this.checkIsOpened(5, true);
+            }, 750);
+        });
+    },
+    testCloseAllNew: function() {
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            YAHOO.util.UserAction.click(YAHOO.util.Dom.get("close-all-new"));
+        }, function() {
+            this.wait(function() {
+                this.checkIsOpened(1, false);
+                this.checkIsOpened(2, false);
+                this.checkIsOpened(5, false);
+            }, 750);
+        });
+    },
+    testOpenThirdNew: function() {
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            YAHOO.util.UserAction.click(YAHOO.util.Dom.get("open-third-new"));
+        }, function() {
+            this.wait(function() {
+                this.checkIsOpened(3, true);
+            }, 750);
+        });
+    },
+    testCloseThirdNew: function() {
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            YAHOO.util.UserAction.click(YAHOO.util.Dom.get("close-third-new"));
+        }, function() {
+            this.wait(function() {
+                this.checkIsOpened(3, false);
+            }, 750);
+        });
+    },
+    testOpenStatesNew: function() {
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            YAHOO.util.UserAction.click(YAHOO.util.Dom.get("open-states-new"));
+        }, function() {
+            this.wait(function() {
+                this.checkIsOpened(5, true);
+            }, 750);
+        });
+    },
+    testCloseStatesNew: function() {
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            YAHOO.util.UserAction.click(YAHOO.util.Dom.get("close-states-new"));
+        }, function() {
+            this.wait(function() {
+                this.checkIsOpened(5, false);
+            }, 750);
+        });
+    },
     testAddState: function() {
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             YAHOO.util.Assert.areEqual(8, this.getDts().length);

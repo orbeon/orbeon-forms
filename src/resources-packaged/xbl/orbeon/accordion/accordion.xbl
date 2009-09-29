@@ -36,14 +36,20 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-accordion-toggle-all" phase="target">
-                <xforms:setvalue model="accordion-model" ref="selected" value="event('selected')"/>
+                <xforms:setvalue ref="operation" value="if (event('selected')) then 'show' else 'hide'"/>
                 <xxforms:script id="xf-ta">YAHOO.xbl.fr.Accordion.toggleAll(this);</xxforms:script>
             </xbl:handler>
-            <!-- Legacy method to toggle a given case. Prefer dispatching fr-toggle directly to fr:case by id. -->
-            <xbl:handler event="fr-accordion-toggle" phase="target" xxbl:scope="outer">
-                <xforms:dispatch target="{event('case-id')}" name="fr-accordion-toggle">
-                    <xxforms:context name="selected" select="event('selected')"/>
-                </xforms:dispatch>
+            <xbl:handler event="fr-show-all" phase="target">
+                <xforms:setvalue ref="operation">show</xforms:setvalue>
+                <xxforms:script id="xf-sa">YAHOO.xbl.fr.Accordion.toggleAll(this);</xxforms:script>
+            </xbl:handler>
+            <xbl:handler event="fr-hide-all" phase="target">
+                <xforms:setvalue ref="operation">hide</xforms:setvalue>
+                <xxforms:script id="xf-ha">YAHOO.xbl.fr.Accordion.toggleAll(this);</xxforms:script>
+            </xbl:handler>
+            <!-- Handler for backward compatibility: prefer dispatching fr-toggle/fr-show/fr-hide directly to fr:case by id. -->
+            <xbl:handler event="fr-toggle fr-accordion-toggle" phase="target" xxbl:scope="outer">
+                <xforms:dispatch target="{event('case-id')}" name="{if (event('selected')) then 'fr-show' else 'fr-hide'}"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -51,7 +57,7 @@
             <xforms:model id="accordion-model">
                 <xforms:instance id="accordion-instance">
                     <instance>
-                        <selected/>
+                        <operation/>
                     </instance>
                 </xforms:instance>
             </xforms:model>
@@ -75,10 +81,10 @@
                         <!-- Constructor -->
                         <xxforms:script id="xf-en" ev:event="xforms-enabled" ev:target="fr-accordion-group">YAHOO.xbl.fr.Accordion.init(event.target);</xxforms:script>
                         <!-- Toggle -->
-                        <xxforms:script id="xf-tg" ev:event="fr-accordion-toggle">YAHOO.xbl.fr.Accordion.toggle(event.target);</xxforms:script>
+                        <xxforms:script id="xf-tg" ev:event="fr-accordion-toggle fr-toggle fr-show fr-hide">YAHOO.xbl.fr.Accordion.toggle(event.target);</xxforms:script>
 
                         <!-- Dummy controls so JavaScript can access the local instance -->
-                        <xforms:output model="accordion-model" value="selected" class="xbl-fr-accordion-selected" style="display: none"/>
+                        <xforms:output model="accordion-model" value="operation" class="xbl-fr-accordion-operation" style="display: none"/>
 
                         <!-- Markup for the accordion -->
                         <xhtml:dl id="dl" class="xbl-fr-accordion-dl">
@@ -127,10 +133,10 @@
                             <xforms:group xxbl:scope="outer">
                                 <xsl:if test="$case-id">
                                     <xsl:attribute name="id" select="$case-id"/>
-                                    <!-- Custom toggling event -->
-                                    <xforms:action ev:event="fr-accordion-toggle" ev:target="{$case-id}">
-                                        <xforms:setvalue model="accordion-model" ref="selected" value="event('selected')" xxbl:scope="inner"/>
-                                    </xforms:action>
+                                    <!-- Custom events -->
+                                    <xforms:setvalue ev:event="fr-toggle" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">toggle</xforms:setvalue>
+                                    <xforms:setvalue ev:event="fr-show" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">show</xforms:setvalue>
+                                    <xforms:setvalue ev:event="fr-hide" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">hide</xforms:setvalue>
                                 </xsl:if>
 
                                 <xsl:copy-of select="node() except $label"/>

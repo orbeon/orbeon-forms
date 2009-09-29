@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -66,9 +66,10 @@
         <xhtml:fieldset>
             <xhtml:legend>Accordion events</xhtml:legend>
             <xhtml:ol>
+                <!-- Backward compatibility events -->
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="open-all">
-                        <xforms:label>Open all</xforms:label>
+                        <xforms:label>Open all (legacy)</xforms:label>
                         <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
                             <xxforms:context name="selected" select="true()"/>
                         </xforms:dispatch>
@@ -76,7 +77,7 @@
                 </xhtml:li>
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="close-all">
-                        <xforms:label>Close all</xforms:label>
+                        <xforms:label>Close all (legacy)</xforms:label>
                         <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
                             <xxforms:context name="selected" select="false()"/>
                         </xforms:dispatch>
@@ -84,7 +85,7 @@
                 </xhtml:li>
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="open-third">
-                        <xforms:label>Open third section (currency)</xforms:label>
+                        <xforms:label>Open third (currency) section (legacy)</xforms:label>
                         <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
                             <xxforms:context name="case-id" select="'my-case-currency'"/>
                             <xxforms:context name="selected" select="true()"/>
@@ -93,7 +94,7 @@
                 </xhtml:li>
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="close-third">
-                        <xforms:label>Close third section (currency)</xforms:label>
+                        <xforms:label>Close third (currency) section (legacy)</xforms:label>
                         <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
                             <xxforms:context name="case-id" select="'my-case-currency'"/>
                             <xxforms:context name="selected" select="false()"/>
@@ -102,7 +103,7 @@
                 </xhtml:li>
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="open-states">
-                        <xforms:label>Open states</xforms:label>
+                        <xforms:label>Open states (legacy)</xforms:label>
                         <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
                             <xxforms:context name="case-id" select="'my-case-repeat'"/>
                             <xxforms:context name="selected" select="true()"/>
@@ -111,13 +112,51 @@
                 </xhtml:li>
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="close-states">
-                        <xforms:label>Close states</xforms:label>
+                        <xforms:label>Close states (legacy)</xforms:label>
                         <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
                             <xxforms:context name="case-id" select="'my-case-repeat'"/>
                             <xxforms:context name="selected" select="false()"/>
                         </xforms:dispatch>
                     </xforms:trigger>
                 </xhtml:li>
+                <!-- New events -->
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal" id="open-all-new">
+                        <xforms:label>Open all</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-show-all"/>
+                    </xforms:trigger>
+                </xhtml:li>
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal" id="close-all-new">
+                        <xforms:label>Close all</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-hide-all"/>
+                    </xforms:trigger>
+                </xhtml:li>
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal" id="open-third-new">
+                        <xforms:label>Open third section (currency)</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-case-currency" name="fr-show"/>
+                    </xforms:trigger>
+                </xhtml:li>
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal" id="close-third-new">
+                        <xforms:label>Close third section (currency)</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-case-currency" name="fr-hide"/>
+                    </xforms:trigger>
+                </xhtml:li>
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal" id="open-states-new">
+                        <xforms:label>Open states</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-case-repeat" name="fr-show"/>
+                    </xforms:trigger>
+                </xhtml:li>
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal" id="close-states-new">
+                        <xforms:label>Close states</xforms:label>
+                        <xforms:dispatch ev:event="DOMActivate" target="my-case-repeat" name="fr-hide"/>
+                    </xforms:trigger>
+                </xhtml:li>
+
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="add-state">
                         <xforms:label>Add state</xforms:label>
@@ -162,28 +201,28 @@
             </fr:case>
             <fr:case>
                 <fr:label>Datatable</fr:label>
-                <fr:datatable id="my-datatable">
-                    <xhtml:thead>
-                        <xhtml:tr>
-                            <xhtml:th fr:sortable="true" fr:resizeable="true">Abbreviation</xhtml:th>
-                            <xhtml:th fr:sortable="true" fr:resizeable="true">Name</xhtml:th>
-                            <xhtml:th fr:sortable="true" fr:resizeable="true">Population</xhtml:th>
-                        </xhtml:tr>
-                    </xhtml:thead>
-                    <xhtml:tbody>
-                        <xhtml:tr repeat-nodeset="states/state">
-                            <xhtml:td>
-                                <xforms:output ref="abbreviation"/>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:output ref="name"/>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:output ref="population"/>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </xhtml:tbody>
-                </fr:datatable>
+                <!--<fr:datatable id="my-datatable">-->
+                    <!--<xhtml:thead>-->
+                        <!--<xhtml:tr>-->
+                            <!--<xhtml:th fr:sortable="true" fr:resizeable="true">Abbreviation</xhtml:th>-->
+                            <!--<xhtml:th fr:sortable="true" fr:resizeable="true">Name</xhtml:th>-->
+                            <!--<xhtml:th fr:sortable="true" fr:resizeable="true">Population</xhtml:th>-->
+                        <!--</xhtml:tr>-->
+                    <!--</xhtml:thead>-->
+                    <!--<xhtml:tbody>-->
+                        <!--<xhtml:tr repeat-nodeset="states/state">-->
+                            <!--<xhtml:td>-->
+                                <!--<xforms:output ref="abbreviation"/>-->
+                            <!--</xhtml:td>-->
+                            <!--<xhtml:td>-->
+                                <!--<xforms:output ref="name"/>-->
+                            <!--</xhtml:td>-->
+                            <!--<xhtml:td>-->
+                                <!--<xforms:output ref="population"/>-->
+                            <!--</xhtml:td>-->
+                        <!--</xhtml:tr>-->
+                    <!--</xhtml:tbody>-->
+                <!--</fr:datatable>-->
             </fr:case>
             <xforms:repeat nodeset="states/state">
                 <fr:case id="my-case-repeat" selected="true">

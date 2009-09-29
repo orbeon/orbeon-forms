@@ -72,11 +72,10 @@
                         <!-- Access to parameters -->
                         <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'accordion', 'open-closes-others')"/>
 
-                        <!-- Event handlers -->
-                        <xxforms:script id="xf-en" ev:event="xforms-enabled" ev:target="fr-accordion-group">YAHOO.xbl.fr.Accordion.init(this);</xxforms:script>
-                        <xforms:action ev:event="fr-accordion-toggle">
-                            <xxforms:script>YAHOO.xbl.fr.Accordion.toggle(arguments[0].target);</xxforms:script>
-                        </xforms:action>
+                        <!-- Constructor -->
+                        <xxforms:script id="xf-en" ev:event="xforms-enabled" ev:target="fr-accordion-group">YAHOO.xbl.fr.Accordion.init(event.target);</xxforms:script>
+                        <!-- Toggle -->
+                        <xxforms:script id="xf-tg" ev:event="fr-accordion-toggle">YAHOO.xbl.fr.Accordion.toggle(event.target);</xxforms:script>
 
                         <!-- Dummy controls so JavaScript can access the local instance -->
                         <xforms:output model="accordion-model" value="selected" class="xbl-fr-accordion-selected" style="display: none"/>

@@ -39,7 +39,7 @@
                 <xsl:variable name="parameters" as="element(parameter)*" select="doc('input:request')/request/parameters/parameter"/>
                 <xsl:variable name="state-abbreviation" as="xs:string?" select="$parameters[name = 'state-abbreviation']/value"/>
                 <xsl:variable name="max" as="xs:integer?" select="$parameters[name = 'max']/value"/>
-                <xsl:variable name="zips" as="element(zip)+" select="/zips/zip[state-abbreviation = $state-abbreviation]"/>
+                <xsl:variable name="zips" as="element(zip)*" select="/zips/zip[state-abbreviation = $state-abbreviation]"/>
                 <xsl:for-each select="distinct-values($zips/city)[empty($max) or position() lt $max]">
                     <xsl:sort/>
                     <city name="{.}"/>

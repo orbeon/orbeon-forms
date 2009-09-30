@@ -11,21 +11,23 @@ YAHOO.xbl.fr.Date = {
             var inputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-date-input", null, container)[0];
             var mindateElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-date-mindate", null, container)[0];
             var maxdateElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-date-maxdate", null, container)[0];
+            var pagedateElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-date-pagedate", null, container)[0];
 
             // Create instance
             var instance = {
                 valueChanged: function() {
                     var date = ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Document.getValue(inputElement.id));
+                    var pagedate = ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Document.getValue(pagedateElement.id));
                     if (date == null) {
                         yuiCalendar.cfg.setProperty("selected", "", false);
-                        yuiCalendar.cfg.setProperty("pagedate", new Date(), false);
+                        yuiCalendar.cfg.setProperty("pagedate", pagedate == null ? new Date() : pagedate, false);
                     } else {
                         // Date must be the internal format expected by YUI
                         var dateStringForYUI = (date.getMonth() + 1)
                            + "/" + date.getDate()
                            + "/" + date.getFullYear();
                         yuiCalendar.cfg.setProperty("selected", dateStringForYUI, false);
-                        yuiCalendar.cfg.setProperty("pagedate", date, false);
+                        yuiCalendar.cfg.setProperty("pagedate", pagedate == null ? date : pagedate, false);
                     }
                     yuiCalendar.render();
                 },
@@ -37,6 +39,11 @@ YAHOO.xbl.fr.Date = {
                 propertyMaxdateChanged: function() {
                     yuiCalendar.cfg.setProperty("maxdate", maxdateElement == null ? null :
                         ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Document.getValue(maxdateElement.id)));
+                    yuiCalendar.render();
+                },
+                propertyPagedateChanged: function() {
+                    yuiCalendar.cfg.setProperty("pagedate", maxdateElement == null ? null :
+                        ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Document.getValue(pagedateElement.id)));
                     yuiCalendar.render();
                 },
                 setLanguage: function() {
@@ -111,5 +118,11 @@ YAHOO.xbl.fr.Date = {
         var instance = YAHOO.xbl.fr.Date._instances[container.id];
         if (! YAHOO.lang.isUndefined(instance))
             instance.propertyMaxdateChanged();
+    },
+    propertyPagedateChanged: function(target) {
+        var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-date");
+        var instance = YAHOO.xbl.fr.Date._instances[container.id];
+        if (! YAHOO.lang.isUndefined(instance))
+            instance.propertyPagedateChanged();
     }
 };

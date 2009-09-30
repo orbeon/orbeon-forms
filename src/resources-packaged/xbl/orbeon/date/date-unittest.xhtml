@@ -31,13 +31,12 @@
                     <date>2009-05-15</date>
                     <mindate>2009-05-05</mindate>
                     <maxdate>2009-05-25</maxdate>
+                    <pagedate>2009-04-01</pagedate>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="/instance/*" type="xs:date"/>
-
         </xforms:model>
         <xhtml:style type="text/css">
-            fieldset  { float: left; clear: both; }
             label { display: inline-block; width: 10em; }
             .xbl-fr-date { float: left; margin-right: 1em;}
         </xhtml:style>
@@ -56,9 +55,14 @@
                         <xforms:label>Max:</xforms:label>
                     </xforms:input>
                 </xhtml:div>
+                <xhtml:div>
+                    <xforms:input ref="pagedate">
+                        <xforms:label>Page date:</xforms:label>
+                    </xforms:input>
+                </xhtml:div>
             </xhtml:fieldset>
             <xhtml:fieldset>
-                <xhtml:legend>fr:date with textfield appearance</xhtml:legend>
+                <xhtml:legend>fr:date with default appearance</xhtml:legend>
                 <xhtml:div>
                     <fr:date ref="date">
                         <xforms:label>Dynamic min/max:</xforms:label>
@@ -86,9 +90,22 @@
             </xhtml:fieldset>
         </xhtml:div>
         <xhtml:fieldset>
+            <xhtml:legend>fr:date with pagedate set</xhtml:legend>
+            <xhtml:div>
+                <fr:date ref="date">
+                    <xforms:label>Dynamic page date:</xforms:label>
+                    <fr:pagedate ref="../pagedate"/>
+                </fr:date>
+            </xhtml:div>
+            <fr:date ref="date" appearance="fr:inline" pagedate="2009-04-01">
+                <!-- <xforms:label>Static page date:</xforms:label> -->
+                <xforms:label>Please select a date:</xforms:label>
+            </fr:date>
+        </xhtml:fieldset>
+        <xhtml:fieldset>
             <xhtml:legend>fr:date with inline appearance</xhtml:legend>
             <fr:date ref="date" appearance="fr:inline">
-                <xforms:label>Dynamic min/max:</xforms:label>
+                <xforms:label>Contract start date:</xforms:label>
                 <fr:mindate ref="../mindate"/>
                 <fr:maxdate ref="../maxdate"/>
             </fr:date>

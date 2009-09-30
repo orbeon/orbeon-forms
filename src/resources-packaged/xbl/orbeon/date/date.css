@@ -2,3 +2,4 @@
 /* Hide XForms input used to exchange date with server */
 .xbl-fr-date-input { display: none; }
 /* Force YUI calendar not to be a float, otherwise next label shows on the right if the picker */
+.xbl-fr-date .yui-calcontainer { float: none; }

@@ -876,7 +876,7 @@
                 </xforms:instance>
                 <xforms:bind nodeset="column/@nbColumns" calculate="1"/>
                 <xforms:bind nodeset="columnSet/@nbColumns" calculate="count(../column)"/>
-                <xforms:bind nodeset="*/@index" calculate="count(../preceding::column) + 1"/>
+                <xforms:bind nodeset="//@index" calculate="count(../preceding::column) + 1"/>
                 <xforms:bind nodeset="//column/@currentSortOrder"
                     calculate="if (../@index = /*/@currentSortColumn) then . else 'none'"/>
                 <xforms:bind nodeset="//column/@nextSortOrder"

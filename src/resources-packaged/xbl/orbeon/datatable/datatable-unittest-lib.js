@@ -112,7 +112,11 @@ ORBEON.widgets.datatable.unittests_lib = {
     checkRowWidth: function(row) {
         for (var icol = 0; icol < row.cells.length; icol++) {
             var cell = row.cells[icol];
-            this.checkCellWidth(cell);
+            if (!YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-begin-end')
+                && !YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-delimiter')
+                && !YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-template')) {
+                this.checkCellWidth(cell);
+            }
         }
     },
 

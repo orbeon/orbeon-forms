@@ -81,7 +81,8 @@ YAHOO.xbl.fr.Date = {
             };
 
             // Create YUI calendar
-            var yuiCalendar = ORBEON.util.Utils.getProperty(DATE_PICKER_NAVIGATOR_PROPERTY)
+            var hasTwoMonths = ORBEON.util.Utils.getProperty(DATE_PICKER_TWO_MONTHS_PROPERTY);
+            yuiCalendar = hasTwoMonths
                 ? new YAHOO.widget.CalendarGroup(calendarDivElement)
                 : new YAHOO.widget.Calendar(calendarDivElement);
             yuiCalendar.selectEvent.subscribe(instance.dateSelected, instance, true);

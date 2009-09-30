@@ -218,8 +218,9 @@ ORBEON.widgets.datatable.unittests_lib = {
                 }
             }
         }
-        YAHOO.util.Assert.fail('Attribute ' + attribute + ' not found');
-
+        if (value  != undefined) {
+            YAHOO.util.Assert.fail('Attribute ' + attribute + ' not found');
+        }
     },
 
     checkColTypeValue: function(div, type) {

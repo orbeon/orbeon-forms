@@ -71,10 +71,11 @@
                 <fr:label>A first basic dynamic datatable</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
-                    <fr:datatable id="hello_world-table">
+                    <xforms:group ref="instance('detailed-lorem')">
+                    <fr:datatable id="hello_world-table" debug="true">
                         <xhtml:thead>
                             <xhtml:tr>
-                                <xforms:repeat nodeset="$basic-nodeset[1]/*">
+                                <xforms:repeat nodeset="line[1]/*">
                                     <xhtml:th>
                                         <xforms:output value="name()"/>
                                     </xhtml:th>
@@ -82,21 +83,23 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="$basic-nodeset">
+                            <xforms:repeat nodeset="line[length &lt; 20]">
                                 <xhtml:tr>
                                     <xforms:repeat nodeset="*">
-                                        <xhtml:th>
+                                        <xhtml:td>
                                             <xforms:output value="."/>
-                                        </xhtml:th>
+                                        </xhtml:td>
                                     </xforms:repeat>
                                 </xhtml:tr>
                             </xforms:repeat>
                         </xhtml:tbody>
-                    </fr:datatable>
+                    </fr:datatable></xforms:group>
                 </xhtml:div>
             </fr:case>
 
         </fr:accordion>
+        
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
 
     </xhtml:body>
 </xhtml:html>

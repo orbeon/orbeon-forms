@@ -824,7 +824,7 @@ public class Dom4jUtils {
         return sb.toString();
     }
 
-    public static String attributeToString(Attribute attribute) {
+    public static String attributeToDebugString(Attribute attribute) {
         final StringBuilder sb = new StringBuilder(attribute.getQualifiedName());
         sb.append("=\"");
         sb.append(attribute.getValue());

@@ -95,7 +95,7 @@ public class XFormsSubmissionUtils {
 
                     if (!valid && indentedLogger.isDebugEnabled()) {
                         indentedLogger.logDebug("", "found invalid attribute",
-                            "attribute name", Dom4jUtils.attributeToString(attribute), "parent element", Dom4jUtils.elementToDebugString(attribute.getParent()));
+                            "attribute name", Dom4jUtils.attributeToDebugString(attribute), "parent element", Dom4jUtils.elementToDebugString(attribute.getParent()));
                     }
                 }
 

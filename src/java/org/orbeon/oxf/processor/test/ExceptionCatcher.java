@@ -43,7 +43,7 @@ public class ExceptionCatcher extends ProcessorImpl {
                     readInputAsSAX(context, getInputByName(INPUT_DATA), dataInput);
                     // No exception: output what was read
                     dataInput.replay(contentHandler);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     // Exception was thrown while reading input: generate a document with that exception
                     ContentHandlerHelper helper = new ContentHandlerHelper(contentHandler);
                     helper.startDocument();

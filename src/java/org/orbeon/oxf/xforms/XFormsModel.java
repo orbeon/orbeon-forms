@@ -36,6 +36,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.net.MalformedURLException;
@@ -191,7 +192,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         }
 
         // Find by static id
-        return resolveObjectById(null, XFormsUtils.getStaticIdFromId(effectiveId));
+        return resolveObjectById(null, XFormsUtils.getStaticIdFromId(effectiveId), null);
     }
 
     /**
@@ -200,9 +201,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      *
      * @param sourceEffectiveId  effective id of the source, or null
      * @param targetStaticId     static id of the target
+     * @param contextItem        context item, or null (used for bind resolution only)
      * @return                   object, or null if not found
      */
-    public Object resolveObjectById(String sourceEffectiveId, String targetStaticId) {
+    public Object resolveObjectById(String sourceEffectiveId, String targetStaticId, Item contextItem) {
 
         if (targetStaticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1 || targetStaticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1)
             throw new OXFException("Target id must be static id: " + targetStaticId);
@@ -223,6 +225,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             final XFormsModelSubmission resultSubmission = submissions.get(targetStaticId);
             if (resultSubmission != null)
                 return resultSubmission;
+        }
+
+        // Search binds
+        if (binds != null) {
+            final XFormsModelBinds.Bind bind = binds.resolveBind(targetStaticId, contextItem);
+            if (bind != null)
+                return bind;
         }
 
         return null;

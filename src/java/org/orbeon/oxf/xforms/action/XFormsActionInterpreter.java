@@ -76,7 +76,7 @@ public class XFormsActionInterpreter {
                 xpathContextObserver = eventObserver;
             } else {
                 // Observer is not parent of action, must resolve effective id of parent
-                xpathContextObserver = (XFormsEventObserver) container.resolveObjectByIdInScope(eventObserver.getEffectiveId(), ancestorObserverStaticId);
+                xpathContextObserver = (XFormsEventObserver) container.resolveObjectByIdInScope(eventObserver.getEffectiveId(), ancestorObserverStaticId, null);
             }
 
             // Effective id of the XPath observer, which must be a control or model object
@@ -485,7 +485,7 @@ public class XFormsActionInterpreter {
         final String repeatIndexes = resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME, false);
         if (StringUtils.isBlank(repeatIndexes)) {
             // Most common case: resolve effective id based on source and target
-            return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(), targetStaticId);
+            return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(), targetStaticId, null);
         } else {
             // Extension: effective id is provided through repeat indexes, modify appropriately and directly reach control
             final Integer[] containerParts = XFormsUtils.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId());
@@ -532,7 +532,7 @@ public class XFormsActionInterpreter {
         } else {
             // Otherwise, try container
             final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement);
-            return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(), targetStaticId);
+            return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(), targetStaticId, null);
         }
     }
 

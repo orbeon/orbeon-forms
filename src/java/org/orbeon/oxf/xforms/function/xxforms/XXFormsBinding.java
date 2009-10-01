@@ -40,7 +40,7 @@ public class XXFormsBinding extends XFormsFunction {
         if (controlStaticId == null)
             return EmptyIterator.getInstance();
 
-        final Object object = getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), controlStaticId);
+        final Object object = getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), controlStaticId, null);
 
         // For now allow single-node controls only
         if (object instanceof XFormsSingleNodeControl) {

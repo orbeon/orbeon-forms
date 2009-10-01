@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.*;
@@ -416,7 +417,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      * @return                  repeat index, -1 if repeat is not found
      */
     public int getRepeatIndex(String sourceEffectiveId, String repeatStaticId) {
-        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) resolveObjectByIdInScope(sourceEffectiveId, repeatStaticId);
+        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) resolveObjectByIdInScope(sourceEffectiveId, repeatStaticId, null);
         if (repeatControl != null) {
             // 1. Found concrete control
             return repeatControl.getIndex();
@@ -438,10 +439,10 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
     }
 
-    public Object resolveObjectByIdInScope(String sourceEffectiveId, String targetStaticId) {
+    public Object resolveObjectByIdInScope(String sourceEffectiveId, String targetStaticId, Item contextItem) {
         final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId);
         final XBLContainer resolutionScopeContainer = findResolutionScope(sourcePrefixedId);
-        return resolutionScopeContainer.resolveObjectById(sourceEffectiveId, targetStaticId);
+        return resolutionScopeContainer.resolveObjectById(sourceEffectiveId, targetStaticId, contextItem);
     }
 
     /**
@@ -449,13 +450,17 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      *
      * @param sourceEffectiveId effective id of the source (control, model, instance, submission, ...), or null
      * @param targetStaticId    static id of the target
+     * @param contextItem       context item, or null (used for bind resolution only)
      * @return                  object, or null if not found
      */
-    public Object resolveObjectById(String sourceEffectiveId, String targetStaticId) {
+    public Object resolveObjectById(String sourceEffectiveId, String targetStaticId, Item contextItem) {
 
         // Make sure the static id passed is actually a static id
         if (!XFormsUtils.isStaticId(targetStaticId))
             throw new OXFException("Target id must be static id: " + targetStaticId);
+
+        if (sourceEffectiveId == null)
+            throw new OXFException("Source id must be specified.");
 
         // 1. Check if requesting the binding id. If so, we interpret this as requesting the bound element
         //    and return the control associated with the bound element.
@@ -465,13 +470,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             return containingDocument.getControls().getObjectByEffectiveId(effectiveId);
 
         // 2. Search in directly contained models
-        final Object resultModelObject = searchContainedModels(sourceEffectiveId, targetStaticId);
+        final Object resultModelObject = searchContainedModels(sourceEffectiveId, targetStaticId, contextItem);
         if (resultModelObject != null)
             return resultModelObject;
-
-        // TODO: move this to top once e.g. XFormsActionInterpreter() is fixed
-        if (sourceEffectiveId == null)
-            throw new OXFException("Source id must be specified.");
 
         // Check that source is resolvable within this container
         if (!isEffectiveIdResolvableByThisContainer(sourceEffectiveId))
@@ -484,9 +485,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         // Find closest control
         final String sourceControlEffectiveId;
         {
-            final Object tempModelObject = searchContainedModels(null, XFormsUtils.getStaticIdFromId(sourceEffectiveId));
+            final Object tempModelObject = searchContainedModels(null, XFormsUtils.getStaticIdFromId(sourceEffectiveId), contextItem);
             if (tempModelObject != null) {
-                // Source is a model object
+                // Source is a model object, so get first control instead
                 sourceControlEffectiveId = getFirstControlEffectiveId();
                 if (sourceControlEffectiveId == null)
                     return null;
@@ -498,7 +499,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         // Resolve on controls
         final XFormsControls controls = containingDocument.getControls();
-        final XFormsControl result = (XFormsControl) controls.resolveObjectById(sourceControlEffectiveId, targetStaticId);
+        final XFormsControl result = (XFormsControl) controls.resolveObjectById(sourceControlEffectiveId, targetStaticId, contextItem);
 
         // If result is provided, make sure it is within the resolution scope of this container
         if (result != null && !isEffectiveIdResolvableByThisContainer(result.getEffectiveId())) {
@@ -529,9 +530,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return componentControl.getChildren();
     }
 
-    private Object searchContainedModels(String sourceEffectiveId, String targetStaticId) {
+    private Object searchContainedModels(String sourceEffectiveId, String targetStaticId, Item contextItem) {
         for (XFormsModel model: models) {
-            final Object resultObject = model.resolveObjectById(sourceEffectiveId, targetStaticId);
+            final Object resultObject = model.resolveObjectById(sourceEffectiveId, targetStaticId, contextItem);
             if (resultObject != null)
                 return resultObject;
         }

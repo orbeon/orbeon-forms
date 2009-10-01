@@ -111,7 +111,7 @@
                         <xxforms:sequence select="." xxbl:scope="outer"/>
                     </xxforms:variable>
 
-                    <!-- React to update to bound node -->
+                    <!-- React to update to bound node or control coming into existence -->
                     <xforms:group ref="$result" appearance="xxforms:internal">
                         <!-- Only set local values if the bound node is an xs:date -->
                         <xforms:action ev:event="xforms-value-changed xforms-enabled">
@@ -120,10 +120,17 @@
                                 <xforms:setvalue ref="instance('date-instance')/month" value="month-from-date($result)"/>
                                 <xforms:setvalue ref="instance('date-instance')/day" value="day-from-date($result)"/>
                             </xforms:action>
-                            <xforms:action if="normalize-space($result cast as xs:string) = ''">
+                            <xforms:action if="not($result castable as xs:date) and normalize-space($result) = ''">
                                 <xforms:setvalue ref="instance('date-instance')/year"/>
                                 <xforms:setvalue ref="instance('date-instance')/month"/>
                                 <xforms:setvalue ref="instance('date-instance')/day"/>
+                            </xforms:action>
+                            <xforms:action if="not($result castable as xs:date) and count(tokenize($result, '-')) ge 3">
+                                <xforms:action xxforms:iterate="tokenize($result, '-')">
+                                    <xxforms:variable name="position" select="position()" as="xs:integer"/>
+                                    <xforms:setvalue ref="instance('date-instance')/*[$position]"
+                                                     value="if (context() castable as xs:integer) then xs:integer(context()) else ''"/>
+                                </xforms:action>
                             </xforms:action>
                         </xforms:action>
                     </xforms:group>
@@ -166,19 +173,25 @@
 
                         <!-- React to update to local values -->
                         <xforms:action ev:event="xforms-value-changed">
-                            <!-- Invalid by default -->
-                            <xforms:setvalue ref="is-valid">false</xforms:setvalue>
-                            <!-- Only proceed if all parts are integers -->
-                            <xforms:action if="year castable as xs:integer and month castable as xs:integer and day castable as xs:integer">
-                                <xxforms:variable name="date-string" select="concat(year, '-', format-number(xs:integer(month), '00'), '-', format-number(xs:integer(day), '00'))" as="xs:string"/>
-                                <!-- Only set value if the result is castable as a date -->
-                                <xforms:setvalue ref="is-valid">true</xforms:setvalue>
-                                <xforms:setvalue if="$date-string castable as xs:date" ref="$result" value="$date-string"/>
+                            <xxforms:variable name="c" select="normalize-space(string-join((year, month, day), ''))" as="xs:string"/>
+                            <!-- Blank result -->
+                            <xforms:action if="$c = ''">
+                                <xforms:setvalue ref="is-valid" value="false()"/>
+                                <xforms:setvalue ref="$result"/>
                             </xforms:action>
-                            <!-- Set invalid string -->
-                            <xforms:action if="is-valid = 'false'">
-                                <!--<xforms:setvalue ref="$result" value="if (concat(context()/year, context()/month, context()/day) = '') then '' else concat(context()/year, '-', context()/month, '-', context()/day)"/>-->
-                                <xforms:setvalue ref="$result" value="string-join((context()/year, context()/month, context()/day), '-')"/>
+                            <!-- Non-blank result -->
+                            <xforms:action if="$c != ''">
+                                <!-- Compute date parts -->
+                                <xxforms:variable name="y" select="if (year castable as xs:integer) then format-number(xs:integer(year), '0000') else '____'" as="xs:string"/>
+                                <xxforms:variable name="m" select="if (month castable as xs:integer) then format-number(xs:integer(month), '00') else '__'" as="xs:string"/>
+                                <xxforms:variable name="d" select="if (day castable as xs:integer) then format-number(xs:integer(day), '00') else '__'" as="xs:string"/>
+
+                                <!-- Create date string -->
+                                <xxforms:variable name="date-string" select="string-join(($y, $m, $d), '-')" as="xs:string"/>
+
+                                <!-- Set value to format like 2008-02-31 or 0000-12-01 if parts are unknown -->
+                                <xforms:setvalue ref="is-valid" value="$date-string castable as xs:date"/>
+                                <xforms:setvalue ref="$result" value="$date-string"/>
                             </xforms:action>
                         </xforms:action>
                     </xforms:group>

@@ -38,17 +38,18 @@
                     <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
 
                         <!-- Inner group -->
-                        <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
+                        <xforms:group xxbl:scope="inner" appearance="xxforms:internal">
                             <!-- Variable pointing to external single-node binding -->
                             <xxforms:variable name="result" as="node()?">
                                 <xxforms:sequence select="." xxbl:scope="outer"/>
                             </xxforms:variable>
 
-                            <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.FusionCharts.init(this);</xxforms:script>
                             <!-- Div in which the chart is rendered -->
                             <xhtml:div id="chart-div" class="xbl-fr-fusion-charts-chart-div">The chart will appear within this DIV. This text will be replaced by the chart.</xhtml:div>
                             <!-- XML -->
-                            <xforms:output value="saxon:serialize($result, 'xml')" style="display: none" class="xbl-fr-fusion-charts-xml"/>
+                            <xforms:output value="saxon:serialize($result, 'xml')" style="display: none" class="xbl-fr-fusion-charts-xml">
+                                <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.FusionCharts.init(this);</xxforms:script>
+                            </xforms:output>
                             <!-- Access to parameters -->
                             <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'fusion-charts', 'uri-to-swf')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'fusion-charts', 'swf')"/>

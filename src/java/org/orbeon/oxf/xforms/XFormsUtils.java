@@ -1073,7 +1073,7 @@ public class XFormsUtils {
             }
             return result;
         } catch (URISyntaxException e) {
-            throw new ValidationException("Error while resolving URI: " + uri, e, (LocationData) element.getData());
+            throw new ValidationException("Error while resolving URI: " + uri, e, (element != null) ? (LocationData) element.getData() : null);
         }
     }
 

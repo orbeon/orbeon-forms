@@ -145,15 +145,16 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
      *
      * @param contentHandler    resulting static state document
      * @param ignoreRootElement whether root element must just be skipped
+     * @param baseURI           base URI
      */
-    public XFormsExtractorContentHandler(ContentHandler contentHandler, boolean ignoreRootElement) {
+    public XFormsExtractorContentHandler(ContentHandler contentHandler, boolean ignoreRootElement, String baseURI) {
         super(contentHandler, contentHandler != null);
         this.externalContext = null;
         this.ignoreRootElement = ignoreRootElement;
 
-        // TODO: handle xml:base correctly for XBL components
         try {
-            xmlBaseStack.push(new URI(null, null, "/", null));
+            assert baseURI != null;
+            xmlBaseStack.push(new URI(null, null, baseURI, null));
         } catch (URISyntaxException e) {
             throw new ValidationException(e, new LocationData(locator));
         }

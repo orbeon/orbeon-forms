@@ -769,8 +769,8 @@ public class Dom4jUtils {
         final List<Node> content = mutable ? new ArrayList<Node>(content(container)) : content(container);
 
         // Iterate over the content
-        for (Iterator i = content.iterator(); i.hasNext();) {
-            final Node childNode = (Node) i.next();
+        for (Object childObject: content) {
+            final Node childNode = (Node) childObject;
 
             if (childNode instanceof Element) {
                 final Element childElement = (Element) childNode;
@@ -785,7 +785,7 @@ public class Dom4jUtils {
         }
     }
 
-    public static String elementToString(Element element) {
+    public static String elementToDebugString(Element element) {
         // Open start tag
         final StringBuilder sb = new StringBuilder("<");
         sb.append(element.getQualifiedName());
@@ -824,7 +824,7 @@ public class Dom4jUtils {
         return sb.toString();
     }
 
-    public static String attributeToString(Attribute attribute) {
+    public static String attributeToDebugString(Attribute attribute) {
         final StringBuilder sb = new StringBuilder(attribute.getQualifiedName());
         sb.append("=\"");
         sb.append(attribute.getValue());

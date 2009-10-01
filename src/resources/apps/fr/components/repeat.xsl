@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xsl:stylesheet version="2.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -74,7 +74,9 @@
             </xsl:for-each>
             <!-- Repeated rows -->
             <xsl:for-each select="fr:body">
-                <xforms:repeat nodeset="{$fr-repeat/@nodeset}" bind="{$fr-repeat/@bind}" id="{$fr-repeat/@id}">
+                <xforms:repeat id="{$fr-repeat/@id}">
+                    <xsl:if test="$fr-repeat/@nodeset"><xsl:attribute name="nodeset" select="$fr-repeat/@nodeset"/></xsl:if>
+                    <xsl:if test="$fr-repeat/@bind"><xsl:attribute name="bind" select="$fr-repeat/@bind"/></xsl:if>
                     <xxforms:variable name="repeat-position" select="position()"/>
                     <!-- First line with data -->
                     <xhtml:tr>

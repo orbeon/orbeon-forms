@@ -1386,6 +1386,8 @@ public class
         } else if (XFormsEvents.XXFORMS_OFFLINE.equals(eventName)) {
             // Internal event for going offline
             goOffline(propertyContext);
+        } else {
+            super.performDefaultAction(propertyContext, event);
         }
     }
 

@@ -377,7 +377,7 @@ public class XFormsInsertAction extends XFormsAction {
                                 if (indentedLogger.isDebugEnabled())
                                     indentedLogger.logDebug("xforms:insert", "skipping insertion of node as sibling in element content",
                                                     "type", clonedNode.getNodeTypeName(),
-                                                    "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToString((Attribute) clonedNode) : clonedNode.toString()
+                                                    "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToDebugString((Attribute) clonedNode) : clonedNode.toString()
                                             );
                             }
                         }

@@ -467,7 +467,7 @@ public class XBLBindings {
         if (templateElement != null) {
 
             if (indentedLogger.isDebugEnabled()) {
-                indentedLogger.startHandleOperation("", "generating XBL shadow content", "bound element", Dom4jUtils.elementToString(boundElement), "binding id", binding.attributeValue("id"));
+                indentedLogger.startHandleOperation("", "generating XBL shadow content", "bound element", Dom4jUtils.elementToDebugString(boundElement), "binding id", binding.attributeValue("id"));
             }
 
             // TODO: in script mode, XHTML elements in template should only be kept during page generation
@@ -833,7 +833,7 @@ public class XBLBindings {
         assert StringUtils.isNotBlank(prefix);
 
         if (indentedLogger.isDebugEnabled()) {
-            indentedLogger.startHandleOperation("", "filtering shadow tree", "bound element", Dom4jUtils.elementToString(boundElement));
+            indentedLogger.startHandleOperation("", "filtering shadow tree", "bound element", Dom4jUtils.elementToDebugString(boundElement));
         }
 
         // Filter the tree

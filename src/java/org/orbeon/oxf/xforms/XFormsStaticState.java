@@ -463,7 +463,7 @@ public class XFormsStaticState {
         // probably not a notable performance if any at all, especially since this is needed at page generation time
         // only.
  
-        final String xpathExpression = "/descendant-or-self::xxforms:script[not(ancestor::xforms:instance)]";
+        final String xpathExpression = "/descendant-or-self::xxforms:script[not(ancestor::xforms:instance) and exists(@id)]";
 
         final List scripts = XPathCache.evaluate(pipelineContext, documentInfo, xpathExpression,
                 BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
@@ -703,13 +703,13 @@ public class XFormsStaticState {
                 return cachedMap;
             } else {
                 indentedLogger.logDebug("", "namespace mappings not cached",
-                        "prefix", prefix, "element", Dom4jUtils.elementToString(element));
+                        "prefix", prefix, "element", Dom4jUtils.elementToDebugString(element));
                 return Dom4jUtils.getNamespaceContextNoDefault(element);
             }
         } else {
             // No id attribute
             indentedLogger.logDebug("", "namespace mappings not available because element doesn't have an id attribute",
-                    "prefix", prefix, "element", Dom4jUtils.elementToString(element));
+                    "prefix", prefix, "element", Dom4jUtils.elementToDebugString(element));
             return Dom4jUtils.getNamespaceContextNoDefault(element);
         }
     }
@@ -785,8 +785,7 @@ public class XFormsStaticState {
                 final Document modelDocument = currentEntry.getValue();
                 final DocumentWrapper modelDocumentInfo = new DocumentWrapper(modelDocument, null, xpathConfiguration);
                 // NOTE: Say we don't want to exclude gathering event handlers within nested models, since this is a model
-                extractEventHandlers(propertyContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
-
+                extractEventHandlers(propertyContext, xpathConfiguration, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
                 extractXFormsScripts(propertyContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId));
             }
 
@@ -808,7 +807,7 @@ public class XFormsStaticState {
         }
     }
 
-    private void extractEventHandlers(PropertyContext pipelineContext, DocumentInfo documentInfo, String prefix, boolean isControls) {
+    private void extractEventHandlers(PropertyContext propertyContext, Configuration xpathConfiguration, DocumentInfo documentInfo, String prefix, boolean isControls) {
 
         // Register event handlers on any element which has an id or an observer attribute. This also allows
         // registering event handlers on XBL components. This follows the semantics of XML Events.
@@ -827,7 +826,7 @@ public class XFormsStaticState {
                 "//*[@ev:event and not(ancestor::xforms:instance) and (parent::*/@id or ev:observer)]";
 
         // Get all candidate elements
-        final List actionHandlers = XPathCache.evaluate(pipelineContext, documentInfo,
+        final List actionHandlers = XPathCache.evaluate(propertyContext, documentInfo,
                 xpathExpression, BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
 
         // Check all candidate elements
@@ -860,6 +859,11 @@ public class XFormsStaticState {
                                     final XBLBindings.Scope bindingScope = xblBindings.getResolutionScopeByPrefixedId(parentPrefixedId);
                                     final XFormsConstants.XXBLScope startScope = innerScope.equals(bindingScope) ? XFormsConstants.XXBLScope.inner : XFormsConstants.XXBLScope.outer;
                                     newActionElement = xblBindings.annotateHandler(actionElement, prefix, innerScope, outerScope, startScope).getRootElement();
+
+                                    // Extract scripts in the handler
+                                    final DocumentWrapper handlerWrapper = new DocumentWrapper(newActionElement.getDocument(), null, xpathConfiguration);
+                                    extractXFormsScripts(propertyContext, handlerWrapper, prefix);
+
                                 } else if (controlInfoMap.containsKey(parentPrefixedId)) {
                                     // Parent is a control but not a bound node
                                     newActionElement = actionElement;
@@ -1094,7 +1098,7 @@ public class XFormsStaticState {
 
         // Extract event handlers for this tree of controls
         // NOTE: Do this after analysing controls above so that XBL bindings are available for detection of nested event handlers.
-        extractEventHandlers(propertyContext, controlsDocumentInfo, prefix, true);
+        extractEventHandlers(propertyContext, xpathConfiguration, controlsDocumentInfo, prefix, true);
 
         // Gather label, hint, help, alert information
         {

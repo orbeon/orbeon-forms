@@ -372,7 +372,7 @@
                 <!-- Case where current section has help -->
                 <xforms:group ref=".[$section-has-help]">
                     <!-- Linked reachable from help icon -->
-                    <xhtml:a name="{@id}-help"/>
+                    <xhtml:a name="{@id}$$p"/>
                     <!-- Label and help text -->
                     <xforms:output class="xforms-label" value="{xforms:label/@ref}"/>: <xforms:output value="{xforms:help/@ref}"/>
                     <!-- Link back to control -->
@@ -398,7 +398,7 @@
         <xforms:group ref=".[normalize-space(({xforms:help/@ref})[1])]"><!-- (...)[1] protects against incorrect form where more than one node is returned -->
             <xhtml:li class="xforms-help-group">
                 <!-- Linked reachable from help icon -->
-                <xhtml:a name="{@id}-help"/>
+                <xhtml:a name="{@id}$$p"/>
                 <!-- Label and help text -->
                 <xforms:output class="xforms-label" value="{xforms:label/@ref}"/>: <xforms:output value="{xforms:help/@ref}"/>
                 <!-- Link back to the control -->

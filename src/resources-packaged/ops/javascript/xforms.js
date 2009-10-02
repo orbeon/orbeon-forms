@@ -3844,24 +3844,25 @@ ORBEON.widgets.YUICalendar = function() {
             var date = ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Controls.getCurrentValue(control));
             if (date == null) {
                 yuiCalendar.cfg.setProperty("selected", "", false);
-                yuiCalendar.cfg.setProperty("pagedate", new Date(), false);
             } else {
                 // Date must be the internal format expected by YUI
                 var dateStringForYUI = (date.getMonth() + 1)
                    + "/" + date.getDate()
                    + "/" + date.getFullYear();
                 yuiCalendar.cfg.setProperty("selected", dateStringForYUI, false);
-                yuiCalendar.cfg.setProperty("pagedate", date, false);
             }
             // Set min/max dates
-            var dateContainer = control.parentNode.parentNode;
-            var isDateContainer = ORBEON.util.Dom.hasClass(dateContainer, "xbl-fr-date");
+            var dateContainer = YAHOO.util.Dom.getAncestorByClassName(control, "xbl-fr-date");
+            var isDateContainer = dateContainer != null;
             var mindateControl = isDateContainer ? YAHOO.util.Dom.getElementsByClassName("xbl-fr-date-mindate", null, dateContainer)[0] : null;
             yuiCalendar.cfg.setProperty("mindate", mindateControl == null ? null :
                 ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Controls.getCurrentValue(mindateControl)));
             var maxdateControl = isDateContainer ? YAHOO.util.Dom.getElementsByClassName("xbl-fr-date-maxdate", null, dateContainer)[0] : null;
             yuiCalendar.cfg.setProperty("maxdate", maxdateControl == null ? null :
                 ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Controls.getCurrentValue(maxdateControl)));
+            var pagedateControl = isDateContainer ? YAHOO.util.Dom.getElementsByClassName("xbl-fr-date-pagedate", null, dateContainer)[0] : null;
+            var pagedateValue = pagedateControl == null ? null : ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Controls.getCurrentValue(pagedateControl));
+            yuiCalendar.cfg.setProperty("pagedate", pagedateValue == null ? (date == null ? new Date() : date) : pagedateValue);
 
             // Show calendar
             ORBEON.xforms.Events.yuiCalendarCreated.fire({ yuiCalendar: yuiCalendar, control: control });

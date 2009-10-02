@@ -112,7 +112,11 @@ ORBEON.widgets.datatable.unittests_lib = {
     checkRowWidth: function(row) {
         for (var icol = 0; icol < row.cells.length; icol++) {
             var cell = row.cells[icol];
-            this.checkCellWidth(cell);
+            if (!YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-begin-end')
+                && !YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-delimiter')
+                && !YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-template')) {
+                this.checkCellWidth(cell);
+            }
         }
     },
 
@@ -177,6 +181,56 @@ ORBEON.widgets.datatable.unittests_lib = {
                 this.checkEmbeddedWidthAndHeight(child, width, height);
             }
         }
+    },
+
+    getNumberVisibleCells: function (cells) {
+        var result = 0;
+        for (var i = 0; i < cells.length; i++) {
+            var cell = cells[i];
+            if (!YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-begin-end')
+                    && !YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-delimiter')
+                    && !YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-template')) {
+                result = result + 1;
+            }
+        }
+        return result;
+    },
+
+    checkTableStructure: function(table, nbcols) {
+        YAHOO.util.Assert.isObject(table.tHead, 'The table header is missing');
+        YAHOO.util.Assert.areEqual(1, table.tHead.rows.length, 'There should be exactly one header row (not ' + table.tHead.rows.length + ')');
+        var nbcolsActual = this.getNumberVisibleCells(table.tHead.rows[0].cells);
+        YAHOO.util.Assert.areEqual(nbcols, nbcolsActual, nbcolsActual + ' header columns found instead of ' + nbcols);
+        YAHOO.util.Assert.areEqual(1, table.tBodies.length, 'There should be exactly one body (not ' + table.tBodies.length + ')');
+        nbcolsActual = this.getNumberVisibleCells(table.tBodies[0].rows[2].cells);
+        YAHOO.util.Assert.areEqual(nbcols, nbcolsActual, nbcolsActual + ' columns found on the first body row instead of ' + nbcols);
+    },
+
+
+    checkColDebugValue: function(div, attribute, value) {
+        var ul = div.getElementsByTagName('ul')[0];
+        var lis = ul.getElementsByTagName('li');
+        for (var i=0; i < lis.length; i++) {
+            var li = lis[i];
+            var label = li.getElementsByTagName('label')[0];
+            if (label != undefined) {
+                var labelValue = label.innerHTML.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+                if (labelValue == attribute + ':') {
+                    var span = li.getElementsByTagName('span')[0];
+                    YAHOO.util.Assert.areEqual(value, span.innerHTML, 'Attribute ' + attribute + ' has value ' + span.innerHTML + ' instead of ' + value);
+                    return;
+                }
+            }
+        }
+        if (value  != undefined) {
+            YAHOO.util.Assert.fail('Attribute ' + attribute + ' not found');
+        }
+    },
+
+    checkColTypeValue: function(div, type) {
+        var p = div.getElementsByTagName('p')[0];
+        var span = p.getElementsByTagName('span')[0];
+        YAHOO.util.Assert.areEqual(type, span.innerHTML, 'Type ' + span.innerHTML + ' instead of ' + type);
     },
 
     EOS: null

@@ -41,6 +41,7 @@
                         <!-- Properties -->
                         <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'date', 'mindate')"/>
                         <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'date', 'maxdate')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'date', 'pagedate')"/>
                         <xsl:choose>
                             <!-- Inline data picker-->
                             <xsl:when test="@appearance = concat($fr-prefix, ':', 'inline')">

@@ -38,11 +38,10 @@ import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -110,6 +109,14 @@ public class XFormsServer extends ProcessorImpl {
         // Use request input provided by client
         final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
 
+        // Logger used for heartbeat and request/response
+        final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), XFormsServer.getLogger(), LOGGING_CATEGORY);
+
+        final boolean logRequestResponse = XFormsProperties.getDebugLogging().contains("server-body");
+        if (logRequestResponse) {
+            indentedLogger.logDebug("", "ajax request", "body", Dom4jUtils.domToPrettyString(requestDocument));
+        }
+
         // Get action
         actionElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_ACTION_QNAME);
 
@@ -138,9 +145,6 @@ public class XFormsServer extends ProcessorImpl {
         if (actionElement != null) {
             eventElements.addAll(Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_EVENT_QNAME));
         }
-
-        // Logger used for heartbeat and response
-        final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), XFormsServer.getLogger(), LOGGING_CATEGORY);
 
         // Check for message where there is only the heartbeat event
         if (eventElements.size() == 1) {
@@ -482,8 +486,22 @@ public class XFormsServer extends ProcessorImpl {
                     } else if (!isNoscript) {
                         // This is an Ajax response
                         indentedLogger.startHandleOperation("response", "handling regular Ajax response");
-                        outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, xformsDecodedInitialClientState, allEvents, false, false, false);
-                        indentedLogger.endHandleOperation();
+
+                        // Hook-up debug content handler if we must log the response document
+                        final ContentHandler responseContentHandler;
+                        final LocationSAXContentHandler debugContentHandler;
+                        if (logRequestResponse) {
+                            debugContentHandler = new LocationSAXContentHandler();
+                            responseContentHandler = new TeeContentHandler(contentHandler, debugContentHandler);
+                        } else {
+                            debugContentHandler = null;
+                            responseContentHandler = contentHandler;
+                        }
+
+                        outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds, pipelineContext, responseContentHandler,
+                                xformsDecodedClientState, xformsDecodedInitialClientState, allEvents, false, false, false);
+
+                        indentedLogger.endHandleOperation("ajax response", (debugContentHandler != null) ? Dom4jUtils.domToPrettyString(debugContentHandler.getDocument()) : null);
                     } else {
                         // Noscript mode
                         indentedLogger.startHandleOperation("response", "handling noscript response");

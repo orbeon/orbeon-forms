@@ -266,4 +266,93 @@
         </output>
     </test>
 
+    <test description="fr:tabview label resolution" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <label3>My label 3</label3>
+                                <label4>My label 4</label4>
+                                <label5>My label 5</label5>
+                                <label6>My label 6</label6>
+                            </instance>
+                        </xforms:instance>
+
+                        <xforms:bind id="label5-bind" nodeset="label5"/>
+                    </xforms:model>
+                    <xforms:model id="model2">
+                        <xforms:instance id="instance2">
+                            <instance>
+                                <label7>My label 7</label7>
+                            </instance>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xi:include href="oxf:/xbl/orbeon/tabview/tabview.xbl" xxi:omit-xml-base="true"/>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:tabview id="my-tabview">
+                        <fr:tab id="tab1">
+                            <fr:label/>
+                        </fr:tab>
+                        <fr:tab id="tab2">
+                            <fr:label>My label 2</fr:label>
+                        </fr:tab>
+                        <fr:tab id="tab3">
+                            <fr:label ref="label3"/>
+                        </fr:tab>
+                        <fr:tab id="tab4">
+                            <fr:label value="label4"/>
+                        </fr:tab>
+                        <fr:tab id="tab5">
+                            <fr:label bind="label5-bind"/>
+                        </fr:tab>
+                        <fr:tab id="tab6">
+                            <fr:label context="label5" ref="../label6"/>
+                        </fr:tab>
+                        <fr:tab id="tab7">
+                            <fr:label model="model2" ref="label7"/>
+                        </fr:tab>
+                    </fr:tabview>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <label3>My label 3</label3>
+                                    <label4>My label 4</label4>
+                                    <label5>My label 5</label5>
+                                    <label6>My label 6</label6>
+                                </instance>
+                            </instance>
+                            <instance id="instance2" model-id="model2">
+                                <instance>
+                                    <label7>My label 7</label7>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-tabview$xf-3">My label 3</xxf:control>
+                        <xxf:control id="my-tabview$xf-4">My label 4</xxf:control>
+                        <xxf:control id="my-tabview$xf-5">My label 5</xxf:control>
+                        <xxf:control id="my-tabview$xf-6">My label 6</xxf:control>
+                        <xxf:control id="my-tabview$xf-7">My label 7</xxf:control>
+                    </xxf:control-values>
+                    <xxf:script name="my_tabview_xf_en_xforms_function" target-id="my-tabview$fr-tabview-group" observer-id="my-tabview$fr-tabview-group"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

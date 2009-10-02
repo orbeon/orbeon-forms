@@ -45,8 +45,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -130,7 +128,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                     }
                 } else {
                     // Just use TinyTree as is
-                    documentInfo = TransformerUtils.readTinyTree(new StreamSource(new StringReader(xmlString)), false);
+                    documentInfo = TransformerUtils.stringToTinyTree(xmlString, false);
                 }
             } else {
                 // Instance document is not available, defer to later initialization

@@ -1951,7 +1951,7 @@ ORBEON.xforms.Controls = {
             "help": "$$p",
             "help-image": "$$i",
             "alert": "$$a"
-        }
+        };
 
         // For new layout, try to look for label under the control element
         if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {

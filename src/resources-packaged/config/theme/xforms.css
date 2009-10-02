@@ -173,7 +173,7 @@ html body .xforms-form tr.xforms-disabled,
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
-.xforms-textarea-appearance-xxforms-autosize {
+textarea.xforms-textarea-appearance-xxforms-autosize, .xforms-textarea-appearance-xxforms-autosize textarea {
     width: 100%;
     overflow: hidden;
 }

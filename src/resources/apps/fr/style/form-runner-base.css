@@ -380,11 +380,11 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 /* NOTE: This doesn't work well with IE 6/7, see below hand-tuned widths for IE */
 .fr-grid .xforms-input input,
     .fr-grid .xforms-upload input,
-    .fr-grid .xforms-textarea,
-    .fr-grid .xforms-secret,
-    .fr-grid .xforms-select1-appearance-minimal,
-    .fr-grid .xforms-select1-appearance-compact,
-    .fr-grid .xforms-select-appearance-compact {
+    .xforms-layout-nospan .fr-grid .xforms-textarea, .xforms-layout-span .fr-grid .xforms-textarea textarea,
+    .xforms-layout-nospan .fr-grid .xforms-secret, .xforms-layout-span .fr-grid xforms-secret input,
+    .xforms-layout-nospan .fr-grid .xforms-select1-appearance-minimal, .xforms-layout-span .fr-grid .xforms-select1-appearance-minimal select,
+    .xforms-layout-nospan .fr-grid .xforms-select1-appearance-compact, .xforms-layout-span .fr-grid .xforms-select1-appearance-compact select,
+    .xforms-layout-nospan .fr-grid .xforms-select-appearance-compact, .xforms-layout-span .fr-grid .xforms-select-appearance-compact select {
     width: 100%;
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }

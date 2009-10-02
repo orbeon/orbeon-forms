@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for ˜XPath Cahce details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <!-- This is the Orbeon Forms Form Runner standard summary page -->
 <html xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xforms="http://www.w3.org/2002/xforms"
@@ -279,8 +279,9 @@
 
                     <!-- Compute label information -->
                     <xxforms:variable name="label" select="$control/xforms:label" as="xs:element(xforms:label)*"/>
+                    <xxforms:variable name="form-resources" model="fr-resources-model" select="$fr-form-resources" as="element(resource)?"/>
                     <xforms:setvalue ref="$query/@label"
-                                     value="if ($label/@ref or $label/@bind) then xxforms:instance('fr-current-form-resources')/*[local-name() = $query/@name]/label else $label"/>
+                                     value="if ($label/@ref or $label/@bind) then $form-resources/*[local-name() = $query/@name]/label else $label"/>
                 </xforms:action>
 
             </xforms:action>
@@ -289,13 +290,15 @@
             <xforms:instance id="fr-summary-instance">
                 <documents xmlns="" total="0" search-total="0">
                     <!-- Content will be like this -->
-                    <!--<document name="" created="" last-modified="">-->
-                        <!--<id/>-->
-                        <!--<details>-->
-                            <!--<detail/>-->
-                            <!--<detail/>-->
-                        <!--</details>-->
-                    <!--</document>-->
+                    <!--
+                    <document name="" created="" last-modified="">
+                        <id/>
+                        <details>
+                            <detail/>
+                            <detail/>
+                        </details>
+                    </document>
+                    -->
                 </documents>
             </xforms:instance>
 

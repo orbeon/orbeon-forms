@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xforms:model xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xforms="http://www.w3.org/2002/xforms"
@@ -36,22 +36,12 @@
 
     <xxforms:variable name="lang" select="instance('fr-language-instance')"/>
 
-    <!-- XForms instance containing the current form resources -->
-    <xforms:instance id="fr-current-form-resources">
-        <resource xmlns=""/>
-    </xforms:instance>
-
     <!-- Instance containing the Form Runner resources -->
     <xforms:instance id="fr-fr-resources"><dummy/></xforms:instance>
     <xforms:submission id="fr-get-fr-resources"
             serialization="none" method="get"
             resource="/fr/service/i18n/fr-resources/{xxforms:instance('fr-parameters-instance')/app}/{xxforms:instance('fr-parameters-instance')/form}" 
             replace="instance" instance="fr-fr-resources" xxforms:readonly="true" xxforms:cache="true"/>
-
-    <!-- Instance containing the current Form Runner resources -->
-    <xforms:instance id="fr-fr-current-resources">
-        <resource xmlns=""/>
-    </xforms:instance>
 
     <!-- Instance containing all the ISO 639-1 languages -->
     <xforms:instance id="fr-languages-instance" src="oxf:/apps/fr/i18n/languages.xml" xxforms:readonly="true" xxforms:cache="true"/>
@@ -103,17 +93,13 @@
             </xforms:action>
         </xforms:action>
 
-        <!-- Update resources -->
-        <xforms:insert if="not(instance('fr-current-form-resources')/@xml:lang = $lang)"
-                       nodeset="instance('fr-current-form-resources')"
-                       origin="xxforms:instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]"/>
-        <xforms:insert if="not(instance('fr-fr-current-resources')/@xml:lang = $lang)"
-                       nodeset="instance('fr-fr-current-resources')"
-                       origin="instance('fr-fr-resources')/(resource[@xml:lang = $lang], resource[1])[1]"/>
-
         <!-- Save current language into the session -->
         <xforms:insert context="." origin="xxforms:set-session-attribute('fr-language', xs:string($lang))"/>
     </xforms:action>
+
+    <!-- Public variables pointing to current form and Form Runner ressources -->
+    <xxforms:variable name="fr-form-resources" select="xxforms:instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?"/>
+    <xxforms:variable name="fr-fr-resources" select="instance('fr-fr-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?"/>
 
     <!-- Respond to language change in the UI -->
     <xforms:action ev:observer="fr-language-selector" ev:event="xforms-value-changed DOMActivate">

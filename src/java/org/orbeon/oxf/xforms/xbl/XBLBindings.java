@@ -432,7 +432,7 @@ public class XBLBindings {
     public Document annotateHandler(Element currentHandlerElement, String newPrefix, Scope innerScope, Scope outerScope, XFormsConstants.XXBLScope startScope) {
         final Document handlerDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentHandlerElement, false);// for now, don't detach because element can be processed by multiple bindings
         final Document annotatedDocument = annotateShadowTree(handlerDocument, newPrefix, idGenerator);
-        gatherScopeMappings(annotatedDocument, newPrefix, innerScope, outerScope, startScope, null, false);
+        gatherScopeMappingsAndTransform(annotatedDocument, newPrefix, innerScope, outerScope, startScope, null, false, "/");
         return annotatedDocument;
     }
 
@@ -829,7 +829,8 @@ public class XBLBindings {
      * @param controlPrefixedId     prefixed id of the bound element
      * @return                      compact shadow tree document
      */
-    private Document filterShadowTree(IndentedLogger indentedLogger, Document fullShadowTree, Element boundElement, String prefix, Scope innerScope, String controlPrefixedId) {
+    private Document filterShadowTree(IndentedLogger indentedLogger, Document fullShadowTree, Element boundElement, String prefix,
+                                      Scope innerScope, String controlPrefixedId) {
         assert StringUtils.isNotBlank(prefix);
 
         if (indentedLogger.isDebugEnabled()) {
@@ -837,7 +838,8 @@ public class XBLBindings {
         }
 
         // Filter the tree
-        final LocationDocumentResult result = filterShadowTree(fullShadowTree, prefix, innerScope, controlPrefixedId);
+        final String baseURI = XFormsUtils.resolveXMLBase(boundElement, ".").toString();
+        final LocationDocumentResult result = filterShadowTree(fullShadowTree, prefix, innerScope, controlPrefixedId, baseURI);
 
         // Extractor produces /static-state/xbl:template, so extract the nested element
         final Document compactShadowTree = Dom4jUtils.createDocumentCopyParentNamespaces(result.getDocument().getRootElement().element(XFormsConstants.XBL_TEMPLATE_QNAME), true);
@@ -849,7 +851,7 @@ public class XBLBindings {
         return compactShadowTree;
     }
 
-    private LocationDocumentResult filterShadowTree(Document fullShadowTree, String prefix, Scope innerScope, String controlPrefixedId) {
+    private LocationDocumentResult filterShadowTree(Document fullShadowTree, String prefix, Scope innerScope, String controlPrefixedId, String baseURI) {
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
         final LocationDocumentResult result= new LocationDocumentResult();
         identity.setResult(result);
@@ -857,14 +859,15 @@ public class XBLBindings {
         // Run transformation and gather scope mappings
         // Get ids of the two scopes
         final Scope outerScope = prefixedIdToXBLScopeMap.get(controlPrefixedId);
-        gatherScopeMappings(fullShadowTree, prefix, innerScope, outerScope, XFormsConstants.XXBLScope.inner, identity, true);
+        gatherScopeMappingsAndTransform(fullShadowTree, prefix, innerScope, outerScope, XFormsConstants.XXBLScope.inner, identity, true, baseURI);
 
         return result;
     }
 
-    private void gatherScopeMappings(Document document, String prefix, Scope innerScope, Scope outerScope, XFormsConstants.XXBLScope startScope, ContentHandler result, boolean ignoreRootElement) {
+    private void gatherScopeMappingsAndTransform(Document document, String prefix, Scope innerScope, Scope outerScope,
+                                                 XFormsConstants.XXBLScope startScope, ContentHandler result, boolean ignoreRootElement, String baseURI) {
         // Run transformation which gathers scope information and extracts compact tree into the output ContentHandler
-        TransformerUtils.writeDom4j(document, new ScopeExtractorContentHandler(result, prefix, innerScope, outerScope, ignoreRootElement, startScope));
+        TransformerUtils.writeDom4j(document, new ScopeExtractorContentHandler(result, prefix, innerScope, outerScope, ignoreRootElement, startScope, baseURI));
     }
 
     private static final String scopeURI = XFormsConstants.XXBL_SCOPE_QNAME.getNamespaceURI();
@@ -886,11 +889,12 @@ public class XBLBindings {
          * @param innerScope            inner scope
          * @param outerScope            outer scope, i.e. scope of the bound element
          * @param ignoreRootElement     whether root element must just be skipped
+         * @param baseURI               base URI of new tree
          * @param startScope            scope of root element
          */
         public ScopeExtractorContentHandler(ContentHandler contentHandler, String prefix, Scope innerScope, Scope outerScope,
-                                            boolean ignoreRootElement, XFormsConstants.XXBLScope startScope) {
-            super(contentHandler, ignoreRootElement);
+                                            boolean ignoreRootElement, XFormsConstants.XXBLScope startScope, String baseURI) {
+            super(contentHandler, ignoreRootElement, baseURI);
             assert innerScope != null;
             assert outerScope != null;
 

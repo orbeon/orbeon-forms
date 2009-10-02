@@ -225,7 +225,7 @@
             <xforms:action if="not($continue-with-save)">
                 <!-- Data not valid: display error -->
                 <xforms:setvalue ref="instance('fr-persistence-instance')/message"
-                                 value="xxforms:instance('fr-fr-current-resources')/detail/messages/form-validation-error"/>
+                                 model="fr-resources-model" select="$fr-fr-resources/detail/messages/form-validation-error"/>
                 <xforms:toggle case="fr-message-validation-error"/>
                 <!-- Mark all active alerts as visited -->
                 <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
@@ -484,7 +484,7 @@
     <!-- React to successful submission when saving/updating -->
     <xforms:action ev:event="xforms-submit-done" ev:target="fr-create-update-submission">
         <xforms:setvalue ref="instance('fr-persistence-instance')/message"
-                         value="xxforms:instance('fr-fr-current-resources')/detail/messages/save-success"/>
+                         model="fr-resources-model" select="$fr-fr-resources/detail/messages/save-success"/>
 
         <!-- Show success message -->
         <xforms:toggle case="fr-message-success"/>
@@ -626,12 +626,12 @@
         <!-- Set error message and show error section in UI -->
         <xforms:action if="event('error-type') = 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
-                             value="xxforms:instance('fr-fr-current-resources')/detail/messages/form-validation-error"/>
+                             model="fr-resources-model" select="$fr-fr-resources/detail/messages/form-validation-error"/>
             <xforms:toggle case="fr-message-validation-error"/>
         </xforms:action>
         <xforms:action if="event('error-type') != 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
-                             value="xxforms:instance('fr-fr-current-resources')/detail/messages/database-error"/>
+                             model="fr-resources-model" select="$fr-fr-resources/detail/messages/database-error"/>
             <xforms:toggle case="fr-message-fatal-error"/>
         </xforms:action>
         <!-- Mark all active alerts as visited -->
@@ -650,12 +650,12 @@
         <!-- Set error message and show error section in UI -->
         <xforms:action if="event('error-type') = 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
-                             value="xxforms:instance('fr-fr-current-resources')/detail/messages/form-validation-error"/>
+                             model="fr-resources-model" select="$fr-fr-resources/detail/messages/form-validation-error"/>
             <xforms:toggle case="fr-message-validation-error"/>
         </xforms:action>
         <xforms:action if="event('error-type') != 'validation-error'">
             <xforms:setvalue ref="instance('fr-persistence-instance')/message"
-                             value="xxforms:instance('fr-fr-current-resources')/detail/messages/database-error"/>
+                             model="fr-resources-model" select="$fr-fr-resources/detail/messages/database-error"/>
             <xforms:toggle case="fr-message-fatal-error"/>
         </xforms:action>
         <!-- Mark all active alerts as visited -->
@@ -683,11 +683,6 @@
             if="for $b in xxforms:event('xxforms:binding') return $b/(@filename and @mediatype and @size)">
         <xforms:send submission="fr-upload-attachment-submission"/>
     </xforms:action>
-
-    <!-- TEST XXX -->
-    <!--<xforms:action ev:observer="fr-form-group" ev:event="xforms-select">-->
-        <!--<xforms:message level="xxforms:log-debug"><xforms:output value="event('xxforms:item-value')"/></xforms:message>-->
-    <!--</xforms:action>-->
 
     <xforms:submission id="fr-upload-attachment-submission"
                        ref="xxforms:instance('fr-form-instance')" validate="false" relevant="false"

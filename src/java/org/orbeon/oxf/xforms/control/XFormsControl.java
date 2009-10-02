@@ -346,7 +346,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 contextEffectiveId = container.getFirstControlEffectiveId();
             } else {
                 // Not at top-level, find containing object
-                final Object contextObject = container.resolveObjectById(getEffectiveId(), contextStaticId);
+                final Object contextObject = container.resolveObjectById(getEffectiveId(), contextStaticId, null);
                 if (contextObject instanceof XFormsControl) {
                     // Found context, evaluate relative to that
                     final XFormsControl contextControl = (XFormsControl) contextObject;

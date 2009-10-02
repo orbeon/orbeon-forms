@@ -1,19 +1,20 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -28,13 +29,14 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.ProcessorOutputXMLReader;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.ContentHandler;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -52,19 +54,20 @@ import java.util.Iterator;
 import java.util.Properties;
 
 /**
- * This processor allows sending emails. It supports multipart messages and inline as well as
- * out-of-line attachments.
+ * This processor allows sending emails. It supports multipart messages and inline as well as out-of-line attachments.
  *
  * For some useful JavaMail information: http://java.sun.com/products/javamail/FAQ.html
  *
  * TODO:
+ *
  * o revise support of text/html
- *   o built-in support for HTML could handle src="cid:*" with part/message ids
+ * o built-in support for HTML could handle src="cid:*" with part/message ids
  * o support text/xml? or just XHTML?
  * o build message with SAX, not DOM, so streaming of input is possible [not necessarily a big win]
  */
 public class EmailProcessor extends ProcessorImpl {
-	static private Logger logger = LoggerFactory.createLogger(EmailProcessor.class);
+
+    private static final Logger logger = LoggerFactory.createLogger(EmailProcessor.class);
 
     // Properties for this processor
     public static final String EMAIL_SMTP_HOST = "smtp-host";
@@ -72,7 +75,7 @@ public class EmailProcessor extends ProcessorImpl {
     public static final String EMAIL_TEST_SMTP_HOST = "test-smtp-host";
 
     public static final String EMAIL_FORCE_TO_DEPRECATED = "forceto"; // deprecated
-    public static final String EMAIL_HOST_DEPRECATED = "host"; // deprecated
+    public static final String EMAIL_HOST_DEPRECATED = "host";        // deprecated
 
     public static final String EMAIL_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/email";
 
@@ -119,34 +122,47 @@ public class EmailProcessor extends ProcessorImpl {
                 }
             }
 
-            // Get credentials
-            final Element credentials = messageElement.element("credentials");
-
-            // Create session variable, but don't assign it
+            // Create session
             final Session session;
+            {
+                // Get credentials
+                final String usernameTrimmed;
+                final String passwordTrimmed;
+                {
+                    final Element credentials = messageElement.element("credentials");
+                    if (credentials != null) {
+                        final Element usernameElement = credentials.element("username");
+                        final Element passwordElement = credentials.element("password");
+                        usernameTrimmed = (usernameElement != null) ? usernameElement.getStringValue().trim() : null;
+                        passwordTrimmed = (passwordElement != null) ? passwordElement.getStringValue().trim() : "";
+                    } else {
+                        usernameTrimmed = null;
+                        passwordTrimmed = null;
+                    }
+                }
 
-            // Check if credentials are supplied
-            if(credentials != null && !credentials.equals("")) {
-            	if(logger.isInfoEnabled())
-            		logger.info("Authentication");
-            	// Set the auth property to true
-            	properties.setProperty("mail.smtp.auth", "true");
+                // Check if credentials are supplied
+                if (StringUtils.isNotEmpty(usernameTrimmed)) {
+                    // NOTE: A blank username doesn't trigger authentication
 
-            	final String username = credentials.element("username").getStringValue();
-            	final String password = credentials.element("password").getStringValue();
+                    if (logger.isInfoEnabled())
+                        logger.info("Authentication");
+                    // Set the auth property to true
+                    properties.setProperty("mail.smtp.auth", "true");
 
-            	if(logger.isInfoEnabled())
-                    logger.info("Username: " + username);
+                    if (logger.isInfoEnabled())
+                        logger.info("Username: " + usernameTrimmed);
 
-            	// Create an authenticator
-            	final Authenticator auth = new SMTPAuthenticator(username,password);
+                    // Create an authenticator
+                    final Authenticator authenticator = new SMTPAuthenticator(usernameTrimmed, passwordTrimmed);
 
-            	// Create session with auth
-            	session = Session.getInstance(properties,auth);
-            } else {
-            	if(logger.isInfoEnabled())
-            		logger.info("No Authentication");
-            	session = Session.getInstance(properties);
+                    // Create session with authenticator
+                    session = Session.getInstance(properties, authenticator);
+                } else {
+                    if (logger.isInfoEnabled())
+                        logger.info("No Authentication");
+                    session = Session.getInstance(properties);
+                }
             }
 
             // Create message
@@ -165,30 +181,26 @@ public class EmailProcessor extends ProcessorImpl {
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(testToProperty));
             } else {
                 // Regular list of To elements
-                for (Iterator i = messageElement.elements("to").iterator(); i.hasNext();) {
-                    final Element toElement = (Element) i.next();
+                for (final Element toElement : Dom4jUtils.elements(messageElement, "to")) {
                     final InternetAddress[] addresses = createAddresses(toElement);
                     message.addRecipients(Message.RecipientType.TO, addresses);
                 }
             }
 
             // Set Cc
-            for (Iterator i = messageElement.elements("cc").iterator(); i.hasNext();) {
-                final Element toElement = (Element) i.next();
-                final InternetAddress[] addresses = createAddresses(toElement);
+            for (final Element ccElement : Dom4jUtils.elements(messageElement, "cc")) {
+                final InternetAddress[] addresses = createAddresses(ccElement);
                 message.addRecipients(Message.RecipientType.CC, addresses);
             }
 
             // Set Bcc
-            for (Iterator i = messageElement.elements("bcc").iterator(); i.hasNext();) {
-                final Element toElement = (Element) i.next();
-                final InternetAddress[] addresses = createAddresses(toElement);
+            for (final Element bccElement : Dom4jUtils.elements(messageElement, "bcc")) {
+                final InternetAddress[] addresses = createAddresses(bccElement);
                 message.addRecipients(Message.RecipientType.BCC, addresses);
             }
 
             // Set headers if any
-            for (Iterator i = messageElement.elements("header").iterator(); i.hasNext();) {
-                final Element headerElement = (Element) i.next();
+            for (final Element headerElement : Dom4jUtils.elements(messageElement, "header")) {
                 final String headerName = headerElement.element("name").getTextTrim();
                 final String headerValue = headerElement.element("value").getTextTrim();
 
@@ -201,7 +213,7 @@ public class EmailProcessor extends ProcessorImpl {
             // seems to use the platform's default charset, which we don't want to deal with. So we preemptively encode.
             // The result is pure ASCII so that setSubject() will not attempt to re-encode it.
             message.setSubject(MimeUtility.encodeText(messageElement.element("subject").getStringValue(), DEFAULT_CHARACTER_ENCODING, null));
-            
+
             // Handle body
             final Element textElement = messageElement.element("text");
             final Element bodyElement = messageElement.element("body");
@@ -296,7 +308,7 @@ public class EmailProcessor extends ProcessorImpl {
                         (LocationData) partOrBodyElement.getData());
 
             // Create Document and convert it into a String
-            final Element rootElement = (Element)(needsRootElement ? partOrBodyElement.elements().get(0) : partOrBodyElement);
+            final Element rootElement = (Element) (needsRootElement ? partOrBodyElement.elements().get(0) : partOrBodyElement);
             final Document partDocument = new NonLazyUserDataDocument();
             partDocument.setRootElement((Element) rootElement.clone());
             content = handleInlinePartContent(partDocument, contentType);
@@ -365,7 +377,7 @@ public class EmailProcessor extends ProcessorImpl {
         String contentId = partOrBodyElement.attributeValue("content-id");
         if (contentId != null)
             parentPart.setHeader("content-id", "<" + contentId + ">");
-            //part.setContentID(contentId);
+        //part.setContentID(contentId);
     }
 
     private String handleInlinePartContent(Document document, String contentType) throws SAXException {
@@ -389,9 +401,9 @@ public class EmailProcessor extends ProcessorImpl {
     /**
      * Read a text or binary document and return it as a FileItem
      *
-     * @param pipelineContext   current PipelineContext
-     * @param source            SAX source
-     * @return
+     * @param pipelineContext current PipelineContext
+     * @param source          SAX source
+     * @return                FileItem
      * @throws IOException
      * @throws TransformerException
      */
@@ -411,7 +423,7 @@ public class EmailProcessor extends ProcessorImpl {
         final Element nameElement = addressElement.element("name");
         // If only the <email> element is specified, allow for comma-separated addresses
         return nameElement == null ? InternetAddress.parse(email)
-                : new InternetAddress[] { new InternetAddress(email, nameElement.getStringValue()) };
+                : new InternetAddress[]{new InternetAddress(email, nameElement.getStringValue())};
     }
 
     private class SimpleTextDataSource implements DataSource {
@@ -509,21 +521,21 @@ public class EmailProcessor extends ProcessorImpl {
     }
 
     private class SMTPAuthenticator extends javax.mail.Authenticator {
-    	private String username;
-    	private String password;
+        private String username;
+        private String password;
 
-    	public SMTPAuthenticator(String user, String pass){
-    		username = user;
-    		password = pass;
+        public SMTPAuthenticator(String user, String pass) {
+            username = user;
+            password = pass;
         }
 
-    	public PasswordAuthentication getPasswordAuthentication() {
-    		return new PasswordAuthentication(username,password);
-    	}
+        public PasswordAuthentication getPasswordAuthentication() {
+            return new PasswordAuthentication(username, password);
+        }
     }
 }
 
-                    // Set content-transfer-encoding header
+// Set content-transfer-encoding header
 //                    final String contentTransferEncoding = partElement.attributeValue("content-transfer-encoding");
 //
 //                    MimeBodyPart part = new MimeBodyPart() {

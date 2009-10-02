@@ -2758,16 +2758,14 @@
                     <fr:foo id="foo12" ref="$bar"/>
                     <fr:foo id="foo13" bind="foo-bind1"/>
                     <fr:foo id="foo14" bind="bar-bind1"/>
-                    <!-- TODO: we handle this wrong by restricting by model! -->
-                    <!--<fr:foo id="foo15" bind="foo-bind2"/>-->
-                    <!--<fr:foo id="foo16" bind="bar-bind2"/>-->
+                    <fr:foo id="foo15" bind="foo-bind2"/>
+                    <fr:foo id="foo16" bind="bar-bind2"/>
 
                     <fr:foo id="foo20" model="model2"/>
                     <fr:foo id="foo21" model="model2" ref="bar"/>
                     <fr:foo id="foo22" model="model2" ref="$bar"/>
-                    <!-- TODO: we handle this wrong by restricting by model! -->
-                    <!--<fr:foo id="foo23" model="model2" bind="foo-bind1"/>-->
-                    <!--<fr:foo id="foo24" model="model2" bind="bar-bind1"/>-->
+                    <fr:foo id="foo23" model="model2" bind="foo-bind1"/>
+                    <fr:foo id="foo24" model="model2" bind="bar-bind1"/>
                     <fr:foo id="foo25" model="model2" bind="foo-bind2"/>
                     <fr:foo id="foo26" model="model2" bind="bar-bind2"/>
 
@@ -2801,11 +2799,15 @@
                         <xxf:control id="foo12$xf-14">43</xxf:control>
                         <xxf:control id="foo13$xf-17">42</xxf:control>
                         <xxf:control id="foo14$xf-20">43</xxf:control>
-                        <xxf:control id="foo20$xf-23">44 45</xxf:control>
-                        <xxf:control id="foo21$xf-26">45</xxf:control>
-                        <xxf:control id="foo22$xf-29">45</xxf:control>
-                        <xxf:control id="foo25$xf-32">44</xxf:control>
-                        <xxf:control id="foo26$xf-35">45</xxf:control>
+                        <xxf:control id="foo15$xf-23">44</xxf:control>
+                        <xxf:control id="foo16$xf-26">45</xxf:control>
+                        <xxf:control id="foo20$xf-29">44 45</xxf:control>
+                        <xxf:control id="foo21$xf-32">45</xxf:control>
+                        <xxf:control id="foo22$xf-35">45</xxf:control>
+                        <xxf:control id="foo23$xf-38">42</xxf:control>
+                        <xxf:control id="foo24$xf-41">43</xxf:control>
+                        <xxf:control id="foo25$xf-44">44</xxf:control>
+                        <xxf:control id="foo26$xf-47">45</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

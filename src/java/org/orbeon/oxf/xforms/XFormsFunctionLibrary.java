@@ -179,10 +179,14 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}evaluate", Evaluate.class, Evaluate.EVALUATE, 1, 10, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
+        // xxforms:evaluate-avt
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}evaluate-avt", XXFormsEvaluateAVT.class, 0, 1, 10, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+
         // xxforms:serialize
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}serialize", Serialize.class, 0, 2, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-            StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-            StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:repeat-current
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}repeat-current", XXFormsRepeatCurrent.class, 0, 0, 1, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);

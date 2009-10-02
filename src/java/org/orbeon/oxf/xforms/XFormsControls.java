@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.om.Item;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -361,9 +362,10 @@ public class XFormsControls implements XFormsObjectResolver {
      *
      * @param sourceControlEffectiveId  effective id of the source control
      * @param targetStaticId            static id of the target
+     * @param contextItem               context item, or null (used for bind resolution only)
      * @return                          object, or null if not found
      */
-    public Object resolveObjectById(String sourceControlEffectiveId, String targetStaticId) {
+    public Object resolveObjectById(String sourceControlEffectiveId, String targetStaticId, Item contextItem) {
         final String effectiveControlId = getCurrentControlTree().findEffectiveControlId(sourceControlEffectiveId, targetStaticId);
         return (effectiveControlId != null) ? getObjectByEffectiveId(effectiveControlId) : null;
     }

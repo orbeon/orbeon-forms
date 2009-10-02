@@ -45,7 +45,7 @@
                     <xforms:instance id="itemset"><dummy/></xforms:instance>
                     <!-- What do when doing a refresh -->
                     <xxforms:variable name="resource" xbl:attr="xbl:text=resource"/>
-                    <xforms:submission id="get-itemset" method="get" resource="{{xxforms:component-context()/saxon:evaluate($resource)}}" replace="instance" serialization="none">
+                    <xforms:submission id="get-itemset" method="get" resource="{{xxforms:component-context()/xxforms:evaluate-avt($resource)}}" replace="instance" serialization="none">
                         <xforms:action ev:event="xforms-submit-error">
                             <xforms:insert nodeset="instance('itemset')" origin="xxforms:element('dummy')"/>
                         </xforms:action>

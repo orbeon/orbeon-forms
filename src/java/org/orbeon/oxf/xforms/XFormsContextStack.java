@@ -309,7 +309,7 @@ public class XFormsContextStack {
                 final boolean isNewModel;
                 if (modelId != null) {
                     final XBLContainer resolutionScopeContainer = container.findResolutionScope(scope);
-                    final Object o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId);
+                    final Object o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId, null);
                     if (!(o instanceof XFormsModel)) {
                         // TODO: should be dispatched to element having the @model attribute
                         // Invalid model id
@@ -333,7 +333,11 @@ public class XFormsContextStack {
                 {
                     if (bindId != null) {
                         // Resolve the bind id to a nodeset
-                        if (newModel == null) {
+
+                        // NOTE: For now, only the top-level models in a resolution scope are considered
+                        final XBLContainer resolutionScopeContainer = container.findResolutionScope(scope);
+                        final Object o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, bindId, baseBindingContext.getSingleItem());
+                        if (!(o instanceof XFormsModelBinds.Bind)) {
                             // TODO: should be dispatched to element having the @model attribute
                             // There is no model in scope so the bind id is incorrect
                             container.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, container));
@@ -346,28 +350,13 @@ public class XFormsContextStack {
                             isPushModelVariables = false;
                             variableInfo = null;
                         } else {
-                            final XFormsModelBinds binds = newModel.getBinds();
-                            if (binds == null) {
-                                // TODO: should be dispatched to element having the @model attribute
-                                // There is no model in scope so the bind id is incorrect
-                                container.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, container));
-
-                                newNodeset = null;
-                                hasOverriddenContext = false;
-                                contextItem = null;
-                                isNewBind = false;
-                                newPosition = 0;
-                                isPushModelVariables = false;
-                                variableInfo = null;
-                            } else {
-                                newNodeset = binds.getBindNodeset(bindId, baseBindingContext.getSingleItem());
-                                hasOverriddenContext = false;
-                                contextItem = baseBindingContext.getSingleItem();
-                                isNewBind = true;
-                                newPosition = 1;
-                                isPushModelVariables = false;
-                                variableInfo = null;
-                            }
+                            newNodeset = ((XFormsModelBinds.Bind) o).getNodeset();
+                            hasOverriddenContext = false;
+                            contextItem = baseBindingContext.getSingleItem();
+                            isNewBind = true;
+                            newPosition = Math.min(newNodeset.size(), 1);
+                            isPushModelVariables = false;
+                            variableInfo = null;
                         }
                     } else if (ref != null || nodeset != null) {
 
@@ -413,14 +402,11 @@ public class XFormsContextStack {
                             pushTemporaryContext(currentBindingContext, evaluationContextBinding, evaluationContextBinding.getSingleItem());// provide context information for the context() function
 
                             // Use updated binding context to set model
-//                            final XFormsModel tempModel = functionContext.getModel();
                             functionContext.setModel(evaluationContextBinding.model);
 
                             newNodeset = XPathCache.evaluateKeepItems(propertyContext, evaluationContextBinding.getNodeset(), evaluationContextBinding.getPosition(),
                                     ref != null ? ref : nodeset, bindingElementNamespaceContext, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
                                     functionContext, null, locationData);
-
-//                            functionContext.setModel(tempModel);
 
                             popBinding();
                         } else {
@@ -502,7 +488,7 @@ public class XFormsContextStack {
                     // variables in scope. We have to set them to the newly pushed BindingContext.
                     getCurrentBindingContext().setVariables(variableInfo);
                 } else if (isPushModelVariables) {
-                    // In this case, the model just changed and so we gather the variables in scope for the new model
+                    // In this case, only the model just changed and so we gather the variables in scope for the new model
                     addModelVariables(propertyContext, newModel);
                 }
 

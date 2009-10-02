@@ -2093,6 +2093,13 @@ ORBEON.xforms.Controls = {
                 if (isVisited) ORBEON.util.Dom.addClass(alertElement, "xforms-alert-active-visited");
             }
         }
+
+        // If the control is now valid and there is an alert tooltip for this control, destroy it
+        var alertTooltip = ORBEON.xforms.Globals.alertTooltipForControl[control.id];
+        if (newValid && alertTooltip != null) {
+            alertTooltip.destroy();
+            ORBEON.xforms.Globals.alertTooltipForControl[control.id] = null;
+        }
     },
 
     setRelevant: function(control, isRelevant) {

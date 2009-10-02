@@ -338,9 +338,6 @@
                                                              value="xxforms:bind('application-name-bind')"/>
                                             <xforms:setvalue ref="instance('fb-metadata-instance')/form-name"
                                                              value="xxforms:bind('form-name-bind')"/>
-                                            <!-- Tell that we allow the cancel button -->
-                                            <xforms:setvalue ref="instance('fb-metadata-instance')/allow-cancel">true</xforms:setvalue>
-
                                             <!-- Show and focus -->
                                             <xxforms:show dialog="fb-editor-metadata-dialog"/>
                                         </xforms:action>

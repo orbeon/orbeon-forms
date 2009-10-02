@@ -30,7 +30,7 @@
                     xxforms:element('text', normalize-space($line)), 
                     xxforms:element('length', string-length(normalize-space($line)))
                 ))"/>
-        
+
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
@@ -40,7 +40,7 @@
 
     </xhtml:head>
     <xhtml:body>
- 
+
         <xhtml:fieldset>
             <xhtml:legend>Datatable test events</xhtml:legend>
             <xhtml:ol>
@@ -71,32 +71,190 @@
                 <fr:label>A first basic dynamic datatable</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
-                    <fr:datatable id="hello_world-table">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xforms:repeat nodeset="$basic-nodeset[1]/*">
-                                    <xhtml:th>
-                                        <xforms:output value="name()"/>
-                                    </xhtml:th>
-                                </xforms:repeat>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat nodeset="$basic-nodeset">
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <fr:datatable id="hello_world-table" debug="true">
+                            <xhtml:thead>
                                 <xhtml:tr>
-                                    <xforms:repeat nodeset="*">
+                                    <xforms:repeat nodeset="line[1]/*">
                                         <xhtml:th>
-                                            <xforms:output value="."/>
+                                            <xforms:output value="name()"/>
                                         </xhtml:th>
                                     </xforms:repeat>
                                 </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
-                    </fr:datatable>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="line[length &lt; 20]">
+                                    <xhtml:tr>
+                                        <xforms:repeat nodeset="*">
+                                            <xhtml:td>
+                                                <xforms:output value="."/>
+                                            </xhtml:td>
+                                        </xforms:repeat>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
                 </xhtml:div>
             </fr:case>
 
+            <fr:case selected="true" id="mixed">
+                <fr:label>An example of datatable mixing static and dynamic columns</fr:label>
+                <xhtml:div>
+                    <xhtml:p/>
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <fr:datatable id="mixed-table" debug="true">
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xhtml:th>Position</xhtml:th>
+                                    <xforms:repeat nodeset="line[1]/*">
+                                        <xhtml:th>
+                                            <xforms:output value="name()"/>
+                                        </xhtml:th>
+                                    </xforms:repeat>
+                                    <xhtml:th>Characters per word</xhtml:th>
+
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="line[length &lt; 20]">
+                                    <xhtml:tr>
+                                        <xhtml:td>
+                                            <xforms:output value="position()"/>
+                                        </xhtml:td>
+                                        <xforms:repeat nodeset="*">
+                                            <xhtml:td>
+                                                <xforms:output value="."/>
+                                            </xhtml:td>
+                                        </xforms:repeat>
+                                        <xhtml:td>
+                                            <xforms:output value="round(length div nb-words)"/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
+
+            <fr:case selected="true" id="mixed-two-columnsets">
+                <fr:label>An example of datatable mixing static and dynamic columns with 2 column
+                    sets</fr:label>
+                <xhtml:div>
+                    <xhtml:p/>
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <fr:datatable id="mixed-two-columnsets-table" debug="true">
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xforms:repeat nodeset="line[1]/*[position() &lt; 3]">
+                                        <xhtml:th>
+                                            <xforms:output value="name()"/>
+                                        </xhtml:th>
+                                    </xforms:repeat>
+                                    <xhtml:th>Characters per word</xhtml:th>
+                                    <xforms:repeat nodeset="line[1]/*[position() >= 3]">
+                                        <xhtml:th>
+                                            <xforms:output value="name()"/>
+                                        </xhtml:th>
+                                    </xforms:repeat>
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="line[length &lt; 20]">
+                                    <xhtml:tr>
+                                        <xforms:repeat nodeset="*[position() &lt; 3]">
+                                            <xhtml:td>
+                                                <xforms:output value="."/>
+                                            </xhtml:td>
+                                        </xforms:repeat>
+                                        <xhtml:td>
+                                            <xforms:output value="round(length div nb-words)"/>
+                                        </xhtml:td>
+                                        <xforms:repeat nodeset="*[position() >= 3]">
+                                            <xhtml:td>
+                                                <xforms:output value="."/>
+                                            </xhtml:td>
+                                        </xforms:repeat>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
+
+            <fr:case selected="true" id="static">
+                <fr:label>An example of datatable with static columns using the dynamic
+                    code</fr:label>
+                <xhtml:div>
+                    <xhtml:p/>
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <fr:datatable id="static-table" debug="true" dynamic="true">
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xhtml:th>Position</xhtml:th>
+                                    <xhtml:th>text</xhtml:th>
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="line[length &lt; 20]">
+                                    <xhtml:tr>
+                                        <xhtml:td>
+                                            <xforms:output value="position"/>
+                                        </xhtml:td>
+                                        <xhtml:td>
+                                            <xforms:output value="text"/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
+
+            <fr:case selected="true" id="resize">
+                <fr:label>Testing resizeable columns on a mixed datatable</fr:label>
+                <xhtml:div>
+                    <xhtml:p/>
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <fr:datatable id="resize-table">
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xhtml:th fr:resizeable="true">Position</xhtml:th>
+                                    <xforms:repeat nodeset="line[1]/*">
+                                        <xhtml:th fr:resizeable="true">
+                                            <xforms:output value="name()"/>
+                                        </xhtml:th>
+                                    </xforms:repeat>
+                                    <xhtml:th fr:resizeable="true">Characters per word</xhtml:th>
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="line[length &lt; 20]">
+                                    <xhtml:tr>
+                                        <xhtml:td>
+                                            <xforms:output value="position()"/>
+                                        </xhtml:td>
+                                        <xforms:repeat nodeset="*">
+                                            <xhtml:td>
+                                                <xforms:output value="."/>
+                                            </xhtml:td>
+                                        </xforms:repeat>
+                                        <xhtml:td>
+                                            <xforms:output value="round(length div nb-words)"/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
         </fr:accordion>
+
+        <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
 
     </xhtml:body>
 </xhtml:html>

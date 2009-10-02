@@ -230,7 +230,10 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 	this.colSorters =[];
 	for (var j = 0; j < this.headerColumns.length; j++) {
         var headerColumn = this.headerColumns[j];
-        if (! YAHOO.util.Dom.hasClass(headerColumn, 'fr-datatable-scrollbar-space')) {
+        if (! YAHOO.util.Dom.hasClass(headerColumn, 'fr-datatable-scrollbar-space')
+                && !YAHOO.util.Dom.hasClass(headerColumn, 'xforms-repeat-begin-end')
+                && !YAHOO.util.Dom.hasClass(headerColumn, 'xforms-repeat-delimiter')
+                && !YAHOO.util.Dom.hasClass(headerColumn, 'xforms-repeat-template')) {
             var childDiv = YAHOO.util.Selector.query('div', headerColumn, true);
             var colResizer = null;
             if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {

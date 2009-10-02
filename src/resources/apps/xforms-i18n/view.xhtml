@@ -1,0 +1,95 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude">
+    <xhtml:head>
+        <xhtml:title>XForms Internationalization</xhtml:title>
+        <xforms:model id="main-model">
+            
+            <!-- User in which user data is collected -->
+            <xforms:instance id="user-data">
+                <registration>
+                    <first-name/>
+                    <last-name/>
+                </registration>
+            </xforms:instance>
+            
+            <!-- === Internationalization === -->
+            
+            <!-- Resources in all the languages -->
+            <xforms:instance id="all-resources" xxforms:readonly="true" xxforms:cache="true" src="oxf:/apps/xforms-i18n/resources.xml"/>
+            <!-- Current language -->
+            <xforms:instance id="language"><language/></xforms:instance>
+            <!-- Shortcut pointing to the resource current resources -->
+            <xxforms:variable name="resources" select="instance('all-resources')/resources[@xml:lang = instance('language')]"/>
+            <!-- Load resources for the current language -->
+            <xforms:action ev:event="xforms-model-construct-done load-resources">
+                <xxforms:variable name="session-language" select="xxforms:get-session-attribute('language')"/>
+                <xforms:setvalue ref="instance('language')" value="if (exists($session-language)) 
+                    then $session-language/string() else instance('all-resources')/resources[1]/@xml:lang/string()"/>
+            </xforms:action>
+            
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-label { display: block; }
+            fieldset { width: 15em; margin-top: 1em; }
+            button { display: block; }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        
+        <!-- Language selector -->
+        <xforms:select1 appearance="minimal" ref="instance('language')">
+            <xforms:action ev:event="xforms-value-changed">
+                <xforms:insert context="." origin="xxforms:set-session-attribute('language', .)"/>
+                <xxforms:variable name="session-language" select="xxforms:get-session-attribute('language')"/>
+                <xforms:dispatch target="main-model" name="load-resources"/>
+            </xforms:action>
+            <xforms:label ref="$resources/language/change"/>
+            <xforms:itemset nodeset="instance('all-resources')/resources">
+                <xforms:label ref="label"/>
+                <xforms:value ref="@xml:lang"/>
+            </xforms:itemset>
+        </xforms:select1>
+        
+        <!-- Form -->
+        <xforms:switch>
+            <xforms:case id="fields">
+                <xhtml:fieldset>
+                    <xhtml:legend>Registration form</xhtml:legend>
+                    <xforms:input ref="first-name">
+                        <xforms:label ref="$resources/registration/first-name"/>
+                    </xforms:input>
+                    <xforms:input ref="last-name">
+                        <xforms:label ref="$resources/registration/last-name"/>
+                    </xforms:input>
+                </xhtml:fieldset>
+                <xforms:trigger>
+                    <xforms:label ref="$resources/registration/register"/>
+                    <xforms:toggle ev:event="DOMActivate" case="thank-you"/>
+                </xforms:trigger>
+            </xforms:case>
+            <xforms:case id="thank-you">
+                <xhtml:p>
+                    <xforms:output ref="$resources/registration/thank-you"/>
+                </xhtml:p>
+            </xforms:case>
+        </xforms:switch>
+
+    </xhtml:body>
+</xhtml:html>

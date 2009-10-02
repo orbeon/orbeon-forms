@@ -1710,15 +1710,19 @@ ORBEON.xforms.Controls = {
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
             // XForms output or "static readonly" mode
             if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-image")) {
-                var image = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                var image = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                    ? YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0]
+                    : ORBEON.util.Dom.getChildElementByIndex(control, 0);
                 image.src = newControlValue;
-            } else if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
-                control.innerHTML = newControlValue;
             } else {
                 var output = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
                         ? YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0]
                         : control;
-                ORBEON.util.Dom.setStringValue(output, newControlValue);
+                if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+                    output.innerHTML = newControlValue;
+                } else {
+                    ORBEON.util.Dom.setStringValue(output, newControlValue);
+                }
             }
         } else if (ORBEON.xforms.Globals.changedIdsRequest[control.id] != null) {
             // User has modified the value of this control since we sent our request:

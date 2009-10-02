@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<resources>
+    <resources xml:lang="en">
+        <label>English</label>
+        <registration>
+            <first-name>First name</first-name>
+            <last-name>Last name</last-name>
+            <register>Register</register>
+            <thank-you>You have been registered. Thank you.</thank-you>
+        </registration>
+        <language>
+            <change>Change language:</change>
+        </language>
+    </resources>
+    <resources xml:lang="fr">
+        <label>Français</label>o
+        <registration>
+            <first-name>Prénom</first-name>
+            <last-name>Nom de famille</last-name>
+            <register>Enregistrer</register>
+            <thank-you>Vous vous être enregistré. Merci.</thank-you>
+        </registration>
+        <language>
+            <change>Choisissez votre language:</change>
+        </language>
+    </resources>
+</resources>

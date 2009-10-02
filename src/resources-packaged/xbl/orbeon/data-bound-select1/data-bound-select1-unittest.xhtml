@@ -61,7 +61,7 @@
     </xhtml:head>
     <xhtml:body>
         <xhtml:p>
-            <fr:data-bound-select1 ref="state" appearance="minimal" resource="'/xforms-sandbox/service/zip-states'">
+            <fr:data-bound-select1 ref="state" appearance="minimal" resource="/xforms-sandbox/service/zip-states">
                 <xforms:label>State: </xforms:label>
                 <xforms:itemset nodeset="/states/state">
                     <xforms:label ref="@name"/>
@@ -69,7 +69,7 @@
                 </xforms:itemset>
             </fr:data-bound-select1>
             <fr:data-bound-select1 ref="city" appearance="minimal"
-                                   resource="concat('/xforms-sandbox/service/zip-cities?state-abbreviation=', state)">
+                                   resource="/xforms-sandbox/service/zip-cities?state-abbreviation={state}">
                 <xforms:label>City: </xforms:label>
                 <xforms:itemset nodeset="/cities/city">
                     <xforms:label ref="@name"/>
@@ -78,7 +78,7 @@
                 <fr:dependency ref="../state"/>
             </fr:data-bound-select1>
             <fr:data-bound-select1 ref="zip" appearance="minimal"
-                                   resource="concat('/xforms-sandbox/service/zip-zips?state-abbreviation=', state, '&amp;city=', city)">
+                                   resource="/xforms-sandbox/service/zip-zips?state-abbreviation={state}&amp;city={city}">
                 <xforms:label>Zip: </xforms:label>
                 <xforms:itemset nodeset="/zips/zip">
                     <xforms:label ref="@code"/>

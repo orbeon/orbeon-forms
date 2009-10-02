@@ -11,9 +11,9 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function.exforms;
+package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsSort;
+import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
@@ -21,30 +21,24 @@ import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
-/**
- * exforms:sort() function
- */
-public class EXFormsSort extends XXFormsSort {
+public class XXFormsEvaluateAVT extends XFormsFunction {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
-        final Expression sequenceToSortExpression = argument[0];
-        final Expression selectExpression = argument[1];
-
-        final Expression sortKeyExpression;
+        final Expression avtExpression;
         final XPathContextMajor newXPathContext;
         {
             // NOTE: It would be better if we could use XPathCache/PooledXPathExpression instead of rewriting custom
             // code below. This would provide caching of compiled expressions, abstraction and some simplicity.
 
             // Prepare expression and context
-            final PreparedExpression preparedExpression = prepareExpression(xpathContext, selectExpression, false);
+            final PreparedExpression preparedExpression = prepareExpression(xpathContext, argument[0], true);
             newXPathContext = prepareXPathContext(xpathContext, preparedExpression);
             // Return expression
-            sortKeyExpression = preparedExpression.expression;
+            avtExpression = preparedExpression.expression;
         }
 
-        return sort(newXPathContext, sequenceToSortExpression, sortKeyExpression);
+        return avtExpression.iterate(newXPathContext);
     }
 
     public void checkArguments(StaticContext env) throws XPathException {

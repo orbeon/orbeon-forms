@@ -1681,6 +1681,8 @@ ORBEON.xforms.Controls = {
                 }
             }
             return result;
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-range")) {
+            return ORBEON.xforms.Globals.sliderYui[control.id].previousVal / 200;
         }
     },
 
@@ -3293,6 +3295,8 @@ ORBEON.xforms.Events = {
 
     sliderValueChange: function(offset) {
         // Notify server that value changed
+        console.log("Range", this, offset);
+        console.log(this.previousVal);
         var rangeControl = ORBEON.util.Dom.getElementById(this.id);
         if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY))
             rangeControl = rangeControl.parentNode;
@@ -4328,6 +4332,7 @@ ORBEON.xforms.Init = {
             menuItemsets: {},                    // Maps menu id to structure defining the content of the menu
             menuYui: {},                         // Maps menu id to the YUI object for that menu
             treeYui: {},                         // Maps tree id to the YUI object for that tree
+            sliderYui: {},                       // Maps slider id to the YUI object for that slider
             idToElement: {},                     // Maintain mapping from ID to element, so we don't lookup the sme ID more than once
             isReloading: false,                  // Whether the form is being reloaded from the server
             lastDialogZIndex: 5,                 // zIndex of the last dialog displayed. Gets incremented so the last dialog is always on top of everything else
@@ -4735,6 +4740,7 @@ ORBEON.xforms.Init = {
 
         var slider = YAHOO.widget.Slider.getHorizSlider(backgroundDiv.id, thumbDiv.id, 0, 200);
         slider.subscribe("change", ORBEON.xforms.Events.sliderValueChange);
+        ORBEON.xforms.Globals.sliderYui[range.id] = slider;
     },
 
     _addToTree: function (treeDiv, nameValueArray, treeNode, firstPosition) {

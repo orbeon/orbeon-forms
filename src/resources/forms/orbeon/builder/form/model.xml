@@ -756,9 +756,7 @@
         <metadata>
             <application-name/>
             <form-name/>
-            <cancel-trigger/>
             <next-trigger/>
-            <allow-cancel/>
         </metadata>
     </xforms:instance>
 
@@ -772,7 +770,6 @@
         <xforms:bind nodeset="application-name" required="true()" type="xs:NCName" constraint="normalize-space() = ."/>
         <xforms:bind nodeset="form-name" required="true()" type="xs:NCName" constraint="normalize-space() = ."/>
         <!-- Triggers -->
-        <xforms:bind nodeset="cancel-trigger" relevant="../allow-cancel = 'true'"/>
         <xforms:bind nodeset="next-trigger" readonly=". = 'disabled'"/>
     </xforms:bind>
 

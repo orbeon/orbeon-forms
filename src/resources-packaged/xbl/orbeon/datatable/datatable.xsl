@@ -126,7 +126,7 @@
     </div>-->
 
 
-    <xsl:template match="@*|node()" mode="#all">
+    <xsl:template match="@*|node()" mode="#all" priority="-100">
         <!-- Default template == identity -->
         <xsl:copy>
             <xsl:apply-templates select="@*|node()" mode="#current"/>

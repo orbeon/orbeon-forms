@@ -120,7 +120,9 @@ public class XFormsProperties {
     public static final String COMPUTED_BINDS_RECALCULATE_VALUE = "recalculate";
     public static final String COMPUTED_BINDS_REVALIDATE_VALUE = "revalidate";
 
-    public static final String NEW_XHTML_LAYOUT = "new-xhtml-layout";
+    public static final String NEW_XHTML_LAYOUT = "new-xhtml-layout";   // deprecated
+    public static final String XHTML_LAYOUT = "xhtml-layout";
+    public enum XHTMLLayout { NOSPAN, SPAN }
 
     private static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
 
@@ -199,7 +201,6 @@ public class XFormsProperties {
             new PropertyDefinition(COMBINE_RESOURCES_PROPERTY, true, false),
             new PropertyDefinition(SKIP_SCHEMA_VALIDATION_PROPERTY, false, false),
             new PropertyDefinition(COMPUTED_BINDS_PROPERTY, COMPUTED_BINDS_RECALCULATE_VALUE, false),
-            new PropertyDefinition(NEW_XHTML_LAYOUT, false, false),
             new PropertyDefinition(DATE_FORMAT_PROPERTY, "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(DATETIME_FORMAT_PROPERTY, "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(TIME_FORMAT_PROPERTY, "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
@@ -212,6 +213,8 @@ public class XFormsProperties {
             new PropertyDefinition(FORWARD_SUBMISSION_HEADERS, DEFAULT_FORWARD_SUBMISSION_HEADERS, false),
 
             // Properties to propagate to the client
+            new PropertyDefinition(NEW_XHTML_LAYOUT, false, true),
+            new PropertyDefinition(XHTML_LAYOUT, XHTMLLayout.NOSPAN.toString().toLowerCase(), true),
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
             new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, 12 * 60 * 60 * 800, true), // dynamic; 80 % of 12 hours in ms
             new PropertyDefinition(FCK_EDITOR_BASE_PATH_PROPERTY, "/ops/fckeditor/", true),// dynamic
@@ -469,7 +472,9 @@ public class XFormsProperties {
     }
 
     public static boolean isNewXHTMLLayout(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, NEW_XHTML_LAYOUT);
+        // Check both properties for backward compatibility
+        final String value = getStringProperty(containingDocument, XHTML_LAYOUT);
+        return XHTMLLayout.SPAN.toString().toLowerCase().equals(value) || getBooleanProperty(containingDocument, NEW_XHTML_LAYOUT);
     }
 
     public static boolean isReadonly(XFormsContainingDocument containingDocument) {

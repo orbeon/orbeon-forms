@@ -1416,7 +1416,7 @@
         </output>
     </test>
 
-    <test description="xxforms-nodeset-change event" name="oxf:pipeline">
+    <test description="xxforms-nodeset-changed event" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>

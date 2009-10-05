@@ -233,5 +233,41 @@ ORBEON.widgets.datatable.unittests_lib = {
         YAHOO.util.Assert.areEqual(type, span.innerHTML, 'Type ' + span.innerHTML + ' instead of ' + type);
     },
 
+    getSignificantElementByIndex: function(elements, index) {
+        for (var i=0; i< elements.length; i++) {
+            var element = elements[i];
+            if (!YAHOO.util.Dom.hasClass(element, 'xforms-repeat-begin-end')
+                && !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-delimiter')
+                && !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-template')) {
+                if (index == 1) {
+                    return element;
+                }
+                index -= 1;
+            }
+        }
+        return null;
+    },
+
+    clickAndCheckSortOrder: function(table, columnIndex, expectedOrder, callback) {
+        //TODO: support scrollable tables
+        var className;
+        if (expectedOrder == 'ascending') {
+            className = 'yui-dt-asc';
+        } else if (expectedOrder = 'descending') {
+            className = 'yui-dt-desc';
+        }
+        var headerCell = this.getSignificantElementByIndex(table.tHead.rows[0].cells, columnIndex);
+        var liner= ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
+        YAHOO.util.UserAction.click(liner, {clientX: 1});
+        this.wait(function() {
+            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(headerCell, className), 'Column ' + columnIndex + ' header cell should now have a class ' + className);
+            var firstRow = this.getSignificantElementByIndex(table.tBodies[0].rows, 1);
+            var bodyCell = this.getSignificantElementByIndex(firstRow.cells, columnIndex);
+            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(bodyCell, className), 'Column ' + columnIndex + ' body cellls should now have a class ' + className);
+            //TODO: test that the table is actually sorted
+            callback();
+        }, 750);
+    },
+
     EOS: null
 }

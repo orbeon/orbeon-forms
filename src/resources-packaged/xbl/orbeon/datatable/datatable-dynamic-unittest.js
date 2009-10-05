@@ -13,206 +13,309 @@
  */
 
 
-YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+var testCase = {
 
-    name: "datatable",
+    name: "datatable: dynamic columns features",
 
-    lib: ORBEON.widgets.datatable.unittests_lib,
+    lib: new YAHOO.tool.TestCase(ORBEON.widgets.datatable.unittests_lib),
 
     testHelloWorld: function() {
         var thiss = this;
-        ORBEON.widgets.datatable.unittests_lib.openAccordionCase(thiss, 'hello_world', function() {
+        thiss.openAccordionCase(thiss, 'hello_world', function() {
             // Test significant values from the column set
             var colset = YAHOO.util.Dom.get('my-accordion$hello_world-table$debug-column·1');
-            ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(colset, 'columnSet');
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(colset, 'index', 1);
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(colset, 'nbColumns', 4);
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(colset, 'nodeset', '*');
+            thiss.checkColTypeValue(colset, 'columnSet');
+            thiss.checkColDebugValue(colset, 'index', 1);
+            thiss.checkColDebugValue(colset, 'nbColumns', 4);
+            thiss.checkColDebugValue(colset, 'nodeset', '*');
             // Test significant values from the first column
             var column = YAHOO.util.Dom.get('my-accordion$hello_world-table$debug-column·2');
-            ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(column, 'column');
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(column, 'index', 1);
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(column, 'position', 1);
+            thiss.checkColTypeValue(column, 'column');
+            thiss.checkColDebugValue(column, 'index', 1);
+            thiss.checkColDebugValue(column, 'position', 1);
             // Test significant values from the second column
             column = YAHOO.util.Dom.get('my-accordion$hello_world-table$debug-column·3');
-            ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(column, 'column');
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(column, 'index', 2);
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(column, 'position', 2);
+            thiss.checkColTypeValue(column, 'column');
+            thiss.checkColDebugValue(column, 'index', 2);
+            thiss.checkColDebugValue(column, 'position', 2);
             // Test significant values from the third column
             column = YAHOO.util.Dom.get('my-accordion$hello_world-table$debug-column·4');
-            ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(column, 'column');
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(column, 'index', 3);
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(column, 'position', 3);
+            thiss.checkColTypeValue(column, 'column');
+            thiss.checkColDebugValue(column, 'index', 3);
+            thiss.checkColDebugValue(column, 'position', 3);
             // Test significant values from the fourth column
             column = YAHOO.util.Dom.get('my-accordion$hello_world-table$debug-column·5');
-            ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(column, 'column');
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(column, 'index', 4);
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(column, 'position', 4);
+            thiss.checkColTypeValue(column, 'column');
+            thiss.checkColDebugValue(column, 'index', 4);
+            thiss.checkColDebugValue(column, 'position', 4);
             // Check the table structure
             var table = YAHOO.util.Dom.get('my-accordion$hello_world-table$hello_world-table-table');
-            ORBEON.widgets.datatable.unittests_lib.checkTableStructure(table, 4);
+            thiss.checkTableStructure(table, 4);
 
-            ORBEON.widgets.datatable.unittests_lib.closeAccordionCase(thiss, 'hello_world');
+            thiss.closeAccordionCase(thiss, 'hello_world');
         });
     },
 
     testMixed: function() {
          var thiss = this;
-         ORBEON.widgets.datatable.unittests_lib.openAccordionCase(thiss, 'mixed', function() {
+         thiss.openAccordionCase(thiss, 'mixed', function() {
              // Test significant values the first column
              var div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·1');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'column');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 1);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'position', undefined);
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 1);
+             thiss.checkColDebugValue(div, 'position', undefined);
              // Test significant values the column set
              div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·2');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'columnSet');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 2);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'nbColumns', 4);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'nodeset', '*');
+             thiss.checkColTypeValue(div, 'columnSet');
+             thiss.checkColDebugValue(div, 'index', 2);
+             thiss.checkColDebugValue(div, 'nbColumns', 4);
+             thiss.checkColDebugValue(div, 'nodeset', '*');
              // Test significant values from the second column
              div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·3');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'column');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 2);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'position', 1);
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 2);
+             thiss.checkColDebugValue(div, 'position', 1);
              // Test significant values from the third column
              div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·4');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'column');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 3);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'position', 2);
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 3);
+             thiss.checkColDebugValue(div, 'position', 2);
              // Test significant values from the fourth column
              div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·5');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'column');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 4);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'position', 3);
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 4);
+             thiss.checkColDebugValue(div, 'position', 3);
              // Test significant values from the fifth column
              div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·6');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'column');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 5);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'position', 4);
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 5);
+             thiss.checkColDebugValue(div, 'position', 4);
              // Test significant values from the sixth column
              div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·7');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'column');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 6);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'position', undefined);
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 6);
+             thiss.checkColDebugValue(div, 'position', undefined);
 
              // Check the table structure
              var table = YAHOO.util.Dom.get('my-accordion$mixed-table$mixed-table-table');
-             ORBEON.widgets.datatable.unittests_lib.checkTableStructure(table, 6);
+             thiss.checkTableStructure(table, 6);
 
-             ORBEON.widgets.datatable.unittests_lib.closeAccordionCase(thiss, 'mixed');
+             thiss.closeAccordionCase(thiss, 'mixed');
          });
      },
 
     testMixedTwoColumsets: function() {
          var thiss = this;
-         ORBEON.widgets.datatable.unittests_lib.openAccordionCase(thiss, 'mixed-two-columnsets', function() {
+         thiss.openAccordionCase(thiss, 'mixed-two-columnsets', function() {
              // Test significant values the first column set
              var div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·1');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'columnSet');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 1);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'nbColumns', 2);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'nodeset', '*[position() &lt; 3]');
+             thiss.checkColTypeValue(div, 'columnSet');
+             thiss.checkColDebugValue(div, 'index', 1);
+             thiss.checkColDebugValue(div, 'nbColumns', 2);
+             thiss.checkColDebugValue(div, 'nodeset', '*[position() &lt; 3]');
              // First column (dynamic)
              div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·2');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'column');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 1);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'position', 1);
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 1);
+             thiss.checkColDebugValue(div, 'position', 1);
              // Second column (dynamic)
              div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·3');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'column');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 2);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'position', 2);
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 2);
+             thiss.checkColDebugValue(div, 'position', 2);
              // Third column (static)
              div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·4');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'column');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 3);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'position', undefined);
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 3);
+             thiss.checkColDebugValue(div, 'position', undefined);
              // Second columnset
              div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·5');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'columnSet');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 4);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'nbColumns', 2);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'nodeset', '*[position() &gt;= 3]');
+             thiss.checkColTypeValue(div, 'columnSet');
+             thiss.checkColDebugValue(div, 'index', 4);
+             thiss.checkColDebugValue(div, 'nbColumns', 2);
+             thiss.checkColDebugValue(div, 'nodeset', '*[position() &gt;= 3]');
              // Fourth column (dynamic)
              div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·6');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'column');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 4);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'position', 1);
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 4);
+             thiss.checkColDebugValue(div, 'position', 1);
              // Fifth column (dynamic)
              div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·7');
-             ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'column');
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 5);
-             ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'position', 2);
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 5);
+             thiss.checkColDebugValue(div, 'position', 2);
 
 
              // Check the table structure
              var table = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$mixed-two-columnsets-table-table');
-             ORBEON.widgets.datatable.unittests_lib.checkTableStructure(table, 5);
+             thiss.checkTableStructure(table, 5);
 
-             ORBEON.widgets.datatable.unittests_lib.closeAccordionCase(thiss, 'mixed-two-columnsets');
+             thiss.closeAccordionCase(thiss, 'mixed-two-columnsets');
          });
      },
 
     testStatic: function() {
          var thiss = this;
-         ORBEON.widgets.datatable.unittests_lib.openAccordionCase(thiss, 'static', function() {
+         thiss.openAccordionCase(thiss, 'static', function() {
              // Test significant values the first column set
              var div;
              // First column (static)
             div = YAHOO.util.Dom.get('my-accordion$static-table$debug-column·1');
-            ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'column');
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 1);
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'position', undefined);
+            thiss.checkColTypeValue(div, 'column');
+            thiss.checkColDebugValue(div, 'index', 1);
+            thiss.checkColDebugValue(div, 'position', undefined);
              // Second column (static)
             div = YAHOO.util.Dom.get('my-accordion$static-table$debug-column·2');
-            ORBEON.widgets.datatable.unittests_lib.checkColTypeValue(div, 'column');
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'index', 2);
-            ORBEON.widgets.datatable.unittests_lib.checkColDebugValue(div, 'position', undefined);
+            thiss.checkColTypeValue(div, 'column');
+            thiss.checkColDebugValue(div, 'index', 2);
+            thiss.checkColDebugValue(div, 'position', undefined);
 
              // Check the table structure
              var table = YAHOO.util.Dom.get('my-accordion$static-table$static-table-table');
-             ORBEON.widgets.datatable.unittests_lib.checkTableStructure(table, 2);
+             thiss.checkTableStructure(table, 2);
 
-             ORBEON.widgets.datatable.unittests_lib.closeAccordionCase(thiss, 'static');
+             thiss.closeAccordionCase(thiss, 'static');
          });
      },
 
     testResize: function() {
          var thiss = this;
-         ORBEON.widgets.datatable.unittests_lib.openAccordionCase(thiss, 'resize', function() {
+         thiss.openAccordionCase(thiss, 'resize', function() {
              // Check the table structure
              var table = YAHOO.util.Dom.get('my-accordion$resize-table$resize-table-table');
-             ORBEON.widgets.datatable.unittests_lib.checkTableStructure(table, 6);
-             ORBEON.widgets.datatable.unittests_lib.checkTableAndContainerWidths(table);
-             ORBEON.widgets.datatable.unittests_lib.checkRowWidth(table.tHead.rows[0]);
+             thiss.checkTableStructure(table, 6);
+             thiss.checkTableAndContainerWidths(table);
+             thiss.checkRowWidth(table.tHead.rows[0]);
 
             var th1 = table.tHead.rows[0].cells[0]; // Static column
             var th2 = table.tHead.rows[0].cells[3]; // Second dynamic column
             var width1 = th1.clientWidth;
             var width2 = th2.clientWidth;
 
-             ORBEON.widgets.datatable.unittests_lib.resizeColumn(th1, 100, 10);
-             ORBEON.widgets.datatable.unittests_lib.checkTableAndContainerWidths(table);
-             ORBEON.widgets.datatable.unittests_lib.checkRowWidth(table.tHead.rows[0]);
+             thiss.resizeColumn(th1, 100, 10);
+             thiss.checkTableAndContainerWidths(table);
+             thiss.checkRowWidth(table.tHead.rows[0]);
              YAHOO.util.Assert.areEqual(width2, th2.clientWidth, "The width of the second column shouldn't change (before: " + width2 + ", after: " + th2.clientWidth + ").");
              YAHOO.util.Assert.areEqual(width1 + 100, th1.clientWidth, "The width of the first column should be " + (width1 + 100) + ", not " + th1.clientWidth);
 
-             ORBEON.widgets.datatable.unittests_lib.resizeColumn(th2, 100, 10);
-             ORBEON.widgets.datatable.unittests_lib.checkTableAndContainerWidths(table);
-             ORBEON.widgets.datatable.unittests_lib.checkRowWidth(table.tHead.rows[0]);
+             thiss.resizeColumn(th2, 100, 10);
+             thiss.checkTableAndContainerWidths(table);
+             thiss.checkRowWidth(table.tHead.rows[0]);
              YAHOO.util.Assert.areEqual(width1 + 100, th1.clientWidth, "The width of the first column shouldn't change (before: " + width1 + 100 + ", after: " + th1.clientWidth + ").");
              YAHOO.util.Assert.areEqual(width2 + 100, th2.clientWidth, "The width of the second column should be " + (width2 + 100) + ", not " + th2.clientWidth);
 
-            ORBEON.widgets.datatable.unittests_lib.closeAccordionCase(thiss, 'resize');
+            thiss.closeAccordionCase(thiss, 'resize');
          });
+     },
+
+    testSortable: function() {
+         var thiss = this;
+         thiss.openAccordionCase(thiss, 'sortable', function() {
+             // Check the table structure
+             var table = YAHOO.util.Dom.get('my-accordion$sortable-table$sortable-table-table');
+             thiss.checkTableStructure(table, 6);
+             thiss.checkTableAndContainerWidths(table);
+             thiss.checkRowWidth(table.tHead.rows[0]);
+
+             // Check significant values in the datatable local instance before any sort action
+             var columnsDiv = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-columns');
+             thiss.checkColTypeValue(columnsDiv, 'columns');
+             thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', -1);
+
+             var col1Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·1');
+             thiss.checkColTypeValue(col1Div, 'column');
+             thiss.checkColDebugValue(col1Div, 'currentSortOrder', 'none');
+             thiss.checkColDebugValue(col1Div, 'nextSortOrder', 'ascending');
+             thiss.checkColDebugValue(col1Div, 'type', 'number');
+             thiss.checkColDebugValue(col1Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/(position())');
+             thiss.checkColDebugValue(col1Div, 'sortKey', 'position()');
+             thiss.checkColDebugValue(col1Div, 'fr:sortable', 'true');
+
+             var col2Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·3');
+             thiss.checkColTypeValue(col2Div, 'column');
+             thiss.checkColDebugValue(col2Div, 'currentSortOrder', 'none');
+             thiss.checkColDebugValue(col2Div, 'nextSortOrder', 'ascending');
+             thiss.checkColDebugValue(col2Div, 'type', 'number');
+             thiss.checkColDebugValue(col2Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[1]/.)');
+             thiss.checkColDebugValue(col2Div, 'sortKey', '(*)[1]/.');
+             thiss.checkColDebugValue(col2Div, 'fr:sortable', 'true');
+
+             var col3Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·4');
+             thiss.checkColTypeValue(col3Div, 'column');
+             thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'none');
+             thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'ascending');
+             thiss.checkColDebugValue(col3Div, 'type', 'text');
+             thiss.checkColDebugValue(col3Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[2]/.)');
+             thiss.checkColDebugValue(col3Div, 'sortKey', '(*)[2]/.');
+             thiss.checkColDebugValue(col3Div, 'fr:sortable', 'true');
+
+             var col4Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·5');
+             thiss.checkColTypeValue(col4Div, 'column');
+             thiss.checkColDebugValue(col4Div, 'currentSortOrder', 'none');
+             thiss.checkColDebugValue(col4Div, 'nextSortOrder', 'ascending');
+             thiss.checkColDebugValue(col4Div, 'type', 'number');
+             thiss.checkColDebugValue(col4Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[3]/.)');
+             thiss.checkColDebugValue(col4Div, 'sortKey', '(*)[3]/.');
+             thiss.checkColDebugValue(col4Div, 'fr:sortable', 'true');
+
+             var col5Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·6');
+             thiss.checkColTypeValue(col5Div, 'column');
+             thiss.checkColDebugValue(col5Div, 'currentSortOrder', 'none');
+             thiss.checkColDebugValue(col5Div, 'nextSortOrder', 'ascending');
+             thiss.checkColDebugValue(col5Div, 'type', 'number');
+             thiss.checkColDebugValue(col5Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[4]/.)');
+             thiss.checkColDebugValue(col5Div, 'sortKey', '(*)[4]/.');
+             thiss.checkColDebugValue(col5Div, 'fr:sortable', 'true');
+
+             var col6Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·7');
+             thiss.checkColTypeValue(col6Div, 'column');
+             thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'none');
+             thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'ascending');
+             thiss.checkColDebugValue(col6Div, 'type', 'number');
+             thiss.checkColDebugValue(col6Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/(round(length div nb-words))');
+             thiss.checkColDebugValue(col6Div, 'sortKey', 'round(length div nb-words)');
+             thiss.checkColDebugValue(col6Div, 'fr:sortable', 'true');
+
+             // Click to sort the 3rd column
+             thiss.clickAndCheckSortOrder(table, 3, 'ascending', function() {
+                 var col3th = YAHOO.util.Dom.get('my-accordion$sortable-table$sortable-th-dyn·2');
+                 thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 3);
+                 thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'ascending');
+                 thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'descending');
+
+                 thiss.clickAndCheckSortOrder(table, 6, 'ascending', function() {
+                     thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 6);
+                     thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'ascending');
+                     thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'descending');
+                     thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'none');
+                     thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'ascending');
+
+                     thiss.clickAndCheckSortOrder(table, 6, 'descending', function() {
+                         thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 6);
+                         thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'descending');
+                         thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'ascending');
+                     
+                        thiss.closeAccordionCase(thiss, 'sortable');
+                     });
+                      
+                  });
+ 
+             });
+         });
+
      },
 
 
     EOS: ""
-}));
+};
+
+
 
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+    for (var property in ORBEON.widgets.datatable.unittests_lib) {
+        testCase[property] = ORBEON.widgets.datatable.unittests_lib[property];
+    }
+    YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase(testCase));
     AccordionMenu.setting('my-accordion$dl', {animation: true, seconds: 0.001, openedIds: [], dependent: false, easeOut: false});
     if (parent && parent.TestManager) {
         parent.TestManager.load();

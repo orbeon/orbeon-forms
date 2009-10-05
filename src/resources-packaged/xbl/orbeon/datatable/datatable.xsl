@@ -126,7 +126,7 @@
     </div>-->
 
 
-    <xsl:template match="@*|node()" mode="#all">
+    <xsl:template match="@*|node()" mode="#all" priority="-100">
         <!-- Default template == identity -->
         <xsl:copy>
             <xsl:apply-templates select="@*|node()" mode="#current"/>
@@ -905,18 +905,22 @@
                 <xhtml:div style="border:thin solid black" id="debug">
                     <xhtml:h3>Local instance:</xhtml:h3>
                     <xforms:group model="datatable-model" instance="datatable-instance">
-                        <xhtml:p>columns</xhtml:p>
-                        <xhtml:ul>
-                            <xforms:repeat nodeset="@*">
-                                <xhtml:li id="debug-top-level-attribute">
-                                    <xforms:output ref=".">
-                                        <xforms:label>
-                                            <xforms:output value="concat(name(), ': ')"/>
-                                        </xforms:label>
-                                    </xforms:output>
-                                </xhtml:li>
-                            </xforms:repeat>
-                        </xhtml:ul>
+                        <xhtml:div id="debug-columns">
+                            <xhtml:p>
+                                <xforms:output value="name()"/>
+                            </xhtml:p>
+                            <xhtml:ul>
+                                <xforms:repeat nodeset="@*">
+                                    <xhtml:li id="debug-top-level-attribute">
+                                        <xforms:output ref=".">
+                                            <xforms:label>
+                                                <xforms:output value="concat(name(), ': ')"/>
+                                            </xforms:label>
+                                        </xforms:output>
+                                    </xhtml:li>
+                                </xforms:repeat>
+                            </xhtml:ul>
+                        </xhtml:div>
                         <xforms:repeat nodeset="*|//column">
                             <xhtml:div id="debug-column">
                                 <xhtml:p>
@@ -924,7 +928,7 @@
                                 </xhtml:p>
                                 <xhtml:ul>
                                     <xforms:repeat nodeset="@*">
-                                        <xhtml:li >
+                                        <xhtml:li>
                                             <xforms:output ref="." id="debug-column-attribute">
                                                 <xforms:label>
                                                   <xforms:output value="concat(name(), ': ')"/>
@@ -1044,33 +1048,42 @@
     </xsl:template>
 
     <xsl:template match="header/xhtml:th" mode="dynamic">
+        <xxforms:variable name="index" select="{count(../../preceding-sibling::*) + 1}"/>
+        <xxforms:variable name="columnDesc" model="datatable-model"
+            select="instance('datatable-instance')/*[position() = $index]"/>
         <xhtml:th
             class="
             {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
             {if (@fr:resizeable = 'true') then 'yui-dt-resizeable' else ''} 
+            {{if ($columnDesc/@currentSortOrder = 'ascending') then 'yui-dt-asc'
+            else if ($columnDesc/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
+            
              {@class}
             ">
             <xsl:apply-templates select="@*[name() != 'class']" mode="dynamic"/>
-            <xxforms:variable name="index" select="{count(../../preceding-sibling::*) + 1}"/>
-            <xxforms:variable name="columnDesc" model="datatable-model"
-                select="instance('datatable-instance')/*[position() = $index]"/>
             <xsl:call-template name="header-cell"/>
 
         </xhtml:th>
     </xsl:template>
 
     <xsl:template match="header/xforms:repeat/xhtml:th" mode="dynamic">
+        <xxforms:variable name="position" select="position()"/>
+        <xxforms:variable name="index" select="{count(../../../preceding-sibling::*) + 1}"/>
+        <xxforms:variable name="columnSet" model="datatable-model"
+            select="instance('datatable-instance')/*[position() = $index]"/>
+        <xxforms:variable name="columnIndex" model="datatable-model"
+            select="$columnSet/@index + $position - 1"/>
+        <xxforms:variable name="column" model="datatable-model"
+            select="$columnSet/column[@index = $columnIndex]"/>
         <xhtml:th
             class="
             {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
             {if (@fr:resizeable = 'true') then 'yui-dt-resizeable' else ''} 
+            {{if ($column/@currentSortOrder = 'ascending') then 'yui-dt-asc'
+            else if ($column/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
             {@class}
             ">
             <xsl:apply-templates select="@*[name() != 'class']" mode="dynamic"/>
-            <xxforms:variable name="position" select="position()"/>
-            <xxforms:variable name="index" select="{count(../../../preceding-sibling::*) + 1}"/>
-            <xxforms:variable name="columnSet" model="datatable-model"
-                select="instance('datatable-instance')/*[position() = $index]"/>
             <xforms:group ref=".">
                 <xforms:action ev:event="xforms-enabled">
                     <!--<xforms:delete nodeset="$columnSet/column[@position = $position]"/>-->
@@ -1078,7 +1091,7 @@
                         origin="xxforms:element('column', (
                                 xxforms:attribute('position', $position),
                                 xxforms:attribute('nbColumns', 1),
-                                xxforms:attribute('index', $columnSet/@index + $position - 1),
+                                xxforms:attribute('index', $columnIndex),
                                 xxforms:attribute('sortKey', concat( '(',  $columnSet/@nodeset, ')[', $position , ']/', $columnSet/@sortKey)),
                                 xxforms:attribute('currentSortOrder', ''),
                                 xxforms:attribute('nextSortOrder', ''),
@@ -1142,45 +1155,50 @@
     </xsl:template>
 
     <xsl:template match="/*/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td" mode="dynamic">
-        <xsl:variable name="position" select="count(preceding-sibling::xhtml:td) + 1"/>
-        <xxforms:variable name="currentId" model="datatable-model" select="@currentId"/>
-        <xxforms:variable name="currentOrder" model="datatable-model" select="@currentOrder"/>
+        <xxforms:variable name="index" select="{count(preceding-sibling::*) + 1}"/>
+        <xxforms:variable name="columnDesc" model="datatable-model"
+            select="instance('datatable-instance')/*[position() = $index]"/>
+
         <xhtml:td
             class="
             {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
-            {{if ({$position} = $currentId) 
-            then  if($currentOrder = 'descending') then 'yui-dt-desc' else 'yui-dt-asc'
-            else ''}}
+            {{if ($columnDesc/@currentSortOrder = 'ascending') then 'yui-dt-asc'
+            else if ($columnDesc/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
             {@class}            
             ">
-            
+
             <xsl:apply-templates select="@*[name() != 'class']" mode="dynamic"/>
             <xhtml:div class="yui-dt-liner">
                 <xsl:apply-templates select="node()" mode="dynamic"/>
             </xhtml:div>
         </xhtml:td>
     </xsl:template>
-    
-    <xsl:template match="/*/xhtml:tbody/xforms:repeat/xhtml:tr/xforms:repeat/xhtml:td" mode="dynamic">
-        <xsl:variable name="position" select="count(preceding-sibling::xhtml:td) + 1"/>
-        <xxforms:variable name="currentId" model="datatable-model" select="@currentId"/>
-        <xxforms:variable name="currentOrder" model="datatable-model" select="@currentOrder"/>
+
+    <xsl:template match="/*/xhtml:tbody/xforms:repeat/xhtml:tr/xforms:repeat/xhtml:td"
+        mode="dynamic">
+        <xxforms:variable name="position" select="position()"/>
+        <xxforms:variable name="index" select="{count(../preceding-sibling::*) + 1}"/>
+        <xxforms:variable name="columnSet" model="datatable-model"
+            select="instance('datatable-instance')/*[position() = $index]"/>
+        <xxforms:variable name="columnIndex" model="datatable-model"
+            select="$columnSet/@index + $position - 1"/>
+        <xxforms:variable name="column" model="datatable-model"
+            select="$columnSet/column[@index = $columnIndex]"/>
         <xhtml:td
             class="
             {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
-            {{if ({$position} = $currentId) 
-            then  if($currentOrder = 'descending') then 'yui-dt-desc' else 'yui-dt-asc'
-            else ''}}
+            {{if ($column/@currentSortOrder = 'ascending') then 'yui-dt-asc'
+            else if ($column/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
             {@class}            
             ">
-            
+
             <xsl:apply-templates select="@*[name() != 'class']" mode="dynamic"/>
             <xhtml:div class="yui-dt-liner">
                 <xsl:apply-templates select="node()" mode="dynamic"/>
             </xhtml:div>
         </xhtml:td>
     </xsl:template>
-    
+
     <xsl:template match="@fr:*" mode="dynamic"/>
 
     <!-- 

@@ -1681,6 +1681,8 @@ ORBEON.xforms.Controls = {
                 }
             }
             return result;
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-range")) {
+            return ORBEON.xforms.Globals.sliderYui[control.id].previousVal / 200;
         }
     },
 
@@ -1710,15 +1712,19 @@ ORBEON.xforms.Controls = {
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
             // XForms output or "static readonly" mode
             if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-image")) {
-                var image = ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                var image = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                    ? YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0]
+                    : ORBEON.util.Dom.getChildElementByIndex(control, 0);
                 image.src = newControlValue;
-            } else if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
-                control.innerHTML = newControlValue;
             } else {
                 var output = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
                         ? YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0]
                         : control;
-                ORBEON.util.Dom.setStringValue(output, newControlValue);
+                if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+                    output.innerHTML = newControlValue;
+                } else {
+                    ORBEON.util.Dom.setStringValue(output, newControlValue);
+                }
             }
         } else if (ORBEON.xforms.Globals.changedIdsRequest[control.id] != null) {
             // User has modified the value of this control since we sent our request:
@@ -1734,10 +1740,12 @@ ORBEON.xforms.Controls = {
                 control.previousValue = newControlValue;
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-time")) {
+            // Time control
             var inputField = control.getElementsByTagName("input")[0];
             var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
             inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayTime(jsDate);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-date")) {
+            // Date control
             var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
             var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToformatDisplayDate(jsDate);
 			if (ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
@@ -1747,6 +1755,37 @@ ORBEON.xforms.Controls = {
                 var inputField = control.getElementsByTagName("input")[0];
                 inputField.value = displayDate;
 			}
+        } else if ((ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))
+                || ORBEON.util.Dom.hasClass(control, "xforms-secret")) {
+            // Regular XForms input (not boolean, date, time or dateTime) or secret
+            var input = control.tagName.toLowerCase() == "input" ? control : control.getElementsByTagName("input")[0];
+            if (control.value != newControlValue) {
+                control.previousValue = newControlValue;
+                control.valueSetByXForms++;
+                control.value = newControlValue;
+            }
+            if (input.value != newControlValue)
+                input.value = newControlValue;
+
+            // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be the best thing to do.
+            if (attribute1 != null) {
+                if (attribute1 == "")
+                    input.removeAttribute("size");
+                else
+                    input.size = attribute1;
+            }
+            if (attribute2 != null) {
+                if (attribute2 == "")
+                    input.removeAttribute("maxlength");// this, or = null doesn't work w/ IE 6
+                else
+                    input.maxLength = attribute2;// setAttribute() doesn't work with IE 6
+            }
+            if (attribute3 != null) {
+                if (attribute2 == "")
+                    input.removeAttribute("autocomplete");
+                else
+                    input.autocomplete = attribute3;
+            }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
                 || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))) {
@@ -1802,37 +1841,6 @@ ORBEON.xforms.Controls = {
                 var timePartJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timePartString);
                 var inputFieldTime = control.getElementsByTagName("input")[1];
                 inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToformatDisplayTime(timePartJSDate);
-            }
-        } else if ((ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))
-                || ORBEON.util.Dom.hasClass(control, "xforms-secret")) {
-            // Regular XForms input (not boolean, date, time or dateTime) or secret
-            var input = control.tagName.toLowerCase() == "input" ? control : control.getElementsByTagName("input")[0];
-            if (control.value != newControlValue) {
-                control.previousValue = newControlValue;
-                control.valueSetByXForms++;
-                control.value = newControlValue;
-            }
-            if (input.value != newControlValue)
-                input.value = newControlValue;
-
-            // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be the best thing to do.
-            if (attribute1 != null) {
-                if (attribute1 == "")
-                    input.removeAttribute("size");
-                else
-                    input.size = attribute1;
-            }
-            if (attribute2 != null) {
-                if (attribute2 == "")
-                    input.removeAttribute("maxlength");// this, or = null doesn't work w/ IE 6
-                else
-                    input.maxLength = attribute2;// setAttribute() doesn't work with IE 6
-            }
-            if (attribute3 != null) {
-                if (attribute2 == "")
-                    input.removeAttribute("autocomplete");
-                else
-                    input.autocomplete = attribute3;
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ! ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
@@ -2086,6 +2094,13 @@ ORBEON.xforms.Controls = {
                 ORBEON.util.Dom.addClass(alertElement, "xforms-alert-active");
                 if (isVisited) ORBEON.util.Dom.addClass(alertElement, "xforms-alert-active-visited");
             }
+        }
+
+        // If the control is now valid and there is an alert tooltip for this control, destroy it
+        var alertTooltip = ORBEON.xforms.Globals.alertTooltipForControl[control.id];
+        if (newValid && alertTooltip != null) {
+            alertTooltip.destroy();
+            ORBEON.xforms.Globals.alertTooltipForControl[control.id] = null;
         }
     },
 
@@ -3280,6 +3295,8 @@ ORBEON.xforms.Events = {
 
     sliderValueChange: function(offset) {
         // Notify server that value changed
+        console.log("Range", this, offset);
+        console.log(this.previousVal);
         var rangeControl = ORBEON.util.Dom.getElementById(this.id);
         if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY))
             rangeControl = rangeControl.parentNode;
@@ -4315,6 +4332,7 @@ ORBEON.xforms.Init = {
             menuItemsets: {},                    // Maps menu id to structure defining the content of the menu
             menuYui: {},                         // Maps menu id to the YUI object for that menu
             treeYui: {},                         // Maps tree id to the YUI object for that tree
+            sliderYui: {},                       // Maps slider id to the YUI object for that slider
             idToElement: {},                     // Maintain mapping from ID to element, so we don't lookup the sme ID more than once
             isReloading: false,                  // Whether the form is being reloaded from the server
             lastDialogZIndex: 5,                 // zIndex of the last dialog displayed. Gets incremented so the last dialog is always on top of everything else
@@ -4722,6 +4740,7 @@ ORBEON.xforms.Init = {
 
         var slider = YAHOO.widget.Slider.getHorizSlider(backgroundDiv.id, thumbDiv.id, 0, 200);
         slider.subscribe("change", ORBEON.xforms.Events.sliderValueChange);
+        ORBEON.xforms.Globals.sliderYui[range.id] = slider;
     },
 
     _addToTree: function (treeDiv, nameValueArray, treeNode, firstPosition) {

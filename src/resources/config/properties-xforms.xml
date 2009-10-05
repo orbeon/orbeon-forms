@@ -95,10 +95,10 @@
     <!--<property as="xs:boolean" name="oxf.xforms.noscript.select-full-fieldsets"       value="false"/>-->
     <property as="xs:integer" name="oxf.xforms.offline-repeat-count"                    value="4"/>
     <property as="xs:integer" name="oxf.xforms.request-retries"                             value="1"/>
-    <property as="xs:string"  name="oxf.xforms.datepicker"                                  value="yui"/>  <!-- jscalendar or yui -->
+    <property as="xs:string"  name="oxf.xforms.datepicker"                                  value="yui"/>       <!-- jscalendar | yui -->
     <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                        value="true"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.two-months"                       value="false"/>
-    <property as="xs:string"  name="oxf.xforms.htmleditor"                                  value="yui"/>  <!-- fck or yui -->
+    <property as="xs:string"  name="oxf.xforms.htmleditor"                                  value="yui"/>       <!-- fck | yui -->
     <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                           value="true"/>
 
     <property as="xs:integer" name="oxf.xforms.internal-short-delay"                        value="100"/>
@@ -109,9 +109,9 @@
     <property as="xs:boolean" name="oxf.xforms.server.events.plain-value-change"            value="false"/>
     <property as="xs:boolean" name="oxf.xforms.server.events.initial-refresh-events"        value="true"/>
 
-    <property as="xs:string"  name="oxf.xforms.client.events.mode"                          value="default"/>  <!-- default or deferred -->
+    <property as="xs:string"  name="oxf.xforms.client.events.mode"                          value="default"/>   <!-- default | deferred -->
     <property as="xs:string"  name="oxf.xforms.client.events.filter"                        value=""/>
-    <property as="xs:boolean" name="oxf.xforms.new-xhtml-layout"                            value="false"/>
+    <property as="xs:string"  name="oxf.xforms.xhtml-layout"                                value="nospan"/>    <!-- nospan | span -->
 
     <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                              value=""/>

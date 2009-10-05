@@ -68,6 +68,7 @@ var CLIENT_EVENTS_FILTER_PROPERTY = "client.events.filter";
 var RESOURCES_VERSIONED = "oxf.resources.versioned";
 var APPLICATION_RESOURCES_VERSION_PROPERTY = "oxf.resources.version-number";
 var NEW_XHTML_LAYOUT_PROPERTY = "new-xhtml-layout";
+var XHTML_LAYOUT_PROPERTY = "xhtml-layout";
 
 // Parameter defaults
 // NOTE: Default values below MUST match the ones in XFormsProperties
@@ -97,6 +98,7 @@ var XFORMS_DATEPICKER_TWO_MONTHS = false;
 var XFORMS_HTMLEDITOR = "yui";
 var XFORMS_CLIENT_EVENTS_MODE = "default";
 var XFORMS_CLIENT_EVENTS_FILTER = "";
+var XHTML_LAYOUT_NOSPAN = "nospan";
 
 /**
  * Constants
@@ -1024,15 +1026,21 @@ ORBEON.util.Utils = {
             case CLIENT_EVENTS_FILTER_PROPERTY: { return XFORMS_CLIENT_EVENTS_FILTER; }
             case RESOURCES_VERSIONED: { return "false"; }
             case NEW_XHTML_LAYOUT_PROPERTY: { return false; }
+            case XHTML_LAYOUT_PROPERTY: { return XHTML_LAYOUT_NOSPAN; }
         }
     	// Neither the property's value was supplied, nor a default value exists for the property
         return null;
     },
 
+    isNewXHTMLLayout: function() {
+        return ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+            || ORBEON.util.Utils.getProperty(XHTML_LAYOUT_PROPERTY) != XHTML_LAYOUT_NOSPAN;
+    },
+
     hideModalProgressPanel: function() {
         if (ORBEON.xforms.Globals.modalProgressPanel) {
             ORBEON.xforms.Globals.modalProgressPanel.hide();
-            // We set it to null when hidding so we have an easy way of knowing of the panel is visible or not.
+            // We set it to null when hiding so we have an easy way of knowing of the panel is visible or not.
             // See: http://www.nabble.com/Is-Panel-visible--td22139417.html
             ORBEON.xforms.Globals.modalProgressPanel = null;
         }
@@ -1621,7 +1629,7 @@ ORBEON.xforms.Controls = {
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-compact")) {
             // Drop-down and list
-            var options = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+            var options = ORBEON.util.Utils.isNewXHTMLLayout()
                           ? YAHOO.util.Dom.getElementsByClassName("", "select", control)[0].options
                           : control.options;
             var selectValue = "";
@@ -1655,7 +1663,7 @@ ORBEON.xforms.Controls = {
             } else if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
                 return control.innerHTML;
             } else {
-                var spanWithValue = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                var spanWithValue = ORBEON.util.Utils.isNewXHTMLLayout()
                     ? control.getElementsByTagName("span")[0]
                     : control;
                 return ORBEON.util.Dom.getStringValue(spanWithValue);
@@ -1715,7 +1723,7 @@ ORBEON.xforms.Controls = {
             } else if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
                 control.innerHTML = newControlValue;
             } else {
-                var output = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                var output = ORBEON.util.Utils.isNewXHTMLLayout()
                         ? YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0]
                         : control;
                 ORBEON.util.Dom.setStringValue(output, newControlValue);
@@ -1801,7 +1809,7 @@ ORBEON.xforms.Controls = {
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
             // Handle lists and comboboxes
             var selectedValues = ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")  ? newControlValue.split(" ") : new Array(newControlValue);
-            var select = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) ? control.getElementsByTagName("select")[0] : control;
+            var select = ORBEON.util.Utils.isNewXHTMLLayout() ? control.getElementsByTagName("select")[0] : control;
             var options = select.options;
             if (options != null) {
                 for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
@@ -1954,7 +1962,7 @@ ORBEON.xforms.Controls = {
         };
 
         // For new layout, try to look for label under the control element
-        if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {
+        if (ORBEON.util.Utils.isNewXHTMLLayout()) {
             var labels = YAHOO.util.Dom.getElementsByClassName("xforms-" + className, null, control);
             if (labels.length > 0) return labels[0];
         }
@@ -2017,7 +2025,7 @@ ORBEON.xforms.Controls = {
     setLabelMessage: function(control, message) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")
                 || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
-            var linkButtonElement = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+            var linkButtonElement = ORBEON.util.Utils.isNewXHTMLLayout()
                 ? YAHOO.util.Dom.getFirstChild(control) : control;
             if (linkButtonElement.tagName.toLowerCase() == "input") {
                 // Image
@@ -2559,7 +2567,7 @@ ORBEON.xforms.Controls = {
 
         // Show and reposition dialog when needed
         if (showAndRepositionPanel) {
-            var controlContainer = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) ? control : control.parentNode;
+            var controlContainer = ORBEON.util.Utils.isNewXHTMLLayout() ? control : control.parentNode;
             var helpImage = ORBEON.util.Dom.getChildElementByClass(controlContainer, "xforms-help-image");
             ORBEON.xforms.Globals.formHelpPanel[form.id].element.style.display = "block";
             ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("context", [helpImage, "bl", "tl"]);
@@ -2833,7 +2841,7 @@ ORBEON.xforms.Events = {
 
                 if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-compact")) {
                     // For select1 list, make sure we have exactly one value selected
-                    var select = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                    var select = ORBEON.util.Utils.isNewXHTMLLayout()
                                   ? YAHOO.util.Dom.getElementsByClassName("", "select", target)[0]
                                   : target;
                     if (select.value == "") {
@@ -3283,7 +3291,7 @@ ORBEON.xforms.Events = {
     sliderValueChange: function(offset) {
         // Notify server that value changed
         var rangeControl = ORBEON.util.Dom.getElementById(this.id);
-        if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY))
+        if (ORBEON.util.Utils.isNewXHTMLLayout())
             rangeControl = rangeControl.parentNode;
 
         var value = offset / 200;
@@ -4059,7 +4067,7 @@ ORBEON.widgets.RTE = function() {
                 };
 
             // Create RTE object
-            var textarea = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+            var textarea = ORBEON.util.Utils.isNewXHTMLLayout()
                 ? control.getElementsByTagName("textarea")[0] : control;
             var yuiRTE = new YAHOO.widget.Editor(textarea, rteConfig);
 
@@ -4080,7 +4088,7 @@ ORBEON.widgets.RTE = function() {
             isIncremental[control.id] = ORBEON.util.Dom.hasClass(control, "xforms-incremental");
             // Transform text area into RTE on the page
             yuiRTE.on("editorContentLoaded", function() {
-                if (!ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {
+                if (!ORBEON.util.Utils.isNewXHTMLLayout()) {
                     var rteContainer = control.parentNode;
                     rteContainer.className += " " + control.className;
                 }
@@ -4713,7 +4721,7 @@ ORBEON.xforms.Init = {
 
         // In both cases the background <div> element must already have an id
         var backgroundDiv;
-        if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {
+        if (ORBEON.util.Utils.isNewXHTMLLayout()) {
             backgroundDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-background", "div", range)[0];
         } else {
             backgroundDiv = range;
@@ -4917,7 +4925,7 @@ ORBEON.xforms.Init = {
      */
     _list: function(list) {
         var value = "";
-        if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY))
+        if (ORBEON.util.Utils.isNewXHTMLLayout())
             list = YAHOO.util.Dom.getElementsByClassName("", "select", list)[0];
         for (var i = 0; i < list.options.length; i++) {
             var option = list.options[i];
@@ -5858,7 +5866,7 @@ ORBEON.xforms.Server = {
                                                 || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-minimal")) {
 
                                             // Case of list / combobox
-                                            var select = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                                            var select = ORBEON.util.Utils.isNewXHTMLLayout()
                                                 ? documentElement.getElementsByTagName("select")[0]
                                                 : documentElement;
                                             var options = select.options;
@@ -5936,7 +5944,7 @@ ORBEON.xforms.Server = {
                                             template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
 
                                             // Get the span that contains the one span per checkbox/radio
-                                            var spanContainer = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) 
+                                            var spanContainer = ORBEON.util.Utils.isNewXHTMLLayout()
                                                 ? documentElement.getElementsByTagName("span")[0]
                                                 : documentElement;
 
@@ -6112,7 +6120,7 @@ ORBEON.xforms.Server = {
                                                 }
 
                                                 function insertIntoDocument(nodes) {
-                                                    if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {
+                                                    if (ORBEON.util.Utils.isNewXHTMLLayout()) {
                                                         // New markup: insert after "last label" (we remembered the position of the label after which there is real content)
                                                         if (childElements.length == 0) {
                                                             for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)

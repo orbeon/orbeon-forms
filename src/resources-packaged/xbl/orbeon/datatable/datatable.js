@@ -405,13 +405,14 @@ ORBEON.widgets.datatable.prototype.getAndSetColumns = function () {
             this.bodyColumns.push([]);
         }
     }
-    var bodyRows = this.tbody.rows;
+    var bodyRows = YAHOO.util.Dom.getChildren(this.tbody);  //    bodyRows.length blows up IE 6/7 in some cases here :(
     for (var irow = 0; irow < bodyRows.length; irow++) {
         var row = bodyRows[irow];
         if (ORBEON.widgets.datatable.isSignificant(row)) {
             var iActualCol = 0;
-            for (var icol = 0; icol < row.cells.length; icol++) {
-                var cell = row.cells[icol];
+            var cells = YAHOO.util.Dom.getChildren(row);
+            for (var icol = 0; icol < cells.length ; icol++) {
+                var cell = cells[icol];
                 if (ORBEON.widgets.datatable.isSignificant(cell)) {
                     this.bodyColumns[iActualCol].push(cell);
                     iActualCol += 1;
@@ -430,7 +431,11 @@ ORBEON.widgets.datatable.prototype.update = function () {
     if (this.totalNbRows == undefined) {
         this.totalNbRows = -1;
     }
-    var totalNbRows = this.tbody.rows.length;
+    var totalNbRows =  YAHOO.util.Dom.getChildren(this.tbody).length; // this.tbody.rows.length blows up IE 6/7 in some cases here!
+    if (totalNbRows != this.totalNbRows) {
+        // If the number of rows has changed, we need to reset our cell arrays
+        this.getAndSetColumns();
+    }
     if (totalNbRows > this.totalNbRows) {
         // If we have new rows, we need to (re)write their cells width
         for (var icol = 0; icol < this.headerColumns.length; icol++) {

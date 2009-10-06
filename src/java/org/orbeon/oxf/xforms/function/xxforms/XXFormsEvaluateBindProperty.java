@@ -23,7 +23,7 @@ import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 
-public class XXFormsEvaluateMIP extends XFormsFunction {
+public class XXFormsEvaluateBindProperty extends XFormsFunction {
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
         // Get bind id

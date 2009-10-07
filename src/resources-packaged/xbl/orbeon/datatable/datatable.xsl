@@ -376,7 +376,7 @@
                                 </xsl:choose>
                                 <xforms:group ref=".[. = $page and $display = 'page']">
                                     <xforms:output class="yui-pg-page" value="$page">
-                                       <!-- <xforms:hint>Current page (edit to move to another
+                                        <!-- <xforms:hint>Current page (edit to move to another
                                             page)</xforms:hint>-->
                                     </xforms:output>
                                 </xforms:group>
@@ -494,8 +494,8 @@
                 </xforms:dispatch>
             </xsl:when>
             <xsl:otherwise>
-                <xforms:setvalue ev:event="DOMActivate" model="datatable-model" ref="instance('page')"
-                    value="{$fr-new-page}"/>
+                <xforms:setvalue ev:event="DOMActivate" model="datatable-model"
+                    ref="instance('page')" value="{$fr-new-page}"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -627,7 +627,8 @@
 
     <xsl:template match="xforms:repeat" mode="YUI">
         <xxforms:variable name="sort" model="datatable-model" select="."/>
-        <xxforms:variable name="key" model="datatable-model" select="key[position() = $sort/@currentId]"/>
+        <xxforms:variable name="key" model="datatable-model"
+            select="key[position() = $sort/@currentId]"/>
         <xxforms:variable name="nodeset">
             <xsl:attribute name="select">
                 <xsl:choose>
@@ -787,9 +788,14 @@
                     </xhtml:tr>
                 </xhtml:thead>
             </xsl:if>
-            <xsl:copy-of select="xhtml:tbody"/>
+            <xsl:apply-templates select="xhtml:tbody" mode="pass4"/>
         </xsl:copy>
     </xsl:template>
+
+    <xsl:template
+        match="/fr:datatable/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td/xforms:output[xforms:label][1]/xforms:label
+        |/fr:datatable/xhtml:tbody/xforms:repeat/xhtml:tr/xforms:repeat/xhtml:td/xforms:output[xforms:label][1]/xforms:label"
+        mode="pass4"/>
 
     <!-- 
         
@@ -942,8 +948,9 @@
                         else max((1, $nbPages - $maxNbPagesToDisplay + 1))
                         else 1) cast as xs:integer"/>
                     <xxforms:variable name="pages"
-                        select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"/>
-                 </xsl:when>
+                        select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"
+                    />
+                </xsl:when>
             </xsl:choose>
 
             <xsl:variable name="pagination">
@@ -1006,7 +1013,7 @@
                                 </xsl:choose>
                                 <xforms:group ref=".[. = $page and $display = 'page']">
                                     <xforms:output class="yui-pg-page" value="$page">
-                                       <!-- <xforms:hint>Current page (edit to move to another
+                                        <!-- <xforms:hint>Current page (edit to move to another
                                             page)</xforms:hint>-->
                                     </xforms:output>
                                 </xforms:group>
@@ -1108,8 +1115,8 @@
             </xsl:if>
 
             <xsl:copy-of select="$pagination"/>
-            
-            
+
+
             <xforms:group>
                 <xsl:attribute name="ref">
                     <xsl:text>xxforms:component-context()</xsl:text>
@@ -1164,8 +1171,8 @@
             </xsl:if>
 
             <xsl:copy-of select="$pagination"/>
-            
-            
+
+
         </xhtml:div>
         <!-- End of template on the bound element -->
     </xsl:template>

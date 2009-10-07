@@ -303,8 +303,10 @@ ORBEON.widgets.datatable.unittests_lib = {
             if (this.isSignificant(cell)) {
                 iActual += 1;
                 var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
-                var className = classPrefix + iActual;
-                YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(liner, className), 'Cell column ' + iActual + ' should have a class ' + className + '. Its current class attribute is: ' + liner.className);
+                if (liner != undefined) {
+                    var className = classPrefix + iActual;
+                    YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(liner, className), 'Cell column ' + iActual + ' should have a class ' + className + '. Its current class attribute is: ' + liner.className);
+                }
             }
         }
     },
@@ -352,8 +354,10 @@ ORBEON.widgets.datatable.unittests_lib = {
                     var cell = row.cells[j];
                     if (this.isSignificant(cell)) {
                         var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
-                        YAHOO.util.Assert.areEqual(colWidths[jActual], liner.style.width, 'Body cell for row ' + iActual + ' and column ' + (jActual + 1) + ' should have a style width property equal to ' + colWidths[jActual]);
-                        jActual += 1;
+                        if (liner != undefined) {
+                            YAHOO.util.Assert.areEqual(colWidths[jActual], liner.style.width, 'Body cell for row ' + iActual + ' and column ' + (jActual + 1) + ' should have a style width property equal to ' + colWidths[jActual]);
+                            jActual += 1;
+                        }
                     }
                 }
             }

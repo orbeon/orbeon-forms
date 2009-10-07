@@ -17,6 +17,22 @@ var testCase = {
 
     name: "datatable",
 
+    test314359: function() {
+        var thiss = this;
+        thiss.openAccordionCase(thiss, '_314359', function() {
+            // Check the table structure
+            var table = YAHOO.util.Dom.get('my-accordion$table-314359$table-314359-table');
+            thiss.checkIsSplit(table, true);
+            thiss.checkTableStructure(table, 2, true);
+            thiss.checkCellClasses(table, true);
+            thiss.checkCellStyles(table, true);
+
+            thiss.closeAccordionCase(thiss, '_314359');
+
+        });
+
+    },
+
     test314217: function() {
         var thiss = this;
         thiss.openAccordionCase(thiss, '_314217', function() {

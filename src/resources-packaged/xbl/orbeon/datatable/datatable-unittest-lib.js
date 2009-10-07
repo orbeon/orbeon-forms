@@ -234,6 +234,18 @@ ORBEON.widgets.datatable.unittests_lib = {
         YAHOO.util.Assert.areEqual(nbRows, nbRowsActual, nbRowsActual + ' rows found on the instead of ' + nbRows);
     },
 
+    trim: function(string) {
+        return string.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+    },
+
+    textContent: function(element) {
+        if (element.innerText != undefined) {
+            return element.innerText;
+        } else {
+            return element.textContent;
+        }
+    },
+
     checkColumnValues: function(table, colId, isSplit, values) {
         var bodyTable = this.getBodyTable(table, isSplit);
         var rows = bodyTable.tBodies[0].rows;
@@ -242,13 +254,7 @@ ORBEON.widgets.datatable.unittests_lib = {
             var row = rows[i];
             if (this.isSignificant(row)) {
                 var cell = this.getSignificantElementByIndex(row.cells, colId);
-                var value;
-                if (cell.innerText != undefined) {
-                    value = cell.innerText;
-                } else {
-                    value = cell.textContent;
-                }
-                value = value.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+                var value = this.trim(this.textContent(cell));
                 YAHOO.util.Assert.areEqual(values[iActual], value, value + ' found in row ' + iActual + ' instead of ' + values[iActual]);
                 iActual += 1;
             }
@@ -264,7 +270,7 @@ ORBEON.widgets.datatable.unittests_lib = {
             var li = lis[i];
             var label = li.getElementsByTagName('label')[0];
             if (label != undefined) {
-                var labelValue = label.innerHTML.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+                var labelValue = this.trim(this.textContent(label));
                 if (labelValue == attribute + ':') {
                     var span = li.getElementsByTagName('span')[0];
                     YAHOO.util.Assert.areEqual(value, span.innerHTML, 'Attribute ' + attribute + ' has value ' + span.innerHTML + ' instead of ' + value);
@@ -373,6 +379,42 @@ ORBEON.widgets.datatable.unittests_lib = {
         return null;
     },
 
+    getPaginationLinks: function(paginator) {
+        var links = [];
+        var children = YAHOO.util.Dom.getChildren(paginator);
+        for (var i = 0; i < children.length; i++) {
+            var element = children[i];
+            if (this.isSignificant(element)
+                    && !YAHOO.util.Dom.hasClass(element, 'xforms-disabled-subsequent')
+                    && !YAHOO.util.Dom.hasClass(element, 'xforms-disabled')) {
+                if (YAHOO.util.Dom.hasClass(element, 'xforms-group')
+                        || YAHOO.util.Dom.hasClass(element, 'yui-pg-pages')) {
+                    links = links.concat(this.getPaginationLinks(element));
+                } else {
+                    links.push(element);
+                }
+            }
+        }
+        return links;
+    },
+
+    checkPaginationLinks: function(container, links) {
+        var paginator = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(container, 'div', 'yui-dt-paginator');
+        var actualLinks = this.getPaginationLinks(paginator);
+        YAHOO.util.Assert.areEqual(links.length, actualLinks.length, "Found " + actualLinks.length + ' instead of ' + links.length);
+        for (var i = 0; i < links.length; i++) {
+            var link = links[i];
+            var actualLink = this.trim(this.textContent(actualLinks[i]));
+            if (actualLinks[i].nodeName == 'A' || ORBEON.widgets.datatable.utils.getFirstChildByTagName(actualLinks[i], 'a') != undefined) {
+                actualLink = '+' + actualLink;
+            } else {
+                actualLink = '-' + actualLink;
+            }
+            YAHOO.util.Assert.areEqual(link, actualLink, "Found " + actualLink + ' instead of ' + link);
+        }
+
+    },
+
     clickAndCheckSortOrder: function(table, columnIndex, expectedOrder, callback) {
         //TODO: support scrollable tables
         var className;
@@ -383,15 +425,16 @@ ORBEON.widgets.datatable.unittests_lib = {
         }
         var headerCell = this.getSignificantElementByIndex(table.tHead.rows[0].cells, columnIndex);
         var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
-        YAHOO.util.UserAction.click(liner, {clientX: 1});
-        this.wait(function() {
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            YAHOO.util.UserAction.click(liner, {clientX: 1});
+        }, function() {
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(headerCell, className), 'Column ' + columnIndex + ' header cell should now have a class ' + className);
             var firstRow = this.getSignificantElementByIndex(table.tBodies[0].rows, 1);
             var bodyCell = this.getSignificantElementByIndex(firstRow.cells, columnIndex);
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(bodyCell, className), 'Column ' + columnIndex + ' body cellls should now have a class ' + className);
             //TODO: test that the table is actually sorted
             callback();
-        }, 1000);
+        });
     },
 
     EOS: null

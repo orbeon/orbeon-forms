@@ -329,23 +329,27 @@ var testCase = {
             thiss.checkNumberRows(table, 6, false);
             thiss.checkCellClasses(table, false);
             thiss.checkCellStyles(table, false);
-            ORBEON.xforms.Document.setValue("maxLength", "15");
-            thiss.wait(function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                ORBEON.xforms.Document.setValue("maxLength", "15");
+            }, function() {
+                // Test after reducing the number of rows
                 thiss.checkNumberRows(table, 2, false);
                 thiss.checkCellClasses(table, false);
                 thiss.checkCellStyles(table, false);
 
-                ORBEON.xforms.Document.setValue("maxLength", "40");
-                thiss.wait(function() {
+                ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                    ORBEON.xforms.Document.setValue("maxLength", "40");
+                }, function() {
+                    // Test after increasing the numebr of rows
                     thiss.checkNumberRows(table, 16, false);
                     thiss.checkCellClasses(table, false);
                     thiss.checkCellStyles(table, false);
 
                     thiss.closeAccordionCase(thiss, 'update');
 
-                }, 1000);
+                });
 
-            }, 1000);
+            });
         });
     },
 
@@ -357,18 +361,55 @@ var testCase = {
             thiss.checkColumnValues(table, 2, false, [0, 1, 2, 3, 4]);
 
             var linkNext = YAHOO.util.Dom.get('my-accordion$paginate-table$xf-42');
-            YAHOO.util.UserAction.click(linkNext, {clientX: 1});
-            thiss.wait(function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                YAHOO.util.UserAction.click(linkNext, {clientX: 1});
+            }, function() {
+                // Test the status after clicking on "next"
                 thiss.checkColumnValues(table, 2, false, [5, 6, 7, 8, 9]);
 
                 var linkLast = YAHOO.util.Dom.get('my-accordion$paginate-table$xf-47');
-                YAHOO.util.UserAction.click(linkLast, {clientX: 1});
-                thiss.wait(function() {
+                ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                    YAHOO.util.UserAction.click(linkLast, {clientX: 1});
+                }, function() {
+                    // Test the status after clicking on "last"
                     thiss.checkColumnValues(table, 2, false, [35, 36, 37]);
 
                     thiss.closeAccordionCase(thiss, 'paginate');
-                }, 1000);
-            }, 1000);
+                });
+            });
+
+
+        });
+    },
+
+    testPaginateMaxPage: function() {
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'paginateMaxPage', function() {
+            // Check the table structure
+            var table = YAHOO.util.Dom.get('my-accordion$paginateMaxPage-table$paginateMaxPage-table-table');
+            thiss.checkColumnValues(table, 2, false, [0, 1, 2, 3]);
+            var container = YAHOO.util.Dom.get('my-accordion$paginateMaxPage-table$paginateMaxPage-table-container');
+            thiss.checkPaginationLinks(container, ['-<< first', '-< prev', '-1', '+2', '+3', '+4', '+5', '-...', '+10', '+next >', '+last >>']);
+
+            var linkNext = YAHOO.util.Dom.get('my-accordion$paginateMaxPage-table$xf-45');
+            ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                YAHOO.util.UserAction.click(linkNext, {clientX: 1});
+            }, function() {
+                // Test the status after clicking on "next"
+                thiss.checkColumnValues(table, 2, false, [4, 5, 6, 7]);
+                thiss.checkPaginationLinks(container, ['+<< first', '+< prev', '+1', '-2', '+3', '+4', '+5', '-...', '+10', '+next >', '+last >>']);
+
+                var linkLast = YAHOO.util.Dom.get('my-accordion$paginateMaxPage-table$xf-50');
+                ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                    YAHOO.util.UserAction.click(linkLast, {clientX: 1});
+                }, function() {
+                    // Test the status after clicking on "last"
+                    thiss.checkColumnValues(table, 2, false, [36, 37]);
+                    thiss.checkPaginationLinks(container, ['+<< first', '+< prev', '+1', '-...', '+6', '+7', '+8', '+9', '-10', '-next >', '-last >>']);
+
+                    thiss.closeAccordionCase(thiss, 'paginateMaxPage');
+                });
+            });
 
 
         });

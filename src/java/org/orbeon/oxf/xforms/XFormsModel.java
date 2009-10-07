@@ -741,7 +741,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         try {
             if (cacheHint && ProcessorImpl.getProcessorInputSchemeInputName(resourceAbsolutePathOrAbsoluteURL) == null) {
-                // Instance 1) has cache hing and 2) is not input:*, so it can be cached
+                // Instance 1) has cache hint and 2) is not input:*, so it can be cached
                 // NOTE: We don't allow sharing for input:* URLs because this is very likely NOT to make sense
 
                 // TODO: This doesn't handle optimized submissions!

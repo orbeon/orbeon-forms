@@ -26,7 +26,6 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.saxrewrite.RootFilter;
 import org.orbeon.oxf.xml.saxrewrite.State;
 import org.orbeon.oxf.xml.saxrewrite.StatefullHandler;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -113,6 +112,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         /**
          * @param previousState     The previous state.
          * @param contentHandler    The destination for the rewrite transformation.
+         * @param request
          * @param response          Used to perform URL rewrites.
          * @param isPortlet         Whether or not the context is a portlet context.
          * @param scriptDepth       How below script elt we are.
@@ -169,14 +169,11 @@ abstract class AbstractRewrite extends ProcessorImpl {
     static class RewriteState extends State2 {
 
         /**
-         * Used to accumulate characters from characters event.  Lazily init'd in characters.
-         * Btw we use CharacterBuffer instead of StringBuffer because :
-         * <ul>
-         * <li>We want something that works in JDK 1.4.</li>
-         * <li>
-         * We don't want the performance penalty of StringBuffer's synchronization in JDK 1.5.
-         * <li>
-         * </ul>
+         * Used to accumulate characters from characters event. Lazily init'd in characters. Btw we use
+         * CharacterBuffer instead of StringBuffer because :
+         *
+         * o We want something that works in JDK 1.4.
+         * o We don't want the performance penalty of StringBuffer's synchronization in JDK 1.5.
          *
          * Btw if we didn't care about 1.4 we could use StringBuilder instead.
          */
@@ -277,16 +274,16 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     }
                     if (archiveAttribute != null) {
                         final StringTokenizer st = new StringTokenizer(archiveAttribute, " ");
-                        final FastStringBuffer sb = new FastStringBuffer(archiveAttribute.length() * 2);
+                        final StringBuilder sb = new StringBuilder(archiveAttribute.length() * 2);
                         boolean first = true;
                         while (st.hasMoreTokens()) {
                             final String currentArchive = st.nextToken().trim();
                             final String newArchive = response.rewriteResourceURL(currentArchive, false);
                             if (!first) {
                                 sb.append(' ');
-                                first = false;
                             }
                             sb.append(newArchive);
+                            first = false;
                         }
                         final int idx = newAtts.getIndex("", "archive");
                         newAtts.setValue(idx, sb.toString());
@@ -323,22 +320,20 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     newAtts.setValue(idx, newAttribute);
                 } else {
                     // We don't rewrite the @archive attribute if there is a codebase
-                    if (archiveAttribute != null) {
-                        final StringTokenizer st = new StringTokenizer(archiveAttribute, ",");
-                        final FastStringBuffer sb = new FastStringBuffer(archiveAttribute.length() * 2);
-                        boolean first = true;
-                        while (st.hasMoreTokens()) {
-                            final String currentArchive = st.nextToken().trim();
-                            final String newArchive = response.rewriteResourceURL(currentArchive, false);
-                            if (!first) {
-                                sb.append(' ');
-                                first = false;
-                            }
-                            sb.append(newArchive);
+                    final StringTokenizer st = new StringTokenizer(archiveAttribute, ",");
+                    final StringBuilder sb = new StringBuilder(archiveAttribute.length() * 2);
+                    boolean first = true;
+                    while (st.hasMoreTokens()) {
+                        final String currentArchive = st.nextToken().trim();
+                        final String newArchive = response.rewriteResourceURL(currentArchive, false);
+                        if (!first) {
+                            sb.append(' ');
                         }
-                        final int idx = newAtts.getIndex("", "archive");
-                        newAtts.setValue(idx, sb.toString());
+                        sb.append(newArchive);
+                        first = false;
                     }
+                    final int idx = newAtts.getIndex("", "archive");
+                    newAtts.setValue(idx, sb.toString());
                 }
 
                 contentHandler.startElement(ns, lnam, qnam, newAtts);
@@ -488,7 +483,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
 
         /**
-         * Handler for {http://www.w3.org/1999/xhtml}input.  Assumes namespace test has already
+         * Handler for {http://www.w3.org/1999/xhtml}form.  Assumes namespace test has already
          * happened.  Implements :
          * <pre>
          *   <xsl:template match="form | xhtml:form">

@@ -49,17 +49,19 @@ ORBEON.widgets.datatable.unittests_lib = {
             }
         }
 
-        // Check if the action has been done and call back
-        if (this.isOpenAccordionCase(targetId)) {
-            if (callback) {
-                callback.call();
+        this.wait(function () {
+            // Check if the action has been done and call back
+            if (this.isOpenAccordionCase(targetId)) {
+                if (callback) {
+                    callback.call();
+                }
+            } else {
+                var thiss = this;
+                testCase.wait(function() {
+                    thiss.openAccordionCase(testCase, targetId, callback);
+                }, 10);
             }
-        } else {
-            var thiss = this;
-            testCase.wait(function() {
-                thiss.openAccordionCase(testCase, targetId, callback);
-            }, 10);
-        }
+        }, 100);
     },
 
     closeAccordionCase: function (testCase, targetId, callback) {
@@ -84,16 +86,18 @@ ORBEON.widgets.datatable.unittests_lib = {
         }
 
         // Check if the action has been done and call back
-        if (!this.isOpenAccordionCase(targetId)) {
-            if (callback) {
-                callback.call();
+        this.wait(function () {
+            if (!this.isOpenAccordionCase(targetId)) {
+                if (callback) {
+                    callback.call();
+                }
+            } else {
+                var thiss = this;
+                testCase.wait(function() {
+                    thiss.closeAccordionCase(testCase, targetId, callback);
+                }, 10);
             }
-        } else {
-            var thiss = this;
-            testCase.wait(function() {
-                thiss.closeAccordionCase(testCase, targetId, callback);
-            }, 10);
-        }
+        }, 50);
     },
 
     checkCellWidth: function(cell) {
@@ -250,7 +254,7 @@ ORBEON.widgets.datatable.unittests_lib = {
                 && !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-template');
     },
 
-    checkCellStylesInARow: function(row, classPrefix) {
+    checkCellClassesInARow: function(row, classPrefix) {
         var iActual = 0;
         for (var i = 0; i < row.cells.length; i++)
         {
@@ -264,18 +268,53 @@ ORBEON.widgets.datatable.unittests_lib = {
         }
     },
 
-    checkCellStyles: function(table, isSplit) {
+    checkCellClasses: function(table, isSplit) {
         if (YAHOO.env.ua.ie != 0) {
             return;
         }
         var classPrefix = 'dt-' + table.id.replace('\$', '-', 'g') + '-col-';
-        this.checkCellStylesInARow(table.tHead.rows[0], classPrefix);
-        var bodyTable = this.getBodyTable(table,  isSplit);
+        this.checkCellClassesInARow(table.tHead.rows[0], classPrefix);
+        var bodyTable = this.getBodyTable(table, isSplit);
         var rows = bodyTable.tBodies[0].rows;
-        for (var i = 0; i< rows.length; i++) {
+        for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
             if (this.isSignificant(row)) {
-                this.checkCellStylesInARow(row, classPrefix);    
+                this.checkCellClassesInARow(row, classPrefix);
+            }
+        }
+    },
+
+    checkCellStyles: function(table, isSplit) {
+        if (YAHOO.env.ua.ie == 0) {
+            return;
+        }
+        var colWidths = [];
+        var headerCells = table.tHead.rows[0].cells;
+        for (var i = 0; i < headerCells.length; i++) {
+            var cell = headerCells[i];
+            if (this.isSignificant(cell)) {
+                var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
+                colWidths.push(liner.style.width);
+                YAHOO.util.Assert.areNotEqual('', liner.style.width, 'Header cell for column ' + colWidths.length + ' should have a style width property in IE');
+                YAHOO.util.Assert.areNotEqual('auto', liner.style.width, 'Header cell for column ' + colWidths.length + ' should have a style width property in IE');
+            }
+        }
+        var bodyTable = this.getBodyTable(table, isSplit);
+        var rows = bodyTable.tBodies[0].rows;
+        var iActual = 0;
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            if (this.isSignificant(row)) {
+                iActual += 1;
+                var jActual = 0;
+                for (var j = 0; j < row.cells.length; j++) {
+                    var cell = row.cells[j];
+                    if (this.isSignificant(cell)) {
+                        var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
+                        YAHOO.util.Assert.areEqual(colWidths[jActual], liner.style.width, 'Body cell for row ' + iActual + ' and column ' + (jActual + 1) + ' should have a style width property equal to ' + colWidths[jActual]);
+                        jActual += 1;
+                    }
+                }
             }
         }
     },

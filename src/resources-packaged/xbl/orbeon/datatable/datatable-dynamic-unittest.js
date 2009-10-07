@@ -17,8 +17,6 @@ var testCase = {
 
     name: "datatable: dynamic columns features",
 
-    lib: new YAHOO.tool.TestCase(ORBEON.widgets.datatable.unittests_lib),
-
     testHelloWorld: function() {
         var thiss = this;
         thiss.openAccordionCase(thiss, 'hello_world', function() {
@@ -312,6 +310,7 @@ var testCase = {
              var table = YAHOO.util.Dom.get('my-accordion$scrollH-table$scrollH-table-table');
              thiss.checkIsSplit(table, true);
              thiss.checkTableStructure(table, 6, true);
+             thiss.checkCellClasses(table, true);
              thiss.checkCellStyles(table, true);
 
              thiss.closeAccordionCase(thiss, 'scrollH');

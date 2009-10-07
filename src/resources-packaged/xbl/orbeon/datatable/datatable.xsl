@@ -881,8 +881,11 @@
                     calculate="if (../@index = /*/@currentSortColumn) then . else 'none'"/>
                 <xforms:bind nodeset="//column/@nextSortOrder"
                     calculate="if (../@index = /*/@currentSortColumn) then if (../@currentSortOrder = 'ascending') then 'descending' else 'ascending' else 'ascending'"/>
+                <xxforms:variable name="repeatNodeset">
+                    <xsl:value-of select="/*/xhtml:tbody/xforms:repeat/@nodeset"/>
+                </xxforms:variable>
                 <xforms:bind nodeset="//column/@pathToFirstNode"
-                    calculate="concat('xxforms:component-context()/({/*/xhtml:tbody/xforms:repeat/@nodeset})[1]/(', ../@sortKey, ')')"/>
+                    calculate="concat('xxforms:component-context()/(', $repeatNodeset, ')[1]/(', ../@sortKey, ')')"/>
                 <xforms:bind nodeset="//column[@fr:sortType]/@type" calculate="../@fr:sortType"/>
                 <xforms:bind nodeset="//column[not(@fr:sortType)]/@type"
                     calculate="for $value in xxforms:evaluate(../@pathToFirstNode)

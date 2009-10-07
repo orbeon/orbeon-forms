@@ -234,6 +234,28 @@ ORBEON.widgets.datatable.unittests_lib = {
         YAHOO.util.Assert.areEqual(nbRows, nbRowsActual, nbRowsActual + ' rows found on the instead of ' + nbRows);
     },
 
+    checkColumnValues: function(table, colId, isSplit, values) {
+        var bodyTable = this.getBodyTable(table, isSplit);
+        var rows = bodyTable.tBodies[0].rows;
+        var iActual = 0;
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            if (this.isSignificant(row)) {
+                var cell = this.getSignificantElementByIndex(row.cells, colId);
+                var value;
+                if (cell.innerText != undefined) {
+                    value = cell.innerText;
+                } else {
+                    value = cell.textContent;
+                }
+                value = value.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+                YAHOO.util.Assert.areEqual(values[iActual], value, value + ' found in row ' + iActual + ' instead of ' + values[iActual]);
+                iActual += 1;
+            }
+        }
+        YAHOO.util.Assert.areEqual(values.length, iActual, iActual + ' rows found on the instead of ' + values.length);
+    },
+
 
     checkColDebugValue: function(div, attribute, value) {
         var ul = div.getElementsByTagName('ul')[0];

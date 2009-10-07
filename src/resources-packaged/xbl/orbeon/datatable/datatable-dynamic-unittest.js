@@ -55,309 +55,329 @@ var testCase = {
     },
 
     testMixed: function() {
-         var thiss = this;
-         thiss.openAccordionCase(thiss, 'mixed', function() {
-             // Test significant values the first column
-             var div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·1');
-             thiss.checkColTypeValue(div, 'column');
-             thiss.checkColDebugValue(div, 'index', 1);
-             thiss.checkColDebugValue(div, 'position', undefined);
-             // Test significant values the column set
-             div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·2');
-             thiss.checkColTypeValue(div, 'columnSet');
-             thiss.checkColDebugValue(div, 'index', 2);
-             thiss.checkColDebugValue(div, 'nbColumns', 4);
-             thiss.checkColDebugValue(div, 'nodeset', '*');
-             // Test significant values from the second column
-             div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·3');
-             thiss.checkColTypeValue(div, 'column');
-             thiss.checkColDebugValue(div, 'index', 2);
-             thiss.checkColDebugValue(div, 'position', 1);
-             // Test significant values from the third column
-             div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·4');
-             thiss.checkColTypeValue(div, 'column');
-             thiss.checkColDebugValue(div, 'index', 3);
-             thiss.checkColDebugValue(div, 'position', 2);
-             // Test significant values from the fourth column
-             div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·5');
-             thiss.checkColTypeValue(div, 'column');
-             thiss.checkColDebugValue(div, 'index', 4);
-             thiss.checkColDebugValue(div, 'position', 3);
-             // Test significant values from the fifth column
-             div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·6');
-             thiss.checkColTypeValue(div, 'column');
-             thiss.checkColDebugValue(div, 'index', 5);
-             thiss.checkColDebugValue(div, 'position', 4);
-             // Test significant values from the sixth column
-             div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·7');
-             thiss.checkColTypeValue(div, 'column');
-             thiss.checkColDebugValue(div, 'index', 6);
-             thiss.checkColDebugValue(div, 'position', undefined);
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'mixed', function() {
+            // Test significant values the first column
+            var div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·1');
+            thiss.checkColTypeValue(div, 'column');
+            thiss.checkColDebugValue(div, 'index', 1);
+            thiss.checkColDebugValue(div, 'position', undefined);
+            // Test significant values the column set
+            div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·2');
+            thiss.checkColTypeValue(div, 'columnSet');
+            thiss.checkColDebugValue(div, 'index', 2);
+            thiss.checkColDebugValue(div, 'nbColumns', 4);
+            thiss.checkColDebugValue(div, 'nodeset', '*');
+            // Test significant values from the second column
+            div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·3');
+            thiss.checkColTypeValue(div, 'column');
+            thiss.checkColDebugValue(div, 'index', 2);
+            thiss.checkColDebugValue(div, 'position', 1);
+            // Test significant values from the third column
+            div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·4');
+            thiss.checkColTypeValue(div, 'column');
+            thiss.checkColDebugValue(div, 'index', 3);
+            thiss.checkColDebugValue(div, 'position', 2);
+            // Test significant values from the fourth column
+            div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·5');
+            thiss.checkColTypeValue(div, 'column');
+            thiss.checkColDebugValue(div, 'index', 4);
+            thiss.checkColDebugValue(div, 'position', 3);
+            // Test significant values from the fifth column
+            div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·6');
+            thiss.checkColTypeValue(div, 'column');
+            thiss.checkColDebugValue(div, 'index', 5);
+            thiss.checkColDebugValue(div, 'position', 4);
+            // Test significant values from the sixth column
+            div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·7');
+            thiss.checkColTypeValue(div, 'column');
+            thiss.checkColDebugValue(div, 'index', 6);
+            thiss.checkColDebugValue(div, 'position', undefined);
 
-             // Check the table structure
-             var table = YAHOO.util.Dom.get('my-accordion$mixed-table$mixed-table-table');
-             thiss.checkTableStructure(table, 6);
+            // Check the table structure
+            var table = YAHOO.util.Dom.get('my-accordion$mixed-table$mixed-table-table');
+            thiss.checkTableStructure(table, 6);
 
-             thiss.closeAccordionCase(thiss, 'mixed');
-         });
-     },
+            thiss.closeAccordionCase(thiss, 'mixed');
+        });
+    },
 
     testMixedTwoColumsets: function() {
-         var thiss = this;
-         thiss.openAccordionCase(thiss, 'mixed-two-columnsets', function() {
-             // Test significant values the first column set
-             var div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·1');
-             thiss.checkColTypeValue(div, 'columnSet');
-             thiss.checkColDebugValue(div, 'index', 1);
-             thiss.checkColDebugValue(div, 'nbColumns', 2);
-             thiss.checkColDebugValue(div, 'nodeset', '*[position() &lt; 3]');
-             // First column (dynamic)
-             div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·2');
-             thiss.checkColTypeValue(div, 'column');
-             thiss.checkColDebugValue(div, 'index', 1);
-             thiss.checkColDebugValue(div, 'position', 1);
-             // Second column (dynamic)
-             div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·3');
-             thiss.checkColTypeValue(div, 'column');
-             thiss.checkColDebugValue(div, 'index', 2);
-             thiss.checkColDebugValue(div, 'position', 2);
-             // Third column (static)
-             div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·4');
-             thiss.checkColTypeValue(div, 'column');
-             thiss.checkColDebugValue(div, 'index', 3);
-             thiss.checkColDebugValue(div, 'position', undefined);
-             // Second columnset
-             div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·5');
-             thiss.checkColTypeValue(div, 'columnSet');
-             thiss.checkColDebugValue(div, 'index', 4);
-             thiss.checkColDebugValue(div, 'nbColumns', 2);
-             thiss.checkColDebugValue(div, 'nodeset', '*[position() &gt;= 3]');
-             // Fourth column (dynamic)
-             div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·6');
-             thiss.checkColTypeValue(div, 'column');
-             thiss.checkColDebugValue(div, 'index', 4);
-             thiss.checkColDebugValue(div, 'position', 1);
-             // Fifth column (dynamic)
-             div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·7');
-             thiss.checkColTypeValue(div, 'column');
-             thiss.checkColDebugValue(div, 'index', 5);
-             thiss.checkColDebugValue(div, 'position', 2);
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'mixed-two-columnsets', function() {
+            // Test significant values the first column set
+            var div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·1');
+            thiss.checkColTypeValue(div, 'columnSet');
+            thiss.checkColDebugValue(div, 'index', 1);
+            thiss.checkColDebugValue(div, 'nbColumns', 2);
+            thiss.checkColDebugValue(div, 'nodeset', '*[position() &lt; 3]');
+            // First column (dynamic)
+            div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·2');
+            thiss.checkColTypeValue(div, 'column');
+            thiss.checkColDebugValue(div, 'index', 1);
+            thiss.checkColDebugValue(div, 'position', 1);
+            // Second column (dynamic)
+            div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·3');
+            thiss.checkColTypeValue(div, 'column');
+            thiss.checkColDebugValue(div, 'index', 2);
+            thiss.checkColDebugValue(div, 'position', 2);
+            // Third column (static)
+            div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·4');
+            thiss.checkColTypeValue(div, 'column');
+            thiss.checkColDebugValue(div, 'index', 3);
+            thiss.checkColDebugValue(div, 'position', undefined);
+            // Second columnset
+            div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·5');
+            thiss.checkColTypeValue(div, 'columnSet');
+            thiss.checkColDebugValue(div, 'index', 4);
+            thiss.checkColDebugValue(div, 'nbColumns', 2);
+            thiss.checkColDebugValue(div, 'nodeset', '*[position() &gt;= 3]');
+            // Fourth column (dynamic)
+            div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·6');
+            thiss.checkColTypeValue(div, 'column');
+            thiss.checkColDebugValue(div, 'index', 4);
+            thiss.checkColDebugValue(div, 'position', 1);
+            // Fifth column (dynamic)
+            div = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$debug-column·7');
+            thiss.checkColTypeValue(div, 'column');
+            thiss.checkColDebugValue(div, 'index', 5);
+            thiss.checkColDebugValue(div, 'position', 2);
 
 
-             // Check the table structure
-             var table = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$mixed-two-columnsets-table-table');
-             thiss.checkTableStructure(table, 5);
+            // Check the table structure
+            var table = YAHOO.util.Dom.get('my-accordion$mixed-two-columnsets-table$mixed-two-columnsets-table-table');
+            thiss.checkTableStructure(table, 5);
 
-             thiss.closeAccordionCase(thiss, 'mixed-two-columnsets');
-         });
-     },
+            thiss.closeAccordionCase(thiss, 'mixed-two-columnsets');
+        });
+    },
 
     testStatic: function() {
-         var thiss = this;
-         thiss.openAccordionCase(thiss, 'static', function() {
-             // Test significant values the first column set
-             var div;
-             // First column (static)
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'static', function() {
+            // Test significant values the first column set
+            var div;
+            // First column (static)
             div = YAHOO.util.Dom.get('my-accordion$static-table$debug-column·1');
             thiss.checkColTypeValue(div, 'column');
             thiss.checkColDebugValue(div, 'index', 1);
             thiss.checkColDebugValue(div, 'position', undefined);
-             // Second column (static)
+            // Second column (static)
             div = YAHOO.util.Dom.get('my-accordion$static-table$debug-column·2');
             thiss.checkColTypeValue(div, 'column');
             thiss.checkColDebugValue(div, 'index', 2);
             thiss.checkColDebugValue(div, 'position', undefined);
 
-             // Check the table structure
-             var table = YAHOO.util.Dom.get('my-accordion$static-table$static-table-table');
-             thiss.checkTableStructure(table, 2);
+            // Check the table structure
+            var table = YAHOO.util.Dom.get('my-accordion$static-table$static-table-table');
+            thiss.checkTableStructure(table, 2);
 
-             thiss.closeAccordionCase(thiss, 'static');
-         });
-     },
+            thiss.closeAccordionCase(thiss, 'static');
+        });
+    },
 
     testResize: function() {
-         var thiss = this;
-         thiss.openAccordionCase(thiss, 'resize', function() {
-             // Check the table structure
-             var table = YAHOO.util.Dom.get('my-accordion$resize-table$resize-table-table');
-             thiss.checkTableStructure(table, 6);
-             thiss.checkTableAndContainerWidths(table);
-             thiss.checkRowWidth(table.tHead.rows[0]);
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'resize', function() {
+            // Check the table structure
+            var table = YAHOO.util.Dom.get('my-accordion$resize-table$resize-table-table');
+            thiss.checkTableStructure(table, 6);
+            thiss.checkTableAndContainerWidths(table);
+            thiss.checkRowWidth(table.tHead.rows[0]);
 
             var th1 = table.tHead.rows[0].cells[0]; // Static column
             var th2 = table.tHead.rows[0].cells[3]; // Second dynamic column
             var width1 = th1.clientWidth;
             var width2 = th2.clientWidth;
 
-             thiss.resizeColumn(th1, 100, 10);
-             thiss.checkTableAndContainerWidths(table);
-             thiss.checkRowWidth(table.tHead.rows[0]);
-             YAHOO.util.Assert.areEqual(width2, th2.clientWidth, "The width of the second column shouldn't change (before: " + width2 + ", after: " + th2.clientWidth + ").");
-             YAHOO.util.Assert.areEqual(width1 + 100, th1.clientWidth, "The width of the first column should be " + (width1 + 100) + ", not " + th1.clientWidth);
+            thiss.resizeColumn(th1, 100, 10);
+            thiss.checkTableAndContainerWidths(table);
+            thiss.checkRowWidth(table.tHead.rows[0]);
+            YAHOO.util.Assert.areEqual(width2, th2.clientWidth, "The width of the second column shouldn't change (before: " + width2 + ", after: " + th2.clientWidth + ").");
+            YAHOO.util.Assert.areEqual(width1 + 100, th1.clientWidth, "The width of the first column should be " + (width1 + 100) + ", not " + th1.clientWidth);
 
-             thiss.resizeColumn(th2, 100, 10);
-             thiss.checkTableAndContainerWidths(table);
-             thiss.checkRowWidth(table.tHead.rows[0]);
-             YAHOO.util.Assert.areEqual(width1 + 100, th1.clientWidth, "The width of the first column shouldn't change (before: " + width1 + 100 + ", after: " + th1.clientWidth + ").");
-             YAHOO.util.Assert.areEqual(width2 + 100, th2.clientWidth, "The width of the second column should be " + (width2 + 100) + ", not " + th2.clientWidth);
+            thiss.resizeColumn(th2, 100, 10);
+            thiss.checkTableAndContainerWidths(table);
+            thiss.checkRowWidth(table.tHead.rows[0]);
+            YAHOO.util.Assert.areEqual(width1 + 100, th1.clientWidth, "The width of the first column shouldn't change (before: " + width1 + 100 + ", after: " + th1.clientWidth + ").");
+            YAHOO.util.Assert.areEqual(width2 + 100, th2.clientWidth, "The width of the second column should be " + (width2 + 100) + ", not " + th2.clientWidth);
 
             thiss.closeAccordionCase(thiss, 'resize');
-         });
-     },
+        });
+    },
 
     testSortable: function() {
-         var thiss = this;
-         thiss.openAccordionCase(thiss, 'sortable', function() {
-             // Check the table structure
-             var table = YAHOO.util.Dom.get('my-accordion$sortable-table$sortable-table-table');
-             thiss.checkTableStructure(table, 6);
-             thiss.checkTableAndContainerWidths(table);
-             thiss.checkRowWidth(table.tHead.rows[0]);
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'sortable', function() {
+            // Check the table structure
+            var table = YAHOO.util.Dom.get('my-accordion$sortable-table$sortable-table-table');
+            thiss.checkTableStructure(table, 6);
+            thiss.checkTableAndContainerWidths(table);
+            thiss.checkRowWidth(table.tHead.rows[0]);
 
-             // Check significant values in the datatable local instance before any sort action
-             var columnsDiv = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-columns');
-             thiss.checkColTypeValue(columnsDiv, 'columns');
-             thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', -1);
+            // Check significant values in the datatable local instance before any sort action
+            var columnsDiv = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-columns');
+            thiss.checkColTypeValue(columnsDiv, 'columns');
+            thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', -1);
 
-             var col1Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·1');
-             thiss.checkColTypeValue(col1Div, 'column');
-             thiss.checkColDebugValue(col1Div, 'currentSortOrder', 'none');
-             thiss.checkColDebugValue(col1Div, 'nextSortOrder', 'ascending');
-             thiss.checkColDebugValue(col1Div, 'type', 'number');
-             thiss.checkColDebugValue(col1Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/(position())');
-             thiss.checkColDebugValue(col1Div, 'sortKey', 'position()');
-             thiss.checkColDebugValue(col1Div, 'fr:sortable', 'true');
+            var col1Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·1');
+            thiss.checkColTypeValue(col1Div, 'column');
+            thiss.checkColDebugValue(col1Div, 'currentSortOrder', 'none');
+            thiss.checkColDebugValue(col1Div, 'nextSortOrder', 'ascending');
+            thiss.checkColDebugValue(col1Div, 'type', 'number');
+            thiss.checkColDebugValue(col1Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/(position())');
+            thiss.checkColDebugValue(col1Div, 'sortKey', 'position()');
+            thiss.checkColDebugValue(col1Div, 'fr:sortable', 'true');
 
-             var col2Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·3');
-             thiss.checkColTypeValue(col2Div, 'column');
-             thiss.checkColDebugValue(col2Div, 'currentSortOrder', 'none');
-             thiss.checkColDebugValue(col2Div, 'nextSortOrder', 'ascending');
-             thiss.checkColDebugValue(col2Div, 'type', 'number');
-             thiss.checkColDebugValue(col2Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[1]/.)');
-             thiss.checkColDebugValue(col2Div, 'sortKey', '(*)[1]/.');
-             thiss.checkColDebugValue(col2Div, 'fr:sortable', 'true');
+            var col2Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·3');
+            thiss.checkColTypeValue(col2Div, 'column');
+            thiss.checkColDebugValue(col2Div, 'currentSortOrder', 'none');
+            thiss.checkColDebugValue(col2Div, 'nextSortOrder', 'ascending');
+            thiss.checkColDebugValue(col2Div, 'type', 'number');
+            thiss.checkColDebugValue(col2Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[1]/.)');
+            thiss.checkColDebugValue(col2Div, 'sortKey', '(*)[1]/.');
+            thiss.checkColDebugValue(col2Div, 'fr:sortable', 'true');
 
-             var col3Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·4');
-             thiss.checkColTypeValue(col3Div, 'column');
-             thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'none');
-             thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'ascending');
-             thiss.checkColDebugValue(col3Div, 'type', 'text');
-             thiss.checkColDebugValue(col3Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[2]/.)');
-             thiss.checkColDebugValue(col3Div, 'sortKey', '(*)[2]/.');
-             thiss.checkColDebugValue(col3Div, 'fr:sortable', 'true');
+            var col3Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·4');
+            thiss.checkColTypeValue(col3Div, 'column');
+            thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'none');
+            thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'ascending');
+            thiss.checkColDebugValue(col3Div, 'type', 'text');
+            thiss.checkColDebugValue(col3Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[2]/.)');
+            thiss.checkColDebugValue(col3Div, 'sortKey', '(*)[2]/.');
+            thiss.checkColDebugValue(col3Div, 'fr:sortable', 'true');
 
-             var col4Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·5');
-             thiss.checkColTypeValue(col4Div, 'column');
-             thiss.checkColDebugValue(col4Div, 'currentSortOrder', 'none');
-             thiss.checkColDebugValue(col4Div, 'nextSortOrder', 'ascending');
-             thiss.checkColDebugValue(col4Div, 'type', 'number');
-             thiss.checkColDebugValue(col4Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[3]/.)');
-             thiss.checkColDebugValue(col4Div, 'sortKey', '(*)[3]/.');
-             thiss.checkColDebugValue(col4Div, 'fr:sortable', 'true');
+            var col4Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·5');
+            thiss.checkColTypeValue(col4Div, 'column');
+            thiss.checkColDebugValue(col4Div, 'currentSortOrder', 'none');
+            thiss.checkColDebugValue(col4Div, 'nextSortOrder', 'ascending');
+            thiss.checkColDebugValue(col4Div, 'type', 'number');
+            thiss.checkColDebugValue(col4Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[3]/.)');
+            thiss.checkColDebugValue(col4Div, 'sortKey', '(*)[3]/.');
+            thiss.checkColDebugValue(col4Div, 'fr:sortable', 'true');
 
-             var col5Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·6');
-             thiss.checkColTypeValue(col5Div, 'column');
-             thiss.checkColDebugValue(col5Div, 'currentSortOrder', 'none');
-             thiss.checkColDebugValue(col5Div, 'nextSortOrder', 'ascending');
-             thiss.checkColDebugValue(col5Div, 'type', 'number');
-             thiss.checkColDebugValue(col5Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[4]/.)');
-             thiss.checkColDebugValue(col5Div, 'sortKey', '(*)[4]/.');
-             thiss.checkColDebugValue(col5Div, 'fr:sortable', 'true');
+            var col5Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·6');
+            thiss.checkColTypeValue(col5Div, 'column');
+            thiss.checkColDebugValue(col5Div, 'currentSortOrder', 'none');
+            thiss.checkColDebugValue(col5Div, 'nextSortOrder', 'ascending');
+            thiss.checkColDebugValue(col5Div, 'type', 'number');
+            thiss.checkColDebugValue(col5Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[4]/.)');
+            thiss.checkColDebugValue(col5Div, 'sortKey', '(*)[4]/.');
+            thiss.checkColDebugValue(col5Div, 'fr:sortable', 'true');
 
-             var col6Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·7');
-             thiss.checkColTypeValue(col6Div, 'column');
-             thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'none');
-             thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'ascending');
-             thiss.checkColDebugValue(col6Div, 'type', 'number');
-             thiss.checkColDebugValue(col6Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/(round(length div nb-words))');
-             thiss.checkColDebugValue(col6Div, 'sortKey', 'round(length div nb-words)');
-             thiss.checkColDebugValue(col6Div, 'fr:sortable', 'true');
+            var col6Div = YAHOO.util.Dom.get('my-accordion$sortable-table$debug-column·7');
+            thiss.checkColTypeValue(col6Div, 'column');
+            thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'none');
+            thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'ascending');
+            thiss.checkColDebugValue(col6Div, 'type', 'number');
+            thiss.checkColDebugValue(col6Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/(round(length div nb-words))');
+            thiss.checkColDebugValue(col6Div, 'sortKey', 'round(length div nb-words)');
+            thiss.checkColDebugValue(col6Div, 'fr:sortable', 'true');
 
-             // Click to sort the 3rd column
-             thiss.clickAndCheckSortOrder(table, 3, 'ascending', function() {
-                 var col3th = YAHOO.util.Dom.get('my-accordion$sortable-table$sortable-th-dyn·2');
-                 thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 3);
-                 thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'ascending');
-                 thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'descending');
+            // Click to sort the 3rd column
+            thiss.clickAndCheckSortOrder(table, 3, 'ascending', function() {
+                var col3th = YAHOO.util.Dom.get('my-accordion$sortable-table$sortable-th-dyn·2');
+                thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 3);
+                thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'ascending');
+                thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'descending');
 
-                 thiss.clickAndCheckSortOrder(table, 6, 'ascending', function() {
-                     thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 6);
-                     thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'ascending');
-                     thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'descending');
-                     thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'none');
-                     thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'ascending');
+                thiss.clickAndCheckSortOrder(table, 6, 'ascending', function() {
+                    thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 6);
+                    thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'ascending');
+                    thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'descending');
+                    thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'none');
+                    thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'ascending');
 
-                     thiss.clickAndCheckSortOrder(table, 6, 'descending', function() {
-                         thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 6);
-                         thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'descending');
-                         thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'ascending');
+                    thiss.clickAndCheckSortOrder(table, 6, 'descending', function() {
+                        thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 6);
+                        thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'descending');
+                        thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'ascending');
 
                         thiss.closeAccordionCase(thiss, 'sortable');
-                     });
+                    });
 
-                  });
+                });
 
-             });
-         });
+            });
+        });
 
-     },
+    },
 
     testScrollH: function() {
-         var thiss = this;
-         thiss.openAccordionCase(thiss, 'scrollH', function() {
-             // Check the table structure
-             var table = YAHOO.util.Dom.get('my-accordion$scrollH-table$scrollH-table-table');
-             thiss.checkIsSplit(table, true);
-             thiss.checkTableStructure(table, 6, true);
-             thiss.checkCellClasses(table, true);
-             thiss.checkCellStyles(table, true);
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'scrollH', function() {
+            // Check the table structure
+            var table = YAHOO.util.Dom.get('my-accordion$scrollH-table$scrollH-table-table');
+            thiss.checkIsSplit(table, true);
+            thiss.checkTableStructure(table, 6, true);
+            thiss.checkCellClasses(table, true);
+            thiss.checkCellStyles(table, true);
 
-             thiss.closeAccordionCase(thiss, 'scrollH');
+            thiss.closeAccordionCase(thiss, 'scrollH');
 
-         });
+        });
 
-     },
+    },
 
     testUpdate: function() {
-         var thiss = this;
-         thiss.openAccordionCase(thiss, 'update', function() {
-             // Check the table structure
-             var table = YAHOO.util.Dom.get('my-accordion$update-table$update-table-table');
-             thiss.checkIsSplit(table, false);
-             thiss.checkTableStructure(table, 6, false);
-             thiss.checkNumberRows(table, 6, false);
-             thiss.checkCellClasses(table, false);
-             thiss.checkCellStyles(table, false);
-             ORBEON.xforms.Document.setValue("maxLength", "15");
-             thiss.wait(function() {
-                 thiss.checkNumberRows(table, 2, false);
-                 thiss.checkCellClasses(table, false);
-                 thiss.checkCellStyles(table, false);                 
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'update', function() {
+            // Check the table structure
+            var table = YAHOO.util.Dom.get('my-accordion$update-table$update-table-table');
+            thiss.checkIsSplit(table, false);
+            thiss.checkTableStructure(table, 6, false);
+            thiss.checkNumberRows(table, 6, false);
+            thiss.checkCellClasses(table, false);
+            thiss.checkCellStyles(table, false);
+            ORBEON.xforms.Document.setValue("maxLength", "15");
+            thiss.wait(function() {
+                thiss.checkNumberRows(table, 2, false);
+                thiss.checkCellClasses(table, false);
+                thiss.checkCellStyles(table, false);
 
-                 ORBEON.xforms.Document.setValue("maxLength", "40");
-                 thiss.wait(function() {
-                     thiss.checkNumberRows(table, 16, false);
-                     thiss.checkCellClasses(table, false);
-                     thiss.checkCellStyles(table, false);
+                ORBEON.xforms.Document.setValue("maxLength", "40");
+                thiss.wait(function() {
+                    thiss.checkNumberRows(table, 16, false);
+                    thiss.checkCellClasses(table, false);
+                    thiss.checkCellStyles(table, false);
 
-                     thiss.closeAccordionCase(thiss, 'update');
+                    thiss.closeAccordionCase(thiss, 'update');
 
-                 }, 1000);
+                }, 1000);
 
-             }, 1000);
+            }, 1000);
+        });
+    },
 
-             
+    testPaginate: function() {
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'paginate', function() {
+            // Check the table structure
+            var table = YAHOO.util.Dom.get('my-accordion$paginate-table$paginate-table-table');
+            thiss.checkColumnValues(table, 2, false, [0, 1, 2, 3, 4]);
+
+            var linkNext = YAHOO.util.Dom.get('my-accordion$paginate-table$xf-42');
+            YAHOO.util.UserAction.click(linkNext, {clientX: 1});
+            thiss.wait(function() {
+                thiss.checkColumnValues(table, 2, false, [5, 6, 7, 8, 9]);
+
+                var linkLast = YAHOO.util.Dom.get('my-accordion$paginate-table$xf-47');
+                YAHOO.util.UserAction.click(linkLast, {clientX: 1});
+                thiss.wait(function() {
+                    thiss.checkColumnValues(table, 2, false, [35, 36, 37]);
+
+                    thiss.closeAccordionCase(thiss, 'paginate');
+                }, 1000);
+            }, 1000);
 
 
-         });
+        });
+    },
 
-     },
 
-
-    EOS: ""
-};
-
+    EOS:""
+}
+        ;
 
 
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {

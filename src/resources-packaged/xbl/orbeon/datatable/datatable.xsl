@@ -376,8 +376,8 @@
                                 </xsl:choose>
                                 <xforms:group ref=".[. = $page and $display = 'page']">
                                     <xforms:output class="yui-pg-page" value="$page">
-                                        <xforms:hint>Current page (edit to move to another
-                                            page)</xforms:hint>
+                                       <!-- <xforms:hint>Current page (edit to move to another
+                                            page)</xforms:hint>-->
                                     </xforms:output>
                                 </xforms:group>
                                 <xforms:group ref=".[. != $page and $display = 'page']">
@@ -1006,8 +1006,8 @@
                                 </xsl:choose>
                                 <xforms:group ref=".[. = $page and $display = 'page']">
                                     <xforms:output class="yui-pg-page" value="$page">
-                                        <xforms:hint>Current page (edit to move to another
-                                            page)</xforms:hint>
+                                       <!-- <xforms:hint>Current page (edit to move to another
+                                            page)</xforms:hint>-->
                                     </xforms:output>
                                 </xforms:group>
                                 <xforms:group ref=".[. != $page and $display = 'page']">

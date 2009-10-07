@@ -319,6 +319,41 @@ var testCase = {
 
      },
 
+    testUpdate: function() {
+         var thiss = this;
+         thiss.openAccordionCase(thiss, 'update', function() {
+             // Check the table structure
+             var table = YAHOO.util.Dom.get('my-accordion$update-table$update-table-table');
+             thiss.checkIsSplit(table, false);
+             thiss.checkTableStructure(table, 6, false);
+             thiss.checkNumberRows(table, 6, false);
+             thiss.checkCellClasses(table, false);
+             thiss.checkCellStyles(table, false);
+             ORBEON.xforms.Document.setValue("maxLength", "15");
+             thiss.wait(function() {
+                 thiss.checkNumberRows(table, 2, false);
+                 thiss.checkCellClasses(table, false);
+                 thiss.checkCellStyles(table, false);                 
+
+                 ORBEON.xforms.Document.setValue("maxLength", "40");
+                 thiss.wait(function() {
+                     thiss.checkNumberRows(table, 16, false);
+                     thiss.checkCellClasses(table, false);
+                     thiss.checkCellStyles(table, false);
+
+                     thiss.closeAccordionCase(thiss, 'update');
+
+                 }, 1000);
+
+             }, 1000);
+
+             
+
+
+         });
+
+     },
+
 
     EOS: ""
 };

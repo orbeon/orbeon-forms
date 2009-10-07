@@ -221,6 +221,19 @@ ORBEON.widgets.datatable.unittests_lib = {
         YAHOO.util.Assert.areEqual(nbcols, nbcolsActual, nbcolsActual + ' columns found on the first body row instead of ' + nbcols);
     },
 
+    checkNumberRows: function(table, nbRows, isSplit) {
+        var bodyTable = this.getBodyTable(table, isSplit);
+        var rows = bodyTable.tBodies[0].rows;
+        var nbRowsActual = 0;
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            if (this.isSignificant(row)) {
+                nbRowsActual += 1;
+            }
+        }
+        YAHOO.util.Assert.areEqual(nbRows, nbRowsActual, nbRowsActual + ' rows found on the instead of ' + nbRows);
+    },
+
 
     checkColDebugValue: function(div, attribute, value) {
         var ul = div.getElementsByTagName('ul')[0];

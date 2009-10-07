@@ -1125,7 +1125,9 @@
             select="@currentSortColumn"/>
         <xxforms:variable name="currentSortColumn" model="datatable-model"
             select="(//column)[@index=$currentSortColumnIndex]"/>
-        <xforms:repeat>
+        <xxforms:script ev:event="xxforms-nodeset-changed" ev:target="fr-datatable-repeat">
+            ORBEON.widgets.datatable.update(this); </xxforms:script>
+        <xforms:repeat id="fr-datatable-repeat">
             <xsl:attribute name="nodeset">
                 <xsl:if test="$paginated">(</xsl:if>
                 <xsl:text>if (not($currentSortColumn) or $currentSortColumn/@currentSortOrder = 'none') then </xsl:text>

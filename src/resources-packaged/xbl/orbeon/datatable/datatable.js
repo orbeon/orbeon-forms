@@ -711,6 +711,7 @@ ORBEON.widgets.datatable.update = function (target) {
     // Updates a datatable when the xforms:repeat nodeset has been changed
     var container = target.parentNode.parentNode;
     var id = container.id;
+    YAHOO.log("Updating datatable " + id, "info");
     if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled')) {
         if (ORBEON.widgets.datatable.datatables[id] != undefined) {
             ORBEON.widgets.datatable.datatables[id].update();

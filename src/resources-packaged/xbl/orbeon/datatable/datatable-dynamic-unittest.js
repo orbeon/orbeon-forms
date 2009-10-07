@@ -294,13 +294,28 @@ var testCase = {
                          thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 6);
                          thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'descending');
                          thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'ascending');
-                     
+
                         thiss.closeAccordionCase(thiss, 'sortable');
                      });
-                      
+
                   });
- 
+
              });
+         });
+
+     },
+
+    testScrollH: function() {
+         var thiss = this;
+         thiss.openAccordionCase(thiss, 'scrollH', function() {
+             // Check the table structure
+             var table = YAHOO.util.Dom.get('my-accordion$scrollH-table$scrollH-table-table');
+             thiss.checkIsSplit(table, true);
+             thiss.checkTableStructure(table, 6, true);
+             thiss.checkCellStyles(table, true);
+
+             thiss.closeAccordionCase(thiss, 'scrollH');
+
          });
 
      },

@@ -113,8 +113,8 @@ ORBEON.widgets.datatable.unittests_lib = {
         for (var icol = 0; icol < row.cells.length; icol++) {
             var cell = row.cells[icol];
             if (!YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-begin-end')
-                && !YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-delimiter')
-                && !YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-template')) {
+                    && !YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-delimiter')
+                    && !YAHOO.util.Dom.hasClass(cell, 'xforms-repeat-template')) {
                 this.checkCellWidth(cell);
             }
         }
@@ -125,7 +125,7 @@ ORBEON.widgets.datatable.unittests_lib = {
         var tableWidthValue = parseInt(tableWidth.substr(0, tableWidth.length - 2)) ;
         var headerContainerWidth = YAHOO.util.Dom.getStyle(table.parentNode, 'width');
         var mainContainerWidth = YAHOO.util.Dom.getStyle(table.parentNode.parentNode, 'width');
-        if (headerContainerWidth == 'auto')  {
+        if (headerContainerWidth == 'auto') {
             headerContainerWidth = tableWidth;
         }
         var mainContainerWidthValue = parseInt(mainContainerWidth.substr(0, mainContainerWidth.length - 2)) ;
@@ -157,7 +157,7 @@ ORBEON.widgets.datatable.unittests_lib = {
     },
 
     checkEmbeddedWidthAndHeight: function (elt, parentWidth, parentHeight) {
-        var region =  YAHOO.util.Region.getRegion(elt);
+        var region = YAHOO.util.Region.getRegion(elt);
         var width;
         var height;
         if (region != null && region.right != null && region.left != null) {
@@ -165,9 +165,9 @@ ORBEON.widgets.datatable.unittests_lib = {
             height = region.bottom - region.top;
         } else {
             width = parentWidth;
-            height = parentHeight ;
+            height = parentHeight;
         }
-  
+
         if (parentWidth != undefined) {
             YAHOO.util.Assert.isTrue(parentWidth >= width, 'Node ' + elt.nodeName + '.' + elt.className + ', width (' + width + ") is larger than its parent's " + elt.parentNode.nodeName + '.' + elt.parentNode.className + " width (" + parentWidth + ')');
         }
@@ -196,13 +196,24 @@ ORBEON.widgets.datatable.unittests_lib = {
         return result;
     },
 
-    checkTableStructure: function(table, nbcols) {
+    getBodyTable: function(table, isSplit) {
+        if (isSplit) {
+            var container = table.parentNode.parentNode;
+            return container.getElementsByTagName('table')[1];
+        } else {
+            return table;
+        }
+
+    },
+
+    checkTableStructure: function(table, nbcols, isSplit) {
         YAHOO.util.Assert.isObject(table.tHead, 'The table header is missing');
         YAHOO.util.Assert.areEqual(1, table.tHead.rows.length, 'There should be exactly one header row (not ' + table.tHead.rows.length + ')');
         var nbcolsActual = this.getNumberVisibleCells(table.tHead.rows[0].cells);
         YAHOO.util.Assert.areEqual(nbcols, nbcolsActual, nbcolsActual + ' header columns found instead of ' + nbcols);
-        YAHOO.util.Assert.areEqual(1, table.tBodies.length, 'There should be exactly one body (not ' + table.tBodies.length + ')');
-        nbcolsActual = this.getNumberVisibleCells(table.tBodies[0].rows[2].cells);
+        var bodyTable = this.getBodyTable(table, isSplit);
+        YAHOO.util.Assert.areEqual(1, bodyTable.tBodies.length, 'There should be exactly one body (not ' + bodyTable.tBodies.length + ')');
+        nbcolsActual = this.getNumberVisibleCells(bodyTable.tBodies[0].rows[2].cells);
         YAHOO.util.Assert.areEqual(nbcols, nbcolsActual, nbcolsActual + ' columns found on the first body row instead of ' + nbcols);
     },
 
@@ -210,7 +221,7 @@ ORBEON.widgets.datatable.unittests_lib = {
     checkColDebugValue: function(div, attribute, value) {
         var ul = div.getElementsByTagName('ul')[0];
         var lis = ul.getElementsByTagName('li');
-        for (var i=0; i < lis.length; i++) {
+        for (var i = 0; i < lis.length; i++) {
             var li = lis[i];
             var label = li.getElementsByTagName('label')[0];
             if (label != undefined) {
@@ -222,7 +233,7 @@ ORBEON.widgets.datatable.unittests_lib = {
                 }
             }
         }
-        if (value  != undefined) {
+        if (value != undefined) {
             YAHOO.util.Assert.fail('Attribute ' + attribute + ' not found');
         }
     },
@@ -233,12 +244,52 @@ ORBEON.widgets.datatable.unittests_lib = {
         YAHOO.util.Assert.areEqual(type, span.innerHTML, 'Type ' + span.innerHTML + ' instead of ' + type);
     },
 
-    getSignificantElementByIndex: function(elements, index) {
-        for (var i=0; i< elements.length; i++) {
-            var element = elements[i];
-            if (!YAHOO.util.Dom.hasClass(element, 'xforms-repeat-begin-end')
+    isSignificant: function(element) {
+        return !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-begin-end')
                 && !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-delimiter')
-                && !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-template')) {
+                && !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-template');
+    },
+
+    checkCellStylesInARow: function(row, classPrefix) {
+        var iActual = 0;
+        for (var i = 0; i < row.cells.length; i++)
+        {
+            var cell = row.cells[i];
+            if (this.isSignificant(cell)) {
+                iActual += 1;
+                var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
+                var className = classPrefix + iActual;
+                YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(liner, className), 'Cell column ' + iActual + ' should have a class ' + className + '. Its current class attribute is: ' + liner.className);
+            }
+        }
+    },
+
+    checkCellStyles: function(table, isSplit) {
+        if (YAHOO.env.ua.ie != 0) {
+            return;
+        }
+        var classPrefix = 'dt-' + table.id.replace('\$', '-', 'g') + '-col-';
+        this.checkCellStylesInARow(table.tHead.rows[0], classPrefix);
+        var bodyTable = this.getBodyTable(table,  isSplit);
+        var rows = bodyTable.tBodies[0].rows;
+        for (var i = 0; i< rows.length; i++) {
+            var row = rows[i];
+            if (this.isSignificant(row)) {
+                this.checkCellStylesInARow(row, classPrefix);    
+            }
+        }
+    },
+
+    checkIsSplit: function(table, isSplit) {
+        YAHOO.util.Assert.areEqual(isSplit, table.tBodies.length == 0, "Header table's body doesn't match split status");
+        var bodyTable = this.getBodyTable(table, isSplit);
+        YAHOO.util.Assert.areEqual(isSplit, bodyTable.tHead == undefined, "Body table's header  doesn't match split status");
+    },
+
+    getSignificantElementByIndex: function(elements, index) {
+        for (var i = 0; i < elements.length; i++) {
+            var element = elements[i];
+            if (this.isSignificant(element)) {
                 if (index == 1) {
                     return element;
                 }
@@ -257,7 +308,7 @@ ORBEON.widgets.datatable.unittests_lib = {
             className = 'yui-dt-desc';
         }
         var headerCell = this.getSignificantElementByIndex(table.tHead.rows[0].cells, columnIndex);
-        var liner= ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
+        var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
         YAHOO.util.UserAction.click(liner, {clientX: 1});
         this.wait(function() {
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(headerCell, className), 'Column ' + columnIndex + ' header cell should now have a class ' + className);
@@ -266,7 +317,7 @@ ORBEON.widgets.datatable.unittests_lib = {
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(bodyCell, className), 'Column ' + columnIndex + ' body cellls should now have a class ' + className);
             //TODO: test that the table is actually sorted
             callback();
-        }, 750);
+        }, 1000);
     },
 
     EOS: null

@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2005 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <!--
     The epilogue is run after all page views. This is the part of the epilogue called to handle Orbeon Forms
     applications running in a servlet container. It is typically used to perform tasks that need to be done for all
@@ -43,6 +43,7 @@
                 <include>/request/headers/header[name = 'accept']</include>
                 <!-- Return all parameters so they are made available to the theme -->
                 <include>/request/parameters/parameter</include>
+                <include>/request/attributes/attribute[name = 'javax.servlet.forward.context_path']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -57,6 +58,7 @@
             <p:choose href="#request">
                 <!-- Special case for plain theme (not sure if this is the best way) -->
                 <p:when test="starts-with(/request/request-path, '/xforms-renderer')
+                              or /request/attributes/attribute[name = 'javax.servlet.forward.context_path']
                               or /request/parameters/parameter[name = 'orbeon-theme']/value = 'plain'">
                     <!-- Plain theme -->
                     <p:processor name="oxf:identity">

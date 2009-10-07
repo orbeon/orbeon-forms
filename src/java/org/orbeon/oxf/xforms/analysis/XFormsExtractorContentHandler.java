@@ -114,14 +114,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         isSeparateDeployment = "separate".equals(request.getAttributesMap().get(OrbeonXFormsFilter.OPS_XFORMS_RENDERER_DEPLOYMENT));
 
         // Try to get request context path
-        {
-            // First try context path passed by the filter
-            requestContextPath = (String) request.getAttributesMap().get(OrbeonXFormsFilter.OPS_XFORMS_RENDERER_REQUEST_CONTEXT_PATH);
-
-            // Otherwise just use the request's context path
-            if (requestContextPath == null)
-                requestContextPath = request.getContextPath();
-        }
+        requestContextPath = request.getClientContextPath("/");
 
         // Create xml:base stack
         try {

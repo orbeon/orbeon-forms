@@ -23,10 +23,13 @@ import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorFactory;
 import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
 import org.orbeon.oxf.properties.Properties;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,7 +70,7 @@ public class URLRewriterUtils {
      * @return              rewritten URL
      */
     public static String rewriteURL(ExternalContext.Request request, String urlString, int rewriteMode) {
-        return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath(), request.getRequestPath(), urlString, rewriteMode);
+        return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getClientContextPath(urlString), request.getRequestPath(), urlString, rewriteMode);
     }
 
     /**
@@ -86,9 +89,9 @@ public class URLRewriterUtils {
         final int rewriteMode = forceAbsolute ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH;
 
         final String baseURIProperty = getServiceBaseURI();
-        if (baseURIProperty == null || baseURIProperty.trim().equals("")) {
+        if (org.apache.commons.lang.StringUtils.isBlank(baseURIProperty)) {
             // Property not specified, use request to build base URI
-            return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath(), request.getRequestPath(), urlString, rewriteMode);
+            return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getClientContextPath(urlString), request.getRequestPath(), urlString, rewriteMode);
         } else {
             // Property specified
             try {
@@ -100,11 +103,41 @@ public class URLRewriterUtils {
                         baseURI.getPath(), "", urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
             } catch (URISyntaxException e) {
-                // Default to using request
-                // TODO: should warn?
-                return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getContextPath(), request.getRequestPath(), urlString, rewriteMode);
+                throw new OXFException("Incorrect base URI property specified: " + baseURIProperty);
             }
         }
+    }
+
+    /**
+     * Return a context path as seen by the client. This might be the current request's context path, or the forwarding
+     * servlet's context path. The returned path might be different for Orbeon resources vs. application resources.
+     *
+     * @param request           current request.
+     * @param isPlatformPath    whether the URL is a platform path
+     * @return                  context path
+     */
+    public static String getClientContextPath(ExternalContext.Request request, boolean isPlatformPath) {
+        // TODO: check javax.servlet.include.context_path as well?
+        final String sourceContextPath = (String) request.getAttributesMap().get("javax.servlet.forward.context_path");
+        if (sourceContextPath != null) {
+            // We were forwarded to
+            if (isPlatformPath) {
+                // E.g. /foobar/orbeon
+                return sourceContextPath + request.getContextPath();
+            } else {
+                // E.g. /foobar
+                return sourceContextPath;
+            }
+        } else {
+            // We were not forwarded to
+            return request.getContextPath();
+        }
+    }
+
+    public static boolean isForwarded(ExternalContext.Request request) {
+        // TODO: check javax.servlet.include.context_path as well?
+        final String sourceContextPath = (String) request.getAttributesMap().get("javax.servlet.forward.context_path");
+        return sourceContextPath != null;
     }
 
     /**
@@ -119,7 +152,7 @@ public class URLRewriterUtils {
      * @param rewriteMode       rewrite mode (see ExternalContext.Response)
      * @return                  rewritten URL
      */
-    public static String rewriteURL(String scheme, String host, int port, String contextPath, String requestPath, String urlString, int rewriteMode) {
+    private static String rewriteURL(String scheme, String host, int port, String contextPath, String requestPath, String urlString, int rewriteMode) {
         // Case where a protocol is specified: the URL is left untouched in any case
         if (NetUtils.urlHasProtocol(urlString))
             return urlString;
@@ -179,7 +212,7 @@ public class URLRewriterUtils {
      * @param request           incoming request
      * @param urlString         URL to rewrite
      * @param pathMatchers      List of PathMatcher
-     * @param rewriteMode
+     * @param rewriteMode       rewrite mode
      * @return                  rewritten URL
      */
     public static String rewriteResourceURL(ExternalContext.Request request, String urlString, List<URLRewriterUtils.PathMatcher> pathMatchers, int rewriteMode) {
@@ -204,7 +237,8 @@ public class URLRewriterUtils {
             }
 
             if (absolutePathNoContext.startsWith("/xforms-server/")) {
-                // Special URL must not be rewritten
+                // Special URL must not be rewritten as resource
+                // TODO: when is this hit?
                 return rewriteURL(request, urlString, rewriteMode);
             }
 
@@ -260,7 +294,9 @@ public class URLRewriterUtils {
                     // 4. Found a match, perform additional rewrite at the beginning
 
                     final String version = isPlatformURL ? Version.getVersion() : applicationVersion;
-                    return rewriteURL(request, "/" + version + absoluteURINoContext, rewriteMode);
+                    // Call full method so that we can get the proper client context path
+                    return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(),
+                            request.getClientContextPath(urlString), request.getRequestPath(), "/" + version + absoluteURINoContext, rewriteMode);
                 }
             }
 
@@ -279,10 +315,11 @@ public class URLRewriterUtils {
      * @return                      true iif path is a platform path
      */
     public static boolean isPlatformPath(String absolutePathNoContext) {
-        // TODO: add test for /forms/orbeon
+        // TODO: add test for /forms/orbeon; should make this a property!
         return absolutePathNoContext.startsWith("/ops/")
                 || absolutePathNoContext.startsWith("/config/")
-                || absolutePathNoContext.startsWith("/xbl/orbeon/");
+                || absolutePathNoContext.startsWith("/xbl/orbeon/")
+                || absolutePathNoContext.startsWith("/xforms-server-submit");
     }
 
     public static boolean isResourcesVersioned() {
@@ -303,7 +340,7 @@ public class URLRewriterUtils {
 
     public static String getApplicationResourceVersion() {
         final String propertyString = Properties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
-        return (propertyString == null || propertyString.trim().length() == 0) ? null : propertyString.trim();
+        return org.apache.commons.lang.StringUtils.isBlank(propertyString) ? null : propertyString.trim();
     }
 
     public static List<URLRewriterUtils.PathMatcher> getMatchAllPathMatcher() {
@@ -312,6 +349,46 @@ public class URLRewriterUtils {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Create an absolute URL from an action string and a search string.
+     *
+     * @param action            absolute URL or absolute path
+     * @param queryString       optional query string to append to the action URL
+     * @param externalContext   current ExternalContext
+     * @return                  an absolute URL
+     */
+    public static URL createAbsoluteURL(String action, String queryString, ExternalContext externalContext) {
+        URL resultURL;
+        try {
+            final String actionString;
+            {
+                final StringBuilder updatedActionStringBuilder = new StringBuilder(action);
+                if (queryString != null && queryString.length() > 0) {
+                    if (action.indexOf('?') == -1)
+                        updatedActionStringBuilder.append('?');
+                    else
+                        updatedActionStringBuilder.append('&');
+                    updatedActionStringBuilder.append(queryString);
+                }
+                actionString = updatedActionStringBuilder.toString();
+            }
+
+            if (actionString.startsWith("/")) {
+                // Case of path absolute
+                final String requestURL = externalContext.getRequest().getRequestURL();
+                resultURL = URLFactory.createURL(requestURL, actionString);
+            } else if (NetUtils.urlHasProtocol(actionString)) {
+                // Case of absolute URL
+                resultURL = URLFactory.createURL(actionString);
+            } else {
+                throw new OXFException("Invalid URL: " + actionString);
+            }
+        } catch (MalformedURLException e) {
+            throw new OXFException("Invalid URL: " + action, e);
+        }
+        return resultURL;
     }
 
     public static class PathMatcher {

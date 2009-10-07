@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.pipeline;
 
@@ -33,7 +33,7 @@ public class SimpleExternalContext implements ExternalContext {
 
     protected class Request implements ExternalContext.Request {
 
-        protected Map attributesMap = new HashMap();
+        protected Map<String, Object> attributesMap = new HashMap<String, Object>();
 
         public String getContainerType() {
             return "simple";
@@ -55,20 +55,20 @@ public class SimpleExternalContext implements ExternalContext {
             return "127.0.0.1";
         }
 
-        public Map getAttributesMap() {
+        public Map<String, Object> getAttributesMap() {
             return attributesMap;
         }
 
-        public Map getHeaderMap() {
-            return Collections.EMPTY_MAP;
+        public Map<String, String> getHeaderMap() {
+            return Collections.emptyMap();
         }
 
-        public Map getHeaderValuesMap() {
-            return Collections.EMPTY_MAP;
+        public Map<String, String[]> getHeaderValuesMap() {
+            return Collections.emptyMap();
         }
 
-        public Map getParameterMap() {
-            return Collections.EMPTY_MAP;
+        public Map<String, Object[]> getParameterMap() {
+            return Collections.emptyMap();
         }
 
         public String getAuthType() {
@@ -154,6 +154,10 @@ public class SimpleExternalContext implements ExternalContext {
             return "";
         }
 
+        public String getClientContextPath(String urlString) {
+            return getContextPath();
+        }
+
         public Reader getReader() throws IOException {
             return null;
         }
@@ -196,7 +200,7 @@ public class SimpleExternalContext implements ExternalContext {
         protected StringWriter writer = new StringWriter();
         protected String contentType;
         protected int status;
-        protected Map headers = new HashMap();
+        protected Map<String, String> headers = new HashMap<String, String>();
 
         public OutputStream getOutputStream() throws IOException {
             return outputStream;
@@ -297,14 +301,14 @@ public class SimpleExternalContext implements ExternalContext {
 
     protected class Session implements ExternalContext.Session {
 
-        protected Map sessionAttributesMap = new HashMap();
+        protected Map<String, Object> sessionAttributesMap = new HashMap<String, Object>();
 
         public long getCreationTime() {
             return 0;
         }
 
         public String getId() {
-            return new Integer(sessionAttributesMap.hashCode()).toString();
+            return Integer.toString(sessionAttributesMap.hashCode());
         }
 
         public long getLastAccessedTime() {
@@ -316,7 +320,7 @@ public class SimpleExternalContext implements ExternalContext {
         }
 
         public void invalidate() {
-            sessionAttributesMap = new HashMap();
+            sessionAttributesMap = new HashMap<String, Object>();
         }
 
         public boolean isNew() {
@@ -326,11 +330,11 @@ public class SimpleExternalContext implements ExternalContext {
         public void setMaxInactiveInterval(int interval) {
         }
 
-        public Map getAttributesMap() {
+        public Map<String, Object> getAttributesMap() {
             return sessionAttributesMap;
         }
 
-        public Map getAttributesMap(int scope) {
+        public Map<String, Object> getAttributesMap(int scope) {
             if (scope != APPLICATION_SCOPE)
                 throw new OXFException("Invalid session scope scope: only the application scope is allowed in Eclipse");
             return getAttributesMap();
@@ -390,16 +394,12 @@ public class SimpleExternalContext implements ExternalContext {
         return application;
     }
 
-    public Map getSessionMap() {
-        return Collections.EMPTY_MAP;
+    public Map<String, Object> getAttributesMap() {
+        return Collections.emptyMap();
     }
 
-    public Map getAttributesMap() {
-        return Collections.EMPTY_MAP;
-    }
-
-    public Map getInitAttributesMap() {
-        return Collections.EMPTY_MAP;
+    public Map<String, String> getInitAttributesMap() {
+        return Collections.emptyMap();
     }
 
     public String getRealPath(String path) {

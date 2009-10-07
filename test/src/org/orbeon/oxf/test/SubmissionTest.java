@@ -31,7 +31,7 @@ public class SubmissionTest extends TestCase {
     public void testForwardHeaders() {
 
         // Custom headers
-        final Map customHeaderValuesMap = new LinkedHashMap();
+        final Map<String, String[]> customHeaderValuesMap = new LinkedHashMap<String, String[]>();
         customHeaderValuesMap.put("my-stuff", new String[] { "my-value" });
         customHeaderValuesMap.put("your-stuff", new String[] { "your-value-1", "your-value-2" });
 
@@ -39,8 +39,8 @@ public class SubmissionTest extends TestCase {
         final ExternalContext.Request incomingRequest = new RequestAdapter() {
 
             // Fake standard headers
-            final Map incomingHeaderMap = new LinkedHashMap();
-            final Map incomingHeaderValuesMap = new LinkedHashMap();
+            final Map<String, String> incomingHeaderMap = new LinkedHashMap<String, String>();
+            final Map<String, String[]> incomingHeaderValuesMap = new LinkedHashMap<String, String[]>();
 
             {
                 incomingHeaderMap.put("user-agent", "Mozilla 12.1");
@@ -54,11 +54,11 @@ public class SubmissionTest extends TestCase {
                 incomingHeaderValuesMap.put("cookie", new String[] { "JSESSIONID=4FF78C3BD70905FAB502BC989450E40C" });
             }
 
-            public Map getHeaderMap() {
+            public Map<String, String> getHeaderMap() {
                 return incomingHeaderMap;
             }
 
-            public Map getHeaderValuesMap() {
+            public Map<String, String[]> getHeaderValuesMap() {
                 return incomingHeaderValuesMap;
             }
         };
@@ -68,27 +68,27 @@ public class SubmissionTest extends TestCase {
                 "GET", OptimizedSubmission.STANDARD_HEADERS_TO_FORWARD, customHeaderValuesMap);
 
         // Test standard headers received
-        final Map headerMap = request.getHeaderMap();
-        final Map headerValuesMap = request.getHeaderValuesMap();
+        final Map<String, String> headerMap = request.getHeaderMap();
+        final Map<String, String[]> headerValuesMap = request.getHeaderValuesMap();
 
         assertEquals("Mozilla 12.1", headerMap.get("user-agent"));
-        assertEquals("Mozilla 12.1", ((String[]) headerValuesMap.get("user-agent"))[0]);
+        assertEquals("Mozilla 12.1", (headerValuesMap.get("user-agent"))[0]);
 
         assertEquals("xsifj1skf3", headerMap.get("authorization"));
-        assertEquals("xsifj1skf3", ((String[]) headerValuesMap.get("authorization"))[0]);
+        assertEquals("xsifj1skf3", (headerValuesMap.get("authorization"))[0]);
 
         assertEquals("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C", headerMap.get("cookie"));
-        assertEquals("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C", ((String[]) headerValuesMap.get("cookie"))[0]);
+        assertEquals("JSESSIONID=4FF78C3BD70905FAB502BC989450E40C", (headerValuesMap.get("cookie"))[0]);
 
         assertNull(headerMap.get("host"));
         assertNull(headerMap.get("foobar"));
 
         // Test custom headers received
         assertEquals("my-value", headerMap.get("my-stuff"));
-        assertEquals("my-value", ((String[]) headerValuesMap.get("my-stuff"))[0]);
+        assertEquals("my-value", (headerValuesMap.get("my-stuff"))[0]);
 
         assertEquals("your-value-1", headerMap.get("your-stuff"));
-        assertEquals("your-value-1", ((String[]) headerValuesMap.get("your-stuff"))[0]);
-        assertEquals("your-value-2", ((String[]) headerValuesMap.get("your-stuff"))[1]);
+        assertEquals("your-value-1", (headerValuesMap.get("your-stuff"))[0]);
+        assertEquals("your-value-2", (headerValuesMap.get("your-stuff"))[1]);
     }
 }

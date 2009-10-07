@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2009 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 package org.orbeon.oxf.processor.test;
 
 import org.apache.commons.fileupload.FileItem;
@@ -11,9 +24,10 @@ import org.orbeon.oxf.processor.EmailProcessor;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.util.StringUtils;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.sax.SAXSource;
@@ -35,7 +49,7 @@ public class TestExternalContext implements ExternalContext  {
     private Request request;
     private Response response;
 
-    private Map attributesMap;
+    private Map<String, Object> attributesMap;
 
     public TestExternalContext(PipelineContext pipelineContext, Document requestDocument) {
         this.pipelineContext = pipelineContext;
@@ -44,10 +58,10 @@ public class TestExternalContext implements ExternalContext  {
 
     private class Request implements ExternalContext.Request {
 
-        private Map attributesMap;
-        private Map parameterMap;
-        private Map headerMap;
-        private Map headerValuesMap;
+        private Map<String, Object> attributesMap;
+        private Map<String, Object[]> parameterMap;
+        private Map<String, String> headerMap;
+        private Map<String, String[]> headerValuesMap;
 
         private InputStream bodyInputStream;
         private String bodyContentType;
@@ -57,9 +71,15 @@ public class TestExternalContext implements ExternalContext  {
         private boolean getInputStreamCalled;
         private boolean getReaderCalled;
 
-        public Map getAttributesMap() {
+        public Map<String, Object> getAttributesMap() {
             if (attributesMap == null) {
-                attributesMap = new LinkedHashMap();
+                attributesMap = new LinkedHashMap<String, Object>();
+                for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/attributes/attribute"); i.hasNext();) {
+                    final Element e = (Element) i.next();
+                    final String name = XPathUtils.selectStringValueNormalize(e, "name");
+                    final String value = XPathUtils.selectStringValueNormalize(e, "value[1]");
+                    attributesMap.put(name, value);
+                }
             }
             return attributesMap;
         }
@@ -120,12 +140,11 @@ public class TestExternalContext implements ExternalContext  {
                     String systemId = locationData == null ? null : locationData.getSystemID();
 
                     SAXSource saxSource = EmailProcessor.getSAXSource(null, pipelineContext, hrefAttribute, systemId, contentType);
-                    FileItem content = EmailProcessor.handleStreamedPartContent(pipelineContext, saxSource);
+                    final FileItem fileItem = EmailProcessor.handleStreamedPartContent(pipelineContext, saxSource);
 
                     if (!(XMLUtils.isTextContentType(contentType) || XMLUtils.isXMLMediatype(contentType))) {
                         // This is binary content
-                        if (content instanceof FileItem) {
-                            final FileItem fileItem = (FileItem) content;
+                        if (fileItem != null) {
 
                             bodyInputStream = fileItem.getInputStream();
                             bodyContentType = contentType;
@@ -141,9 +160,8 @@ public class TestExternalContext implements ExternalContext  {
                         }
                     } else {
                         // This is text content
-                        if (content instanceof FileItem) {
+                        if (fileItem != null) {
                             // The text content was encoded when written to the FileItem
-                            final FileItem fileItem = (FileItem) content;
 
                             bodyInputStream = fileItem.getInputStream();
                             bodyContentType = contentType;
@@ -184,7 +202,7 @@ public class TestExternalContext implements ExternalContext  {
             return XPathUtils.selectStringValueNormalize(requestDocument, "/*/context-path");
         }
 
-        public Map getHeaderMap() {
+        public Map<String, String> getHeaderMap() {
             if (headerMap == null) {
                 final Map<String, String> map = new LinkedHashMap<String, String>();
                 for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/headers/header"); i.hasNext();) {
@@ -198,7 +216,7 @@ public class TestExternalContext implements ExternalContext  {
             return headerMap;
         }
 
-        public Map getHeaderValuesMap() {
+        public Map<String, String[]> getHeaderValuesMap() {
             if (headerValuesMap == null) {
                 final Map<String, String[]> map = new LinkedHashMap<String, String[]>();
                 for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/headers/header"); i.hasNext();) {
@@ -229,7 +247,7 @@ public class TestExternalContext implements ExternalContext  {
             return XPathUtils.selectStringValueNormalize(requestDocument, "/*/method");
         }
 
-        public Map getParameterMap() {
+        public Map<String, Object[]> getParameterMap() {
             if (parameterMap == null) {
                 final Map<String, Object[]> map = new LinkedHashMap<String, Object[]>();
                 for (Iterator i = XPathUtils.selectIterator(requestDocument, "/*/parameters/parameter"); i.hasNext();) {
@@ -304,6 +322,10 @@ public class TestExternalContext implements ExternalContext  {
 
         public String getServletPath() {
             return XPathUtils.selectStringValueNormalize(requestDocument, "/*/servlet-path");
+        }
+
+        public String getClientContextPath(String urlString) {
+            return URLRewriterUtils.getClientContextPath(this, URLRewriterUtils.isPlatformPath(urlString));
         }
 
         public Principal getUserPrincipal() {
@@ -446,7 +468,7 @@ public class TestExternalContext implements ExternalContext  {
     public ExternalContext.Session getSession(boolean create) {
         if (session == null && create) {
             session = new ExternalContext.Session() {
-                final Map attributes = new LinkedHashMap();
+                final Map<String, Object> attributes = new LinkedHashMap<String, Object>();
                 public long getCreationTime() {
                     return System.currentTimeMillis();
                 }
@@ -479,11 +501,11 @@ public class TestExternalContext implements ExternalContext  {
                     // TODO
                 }
 
-                public Map getAttributesMap() {
+                public Map<String, Object> getAttributesMap() {
                     return attributes;
                 }
 
-                public Map getAttributesMap(int scope) {
+                public Map<String, Object> getAttributesMap(int scope) {
                     return attributes;
                 }
 
@@ -534,15 +556,15 @@ public class TestExternalContext implements ExternalContext  {
         return null;
     }
 
-    public Map getAttributesMap() {
+    public Map<String, Object> getAttributesMap() {
         if (attributesMap == null) {
-            attributesMap = new LinkedHashMap();
+            attributesMap = new LinkedHashMap<String, Object>();
         }
         return attributesMap;
     }
 
-    public Map getInitAttributesMap() {
-        return Collections.EMPTY_MAP;
+    public Map<String, String> getInitAttributesMap() {
+        return Collections.emptyMap();
     }
 
     public Object getNativeContext() {

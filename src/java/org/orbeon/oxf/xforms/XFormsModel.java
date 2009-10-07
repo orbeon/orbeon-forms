@@ -749,7 +749,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // Make sure URL is absolute to make it unique
                 final String absoluteResolvedURLString; {
                     // TODO: most likely WRONG; should use resolveServiceURL(), right?
-                    final URL absoluteResolvedURL = NetUtils.createAbsoluteURL(resourceAbsolutePathOrAbsoluteURL, null, externalContext);
+                    final URL absoluteResolvedURL = URLRewriterUtils.createAbsoluteURL(resourceAbsolutePathOrAbsoluteURL, null, externalContext);
                     absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
                 }
 
@@ -849,7 +849,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 absoluteResolvedURLString = resourceAbsolutePathOrAbsoluteURL;
             } else {
                 // URL is regular URL, make sure it is absolute
-                absoluteResolvedURL = NetUtils.createAbsoluteURL(resourceAbsolutePathOrAbsoluteURL, null, externalContext);
+                absoluteResolvedURL = URLRewriterUtils.createAbsoluteURL(resourceAbsolutePathOrAbsoluteURL, null, externalContext);
                 absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
             }
         }

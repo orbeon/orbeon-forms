@@ -1,22 +1,21 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.generator;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
@@ -28,7 +27,6 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.*;
@@ -79,8 +77,6 @@ import java.util.Map;
  *   memory?
  */
 public class RequestGenerator extends ProcessorImpl {
-
-    static Logger logger = LoggerFactory.createLogger(RequestGenerator.class);
 
     public static final String REQUEST_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/request-config";
     private static final String REQUEST_PRIVATE_NAMESPACE_URI = "http://orbeon.org/oxf/xml/request-private";
@@ -331,10 +327,11 @@ public class RequestGenerator extends ProcessorImpl {
         addTextElement(requestElement, "scheme", request.getScheme());
         addTextElement(requestElement, "server-name", request.getServerName());
         addTextElement(requestElement, "server-port", Integer.toString(request.getServerPort()));
-        addTextElement(requestElement, "is-secure", new Boolean(request.isSecure()).toString());
+        addTextElement(requestElement, "is-secure", Boolean.toString(request.isSecure()));
         addTextElement(requestElement, "auth-type", request.getAuthType());
         addTextElement(requestElement, "context-path", request.getContextPath());
         addHeaders(requestElement, request);
+        addAttributes(requestElement, request);
         addTextElement(requestElement, "method", request.getMethod());
         addTextElement(requestElement, "path-info", request.getPathInfo());
         addTextElement(requestElement, "path-translated", request.getPathTranslated());
@@ -384,22 +381,22 @@ public class RequestGenerator extends ProcessorImpl {
     }
 
     private void prune(Element element) {
-        Attribute a = element.attribute(MARK_ATTRIBUTE);
-        if (a == null) {
+        Attribute attribute = element.attribute(MARK_ATTRIBUTE);
+        if (attribute == null) {
             element.detach();
         } else {
-            element.remove(a);
-            List remove = new ArrayList();
+            element.remove(attribute);
+            final List<Element> elementsToRemove = new ArrayList<Element>();
             for (Iterator i = element.elementIterator(); i.hasNext();) {
-                Element e = (Element) i.next();
-                a = e.attribute(MARK_ATTRIBUTE);
-                if (a == null)
-                    remove.add(e);
+                final Element e = (Element) i.next();
+                attribute = e.attribute(MARK_ATTRIBUTE);
+                if (attribute == null)
+                    elementsToRemove.add(e);
                 else
                     prune(e);
             }
-            for (Iterator i = remove.iterator(); i.hasNext();)
-                ((Element) i.next()).detach();
+            for (final Element elementToRemove : elementsToRemove)
+                elementToRemove.detach();
         }
     }
 
@@ -450,12 +447,11 @@ public class RequestGenerator extends ProcessorImpl {
      */
     protected void addParameters(PipelineContext pipelineContext, Element requestElement, final ExternalContext.Request request) {
         // Obtain parameters from external context
-        Map parametersMap = request.getParameterMap();
+        final Map<String, Object[]> parametersMap = request.getParameterMap();
         // Check if there is at least one file upload and set this information in the pipeline context
-        for (Iterator i = parametersMap.values().iterator(); i.hasNext();) {
-            final Object[] values = (Object[]) i.next();
-            for (int j = 0; j < values.length; j++) {
-                if (values[j] instanceof FileItem) {
+        for (final Object[] values : parametersMap.values()) {
+            for (Object value : values) {
+                if (value instanceof FileItem) {
                     getContext(pipelineContext).hasUpload = true;
                     break;
                 }
@@ -465,47 +461,61 @@ public class RequestGenerator extends ProcessorImpl {
         addElements(requestElement, parametersMap, "parameters", "parameter");
     }
 
+    protected void addAttributes(Element requestElement, final ExternalContext.Request request) {
+        // Add attributes elements
+        addElements(requestElement, request.getAttributesMap(), "attributes", "attribute");
+    }
+
     protected void addHeaders(Element requestElement, ExternalContext.Request request) {
         addElements(requestElement, request.getHeaderValuesMap(), "headers", "header");
     }
 
-    protected void addElements(Element requestElement, Map map, String name1, String name2) {
-        final Element parametersElement = requestElement.addElement(name1);
-        for (Iterator i = map.keySet().iterator(); i.hasNext();) {
-            final Element parameterElement = parametersElement.addElement(name2);
-            // Always create the name element
-            final String name = (String) i.next();
-            parameterElement.addElement("name").addText(name);
+    protected void addElements(Element requestElement, Map<String, ?> map, String name1, String name2) {
+        if (map.size() >= 0) {
+            final Element parametersElement = requestElement.addElement(name1);
+            for (final String name : map.keySet()) {
 
-            final Object[] values = (Object[]) map.get(name);
-            for (int j = 0; j < values.length; j++) {
-                final Object value = values[j];
+                final Element parameterElement = parametersElement.addElement(name2);
+                // Always create the name element
+                parameterElement.addElement("name").addText(name);
 
-                if (value instanceof String) {
-                    // Simple String parameter
-                    parameterElement.addElement("value").addText((String) value);
-                } else if (value instanceof FileItem) {
-                    // Retrieve the FileItem (only for parameters)
-                    final FileItem fileItem = (FileItem) value;
-
-                    // Set meta-information element
-                    if (fileItem.getName() != null)
-                        parameterElement.addElement("filename").addText(fileItem.getName());
-                    if (fileItem.getContentType() != null)
-                        parameterElement.addElement("content-type").addText(fileItem.getContentType());
-                    parameterElement.addElement("content-length").addText(Long.toString(fileItem.getSize()));
-
-                    if (!isFileItemEmpty(fileItem)) {
-                        // Create private placeholder element with parameter name as attribute
-                        final Element fileItemElement = parameterElement.addElement(FILE_ITEM_ELEMENT, REQUEST_PRIVATE_NAMESPACE_URI);
-                        fileItemElement.addAttribute(PARAMETER_NAME_ATTRIBUTE, name);
-                        fileItemElement.addAttribute(PARAMETER_POSITION_ATTRIBUTE, Integer.toString(j));
-                    } else {
-                        // Just generate an empty "value" element
-                        parameterElement.addElement("value");
-                    }
+                final Object entryValue = map.get(name);
+                final Object[] values;
+                if (entryValue instanceof Object[]) {
+                    values = (Object[]) entryValue;
                 } else {
-                    throw new OXFException("Invalid value type.");
+                    values = new Object[] { entryValue };
+                }
+
+                for (int j = 0; j < values.length; j++) {
+                    final Object value = values[j];
+
+                    if (value instanceof String) {
+                        // Simple String parameter
+                        parameterElement.addElement("value").addText((String) value);
+                    } else if (value instanceof FileItem) {
+                        // Retrieve the FileItem (only for parameters)
+                        final FileItem fileItem = (FileItem) value;
+
+                        // Set meta-information element
+                        if (fileItem.getName() != null)
+                            parameterElement.addElement("filename").addText(fileItem.getName());
+                        if (fileItem.getContentType() != null)
+                            parameterElement.addElement("content-type").addText(fileItem.getContentType());
+                        parameterElement.addElement("content-length").addText(Long.toString(fileItem.getSize()));
+
+                        if (!isFileItemEmpty(fileItem)) {
+                            // Create private placeholder element with parameter name as attribute
+                            final Element fileItemElement = parameterElement.addElement(FILE_ITEM_ELEMENT, REQUEST_PRIVATE_NAMESPACE_URI);
+                            fileItemElement.addAttribute(PARAMETER_NAME_ATTRIBUTE, name);
+                            fileItemElement.addAttribute(PARAMETER_POSITION_ATTRIBUTE, Integer.toString(j));
+                        } else {
+                            // Just generate an empty "value" element
+                            parameterElement.addElement("value");
+                        }
+                    } else {
+                        // ignore (needed in case of attributes, which can be any Java object)
+                    }
                 }
             }
         }

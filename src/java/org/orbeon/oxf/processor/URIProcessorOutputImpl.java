@@ -387,7 +387,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
                 // Compute absolute submission URL
-                final URL submissionURL = NetUtils.createAbsoluteURL(urlString, null, externalContext);
+                final URL submissionURL = URLRewriterUtils.createAbsoluteURL(urlString, null, externalContext);
                 // Open connection
                 final ConnectionResult connectionResult
                     = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),

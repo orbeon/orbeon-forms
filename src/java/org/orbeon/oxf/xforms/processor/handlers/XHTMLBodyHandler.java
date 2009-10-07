@@ -16,8 +16,9 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
@@ -68,11 +69,12 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         final String requestPath;
         final String xformsSubmissionPath;
         {
-            requestPath = handlerContext.getExternalContext().getRequest().getRequestPath();
-            final boolean isForwarded = OrbeonXFormsFilter.OPS_RENDERER_PATH.equals(requestPath);
-            if (isForwarded) {
+            final ExternalContext.Request request = handlerContext.getExternalContext().getRequest();
+            requestPath = request.getRequestPath();
+            if (URLRewriterUtils.isForwarded(request)) {
                 // This is the case where the request was forwarded to us (separate deployment)
-                xformsSubmissionPath = "/xforms-server-submit";// TODO: read property!
+                // TODO: read property?
+                xformsSubmissionPath =  "/xforms-server-submit";
             } else {
                 // Submission posts to URL of the current page and xforms-xml-submission.xpl intercepts that
                 xformsSubmissionPath = requestPath;

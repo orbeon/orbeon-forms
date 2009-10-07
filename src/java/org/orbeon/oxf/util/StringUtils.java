@@ -59,6 +59,22 @@ public class StringUtils {
     }
 
     /**
+     * Convert a String array into an Object array.
+     */
+    public static Object[] stringArrayToObjectArray(String[] values) {
+
+        if (values == null)
+            return null;
+
+        final Object[] result = new Object[values.length];
+        int size = 0;
+        for (final Object currentValue: values) {
+            result[size++] = currentValue;
+        }
+        return result;
+    }
+
+    /**
      * Return the value of the first object in the array as a String.
      */
     public static String getStringFromObjectArray(Object[] values) {

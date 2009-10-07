@@ -30,13 +30,13 @@ import java.util.*;
 public class OrbeonXFormsFilter implements Filter {
 
     public static final String OPS_XFORMS_RENDERER_DEPLOYMENT = "oxf.xforms.renderer.deployment";
-    public static final String OPS_XFORMS_RENDERER_REQUEST_CONTEXT_PATH = "oxf.xforms.renderer.request.context-path";
-    public static final String OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.document";
+
     public static final String OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME = "oxf.xforms.renderer.base-uri";
+
+    public static final String OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.document";
     public static final String OPS_XFORMS_RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME = "oxf.xforms.renderer.content-type";
     public static final String OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME = "oxf.xforms.renderer.has-session";
 
-    public static final String OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME = "oxf.servlet.context";
     public static final String OPS_RENDERER_PATH = "/xforms-renderer";
 
     private static final String OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME = "oxf.xforms.renderer.context";
@@ -57,10 +57,10 @@ public class OrbeonXFormsFilter implements Filter {
         final HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         final HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
-        final String requestPath = getRequestPathInfo(httpRequest);
+        final String requestPath = getRequestPath(httpRequest);
 
         if (isOPSResourceRequest(requestPath)) {
-            // Directly forward all requests meant for Orbeon Forms resources
+            // Directly forward all requests meant for Orbeon Forms resources (including /xforms-server)
             final String subRequestPath = requestPath.substring(opsContextPath.length());
             getOPSDispatcher(subRequestPath).forward(httpRequest, httpResponse);
         } else {
@@ -80,13 +80,6 @@ public class OrbeonXFormsFilter implements Filter {
 
             // Set whether deployment is integrated or separate
             httpRequest.setAttribute(OPS_XFORMS_RENDERER_DEPLOYMENT, (getOPSContext() == servletContext) ? "integrated" : "separate");
-
-            // Set servlet context for renderer
-            httpRequest.setAttribute(OPS_XFORMS_RENDERER_REQUEST_CONTEXT_PATH, httpRequest.getContextPath());
-
-            // Override Orbeon Forms context so that rewriting works correctly
-            if (opsContextPath != null)
-                httpRequest.setAttribute(OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME, httpRequest.getContextPath() + opsContextPath);
 
             // Tell whether there is a session
             httpRequest.setAttribute(OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME, Boolean.toString(httpRequest.getSession(false) != null));
@@ -146,7 +139,7 @@ public class OrbeonXFormsFilter implements Filter {
     }
 
     // NOTE: This is borrowed from NetUtils but we don't want the dependency
-    private static String getRequestPathInfo(HttpServletRequest request) {
+    private static String getRequestPath(HttpServletRequest request) {
 
         // Get servlet path and path info
         String servletPath = request.getServletPath();
@@ -170,10 +163,10 @@ public class OrbeonXFormsFilter implements Filter {
     public static String getContentTypeCharset(String contentType) {
         if (contentType == null)
             return null;
-        int semicolumnIndex = contentType.indexOf(";");
-        if (semicolumnIndex == -1)
+        int semicolonIndex = contentType.indexOf(";");
+        if (semicolonIndex == -1)
             return null;
-        int charsetIndex = contentType.indexOf("charset=", semicolumnIndex);
+        int charsetIndex = contentType.indexOf("charset=", semicolonIndex);
         if (charsetIndex == -1)
             return null;
         // FIXME: There may be other attributes after charset, right?
@@ -186,10 +179,10 @@ public class OrbeonXFormsFilter implements Filter {
     public static String getContentTypeMediaType(String contentType) {
         if (contentType == null || contentType.equalsIgnoreCase("content/unknown"))
             return null;
-        int semicolumnIndex = contentType.indexOf(";");
-        if (semicolumnIndex == -1)
+        int semicolonIndex = contentType.indexOf(";");
+        if (semicolonIndex == -1)
             return contentType;
-        return contentType.substring(0, semicolumnIndex).trim();
+        return contentType.substring(0, semicolonIndex).trim();
     }
 
     private static class MyHttpServletRequestWrapper extends HttpServletRequestWrapper {

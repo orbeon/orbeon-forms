@@ -205,7 +205,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:bind-property
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}bind-property", XXFormsEvaluateMIP.class, 0, 2, 2, Type.ANY_ATOMIC_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}evaluate-bind-property", XXFormsEvaluateBindProperty.class, 0, 2, 2, Type.ANY_ATOMIC_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 1, Type.ANY_ATOMIC_TYPE, StaticProperty.EXACTLY_ONE); // QName or String
 

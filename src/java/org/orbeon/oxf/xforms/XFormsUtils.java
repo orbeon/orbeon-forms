@@ -806,7 +806,7 @@ public class XFormsUtils {
         try {
             final StringBuffer value = new StringBuffer();
             final char[] buff = new char[SRC_CONTENT_BUFFER_SIZE];
-            int c = 0;
+            int c;
             while ((c = reader.read(buff, 0, SRC_CONTENT_BUFFER_SIZE - 1)) != -1) value.append(buff, 0, c);
             return value.toString();
         } finally {
@@ -853,10 +853,9 @@ public class XFormsUtils {
      * @param propertyContext       current context
      * @param currentElement        element used for xml:base resolution
      * @param url                   URL to resolve
-     * @param generateAbsoluteURL   whether the result must be an absolute URL (if isPortletLoad == false)
      * @return                      resolved URL
      */
-    public static String resolveRenderOrActionURL(boolean isPortletLoad, PropertyContext propertyContext, Element currentElement, String url, boolean generateAbsoluteURL) {
+    public static String resolveRenderOrActionURL(boolean isPortletLoad, PropertyContext propertyContext, Element currentElement, String url) {
         final URI resolvedURI = resolveXMLBase(currentElement, url);
         final String resolvedURIString = resolvedURI.toString();
         final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
@@ -866,10 +865,7 @@ public class XFormsUtils {
         // runs in a servlet when processing these events!
         if (!isPortletLoad) {
             // XForms page was loaded from a servlet
-            // TODO: check this: must probably use response rewriting methods
-//            externalURL = externalContext.getResponse().rewriteRenderURL(resolvedURIString);
-            externalURL = URLRewriterUtils.rewriteURL(externalContext.getRequest(), resolvedURIString,
-                generateAbsoluteURL ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+            externalURL = externalContext.getResponse().rewriteRenderURL(resolvedURIString, null, null);
         } else {
             // XForms page was loaded from a portlet
             if (resolvedURI.getFragment() != null) {
@@ -940,7 +936,7 @@ public class XFormsUtils {
             // TODO: href may be an action URL or a render URL. Should pass element name and reuse code from AbstractRewrite.
 
             final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
-            rewrittenValue = resolveRenderOrActionURL(isPortletLoad, pipelineContext, element, attributeValue, false);
+            rewrittenValue = resolveRenderOrActionURL(isPortletLoad, pipelineContext, element, attributeValue);
         } else {
             rewrittenValue = attributeValue;
         }
@@ -1129,7 +1125,6 @@ public class XFormsUtils {
      * @param document      the Document to display
      */
     public static void logDebugDocument(String debugMessage, Document document) {
-//        XFormsServer.logger.debug(debugMessage + ":\n" + Dom4jUtils.domToString(document));
         DebugProcessor.logger.info(debugMessage + ":\n" + Dom4jUtils.domToString(document));
     }
 

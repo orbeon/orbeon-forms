@@ -122,7 +122,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         this.submissions = new Submission[] {
             new EchoSubmission(this),
-            new OptimizedGetSubmission(this),
+            new ClientGetAllSubmission(this),
             new OptimizedSubmission(this),
             new CacheableSubmission(this),
             new RegularSubmission(this)
@@ -640,7 +640,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean resolvedValidate;
         final boolean resolvedRelevant;
         
-        final boolean isHandlingOptimizedGet;
+        final boolean isHandlingClientGetAll;
 
         // XPath function library and namespace mappings
         final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
@@ -718,7 +718,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 resolvedRelevant = !"false".equals(resolvedRelevantString);
             }
         
-            isHandlingOptimizedGet = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && actualHttpMethod.equals("GET")
+            isHandlingClientGetAll = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && actualHttpMethod.equals("GET")
                     && isReplaceAll
                     && (resolvedMediatype == null || !resolvedMediatype.startsWith(NetUtils.APPLICATION_SOAP_XML)) // can't let SOAP requests be handled by the browser
                     && avtXXFormsUsername == null // can't optimize if there are authentication credentials
@@ -728,7 +728,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             isNoscript = XFormsProperties.isNoscript(containingDocument);
             isAllowDeferredSubmission = !isNoscript && !XFormsProperties.isAjaxPortlet(containingDocument);
         
-            isPossibleDeferredSubmission = (isReplaceAll && !isHandlingOptimizedGet) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);
+            isPossibleDeferredSubmission = (isReplaceAll && !isHandlingClientGetAll) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);
             isDeferredSubmission = isAllowDeferredSubmission && isPossibleDeferredSubmission;
             isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
             isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT

@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -67,7 +68,7 @@ public abstract class BaseSubmission implements Submission {
         }
 
         // Compute absolute submission URL
-        return NetUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
+        return URLRewriterUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
     }
 
     /**

@@ -1,27 +1,27 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 
-import java.util.Map;
-import java.util.Locale;
-import java.util.Enumeration;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.security.Principal;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  *
@@ -35,7 +35,7 @@ public class RequestWrapper implements ExternalContext.Request {
         this._request = request;
     }
 
-    public Map getAttributesMap() {
+    public Map<String, Object> getAttributesMap() {
         return _request.getAttributesMap();
     }
 
@@ -67,11 +67,11 @@ public class RequestWrapper implements ExternalContext.Request {
         return _request.getContextPath();
     }
 
-    public Map getHeaderMap() {
+    public Map<String, String> getHeaderMap() {
         return _request.getHeaderMap();
     }
 
-    public Map getHeaderValuesMap() {
+    public Map<String, String[]> getHeaderValuesMap() {
         return _request.getHeaderValuesMap();
     }
 
@@ -95,7 +95,7 @@ public class RequestWrapper implements ExternalContext.Request {
         return _request.getNativeRequest();
     }
 
-    public Map getParameterMap() {
+    public Map<String, Object[]> getParameterMap() {
         return _request.getParameterMap();
     }
 
@@ -161,6 +161,10 @@ public class RequestWrapper implements ExternalContext.Request {
 
     public String getServletPath() {
         return _request.getServletPath();
+    }
+
+    public String getClientContextPath(String urlString) {
+        return _request.getClientContextPath(urlString);
     }
 
     public Principal getUserPrincipal() {

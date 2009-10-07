@@ -98,7 +98,7 @@ public class XFormsLoadAction extends XFormsAction {
         } else {
             // URL must be resolved
             if ((!isPortletLoad) ? doReplace : (doReplace && !"resource".equals(urlType))) {
-                externalURL = XFormsUtils.resolveRenderOrActionURL(isPortletLoad, propertyContext, currentElement, value, false);
+                externalURL = XFormsUtils.resolveRenderOrActionURL(isPortletLoad, propertyContext, currentElement, value);
             } else {
                 // Just a resource URL
                 externalURL = XFormsUtils.resolveResourceURL(propertyContext, currentElement, value,

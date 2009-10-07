@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.portlet;
 
@@ -21,8 +21,8 @@ import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.util.StringUtils;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -240,6 +240,28 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         public String getServletPath() {
             // NOTE: The portlet API does not provide for this value.
             return null;
+        }
+
+        private String platformClientContextPath;
+        private String applicationClientContextPath;
+
+        public String getClientContextPath(String urlString) {
+            // Return depending on whether passed URL is a platform URL or not
+            return URLRewriterUtils.isPlatformPath(urlString) ? getPlatformClientContextPath() : getApplicationClientContextPath();
+        }
+
+        private String getPlatformClientContextPath() {
+            if (platformClientContextPath == null) {
+                platformClientContextPath = URLRewriterUtils.getClientContextPath(this, true);
+            }
+            return platformClientContextPath;
+        }
+
+        private String getApplicationClientContextPath() {
+            if (applicationClientContextPath == null) {
+                applicationClientContextPath = URLRewriterUtils.getClientContextPath(this, false);
+            }
+            return applicationClientContextPath;
         }
 
         public Locale getLocale() {

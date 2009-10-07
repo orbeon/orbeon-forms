@@ -891,7 +891,7 @@
         </output>
     </test>
     
-    <test description="Simple use of xxforms:bind-property function" name="oxf:pipeline">
+    <test description="Simple use of xxforms:evaluate-bind-property function" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -913,13 +913,13 @@
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:output id="output-relevant" value="xxforms:bind-property('foo-bind', 'relevant')"/>
-                    <xforms:output id="output-readonly" value="xxforms:bind-property('foo-bind', 'readonly')"/>
-                    <xforms:output id="output-required" value="xxforms:bind-property('foo-bind', 'required')"/>
-                    <xforms:output id="output-type" value="xxforms:bind-property('foo-bind', 'type')"/>
-                    <xforms:output id="output-constraint" value="xxforms:bind-property('foo-bind', 'constraint')"/>
-                    <xforms:output id="output-calculate" value="xxforms:bind-property('foo-bind', 'calculate')"/>
-                    <xforms:output id="output-default" value="xxforms:bind-property('foo-bind', 'xxforms:default')"/>
+                    <xforms:output id="output-relevant" value="xxforms:evaluate-bind-property('foo-bind', 'relevant')"/>
+                    <xforms:output id="output-readonly" value="xxforms:evaluate-bind-property('foo-bind', 'readonly')"/>
+                    <xforms:output id="output-required" value="xxforms:evaluate-bind-property('foo-bind', 'required')"/>
+                    <xforms:output id="output-type" value="xxforms:evaluate-bind-property('foo-bind', 'type')"/>
+                    <xforms:output id="output-constraint" value="xxforms:evaluate-bind-property('foo-bind', 'constraint')"/>
+                    <xforms:output id="output-calculate" value="xxforms:evaluate-bind-property('foo-bind', 'calculate')"/>
+                    <xforms:output id="output-default" value="xxforms:evaluate-bind-property('foo-bind', 'xxforms:default')"/>
                 </xhtml:body>
             </xhtml:html>
         </input>
@@ -951,7 +951,7 @@
         </output>
     </test>
 
-    <test description="xxforms:bind-property function within nested nested binds with repeat" name="oxf:pipeline">
+    <test description="xxforms:evaluate-bind-property function within nested nested binds with repeat" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -983,15 +983,15 @@
                 </xhtml:head>
                 <xhtml:body>
                     <xforms:repeat bind="foo-bind" id="repeat">
-                        <xforms:output id="output-relevant" value="xxforms:bind-property('value-bind', 'relevant')"/>
-                        <xforms:output id="output-readonly" value="xxforms:bind-property('value-bind', 'readonly')"/>
-                        <xforms:output id="output-required" value="xxforms:bind-property('value-bind', 'required')"/>
-                        <xforms:output id="output-type" value="xxforms:bind-property('value-bind', 'type')"/>
-                        <xforms:output id="output-constraint" value="xxforms:bind-property('value-bind', 'constraint')"/>
-                        <xforms:output id="output-default" value="xxforms:bind-property('value-bind', 'xxforms:default')"/>
-                        <xforms:output id="output-custom" value="xxforms:bind-property('value-bind', 'foo:bar')"/>
+                        <xforms:output id="output-relevant" value="xxforms:evaluate-bind-property('value-bind', 'relevant')"/>
+                        <xforms:output id="output-readonly" value="xxforms:evaluate-bind-property('value-bind', 'readonly')"/>
+                        <xforms:output id="output-required" value="xxforms:evaluate-bind-property('value-bind', 'required')"/>
+                        <xforms:output id="output-type" value="xxforms:evaluate-bind-property('value-bind', 'type')"/>
+                        <xforms:output id="output-constraint" value="xxforms:evaluate-bind-property('value-bind', 'constraint')"/>
+                        <xforms:output id="output-default" value="xxforms:evaluate-bind-property('value-bind', 'xxforms:default')"/>
+                        <xforms:output id="output-custom" value="xxforms:evaluate-bind-property('value-bind', 'foo:bar')"/>
 
-                        <xforms:output id="output-calculate" value="xxforms:bind-property('bar-bind', 'calculate')"/>
+                        <xforms:output id="output-calculate" value="xxforms:evaluate-bind-property('bar-bind', 'calculate')"/>
                     </xforms:repeat>
                 </xhtml:body>
             </xhtml:html>

@@ -45,10 +45,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -656,7 +653,7 @@ public class XFormsModelSchemaValidator {
             // NOTE: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
             final String resolvedURLString = XFormsUtils.resolveServiceURL(propertyContext, modelElement, schemaURIs[0],
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-            final URL resolvedURL = NetUtils.createAbsoluteURL(resolvedURLString, null, externalContext);
+            final URL resolvedURL = URLRewriterUtils.createAbsoluteURL(resolvedURLString, null, externalContext);
 
             // Load associated grammar
             schemaGrammar = loadCacheGrammar(propertyContext, resolvedURL.toExternalForm());

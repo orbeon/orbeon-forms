@@ -17,21 +17,21 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
 
 /**
- * Optimized GET submission. It stores the resulting location directly into the containing document.
+ * Client-side GET all submission. It stores the resulting location directly into the containing document.
  */
-public class OptimizedGetSubmission extends BaseSubmission {
+public class ClientGetAllSubmission extends BaseSubmission {
 
-    public OptimizedGetSubmission(XFormsModelSubmission submission) {
+    public ClientGetAllSubmission(XFormsModelSubmission submission) {
         super(submission);
     }
 
     public String getType() {
-        return "optimized get";
+        return "get all";
     }
 
     public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
-        return p.isHandlingOptimizedGet;
+        return p.isHandlingClientGetAll;
     }
 
     public SubmissionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,

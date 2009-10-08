@@ -90,22 +90,24 @@ public class XFormsLoadAction extends XFormsAction {
                                                Element currentElement, boolean doReplace, String value, String target,
                                                String urlType, boolean urlNorewrite, boolean isShowProgress) {
 
-        final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
+        final boolean isPortlet = "portlet".equals(containingDocument.getContainerType());
         final String externalURL;
         if (value.startsWith("#") || urlNorewrite) {
             // Keep value unchanged if it's just a fragment or if we are explicitly disabling rewriting
             externalURL = value;
         } else {
             // URL must be resolved
-            if ((!isPortletLoad) ? doReplace : (doReplace && !"resource".equals(urlType))) {
-                externalURL = XFormsUtils.resolveRenderOrActionURL(isPortletLoad, propertyContext, currentElement, value);
-            } else {
-                // Just a resource URL
+            if ("resource".equals(urlType) || isPortlet && !doReplace) {
+                // Load as resource URL
+                // In a portlet, there is not much sense in opening a new portlet "window", so in this case we open as a resource URL
                 externalURL = XFormsUtils.resolveResourceURL(propertyContext, currentElement, value,
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+            } else {
+                // Load as render URL
+                externalURL = XFormsUtils.resolveRenderURL(isPortlet, propertyContext, currentElement, value);
             }
         }
-        containingDocument.addLoadToRun(externalURL, target, urlType, doReplace, isPortletLoad, isShowProgress);
+        containingDocument.addLoadToRun(externalURL, target, urlType, doReplace, isPortlet, isShowProgress);
         return externalURL;
     }
 }

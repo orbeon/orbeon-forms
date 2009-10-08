@@ -307,11 +307,11 @@
                 <xsl:comment>Set main processor</xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
-                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                    <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
                 </init-param>
                 <init-param>
-                    <param-name>oxf.main-processor.input.config</param-name>
-                    <param-value>oxf:/ops/xforms/xforms-renderer.xpl</param-value>
+                    <param-name>oxf.main-processor.input.controller</param-name>
+                    <param-value>oxf:/ops/xforms/xforms-renderer-page-flow.xml</param-value>
                 </init-param>
                 <xsl:comment>Set error processor</xsl:comment>
                 <init-param>

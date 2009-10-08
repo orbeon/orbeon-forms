@@ -27,6 +27,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
 
     private ExternalContext.Request directRequest;
     private ExternalContext.Request forwardRequest;
+    private ExternalContext.Request filterRequest;
 
     protected void setUp() throws Exception {
         {
@@ -42,6 +43,14 @@ public class URLRewriterTest extends ResourceManagerTestBase {
             final Document requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request-forward.xml", null);
             final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
             forwardRequest = externalContext.getRequest();
+            // NOTE: PipelineContext is not really used by TestExternalContext in this test suite
+            pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
+        }
+        {
+            final PipelineContext pipelineContext = new PipelineContext();
+            final Document requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request-filter.xml", null);
+            final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
+            filterRequest = externalContext.getRequest();
             // NOTE: PipelineContext is not really used by TestExternalContext in this test suite
             pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
         }
@@ -205,8 +214,8 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         assertEquals("http://localhost:8080/myapp/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
         assertEquals("http://localhost:8080/myapp/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
         assertEquals("http://localhost:8080/myapp/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers , mode));
-        assertEquals("http://localhost:8080/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
-        assertEquals("http://localhost:8080/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
+        assertEquals("http://localhost:8080/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
+        assertEquals("http://localhost:8080/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
 
         mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH;
         assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "https://foo.com/bar", pathMatchers , mode));
@@ -215,8 +224,8 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         assertEquals("/myapp/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
         assertEquals("/myapp/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
         assertEquals("/myapp/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers , mode));
-        assertEquals("/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
-        assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
+        assertEquals("/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
+        assertEquals("/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
 
         mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT;
         assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(forwardRequest, "https://foo.com/bar", pathMatchers , mode));
@@ -235,7 +244,54 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         assertEquals("/myapp/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
         assertEquals("/myapp/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
         assertEquals("/myapp/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(forwardRequest, "?a=1&amp;b=2", pathMatchers , mode));
-        assertEquals("/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
-        assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
+        assertEquals("/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
+        assertEquals("/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
+    }
+    
+    public void testResourceRewriteFilter() {
+
+        final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getMatchAllPathMatcher();
+        final String version = Version.getVersion();
+
+        // Test against request
+        int mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE;
+        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "https://foo.com/bar", pathMatchers , mode));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
+        assertEquals("http://localhost:8080/myapp/42/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar", pathMatchers , mode));
+        assertEquals("http://localhost:8080/myapp/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("http://localhost:8080/myapp/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
+        assertEquals("http://localhost:8080/myapp/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("http://localhost:8080/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/ops/bar.png", pathMatchers , mode));
+        assertEquals("http://localhost:8080/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/config/bar.png", pathMatchers , mode));
+
+        mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH;
+        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "https://foo.com/bar", pathMatchers , mode));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
+        assertEquals("/myapp/42/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar", pathMatchers , mode));
+        assertEquals("/myapp/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("/myapp/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
+        assertEquals("/myapp/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/ops/bar.png", pathMatchers , mode));
+        assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/config/bar.png", pathMatchers , mode));
+
+        mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT;
+        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "https://foo.com/bar", pathMatchers , mode));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
+        assertEquals("/42/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar", pathMatchers , mode));
+        assertEquals("/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
+        assertEquals("/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/ops/bar.png", pathMatchers , mode));
+        assertEquals("/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/config/bar.png", pathMatchers , mode));
+
+        mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE;
+        assertEquals("https://foo.com/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "https://foo.com/bar", pathMatchers , mode));
+//        assertEquals("http://example.org/cool/service/relative/sub/path", URLRewriterUtils.rewriteResourceURL(request, "relative/sub/path", pathMatchers , mode));
+        assertEquals("/myapp/42/bar", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar", pathMatchers , mode));
+        assertEquals("/myapp/42/bar?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("/myapp/42/bar?a=1&amp;b=2#there", URLRewriterUtils.rewriteResourceURL(filterRequest, "/bar?a=1&amp;b=2#there", pathMatchers , mode));
+        assertEquals("/myapp/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "?a=1&amp;b=2", pathMatchers , mode));
+        assertEquals("/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/ops/bar.png", pathMatchers , mode));
+        assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/config/bar.png", pathMatchers , mode));
     }
 }

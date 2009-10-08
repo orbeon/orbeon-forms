@@ -35,7 +35,6 @@ import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.ValueRepresentation;
@@ -722,7 +721,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         final String result;
         if (needsRewrite) {
             // Rewrite URLs
-            final FastStringBuffer sb = new FastStringBuffer(rawValue.length() * 2);// just an approx of the size it may take
+            final StringBuilder sb = new StringBuilder(rawValue.length() * 2);// just an approx of the size it may take
             // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
             XFormsUtils.streamHTMLFragment(new ForwardingContentHandler() {
 
@@ -743,7 +742,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                         final String currentValue = attributes.getValue(i);
 
                         // Rewrite URI attribute if needed
-                        // NOTE: Sould probably use xml:base but we don't have an Element available to gather xml:base information
+                        // NOTE: Should probably use xml:base but we don't have an Element available to gather xml:base information
                         final String rewrittenValue = XFormsUtils.getEscapedURLAttributeIfNeeded(pipelineContext, containingDocument, null, currentName, currentValue);
 
                         sb.append(' ');

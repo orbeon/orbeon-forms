@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <!--
     The epilogue is run after all page views. It is typically used to perform tasks that need to be
     done for all views, for example running the server-side XForms engine, applying a common theme,
@@ -30,8 +30,6 @@
     <p:param type="input" name="model-data"/>
     <!-- The XML submission if any -->
     <p:param type="input" name="instance"/>
-    <!-- The legacy XForms model as produced by the PFC's page/@xforms attribute if any -->
-    <p:param type="input" name="xforms-model"/>
 
     <!-- Run the XForms epilogue -->
     <!-- If you don't use XForms at all, you can bypass this -->
@@ -40,7 +38,6 @@
         <p:input name="data" href="#data"/>
         <p:input name="model-data" href="#model-data"/>
         <p:input name="instance" href="#instance"/>
-        <p:input name="xforms-model" href="#xforms-model"/>
         <p:output name="xformed-data" id="xformed-data"/>
     </p:processor>
 

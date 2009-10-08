@@ -29,27 +29,27 @@ import java.util.*;
  */
 public class OrbeonXFormsFilter implements Filter {
 
-    public static final String OPS_XFORMS_RENDERER_DEPLOYMENT = "oxf.xforms.renderer.deployment";
+    public static final String RENDERER_DEPLOYMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.deployment";
 
-    public static final String OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME = "oxf.xforms.renderer.base-uri";
+    public static final String RENDERER_BASE_URI_ATTRIBUTE_NAME = "oxf.xforms.renderer.base-uri";
 
-    public static final String OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.document";
-    public static final String OPS_XFORMS_RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME = "oxf.xforms.renderer.content-type";
-    public static final String OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME = "oxf.xforms.renderer.has-session";
+    public static final String RENDERER_DOCUMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.document";
+    public static final String RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME = "oxf.xforms.renderer.content-type";
+    public static final String RENDERER_HAS_SESSION_ATTRIBUTE_NAME = "oxf.xforms.renderer.has-session";
 
-    public static final String OPS_RENDERER_PATH = "/xforms-renderer";
+    public static final String RENDERER_PATH = "/xforms-renderer";
 
-    private static final String OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME = "oxf.xforms.renderer.context";
+    private static final String RENDERER_CONTEXT_PARAMETER_NAME = "oxf.xforms.renderer.context";
     private static final String DEFAULT_ENCODING = "ISO-8859-1"; // must be this per Servlet spec
 
     private ServletContext servletContext;
-    private String opsContextPath;
+    private String orbeonContextPath;
 
     public void init(FilterConfig filterConfig) throws ServletException {
         servletContext = filterConfig.getServletContext();
-        opsContextPath = filterConfig.getInitParameter(OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME);
+        orbeonContextPath = filterConfig.getInitParameter(RENDERER_CONTEXT_PARAMETER_NAME);
 
-        // TODO: check opsContextPath format: starts with /, doesn't end with one, etc.
+        // TODO: check orbeonContextPath format: starts with /, doesn't end with one, etc.
     }
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -59,10 +59,14 @@ public class OrbeonXFormsFilter implements Filter {
 
         final String requestPath = getRequestPath(httpRequest);
 
-        if (isOPSResourceRequest(requestPath)) {
+        // Set whether deployment is integrated or separate
+        // NOTE: DO this also for resources, so that e.g. /xforms-server, /xforms-server-submit can handle URLs properly
+        httpRequest.setAttribute(RENDERER_DEPLOYMENT_ATTRIBUTE_NAME, (getOrbeonContext() == servletContext) ? "integrated" : "separate");
+
+        if (isOrbeonResourceRequest(requestPath)) {
             // Directly forward all requests meant for Orbeon Forms resources (including /xforms-server)
-            final String subRequestPath = requestPath.substring(opsContextPath.length());
-            getOPSDispatcher(subRequestPath).forward(httpRequest, httpResponse);
+            final String subRequestPath = requestPath.substring(orbeonContextPath.length());
+            getOrbeonDispatcher(subRequestPath).forward(httpRequest, httpResponse);
         } else {
             // Forward the request to the Orbeon Forms renderer
             final MyHttpServletResponseWrapper responseWrapper = new MyHttpServletResponseWrapper(httpResponse);
@@ -71,31 +75,28 @@ public class OrbeonXFormsFilter implements Filter {
             filterChain.doFilter(new MyHttpServletRequestWrapper(httpRequest), responseWrapper);
 
             // Set document if not present AND output was intercepted
-            if (httpRequest.getAttribute(OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME) == null) {
+            if (httpRequest.getAttribute(RENDERER_DOCUMENT_ATTRIBUTE_NAME) == null) {
                 final String content = responseWrapper.getContent();
                 if (content != null) {
-                    httpRequest.setAttribute(OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME, content);
+                    httpRequest.setAttribute(RENDERER_DOCUMENT_ATTRIBUTE_NAME, content);
                 }
             }
 
-            // Set whether deployment is integrated or separate
-            httpRequest.setAttribute(OPS_XFORMS_RENDERER_DEPLOYMENT, (getOPSContext() == servletContext) ? "integrated" : "separate");
-
             // Tell whether there is a session
-            httpRequest.setAttribute(OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME, Boolean.toString(httpRequest.getSession(false) != null));
+            httpRequest.setAttribute(RENDERER_HAS_SESSION_ATTRIBUTE_NAME, Boolean.toString(httpRequest.getSession(false) != null));
 
             // Provide media type if available
             if (responseWrapper.getMediaType() != null)
-                httpRequest.setAttribute(OPS_XFORMS_RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME, responseWrapper.getMediaType());
+                httpRequest.setAttribute(RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME, responseWrapper.getMediaType());
 
             // Set base URI
-            httpRequest.setAttribute(OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME, requestPath);
+            httpRequest.setAttribute(RENDERER_BASE_URI_ATTRIBUTE_NAME, requestPath);
 
             // Forward to Orbeon Forms for rendering only of there is content to be rendered, otherwise just return and
             // let the filterChain finish its life naturally, assuming that when sendRedirect is used, no content is
             // available in the response object
             if (!isBlank(responseWrapper.getContent()))
-                getOPSDispatcher(OPS_RENDERER_PATH).forward(httpRequest, httpResponse);
+                getOrbeonDispatcher(RENDERER_PATH).forward(httpRequest, httpResponse);
         }
     }
 
@@ -117,24 +118,24 @@ public class OrbeonXFormsFilter implements Filter {
     public void destroy() {
     }
 
-    private ServletContext getOPSContext() throws ServletException {
-        final ServletContext opsContext = (opsContextPath != null) ? servletContext.getContext(opsContextPath) : servletContext;
-        if (opsContext == null)
-            throw new ServletException("Can't find Orbeon Forms context called '" + opsContextPath + "'. Check the '" + OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME + "' filter initialization parameter and the <Context crossContext=\"true\"/> attribute.");
+    private ServletContext getOrbeonContext() throws ServletException {
+        final ServletContext orbeonContext = (orbeonContextPath != null) ? servletContext.getContext(orbeonContextPath) : servletContext;
+        if (orbeonContext  == null)
+            throw new ServletException("Can't find Orbeon Forms context called '" + orbeonContextPath + "'. Check the '" + RENDERER_CONTEXT_PARAMETER_NAME + "' filter initialization parameter and the <Context crossContext=\"true\"/> attribute.");
 
-        return opsContext;
+        return orbeonContext ;
     }
 
-    private RequestDispatcher getOPSDispatcher(String path) throws ServletException {
-        final RequestDispatcher dispatcher = getOPSContext().getRequestDispatcher(path);
+    private RequestDispatcher getOrbeonDispatcher(String path) throws ServletException {
+        final RequestDispatcher dispatcher = getOrbeonContext().getRequestDispatcher(path);
         if (dispatcher == null)
             throw new ServletException("Can't find Orbeon Forms request dispatcher.");
 
         return dispatcher;
     }
 
-    private boolean isOPSResourceRequest(String requestPath) {
-        return opsContextPath != null && requestPath != null && requestPath.startsWith(opsContextPath + "/");
+    private boolean isOrbeonResourceRequest(String requestPath) {
+        return orbeonContextPath != null && requestPath != null && requestPath.startsWith(orbeonContextPath + "/");
 
     }
 

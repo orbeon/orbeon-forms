@@ -80,7 +80,11 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         public String getContextPath() {
             if (contextPath == null) {
-                // TODO: what about javax.servlet.forward.context_path?
+                // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
+                // included servlet via the getAttribute method on the request object and their values must be equal to
+                // the request URI, context path, servlet path, path info, and query string of the included servlet,
+                // respectively."
+                // NOTE: This is very different from the similarly-named forward attributes!
                 final String dispatcherContext = (String) nativeRequest.getAttribute("javax.servlet.include.context_path");
                 if (dispatcherContext != null) {
                     // This ensures we return the included / forwarded servlet's value
@@ -239,6 +243,11 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         public String getQueryString() {
             // Use included / forwarded servlet's value
+            // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
+            // included servlet via the getAttribute method on the request object and their values must be equal to the
+            // request URI, context path, servlet path, path info, and query string of the included servlet,
+            // respectively."
+            // NOTE: This is very different from the similarly-named forward attributes!
             final String dispatcherQueryString = (String) nativeRequest.getAttribute("javax.servlet.include.query_string");
             return (dispatcherQueryString != null) ? dispatcherQueryString : nativeRequest.getQueryString();
         }
@@ -253,6 +262,11 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         public String getRequestURI() {
             // Use included / forwarded servlet's value
+            // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
+            // included servlet via the getAttribute method on the request object and their values must be equal to the
+            // request URI, context path, servlet path, path info, and query string of the included servlet,
+            // respectively."
+            // NOTE: This is very different from the similarly-named forward attributes!
             final String dispatcherRequestURI = (String) nativeRequest.getAttribute("javax.servlet.include.request_uri");
             return (dispatcherRequestURI != null) ? dispatcherRequestURI : nativeRequest.getRequestURI();
         }

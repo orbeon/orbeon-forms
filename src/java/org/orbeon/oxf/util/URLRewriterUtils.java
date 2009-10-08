@@ -120,8 +120,10 @@ public class URLRewriterUtils {
      */
     public static String getClientContextPath(ExternalContext.Request request, boolean isPlatformPath) {
         final Map<String, Object> attributes = request.getAttributesMap();
+        // NOTE: We don't check on javax.servlet.include.context_path, because that attribute behaves very differently:
+        // in the case of includes, it represents properties of the included servlet, not the values of the including
+        // servlet.
         final String sourceContextPath = (String) attributes.get("javax.servlet.forward.context_path");
-        // TODO: check javax.servlet.include.context_path as well?
         if (sourceContextPath != null) {
             // We were forwarded to
             final boolean isSeparateDeployment = "separate".equals(attributes.get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME));
@@ -145,7 +147,9 @@ public class URLRewriterUtils {
     }
 
     public static boolean isForwarded(ExternalContext.Request request) {
-        // TODO: check javax.servlet.include.context_path as well?
+        // NOTE: We don't check on javax.servlet.include.context_path, because that attribute behaves very differently:
+        // in the case of includes, it represents properties of the included servlet, not the values of the including
+        // servlet.
         final String sourceContextPath = (String) request.getAttributesMap().get("javax.servlet.forward.context_path");
         return sourceContextPath != null;
     }

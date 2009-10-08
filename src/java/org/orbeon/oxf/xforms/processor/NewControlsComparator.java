@@ -148,6 +148,7 @@ public class NewControlsComparator extends BaseControlsComparator {
 
                                 // Custom MIPs
                                 doOutputElement = diffCustomMIPs(attributesImpl, xformsSingleNodeControl1, xformsSingleNodeControl2, isNewlyVisibleSubtree, doOutputElement);
+                                doOutputElement = diffClassAVT(attributesImpl, xformsSingleNodeControl1, xformsSingleNodeControl2, isNewlyVisibleSubtree, doOutputElement);
 
                                 // Type attribute
                                 final boolean isOutputControlWithValueAttribute = xformsSingleNodeControl2 instanceof XFormsOutputControl && ((XFormsOutputControl) xformsSingleNodeControl2).getValueAttribute() != null;
@@ -160,7 +161,7 @@ public class NewControlsComparator extends BaseControlsComparator {
                                         final String attributeValue = typeValue2 != null ? typeValue2 : "";
                                         // NOTE: No type is considered equivalent to xs:string or xforms:string
                                         // TODO: should have more generic code in XForms engine to equate "no type" and "xs:string"
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewlyVisibleSubtree,
+                                        doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewlyVisibleSubtree,
                                             attributeValue.equals("") || XMLConstants.XS_STRING_EXPLODED_QNAME.equals(attributeValue) || XFormsConstants.XFORMS_STRING_EXPLODED_QNAME.equals(attributeValue));
                                     }
                                 }
@@ -173,7 +174,7 @@ public class NewControlsComparator extends BaseControlsComparator {
                                     if (!((labelValue1 == null && labelValue2 == null) || (labelValue1 != null && labelValue2 != null && labelValue1.equals(labelValue2)))) {
                                         final String escapedLabelValue2 = xformsSingleNodeControl2.getEscapedLabel(pipelineContext);
                                         final String attributeValue = escapedLabelValue2 != null ? escapedLabelValue2 : "";
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "label", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
+                                        doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "label", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                     }
                                 }
 
@@ -184,7 +185,7 @@ public class NewControlsComparator extends BaseControlsComparator {
                                     if (!((helpValue1 == null && helpValue2 == null) || (helpValue1 != null && helpValue2 != null && helpValue1.equals(helpValue2)))) {
                                 final String escapedHelpValue2 = xformsSingleNodeControl2.getEscapedHelp(pipelineContext);
                                 final String attributeValue = escapedHelpValue2 != null ? escapedHelpValue2 : "";
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "help", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
+                                        doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "help", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                     }
                                 }
 
@@ -194,7 +195,7 @@ public class NewControlsComparator extends BaseControlsComparator {
 
                                     if (!((hintValue1 == null && hintValue2 == null) || (hintValue1 != null && hintValue2 != null && hintValue1.equals(hintValue2)))) {
                                         final String attributeValue = hintValue2 != null ? hintValue2 : "";
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "hint", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
+                                        doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "hint", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                     }
                                 }
 
@@ -205,12 +206,12 @@ public class NewControlsComparator extends BaseControlsComparator {
                                     if (!((alertValue1 == null && alertValue2 == null) || (alertValue1 != null && alertValue2 != null && alertValue1.equals(alertValue2)))) {
                                         final String escapedAlertValue2 = xformsSingleNodeControl2.getEscapedAlert(pipelineContext);
                                         final String attributeValue = escapedAlertValue2 != null ? escapedAlertValue2 : "";
-                                        doOutputElement |= addAttributeIfNeeded(attributesImpl, "alert", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
+                                        doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "alert", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
                                     }
                                 }
 
                                 // Output control-specific attributes
-                                doOutputElement |= xformsSingleNodeControl2.addAttributesDiffs(pipelineContext, xformsSingleNodeControl1, attributesImpl, isNewlyVisibleSubtree);
+                                doOutputElement |= xformsSingleNodeControl2.addCustomAttributesDiffs(pipelineContext, xformsSingleNodeControl1, attributesImpl, isNewlyVisibleSubtree);
 
                                 // Get current value if possible for this control
                                 // NOTE: We issue the new value in all cases because we don't have yet a mechanism to tell the
@@ -241,7 +242,7 @@ public class NewControlsComparator extends BaseControlsComparator {
 
                                 // Output extension attributes in no namespace
                                 // TODO: If only some attributes changed, then we also output xxf:control above, which is unnecessary
-                                xformsSingleNodeControl2.addAttributesDiffs(xformsSingleNodeControl1, ch, isNewlyVisibleSubtree);
+                                xformsSingleNodeControl2.addStandardAttributesDiffs(xformsSingleNodeControl1, ch, isNewlyVisibleSubtree);
                             } else {
 
                                 // Use the effective id of the parent repeat

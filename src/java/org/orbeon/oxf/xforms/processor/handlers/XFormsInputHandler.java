@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -79,8 +78,6 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final boolean isConcreteControl = inputControl != null;
 
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, inputControl, false);
-
         if (isBoolean) {
             // Produce a boolean output
 
@@ -122,6 +119,8 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
             final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
             final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
 
+            final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, inputControl, false);
+
             if (!handlerContext.isNewXHTMLLayout())
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);
 
@@ -141,7 +140,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                                 reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
                             // Use effective id for name of first field
                             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputIdName);
-                            final FastStringBuffer inputClasses = new FastStringBuffer("xforms-input-input");
+                            final StringBuilder inputClasses = new StringBuilder("xforms-input-input");
                             if (isConcreteControl) {
                                 // Output value only for concrete control
                                 final String formattedValue = inputControl.getFirstValueUseFormat(pipelineContext);
@@ -203,7 +202,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                             // TODO: Is this an appropriate name? Noscript must be able to find this
                             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputIdName);
 
-                            final FastStringBuffer inputClasses = new FastStringBuffer("xforms-input-input");
+                            final StringBuilder inputClasses = new StringBuilder("xforms-input-input");
                             if (isConcreteControl) {
                                 // Output value only for concrete control
                                 final String inputValue = inputControl.getSecondValueUseFormat(pipelineContext);

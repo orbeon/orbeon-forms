@@ -14,10 +14,7 @@
 package org.orbeon.oxf.xforms.processor;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -26,11 +23,10 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class BaseControlsComparator implements ControlsComparator {
 
@@ -57,11 +53,11 @@ public abstract class BaseControlsComparator implements ControlsComparator {
         this.isStaticReadonly = XFormsProperties.isStaticReadonlyAppearance(containingDocument);
     }
 
-    protected static boolean addAttributeIfNeeded(AttributesImpl attributesImpl, String name, String value, boolean isNewRepeatIteration, boolean isDefaultValue) {
+    protected static boolean addOrAppendToAttributeIfNeeded(AttributesImpl attributesImpl, String name, String value, boolean isNewRepeatIteration, boolean isDefaultValue) {
         if (isNewRepeatIteration && isDefaultValue) {
             return false;
         } else {
-            attributesImpl.addAttribute("", name, name, ContentHandlerHelper.CDATA, value);
+            XMLUtils.addOrAppendToAttribute(attributesImpl, name, value);
             return true;
         }
     }
@@ -193,7 +189,7 @@ public abstract class BaseControlsComparator implements ControlsComparator {
 
     // public for unit tests
     public static boolean diffCustomMIPs(AttributesImpl attributesImpl, XFormsSingleNodeControl xformsSingleNodeControl1,
-                                     XFormsSingleNodeControl xformsSingleNodeControl2, boolean newlyVisibleSubtree, boolean doOutputElement) {
+                                         XFormsSingleNodeControl xformsSingleNodeControl2, boolean newlyVisibleSubtree, boolean doOutputElement) {
         final Map<String, String> customMIPs1 = (xformsSingleNodeControl1 == null) ? null : xformsSingleNodeControl1.getCustomMIPs();
         final Map<String, String> customMIPs2 = xformsSingleNodeControl2.getCustomMIPs();
 
@@ -204,7 +200,7 @@ public abstract class BaseControlsComparator implements ControlsComparator {
             if (customMIPs1 == null) {
                 attributeValue = xformsSingleNodeControl2.getCustomMIPsClasses();
             } else {
-                final FastStringBuffer sb = new FastStringBuffer(100);
+                final StringBuilder sb = new StringBuilder(100);
 
                 // Classes to remove
                 for (final Map.Entry<String, String> entry: customMIPs1.entrySet()) {
@@ -250,10 +246,75 @@ public abstract class BaseControlsComparator implements ControlsComparator {
 
                 attributeValue = sb.toString();
             }
-            // This attribute is a space-separate list of attributes names prefixed with either '-' or '+'
+            // This attribute is a space-separate list of class names prefixed with either '-' or '+'
             if (attributeValue != null)
-                doOutputElement |= addAttributeIfNeeded(attributesImpl, "class", attributeValue, newlyVisibleSubtree, attributeValue.equals(""));
+                doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "class", attributeValue, newlyVisibleSubtree, attributeValue.equals(""));
         }
         return doOutputElement;
+    }
+
+    // public for unit tests
+    public static boolean diffClassAVT(AttributesImpl attributesImpl, XFormsControl control1, XFormsControl control2,
+                                       boolean newlyVisibleSubtree, boolean doOutputElement) {
+
+        final String class1 = (control1 == null) ? null : control1.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME);
+        final String class2 = control2.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME);
+
+        if (newlyVisibleSubtree || !XFormsUtils.compareStrings(class1, class2)) {
+            // Custom MIPs changed
+
+            final String attributeValue;
+            if (class1 == null) {
+                attributeValue = class2;
+            } else {
+                final StringBuilder sb = new StringBuilder(100);
+
+                final Set<String> classes1 = tokenize(class1);
+                final Set<String> classes2 = tokenize(class2);
+
+                // Classes to remove
+                for (final String currentClass: classes1) {
+                    if (!classes2.contains(currentClass)) {
+
+                        if (sb.length() > 0)
+                            sb.append(' ');
+
+                        sb.append('-');
+                        sb.append(currentClass);
+                    }
+                }
+
+                // Classes to add
+                for (final String currentClass: classes2) {
+                    if (!classes1.contains(currentClass)) {
+
+                        if (sb.length() > 0)
+                            sb.append(' ');
+
+                        sb.append('+');
+                        sb.append(currentClass);
+                    }
+                }
+
+                attributeValue = sb.toString();
+            }
+            // This attribute is a space-separate list of class names prefixed with either '-' or '+'
+            if (attributeValue != null)
+                doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "class", attributeValue, newlyVisibleSubtree, attributeValue.equals(""));
+        }
+        return doOutputElement;
+    }
+
+    private static Set<String> tokenize(String value) {
+        final Set<String> result;
+        if (value != null) {
+            result = new LinkedHashSet<String>();
+            for (final StringTokenizer st = new StringTokenizer(value); st.hasMoreTokens();) {
+                result.add(st.nextToken());
+            }
+        } else {
+            result = Collections.emptySet();
+        }
+        return result;
     }
 }

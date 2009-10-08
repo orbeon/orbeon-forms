@@ -61,10 +61,10 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             // All items
             final Itemset itemset = getItemset(propertyContext, true);
             // Current values in the instance
-            final Map<String, String> instanceValues = tokenize(propertyContext, controlValue, false);
+            final Set<String> instanceValues = tokenize(propertyContext, controlValue, false);
 
             // Values currently selected in the UI
-            final Map<String, String> uiValues = tokenize(propertyContext, value, isEncryptItemValues());
+            final Set<String> uiValues = tokenize(propertyContext, value, isEncryptItemValues());
 
             // Iterate over all the items
             final List<XFormsSelectEvent> selectEvents = new ArrayList<XFormsSelectEvent>();
@@ -72,11 +72,11 @@ public class XFormsSelectControl extends XFormsSelect1Control {
 
             for (Item currentItem: itemset.toList()) {
                 final String currentItemValue = currentItem.getValue();
-                final boolean itemWasSelected = instanceValues.get(currentItemValue) != null;
+                final boolean itemWasSelected = instanceValues.contains(currentItemValue);
                 final boolean itemIsSelected;
-                if (uiValues.get(currentItemValue) != null) {
+                if (uiValues.contains(currentItemValue)) {
                     // Value is currently selected in the UI
-                    instanceValues.put(currentItemValue, "");
+                    instanceValues.add(currentItemValue);
                     itemIsSelected = true;
                 } else {
                     // Value is currently NOT selected in the UI
@@ -109,7 +109,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             // Create resulting string
             final FastStringBuffer sb = new FastStringBuffer(controlValue.length() + value.length() * 2);
             int index = 0;
-            for (Iterator<String> i = instanceValues.keySet().iterator(); i.hasNext(); index++) {
+            for (Iterator<String> i = instanceValues.iterator(); i.hasNext(); index++) {
                 final String currentKey = i.next();
                 if (index > 0)
                     sb.append(' ');
@@ -138,14 +138,14 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             if (itemset != null) {
 
                 // Current values in the instance
-                final Map<String, String> instanceValues = tokenize(propertyContext, internalValue, false);
+                final Set<String> instanceValues = tokenize(propertyContext, internalValue, false);
 
                 // Actual value to return is the intersection of values in the instance and values in the itemset
                 final FastStringBuffer sb = new FastStringBuffer(internalValue.length());
                 int index = 0;
                 for (Item currentItem: itemset.toList()) {
                     final String currentValue = currentItem.getValue();
-                    if (instanceValues.get(currentValue) != null) {
+                    if (instanceValues.contains(currentValue)) {
                         if (index > 0)
                             sb.append(' ');
 
@@ -164,14 +164,17 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         setExternalValue(updatedValue);
     }
 
-    private static Map<String, String> tokenize(PropertyContext propertyContext, String value, boolean decryptValues) {
-        final Map<String, String> result = new LinkedHashMap<String, String>();
+    private static Set<String> tokenize(PropertyContext propertyContext, String value, boolean decryptValues) {
+        final Set<String> result;
         if (value != null) {
+            result = new LinkedHashSet<String>();
             for (final StringTokenizer st = new StringTokenizer(value); st.hasMoreTokens();) {
                 final String token = st.nextToken();
                 // Keep value and decrypt if necessary
-                result.put(decryptValues ? XFormsItemUtils.decryptValue(propertyContext, token) : token, "");
+                result.add(decryptValues ? XFormsItemUtils.decryptValue(propertyContext, token) : token);
             }
+        } else {
+            result = Collections.emptySet();
         }
         return result;
     }

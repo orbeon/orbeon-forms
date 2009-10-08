@@ -135,6 +135,11 @@ public class NetUtils {
      */
     public static String getRequestPathInfo(HttpServletRequest request) {
 
+        // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the included
+        // servlet via the getAttribute method on the request object and their values must be equal to the request URI,
+        // context path, servlet path, path info, and query string of the included servlet, respectively."
+        // NOTE: This is very different from the similarly-named forward attributes!
+
         // Get servlet path
         String servletPath = (String) request.getAttribute("javax.servlet.include.servlet_path");
         if (servletPath == null) {

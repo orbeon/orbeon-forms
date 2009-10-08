@@ -24,6 +24,7 @@ import org.orbeon.oxf.processor.ProcessorFactory;
 import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.net.MalformedURLException;
@@ -32,6 +33,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Utility class to rewrite URLs.
@@ -117,14 +119,22 @@ public class URLRewriterUtils {
      * @return                  context path
      */
     public static String getClientContextPath(ExternalContext.Request request, boolean isPlatformPath) {
+        final Map<String, Object> attributes = request.getAttributesMap();
+        final String sourceContextPath = (String) attributes.get("javax.servlet.forward.context_path");
         // TODO: check javax.servlet.include.context_path as well?
-        final String sourceContextPath = (String) request.getAttributesMap().get("javax.servlet.forward.context_path");
         if (sourceContextPath != null) {
             // We were forwarded to
-            if (isPlatformPath) {
+            final boolean isSeparateDeployment = "separate".equals(attributes.get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME));
+            if (isPlatformPath && isSeparateDeployment) {
+                // This is the case of forwarding in separate deployment: Orbeon resources are forwarded
                 // E.g. /foobar/orbeon
                 return sourceContextPath + request.getContextPath();
+            } else if (isPlatformPath) {
+                // This is the case of forwarding without separate deployment: Orbeon resources are loaded by the Orbeon context
+                // E.g. /orbeon
+                return request.getContextPath();
             } else {
+                // This is the case of application resources: they are loaded from the original context
                 // E.g. /foobar
                 return sourceContextPath;
             }
@@ -316,10 +326,11 @@ public class URLRewriterUtils {
      */
     public static boolean isPlatformPath(String absolutePathNoContext) {
         // TODO: add test for /forms/orbeon; should make this a property!
+        // See PageFlowController as well
         return absolutePathNoContext.startsWith("/ops/")
                 || absolutePathNoContext.startsWith("/config/")
                 || absolutePathNoContext.startsWith("/xbl/orbeon/")
-                || absolutePathNoContext.startsWith("/xforms-server-submit");
+                || absolutePathNoContext.startsWith("/xforms-server");
     }
 
     public static boolean isResourcesVersioned() {

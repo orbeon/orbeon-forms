@@ -56,7 +56,12 @@
 
             <!-- Pick theme -->
             <p:choose href="#request">
-                <!-- Special case for plain theme (not sure if this is the best way) -->
+                <!--
+                    Special case for plain theme (not sure if this is the best way):
+                    o If output is produced by renderer
+                    o If we are forwarded to (also catches noscript mode in separate deployment)
+                    o The theme is explicitly specified
+                -->
                 <p:when test="starts-with(/request/request-path, '/xforms-renderer')
                               or /request/attributes/attribute[name = 'javax.servlet.forward.context_path']
                               or /request/parameters/parameter[name = 'orbeon-theme']/value = 'plain'">

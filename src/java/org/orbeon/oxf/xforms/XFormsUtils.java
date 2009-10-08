@@ -802,6 +802,7 @@ public class XFormsUtils {
         final URL url = URLFactory.createURL(src);
 
         // Load file into buffer
+        // TODO: this is wrong, must use regular URL resolution methods
         final InputStreamReader reader = new InputStreamReader(url.openStream());
         try {
             final StringBuffer value = new StringBuffer();
@@ -847,7 +848,7 @@ public class XFormsUtils {
     }
 
     /**
-     * Resolve a render or action URL including xml:base resolution.
+     * Resolve a render URL including xml:base resolution.
      *
      * @param isPortletLoad         whether this is called within a portlet
      * @param propertyContext       current context
@@ -855,7 +856,7 @@ public class XFormsUtils {
      * @param url                   URL to resolve
      * @return                      resolved URL
      */
-    public static String resolveRenderOrActionURL(boolean isPortletLoad, PropertyContext propertyContext, Element currentElement, String url) {
+    public static String resolveRenderURL(boolean isPortletLoad, PropertyContext propertyContext, Element currentElement, String url) {
         final URI resolvedURI = resolveXMLBase(currentElement, url);
         final String resolvedURIString = resolvedURI.toString();
         final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
@@ -863,6 +864,7 @@ public class XFormsUtils {
         final String externalURL;
         // NOTE: Keep in mind that this is going to run from within a servlet, as the XForms server
         // runs in a servlet when processing these events!
+        // TODO: is this the case with JSR-268? Don't/can't we run xforms-server in the portlet?
         if (!isPortletLoad) {
             // XForms page was loaded from a servlet
             externalURL = externalContext.getResponse().rewriteRenderURL(resolvedURIString, null, null);
@@ -936,7 +938,7 @@ public class XFormsUtils {
             // TODO: href may be an action URL or a render URL. Should pass element name and reuse code from AbstractRewrite.
 
             final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
-            rewrittenValue = resolveRenderOrActionURL(isPortletLoad, pipelineContext, element, attributeValue);
+            rewrittenValue = resolveRenderURL(isPortletLoad, pipelineContext, element, attributeValue);
         } else {
             rewrittenValue = attributeValue;
         }

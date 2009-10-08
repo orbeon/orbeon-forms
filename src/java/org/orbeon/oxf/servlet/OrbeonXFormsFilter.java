@@ -29,27 +29,27 @@ import java.util.*;
  */
 public class OrbeonXFormsFilter implements Filter {
 
-    public static final String OPS_XFORMS_RENDERER_DEPLOYMENT = "oxf.xforms.renderer.deployment";
+    public static final String RENDERER_DEPLOYMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.deployment";
 
-    public static final String OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME = "oxf.xforms.renderer.base-uri";
+    public static final String RENDERER_BASE_URI_ATTRIBUTE_NAME = "oxf.xforms.renderer.base-uri";
 
-    public static final String OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.document";
-    public static final String OPS_XFORMS_RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME = "oxf.xforms.renderer.content-type";
-    public static final String OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME = "oxf.xforms.renderer.has-session";
+    public static final String RENDERER_DOCUMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.document";
+    public static final String RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME = "oxf.xforms.renderer.content-type";
+    public static final String RENDERER_HAS_SESSION_ATTRIBUTE_NAME = "oxf.xforms.renderer.has-session";
 
-    public static final String OPS_RENDERER_PATH = "/xforms-renderer";
+    public static final String RENDERER_PATH = "/xforms-renderer";
 
-    private static final String OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME = "oxf.xforms.renderer.context";
+    private static final String RENDERER_CONTEXT_PARAMETER_NAME = "oxf.xforms.renderer.context";
     private static final String DEFAULT_ENCODING = "ISO-8859-1"; // must be this per Servlet spec
 
     private ServletContext servletContext;
-    private String opsContextPath;
+    private String orbeonContextPath;
 
     public void init(FilterConfig filterConfig) throws ServletException {
         servletContext = filterConfig.getServletContext();
-        opsContextPath = filterConfig.getInitParameter(OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME);
+        orbeonContextPath = filterConfig.getInitParameter(RENDERER_CONTEXT_PARAMETER_NAME);
 
-        // TODO: check opsContextPath format: starts with /, doesn't end with one, etc.
+        // TODO: check orbeonContextPath format: starts with /, doesn't end with one, etc.
     }
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -59,43 +59,44 @@ public class OrbeonXFormsFilter implements Filter {
 
         final String requestPath = getRequestPath(httpRequest);
 
-        if (isOPSResourceRequest(requestPath)) {
+        // Set whether deployment is integrated or separate
+        // NOTE: DO this also for resources, so that e.g. /xforms-server, /xforms-server-submit can handle URLs properly
+        httpRequest.setAttribute(RENDERER_DEPLOYMENT_ATTRIBUTE_NAME, (getOrbeonContext() == servletContext) ? "integrated" : "separate");
+
+        if (isOrbeonResourceRequest(requestPath)) {
             // Directly forward all requests meant for Orbeon Forms resources (including /xforms-server)
-            final String subRequestPath = requestPath.substring(opsContextPath.length());
-            getOPSDispatcher(subRequestPath).forward(httpRequest, httpResponse);
+            final String subRequestPath = requestPath.substring(orbeonContextPath.length());
+            getOrbeonDispatcher(subRequestPath).forward(httpRequest, httpResponse);
         } else {
             // Forward the request to the Orbeon Forms renderer
             final MyHttpServletResponseWrapper responseWrapper = new MyHttpServletResponseWrapper(httpResponse);
 
             // Execute filter
-            filterChain.doFilter(new MyHttpServletRequestWrapper(httpRequest), responseWrapper);
+            filterChain.doFilter(new FilterHeadersRequestWrapper(httpRequest), responseWrapper);
 
             // Set document if not present AND output was intercepted
-            if (httpRequest.getAttribute(OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME) == null) {
+            if (httpRequest.getAttribute(RENDERER_DOCUMENT_ATTRIBUTE_NAME) == null) {
                 final String content = responseWrapper.getContent();
                 if (content != null) {
-                    httpRequest.setAttribute(OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME, content);
+                    httpRequest.setAttribute(RENDERER_DOCUMENT_ATTRIBUTE_NAME, content);
                 }
             }
 
-            // Set whether deployment is integrated or separate
-            httpRequest.setAttribute(OPS_XFORMS_RENDERER_DEPLOYMENT, (getOPSContext() == servletContext) ? "integrated" : "separate");
-
             // Tell whether there is a session
-            httpRequest.setAttribute(OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME, Boolean.toString(httpRequest.getSession(false) != null));
+            httpRequest.setAttribute(RENDERER_HAS_SESSION_ATTRIBUTE_NAME, Boolean.toString(httpRequest.getSession(false) != null));
 
             // Provide media type if available
             if (responseWrapper.getMediaType() != null)
-                httpRequest.setAttribute(OPS_XFORMS_RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME, responseWrapper.getMediaType());
+                httpRequest.setAttribute(RENDERER_CONTENT_TYPE_ATTRIBUTE_NAME, responseWrapper.getMediaType());
 
             // Set base URI
-            httpRequest.setAttribute(OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME, requestPath);
+            httpRequest.setAttribute(RENDERER_BASE_URI_ATTRIBUTE_NAME, requestPath);
 
             // Forward to Orbeon Forms for rendering only of there is content to be rendered, otherwise just return and
             // let the filterChain finish its life naturally, assuming that when sendRedirect is used, no content is
             // available in the response object
             if (!isBlank(responseWrapper.getContent()))
-                getOPSDispatcher(OPS_RENDERER_PATH).forward(httpRequest, httpResponse);
+                getOrbeonDispatcher(RENDERER_PATH).forward(new EmptyBodyRequestWrapper(httpRequest), httpResponse);
         }
     }
 
@@ -117,24 +118,24 @@ public class OrbeonXFormsFilter implements Filter {
     public void destroy() {
     }
 
-    private ServletContext getOPSContext() throws ServletException {
-        final ServletContext opsContext = (opsContextPath != null) ? servletContext.getContext(opsContextPath) : servletContext;
-        if (opsContext == null)
-            throw new ServletException("Can't find Orbeon Forms context called '" + opsContextPath + "'. Check the '" + OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME + "' filter initialization parameter and the <Context crossContext=\"true\"/> attribute.");
+    private ServletContext getOrbeonContext() throws ServletException {
+        final ServletContext orbeonContext = (orbeonContextPath != null) ? servletContext.getContext(orbeonContextPath) : servletContext;
+        if (orbeonContext  == null)
+            throw new ServletException("Can't find Orbeon Forms context called '" + orbeonContextPath + "'. Check the '" + RENDERER_CONTEXT_PARAMETER_NAME + "' filter initialization parameter and the <Context crossContext=\"true\"/> attribute.");
 
-        return opsContext;
+        return orbeonContext ;
     }
 
-    private RequestDispatcher getOPSDispatcher(String path) throws ServletException {
-        final RequestDispatcher dispatcher = getOPSContext().getRequestDispatcher(path);
+    private RequestDispatcher getOrbeonDispatcher(String path) throws ServletException {
+        final RequestDispatcher dispatcher = getOrbeonContext().getRequestDispatcher(path);
         if (dispatcher == null)
             throw new ServletException("Can't find Orbeon Forms request dispatcher.");
 
         return dispatcher;
     }
 
-    private boolean isOPSResourceRequest(String requestPath) {
-        return opsContextPath != null && requestPath != null && requestPath.startsWith(opsContextPath + "/");
+    private boolean isOrbeonResourceRequest(String requestPath) {
+        return orbeonContextPath != null && requestPath != null && requestPath.startsWith(orbeonContextPath + "/");
 
     }
 
@@ -185,15 +186,16 @@ public class OrbeonXFormsFilter implements Filter {
         return contentType.substring(0, semicolonIndex).trim();
     }
 
-    private static class MyHttpServletRequestWrapper extends HttpServletRequestWrapper {
+    private static class FilterHeadersRequestWrapper extends HttpServletRequestWrapper {
 
         private Enumeration<String> headerNames;
 
-        public MyHttpServletRequestWrapper(HttpServletRequest httpServletRequest) {
+        public FilterHeadersRequestWrapper(HttpServletRequest httpServletRequest) {
             super(httpServletRequest);
 
         }
 
+        @Override
         public String getHeader(String s) {
             // Filter conditional get headers so that we always get content
             if (s.toLowerCase().startsWith("if-") )
@@ -202,6 +204,7 @@ public class OrbeonXFormsFilter implements Filter {
                 return super.getHeader(s);
         }
 
+        @Override
         public Enumeration getHeaders(String s) {
             // Filter conditional get headers so that we always get content
             if (s.toLowerCase().startsWith("if-"))
@@ -210,6 +213,7 @@ public class OrbeonXFormsFilter implements Filter {
                 return super.getHeaders(s);
         }
 
+        @Override
         public Enumeration getHeaderNames() {
             if (headerNames == null) {
                 // Filter conditional get headers so that we always get content
@@ -225,12 +229,41 @@ public class OrbeonXFormsFilter implements Filter {
             return headerNames;
         }
 
+        @Override
         public long getDateHeader(String s) {
             // Filter conditional get headers so that we always get content
             if (s.toLowerCase().startsWith("if-"))
                 return -1;
             else
                 return super.getDateHeader(s);
+        }
+    }
+
+    // Return an empty stream for the body, because the body might be read by the JSP and we don't want Orbeon Forms to
+    // attempt to read a closed stream.
+    private static class EmptyBodyRequestWrapper extends FilterHeadersRequestWrapper {
+        private EmptyBodyRequestWrapper(HttpServletRequest httpServletRequest) {
+            super(httpServletRequest);
+        }
+
+        @Override
+        public String getContentType() {
+            return null;
+        }
+
+        @Override
+        public int getContentLength() {
+            return 0;
+        }
+
+        @Override
+        public ServletInputStream getInputStream() throws IOException {
+            return new ServletInputStream() {
+                @Override
+                public int read() throws IOException {
+                    return -1;
+                }
+            };
         }
     }
 
@@ -250,84 +283,103 @@ public class OrbeonXFormsFilter implements Filter {
         private String encoding;
         private String mediatype;
 
+        @Override
         public void addCookie(Cookie cookie) {
             super.addCookie(cookie);
         }
 
+        @Override
         public boolean containsHeader(String string) {
             return super.containsHeader(string);
         }
 
+        @Override
         public String encodeURL(String string) {
             return super.encodeURL(string);
         }
 
+        @Override
         public String encodeRedirectURL(String string) {
             return super.encodeRedirectURL(string);
         }
 
+        @Override
         public String encodeUrl(String string) {
             return super.encodeUrl(string);
         }
 
+        @Override
         public String encodeRedirectUrl(String string) {
             return super.encodeRedirectUrl(string);
         }
 
+        @Override
         public void sendError(int i, String string) throws IOException {
             // TODO
         }
 
+        @Override
         public void sendError(int i) throws IOException {
             // TODO
         }
 
+        @Override
         public void sendRedirect(String string) throws IOException {
             super.sendRedirect(string); 
         }
 
+        @Override
         public void setDateHeader(String string, long l) {
             // TODO
         }
 
+        @Override
         public void addDateHeader(String string, long l) {
             // TODO
         }
 
+        @Override
         public void setHeader(String string, String string1) {
             // TODO
         }
 
+        @Override
         public void addHeader(String string, String string1) {
             // TODO
         }
 
+        @Override
         public void setIntHeader(String string, int i) {
             // TODO
         }
 
+        @Override
         public void addIntHeader(String string, int i) {
 
             // TODO
         }
 
+        @Override
         public void setStatus(int i) {
             // TODO
         }
 
+        @Override
         public void setStatus(int i, String string) {
             // TODO
         }
 
-
+        @Override
         public ServletResponse getResponse() {
             return super.getResponse();
         }
 
+        @Override
         public void setResponse(ServletResponse servletResponse) {
             super.setResponse(servletResponse);
         }
 
+        @Override
         public String getCharacterEncoding() {
             // TODO: we don't support setLocale()
             return (encoding == null) ? DEFAULT_ENCODING : encoding;
@@ -337,6 +389,7 @@ public class OrbeonXFormsFilter implements Filter {
             return mediatype;
         }
 
+        @Override
         public ServletOutputStream getOutputStream() throws IOException {
             if (byteArrayOutputStream == null) {
                 byteArrayOutputStream = new ByteArrayOutputStream();
@@ -349,6 +402,7 @@ public class OrbeonXFormsFilter implements Filter {
             return servletOutputStream;
         }
 
+        @Override
         public PrintWriter getWriter() throws IOException {
             if (printWriter == null) {
                 stringWriter = new StringWriter();
@@ -357,37 +411,45 @@ public class OrbeonXFormsFilter implements Filter {
             return printWriter;
         }
 
+        @Override
         public void setContentLength(int i) {
             // NOP
         }
 
+        @Override
         public void setContentType(String contentType) {
             this.encoding = getContentTypeCharset(contentType);
             this.mediatype = getContentTypeMediaType(contentType);
         }
 
+        @Override
         public void setBufferSize(int i) {
             // NOP
         }
 
+        @Override
         public int getBufferSize() {
             // We have a buffer, but it is infinite
             return Integer.MAX_VALUE;
         }
 
+        @Override
         public void flushBuffer() throws IOException {
             // NOPE
         }
 
+        @Override
         public boolean isCommitted() {
             // We buffer everything so return false all the time
             return false;
         }
 
+        @Override
         public void reset() {
             resetBuffer();
         }
 
+        @Override
         public void resetBuffer() {
             if (byteArrayOutputStream != null) {
                 try {
@@ -403,10 +465,12 @@ public class OrbeonXFormsFilter implements Filter {
             }
         }
 
+        @Override
         public void setLocale(Locale locale) {
             // TODO
         }
 
+        @Override
         public Locale getLocale() {
             return super.getLocale();
         }

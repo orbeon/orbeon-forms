@@ -111,7 +111,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         final ExternalContext.Request request = externalContext.getRequest();
 
         // Remember if filter provided separate deployment information
-        isSeparateDeployment = "separate".equals(request.getAttributesMap().get(OrbeonXFormsFilter.OPS_XFORMS_RENDERER_DEPLOYMENT));
+        isSeparateDeployment = "separate".equals(request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME));
 
         // Try to get request context path
         requestContextPath = request.getClientContextPath("/");
@@ -121,7 +121,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             final String rootXMLBase;
             {
                 // It is possible to override the base URI by setting a request attribute. This is used by OPSXFormsFilter.
-                final String rendererBaseURI = (String) request.getAttributesMap().get(OrbeonXFormsFilter.OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME);
+                final String rendererBaseURI = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_BASE_URI_ATTRIBUTE_NAME);
                 if (rendererBaseURI != null)
                     rootXMLBase = rendererBaseURI;
                 else

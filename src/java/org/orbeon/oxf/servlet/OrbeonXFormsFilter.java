@@ -72,7 +72,7 @@ public class OrbeonXFormsFilter implements Filter {
             final MyHttpServletResponseWrapper responseWrapper = new MyHttpServletResponseWrapper(httpResponse);
 
             // Execute filter
-            filterChain.doFilter(new MyHttpServletRequestWrapper(httpRequest), responseWrapper);
+            filterChain.doFilter(new FilterHeadersRequestWrapper(httpRequest), responseWrapper);
 
             // Set document if not present AND output was intercepted
             if (httpRequest.getAttribute(RENDERER_DOCUMENT_ATTRIBUTE_NAME) == null) {
@@ -96,7 +96,7 @@ public class OrbeonXFormsFilter implements Filter {
             // let the filterChain finish its life naturally, assuming that when sendRedirect is used, no content is
             // available in the response object
             if (!isBlank(responseWrapper.getContent()))
-                getOrbeonDispatcher(RENDERER_PATH).forward(httpRequest, httpResponse);
+                getOrbeonDispatcher(RENDERER_PATH).forward(new EmptyBodyRequestWrapper(httpRequest), httpResponse);
         }
     }
 
@@ -186,15 +186,16 @@ public class OrbeonXFormsFilter implements Filter {
         return contentType.substring(0, semicolonIndex).trim();
     }
 
-    private static class MyHttpServletRequestWrapper extends HttpServletRequestWrapper {
+    private static class FilterHeadersRequestWrapper extends HttpServletRequestWrapper {
 
         private Enumeration<String> headerNames;
 
-        public MyHttpServletRequestWrapper(HttpServletRequest httpServletRequest) {
+        public FilterHeadersRequestWrapper(HttpServletRequest httpServletRequest) {
             super(httpServletRequest);
 
         }
 
+        @Override
         public String getHeader(String s) {
             // Filter conditional get headers so that we always get content
             if (s.toLowerCase().startsWith("if-") )
@@ -203,6 +204,7 @@ public class OrbeonXFormsFilter implements Filter {
                 return super.getHeader(s);
         }
 
+        @Override
         public Enumeration getHeaders(String s) {
             // Filter conditional get headers so that we always get content
             if (s.toLowerCase().startsWith("if-"))
@@ -211,6 +213,7 @@ public class OrbeonXFormsFilter implements Filter {
                 return super.getHeaders(s);
         }
 
+        @Override
         public Enumeration getHeaderNames() {
             if (headerNames == null) {
                 // Filter conditional get headers so that we always get content
@@ -226,12 +229,41 @@ public class OrbeonXFormsFilter implements Filter {
             return headerNames;
         }
 
+        @Override
         public long getDateHeader(String s) {
             // Filter conditional get headers so that we always get content
             if (s.toLowerCase().startsWith("if-"))
                 return -1;
             else
                 return super.getDateHeader(s);
+        }
+    }
+
+    // Return an empty stream for the body, because the body might be read by the JSP and we don't want Orbeon Forms to
+    // attempt to read a closed stream.
+    private static class EmptyBodyRequestWrapper extends FilterHeadersRequestWrapper {
+        private EmptyBodyRequestWrapper(HttpServletRequest httpServletRequest) {
+            super(httpServletRequest);
+        }
+
+        @Override
+        public String getContentType() {
+            return null;
+        }
+
+        @Override
+        public int getContentLength() {
+            return 0;
+        }
+
+        @Override
+        public ServletInputStream getInputStream() throws IOException {
+            return new ServletInputStream() {
+                @Override
+                public int read() throws IOException {
+                    return -1;
+                }
+            };
         }
     }
 
@@ -251,84 +283,103 @@ public class OrbeonXFormsFilter implements Filter {
         private String encoding;
         private String mediatype;
 
+        @Override
         public void addCookie(Cookie cookie) {
             super.addCookie(cookie);
         }
 
+        @Override
         public boolean containsHeader(String string) {
             return super.containsHeader(string);
         }
 
+        @Override
         public String encodeURL(String string) {
             return super.encodeURL(string);
         }
 
+        @Override
         public String encodeRedirectURL(String string) {
             return super.encodeRedirectURL(string);
         }
 
+        @Override
         public String encodeUrl(String string) {
             return super.encodeUrl(string);
         }
 
+        @Override
         public String encodeRedirectUrl(String string) {
             return super.encodeRedirectUrl(string);
         }
 
+        @Override
         public void sendError(int i, String string) throws IOException {
             // TODO
         }
 
+        @Override
         public void sendError(int i) throws IOException {
             // TODO
         }
 
+        @Override
         public void sendRedirect(String string) throws IOException {
             super.sendRedirect(string); 
         }
 
+        @Override
         public void setDateHeader(String string, long l) {
             // TODO
         }
 
+        @Override
         public void addDateHeader(String string, long l) {
             // TODO
         }
 
+        @Override
         public void setHeader(String string, String string1) {
             // TODO
         }
 
+        @Override
         public void addHeader(String string, String string1) {
             // TODO
         }
 
+        @Override
         public void setIntHeader(String string, int i) {
             // TODO
         }
 
+        @Override
         public void addIntHeader(String string, int i) {
 
             // TODO
         }
 
+        @Override
         public void setStatus(int i) {
             // TODO
         }
 
+        @Override
         public void setStatus(int i, String string) {
             // TODO
         }
 
-
+        @Override
         public ServletResponse getResponse() {
             return super.getResponse();
         }
 
+        @Override
         public void setResponse(ServletResponse servletResponse) {
             super.setResponse(servletResponse);
         }
 
+        @Override
         public String getCharacterEncoding() {
             // TODO: we don't support setLocale()
             return (encoding == null) ? DEFAULT_ENCODING : encoding;
@@ -338,6 +389,7 @@ public class OrbeonXFormsFilter implements Filter {
             return mediatype;
         }
 
+        @Override
         public ServletOutputStream getOutputStream() throws IOException {
             if (byteArrayOutputStream == null) {
                 byteArrayOutputStream = new ByteArrayOutputStream();
@@ -350,6 +402,7 @@ public class OrbeonXFormsFilter implements Filter {
             return servletOutputStream;
         }
 
+        @Override
         public PrintWriter getWriter() throws IOException {
             if (printWriter == null) {
                 stringWriter = new StringWriter();
@@ -358,37 +411,45 @@ public class OrbeonXFormsFilter implements Filter {
             return printWriter;
         }
 
+        @Override
         public void setContentLength(int i) {
             // NOP
         }
 
+        @Override
         public void setContentType(String contentType) {
             this.encoding = getContentTypeCharset(contentType);
             this.mediatype = getContentTypeMediaType(contentType);
         }
 
+        @Override
         public void setBufferSize(int i) {
             // NOP
         }
 
+        @Override
         public int getBufferSize() {
             // We have a buffer, but it is infinite
             return Integer.MAX_VALUE;
         }
 
+        @Override
         public void flushBuffer() throws IOException {
             // NOPE
         }
 
+        @Override
         public boolean isCommitted() {
             // We buffer everything so return false all the time
             return false;
         }
 
+        @Override
         public void reset() {
             resetBuffer();
         }
 
+        @Override
         public void resetBuffer() {
             if (byteArrayOutputStream != null) {
                 try {
@@ -404,10 +465,12 @@ public class OrbeonXFormsFilter implements Filter {
             }
         }
 
+        @Override
         public void setLocale(Locale locale) {
             // TODO
         }
 
+        @Override
         public Locale getLocale() {
             return super.getLocale();
         }

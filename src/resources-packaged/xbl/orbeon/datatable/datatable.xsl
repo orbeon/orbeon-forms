@@ -86,6 +86,7 @@
         select="$pass4/fr:datatable/@scrollable = ('horizontal', 'both') and $pass4/fr:datatable/@width"/>
     <xsl:variable name="scrollV"
         select="$pass4/fr:datatable/@scrollable = ('vertical', 'both') and $pass4/fr:datatable/@height"/>
+    <xsl:variable name="scrollable" select="$scrollH or $scrollV"/>
     <xsl:variable name="height"
         select="if ($scrollV) then concat('height: ', $pass4/fr:datatable/@height, ';') else ''"/>
     <xsl:variable name="width"
@@ -450,28 +451,60 @@
             </xforms:group>
 
             <xsl:if test="$hasLoadingFeature">
+                <!-- The trick with the spans is working fine for simple case where we don't need to specify the height or width.
+                     In other cases, the elements "gain layout" in IE world and the width of the div that contains the 
+                     scrollbar takes all the page in IE 6 if not explicitely set...-->
                 <xforms:group ref="xxforms:component-context()[$loading = true()]">
-                    <xhtml:span class="yui-dt yui-dt-scrollable" style="display: table; ">
-                        <xhtml:span class="yui-dt-hd"
-                            style="border: 1px solid rgb(127, 127, 127); display: table-cell;">
-                            <xhtml:table class="datatable  yui-dt-table" style="{$height} {$width}">
-                                <xhtml:thead>
-                                    <xhtml:tr class="yui-dt-first yui-dt-last">
-                                        <xsl:apply-templates
-                                            select="$pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th"
-                                            mode="YUI"/>
-                                    </xhtml:tr>
-                                </xhtml:thead>
-                                <xhtml:tbody>
-                                    <xhtml:tr>
-                                        <xhtml:td
-                                            colspan="{count($pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th)}"
-                                            class="fr-datatable-is-loading"/>
-                                    </xhtml:tr>
-                                </xhtml:tbody>
-                            </xhtml:table>
-                        </xhtml:span>
-                    </xhtml:span>
+                    <xforms:action ev:event="xforms-enabled">
+                        <xxforms:script> ORBEON.widgets.datatable.initLoadingIndicator(this,
+                                <xsl:value-of select="$scrollV"/>, <xsl:value-of select="$scrollH"
+                            />); </xxforms:script>
+                    </xforms:action>
+                    <xsl:variable name="tableContent">
+                        <xhtml:thead>
+                            <xhtml:tr class="yui-dt-first yui-dt-last">
+                                <xsl:apply-templates
+                                    select="$pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th"
+                                    mode="YUI"/>
+                            </xhtml:tr>
+                        </xhtml:thead>
+                        <xhtml:tbody>
+                            <xhtml:tr>
+                                <xhtml:td
+                                    colspan="{count($pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th)}">
+                                    <xhtml:div class="fr-datatable-is-loading"
+                                        style="{if ($scrollable) then concat( $height, ' ', $width) else ''}"
+                                    />
+                                </xhtml:td>
+                            </xhtml:tr>
+                        </xhtml:tbody>
+                    </xsl:variable>
+                    <xsl:choose>
+                        <xsl:when test="$scrollable">
+                            <div class="yui-dt yui-dt-scrollable"
+                                style="{if ($scrollV) then $height else 'height: 95px;'} {$width}">
+                                <div
+                                    style="overflow: auto; {if ($scrollV) then $height else 'height: 95px;'} {$width}"
+                                    class="yui-dt-hd">
+                                    <table style=""
+                                        class="datatable datatable-table-scrollV yui-dt-table fr-scrollV">
+                                        <xsl:copy-of select="$tableContent"/>
+                                    </table>
+                                </div>
+                            </div>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xhtml:span class="yui-dt yui-dt-scrollable" style="display: table; ">
+                                <xhtml:span class="yui-dt-hd"
+                                    style="border: 1px solid rgb(127, 127, 127); display: table-cell;">
+                                    <xhtml:table class="datatable  yui-dt-table"
+                                        style="{$height} {$width}">
+                                        <xsl:copy-of select="$tableContent"/>
+                                    </xhtml:table>
+                                </xhtml:span>
+                            </xhtml:span>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xforms:group>
             </xsl:if>
 
@@ -1145,28 +1178,59 @@
 
             </xforms:group>
 
-
             <xsl:if test="$hasLoadingFeature">
+                <!-- The trick with the spans is working fine for simple case where we don't need to specify the height or width.
+                    In other cases, the elements "gain layout" in IE world and the width of the div that contains the 
+                    scrollbar takes all the page in IE 6 if not explicitely set...-->
                 <xforms:group ref="xxforms:component-context()[$loading = true()]">
-                    <xhtml:span class="yui-dt yui-dt-scrollable" style="display: table; ">
-                        <xhtml:span class="yui-dt-hd"
-                            style="border: 1px solid rgb(127, 127, 127); display: table-cell;">
-                            <xhtml:table class="datatable  yui-dt-table" style="{$height} {$width}">
-                                <xhtml:thead>
-                                    <xhtml:tr class="yui-dt-first yui-dt-last">
-                                        <xsl:apply-templates select="$columns/*"
-                                            mode="dynamic-loadingIndicator"/>
-                                    </xhtml:tr>
-                                </xhtml:thead>
-                                <xhtml:tbody>
-                                    <xhtml:tr>
-                                        <xhtml:td colspan="{count($columns/*)}"
-                                            class="fr-datatable-is-loading"/>
-                                    </xhtml:tr>
-                                </xhtml:tbody>
-                            </xhtml:table>
-                        </xhtml:span>
-                    </xhtml:span>
+                    <xforms:action ev:event="xforms-enabled">
+                        <xxforms:script> ORBEON.widgets.datatable.initLoadingIndicator(this,
+                                <xsl:value-of select="$scrollV"/>, <xsl:value-of select="$scrollH"
+                            />); </xxforms:script>
+                    </xforms:action>
+                    <xsl:variable name="tableContent">
+                        <xhtml:thead>
+                            <xhtml:tr class="yui-dt-first yui-dt-last">
+                                <xsl:apply-templates select="$columns/*" mode="dyn-loadingIndicator"
+                                />
+                            </xhtml:tr>
+                        </xhtml:thead>
+                        <xhtml:tbody>
+                            <xhtml:tr>
+                                <xhtml:td colspan="{count($columns/*)}">
+                                    <xhtml:div class="fr-datatable-is-loading"
+                                        style="{if ($scrollable) then concat( $height, ' ', $width) else ''}"
+                                    />
+                                </xhtml:td>
+                            </xhtml:tr>
+                        </xhtml:tbody>
+                    </xsl:variable>
+                    <xsl:choose>
+                        <xsl:when test="$scrollable">
+                            <div class="yui-dt yui-dt-scrollable"
+                                style="{if ($scrollV) then $height else 'height: 95px;'} {$width}">
+                                <div
+                                    style="overflow: auto; {if ($scrollV) then $height else 'height: 95px;'} {$width}"
+                                    class="yui-dt-hd">
+                                    <table style=""
+                                        class="datatable datatable-table-scrollV yui-dt-table fr-scrollV">
+                                        <xsl:copy-of select="$tableContent"/>
+                                    </table>
+                                </div>
+                            </div>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xhtml:span class="yui-dt yui-dt-scrollable" style="display: table; ">
+                                <xhtml:span class="yui-dt-hd"
+                                    style="border: 1px solid rgb(127, 127, 127); display: table-cell;">
+                                    <xhtml:table class="datatable  yui-dt-table"
+                                        style="{$height} {$width}">
+                                        <xsl:copy-of select="$tableContent"/>
+                                    </xhtml:table>
+                                </xhtml:span>
+                            </xhtml:span>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xforms:group>
             </xsl:if>
 

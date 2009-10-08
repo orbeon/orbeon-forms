@@ -419,6 +419,16 @@ ORBEON.widgets.datatable.unittests_lib = {
 
     },
 
+    getLoadingIndicator: function(table) {
+        var tableGroup = YAHOO.util.Dom.getAncestorByTagName(table, 'span');
+        return YAHOO.util.Dom.getNextSibling(tableGroup);
+    },
+
+    checkVisibility: function(element, value) {
+        var visibility = ! YAHOO.util.Dom.hasClass(element, 'xforms-disabled-subsequent');
+        YAHOO.util.Assert.areEqual(value, visibility, 'Visibility is ' + visibility + ' instead of ' + value);
+    },
+
     clickAndCheckSortOrder: function(table, columnIndex, expectedOrder, callback) {
         //TODO: support scrollable tables
         var className;

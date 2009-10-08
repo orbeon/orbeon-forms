@@ -423,7 +423,11 @@ ORBEON.widgets.datatable.prototype.getAndSetColumns = function () {
         }
     }
     this.nbColumns = this.headerColumns.length;
-    this.nbRows = this.bodyColumns[0].length;
+    if (this.bodyColumns.length > 0) {
+        this.nbRows = this.bodyColumns[0].length;
+    } else {
+        this.nbRows = 0;
+    }
 }
 
 
@@ -686,6 +690,36 @@ ORBEON.widgets.datatable.removeIdAttributes = function (element, skipSelf) {
     }
 }
 
+
+ORBEON.widgets.datatable.initLoadingIndicator = function(target, scrollV, scrollH) {
+    var div = YAHOO.util.Dom.getFirstChild(target);
+    var subDiv = YAHOO.util.Dom.getFirstChild(div);
+    var table = YAHOO.util.Dom.getFirstChild(subDiv);
+    var region =    YAHOO.util.Dom.getRegion(table);
+    var curTableWidth = region.right - region.left;
+    if (curTableWidth < 50) {
+        YAHOO.util.Dom.setStyle(table, 'width', '50px');    
+    }
+    if (scrollV) {
+        if (YAHOO.env.ua.ie == 6 && target.hasBeenAdjusted == undefined ) {
+            // This is a hack to adjust the indicator height in IE6 :(
+            region =    YAHOO.util.Dom.getRegion(div);
+            var curHeight = region.bottom - region.top;
+            var heightProp =   (curHeight - 4) + 'px'    ;
+            YAHOO.util.Dom.setStyle(div, 'height', heightProp);
+            YAHOO.util.Dom.setStyle(subDiv, 'height', heightProp);
+            target.hasBeenAdjusted = true;
+        }
+        var cell = table.tBodies[0].rows[0].cells[0];
+        var cellDiv = ORBEON.widgets.datatable.utils.getFirstChildByTagName(cell, 'div');
+        if (scrollH) {
+            YAHOO.util.Dom.setStyle(cellDiv, 'height', (div.clientHeight - 41) + 'px');
+        } else {
+            YAHOO.util.Dom.setStyle(cellDiv, 'height', (div.clientHeight - 21) + 'px');
+            YAHOO.util.Dom.setStyle(div, 'width', (table.clientWidth + 22) + 'px');
+        }
+    }
+}
 
 ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
     // Initializes a datatable (called by xforms-enabled events)

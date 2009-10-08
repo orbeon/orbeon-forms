@@ -73,6 +73,7 @@
     <xforms:instance id="controls">
         <controls>
             <maxLength>20</maxLength>
+            <loading>true</loading>
         </controls>
     </xforms:instance>
 

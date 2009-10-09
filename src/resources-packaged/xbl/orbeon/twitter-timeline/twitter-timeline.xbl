@@ -89,7 +89,7 @@
             </xforms:model>
             <!-- Local controls -->
             <xforms:group>
-                <!-- DIV around all statuses -->
+                <!-- DIV to help styling -->
                 <xhtml:div class="fr-top-shadow"/>
                 <xhtml:div class="fr-container">
 
@@ -117,9 +117,10 @@
                                         <xforms:output value="user/screen_name"/>
                                     </xhtml:a>
                                 </xhtml:div>
-                                <!-- Message info -->
+                                <!-- Entry -->
                                 <xhtml:div class="entry">
                                     <xhtml:div>
+                                        <!-- Message -->
                                         <xhtml:span class="message">
                                             <!-- Bunch of regexps to escape, parse links, users, and hash tags with the message -->
                                             <xxforms:variable name="markup-replaced" as="xs:string"
@@ -137,9 +138,11 @@
                                             <!-- Output the resulting HTML -->
                                             <xforms:output mediatype="text/html" value="$hash-replaced"/>
                                         </xhtml:span>
+                                        <!-- Link to tweet -->
                                         <xhtml:a class="link" rel="bookmark" href="http://twitter.com/{user/screen_name}/status/{id}">
                                             <xhtml:img src="/apps/fr/style/images/silk/link.png" alt="Link to this tweet"/>
                                         </xhtml:a>
+                                        <!-- Source of the tweet -->
                                         <xhtml:span class="meta">
                                             <xhtml:span>posted  from <xforms:output mediatype="text/html" value="source"/></xhtml:span>
                                         </xhtml:span>

@@ -275,20 +275,20 @@ var testCase = {
             thiss.checkColDebugValue(col6Div, 'fr:sortable', 'true');
 
             // Click to sort the 3rd column
-            thiss.clickAndCheckSortOrder(table, 3, 'ascending', function() {
+            thiss.clickAndCheckSortOrder(table, 3, 'ascending', 'text', function() {
                 var col3th = YAHOO.util.Dom.get('my-accordion$sortable-table$sortable-th-dyn·2');
                 thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 3);
                 thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'ascending');
                 thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'descending');
 
-                thiss.clickAndCheckSortOrder(table, 6, 'ascending', function() {
+                thiss.clickAndCheckSortOrder(table, 6, 'ascending', 'number', function() {
                     thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 6);
                     thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'ascending');
                     thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'descending');
                     thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'none');
                     thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'ascending');
 
-                    thiss.clickAndCheckSortOrder(table, 6, 'descending', function() {
+                    thiss.clickAndCheckSortOrder(table, 6, 'descending', 'number', function() {
                         thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 6);
                         thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'descending');
                         thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'ascending');
@@ -358,16 +358,17 @@ var testCase = {
         thiss.openAccordionCase(thiss, 'paginate', function() {
             // Check the table structure
             var table = YAHOO.util.Dom.get('my-accordion$paginate-table$paginate-table-table');
+            var container = YAHOO.util.Dom.get('my-accordion$paginate-table$paginate-table-container');
             thiss.checkColumnValues(table, 2, false, [0, 1, 2, 3, 4]);
 
-            var linkNext = YAHOO.util.Dom.get('my-accordion$paginate-table$xf-42');
+            var linkNext = thiss.getPaginateLink(container, 'next >');
             ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                 YAHOO.util.UserAction.click(linkNext, {clientX: 1});
             }, function() {
                 // Test the status after clicking on "next"
                 thiss.checkColumnValues(table, 2, false, [5, 6, 7, 8, 9]);
 
-                var linkLast = YAHOO.util.Dom.get('my-accordion$paginate-table$xf-47');
+                var linkLast = thiss.getPaginateLink(container, 'last >>');
                 ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                     YAHOO.util.UserAction.click(linkLast, {clientX: 1});
                 }, function() {
@@ -391,7 +392,7 @@ var testCase = {
             var container = YAHOO.util.Dom.get('my-accordion$paginateMaxPage-table$paginateMaxPage-table-container');
             thiss.checkPaginationLinks(container, ['-<< first', '-< prev', '-1', '+2', '+3', '+4', '+5', '-...', '+10', '+next >', '+last >>']);
 
-            var linkNext = YAHOO.util.Dom.get('my-accordion$paginateMaxPage-table$xf-45');
+            var linkNext = thiss.getPaginateLink(container, 'next >');
             ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                 YAHOO.util.UserAction.click(linkNext, {clientX: 1});
             }, function() {
@@ -399,7 +400,7 @@ var testCase = {
                 thiss.checkColumnValues(table, 2, false, [4, 5, 6, 7]);
                 thiss.checkPaginationLinks(container, ['+<< first', '+< prev', '+1', '-2', '+3', '+4', '+5', '-...', '+10', '+next >', '+last >>']);
 
-                var linkLast = YAHOO.util.Dom.get('my-accordion$paginateMaxPage-table$xf-50');
+                var linkLast = thiss.getPaginateLink(container, 'last >>');
                 ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                     YAHOO.util.UserAction.click(linkLast, {clientX: 1});
                 }, function() {

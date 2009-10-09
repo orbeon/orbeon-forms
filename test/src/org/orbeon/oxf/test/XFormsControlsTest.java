@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.test;
 
-import junit.framework.TestCase;
 import org.dom4j.QName;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
@@ -23,7 +22,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class XFormsControlsTest extends TestCase {
+public class XFormsControlsTest extends ResourceManagerTestBase {
 
     public void testDiffCustomMIPsChanges() {
 

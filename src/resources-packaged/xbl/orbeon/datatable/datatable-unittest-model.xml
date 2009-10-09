@@ -74,6 +74,8 @@
         <controls>
             <maxLength>20</maxLength>
             <loading>true</loading>
+            <page>1</page>
+            <nbPages>15</nbPages>
         </controls>
     </xforms:instance>
 

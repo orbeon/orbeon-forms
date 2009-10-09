@@ -60,7 +60,7 @@
             <xsl:if test="position() >1">,</xsl:if>
             <xsl:text>resolve-QName('</xsl:text>
             <xsl:value-of select="."/>
-            <xsl:text>',..)</xsl:text>
+            <xsl:text>',.)</xsl:text>
         </xsl:for-each>
     </xsl:variable>
 
@@ -911,7 +911,7 @@
                 <xforms:bind nodeset="//column/@pathToFirstNode"
                     calculate="concat('xxforms:component-context()/(', $repeatNodeset, ')[1]/(', ../@sortKey, ')')"/>
                 <xforms:bind nodeset="//column[@fr:sortType]/@type" calculate="../@fr:sortType"/>
-                <xforms:bind nodeset="//column[not(@fr:sortType)]/@type"
+                <!--<xforms:bind nodeset="//column[not(@fr:sortType)]/@type"
                     calculate="for $value in xxforms:evaluate(../@pathToFirstNode)
                         return if ($value instance of node())
                         then if (xxforms:type($value) = ({$numberTypesEnumeration}))
@@ -920,7 +920,7 @@
                         else if ($value instance of xs:decimal)
                             then 'number'
                             else 'text'"/>
-
+-->
 
                 <xsl:if test="$paginated">
                     <xforms:instance id="page">
@@ -1359,8 +1359,43 @@
                 select="(instance('datatable-instance')//column)[@index=$currentSortColumnIndex]"
                 xxbl:scope="inner"/>
         </xxforms:variable>
-        <xsl:if test="$paginated">
-            <xxforms:variable name="outerPage" xxbl:scope="outer">
+
+        <xxforms:variable name="currentSortColumnType" xxbl:scope="outer"
+            select="
+            
+            if ($currentSortColumn)
+                then if ($currentSortColumn/@type != '')
+                    then $currentSortColumn/@type
+                    else for $value in xxforms:evaluate($currentSortColumn/@pathToFirstNode)
+                        return if ($value instance of node())
+                            then if (xxforms:type($value) = ({$numberTypesEnumeration}))
+                                then 'number'
+                                else 'text'
+                            else if ($value instance of xs:decimal)
+                                then 'number'
+                                else 'text'
+                else ''
+            
+            "/>
+
+
+<!-- 
+
+(evaluating XPath expression: expression='                          
+
+
+if ($currentSortColumn/@type != '')                 
+then $currentSortColumn/@type                
+else for $value in xxforms:evaluate($currentSortColumn/@pathToFirstNode)                     
+return if ($value instance of node())                         
+then if (xxforms:type($value) = (resolve-QName('xs:decimal',..),resolve-QName('xs:integer',..),resolve-QName('xs:nonPositiveInteger',..),resolve-QName('xs:negativeInteger',..),resolve-QName('xs:long',..),resolve-QName('xs:int',..),resolve-QName('xs:short',..),resolve-QName('xs:byte',..),resolve-QName('xs:nonNegativeInteger',..),resolve-QName('xs:unsignedLong',..),resolve-QName('xs:unsignedInt',..),resolve-QName('xs:unsignedShort',..),resolve-QName('xs:unsignedByte',..),resolve-QName('xs:positiveInteger',..)))                             then 'number'                             else 'text'                         else if ($value instance of xs:decimal)                             then 'number'                             else 'text'                          '): An empty sequence is not allowed as the first argument of xxforms:evaluate()
+
+An empty sequence is not allowed as the first argument of xxforms:evaluate() 
+
+-->
+
+         <xsl:if test="$paginated and not($sortAndPaginationMode = 'external')">
+            <xxforms:variable name="page" xxbl:scope="outer">
                 <xxforms:sequence select="$page" xxbl:scope="inner"/>
             </xxforms:variable>
         </xsl:if>
@@ -1369,16 +1404,16 @@
             <xxforms:sequence xxbl:scope="outer"
                 select="
                 
-                {if ($paginated) then '(' else ''}
+                {if ($paginated and not($sortAndPaginationMode = 'external')) then '(' else ''}
                 
                 if (not($currentSortColumn) or $currentSortColumn/@currentSortOrder = 'none') 
                     then $nodeset
-                    else exf:sort($nodeset,  $currentSortColumn/@sortKey , $currentSortColumn/@type, $currentSortColumn/@currentSortOrder)
+                    else exf:sort($nodeset,  $currentSortColumn/@sortKey , $currentSortColumnType, $currentSortColumn/@currentSortOrder)
                 
-                {if ($paginated) then concat(
-                    ')[position() >= ($outerPage - 1) * '
+                {if ($paginated and not($sortAndPaginationMode = 'external')) then concat(
+                    ')[position() >= ($page - 1) * '
                     , $rowsPerPage 
-                    , ' + 1 and position() &lt;= $outerPage *'
+                    , ' + 1 and position() &lt;= $page *'
                     , $rowsPerPage
                     ,']') else ''}
                 
@@ -1388,17 +1423,6 @@
         <xxforms:script ev:event="xxforms-nodeset-changed" ev:target="fr-datatable-repeat">
             ORBEON.widgets.datatable.update(this); </xxforms:script>
         <xforms:repeat id="fr-datatable-repeat" nodeset="$rewrittenNodeset" xxbl:scope="inner">
-            <!-- <xsl:attribute name="nodeset">
-                <xsl:if test="$paginated">(</xsl:if>
-                <xsl:text>if (not($currentSortColumn) or $currentSortColumn/@currentSortOrder = 'none') then </xsl:text>
-                <xsl:value-of select="@nodeset"/>
-                <xsl:text> else exf:sort(</xsl:text>
-                <xsl:value-of select="@nodeset"/>
-                <xsl:text>, $currentSortColumn/@sortKey , $currentSortColumn/@type, $currentSortColumn/@currentSortOrder)</xsl:text>
-                <xsl:if test="$paginated">)[position() >= ($page - 1) * <xsl:value-of
-                        select="$rowsPerPage"/> + 1 and position() &lt;= $page * <xsl:value-of
-                        select="$rowsPerPage"/>]</xsl:if>
-            </xsl:attribute>-->
             <xsl:apply-templates select="@*[not(name()='nodeset')]|node()" mode="dynamic"/>
         </xforms:repeat>
     </xsl:template>

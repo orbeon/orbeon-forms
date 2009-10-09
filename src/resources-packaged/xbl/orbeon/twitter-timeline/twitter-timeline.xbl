@@ -121,7 +121,7 @@
                                 <xhtml:div class="entry">
                                     <xhtml:div>
                                         <xhtml:span class="message">
-                                            <!-- Bunch of regexps to parse links, users, and hash tags with the message -->
+                                            <!-- Bunch of regexps to escape, parse links, users, and hash tags with the message -->
                                             <xxforms:variable name="markup-replaced" as="xs:string"
                                                               select="replace(replace(text, '&lt;', '&amp;lt;'), '&quot;', '&amp;quot;')"/>
                                             <xxforms:variable name="url-replaced" as="xs:string"
@@ -137,7 +137,7 @@
                                             <!-- Output the resulting HTML -->
                                             <xforms:output mediatype="text/html" value="$hash-replaced"/>
                                         </xhtml:span>
-                                        <xhtml:a class="entry-link" rel="bookmark" href="http://twitter.com/{user/screen_name}/status/{id}">
+                                        <xhtml:a class="link" rel="bookmark" href="http://twitter.com/{user/screen_name}/status/{id}">
                                             <xhtml:img src="/apps/fr/style/images/silk/link.png" alt="Link to this tweet"/>
                                         </xhtml:a>
                                         <xhtml:span class="meta">

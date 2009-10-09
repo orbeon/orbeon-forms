@@ -70,8 +70,14 @@
         <text/>
     </xforms:instance>
 
-    <xforms:insert ev:event="xforms-model-construct-done" 
-        context="instance('detailed-lorem')"
+    <xforms:instance id="controls">
+        <controls>
+            <maxLength>20</maxLength>
+            <loading>true</loading>
+        </controls>
+    </xforms:instance>
+
+    <xforms:insert ev:event="xforms-model-construct-done" context="instance('detailed-lorem')"
         origin=" 
         for $line in instance('lorem')/line return 
             xxforms:element( 'line', (
@@ -79,12 +85,16 @@
                 xxforms:element('text', normalize-space($line)), 
                 xxforms:element('length', string-length(normalize-space($line))),
                 xxforms:element('nb-words', string-length(normalize-space($line)) - string-length(translate(normalize-space($line), ' ', '')) + 1)
-                ))" />
+                ))"/>
 
     <xforms:bind nodeset="instance('detailed-lorem')/line">
         <xforms:bind nodeset="position" type="xs:integer"/>
         <xforms:bind nodeset="length" type="xs:integer"/>
         <xforms:bind nodeset="nb-words" type="xs:integer"/>
+    </xforms:bind>
+
+    <xforms:bind nodeset="instance('controls')/line">
+        <xforms:bind nodeset="maxLength" type="xs:integer"/>
     </xforms:bind>
 
 </xforms:model>

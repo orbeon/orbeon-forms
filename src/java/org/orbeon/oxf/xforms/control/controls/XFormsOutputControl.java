@@ -258,7 +258,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    public boolean addAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
+    public boolean addCustomAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
         final XFormsOutputControl outputControlInfo1 = (XFormsOutputControl) other;
         final XFormsOutputControl outputControlInfo2 = this;
 

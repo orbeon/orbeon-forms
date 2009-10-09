@@ -14,6 +14,7 @@
 package org.orbeon.oxf.test;
 
 import junit.framework.TestCase;
+import org.dom4j.QName;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 import org.orbeon.oxf.xforms.processor.OldControlsComparator;
@@ -43,7 +44,7 @@ public class XFormsControlsTest extends TestCase {
             }
         };
 
-        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input", "input-1") {
+        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input", "input-2") {
             private Map<String, String> customMIPs = new LinkedHashMap<String, String>();
             {
                 // leave as is
@@ -64,7 +65,7 @@ public class XFormsControlsTest extends TestCase {
         OldControlsComparator.diffCustomMIPs(attributes, control1, control2, false, false);
         assertEquals("-name2-value2 -name3-value3 +name3-newvalue3", attributes.getValue("class"));
     }
-
+    
     public void testDiffCustomMIPsNew() {
 
         final AttributesImpl attributes = new AttributesImpl();
@@ -78,6 +79,7 @@ public class XFormsControlsTest extends TestCase {
                 customMIPs.put("name4", "value4");
             }
 
+            @Override
             public Map<String, String> getCustomMIPs() {
                 return customMIPs;
             }
@@ -85,6 +87,41 @@ public class XFormsControlsTest extends TestCase {
 
         OldControlsComparator.diffCustomMIPs(attributes, null, control2, false, false);
         assertEquals("name1-value1 name2-value2 name3-value3 name4-value4", attributes.getValue("class"));
+    }
+
+    public void testDiffClassAVT() {
+        final AttributesImpl attributes = new AttributesImpl();
+
+        final XFormsSingleNodeControl control1 = new XFormsInputControl(null, null, null, "input", "input-1") {
+            @Override
+            public String getExtensionAttributeValue(QName attributeName) {
+                return "foo bar gaga";
+            }
+        };
+
+        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input", "input-2") {
+            @Override
+            public String getExtensionAttributeValue(QName attributeName) {
+                return "bar toto";
+            }
+        };
+
+        OldControlsComparator.diffClassAVT(attributes, control1, control2, false, false);
+        assertEquals("-foo -gaga +toto", attributes.getValue("class"));
+    }
+
+    public void testDiffClassAVTNew() {
+        final AttributesImpl attributes = new AttributesImpl();
+
+        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input", "input-1") {
+            @Override
+            public String getExtensionAttributeValue(QName attributeName) {
+                return "foo bar";
+            }
+        };
+
+        OldControlsComparator.diffClassAVT(attributes, null, control2, false, false);
+        assertEquals("foo bar", attributes.getValue("class"));
     }
 
     // NOTE: started writing this test, but just using an XFormsOutputControl without the context of an XFormsContainingDocument seems a dead-end!

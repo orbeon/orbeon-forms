@@ -287,7 +287,7 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    public boolean addAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
+    public boolean addCustomAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
 
         final XFormsUploadControl uploadControlInfo1 = (XFormsUploadControl) other;
         final XFormsUploadControl uploadControlInfo2 = this;

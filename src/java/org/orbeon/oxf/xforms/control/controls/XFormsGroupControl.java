@@ -30,4 +30,11 @@ public class XFormsGroupControl extends XFormsValueContainerControl {
     public XFormsGroupControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
         super(container, parent, element, name, id);
     }
+
+    @Override
+    public boolean isStaticReadonly() {
+        // Static readonly-ness doesn't seem to make much sense for xforms:group, and we don't want to see the
+        // xforms-static class in the resulting HTML
+        return false;
+    }
 }

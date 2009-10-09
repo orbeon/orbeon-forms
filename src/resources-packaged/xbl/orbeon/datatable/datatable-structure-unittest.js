@@ -13,51 +13,54 @@
  */
 
 
-YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
-
+var testCase = {
  
     name: "datatable",
 
     testComplete: function() {
         var thiss = this;
-        ORBEON.widgets.datatable.unittests_lib.openAccordionCase(this, 'complete', function(){
+        thiss.openAccordionCase(this, 'complete', function(){
             var table = YAHOO.util.Dom.get('my-accordion$table-complete$table-complete-table');
-            ORBEON.widgets.datatable.unittests_lib.checkTableStructure(table, 2);
-            ORBEON.widgets.datatable.unittests_lib.closeAccordionCase(thiss, 'complete');
+            thiss.checkTableStructure(table, 2);
+            thiss.closeAccordionCase(thiss, 'complete');
         });
     },
 
     testTrRepeatNodeset: function() {
         var thiss = this;
-        ORBEON.widgets.datatable.unittests_lib.openAccordionCase(thiss, 'tr-repeat-nodeset', function(){
+        thiss.openAccordionCase(thiss, 'tr-repeat-nodeset', function(){
             var table = YAHOO.util.Dom.get('my-accordion$table-tr-repeat-nodeset$table-tr-repeat-nodeset-table');
-            ORBEON.widgets.datatable.unittests_lib.checkTableStructure(table, 2);
-            ORBEON.widgets.datatable.unittests_lib.closeAccordionCase(thiss, 'tr-repeat-nodeset');
+            thiss.checkTableStructure(table, 2);
+            thiss.closeAccordionCase(thiss, 'tr-repeat-nodeset');
         });
     },
     
     testNoHeader: function() {
         var thiss = this;
-        ORBEON.widgets.datatable.unittests_lib.openAccordionCase(thiss, 'no-header', function(){
+        thiss.openAccordionCase(thiss, 'no-header', function(){
             var table = YAHOO.util.Dom.get('my-accordion$table-no-header$table-no-header-table');
-            ORBEON.widgets.datatable.unittests_lib.checkTableStructure(table, 2);
-            ORBEON.widgets.datatable.unittests_lib.closeAccordionCase(thiss, 'no-header');
+            thiss.checkTableStructure(table, 2);
+            thiss.closeAccordionCase(thiss, 'no-header');
         });
     },
 
     testNoHeaderTrRepeatNodeset: function() {
         var thiss = this;
-        ORBEON.widgets.datatable.unittests_lib.openAccordionCase(thiss, 'no-header-tr-repeat-nodeset', function(){
+        thiss.openAccordionCase(thiss, 'no-header-tr-repeat-nodeset', function(){
             var table = YAHOO.util.Dom.get('my-accordion$table-no-header-tr-repeat-nodeset$table-no-header-tr-repeat-nodeset-table');
-            ORBEON.widgets.datatable.unittests_lib.checkTableStructure(table, 2);
-            ORBEON.widgets.datatable.unittests_lib.closeAccordionCase(thiss, 'no-header-tr-repeat-nodeset');
+            thiss.checkTableStructure(table, 2);
+            thiss.closeAccordionCase(thiss, 'no-header-tr-repeat-nodeset');
         });
     },
 
     EOS: ""
-}));
+};
 
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+    for (var property in ORBEON.widgets.datatable.unittests_lib) {
+        testCase[property] = ORBEON.widgets.datatable.unittests_lib[property];
+    }
+    YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase(testCase));
     AccordionMenu.setting('my-accordion$dl', {animation: true, seconds: 0.001, openedIds: [], dependent: false, easeOut: false});
     if (parent && parent.TestManager) {
         parent.TestManager.load();

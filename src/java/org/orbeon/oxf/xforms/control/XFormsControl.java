@@ -50,9 +50,9 @@ import java.util.*;
 public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObserver, Cloneable {
 
     // List of standard extension attributes
-    private static final QName[] EXTENSION_ATTRIBUTES = {
+    private static final QName[] STANDARD_EXTENSION_ATTRIBUTES = {
             XFormsConstants.STYLE_QNAME,
-            //XFormsConstants.CLASS_QNAME, TODO: handle @class specially as it is now copied as is in XFormsBaseHandler
+            XFormsConstants.CLASS_QNAME
     };
 
     private XBLContainer container;
@@ -494,7 +494,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             evaluate(propertyContext);
 
             // Evaluate standard extension attributes
-            evaluateExtensionAttributes(propertyContext, EXTENSION_ATTRIBUTES);
+            evaluateExtensionAttributes(propertyContext, STANDARD_EXTENSION_ATTRIBUTES);
             // Evaluate custom extension attributes
             final QName[] extensionAttributes = getExtensionAttributes();
             if (extensionAttributes != null) {
@@ -696,21 +696,16 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @param isNewRepeatIteration  whether the current controls is within a new repeat iteration
      * @return                      true if any attribute was added, false otherwise
      */
-    public boolean addAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl originalControl,
-                                      AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
+    public boolean addCustomAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl originalControl,
+                                            AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
 
         final QName[] extensionAttributes = getExtensionAttributes();
-        if (extensionAttributes != null) {
-            // By default, diff only attributes in the xxforms:* namespace
-            return addAttributesDiffs(originalControl, attributesImpl, isNewRepeatIteration, extensionAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
-        } else {
-            return false;
-        }
+        // By default, diff only attributes in the xxforms:* namespace
+        return extensionAttributes != null && addAttributesDiffs(originalControl, attributesImpl, isNewRepeatIteration, extensionAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
     }
 
-    private boolean addAttributesDiffs(XFormsControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration, QName[] attributeQNames, String namespaceURI) {
+    private boolean addAttributesDiffs(XFormsControl control1, AttributesImpl attributesImpl, boolean isNewRepeatIteration, QName[] attributeQNames, String namespaceURI) {
 
-        final XFormsControl control1 = other;
         final XFormsControl control2 = this;
 
         boolean added = false;
@@ -733,23 +728,18 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return added;
     }
 
-    protected static boolean addAttributeIfNeeded(AttributesImpl attributesImpl, String name, String value, boolean isNewRepeatIteration, boolean isDefaultValue) {
-        if (isNewRepeatIteration && isDefaultValue) {
-            return false;
-        } else {
-            attributesImpl.addAttribute("", name, name, ContentHandlerHelper.CDATA, value);
-            return true;
-        }
-    }
-
-    public void addAttributesDiffs(XFormsSingleNodeControl originalControl, ContentHandlerHelper ch, boolean isNewRepeatIteration) {
-        final QName[] extensionAttributes = EXTENSION_ATTRIBUTES;
+    public void addStandardAttributesDiffs(XFormsSingleNodeControl originalControl, ContentHandlerHelper ch, boolean isNewRepeatIteration) {
+        final QName[] extensionAttributes = STANDARD_EXTENSION_ATTRIBUTES;
         if (extensionAttributes != null) {
-            final XFormsControl control1 = originalControl;
             final XFormsControl control2 = this;
 
             for (final QName avtAttributeQName: extensionAttributes) {
-                final String value1 = (control1 == null) ? null : control1.getExtensionAttributeValue(avtAttributeQName);
+
+                // Skip @class because this is handled separately
+                if (avtAttributeQName.equals(XFormsConstants.CLASS_QNAME))
+                    continue;
+
+                final String value1 = (originalControl == null) ? null : originalControl.getExtensionAttributeValue(avtAttributeQName);
                 final String value2 = control2.getExtensionAttributeValue(avtAttributeQName);
 
                 if (!XFormsUtils.compareStrings(value1, value2)) {
@@ -773,6 +763,15 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                     ch.endElement();
                 }
             }
+        }
+    }
+
+    protected static boolean addAttributeIfNeeded(AttributesImpl attributesImpl, String name, String value, boolean isNewRepeatIteration, boolean isDefaultValue) {
+        if (isNewRepeatIteration && isDefaultValue) {
+            return false;
+        } else {
+            attributesImpl.addAttribute("", name, name, ContentHandlerHelper.CDATA, value);
+            return true;
         }
     }
 
@@ -916,7 +915,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return container.getNamespaceMappings(controlElement);
     }
 
-    protected String getExtensionAttributeValue(QName attributeName) {
+    public String getExtensionAttributeValue(QName attributeName) {
         return (extensionAttributesValues == null) ? null : extensionAttributesValues.get(attributeName);
     }
 
@@ -933,6 +932,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
                 // Skip if namespace URI is excluded
                 if (namespaceURI != null && !namespaceURI.equals(currentName.getNamespaceURI()))
+                    continue;
+
+                // Skip @class because this is handled separately
+                if (currentName.equals(XFormsConstants.CLASS_QNAME))
                     continue;
 
                 final String currentValue = currentEntry.getValue();
@@ -1037,11 +1040,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Compare two nodesets.
      *
-     * @param nodeset1  List<NodeInfo> first nodeset
-     * @param nodeset2  List<NodeInfo> second nodeset
+     * @param nodeset1  first nodeset
+     * @param nodeset2  second nodeset
      * @return  true iif the nodesets point to the same nodes
      */
-    protected boolean compareNodesets(List nodeset1, List nodeset2) {
+    protected boolean compareNodesets(List<Item> nodeset1, List<Item> nodeset2) {
 
         // Can't be the same if the size has changed
         if (nodeset1.size() != nodeset2.size())

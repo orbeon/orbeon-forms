@@ -763,4 +763,128 @@
         </output>
     </test>
 
+    <test description="Output of @class without and with AVT on controls" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xhtml:head>
+                    <xforms:model>
+                        <xforms:instance id="instance">
+                            <instance>
+                                <name/>
+                            </instance>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+
+                    <!-- Without AVT -->
+                    <xforms:input id="input1a" ref="name" class="my-static"/>
+                    <xforms:group id="group1a" ref="name" class="my-static"/>
+                    <xforms:group id="group2a" ref="()">
+                        <xforms:input id="input2a" ref="name" class="my-static"/>
+                    </xforms:group>
+
+                    <!-- With AVT -->
+                    <xforms:input id="input1b" ref="name" class="{if (string-length() mod 2 = 0) then 'my-even' else 'my-odd'}"/>
+                    <xforms:group id="group1b" ref="name" class="{if (string-length() mod 2 = 0) then 'my-even' else 'my-odd'}"/>
+                    <xforms:group id="group2b" ref="()">
+                        <xforms:input id="input2b" ref="name" class="{if (string-length() mod 2 = 0) then 'my-even' else 'my-odd'}"/>
+                    </xforms:group>
+
+                </xhtml:body>
+            </xhtml:html>
+
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:span id="input1a" class="my-static xforms-control xforms-input">
+                    <xhtml:input id="input1a$xforms-input-1" type="text" name="input1a$xforms-input-1" value="" class="xforms-input-input"/>
+                </xhtml:span>
+                <xhtml:span id="group1a" class="my-static xforms-group"/>
+                <xhtml:span id="group2a" class="xforms-group xforms-disabled">
+                    <xhtml:span id="input2a" class="my-static xforms-control xforms-input xforms-disabled">
+                        <xhtml:input id="input2a$xforms-input-1" type="text" name="input2a$xforms-input-1" value="" class="xforms-input-input"/>
+                    </xhtml:span>
+                </xhtml:span>
+                <xhtml:span id="input1b" class="my-even xforms-control xforms-input">
+                    <xhtml:input id="input1b$xforms-input-1" type="text" name="input1b$xforms-input-1" value="" class="xforms-input-input"/>
+                </xhtml:span>
+                <xhtml:span id="group1b" class="my-even xforms-group"/>
+                <xhtml:span id="group2b" class="xforms-group xforms-disabled">
+                    <xhtml:span id="input2b" class="xforms-control xforms-input xforms-disabled">
+                        <xhtml:input id="input2b$xforms-input-1" type="text" name="input2b$xforms-input-1" value="" class="xforms-input-input"/>
+                    </xhtml:span>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
+    <test description="Output of @class without and with AVT on controls" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <name/>
+                            </instance>
+                        </xforms:instance>
+                        <!-- Set even length -->
+                        <xforms:setvalue ev:event="xforms-ready" ref="name">XML</xforms:setvalue>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+
+                    <!-- Without AVT -->
+                    <xforms:input id="input1a" ref="name" class="my-static"/>
+                    <xforms:group id="group1a" ref="name" class="my-static"/>
+                    <xforms:group id="group2a" ref="()">
+                        <xforms:input id="input2a" ref="name" class="my-static"/>
+                    </xforms:group>
+
+                    <!-- With AVT -->
+                    <xforms:input id="input1b" ref="name" class="{if (string-length() mod 2 = 0) then 'my-even' else 'my-odd'}"/>
+                    <xforms:group id="group1b" ref="name" class="{if (string-length() mod 2 = 0) then 'my-even' else 'my-odd'}"/>
+                    <xforms:group id="group2b" ref=".[string-length(name) mod 2 = 1]">
+                        <xforms:input id="input2b" ref="name" class="{if (string-length() mod 2 = 0) then 'my-even' else 'my-odd'}"/>
+                    </xforms:group>
+                    <xforms:input id="input3b" ref="name[string-length() mod 2 = 1]" class="{if (string-length() mod 2 = 0) then 'my-even' else 'my-odd'}"/>
+
+                </xhtml:body>
+            </xhtml:html>
+
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <name>XML</name>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="input1a" class="my-static">XML</xxf:control>
+                        <xxf:control id="group1a" class="my-static"/>
+                        <xxf:control id="group2a" relevant="false"/>
+                        <xxf:control id="input2a" relevant="false" class="my-static"/>
+                        <xxf:control id="input1b" class="my-odd">XML</xxf:control>
+                        <xxf:control id="group1b" class="my-odd"/>
+                        <xxf:control id="input2b" class="my-odd">XML</xxf:control>
+                        <xxf:control id="input3b" class="my-odd">XML</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

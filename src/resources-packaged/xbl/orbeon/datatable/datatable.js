@@ -240,7 +240,9 @@ ORBEON.widgets.datatable.prototype.finish = function () {
             YAHOO.util.Dom.addClass(childDiv, className);
             for (var k = 0; k < this.bodyColumns[j].length; k++) {
                 var cell = this.bodyColumns[j][k];
-                YAHOO.util.Dom.addClass(cell, className);
+                var liner = YAHOO.util.Selector.query('div', cell, true);
+                YAHOO.util.Dom.addClass(liner, className);
+
             }
             if (! this.styleElt) {
                 this.styleElt = document.createElement('style');
@@ -411,7 +413,7 @@ ORBEON.widgets.datatable.prototype.getAndSetColumns = function () {
         if (ORBEON.widgets.datatable.isSignificant(row)) {
             var iActualCol = 0;
             var cells = YAHOO.util.Dom.getChildren(row);
-            for (var icol = 0; icol < cells.length ; icol++) {
+            for (var icol = 0; icol < cells.length; icol++) {
                 var cell = cells[icol];
                 if (ORBEON.widgets.datatable.isSignificant(cell)) {
                     this.bodyColumns[iActualCol].push(cell);
@@ -421,7 +423,11 @@ ORBEON.widgets.datatable.prototype.getAndSetColumns = function () {
         }
     }
     this.nbColumns = this.headerColumns.length;
-    this.nbRows = this.bodyColumns[0].length;
+    if (this.bodyColumns.length > 0) {
+        this.nbRows = this.bodyColumns[0].length;
+    } else {
+        this.nbRows = 0;
+    }
 }
 
 
@@ -431,7 +437,7 @@ ORBEON.widgets.datatable.prototype.update = function () {
     if (this.totalNbRows == undefined) {
         this.totalNbRows = -1;
     }
-    var totalNbRows =  YAHOO.util.Dom.getChildren(this.tbody).length; // this.tbody.rows.length blows up IE 6/7 in some cases here!
+    var totalNbRows = YAHOO.util.Dom.getChildren(this.tbody).length; // this.tbody.rows.length blows up IE 6/7 in some cases here!
     if (totalNbRows != this.totalNbRows) {
         // If the number of rows has changed, we need to reset our cell arrays
         this.getAndSetColumns();
@@ -445,7 +451,7 @@ ORBEON.widgets.datatable.prototype.update = function () {
                 var div = divs[0];
                 if (div != undefined) {
                     if (div.style.width != "") {
-                        // Resizing is supported through width attributes
+                        // Resizing is supported through width style properties
                         var width = div.style.width;
                         var styles = [div.style];
                         for (var irow = 0; irow < this.bodyColumns[icol].length; irow++) {
@@ -685,6 +691,36 @@ ORBEON.widgets.datatable.removeIdAttributes = function (element, skipSelf) {
 }
 
 
+ORBEON.widgets.datatable.initLoadingIndicator = function(target, scrollV, scrollH) {
+    var div = YAHOO.util.Dom.getFirstChild(target);
+    var subDiv = YAHOO.util.Dom.getFirstChild(div);
+    var table = YAHOO.util.Dom.getFirstChild(subDiv);
+    var region =    YAHOO.util.Dom.getRegion(table);
+    var curTableWidth = region.right - region.left;
+    if (curTableWidth < 50) {
+        YAHOO.util.Dom.setStyle(table, 'width', '50px');    
+    }
+    if (scrollV) {
+        if (YAHOO.env.ua.ie == 6 && target.hasBeenAdjusted == undefined ) {
+            // This is a hack to adjust the indicator height in IE6 :(
+            region =    YAHOO.util.Dom.getRegion(div);
+            var curHeight = region.bottom - region.top;
+            var heightProp =   (curHeight - 4) + 'px'    ;
+            YAHOO.util.Dom.setStyle(div, 'height', heightProp);
+            YAHOO.util.Dom.setStyle(subDiv, 'height', heightProp);
+            target.hasBeenAdjusted = true;
+        }
+        var cell = table.tBodies[0].rows[0].cells[0];
+        var cellDiv = ORBEON.widgets.datatable.utils.getFirstChildByTagName(cell, 'div');
+        if (scrollH) {
+            YAHOO.util.Dom.setStyle(cellDiv, 'height', (div.clientHeight - 41) + 'px');
+        } else {
+            YAHOO.util.Dom.setStyle(cellDiv, 'height', (div.clientHeight - 21) + 'px');
+            YAHOO.util.Dom.setStyle(div, 'width', (table.clientWidth + 22) + 'px');
+        }
+    }
+}
+
 ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
     // Initializes a datatable (called by xforms-enabled events)
     var container = target.parentNode.parentNode;
@@ -711,6 +747,7 @@ ORBEON.widgets.datatable.update = function (target) {
     // Updates a datatable when the xforms:repeat nodeset has been changed
     var container = target.parentNode.parentNode;
     var id = container.id;
+    YAHOO.log("Updating datatable " + id, "info");
     if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled')) {
         if (ORBEON.widgets.datatable.datatables[id] != undefined) {
             ORBEON.widgets.datatable.datatables[id].update();

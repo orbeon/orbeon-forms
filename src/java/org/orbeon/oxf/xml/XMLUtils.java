@@ -1142,26 +1142,27 @@ public class XMLUtils {
     }
 
     /**
-     * Append classes to existing mutable attributes.
+     * Append an attribute value to existing mutable attributes.
      *
-     * @param attributes    existing attributes
-     * @param newClasses    new classes to append
+     * @param attributes        existing attributes
+     * @param attributeName     attribute name
+     * @param attributeValue    value to set or append
      */
-    public static void appendToClassAttribute(AttributesImpl attributes, String newClasses) {
-        final int oldClassAttributeIndex = attributes.getIndex("class");
+    public static void addOrAppendToAttribute(AttributesImpl attributes, String attributeName, String attributeValue) {
+        final int oldAttributeIndex = attributes.getIndex(attributeName);
 
-        if (oldClassAttributeIndex == -1) {
+        if (oldAttributeIndex == -1) {
             // No existing class attribute
 
             // Add
-            attributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, newClasses);
+            attributes.addAttribute("", attributeName, attributeName, ContentHandlerHelper.CDATA, attributeValue);
         } else {
-            // Existing class attribute
-            final String oldClassAttribute = attributes.getValue(oldClassAttributeIndex);
-            final String newClassAttribute = oldClassAttribute + ' ' + newClasses;
+            // Existing attribute
+            final String oldAttributeValue = attributes.getValue(oldAttributeIndex);
+            final String newAttributeValue = oldAttributeValue + ' ' + attributeValue;
 
             // Replace value
-            attributes.setValue(oldClassAttributeIndex, newClassAttribute);
+            attributes.setValue(oldAttributeIndex, newAttributeValue);
         }
     }
 

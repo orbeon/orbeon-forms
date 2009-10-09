@@ -71,7 +71,7 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
         if (hrefValue == null || hrefValue.trim().equals("")) {
             // No URL so make sure a click doesn't cause navigation, and add class
             aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
-            XMLUtils.appendToClassAttribute(aAttributes, "xforms-readonly");
+            XMLUtils.addOrAppendToAttribute(aAttributes, "class", "xforms-readonly");
         } else {
             // URL value
             aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);

@@ -135,6 +135,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                         sb.append(' ');
                     sb.append("xforms-required");
                     if (xformsControl instanceof XFormsValueControl) {
+                        // NOTE: Test above excludes xforms:group
                         if (isEmpty(xformsControl))
                             sb.append(" xforms-required-empty");
                         else
@@ -239,14 +240,33 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         // User-defined classes go first
         {
             {
-                final String value = controlAttributes.getValue("class");
-                if (value != null) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append(value);
+                final String attributeValue = controlAttributes.getValue("class");
+                final String value;
+                if (attributeValue != null) {
+
+                    if (attributeValue.indexOf('{') == -1) {
+                        // Definitely not an AVT
+                        value = attributeValue;
+                    } else {
+                        // Possible AVT
+                        if (xformsControl != null) {
+                            // Ask the control if possible
+                            value = xformsControl.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME);
+                        } else {
+                            // Otherwise we can't compute it
+                            value = null;
+                        }
+                    }
+
+                    if (value != null) {
+                        if (sb.length() > 0)
+                            sb.append(' ');
+                        sb.append(value);
+                    }
                 }
             }
             {
+                // TODO: Do we need to support this? Should just use @class
                 final String value = controlAttributes.getValue(XMLConstants.XHTML_NAMESPACE_URI, "class");
                 if (value != null) {
                     if (sb.length() > 0)

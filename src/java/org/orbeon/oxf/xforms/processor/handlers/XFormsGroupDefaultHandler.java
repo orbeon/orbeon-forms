@@ -17,7 +17,6 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.util.HashSet;
@@ -79,16 +78,10 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
         if (!isGroupInTable) {
             // Group outside table
 
-            // Get classes
-            // TODO: should use getContainerAttributes() instead?
-            final StringBuilder classes = getInitialClasses(uri, localname, attributes, null);
-            handleMIPClasses(classes, getPrefixedId(), xformsControl);
-
-            final ContentHandler contentHandler = controller.getOutput();
-
             // Start xhtml:span element
             if (!handlerContext.isNewXHTMLLayout())
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveId));
+                controller.getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName,
+                        getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, false));
 
         } else {
             // Group within table

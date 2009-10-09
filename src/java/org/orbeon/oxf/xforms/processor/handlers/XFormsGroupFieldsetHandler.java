@@ -42,16 +42,12 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
 
         final ElementHandlerController controller = handlerContext.getController();
 
-        // Get classes
-        // TODO: should use getContainerAttributes() instead?
-        final StringBuilder classes = getInitialClasses(uri, localname, attributes, null);
-        handleMIPClasses(classes, getPrefixedId(), xformsControl);
-
         final ContentHandler contentHandler = controller.getOutput();
 
         // Start xhtml:fieldset element if needed
         if (!handlerContext.isNewXHTMLLayout())
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveId));
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName,
+                    getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, false));
 
         // Output an xhtml:legend element if and only if there is an xforms:label element. This help with
         // styling in particular.

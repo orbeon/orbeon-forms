@@ -19,14 +19,12 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 
-import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,29 +44,25 @@ public abstract class BaseSubmission implements Submission {
         return (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
     }
 
-    protected URL getResolvedSubmissionURL(PropertyContext propertyContext, ExternalContext externalContext, String resolvedActionOrResource, String queryString) {
-
-        final ExternalContext.Request request = externalContext.getRequest();
-
+    protected String getAbsoluteSubmissionURL(PropertyContext propertyContext, String resolvedActionOrResource, String queryString) {
         // Absolute URLs or absolute paths are allowed to a local servlet
-        String resolvedURL;
+        assert NetUtils.urlHasProtocol(resolvedActionOrResource) || resolvedActionOrResource.startsWith("/");
 
-        if (NetUtils.urlHasProtocol(resolvedActionOrResource) || submission.isURLNorewrite()) {
-            // Don't touch the URL if it is absolute or if f:url-norewrite="true"
-            resolvedURL = resolvedActionOrResource;
+        if ("resource".equals(submission.getUrlType())) {
+            // In case, for some reason, author forces a resource URL
+
+            // NOTE: Before 2009-10-08, there was some code performing custom rewriting in portlet mode. That code was
+            // very unclear and was removed as it seemed like resolveResourceURL() should handle all cases.
+
+            return XFormsUtils.resolveResourceURL(propertyContext, submission.getSubmissionElement(),
+                    NetUtils.appendQueryString(resolvedActionOrResource, queryString),
+                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
         } else {
-            // Rewrite URL
-            resolvedURL = XFormsUtils.resolveServiceURL(propertyContext, submission.getSubmissionElement(), resolvedActionOrResource,
-                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-
-            if (request.getContainerType().equals("portlet") && "resource".equals(submission.getUrlType()) && !NetUtils.urlHasProtocol(resolvedURL)) {
-                // In this case, we have to prepend the complete server path
-                resolvedURL = request.getScheme() + "://" + request.getServerName() + (request.getServerPort() > 0 ? ":" + request.getServerPort() : "") + resolvedURL;
-            }
+            // Regular case of service URL
+            return XFormsUtils.resolveServiceURL(propertyContext, submission.getSubmissionElement(),
+                    NetUtils.appendQueryString(resolvedActionOrResource, queryString),
+                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
         }
-
-        // Compute absolute submission URL
-        return URLRewriterUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
     }
 
     /**

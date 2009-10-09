@@ -53,8 +53,8 @@
             </xhtml:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xxf:dynamic-state>
+           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+               <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
                             <instance id="instance" model-id="model">
@@ -75,12 +75,13 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-inplace-input$xf-4" label="Label me!"/>
+                        <xxf:control id="my-inplace-input$xf-4" class="fr-component-group" label="Label me!"/>
                         <xxf:div id="my-inplace-input$fr-inplace-view" visibility="visible"/>
                         <xxf:div id="my-inplace-input$fr-inplace-edit" visibility="hidden"/>
                         <xxf:control id="my-inplace-input$xf-8">[Hint hint!]</xxf:control>
-                        <xxf:control id="my-inplace-input$xf-15" label="Apply"/>
-                        <xxf:control id="my-inplace-input$xf-19" label="Cancel"/>
+                        <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" class="fr-inplace-content fr-inplace-edit"/>
+                        <xxf:control id="my-inplace-input$xf-15" class="fr-inplace-rename" label="Apply"/>
+                        <xxf:control id="my-inplace-input$xf-19" class="fr-inplace-cancel" label="Cancel"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -132,14 +133,14 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-inplace-input$xf-4" readonly="true" label="Label me!"/>
+                        <xxf:control id="my-inplace-input$xf-4" readonly="true" class="fr-component-group" label="Label me!"/>
                         <xxf:div id="my-inplace-input$fr-inplace-view" visibility="visible"/>
                         <xxf:div id="my-inplace-input$fr-inplace-edit" visibility="hidden"/>
                         <xxf:control id="my-inplace-input$xf-8" readonly="true">42</xxf:control>
-                        <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" relevant="false"/>
+                        <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" relevant="false" class="fr-inplace-content fr-inplace-edit"/>
                         <xxf:control id="my-inplace-input$fr-inplace-input" relevant="false"/>
-                        <xxf:control id="my-inplace-input$xf-15" relevant="false"/>
-                        <xxf:control id="my-inplace-input$xf-19" relevant="false"/>
+                        <xxf:control id="my-inplace-input$xf-15" relevant="false" class="fr-inplace-rename"/>
+                        <xxf:control id="my-inplace-input$xf-19" relevant="false" class="fr-inplace-cancel"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -315,11 +316,11 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         /**
          * Add a URL reference.
          *
-         * @param context   optional context (can be null)
-         * @param spec      URL spec
-         * @param username
-         * @param password
-         * @param headersToForward
+         * @param context           optional context (can be null)
+         * @param spec              URL spec
+         * @param username          optional username
+         * @param password          optional password
+         * @param headersToForward  headers to forward
          */
         public void addReference(String context, String spec, String username, String password, String headersToForward) {
             if (references == null)
@@ -366,12 +367,12 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
      * This is called to handle "http:", "https:" and other URLs (but not "oxf:" and "input:"). It is possible to
      * override this method, for example to optimize HTTP access.
      *
-     * @param pipelineContext
+     * @param pipelineContext   current context
      * @param url               URL to read
      * @param state             state to read to
      * @param username          optional username
      * @param password          optional password
-     * @param headersToForward
+     * @param headersToForward  headers to forward
      */
     public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, String username, String password, String headersToForward) {
 
@@ -387,7 +388,12 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
                 // Compute absolute submission URL
-                final URL submissionURL = URLRewriterUtils.createAbsoluteURL(urlString, null, externalContext);
+                final URL submissionURL;
+                try {
+                    submissionURL = URLFactory.createURL(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest(), urlString, true));
+                } catch (MalformedURLException e) {
+                    throw new OXFException(e);
+                }
                 // Open connection
                 final ConnectionResult connectionResult
                     = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),

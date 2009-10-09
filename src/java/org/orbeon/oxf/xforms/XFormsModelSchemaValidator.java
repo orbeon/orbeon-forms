@@ -43,16 +43,17 @@ import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.NodeInfo;
 import org.relaxng.datatype.Datatype;
 import org.relaxng.datatype.DatatypeException;
 import org.xml.sax.InputSource;
@@ -646,17 +647,13 @@ public class XFormsModelSchemaValidator {
 
         // Check for external schema
         if (schemaURIs != null && schemaURIs.length > 0) {
-            // External context
-            final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-
             // Resolve URL
             // NOTE: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
             final String resolvedURLString = XFormsUtils.resolveServiceURL(propertyContext, modelElement, schemaURIs[0],
-                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-            final URL resolvedURL = URLRewriterUtils.createAbsoluteURL(resolvedURLString, null, externalContext);
+                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
             // Load associated grammar
-            schemaGrammar = loadCacheGrammar(propertyContext, resolvedURL.toExternalForm());
+            schemaGrammar = loadCacheGrammar(propertyContext, resolvedURLString);
         }
 
         // Check for inline schema
@@ -768,7 +765,6 @@ public class XFormsModelSchemaValidator {
     /**
      * Check whether a node's value satisfies a simple schema type definition given by namespace URI and local name.
      *
-     * @param containingNodeInfo    node containing the value (to update validation MIPs)
      * @param value                 value to validate
      * @param typeNamespaceURI      namespace URI of the type ("" if no namespace)
      * @param typeLocalname         local name of the type
@@ -777,7 +773,7 @@ public class XFormsModelSchemaValidator {
      * @param modelBindId           id of model bind to use in case of error
      * @return                      validation error message, null if no error
      */
-    public String validateDatatype(NodeInfo containingNodeInfo, String value, String typeNamespaceURI, String typeLocalname, String typeQName, LocationData locationData, String modelBindId) {
+    public String validateDatatype(String value, String typeNamespaceURI, String typeLocalname, String typeQName, LocationData locationData, String modelBindId) {
 
         if (typeNamespaceURI == null)
             typeNamespaceURI = "";

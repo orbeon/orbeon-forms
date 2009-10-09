@@ -876,7 +876,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             return attributeValue;
         } else {
             // Possible AVT
-    
+
             // NOTE: the control may or may not be bound, so don't use getBoundNode()
             final List<Item> contextNodeset = bindingContext.getNodeset();
             if (contextNodeset == null || contextNodeset.size() == 0) {

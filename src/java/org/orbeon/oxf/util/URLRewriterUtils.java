@@ -23,14 +23,11 @@ import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorFactory;
 import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
 import org.orbeon.oxf.properties.Properties;
-import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +69,8 @@ public class URLRewriterUtils {
      * @return              rewritten URL
      */
     public static String rewriteURL(ExternalContext.Request request, String urlString, int rewriteMode) {
-        return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getClientContextPath(urlString), request.getRequestPath(), urlString, rewriteMode);
+        return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getClientContextPath(urlString),
+                request.getRequestPath(), urlString, rewriteMode);
     }
 
     /**
@@ -93,7 +91,8 @@ public class URLRewriterUtils {
         final String baseURIProperty = getServiceBaseURI();
         if (org.apache.commons.lang.StringUtils.isBlank(baseURIProperty)) {
             // Property not specified, use request to build base URI
-            return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getClientContextPath(urlString), request.getRequestPath(), urlString, rewriteMode);
+            return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(), request.getClientContextPath(urlString),
+                    request.getRequestPath(), urlString, rewriteMode);
         } else {
             // Property specified
             try {
@@ -364,46 +363,6 @@ public class URLRewriterUtils {
         } else {
             return null;
         }
-    }
-
-    /**
-     * Create an absolute URL from an action string and a search string.
-     *
-     * @param action            absolute URL or absolute path
-     * @param queryString       optional query string to append to the action URL
-     * @param externalContext   current ExternalContext
-     * @return                  an absolute URL
-     */
-    public static URL createAbsoluteURL(String action, String queryString, ExternalContext externalContext) {
-        URL resultURL;
-        try {
-            final String actionString;
-            {
-                final StringBuilder updatedActionStringBuilder = new StringBuilder(action);
-                if (queryString != null && queryString.length() > 0) {
-                    if (action.indexOf('?') == -1)
-                        updatedActionStringBuilder.append('?');
-                    else
-                        updatedActionStringBuilder.append('&');
-                    updatedActionStringBuilder.append(queryString);
-                }
-                actionString = updatedActionStringBuilder.toString();
-            }
-
-            if (actionString.startsWith("/")) {
-                // Case of path absolute
-                final String requestURL = externalContext.getRequest().getRequestURL();
-                resultURL = URLFactory.createURL(requestURL, actionString);
-            } else if (NetUtils.urlHasProtocol(actionString)) {
-                // Case of absolute URL
-                resultURL = URLFactory.createURL(actionString);
-            } else {
-                throw new OXFException("Invalid URL: " + actionString);
-            }
-        } catch (MalformedURLException e) {
-            throw new OXFException("Invalid URL: " + action, e);
-        }
-        return resultURL;
     }
 
     public static class PathMatcher {

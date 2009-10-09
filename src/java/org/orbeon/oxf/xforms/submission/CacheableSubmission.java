@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
@@ -30,7 +29,6 @@ import org.orbeon.saxon.om.NodeInfo;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.concurrent.Callable;
 
 /**
@@ -61,12 +59,7 @@ public class CacheableSubmission extends BaseSubmission {
         // This can only happen is method="get" and replace="instance" and xxforms:cache="true" or xxforms:shared="application"
 
         // Convert URL to string
-        final String absoluteResolvedURLString;
-        {
-            final ExternalContext externalContext = getExternalContext(propertyContext);
-            final URL absoluteResolvedURL = getResolvedSubmissionURL(propertyContext, externalContext, p2.actionOrResource, sp.queryString);
-            absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
-        }
+        final String absoluteResolvedURLString = getAbsoluteSubmissionURL(propertyContext, p2.actionOrResource, sp.queryString);
 
         // Compute a hash of the body if needed
         final String requestBodyHash;

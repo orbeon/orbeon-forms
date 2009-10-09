@@ -426,38 +426,6 @@ public class NetUtils {
     }
 
     /**
-     * Canonicalize a string of the form "a/b/../../c/./d/". The string may start and end with a
-     * "/". Occurrences of "..." or other similar patterns are ignored. Also, contiguous "/" are
-     * left as is.
-     */
-//    public static String canonicalizePathString(String path) {
-//
-//        StringTokenizer st = new StringTokenizer(path, "/", true);
-//        Stack elements = new Stack();
-//        while (st.hasMoreTokens()) {
-//            String s = st.nextToken();
-//            if (s.equals("..")) {
-//                elements.pop();
-//            } else if (s.equals(".")) {
-//                ;// Do nothing
-//            } else {
-//                elements.push(s);
-//            }
-//        }
-//        StringBuffer sb = new StringBuffer();
-//        int count = 0;
-//        for (Iterator i = elements.iterator(); i.hasNext(); count++) {
-//            String s = (String) i.next();
-//            if (count > 0 || path.startsWith("/"))
-//                sb.append("/");
-//            sb.append(s);
-//        }
-//        if (path.endsWith("/"))
-//            sb.append("/");
-//        return sb.toString();
-//    }
-
-    /**
      * Combine a path info and a parameters map to form a path info with a query string.
      */
     public static String pathInfoParametersToPathInfoQueryString(String pathInfo, Map parameters) throws IOException {
@@ -479,6 +447,24 @@ public class NetUtils {
             }
         }
         return redirectURL.toString();
+    }
+
+    /**
+     * Append a query string to an URL. This adds a '?' or a '&' or nothing, as needed.
+     *
+     * @param urlString     existing URL string
+     * @param queryString   query string, or null
+     * @return              resulting URL
+     */
+    public static String appendQueryString(String urlString, String queryString) {
+        if (org.apache.commons.lang.StringUtils.isBlank(queryString)) {
+            return urlString;
+        } else {
+            final StringBuilder updatedActionStringBuilder = new StringBuilder(urlString);
+            updatedActionStringBuilder.append((urlString.indexOf('?') == -1) ? '?' : '&');
+            updatedActionStringBuilder.append(queryString);
+            return updatedActionStringBuilder.toString();
+        }
     }
 
     /**

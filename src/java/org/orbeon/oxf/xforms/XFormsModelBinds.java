@@ -908,7 +908,8 @@ public class XFormsModelBinds {
                         }
 
                         final String validationError =
-                            xformsValidator.validateDatatype(currentNodeInfo, nodeValue, typeNamespaceURI, typeLocalname, typeQName.getQualifiedName(), bind.getLocationData(), bind.getId());
+                            xformsValidator.validateDatatype(nodeValue, typeNamespaceURI, typeLocalname, typeQName.getQualifiedName(),
+                                    bind.getLocationData(), bind.getId());
 
                         if (validationError != null) {
                             isValid = false;
@@ -972,7 +973,7 @@ public class XFormsModelBinds {
 
                         // There are possibly types defined in the schema
                         final String validationError
-                                = model.getSchemaValidator().validateDatatype(currentNodeInfo, nodeValue, typeNamespaceURI, typeLocalname, typeQName.getQualifiedName(), bind.getLocationData(), bind.getId());
+                                = model.getSchemaValidator().validateDatatype(nodeValue, typeNamespaceURI, typeLocalname, typeQName.getQualifiedName(), bind.getLocationData(), bind.getId());
 
                         // Set error on node if necessary
                         if (validationError != null) {

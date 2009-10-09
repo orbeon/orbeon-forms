@@ -94,6 +94,7 @@ public class XFormsLoadAction extends XFormsAction {
         final String externalURL;
         if (value.startsWith("#") || urlNorewrite) {
             // Keep value unchanged if it's just a fragment or if we are explicitly disabling rewriting
+            // TODO: Not clear what happens in portlet mode: does norewrite make any sense?
             externalURL = value;
         } else {
             // URL must be resolved

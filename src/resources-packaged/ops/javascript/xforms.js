@@ -1268,19 +1268,30 @@ ORBEON.util.Test = {
         });
     },
 
+    /**
+     * Runs a first function as part of a YUI test case, waits for all Ajax requests (if any) that might ensue
+     * to terminate, then run a second function.
+     *
+     * This doesn't use the ajaxResponseProcessedEvent, because we want this to work in cases where we have zero
+     * or more than one Ajax requests.
+     */
     executeCausingAjaxRequest: function(testCase, causingAjaxRequestFunction, afterAjaxResponseFunction) {
 
-        function ajaxReceived() {
-            testCase.resume(function() {
-                ORBEON.xforms.Events.ajaxResponseProcessedEvent.unsubscribe(ajaxReceived);
-                afterAjaxResponseFunction.call(testCase);
-            });
+        function checkAjaxReceived() {
+            console.log("requestInProgress", ORBEON.xforms.Globals.requestInProgress);
+            if (ORBEON.xforms.Globals.requestInProgress || ORBEON.xforms.Globals.eventQueue.length > 0) {
+                // Wait another 100 ms
+                setTimeout(checkAjaxReceived, 100);
+            } else {
+                // We done with Ajax requets, continue with the test
+                testCase.resume(function() {
+                    afterAjaxResponseFunction.call(testCase);
+                });
+            }
         }
 
-        ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(ajaxReceived, testCase, true);
         causingAjaxRequestFunction.call(testCase);
-        // Takes a threshold after which YUI Test considers that the test has failed. The default is 10 s.
-        // We set it to 20 s for tests that call a 5 s delay service multiple times.
+        setTimeout(checkAjaxReceived, 100);
         testCase.wait(20000);
     },
 
@@ -5575,14 +5586,14 @@ ORBEON.xforms.Server = {
             ORBEON.xforms.Server.handleResponseDom(responseXML, formID);
             // Reset changes, as changes are included in this bach of events
             ORBEON.xforms.Globals.changedIdsRequest = {};
+            // Notify listeners that we are done processing this request
+            ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire();
             // Go ahead with next request, if any
+            console.log("Setting in progress to false");
             ORBEON.xforms.Globals.requestInProgress = false;
             ORBEON.xforms.Globals.requestDocument = "";
             ORBEON.xforms.Globals.executeEventFunctionQueued++;
             ORBEON.xforms.Server.executeNextRequest(false);
-
-            // Notify listeners that we are done processing this request
-            ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire();
         }
     },
 

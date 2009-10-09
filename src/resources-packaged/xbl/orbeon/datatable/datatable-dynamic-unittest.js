@@ -417,6 +417,36 @@ var testCase = {
     },
 
 
+    testPaginateExternal: function() {
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'paginateExternal', function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                ORBEON.xforms.Document.setValue("rowsPerPage", "3");
+                ORBEON.xforms.Document.setValue("page", "7");
+            }, function() {
+                // Check the table structure
+                var table = YAHOO.util.Dom.get('my-accordion$paginateExternal-table$paginateExternal-table-table');
+                thiss.checkColumnValues(table, 2, false, [18, 19, 20]);
+                var container = YAHOO.util.Dom.get('my-accordion$paginateExternal-table$paginateExternal-table-container');
+                thiss.checkPaginationLinks(container, ['+<< first', '+< prev', '+1', '-...', '+6', '-7', '+8', '-...', '+13', '+next >', '+last >>']);
+
+                var linkNext = thiss.getPaginateLink(container, '< prev');
+                ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                    YAHOO.util.UserAction.click(linkNext, {clientX: 1});
+                }, function() {
+                    // Test the status after clicking on "prev"
+                    thiss.checkColumnValues(table, 2, false, [15, 16, 17]);
+                    thiss.checkPaginationLinks(container, ['+<< first', '+< prev', '+1', '-...', '+5', '-6', '+7', '-...', '+13', '+next >', '+last >>']);
+
+
+                    thiss.closeAccordionCase(thiss, 'paginateExternal');
+                });
+            });
+
+        });
+    },
+
+
     EOS:""
 }
         ;

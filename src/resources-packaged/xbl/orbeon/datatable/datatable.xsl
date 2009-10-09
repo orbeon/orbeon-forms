@@ -1379,22 +1379,7 @@
             "/>
 
 
-<!-- 
-
-(evaluating XPath expression: expression='                          
-
-
-if ($currentSortColumn/@type != '')                 
-then $currentSortColumn/@type                
-else for $value in xxforms:evaluate($currentSortColumn/@pathToFirstNode)                     
-return if ($value instance of node())                         
-then if (xxforms:type($value) = (resolve-QName('xs:decimal',..),resolve-QName('xs:integer',..),resolve-QName('xs:nonPositiveInteger',..),resolve-QName('xs:negativeInteger',..),resolve-QName('xs:long',..),resolve-QName('xs:int',..),resolve-QName('xs:short',..),resolve-QName('xs:byte',..),resolve-QName('xs:nonNegativeInteger',..),resolve-QName('xs:unsignedLong',..),resolve-QName('xs:unsignedInt',..),resolve-QName('xs:unsignedShort',..),resolve-QName('xs:unsignedByte',..),resolve-QName('xs:positiveInteger',..)))                             then 'number'                             else 'text'                         else if ($value instance of xs:decimal)                             then 'number'                             else 'text'                          '): An empty sequence is not allowed as the first argument of xxforms:evaluate()
-
-An empty sequence is not allowed as the first argument of xxforms:evaluate() 
-
--->
-
-         <xsl:if test="$paginated and not($sortAndPaginationMode = 'external')">
+     <xsl:if test="$paginated and not($sortAndPaginationMode = 'external')">
             <xxforms:variable name="page" xxbl:scope="outer">
                 <xxforms:sequence select="$page" xxbl:scope="inner"/>
             </xxforms:variable>

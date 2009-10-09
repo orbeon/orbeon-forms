@@ -75,7 +75,7 @@
             <maxLength>20</maxLength>
             <loading>true</loading>
             <page>1</page>
-            <nbPages>15</nbPages>
+            <rowsPerPage>5</rowsPerPage>
         </controls>
     </xforms:instance>
 

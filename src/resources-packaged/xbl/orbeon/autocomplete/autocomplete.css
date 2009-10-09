@@ -1,4 +1,13 @@
-/* Override position: absolute in YUI */
-.fr-autocomplete-input .xforms-input-input { position: relative; }
+/* Override position: absolute in YUI, otherwise the the input is taken out of the flow
+   and content after the autocomplete will show below the input field.  */
+.fr-autocomplete-search .xforms-input-input { position: relative; }
+
 /* Make the div that contains the text field inline-block so the component can be used in inline mode */
-/*.fr-autocomplete-container div { display: inline-block; }*/
+.xbl-fr-autocomplete .yui-ac {
+    /* http://wiki.orbeon.com/forms/doc/contributor-guide/ie-bugs#TOC-Inline-block */
+    display: -moz-inline-box;
+    display: inline-block;
+    *zoom: 1;
+    *display: inline;
+    vertical-align: middle;
+}

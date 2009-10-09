@@ -25,7 +25,7 @@
     /**
      * AutoComplete object constructor
      */
-    ORBEON.widget.AutoComplete = function(element) { this.init(element); }
+    ORBEON.widget.AutoComplete = function(element) { this.init(element); };
     ORBEON.widget.AutoComplete.prototype = {
 
         /**
@@ -34,67 +34,94 @@
         element: null,              // Div containing this control
         dynamicItemset: null,       // Do we need to wait for the itemset to change before we update the auto-complete?
         yuiAutoComplete: null,      // YUI object for the auto-complete
+        searchControl: null,        // xforms:input control in which users type
+        searchField: null,          // Form field in which users type
+        externalValueInput : null,  // xforms:input containing the external value
 
         /**
          * Constructor
          */
         init: function(element) {
-            var autoComplete = this;
 
-            autoComplete.element = element;
-
-            var inputSpan = Dom.getElementsByClassName("fr-autocomplete-input", null, element)[0];
-            var inputField = Dom.getChildren(inputSpan)[0];
+            this.element = element;
+            this.searchControl = Dom.getElementsByClassName("fr-autocomplete-search", null, element)[0];
+            this.searchField = Dom.getChildren(this.searchControl)[0];
             var yuiDiv = Dom.getElementsByClassName("fr-autocomplete-yui-div", null, element)[0];
             YAHOO.util.Dom.generateId(yuiDiv); // Generate ID dynamically as our implementation of XBL doesn't rewrite IDs on HTML
-            var valueSelectedButton = Dom.getElementsByClassName("fr-autocomplete-value-selected", null, element)[0];
+            this.externalValueInput = Dom.getElementsByClassName("fr-autocomplete-external-value", null, element)[0];
 
             // Build data source
             var dataSource;
-            if (autoComplete.isDynamicItemset()) {
+            if (this.isDynamicItemset()) {
                 // If the itemset changes dynamically, update list when we have response to an Ajax request
-                dataSource = autoComplete.buildNullDataSource();
-                ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(function() {
-                    // If this YUI auto-complete is focused (otherwise don't bother updating the list)
-                    if (autoComplete.yuiAutoComplete.isFocused()) {
-                        // Get new list of values
-                        var query = inputField.value;
-                        var newList = autoComplete.getCurrentValues(query);
-
-                        // Call YUI code to update list
-                        if (newList.length != 1 || newList[0] != query) {
-                            autoComplete.yuiAutoComplete._populateList(query, { results: newList }, { query: query });
-                        }
-                    }
-                });
+                dataSource = this.buildNullDataSource();
+                ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(this.ajaxResponseProcessed, this, true);
             } else {
                 // Simply get
+                var autoComplete = this;
                 dataSource = new YAHOO.util.FunctionDataSource(function(query) {
                     return autoComplete.getCurrentValues(query);
                 });
             }
 
             // Create YUI auto-complete object
-            autoComplete.yuiAutoComplete = new YAHOO.widget.AutoComplete(inputField.id, yuiDiv.id, dataSource);
+            this.yuiAutoComplete = new YAHOO.widget.AutoComplete(this.searchField.id, yuiDiv.id, dataSource);
             // Use iframe method for IE6/7
             if (YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7)
-                autoComplete.yuiAutoComplete.useIFrame = true;
-            autoComplete.yuiAutoComplete.animVert = false;
+                this.yuiAutoComplete.useIFrame = true;
+            this.yuiAutoComplete.animVert = false;
 
             // Set maximum number of items displayed
-            var maxResultsDisplayedOutput = Dom.getElementsByClassName("fr-max-results-displayed", null, autoComplete.element)[0];
+            var maxResultsDisplayedOutput = Dom.getElementsByClassName("fr-max-results-displayed", null, this.element)[0];
             var maxResultsDisplayed = Document.getValue(maxResultsDisplayedOutput.id);
             if (maxResultsDisplayed == "") maxResultsDisplayed = 10;
-            autoComplete.yuiAutoComplete.maxResultsDisplayed = parseInt(maxResultsDisplayed);
+            this.yuiAutoComplete.maxResultsDisplayed = parseInt(maxResultsDisplayed, 10);
 
-            // When a new value is selected, set the value of the XForms input control
-            // We are doing this because when a value is set by clicking on it with the mouse, a change event is
-            // dispatched to the input, but when it arrives the value of the input hasn't changed yet.
-            autoComplete.yuiAutoComplete.itemSelectEvent.subscribe(function(type, args) {
-                var selectedValue = args[2][0];
-                Document.setValue(inputSpan.id, selectedValue);
-                valueSelectedButton.click();
-            });
+            // Listen on user selecting a value
+            this.yuiAutoComplete.itemSelectEvent.subscribe(this.itemSelected, this, true);
+            // Listen on user typing in search field
+            YAHOO.util.Event.addListener(this.searchField, "keyup", this.searchFieldKeyUp, this, true);
+        },
+
+        /**
+         * Called when the user selects a value from the suggestion list
+         */
+        itemSelected: function(type, args) {
+            var itemLabel = args[2][0];
+            var itemValue = args[2][1];
+            Document.setValue(this.searchControl.id, itemLabel);
+            Document.setValue(this.externalValueInput.id, itemValue);
+        },
+
+        /**
+         * Called when users type in the search field.
+         * If they end up typing something which shows in the suggestion list, set the external value to
+         * to value of that item.
+         */
+        searchFieldKeyUp: function() {
+            var searchFieldValue = this.searchField.value;
+            var select1Element = this.element.getElementsByTagName("select")[0];
+            var options = select1Element.options;
+            for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
+                var option = options[optionIndex];
+                if (option.text == searchFieldValue) {
+                    Document.setValue(this.externalValueInput.id, option.value);
+                }
+            }
+        },
+
+        /**
+         * Called when we received a response for an Ajax request, which means we may have to update the suggestion list
+         */
+        ajaxResponseProcessed: function() {
+            // Get new list of values
+            var query = this.searchField.value;
+            var newList = this.getCurrentValues(query);
+            // Update the list only of the control has the focus, as updating the list will show the suggestion list
+            // and we only want to show the suggestion list if the user happens to be in that field
+            if (this.yuiAutoComplete.isFocused()) {
+                this.yuiAutoComplete._populateList(query, { results: newList }, { query: query });
+            }
         },
 
         /**
@@ -142,17 +169,29 @@
             var result = [];
 
             // Look again for the element, as on IE the <select> is recreated when the itemset changes, and so can't be cached
-            var select1Element = autoComplete.element.getElementsByTagName("select")[0];
+            var select1Element = this.element.getElementsByTagName("select")[0];
             var options = select1Element.options;
             if (query != "") {
-                query = query.toLowerCase();
+                var queryLowerCase = query.toLowerCase();
                 for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
                     var option = options[optionIndex];
                     // We only do filtering for the static itemset mode
-                    if (autoComplete.isDynamicItemset() || option.text.toLowerCase().indexOf(query) == 0)
-                        result[result.length] = option.text;
+                    if (this.isDynamicItemset() || option.text.toLowerCase().indexOf(queryLowerCase) == 0)
+                        result[result.length] = [ option.text, option.value ];
                 }
             }
+
+            if (result.length == 1 && result[0][0] == query) {
+                // If the result only contains one item, and its label is equal to the current value
+                // Set the external value to the value of this option
+                Document.setValue(this.externalValueInput.id, result[0][1]);
+                // Don't return any suggestion
+                result = [];
+            } else {
+                // If the value in the search field is not in the itemset, set the external value to empty string
+                Document.setValue(this.externalValueInput.id, "");
+            }
+
             return result;
         }
     };

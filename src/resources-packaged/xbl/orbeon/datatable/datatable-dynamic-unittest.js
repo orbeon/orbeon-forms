@@ -224,7 +224,7 @@ var testCase = {
             thiss.checkColTypeValue(col1Div, 'column');
             thiss.checkColDebugValue(col1Div, 'currentSortOrder', 'none');
             thiss.checkColDebugValue(col1Div, 'nextSortOrder', 'ascending');
-            thiss.checkColDebugValue(col1Div, 'type', 'number');
+            //thiss.checkColDebugValue(col1Div, 'type', 'number');
             thiss.checkColDebugValue(col1Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/(position())');
             thiss.checkColDebugValue(col1Div, 'sortKey', 'position()');
             thiss.checkColDebugValue(col1Div, 'fr:sortable', 'true');
@@ -233,7 +233,7 @@ var testCase = {
             thiss.checkColTypeValue(col2Div, 'column');
             thiss.checkColDebugValue(col2Div, 'currentSortOrder', 'none');
             thiss.checkColDebugValue(col2Div, 'nextSortOrder', 'ascending');
-            thiss.checkColDebugValue(col2Div, 'type', 'number');
+            //thiss.checkColDebugValue(col2Div, 'type', 'number');
             thiss.checkColDebugValue(col2Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[1]/.)');
             thiss.checkColDebugValue(col2Div, 'sortKey', '(*)[1]/.');
             thiss.checkColDebugValue(col2Div, 'fr:sortable', 'true');
@@ -242,7 +242,7 @@ var testCase = {
             thiss.checkColTypeValue(col3Div, 'column');
             thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'none');
             thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'ascending');
-            thiss.checkColDebugValue(col3Div, 'type', 'text');
+            //thiss.checkColDebugValue(col3Div, 'type', 'text');
             thiss.checkColDebugValue(col3Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[2]/.)');
             thiss.checkColDebugValue(col3Div, 'sortKey', '(*)[2]/.');
             thiss.checkColDebugValue(col3Div, 'fr:sortable', 'true');
@@ -251,7 +251,7 @@ var testCase = {
             thiss.checkColTypeValue(col4Div, 'column');
             thiss.checkColDebugValue(col4Div, 'currentSortOrder', 'none');
             thiss.checkColDebugValue(col4Div, 'nextSortOrder', 'ascending');
-            thiss.checkColDebugValue(col4Div, 'type', 'number');
+            //thiss.checkColDebugValue(col4Div, 'type', 'number');
             thiss.checkColDebugValue(col4Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[3]/.)');
             thiss.checkColDebugValue(col4Div, 'sortKey', '(*)[3]/.');
             thiss.checkColDebugValue(col4Div, 'fr:sortable', 'true');
@@ -260,7 +260,7 @@ var testCase = {
             thiss.checkColTypeValue(col5Div, 'column');
             thiss.checkColDebugValue(col5Div, 'currentSortOrder', 'none');
             thiss.checkColDebugValue(col5Div, 'nextSortOrder', 'ascending');
-            thiss.checkColDebugValue(col5Div, 'type', 'number');
+            //thiss.checkColDebugValue(col5Div, 'type', 'number');
             thiss.checkColDebugValue(col5Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[4]/.)');
             thiss.checkColDebugValue(col5Div, 'sortKey', '(*)[4]/.');
             thiss.checkColDebugValue(col5Div, 'fr:sortable', 'true');
@@ -269,26 +269,26 @@ var testCase = {
             thiss.checkColTypeValue(col6Div, 'column');
             thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'none');
             thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'ascending');
-            thiss.checkColDebugValue(col6Div, 'type', 'number');
+            //thiss.checkColDebugValue(col6Div, 'type', 'number');
             thiss.checkColDebugValue(col6Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/(round(length div nb-words))');
             thiss.checkColDebugValue(col6Div, 'sortKey', 'round(length div nb-words)');
             thiss.checkColDebugValue(col6Div, 'fr:sortable', 'true');
 
             // Click to sort the 3rd column
-            thiss.clickAndCheckSortOrder(table, 3, 'ascending', function() {
+            thiss.clickAndCheckSortOrder(table, 3, 'ascending', 'text', function() {
                 var col3th = YAHOO.util.Dom.get('my-accordion$sortable-table$sortable-th-dyn·2');
                 thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 3);
                 thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'ascending');
                 thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'descending');
 
-                thiss.clickAndCheckSortOrder(table, 6, 'ascending', function() {
+                thiss.clickAndCheckSortOrder(table, 6, 'ascending', 'number', function() {
                     thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 6);
                     thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'ascending');
                     thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'descending');
                     thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'none');
                     thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'ascending');
 
-                    thiss.clickAndCheckSortOrder(table, 6, 'descending', function() {
+                    thiss.clickAndCheckSortOrder(table, 6, 'descending', 'number', function() {
                         thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 6);
                         thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'descending');
                         thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'ascending');
@@ -358,16 +358,17 @@ var testCase = {
         thiss.openAccordionCase(thiss, 'paginate', function() {
             // Check the table structure
             var table = YAHOO.util.Dom.get('my-accordion$paginate-table$paginate-table-table');
+            var container = YAHOO.util.Dom.get('my-accordion$paginate-table$paginate-table-container');
             thiss.checkColumnValues(table, 2, false, [0, 1, 2, 3, 4]);
 
-            var linkNext = YAHOO.util.Dom.get('my-accordion$paginate-table$xf-42');
+            var linkNext = thiss.getPaginateLink(container, 'next >');
             ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                 YAHOO.util.UserAction.click(linkNext, {clientX: 1});
             }, function() {
                 // Test the status after clicking on "next"
                 thiss.checkColumnValues(table, 2, false, [5, 6, 7, 8, 9]);
 
-                var linkLast = YAHOO.util.Dom.get('my-accordion$paginate-table$xf-47');
+                var linkLast = thiss.getPaginateLink(container, 'last >>');
                 ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                     YAHOO.util.UserAction.click(linkLast, {clientX: 1});
                 }, function() {
@@ -391,7 +392,7 @@ var testCase = {
             var container = YAHOO.util.Dom.get('my-accordion$paginateMaxPage-table$paginateMaxPage-table-container');
             thiss.checkPaginationLinks(container, ['-<< first', '-< prev', '-1', '+2', '+3', '+4', '+5', '-...', '+10', '+next >', '+last >>']);
 
-            var linkNext = YAHOO.util.Dom.get('my-accordion$paginateMaxPage-table$xf-45');
+            var linkNext = thiss.getPaginateLink(container, 'next >');
             ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                 YAHOO.util.UserAction.click(linkNext, {clientX: 1});
             }, function() {
@@ -399,7 +400,7 @@ var testCase = {
                 thiss.checkColumnValues(table, 2, false, [4, 5, 6, 7]);
                 thiss.checkPaginationLinks(container, ['+<< first', '+< prev', '+1', '-2', '+3', '+4', '+5', '-...', '+10', '+next >', '+last >>']);
 
-                var linkLast = YAHOO.util.Dom.get('my-accordion$paginateMaxPage-table$xf-50');
+                var linkLast = thiss.getPaginateLink(container, 'last >>');
                 ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                     YAHOO.util.UserAction.click(linkLast, {clientX: 1});
                 }, function() {
@@ -411,6 +412,36 @@ var testCase = {
                 });
             });
 
+
+        });
+    },
+
+
+    testPaginateExternal: function() {
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'paginateExternal', function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                ORBEON.xforms.Document.setValue("rowsPerPage", "3");
+                ORBEON.xforms.Document.setValue("page", "7");
+            }, function() {
+                // Check the table structure
+                var table = YAHOO.util.Dom.get('my-accordion$paginateExternal-table$paginateExternal-table-table');
+                thiss.checkColumnValues(table, 2, false, [18, 19, 20]);
+                var container = YAHOO.util.Dom.get('my-accordion$paginateExternal-table$paginateExternal-table-container');
+                thiss.checkPaginationLinks(container, ['+<< first', '+< prev', '+1', '-...', '+6', '-7', '+8', '-...', '+13', '+next >', '+last >>']);
+
+                var linkNext = thiss.getPaginateLink(container, '< prev');
+                ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                    YAHOO.util.UserAction.click(linkNext, {clientX: 1});
+                }, function() {
+                    // Test the status after clicking on "prev"
+                    thiss.checkColumnValues(table, 2, false, [15, 16, 17]);
+                    thiss.checkPaginationLinks(container, ['+<< first', '+< prev', '+1', '-...', '+5', '-6', '+7', '-...', '+13', '+next >', '+last >>']);
+
+
+                    thiss.closeAccordionCase(thiss, 'paginateExternal');
+                });
+            });
 
         });
     },

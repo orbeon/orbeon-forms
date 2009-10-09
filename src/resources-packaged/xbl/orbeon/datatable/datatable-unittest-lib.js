@@ -419,6 +419,19 @@ ORBEON.widgets.datatable.unittests_lib = {
 
     },
 
+    getPaginateLink: function(container, target) {
+        var paginator = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(container, 'div', 'yui-dt-paginator');
+        var links = this.getPaginationLinks(paginator);
+        for (var i = 0; i < links.length; i++) {
+            var link = links[i];
+            var linkText = this.trim(this.textContent(link));
+            if (target == linkText) {
+                return link;
+            }
+        }
+        return null;
+    },
+
     getLoadingIndicator: function(table) {
         var tableGroup = YAHOO.util.Dom.getAncestorByTagName(table, 'span');
         return YAHOO.util.Dom.getNextSibling(tableGroup);
@@ -429,7 +442,31 @@ ORBEON.widgets.datatable.unittests_lib = {
         YAHOO.util.Assert.areEqual(value, visibility, 'Visibility is ' + visibility + ' instead of ' + value);
     },
 
-    clickAndCheckSortOrder: function(table, columnIndex, expectedOrder, callback) {
+    checkActualSortOrder: function(table, columnIndex, expectedOrder, sortType) {
+        //TODO: support scrollable tables
+        var rows = table.tBodies[0].rows;
+        var precedingValue = null;
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            if (this.isSignificant(row)) {
+                var cell = this.getSignificantElementByIndex(row.cells, columnIndex);
+                var currentValue = this.trim(this.textContent(cell));
+                if (sortType == 'number') {
+                    currentValue = parseFloat(currentValue);
+                }
+                if (precedingValue != null) {
+                    if (expectedOrder == 'ascending') {
+                        YAHOO.util.Assert.isTrue(currentValue >= precedingValue, 'Column ' + columnIndex + ' value "' + currentValue + '" should be bigger than "' + precedingValue + '"');
+                    } else {
+                        YAHOO.util.Assert.isTrue(currentValue <= precedingValue, 'Column ' + columnIndex + ' value "' + currentValue + '" should be smaller than "' + precedingValue + '"');
+                    }
+                }
+                precedingValue = currentValue;
+            }
+        }
+    },
+
+    clickAndCheckSortOrder: function(table, columnIndex, expectedOrder, sortType, callback) {
         //TODO: support scrollable tables
         var className;
         if (expectedOrder == 'ascending') {
@@ -446,8 +483,10 @@ ORBEON.widgets.datatable.unittests_lib = {
             var firstRow = this.getSignificantElementByIndex(table.tBodies[0].rows, 1);
             var bodyCell = this.getSignificantElementByIndex(firstRow.cells, columnIndex);
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(bodyCell, className), 'Column ' + columnIndex + ' body cellls should now have a class ' + className);
-            //TODO: test that the table is actually sorted
+            this.checkActualSortOrder(table, columnIndex, expectedOrder, sortType);
+
             callback();
+
         });
     },
 

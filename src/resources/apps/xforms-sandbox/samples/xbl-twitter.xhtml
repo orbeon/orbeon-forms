@@ -25,17 +25,17 @@
         <xhtml:title>Twitter Status XBL Component Example</xhtml:title>
         <!-- Main XForms model -->
         <xforms:model/>
+        <!-- Force inclusion of button.xbl which is used by included component -->
+        <xi:include href="oxf:/xbl/orbeon/button/button.xbl" xxi:omit-xml-base="true"/>
     </xhtml:head>
     <xhtml:body>
         <p>
             This example shows the use of a sample XBL component that retrieves a Twitter user's status timeline.
         </p>
 
-        <fr:button style="display: none"><xforms:label/></fr:button>
-
         <!-- Use component a few times -->
         <fr:twitter-timeline id="twitter-1" username="orbeon" count="4"/>
-        <!--<fr:twitter-timeline id="twitter-2" username="cnn"/>-->
+        <fr:twitter-timeline id="twitter-2" username="cnn"/>
 
         <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
 

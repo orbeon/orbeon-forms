@@ -1278,7 +1278,6 @@ ORBEON.util.Test = {
     executeCausingAjaxRequest: function(testCase, causingAjaxRequestFunction, afterAjaxResponseFunction) {
 
         function checkAjaxReceived() {
-            console.log("requestInProgress", ORBEON.xforms.Globals.requestInProgress);
             if (ORBEON.xforms.Globals.requestInProgress || ORBEON.xforms.Globals.eventQueue.length > 0) {
                 // Wait another 100 ms
                 setTimeout(checkAjaxReceived, 100);
@@ -3306,8 +3305,6 @@ ORBEON.xforms.Events = {
 
     sliderValueChange: function(offset) {
         // Notify server that value changed
-        console.log("Range", this, offset);
-        console.log(this.previousVal);
         var rangeControl = ORBEON.util.Dom.getElementById(this.id);
         if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY))
             rangeControl = rangeControl.parentNode;
@@ -5589,7 +5586,6 @@ ORBEON.xforms.Server = {
             // Notify listeners that we are done processing this request
             ORBEON.xforms.Events.ajaxResponseProcessedEvent.fire();
             // Go ahead with next request, if any
-            console.log("Setting in progress to false");
             ORBEON.xforms.Globals.requestInProgress = false;
             ORBEON.xforms.Globals.requestDocument = "";
             ORBEON.xforms.Globals.executeEventFunctionQueued++;

@@ -112,17 +112,21 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                     this.simulateTypeInField(staticDynamic, "");
                 }, function() {
                     // Check the alert is active
+                    var control = YAHOO.util.Dom.get(staticDynamic + "-autocomplete");
                     var container = YAHOO.util.Dom.get(staticDynamic + "-autocomplete$autocomplete-container");
                     YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(container, "xforms-invalid"));
-                    var alert = YAHOO.util.Dom.getElementsByClassName("xforms-alert", null, container)[0];
-                    YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(alert, "xforms-alert-active"));
+                    var alert = YAHOO.util.Dom.getElementsByClassName("xforms-alert", null, control)[0];
+                    YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(alert, "xforms-alert-active"),
+                        "initially should have xforms-alert-active for " + staticDynamic);
                     ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                         // Set value to something that will start with the letter "s"
                         this.simulateTypeInField(staticDynamic, "Switzerland");
                     }, function() {
                         // Check the alert in inactive
-                        YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(container, "xforms-invalid"));
-                        YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(alert, "xforms-alert-active"));
+                        YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(container, "xforms-invalid"),
+                            "after setting value, should not have xforms-invalid class for " + staticDynamic);
+                        YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(alert, "xforms-alert-active"),
+                            "after setting value, should not have xforms-alert-active for " + staticDynamic);
                         continuation.call(this);
                     });
                     continuation.call(this);

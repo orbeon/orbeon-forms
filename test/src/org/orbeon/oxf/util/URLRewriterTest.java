@@ -294,4 +294,19 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         assertEquals("/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/ops/bar.png", pathMatchers , mode));
         assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/config/bar.png", pathMatchers , mode));
     }
+
+//    public void testXMLBase() {
+////        TODO: test XFormsUtils.resolveXMLBase()
+//    }
+
+//    public void testHRRI() {
+////        TODO: test XFormsUtils.encodeHRRI()
+//    }
+
+//    public void testXFormsRewrite() {
+//        // TODO
+//        resolveRenderURL()
+//        resolveServiceURL()
+//        resolveResourceURL()
+//    }
 }

@@ -1057,4 +1057,101 @@
             </xxf:event-response>
         </output>
     </test>
+    
+    <test description="Initial build of controls may use out of date binds" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="fr-persistence-model">
+                        <xforms:instance id="fr-persistence-instance">
+                            <save xmlns="">
+                                <data-status>clean</data-status>
+                            </save>
+                        </xforms:instance>
+                        <xforms:instance id="fr-triggers-instance">
+                            <triggers xmlns="">
+                                <save/>
+                            </triggers>
+                        </xforms:instance>
+                        <xforms:bind nodeset="instance('fr-triggers-instance')">
+                            <xforms:bind nodeset="save" readonly="instance('fr-persistence-instance')/data-status = 'clean'"/>
+                        </xforms:bind>
+
+                        <xforms:submission id="fr-get-document-submission" serialization="none"
+                                           method="get" resource="oxf:/apps/xforms-sandbox/samples/bug-events-data.xml"
+                                           replace="instance" xxforms:instance="fr-form-instance"/>
+
+                        <xforms:action ev:event="xforms-model-construct-done">
+                            <xforms:send submission="fr-get-document-submission"/>
+                        </xforms:action>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:rebuild/>
+                            <xforms:recalculate/>
+                            <xforms:revalidate/>
+                            <xforms:refresh/>
+
+                            <xforms:setvalue ref="instance('fr-persistence-instance')/data-status" value="'clean'"/>
+                        </xforms:action>
+                    </xforms:model>
+                    <xforms:model id="fr-form-model">
+                        <xforms:instance id="fr-form-instance">
+                            <book>
+                                <title/>
+                            </book>
+                        </xforms:instance>
+                        <xforms:bind id="title-bind" nodeset="title"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xhtml:p>
+                        See <a
+                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=312406&amp;group_id=168&amp;atid=350207">fixed</a>.
+                        Proper behavior is that the Save button is disabled upon page load.
+                    </xhtml:p>
+                    <xforms:group model="fr-form-model">
+                        <xforms:input id="title-input" bind="title-bind">
+                            <xforms:label>Note</xforms:label>
+                        </xforms:input>
+                        <xforms:setvalue ev:event="xforms-value-changed xforms-enabled" model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status" value="'dirty'"/>
+                    </xforms:group>
+                    <xforms:trigger id="save-trigger" ref="instance('fr-triggers-instance')/save">
+                        <xforms:label>Save</xforms:label>
+                    </xforms:trigger>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="fr-persistence-instance" model-id="fr-persistence-model">
+                                <save>
+                                    <data-status>clean</data-status>
+                                </save>
+                            </instance>
+                            <instance id="fr-triggers-instance" model-id="fr-persistence-model">
+                                <triggers>
+                                    <save/>
+                                </triggers>
+                            </instance>
+                            <instance id="fr-form-instance" model-id="fr-form-model">
+                                <book>
+                                    <title/>
+                                </book>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="title-input" label="Note"/>
+                        <xxf:control id="save-trigger" readonly="true" label="Save"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 </group>

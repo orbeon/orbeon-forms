@@ -89,7 +89,7 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
             }
 
             if (!found) {
-                // Id was not replaced
+                // Id was not replaced as part of AVT processing
 
                 // Update the value of the id attribute
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", effectiveId);

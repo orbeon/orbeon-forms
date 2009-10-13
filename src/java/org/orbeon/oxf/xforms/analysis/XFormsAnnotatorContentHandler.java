@@ -203,8 +203,13 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
             inPreserve = true;
             preserveLevel = level;
 
-        } else if (!isXBL) {
-            // Non-XForms element
+        } else if (isXBL) {
+            // This must be xbl:xbl (otherwise we will have isPreserve == true)
+            // NOTE: Still process attributes, because the annotator is used to process top-level <xbl:handler> as well.
+            attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
+            super.startElement(uri, localname, qName, attributes);
+        } else {
+            // Non-XForms element without an XBL binding
 
             String htmlElementId = null;
 
@@ -224,6 +229,10 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
                 }
             }
 
+            // NOTE: @id attributes on XHTML elements are rewritten with their effective id during XHTML output by
+            // XHTMLElementHandler.
+
+            // Process AVTs if required
             if (hostLanguageAVTs) {
                 // This is a non-XForms element and we allow AVTs
                 final int attributesCount = attributes.getLength();
@@ -277,14 +286,9 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
                 }
 
             } else {
-                // No attributes, just output the element
+                // No AVT handling, just output the element
                 super.startElement(uri, localname, qName, attributes);
             }
-        } else {
-            // Non-XBL element doesn't support AVTs
-            // NOTE: Still process attributes, because the annotator is used to process top-level <xbl:handler> as well.
-            attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
-            super.startElement(uri, localname, qName, attributes);
         }
 
         // Check for preserved content

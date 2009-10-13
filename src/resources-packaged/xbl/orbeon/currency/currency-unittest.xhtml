@@ -35,14 +35,17 @@
                     <readonly is-readonly="true">42</readonly>
                     <no-prefix>42</no-prefix>
                     <repeat show="true">42</repeat>
+                    <required/>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="double" readonly="false()" calculate="for $value in ../value return if ($value castable as xs:decimal) then ../value * 2 else ''"/>
             <xforms:bind nodeset="readonly" readonly="@is-readonly = 'true'"/>
+            <xforms:bind nodeset="required" required="true()"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .xbl-fr-currency .xforms-label { display: inline-block; width: 10em; }
             .xbl-fr-currency { line-height: 2.5em; }
+            .xforms-repeat-selected-item-1 { background-color: transparent; }
         </xhtml:style>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
@@ -131,6 +134,12 @@
                 <xforms:label>Show/hide</xforms:label>
                 <xforms:setvalue ev:event="DOMActivate" ref="repeat/@show" value="if (. = 'true') then 'false' else 'true'"/>
             </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="required" id="required" prefix="">
+                <xforms:label>Required</xforms:label>
+                <xforms:alert>Value is required</xforms:alert>
+            </fr:currency>
         </xhtml:div>
     </xhtml:body>
 </xhtml:html>

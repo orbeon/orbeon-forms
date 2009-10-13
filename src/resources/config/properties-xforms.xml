@@ -75,6 +75,10 @@
 
     <!-- Other XForms options -->
     <property as="xs:string"  name="oxf.xforms.order"                                       value="label control help alert hint"/>
+    <property as="xs:string"  name="oxf.xforms.label-element"                               value="label"/>
+    <property as="xs:string"  name="oxf.xforms.hint-element"                                value="span"/>
+    <property as="xs:string"  name="oxf.xforms.help-element"                                value="span"/>
+    <property as="xs:string"  name="oxf.xforms.alert-element"                               value="span"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-get-all"                            value="true"/>
     <property as="xs:boolean" name="oxf.xforms.local-submission-forward"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.local-submission-include"                    value="false"/>

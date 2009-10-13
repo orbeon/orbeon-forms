@@ -524,12 +524,15 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
                 // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
                 final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : new AttributesImpl();
-                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), controlEffectiveId, forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment, addIds);
+                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), controlEffectiveId,
+                        forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment, addIds);
             }
         }
     }
 
-    protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String controlEffectiveId, String forEffectiveId, LHHAC lhha, String elementName, String value, boolean mustOutputHTMLFragment, boolean addIds) throws SAXException {
+    protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String controlEffectiveId,
+                                         String forEffectiveId, LHHAC lhha, String elementName, String value,
+                                         boolean mustOutputHTMLFragment, boolean addIds) throws SAXException {
 
         // Replace id attribute to be foo-label, foo-hint, foo-help, or foo-alert
         final AttributesImpl newAttribute;
@@ -541,8 +544,8 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             newAttribute = XMLUtils.removeAttribute(attributes, "", "id");
         }
 
-        // Add @for attribute if specified
-        if (forEffectiveId != null)
+        // Add @for attribute if specified and element is a label
+        if (forEffectiveId != null && elementName.equals("label"))
             newAttribute.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, forEffectiveId);
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

@@ -23,11 +23,11 @@
 
 /* ***** XForms Controls ******************************************************************************************** */
 
-/* Make sure disabled items take precendence over display: block on other classes */
+/* Make sure disabled items take precedence over display: block on other classes */
 #fr-view .xforms-disabled { display: none }
 #fr-view .xforms-template { display: none }
 #fr-view .xforms-repeat-template { display: none }
-#fr-view label.xforms-alert-inactive { display: none }
+#fr-view span.xforms-alert-inactive { display: none }
 #fr-view .xforms-disabled .xforms-label { display: none }
 #fr-view .xforms-case-deselected { display: none }
 #fr-view .xforms-case-deselected .xforms-label { display: none }
@@ -225,7 +225,6 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
     padding: .3em;
 }
 .fr-error-list li { margin-bottom: .5em }
-.fr-error-list label { display: none }
 .fr-error-label, .fr-error-row, .fr-error-alert { }
 .fr-error-alert { color: red }
 

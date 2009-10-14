@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function;
 
+import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -35,18 +36,31 @@ public class Instance extends XFormsFunction {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
         // Get instance id
-        final Expression instanceIdExpression = argument[0];
-        final String instanceId = XFormsUtils.namespaceId(getContainingDocument(xpathContext), instanceIdExpression.evaluateAsString(xpathContext));
+        
+        // "If the argument is omitted or is equal to the empty string, then the root element node (also called the
+        // document element node) is returned for the default instance in the model that contains the current context
+        // node."
+        final Expression instanceIdExpression = (argument.length > 0) ? argument[0] : null;
+        final String instanceId;
+        {
+            if (instanceIdExpression != null) {
+                final String tempId = instanceIdExpression.evaluateAsString(xpathContext).trim();
+                instanceId = (StringUtils.isNotBlank(tempId)) ? XFormsUtils.namespaceId(getContainingDocument(xpathContext), tempId) : null;
+            } else {
+                instanceId = null;
+            }
+        }
 
         // Get model and instance with given id for that model only
         
         // "If a match is located, and the matching instance data is associated with the same XForms Model as the
-        // current context node, this function returns a node-set containing just the root element node (also called the
-        // document element node) of the referenced instance data. In all other cases, an empty node-set is returned."
+        // current context node, this function returns a node-set containing just the root element node (also called
+        // the document element node) of the referenced instance data. In all other cases, an empty node-set is
+        // returned."
 
         // NOTE: Model can be null when there is no model in scope at all
         final XFormsModel model = getModel(xpathContext);
-        final XFormsInstance instance = (model != null) ? model.getInstance(instanceId) : null;
+        final XFormsInstance instance = (model != null) ? (instanceId != null) ?  model.getInstance(instanceId) : model.getDefaultInstance() : null;
 
         // Return instance document if found
         if (instance != null) {

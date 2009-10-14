@@ -248,26 +248,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     /**
-     * Return the id of the default instance for this model. Return null if there is no instance in this model.
-     *
-     * @return  instance id or null
-     */
-//    public String getDefaultInstanceId() {
-//        return (instanceIds != null && instanceIds.size() > 0) ? instanceIds.get(0) : null;
-//    }
-
-    /**
      * Return all XFormsInstance objects for this model, in the order they appear in the model.
      */
     public List<XFormsInstance> getInstances() {
         return instances;
-    }
-
-    /**
-     * Return the number of instances in this model.
-     */
-    public int getInstanceCount() {
-        return instanceIds.size();
     }
 
     /**

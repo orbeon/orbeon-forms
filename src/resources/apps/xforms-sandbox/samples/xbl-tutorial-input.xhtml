@@ -1,0 +1,74 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <head>
+        <title>XLB Tutorial fr:tutorial-input illustration</title>
+        <xforms:model>
+            <xforms:instance xxforms:exclude-result-prefixes="#all">
+                <instance xmlns="">
+                    <first-name/>
+                    <last-name/>
+                </instance>
+            </xforms:instance>
+            <xforms:bind id="last-name-bind" nodeset="last-name"/>
+        </xforms:model>
+    </head>
+    <body>
+        
+        <p>
+            This sample illustrates the use of the Orbeon Forms <a
+            href="http://wiki.orbeon.com/forms/doc/developer-guide/xbl-components-guide">XBL Tutorial's</a> simple
+            <code>&lt;fr:tutorial-input></code> component. This component does nothing except encapsulating an
+            <code>&lt;xforms:input></code> control.
+        </p>
+
+        <h2>Using &lt;fr:tutorial-reverse> component</h2>
+
+        <fr:tutorial-input ref="first-name">
+            <xforms:label>First name: </xforms:label>
+            <xforms:hint>Please enter your first name</xforms:hint>
+            <xforms:alert/>
+        </fr:tutorial-input>
+
+        <fr:tutorial-input bind="last-name-bind">
+            <xforms:label>Last name: </xforms:label>
+            <xforms:hint>Please enter your last name</xforms:hint>
+            <xforms:alert/>
+        </fr:tutorial-input>
+
+        <h2>Using plain inputs</h2>
+        
+        <xforms:input ref="first-name">
+            <xforms:label>First name: </xforms:label>
+            <xforms:hint>Please enter your first name</xforms:hint>
+            <xforms:alert/>
+        </xforms:input>
+
+        <xforms:input bind="last-name-bind">
+            <xforms:label>Last name: </xforms:label>
+            <xforms:hint>Please enter your last name</xforms:hint>
+            <xforms:alert/>
+        </xforms:input>
+
+        <widget:xforms-instance-inspector id="xforms-instance-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+
+    </body>
+</html>

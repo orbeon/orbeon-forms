@@ -91,8 +91,20 @@
         select="if ($scrollV) then concat('height: ', $pass4/fr:datatable/@height, ';') else ''"/>
     <xsl:variable name="width"
         select="if ($pass4/fr:datatable/@width) then concat('width: ', $pass4/fr:datatable/@width, ';') else ''"/>
-    <xsl:variable name="id"
-        select="if ($pass4/fr:datatable/@id) then $pass4/fr:datatable/@id else generate-id($pass4/fr:datatable)"/>
+    <xsl:variable name="id">
+        <xsl:choose>
+            <xsl:when test="$pass4/fr:datatable/@id">
+                <id xxbl:scope="outer">
+                    <xsl:value-of select="$pass4/fr:datatable/@id"/>
+                </id>
+            </xsl:when>
+            <xsl:otherwise>
+                <id xxbl:scope="inner">
+                    <xsl:value-of select="generate-id($pass4/fr:datatable)"/>
+                </id>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="paginated" select="$pass4/fr:datatable/@paginated = 'true'"/>
     <xsl:variable name="rowsPerPage"
         select="if ($pass4/fr:datatable/@rowsPerPage castable as xs:integer) then $pass4/fr:datatable/@rowsPerPage cast as xs:integer else 10"/>
@@ -102,8 +114,6 @@
     <xsl:variable name="innerTableWidth"
         select="if ($pass4/fr:datatable/@innerTableWidth) then concat(&quot;'&quot;, $pass4/fr:datatable/@innerTableWidth, &quot;'&quot;) else 'null'"/>
     <xsl:variable name="hasLoadingFeature" select="count($pass4/fr:datatable/@loading) = 1"/>
-    <xsl:variable name="dynamic"
-        select="$pass4/fr:datatable/@dynamic = 'true' or $pass4/fr:datatable/xhtml:thead/xhtml:tr/xforms:repeat or true()"/>
     <xsl:variable name="debug" select="$pass4/fr:datatable/@debug = 'true'"/>
 
     <!-- And some more -->
@@ -119,387 +129,9 @@
     </xsl:template>
 
     <xsl:template match="/">
-        <xsl:choose>
-            <xsl:when test="$dynamic">
-                <xsl:apply-templates select="$pass4/fr:datatable" mode="dynamic"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:apply-templates select="$pass4/fr:datatable"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
 
-    <xsl:template match="fr:datatable">
-        <!-- Matches the bound element -->
+        <xsl:apply-templates select="$pass4/fr:datatable" mode="dynamic"/>
 
-
-        <xhtml:div id="{$id}-container">
-            <xsl:copy-of select="namespace::*"/>
-
-
-
-            <xsl:variable name="pass5">
-
-                <!--
-                This pass generates the XHTML structure .
-                and uses the default mode.
-
-                -->
-
-                <xhtml:table id="{$id}-table"
-                    class="datatable datatable-{$id} yui-dt-table {@class} {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
-                    style="{$height} {$width}">
-                    <!-- Copy attributes that are not parameters! -->
-                    <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id', 'class' ))]"/>
-                    <xsl:if test="not(xhtml:colgroup)">
-                        <!-- If there is no colgroup element, add one -->
-                        <xhtml:colgroup>
-                            <xsl:for-each
-                                select="((xhtml:tbody|self::*)/(xforms:repeat|self::*)/xhtml:tr)[1]/xhtml:td">
-                                <xhtml:col/>
-                            </xsl:for-each>
-                        </xhtml:colgroup>
-                    </xsl:if>
-                    <xsl:if test="not(xhtml:thead)">
-                        <!-- If there is no thead element, add one -->
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xsl:for-each
-                                    select="((xhtml:tbody|self::*)/(xforms:repeat|self::*)/xhtml:tr)[1]/xhtml:td">
-                                    <xhtml:th>
-                                        <xsl:copy-of select="@fr:*"/>
-                                        <xsl:value-of select="xforms:*/xforms:label"/>
-                                    </xhtml:th>
-                                </xsl:for-each>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                    </xsl:if>
-                    <xsl:choose>
-                        <xsl:when test="xhtml:tbody">
-                            <xsl:apply-templates select="node()"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <!-- If there is no tbody, add one -->
-                            <xsl:apply-templates select="xhtml:thead"/>
-                            <xhtml:tbody>
-                                <xsl:apply-templates select="*[not(self::xhtml:thead)]"/>
-                            </xhtml:tbody>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xhtml:table>
-            </xsl:variable>
-
-            <!--
-
-            Now it's time to assemble all that stuff
-
-            -->
-
-            <xforms:model id="datatable-model">
-                <xsl:variable name="sort-instance">
-                    <xforms:instance id="sort">
-                        <xsl:variable name="sorted"
-                            select="$pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th[@fr:sorted = ('descending', 'ascending')][1]/@fr:sorted"/>
-                        <sort
-                            currentId="{if ($sorted) then count($sorted/../preceding-sibling::xhtml:th) + 1 else -1}"
-                            currentOrder="{$sorted}" xmlns="">
-                            <xsl:for-each select="$pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th">
-                                <key
-                                    type="{if (@fr:sortType) then if (@fr:sortType = 'number') then 'number' else 'text' else ''}">
-                                    <xsl:variable name="position"
-                                        select="count(preceding-sibling::xhtml:th) + 1"/>
-                                    <xsl:if test="@fr:sortable='true'">
-                                        <xsl:variable name="sortKeys">
-                                            <xsl:apply-templates
-                                                select="$pass5/xhtml:table/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td[position() = $position]"
-                                                mode="sortKey"/>
-                                        </xsl:variable>
-                                        <xsl:choose>
-                                            <xsl:when test="count($sortKeys/*) > 1">
-                                                <xsl:text>concat(</xsl:text>
-                                                <xsl:value-of select="string-join($sortKeys/*, ',')"/>
-                                                <xsl:text>)</xsl:text>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <xsl:value-of select="$sortKeys/*"/>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </xsl:if>
-                                </key>
-                            </xsl:for-each>
-                        </sort>
-                    </xforms:instance>
-                </xsl:variable>
-                <xsl:copy-of select="$sort-instance"/>
-                <xsl:variable name="repeat-nodeset" select="$pass5//xforms:repeat[1]/@nodeset"/>
-                <xxforms:variable name="nodeset"
-                    select="xxforms:component-context()/{$pass5//xforms:repeat/@nodeset}"/>
-                <xsl:for-each
-                    select="$pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th[@fr:sortable='true' and not(@fr:sortType)]">
-                    <xsl:variable name="position" select="count(preceding-sibling::xhtml:th) + 1"/>
-                    <xxforms:variable name="node{$position}"
-                        select="$nodeset[1]/{$sort-instance/xforms:instance/sort/key[position() = $position]}"/>
-                    <!--Note: the following expression filters out values (for which . instance of node() is false) since xxforms:type doesn't work for them -->
-                    <xxforms:variable name="isNode{$position}"
-                        select="$node{$position} instance of node()"/>
-                    <xxforms:variable name="type{$position}"
-                        select="if ($isNode{$position}) then xxforms:type($node{$position}) else ()"/>
-
-                    <xforms:bind nodeset="key[{$position}]/@type"
-                        calculate="if (($isNode{$position} and $type{$position} = ({$numberTypesEnumeration})) or $node{$position} instance of xs:decimal) then 'number' else 'text'"
-                    />
-                </xsl:for-each>
-                <xsl:if test="$paginated">
-                    <xforms:instance id="page">
-                        <page xmlns="">1</page>
-                    </xforms:instance>
-                </xsl:if>
-                <xforms:bind nodeset="@currentId" type="xs:integer"/>
-
-            </xforms:model>
-
-            <xsl:choose>
-                <xsl:when test="$paginated and not($sortAndPaginationMode='external')">
-                    <xxforms:variable name="page" model="datatable-model" select="instance('page')"/>
-                    <xxforms:variable name="nbRows"
-                        select="count({$pass5//xforms:repeat[1]/@nodeset})"/>
-                    <xxforms:variable name="nbPages"
-                        select="ceiling($nbRows div {$rowsPerPage}) cast as xs:integer"/>
-                </xsl:when>
-
-                <xsl:when test="$paginated and $sortAndPaginationMode='external'">
-                    <xxforms:variable name="page" xbl:attr="select=page"/>
-                    <xxforms:variable name="nbPages" xbl:attr="select=nbPages"/>
-                </xsl:when>
-
-            </xsl:choose>
-
-
-            <xsl:choose>
-                <xsl:when test="$paginated and $maxNbPagesToDisplay &lt; 0">
-                    <xxforms:variable name="pages"
-                        select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"
-                    />
-                </xsl:when>
-                <xsl:when test="$paginated">
-                    <xxforms:variable name="maxNbPagesToDisplay"
-                        select="{$maxNbPagesToDisplay} cast as xs:integer"/>
-                    <xxforms:variable name="radix"
-                        select="floor(($maxNbPagesToDisplay - 2) div 2) cast as xs:integer"/>
-                    <xxforms:variable name="minPage"
-                        select="
-                        (if ($page > $radix)
-                            then if ($nbPages >= $page + $radix)
-                                then ($page - $radix)
-                                else max((1, $nbPages - $maxNbPagesToDisplay + 1))
-                            else 1) cast as xs:integer"/>
-                    <xxforms:variable name="pages"
-                        select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"/>
-                    <!--<xxforms:variable name="pages"
-                        select="for $p in $minPage to min(($nbPages, $minPage + $maxNbPagesToDisplay - 1)) cast as xs:integer return xxforms:element('page', $p)"
-                    />-->
-                </xsl:when>
-            </xsl:choose>
-
-            <xsl:variable name="pagination">
-                <xsl:if test="$paginated">
-                    <xhtml:div class="yui-dt-paginator yui-pg-container" style="">
-
-                        <xforms:group ref=".[$page = 1]">
-                            <xhtml:span class="yui-pg-first">&lt;&lt; first</xhtml:span>
-                        </xforms:group>
-                        <xforms:group ref=".[$page != 1]">
-                            <xforms:trigger class="yui-pg-first" appearance="minimal">
-                                <xforms:label>&lt;&lt; first </xforms:label>
-                                <xsl:call-template name="fr-goto-page">
-                                    <xsl:with-param name="fr-new-page">1</xsl:with-param>
-                                </xsl:call-template>
-                            </xforms:trigger>
-                        </xforms:group>
-
-                        <xforms:group ref=".[$page = 1]">
-                            <xhtml:span class="yui-pg-previous">&lt; prev</xhtml:span>
-                        </xforms:group>
-                        <xforms:group ref=".[$page != 1]">
-                            <xforms:trigger class="yui-pg-previous" appearance="minimal">
-                                <xforms:label>&lt; prev</xforms:label>
-                                <xsl:call-template name="fr-goto-page">
-                                    <xsl:with-param name="fr-new-page">$page - 1</xsl:with-param>
-                                </xsl:call-template>
-                            </xforms:trigger>
-                        </xforms:group>
-
-                        <xhtml:span class="yui-pg-pages">
-                            <xforms:repeat nodeset="$pages">
-                                <xsl:choose>
-                                    <xsl:when test="$maxNbPagesToDisplay &lt; 0">
-                                        <xxforms:variable name="display">page</xxforms:variable>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xxforms:variable name="display"
-                                            select="
-                                                    if ($page &lt; $maxNbPagesToDisplay -2)
-                                                    then if (. &lt;= $maxNbPagesToDisplay - 2 or . = $nbPages)
-                                                        then 'page'
-                                                        else if (. = $nbPages - 1)
-                                                            then 'ellipses'
-                                                            else 'none'
-                                                    else if ($page > $nbPages - $maxNbPagesToDisplay + 3)
-                                                        then if (. >= $nbPages - $maxNbPagesToDisplay + 3 or . = 1)
-                                                            then 'page'
-                                                            else if (. = 2)
-                                                                then 'ellipses'
-                                                                else 'none'
-                                                        else if (. = 1 or . = $nbPages or (. > $page - $radix and . &lt; $page + $radix))
-                                                            then 'page'
-                                                            else if (. = 2 or . = $nbPages -1)
-                                                                then 'ellipses'
-                                                                else 'none'
-                                                 "
-                                        />
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                                <xforms:group ref=".[. = $page and $display = 'page']">
-                                    <xforms:output class="yui-pg-page" value="$page">
-                                        <!-- <xforms:hint>Current page (edit to move to another
-                                            page)</xforms:hint>-->
-                                    </xforms:output>
-                                </xforms:group>
-                                <xforms:group ref=".[. != $page and $display = 'page']">
-                                    <xxforms:variable name="targetPage" select="."/>
-                                    <xforms:trigger class="yui-pg-page" appearance="minimal">
-                                        <xforms:label>
-                                            <xforms:output value="."/>
-                                        </xforms:label>
-                                        <xsl:call-template name="fr-goto-page">
-                                            <xsl:with-param name="fr-new-page"
-                                                >$targetPage</xsl:with-param>
-                                        </xsl:call-template>
-                                    </xforms:trigger>
-                                </xforms:group>
-                                <xforms:group ref=".[ $display = 'ellipses']">
-                                    <xhtml:span class="yui-pg-page">...</xhtml:span>
-                                </xforms:group>
-                            </xforms:repeat>
-                        </xhtml:span>
-
-                        <xforms:group ref=".[$page = $nbPages or $nbPages = 0]">
-                            <xhtml:span class="yui-pg-next">next ></xhtml:span>
-                        </xforms:group>
-                        <xforms:group ref=".[$page != $nbPages and $nbPages != 0]">
-                            <xforms:trigger class="yui-pg-next" appearance="minimal">
-                                <xforms:label>next ></xforms:label>
-                                <xsl:call-template name="fr-goto-page">
-                                    <xsl:with-param name="fr-new-page">$page + 1</xsl:with-param>
-                                </xsl:call-template>
-                            </xforms:trigger>
-                        </xforms:group>
-
-                        <xforms:group ref=".[$page = $nbPages or $nbPages = 0]">
-                            <xhtml:span class="yui-pg-last">last >></xhtml:span>
-                        </xforms:group>
-                        <xforms:group ref=".[$page != $nbPages and $nbPages != 0]">
-                            <xforms:trigger class="yui-pg-last" appearance="minimal">
-                                <xforms:label>last >></xforms:label>
-                                <xsl:call-template name="fr-goto-page">
-                                    <xsl:with-param name="fr-new-page">$nbPages</xsl:with-param>
-                                </xsl:call-template>
-                            </xforms:trigger>
-                        </xforms:group>
-                    </xhtml:div>
-
-                </xsl:if>
-            </xsl:variable>
-
-            <xsl:copy-of select="$pagination"/>
-
-
-            <xsl:if test="$hasLoadingFeature">
-                <xxforms:variable name="loading" xbl:attr="select=loading"/>
-            </xsl:if>
-
-            <xforms:group id="fr-datatable-group">
-                <xsl:attribute name="ref">
-                    <xsl:text>xxforms:component-context()</xsl:text>
-                    <xsl:if test="$hasLoadingFeature">[not($loading = true())]</xsl:if>
-                </xsl:attribute>
-
-                <xforms:action ev:event="xforms-enabled" ev:target="fr-datatable-group">
-                    <xxforms:script> YAHOO.log("Enabling datatable id <xsl:value-of select="$id"
-                        />","info"); ORBEON.widgets.datatable.init(this, <xsl:value-of
-                            select="$innerTableWidth"/>); </xxforms:script>
-                </xforms:action>
-
-                <xsl:apply-templates select="$pass5" mode="YUI"/>
-
-            </xforms:group>
-
-            <xsl:if test="$hasLoadingFeature">
-                <!-- The trick with the spans is working fine for simple case where we don't need to specify the height or width.
-                     In other cases, the elements "gain layout" in IE world and the width of the div that contains the 
-                     scrollbar takes all the page in IE 6 if not explicitely set...-->
-                <xforms:group ref="xxforms:component-context()[$loading = true()]">
-                    <xforms:action ev:event="xforms-enabled">
-                        <xxforms:script> ORBEON.widgets.datatable.initLoadingIndicator(this,
-                                <xsl:value-of select="$scrollV"/>, <xsl:value-of select="$scrollH"
-                            />); </xxforms:script>
-                    </xforms:action>
-                    <xsl:variable name="tableContent">
-                        <xhtml:thead>
-                            <xhtml:tr class="yui-dt-first yui-dt-last">
-                                <xsl:apply-templates
-                                    select="$pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th"
-                                    mode="YUI"/>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xhtml:tr>
-                                <xhtml:td
-                                    colspan="{count($pass5/xhtml:table/xhtml:thead/xhtml:tr/xhtml:th)}">
-                                    <xhtml:div class="fr-datatable-is-loading"
-                                        style="{if ($scrollable) then concat( $height, ' ', $width) else ''}"
-                                    />
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </xhtml:tbody>
-                    </xsl:variable>
-                    <xsl:choose>
-                        <xsl:when test="$scrollable">
-                            <xhtml:div class="yui-dt yui-dt-scrollable"
-                                style="{if ($scrollV) then $height else 'height: 95px;'} {$width}">
-                                <xhtml:div
-                                    style="overflow: auto; {if ($scrollV) then $height else 'height: 95px;'} {$width}"
-                                    class="yui-dt-hd">
-                                    <xhtml:table style=""
-                                        class="datatable datatable-table-scrollV yui-dt-table fr-scrollV">
-                                        <xsl:copy-of select="$tableContent"/>
-                                    </xhtml:table>
-                                </xhtml:div>
-                            </xhtml:div>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xhtml:span class="yui-dt yui-dt-scrollable" style="display: table; ">
-                                <xhtml:span class="yui-dt-hd"
-                                    style="border: 1px solid rgb(127, 127, 127); display: table-cell;">
-                                    <xhtml:table class="datatable  yui-dt-table"
-                                        style="{$height} {$width}">
-                                        <xsl:copy-of select="$tableContent"/>
-                                    </xhtml:table>
-                                </xhtml:span>
-                            </xhtml:span>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xforms:group>
-            </xsl:if>
-
-
-            <xsl:copy-of select="$pagination"/>
-
-
-
-        </xhtml:div>
-
-        <!-- End of template on the bound element -->
     </xsl:template>
 
     <xsl:template name="fr-goto-page">
@@ -515,221 +147,6 @@
                     ref="instance('page')" value="{$fr-new-page}"/>
             </xsl:otherwise>
         </xsl:choose>
-    </xsl:template>
-
-
-    <!--
-
-        YUI mode (YUI decorations)
-
-    -->
-
-    <xsl:template match="xhtml:thead/xhtml:tr" mode="YUI">
-        <xhtml:tr class="yui-dt-first yui-dt-last {@class}" id="{$id}-thead-tr">
-            <xsl:apply-templates select="@*[not(name() = ('class', 'id') )]|node()" mode="YUI"/>
-        </xhtml:tr>
-    </xsl:template>
-
-    <xsl:template match="xhtml:thead" mode="YUI">
-        <xhtml:thead id="{$id}-thead">
-            <xsl:apply-templates select="@*[not(name() = ('id') )]|node()" mode="YUI"/>
-        </xhtml:thead>
-    </xsl:template>
-
-    <xsl:template name="yui-dt-liner">
-        <xsl:param name="position"/>
-        <xhtml:div class="yui-dt-liner datatable-cell-content">
-            <xhtml:span class="yui-dt-label">
-                <xsl:choose>
-                    <xsl:when test="@fr:sortable = 'true' and $sortAndPaginationMode='external'">
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>
-                                <xsl:apply-templates select="node()" mode="YUI"/>
-                            </xforms:label>
-                            <xforms:hint>
-                                <xforms:output value="{@fr:sortMessage}"/>
-                            </xforms:hint>
-                            <xforms:dispatch ev:event="DOMActivate" name="fr-update-sort"
-                                target="fr.datatable">
-                                <xxforms:context name="fr-column"
-                                    select="{count(preceding-sibling::xhtml:th) + 1}"/>
-                            </xforms:dispatch>
-                        </xforms:trigger>
-                    </xsl:when>
-                    <xsl:when
-                        test="@fr:sortable = 'true' and not($sortAndPaginationMode='external')">
-                        <xforms:group model="datatable-model" instance="sort">
-                            <xforms:group ref=".[$nextSortOrder = 'ascending']">
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label>
-                                        <xsl:apply-templates select="node()" mode="YUI"/>
-                                    </xforms:label>
-                                    <xforms:hint>Click to sort <xforms:output value="$nextSortOrder"
-                                        /></xforms:hint>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue ref="@currentOrder" value="$nextSortOrder"/>
-                                        <xforms:setvalue ref="@currentId">
-                                            <xsl:value-of select="$position"/>
-                                        </xforms:setvalue>
-                                        <xforms:setvalue ref="instance('page')" value="1"/>
-                                    </xforms:action>
-                                </xforms:trigger>
-                            </xforms:group>
-                            <xforms:group ref=".[$nextSortOrder != 'ascending']">
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label>
-                                        <xsl:apply-templates select="node()" mode="YUI"/>
-                                    </xforms:label>
-                                    <xforms:hint>Click to sort <xforms:output value="$nextSortOrder"
-                                        /></xforms:hint>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue ref="@currentOrder" value="$nextSortOrder"/>
-                                        <xforms:setvalue ref="@currentId">
-                                            <xsl:value-of select="$position"/>
-                                        </xforms:setvalue>
-                                        <xforms:setvalue ref="instance('page')" value="1"/>
-                                    </xforms:action>
-                                </xforms:trigger>
-                            </xforms:group>
-                        </xforms:group>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:apply-templates select="node()" mode="YUI"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xhtml:span>
-        </xhtml:div>
-    </xsl:template>
-
-    <xsl:template match="xhtml:thead/xhtml:tr/xhtml:th" mode="YUI">
-        <xsl:variable name="position" select="count(preceding-sibling::xhtml:th) + 1"/>
-        <xxforms:variable name="nextSortOrder" model="datatable-model"
-            select=" if (@currentId = {$position} and @currentOrder = 'ascending') then 'descending' else 'ascending' "/>
-        <xxforms:variable name="currentId" model="datatable-model" select="@currentId"/>
-        <xxforms:variable name="currentOrder" model="datatable-model" select="@currentOrder"/>
-        <xhtml:th
-            class="
-            {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''}
-            {if (@fr:resizeable = 'true') then 'yui-dt-resizeable' else ''}
-            {{if ({$position} = $currentId)
-            then  if($currentOrder = 'descending') then 'yui-dt-desc' else 'yui-dt-asc'
-            else ''}}
-            {@class}
-            ">
-            <xsl:apply-templates select="@*[name() != 'class']" mode="YUI"/>
-            <!-- <xsl:choose>
-                <xsl:when test="@fr:resizeable = 'true'">
-                    <xhtml:div class="yui-dt-resizerliner">
-                        <xsl:call-template name="yui-dt-liner">
-                            <xsl:with-param name="position" select="$position"/>table
-                        </xsl:call-template>
-                        <xhtml:div id="{generate-id()}" class="yui-dt-resizer" style=" left: auto; right: 0pt; top: auto; bottom: 0pt; height: 100%;"
-                        />
-                    </xhtml:div>
-                </xsl:when>
-                <xsl:otherwise>-->
-            <xsl:call-template name="yui-dt-liner">
-                <xsl:with-param name="position" select="$position"/>
-            </xsl:call-template>
-            <!--               </xsl:otherwise>
-     </xsl:choose>-->
-        </xhtml:th>
-    </xsl:template>
-
-    <xsl:template match="xhtml:tbody" mode="YUI">
-        <xhtml:tbody class="yui-dt-data {@class}" id="{$id}-tbody">
-            <xsl:apply-templates select="@*[not(name() = ('class', 'id'))]|node()" mode="YUI"/>
-        </xhtml:tbody>
-    </xsl:template>
-
-    <xsl:template match="xforms:repeat" mode="YUI">
-        <xxforms:variable name="sort" model="datatable-model" select="."/>
-        <xxforms:variable name="key" model="datatable-model"
-            select="key[position() = $sort/@currentId]"/>
-        <xxforms:variable name="nodeset">
-            <xsl:attribute name="select">
-                <xsl:choose>
-                    <xsl:when test="$sortAndPaginationMode='external'">
-                        <xsl:value-of select="@nodeset"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:if test="$paginated">(</xsl:if>
-                        <xsl:text>if ($sort/@currentId = -1 or $sort/@currentOrder = '') then </xsl:text>
-                        <xsl:value-of select="@nodeset"/>
-                        <xsl:text> else exf:sort(</xsl:text>
-                        <xsl:value-of select="@nodeset"/>
-                        <xsl:text>, $key , $key/@type, $sort/@currentOrder)</xsl:text>
-                        <xsl:if test="$paginated">)[position() >= ($page - 1) * <xsl:value-of
-                                select="$rowsPerPage"/> + 1 and position() &lt;= $page *
-                                <xsl:value-of select="$rowsPerPage"/>]</xsl:if>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:attribute>
-        </xxforms:variable>
-        <xxforms:script ev:event="xxforms-nodeset-changed" ev:target="fr-datatable-repeat">
-            ORBEON.widgets.datatable.update(this); </xxforms:script>
-        <xforms:repeat id="fr-datatable-repeat" nodeset="$nodeset">
-            <xsl:apply-templates select="@*[not(name()=('nodeset', 'id'))]|node()" mode="YUI"/>
-        </xforms:repeat>
-        <xforms:group ref=".[not($nodeset)]">
-            <xhtml:tr>
-                <xhtml:td>&#xa0;</xhtml:td>
-            </xhtml:tr>
-        </xforms:group>
-    </xsl:template>
-
-    <xsl:template match="xhtml:tr" mode="YUI">
-        <xhtml:tr
-            class="
-            {{if (position() = 1) then 'yui-dt-first' else '' }}
-            {{if (position() = last()) then 'yui-dt-last' else '' }}
-            {{if (position() mod 2 = 0) then 'yui-dt-odd' else 'yui-dt-even' }}
-            {{if (xxforms:index() = position()) then 'yui-dt-selected' else ''}}
-            {@class}"
-            style="height: auto;">
-            <xsl:apply-templates select="@*[name() != 'class']|node()" mode="YUI"/>
-        </xhtml:tr>
-    </xsl:template>
-
-    <xsl:template match="xforms:repeat/xhtml:tr/xhtml:td" mode="YUI">
-        <xsl:variable name="position" select="count(preceding-sibling::xhtml:td) + 1"/>
-        <xxforms:variable name="currentId" model="datatable-model" select="@currentId"/>
-        <xxforms:variable name="currentOrder" model="datatable-model" select="@currentOrder"/>
-        <xhtml:td
-            class="
-            {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''}
-            {{if ({$position} = $currentId)
-                then  if($currentOrder = 'descending') then 'yui-dt-desc' else 'yui-dt-asc'
-                else ''}}
-            {@class}
-            ">
-
-            <xsl:apply-templates select="@*[name() != 'class']" mode="YUI"/>
-            <xhtml:div class="yui-dt-liner datatable-cell-content">
-                <xsl:apply-templates select="node()" mode="YUI"/>
-            </xhtml:div>
-        </xhtml:td>
-    </xsl:template>
-
-    <xsl:template match="@fr:*" mode="YUI"/>
-
-    <!--
-
-        sortKey mode builds a list of sort keys from a cell content
-
-        Note that we don't bother to take text nodes into account, assuming that
-        they are constant and should not influence the sort order...
-
-    -->
-
-    <xsl:template match="*" mode="sortKey">
-        <xsl:apply-templates select="*" mode="sortKey"/>
-    </xsl:template>
-
-    <xsl:template match="xforms:output" mode="sortKey">
-        <xpath>
-            <xsl:value-of select="@ref|@value"/>
-        </xpath>
     </xsl:template>
 
     <!-- 
@@ -878,11 +295,10 @@
             <xsl:apply-templates select="xhtml:thead/xhtml:tr[1]/*" mode="dyn-columns"/>
         </xsl:variable>
 
-        <xhtml:div id="{$id}-container" xxbl:scope="inner">
-            <!-- By default, set the scope to "inner" -->
+        <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer" id="{$id}-container">
             <xsl:copy-of select="namespace::*"/>
 
-            <xforms:model id="datatable-model">
+            <xforms:model id="datatable-model" xxbl:scope="inner">
                 <xforms:instance id="datatable-instance">
                     <columns xmlns="" currentSortColumn="-1">
                         <xsl:for-each select="$columns/*">
@@ -932,12 +348,14 @@
 
             <xsl:choose>
                 <xsl:when test="$paginated and not($sortAndPaginationMode='external')">
-                    <xxforms:variable name="page" model="datatable-model" select="instance('page')"/>
+                    <xxforms:variable name="page" model="datatable-model" select="instance('page')"
+                        xxbl:scope="inner"/>
                     <xxforms:variable name="nbRows" xxbl:scope="inner">
                         <xxforms:sequence select="count({$repeatNodeset})" xxbl:scope="outer"/>
                     </xxforms:variable>
                     <xxforms:variable name="nbPages"
-                        select="ceiling($nbRows div {$rowsPerPage}) cast as xs:integer"/>
+                        select="ceiling($nbRows div {$rowsPerPage}) cast as xs:integer"
+                        xxbl:scope="inner"/>
                 </xsl:when>
 
                 <xsl:when test="$paginated and $sortAndPaginationMode='external'">
@@ -956,63 +374,69 @@
                 <xsl:when test="$paginated and $maxNbPagesToDisplay &lt; 0">
                     <xxforms:variable name="pages"
                         select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"
-                    />
+                        xxbl:scope="inner"/>
                 </xsl:when>
                 <xsl:when test="$paginated">
                     <xxforms:variable name="maxNbPagesToDisplay"
-                        select="{$maxNbPagesToDisplay} cast as xs:integer"/>
+                        select="{$maxNbPagesToDisplay} cast as xs:integer" xxbl:scope="inner"/>
                     <xxforms:variable name="radix"
-                        select="floor(($maxNbPagesToDisplay - 2) div 2) cast as xs:integer"/>
+                        select="floor(($maxNbPagesToDisplay - 2) div 2) cast as xs:integer"
+                        xxbl:scope="inner"/>
                     <xxforms:variable name="minPage"
                         select="
                         (if ($page > $radix)
                         then if ($nbPages >= $page + $radix)
                         then ($page - $radix)
                         else max((1, $nbPages - $maxNbPagesToDisplay + 1))
-                        else 1) cast as xs:integer"/>
+                        else 1) cast as xs:integer"
+                        xxbl:scope="inner"/>
                     <xxforms:variable name="pages"
                         select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"
-                    />
+                        xxbl:scope="inner"/>
                 </xsl:when>
             </xsl:choose>
 
             <xsl:variable name="pagination">
+                <!-- TODO: fix scopes -->
                 <xsl:if test="$paginated">
                     <xhtml:div class="yui-dt-paginator yui-pg-container" style="">
 
-                        <xforms:group ref=".[$page = 1]">
-                            <xhtml:span class="yui-pg-first">&lt;&lt; first</xhtml:span>
-                        </xforms:group>
-                        <xforms:group ref=".[$page != 1]">
-                            <xforms:trigger class="yui-pg-first" appearance="minimal">
-                                <xforms:label>&lt;&lt; first </xforms:label>
-                                <xsl:call-template name="fr-goto-page">
-                                    <xsl:with-param name="fr-new-page">1</xsl:with-param>
-                                </xsl:call-template>
-                            </xforms:trigger>
-                        </xforms:group>
+                        <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
 
-                        <xforms:group ref=".[$page = 1]">
-                            <xhtml:span class="yui-pg-previous">&lt; prev</xhtml:span>
-                        </xforms:group>
-                        <xforms:group ref=".[$page != 1]">
-                            <xforms:trigger class="yui-pg-previous" appearance="minimal">
-                                <xforms:label>&lt; prev</xforms:label>
-                                <xsl:call-template name="fr-goto-page">
-                                    <xsl:with-param name="fr-new-page">$page - 1</xsl:with-param>
-                                </xsl:call-template>
-                            </xforms:trigger>
-                        </xforms:group>
+                            <xforms:group ref=".[$page = 1]">
+                                <xhtml:span class="yui-pg-first">&lt;&lt; first</xhtml:span>
+                            </xforms:group>
+                            <xforms:group ref=".[$page != 1]">
+                                <xforms:trigger class="yui-pg-first" appearance="minimal">
+                                    <xforms:label>&lt;&lt; first </xforms:label>
+                                    <xsl:call-template name="fr-goto-page">
+                                        <xsl:with-param name="fr-new-page">1</xsl:with-param>
+                                    </xsl:call-template>
+                                </xforms:trigger>
+                            </xforms:group>
 
-                        <xhtml:span class="yui-pg-pages">
-                            <xforms:repeat nodeset="$pages">
-                                <xsl:choose>
-                                    <xsl:when test="$maxNbPagesToDisplay &lt; 0">
-                                        <xxforms:variable name="display">page</xxforms:variable>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xxforms:variable name="display"
-                                            select="
+                            <xforms:group ref=".[$page = 1]">
+                                <xhtml:span class="yui-pg-previous">&lt; prev</xhtml:span>
+                            </xforms:group>
+                            <xforms:group ref=".[$page != 1]">
+                                <xforms:trigger class="yui-pg-previous" appearance="minimal">
+                                    <xforms:label>&lt; prev</xforms:label>
+                                    <xsl:call-template name="fr-goto-page">
+                                        <xsl:with-param name="fr-new-page">$page -
+                                            1</xsl:with-param>
+                                    </xsl:call-template>
+                                </xforms:trigger>
+                            </xforms:group>
+
+                            <xhtml:span class="yui-pg-pages">
+                                <xforms:repeat nodeset="$pages">
+                                    <xsl:choose>
+                                        <xsl:when test="$maxNbPagesToDisplay &lt; 0">
+                                            <xxforms:variable name="display">page</xxforms:variable>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xxforms:variable name="display"
+                                                select="
                                             if ($page &lt; $maxNbPagesToDisplay -2)
                                             then if (. &lt;= $maxNbPagesToDisplay - 2 or . = $nbPages)
                                             then 'page'
@@ -1031,55 +455,58 @@
                                             then 'ellipses'
                                             else 'none'
                                             "
-                                        />
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                                <xforms:group ref=".[. = $page and $display = 'page']">
-                                    <xforms:output class="yui-pg-page" value="$page">
-                                        <!-- <xforms:hint>Current page (edit to move to another
+                                            />
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                    <xforms:group ref=".[. = $page and $display = 'page']">
+                                        <xforms:output class="yui-pg-page" value="$page">
+                                            <!-- <xforms:hint>Current page (edit to move to another
                                             page)</xforms:hint>-->
-                                    </xforms:output>
-                                </xforms:group>
-                                <xforms:group ref=".[. != $page and $display = 'page']">
-                                    <xxforms:variable name="targetPage" select="."/>
-                                    <xforms:trigger class="yui-pg-page" appearance="minimal">
-                                        <xforms:label>
-                                            <xforms:output value="."/>
-                                        </xforms:label>
-                                        <xsl:call-template name="fr-goto-page">
-                                            <xsl:with-param name="fr-new-page"
-                                                >$targetPage</xsl:with-param>
-                                        </xsl:call-template>
-                                    </xforms:trigger>
-                                </xforms:group>
-                                <xforms:group ref=".[ $display = 'ellipses']">
-                                    <xhtml:span class="yui-pg-page">...</xhtml:span>
-                                </xforms:group>
-                            </xforms:repeat>
-                        </xhtml:span>
+                                        </xforms:output>
+                                    </xforms:group>
+                                    <xforms:group ref=".[. != $page and $display = 'page']">
+                                        <xxforms:variable name="targetPage" select="."/>
+                                        <xforms:trigger class="yui-pg-page" appearance="minimal">
+                                            <xforms:label>
+                                                <xforms:output value="."/>
+                                            </xforms:label>
+                                            <xsl:call-template name="fr-goto-page">
+                                                <xsl:with-param name="fr-new-page"
+                                                  >$targetPage</xsl:with-param>
+                                            </xsl:call-template>
+                                        </xforms:trigger>
+                                    </xforms:group>
+                                    <xforms:group ref=".[ $display = 'ellipses']">
+                                        <xhtml:span class="yui-pg-page">...</xhtml:span>
+                                    </xforms:group>
+                                </xforms:repeat>
+                            </xhtml:span>
 
-                        <xforms:group ref=".[$page = $nbPages or $nbPages = 0]">
-                            <xhtml:span class="yui-pg-next">next ></xhtml:span>
-                        </xforms:group>
-                        <xforms:group ref=".[$page != $nbPages and $nbPages != 0]">
-                            <xforms:trigger class="yui-pg-next" appearance="minimal">
-                                <xforms:label>next ></xforms:label>
-                                <xsl:call-template name="fr-goto-page">
-                                    <xsl:with-param name="fr-new-page">$page + 1</xsl:with-param>
-                                </xsl:call-template>
-                            </xforms:trigger>
-                        </xforms:group>
+                            <xforms:group ref=".[$page = $nbPages or $nbPages = 0]">
+                                <xhtml:span class="yui-pg-next">next ></xhtml:span>
+                            </xforms:group>
+                            <xforms:group ref=".[$page != $nbPages and $nbPages != 0]">
+                                <xforms:trigger class="yui-pg-next" appearance="minimal">
+                                    <xforms:label>next ></xforms:label>
+                                    <xsl:call-template name="fr-goto-page">
+                                        <xsl:with-param name="fr-new-page">$page +
+                                            1</xsl:with-param>
+                                    </xsl:call-template>
+                                </xforms:trigger>
+                            </xforms:group>
 
-                        <xforms:group ref=".[$page = $nbPages or $nbPages = 0]">
-                            <xhtml:span class="yui-pg-last">last >></xhtml:span>
-                        </xforms:group>
-                        <xforms:group ref=".[$page != $nbPages and $nbPages != 0]">
-                            <xforms:trigger class="yui-pg-last" appearance="minimal">
-                                <xforms:label>last >></xforms:label>
-                                <xsl:call-template name="fr-goto-page">
-                                    <xsl:with-param name="fr-new-page">$nbPages</xsl:with-param>
-                                </xsl:call-template>
-                            </xforms:trigger>
+                            <xforms:group ref=".[$page = $nbPages or $nbPages = 0]">
+                                <xhtml:span class="yui-pg-last">last >></xhtml:span>
+                            </xforms:group>
+                            <xforms:group ref=".[$page != $nbPages and $nbPages != 0]">
+                                <xforms:trigger class="yui-pg-last" appearance="minimal">
+                                    <xforms:label>last >></xforms:label>
+                                    <xsl:call-template name="fr-goto-page">
+                                        <xsl:with-param name="fr-new-page">$nbPages</xsl:with-param>
+                                    </xsl:call-template>
+                                </xforms:trigger>
+                            </xforms:group>
+
                         </xforms:group>
                     </xhtml:div>
 
@@ -1087,21 +514,22 @@
             </xsl:variable>
 
             <xxforms:variable name="currentSortOrder" model="datatable-model"
-                select="instance('datatable-instance')/@currentSortOrder"/>
+                select="instance('datatable-instance')/@currentSortOrder" xxbl:scope="inner"/>
             <xxforms:variable name="currentSortColumn" model="datatable-model"
-                select="instance('datatable-instance')/@currentSortColumn"/>
+                select="instance('datatable-instance')/@currentSortColumn" xxbl:scope="inner"/>
 
             <xsl:if test="$debug">
-                <xhtml:div style="border:thin solid black" id="debug">
+                <xhtml:div style="border:thin solid black" class="fr-dt-debug fr-dt-debug-{id}">
                     <xhtml:h3>Local instance:</xhtml:h3>
-                    <xforms:group model="datatable-model" instance="datatable-instance">
-                        <xhtml:div id="debug-columns">
+                    <xforms:group model="datatable-model" instance="datatable-instance"
+                        xxbl:scope="inner">
+                        <xhtml:div class="fr-dt-debug-columns" id="debug-columns">
                             <xhtml:p>
                                 <xforms:output value="name()"/>
                             </xhtml:p>
                             <xhtml:ul>
                                 <xforms:repeat nodeset="@*">
-                                    <xhtml:li id="debug-top-level-attribute">
+                                    <xhtml:li>
                                         <xforms:output ref=".">
                                             <xforms:label>
                                                 <xforms:output value="concat(name(), ': ')"/>
@@ -1119,7 +547,7 @@
                                 <xhtml:ul>
                                     <xforms:repeat nodeset="@*">
                                         <xhtml:li>
-                                            <xforms:output ref="." id="debug-column-attribute">
+                                            <xforms:output ref=".">
                                                 <xforms:label>
                                                   <xforms:output value="concat(name(), ': ')"/>
                                                 </xforms:label>
@@ -1134,9 +562,7 @@
             </xsl:if>
 
             <xsl:if test="$hasLoadingFeature">
-                <xxforms:variable name="loading" xxbl:scope="inner">
-                    <xxforms:sequence xbl:attr="select=loading" xxbl:scope="outer"/>
-                </xxforms:variable>
+                <xxforms:variable name="fr-dt-loading" xbl:attr="select=loading"/>
             </xsl:if>
 
             <xsl:copy-of select="$pagination"/>
@@ -1145,7 +571,7 @@
             <xforms:group>
                 <xsl:attribute name="ref">
                     <xsl:text>xxforms:component-context()</xsl:text>
-                    <xsl:if test="$hasLoadingFeature">[not($loading = true())]</xsl:if>
+                    <xsl:if test="$hasLoadingFeature">[not($fr-dt-loading = true())]</xsl:if>
                 </xsl:attribute>
 
                 <xforms:action ev:event="xforms-enabled">
@@ -1174,7 +600,7 @@
                 <!-- The trick with the spans is working fine for simple case where we don't need to specify the height or width.
                     In other cases, the elements "gain layout" in IE world and the width of the div that contains the 
                     scrollbar takes all the page in IE 6 if not explicitely set...-->
-                <xforms:group ref="xxforms:component-context()[$loading = true()]">
+                <xforms:group ref="xxforms:component-context()[$fr-dt-loading = true()]">
                     <xforms:action ev:event="xforms-enabled">
                         <xxforms:script> ORBEON.widgets.datatable.initLoadingIndicator(this,
                                 <xsl:value-of select="$scrollV"/>, <xsl:value-of select="$scrollH"
@@ -1229,7 +655,7 @@
             <xsl:copy-of select="$pagination"/>
 
 
-        </xhtml:div>
+        </xforms:group>
         <!-- End of template on the bound element -->
     </xsl:template>
 
@@ -1249,13 +675,13 @@
                             <xforms:label>
                                 <xsl:apply-templates select="node()" mode="dynamic"/>
                             </xforms:label>
-                            <xforms:hint>Click to sort <xforms:output
+                            <xforms:hint xxbl:scope="inner">Click to sort <xforms:output
                                     value="$columnDesc/@nextSortOrder"/></xforms:hint>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:setvalue ref="$columnDesc/@currentSortOrder"
-                                    value="$columnDesc/@nextSortOrder"/>
+                                    value="$columnDesc/@nextSortOrder" xxbl:scope="inner"/>
                                 <xforms:setvalue ref="$currentSortColumn" value="$columnDesc/@index"
-                                />
+                                    xxbl:scope="inner"/>
                             </xforms:action>
                         </xforms:trigger>
                     </xsl:when>
@@ -1277,15 +703,19 @@
     </xsl:template>
 
     <xsl:template match="header/xhtml:th" mode="dynamic">
-        <xxforms:variable name="index" select="{count(../../preceding-sibling::*) + 1}"/>
+        <xxforms:variable name="index" select="{count(../../preceding-sibling::*) + 1}"
+            xxbl:scope="inner"/>
         <xxforms:variable name="columnDesc" model="datatable-model"
-            select="instance('datatable-instance')/*[position() = $index]"/>
+            select="instance('datatable-instance')/*[position() = $index]" xxbl:scope="inner"/>
+        <xxforms:variable name="fr-dt-columnDesc">
+            <xxforms:sequence select="$columnDesc" xxbl:scope="inner"/>
+        </xxforms:variable>
         <xhtml:th
             class="
             {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
             {if (@fr:resizeable = 'true') then 'yui-dt-resizeable' else ''} 
-            {{if ($columnDesc/@currentSortOrder = 'ascending') then 'yui-dt-asc'
-            else if ($columnDesc/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
+            {{if ($fr-dt-columnDesc/@currentSortOrder = 'ascending') then 'yui-dt-asc'
+            else if ($fr-dt-columnDesc/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
             
              {@class}
             ">
@@ -1296,25 +726,31 @@
     </xsl:template>
 
     <xsl:template match="header/xforms:repeat/xhtml:th" mode="dynamic">
-        <xxforms:variable name="position" select="position()"/>
-        <xxforms:variable name="index" select="{count(../../../preceding-sibling::*) + 1}"/>
-        <xxforms:variable name="columnSet" model="datatable-model"
-            select="instance('datatable-instance')/*[position() = $index]"/>
-        <xxforms:variable name="columnIndex" model="datatable-model"
-            select="$columnSet/@index + $position - 1"/>
-        <xxforms:variable name="column" model="datatable-model"
-            select="$columnSet/column[@index = $columnIndex]"/>
+        <xxforms:variable name="position" xxbl:scope="inner">
+            <xxforms:sequence select="position()" xxbl:scope="outer"/>
+        </xxforms:variable>
+        <xxforms:variable name="index" select="{count(../../../preceding-sibling::*) + 1}"
+            xxbl:scope="inner"/>
+        <xxforms:variable name="columnSet"
+            select="instance('datatable-instance')/*[position() = $index]" xxbl:scope="inner"/>
+        <xxforms:variable name="columnIndex" select="$columnSet/@index + $position - 1"
+            xxbl:scope="inner"/>
+        <xxforms:variable name="column" select="$columnSet/column[@index = $columnIndex]"
+            xxbl:scope="inner"/>
+        <xxforms:variable name="fr-dt-column">
+            <xxforms:sequence select="$column" xxbl:scope="inner"/>
+        </xxforms:variable>
         <xhtml:th
             class="
             {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
             {if (@fr:resizeable = 'true') then 'yui-dt-resizeable' else ''} 
-            {{if ($column/@currentSortOrder = 'ascending') then 'yui-dt-asc'
-            else if ($column/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
+            {{if ($fr-dt-column/@currentSortOrder = 'ascending') then 'yui-dt-asc'
+            else if ($fr-dt-column/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
             {@class}
             ">
             <xsl:apply-templates select="@*[name() != 'class']" mode="dynamic"/>
             <xforms:group ref=".">
-                <xforms:action ev:event="xforms-enabled">
+                <xforms:action ev:event="xforms-enabled" xxbl:scope="inner">
                     <!--<xforms:delete nodeset="$columnSet/column[@position = $position]"/>-->
                     <xforms:insert context="$columnSet" nodeset="column"
                         origin="xxforms:element('column', (
@@ -1336,7 +772,8 @@
                 </xforms:action>
             </xforms:group>
 
-            <xxforms:variable name="columnDesc" select="$columnSet/column[@position = $position]"/>
+            <xxforms:variable name="columnDesc" select="$columnSet/column[@position = $position]"
+                xxbl:scope="inner"/>
 
             <xsl:call-template name="header-cell"/>
 
@@ -1351,17 +788,28 @@
 
     <xsl:template match="/*/xhtml:tbody/xforms:repeat" mode="dynamic">
 
-        <xxforms:variable name="currentSortColumnIndex"
-            select="instance('datatable-instance')/@currentSortColumn" xxbl:scope="inner"/>
+        <xxforms:variable name="nodeset" xxbl:scope="outer" select="{$repeatNodeset}"/>
 
-        <xxforms:variable name="currentSortColumn" xxbl:scope="outer">
-            <xxforms:sequence
-                select="(instance('datatable-instance')//column)[@index=$currentSortColumnIndex]"
-                xxbl:scope="inner"/>
-        </xxforms:variable>
+        <xsl:choose>
 
-        <xxforms:variable name="currentSortColumnType" xxbl:scope="outer"
-            select="
+            <xsl:when test="$sortAndPaginationMode = 'external'">
+                <xxforms:variable name="rewrittenNodeset" xxbl:scope="inner">
+                    <xxforms:sequence xxbl:scope="outer" select="$nodeset"/>
+                </xxforms:variable>
+            </xsl:when>
+
+            <xsl:otherwise>
+                <xxforms:variable name="currentSortColumnIndex"
+                    select="instance('datatable-instance')/@currentSortColumn" xxbl:scope="inner"/>
+
+                <xxforms:variable name="currentSortColumn" xxbl:scope="outer">
+                    <xxforms:sequence
+                        select="(instance('datatable-instance')//column)[@index=$currentSortColumnIndex]"
+                        xxbl:scope="inner"/>
+                </xxforms:variable>
+
+                <xxforms:variable name="currentSortColumnType" xxbl:scope="outer"
+                    select="
             
             if ($currentSortColumn)
                 then if ($currentSortColumn/@type != '')
@@ -1379,37 +827,44 @@
             "/>
 
 
-     <xsl:if test="$paginated and not($sortAndPaginationMode = 'external')">
-            <xxforms:variable name="page" xxbl:scope="outer">
-                <xxforms:sequence select="$page" xxbl:scope="inner"/>
-            </xxforms:variable>
-        </xsl:if>
-        <xxforms:variable name="nodeset" xxbl:scope="outer" select="{$repeatNodeset}"/>
-        <xxforms:variable name="rewrittenNodeset" xxbl:scope="inner">
-            <xxforms:sequence xxbl:scope="outer"
-                select="
+                <xsl:if test="$paginated">
+                    <xxforms:variable name="page" xxbl:scope="outer">
+                        <xxforms:sequence select="$page" xxbl:scope="inner"/>
+                    </xxforms:variable>
+                </xsl:if>
+                <xxforms:variable name="rewrittenNodeset" xxbl:scope="inner">
+                    <xxforms:sequence xxbl:scope="outer"
+                        select="
                 
-                {if ($paginated and not($sortAndPaginationMode = 'external')) then '(' else ''}
+                {if ($paginated) then '(' else ''}
                 
                 if (not($currentSortColumn) or $currentSortColumn/@currentSortOrder = 'none') 
                     then $nodeset
                     else exf:sort($nodeset,  $currentSortColumn/@sortKey , $currentSortColumnType, $currentSortColumn/@currentSortOrder)
                 
-                {if ($paginated and not($sortAndPaginationMode = 'external')) then concat(
-                    ')[position() >= ($page - 1) * '
-                    , $rowsPerPage 
-                    , ' + 1 and position() &lt;= $page *'
-                    , $rowsPerPage
-                    ,']') else ''}
+                {if ($paginated) 
+                    then concat(
+                        ')[position() >= ($page - 1) * '
+                        , $rowsPerPage 
+                        , ' + 1 and position() &lt;= $page *'
+                        , $rowsPerPage
+                        ,']') 
+                    else ''}
                 
                 "
-            />
-        </xxforms:variable>
+                    />
+                </xxforms:variable>
+            </xsl:otherwise>
+        </xsl:choose>
+
+
         <xxforms:script ev:event="xxforms-nodeset-changed" ev:target="fr-datatable-repeat">
             ORBEON.widgets.datatable.update(this); </xxforms:script>
+
         <xforms:repeat id="fr-datatable-repeat" nodeset="$rewrittenNodeset" xxbl:scope="inner">
             <xsl:apply-templates select="@*[not(name()='nodeset')]|node()" mode="dynamic"/>
         </xforms:repeat>
+
     </xsl:template>
 
     <xsl:template match="/*/xhtml:tbody/xforms:repeat/xhtml:tr" mode="dynamic">
@@ -1420,7 +875,7 @@
             {{if (position() mod 2 = 0) then 'yui-dt-odd' else 'yui-dt-even' }}
             {{if (xxforms:index() = position()) then 'yui-dt-selected' else ''}}
             {@class}"
-            style="height: auto;">
+            style="height: auto;" xxbl:scope="outer">
             <xsl:apply-templates select="@*[name() != 'class']|node()" mode="dynamic"/>
         </xhtml:tr>
     </xsl:template>

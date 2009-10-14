@@ -465,17 +465,17 @@
                     </xsl:variable>
                     <xsl:choose>
                         <xsl:when test="$scrollable">
-                            <div class="yui-dt yui-dt-scrollable"
+                            <xhtml:div class="yui-dt yui-dt-scrollable"
                                 style="{if ($scrollV) then $height else 'height: 95px;'} {$width}">
-                                <div
+                                <xhtml:div
                                     style="overflow: auto; {if ($scrollV) then $height else 'height: 95px;'} {$width}"
                                     class="yui-dt-hd">
-                                    <table style=""
+                                    <xhtml:table style=""
                                         class="datatable datatable-table-scrollV yui-dt-table fr-scrollV">
                                         <xsl:copy-of select="$tableContent"/>
-                                    </table>
-                                </div>
-                            </div>
+                                    </xhtml:table>
+                                </xhtml:div>
+                            </xhtml:div>
                         </xsl:when>
                         <xsl:otherwise>
                             <xhtml:span class="yui-dt yui-dt-scrollable" style="display: table; ">
@@ -1199,17 +1199,17 @@
                     </xsl:variable>
                     <xsl:choose>
                         <xsl:when test="$scrollable">
-                            <div class="yui-dt yui-dt-scrollable"
+                            <xhtml:div class="yui-dt yui-dt-scrollable"
                                 style="{if ($scrollV) then $height else 'height: 95px;'} {$width}">
-                                <div
+                                <xhtml:div
                                     style="overflow: auto; {if ($scrollV) then $height else 'height: 95px;'} {$width}"
                                     class="yui-dt-hd">
-                                    <table style=""
+                                    <xhtml:table style=""
                                         class="datatable datatable-table-scrollV yui-dt-table fr-scrollV">
                                         <xsl:copy-of select="$tableContent"/>
-                                    </table>
-                                </div>
-                            </div>
+                                    </xhtml:table>
+                                </xhtml:div>
+                            </xhtml:div>
                         </xsl:when>
                         <xsl:otherwise>
                             <xhtml:span class="yui-dt yui-dt-scrollable" style="display: table; ">

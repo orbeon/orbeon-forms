@@ -32,21 +32,31 @@
             <xbl:style src="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css"/>
             <xbl:style src="/xbl/orbeon/autocomplete/autocomplete.css"/>
         </xbl:resources>
+        <xbl:implementation>
+            <!-- Local model -->
+            <xforms:model id="autocomplete-model">
+                <xforms:instance id="autocomplete-instance">
+                    <autocomplete>
+                        <textfield-value/>
+                    </autocomplete>
+                </xforms:instance>
+            </xforms:model>
+        </xbl:implementation>
         <xbl:template>
             <!-- Outer group -->
             <xforms:group xxbl:scope="outer" class="fr-autocomplete-container" xbl:attr="model context ref bind">
-                <xbl:content includes="fr|autocomplete > xforms|label"/>
+                <xbl:content includes="fr|autocomplete > xforms|label, fr|autocomplete > xforms|help, fr|autocomplete > xforms|hint, fr|autocomplete > xforms|alert"/>
 
                 <!-- Inner group -->
                 <xforms:group id="component-inner-group" xxbl:scope="inner">
 
                     <!-- Variable pointing to external single-node binding -->
-                    <xxforms:variable name="result" as="node()?">
+                    <xxforms:variable name="external-value" as="node()?">
                         <xxforms:sequence select="." xxbl:scope="outer"/>
                     </xxforms:variable>
 
                     <!-- Init event -->
-                    <xforms:action ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="component-inner-group">
+                    <xforms:action id="xf-en" ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="component-inner-group">
                         <xxforms:script>ORBEON.widget.AutoComplete.containerXFormsEnabled.call(this);</xxforms:script>
                     </xforms:action>
 
@@ -57,27 +67,38 @@
                     <xforms:output class="fr-max-results-displayed" xxbl:attr="fr:max-results-displayed/@*" style="display: none"
                             value="if ($max-results-displayed != '') then $max-results-displayed else xxforms:property('oxf.xforms.xbl.fr.autocomplete.max-results-displayed')"/>
 
-                    <!-- Controls -->
                     <!-- Dropdown with value shown by autocomplete -->
-                    <xforms:select1 id="select1" ref="$result" class="fr-autocomplete-select1" style="display: none" appearance="minimal" xxforms:encrypt-item-values="false">
+                    <xforms:select1 id="select1" ref="$external-value" class="fr-autocomplete-select1" style="display: none" appearance="minimal" xxforms:encrypt-item-values="false">
                         <xbl:content includes="xforms|itemset, xforms|item"/>
                     </xforms:select1>
-                    <!-- Bridge so the JS code can notify the XForms code when a value has been selected -->
+                    <!-- Input with external value -->
+                    <xforms:input id="external-value" ref="." class="fr-autocomplete-external-value" style="display: none"/>
+                    <!-- Bridge so the JS code can notify the XForms code the user typed in the field -->
                     <xforms:trigger id="value-selected" class="fr-autocomplete-value-selected" style="display: none">
                         <xforms:label/>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="fr-autocomplete" name="DOMActivate"/>
                     </xforms:trigger>
                     <!-- Markup with input for the YUI autocomplete -->
                     <xhtml:div xbl:attr="class style">
-                        <xforms:input ref="$result" xbl:attr="incremental" id="input" class="fr-autocomplete-input"/>
+                        <xforms:input model="autocomplete-model" ref="textfield-value" incremental="true" id="search" class="fr-autocomplete-search">
+                            <xforms:action ev:event="xforms-value-changed">
+                                <!-- If the search value is empty, set the external value to empty as well -->
+                                <xforms:action if=". = ''">
+                                    <xforms:setvalue ref="$external-value"/>
+                                </xforms:action>
+                                <!-- As the user types, dispatch event to notify the external world about the value entered by the user so far -->
+                                <xforms:action if="$dynamic-itemset = 'true'">
+                                    <xforms:dispatch targetid="fr-autocomplete" name="fr-search-changed">
+                                        <xxforms:context name="fr-search-value" select="."/>
+                                    </xforms:dispatch>
+                                </xforms:action>
+                            </xforms:action>
+                        </xforms:input>
                         <xhtml:div class="fr-autocomplete-yui-div"/>
                     </xhtml:div>
 
                     <!-- Stop propagation of all UI events -->
                     <xforms:action ev:event="#all" ev:propagate="stop"/>
                 </xforms:group>
-
-                <xbl:content includes="fr|autocomplete > xforms|help, fr|autocomplete > xforms|hint, fr|autocomplete > xforms|alert"/>
             </xforms:group>
         </xbl:template>
     </xbl:binding>

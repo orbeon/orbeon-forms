@@ -86,6 +86,25 @@ http://forge.objectweb.org/tracker/index.php?func=browse&group_id=168&atid=35020
         <section>
             <title>Compatibility Notes</title>
             <section>
+                <title>HTML elements used to represent help, hint, and alert XForms elements</title>
+                <p>
+                    [TODO: describe change from label to span for HHA elements; reason: screen readers and @for; mention
+                    XForms properties allowing to change this
+                    http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314375&amp;group_id=168&amp;atid=350207]
+                </p>
+                <xml-source>
+                    <property as="xs:string"  name="oxf.xforms.label-element" value="label"/>
+                    <property as="xs:string"  name="oxf.xforms.hint-element"  value="span"/>
+                    <property as="xs:string"  name="oxf.xforms.help-element"  value="span"/>
+                    <property as="xs:string"  name="oxf.xforms.alert-element" value="span"/>
+                </xml-source>
+                <xml-source>
+                    <xforms:model xxforms:hint-element="label">
+                        ...
+                    </xforms:model>
+                </xml-source>
+            </section>
+            <section>
                 <title>XSLT output location information</title>
                 <p>
                     [TODO: describe location-mode, and issue that can be caused by XInclude after XSLT in "none" mode]

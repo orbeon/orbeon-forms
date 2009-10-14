@@ -42,11 +42,10 @@
 
                         <!-- Init event -->
                         <!-- TODO: use ev:target so that xforms-enabled is called only once -->
-                        <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Currency.init(this);</xxforms:script>
+                        <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.Currency.init(this);</xxforms:script>
 
                         <!-- Inner group -->
                         <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
-
 
                             <!-- Variable pointing to external single-node binding -->
                             <xxforms:variable name="result" as="node()?">

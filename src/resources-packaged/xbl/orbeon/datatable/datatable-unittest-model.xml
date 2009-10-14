@@ -76,6 +76,7 @@
             <loading>true</loading>
             <page>1</page>
             <rowsPerPage>5</rowsPerPage>
+            <sortOrder>none</sortOrder>
         </controls>
     </xforms:instance>
 

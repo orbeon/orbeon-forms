@@ -131,7 +131,7 @@
         <tstamp>
             <format property="time" pattern="yyyyMMddHHmm" timezone="GMT"/>
         </tstamp>
-        <property name="release.number" value="${version.number}.${time}"/>
+        <property name="release.number" value="${version.number}.${time}${artifact.suffix}"/>
 
         <!-- User-friendly message -->
         <echo message="Building Orbeon Forms ${release.number}"/>

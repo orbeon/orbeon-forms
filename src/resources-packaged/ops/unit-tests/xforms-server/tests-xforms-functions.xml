@@ -55,8 +55,6 @@
                                         </other-instance>
                                     </xforms:instance>
                                     <xforms:bind nodeset="instance('instance2')/first" calculate="314"/>
-    <!--                                <xforms:bind nodeset="/*/first" calculate="1592"/>-->
-    <!--                                <xforms:bind nodeset="/*/first" type="xs:integer"/>-->
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body>
@@ -754,6 +752,80 @@
                 </xxf:control-values>
             </xxf:action>
         </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="instance() function with blank parameter or without parameter" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                        <xforms:instance id="instance1">
+                            <value>42</value>
+                        </xforms:instance>
+                        <xforms:instance id="instance2">
+                            <value>43</value>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xforms:model id="model2">
+                        <xforms:instance id="instance3">
+                            <value>44</value>
+                        </xforms:instance>
+                        <xforms:instance id="instance4">
+                            <value>45</value>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <!-- Explicit parameter -->
+                    <xforms:output id="output1" value="instance('instance1')"/>
+                    <xforms:output id="output2" value="instance('instance2')"/>
+                    <xforms:output id="output3" model="model2" value="instance('instance3')"/>
+                    <xforms:output id="output4" model="model2" value="instance('instance4')"/>
+                    <!-- Blank parameter  -->
+                    <xforms:output id="output5" value="instance()"/>
+                    <xforms:output id="output6" model="model2" value="instance()"/>
+                    <!-- No parameter  -->
+                    <xforms:output id="output7" value="instance()"/>
+                    <xforms:output id="output8" model="model2" value="instance()"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance1" model-id="model1">
+                                <value>42</value>
+                            </instance>
+                            <instance id="instance2" model-id="model1">
+                                <value>43</value>
+                            </instance>
+                            <instance id="instance3" model-id="model2">
+                                <value>44</value>
+                            </instance>
+                            <instance id="instance4" model-id="model2">
+                                <value>45</value>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1">42</xxf:control>
+                        <xxf:control id="output2">43</xxf:control>
+                        <xxf:control id="output3">44</xxf:control>
+                        <xxf:control id="output4">45</xxf:control>
+                        <xxf:control id="output5">42</xxf:control>
+                        <xxf:control id="output6">44</xxf:control>
+                        <xxf:control id="output7">42</xxf:control>
+                        <xxf:control id="output8">44</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
         </output>
     </test>
 

@@ -19,7 +19,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         testEmptyInitial: function() {
             YAHOO.util.Assert.areEqual("", emptyInput.value);
         },
-        
+
         // If we just enter and leave the field, the value must stay empty
         testEmptyNoChange: function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
@@ -30,11 +30,11 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 YAHOO.util.Assert.areEqual("", emptyInput.value);
             });
         },
-        
+
         testBeforeFocus: function() {
             YAHOO.util.Assert.areEqual("$ 1,234.00", valueInput.value);
         },
-        
+
         testAfterFocus: function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 valueInput.focus();
@@ -42,7 +42,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             }, function() {
             });
         },
-        
+
         testChangeSimple: function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 valueInput.value = 42;
@@ -52,7 +52,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 YAHOO.util.Assert.areEqual("$ 84.00", doubleInput.value);
             });
         },
-        
+
         testChangeWhileFocus: function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 valueInput.focus();
@@ -64,15 +64,15 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 YAHOO.util.Assert.areEqual("86.00", doubleInput.value);
             });
         },
-        
+
         testStaticCurrency: function() {
             YAHOO.util.Assert.areEqual("£ 4,567.00", prefixStaticInput.value);
         },
-        
+
         testDynamicCurrency: function() {
             YAHOO.util.Assert.areEqual("£ 4,567.00", prefixDynamicInput.value);
         },
-        
+
         testChangeCurrency: function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 YAHOO.util.UserAction.click(YAHOO.util.Dom.get("change-prefix"));
@@ -140,6 +140,40 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 }, function() {
                     var repeatInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "in-repeat" + XFORMS_SEPARATOR_1 + "1")[0];
                     YAHOO.util.Assert.areEqual("$ 42.00", repeatInput.value);
+                });
+            });
+        },
+        testClasses: function() {
+            var requiredControl = YAHOO.util.Dom.get("required");
+            var requiredGroup = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, requiredControl)[0];
+            var requiredInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, requiredGroup)[0];
+            var emptyControl = YAHOO.util.Dom.get("empty");
+            var emptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, emptyControl)[0];
+
+            function checkClasses(invalid, required, invalidVisited, requiredFilled, situation) {
+                YAHOO.util.Assert.areEqual(invalid, YAHOO.util.Dom.hasClass(requiredGroup, "xforms-invalid"), situation + " for xforms-invalid");
+                YAHOO.util.Assert.areEqual(required, YAHOO.util.Dom.hasClass(requiredGroup, "xforms-required"), situation + " for xforms-required");
+                YAHOO.util.Assert.areEqual(invalidVisited, YAHOO.util.Dom.hasClass(requiredGroup, "xforms-invalid-visited"), situation + " for xforms-invalid-visited");
+                YAHOO.util.Assert.areEqual(requiredFilled, YAHOO.util.Dom.hasClass(requiredGroup, "xforms-required-filled"), situation + " for xforms-required-filled");
+            }
+
+            // Check classes with no change
+            checkClasses(true, true, false, false, "initially");
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                requiredInput.focus();
+                requiredInput.blur();
+                emptyInput.focus();
+            }, function() {
+                //  Check we now have the class xforms-invalid-visited
+                checkClasses(true, true, true, false, "after visited");
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    requiredInput.focus();
+                    requiredInput.value = "42";
+                    requiredInput.blur();
+                    emptyInput.focus();
+                }, function() {
+                    // Check it is now marked valid and filled
+                    checkClasses(false, true, false, true, "after filled");
                 });
             });
         }

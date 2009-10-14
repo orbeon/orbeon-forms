@@ -14,6 +14,7 @@ YAHOO.xbl.fr.Currency = {
 
             // Get information from the DOM
             var xformsInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-xforms-input", null, container)[0];
+            var groupElement = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, container)[0];
             var visibleInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, container)[0];
             var symbolElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-prefix", null, container)[0];
             var prefix = ORBEON.xforms.Document.getValue(symbolElement.id);
@@ -22,7 +23,7 @@ YAHOO.xbl.fr.Currency = {
             var hasFocus = false;
 
             // Create instance
-            var instance = {
+            instance = {
                 container: container,
                 focus: function() {
                     hasFocus = true;
@@ -35,8 +36,14 @@ YAHOO.xbl.fr.Currency = {
                     if (cleanString.indexOf(prefix) == 0)
                         cleanString = cleanString.substring(prefix.length);
                     var cleanNumber = new Number(cleanString).toString();
-                    ORBEON.xforms.Document.setValue(xformsInputElement.id, visibleInputElement.value == "" || cleanNumber == "NaN" ? visibleInputElement.value : cleanNumber);
+                    var newValue = visibleInputElement.value == "" || cleanNumber == "NaN" ? visibleInputElement.value : cleanNumber;
+                    ORBEON.xforms.Document.setValue(xformsInputElement.id, newValue);
                     visibleInputElement.value = instance.numberToCurrency(visibleInputElement.value);
+                    // Update xforms-required-empty/xforms-required-filled and xforms-visited
+                    ORBEON.xforms.Controls.updateRequiredEmpty(groupElement, newValue);
+                    if (! ORBEON.util.Dom.hasClass(groupElement, "xforms-visited"))
+                        ORBEON.xforms.Events.runOnNext(ORBEON.xforms.Events.ajaxResponseProcessedEvent,
+                            function() { ORBEON.xforms.Controls.updateInvalidVisited(groupElement); });
                 },
                 currencyToNumber: function(currency) {
                     if (currency.indexOf(prefix) == 0) {

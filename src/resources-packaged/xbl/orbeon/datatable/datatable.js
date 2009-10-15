@@ -723,7 +723,7 @@ ORBEON.widgets.datatable.initLoadingIndicator = function(target, scrollV, scroll
 
 ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
     // Initializes a datatable (called by xforms-enabled events)
-    var container = target.parentNode.parentNode;
+    var container = YAHOO.util.Dom.getAncestorByTagName(target, 'div');
     var id = container.id;
     if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled')) {
         if (ORBEON.widgets.datatable.datatables[id] == undefined) {
@@ -745,7 +745,7 @@ ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
 
 ORBEON.widgets.datatable.update = function (target) {
     // Updates a datatable when the xforms:repeat nodeset has been changed
-    var container = target.parentNode.parentNode;
+    var container = YAHOO.util.Dom.getAncestorByTagName(target, 'div');
     var id = container.id;
     YAHOO.log("Updating datatable " + id, "info");
     if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled')) {

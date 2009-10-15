@@ -433,7 +433,9 @@ ORBEON.widgets.datatable.unittests_lib = {
     },
 
     getLoadingIndicator: function(table) {
-        var tableGroup = YAHOO.util.Dom.getAncestorByTagName(table, 'span');
+        var container = YAHOO.util.Dom.getAncestorByClassName(table, 'xbl-fr-datatable');
+        var mainGroup = ORBEON.widgets.datatable.utils.getFirstChildByTagName(container, 'span');
+        var tableGroup = ORBEON.widgets.datatable.utils.getFirstChildByTagName(mainGroup, 'span');
         return YAHOO.util.Dom.getNextSibling(tableGroup);
     },
 

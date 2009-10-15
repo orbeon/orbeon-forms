@@ -35,6 +35,14 @@
 .fr-summary-table, .fr-summary-table td, .fr-summary-table th { border: 1px solid #6E6E6E }
 .fr-summary-table th { background-color: #f8f8f8 }
 .fr-summary-table td, .fr-summary-table th { padding: 4px }
+.fr-summary-table td a {
+    width: 100%;
+    display: -moz-inline-box;
+    display: inline-block;
+    *zoom: 1;
+    *display: inline;
+    vertical-align: middle;
+}
 
 .fr-summary-table-div {
     overflow-x: auto;

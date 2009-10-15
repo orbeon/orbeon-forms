@@ -714,10 +714,9 @@
                                                 <!--<xforms:input ref="@offline" id="fr-document-offline" class="fr-expose-to-javascript"/>-->
                                                 <!-- Expose to JavaScript name of this form -->
                                                 <!--<xforms:input ref="@name" id="fr-document-name" class="fr-expose-to-javascript"/>-->
-                                                <xforms:trigger appearance="minimal">
-                                                    <!-- Just output the number -->
-                                                    <xforms:label><xforms:output ref=".[not(property('xxforms:noscript'))]" value="$document-number"/></xforms:label>
-                                                </xforms:trigger>
+                                                <xhtml:a href="{$document-href}" target="_blank">
+                                                    <xforms:output value="$document-number"/>
+                                                </xhtml:a>
                                             </td>
                                             <xforms:repeat nodeset="if ($show-created) then @created else ()">
                                                 <td>

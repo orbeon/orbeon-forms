@@ -127,23 +127,10 @@
             var oldList = this.lastSuggestionList;
             var newList = this.getCurrentValues(query);
 
-            var sameSuggestionAsBeforeAjax = function() {
-                var result = newList.length == oldList.length;
-                if (result) {
-                    for (var listIndex = 0; listIndex < newList.length; listIndex++) {
-                        if (newList[listIndex][0] != oldList[listIndex][0] || newList[listIndex][1] != oldList[listIndex][1]) {
-                            result = false;
-                            break;
-                        }
-                    };
-                }
-                return result;
-            }.call(this);
-
             var doUdateSuggestionList =
-                    // If the user just selected something and the response when the Ajax query comes back has the same
-                    // itemset, don't update the suggestion list
-                    ! (this.justMadeSelection && sameSuggestionAsBeforeAjax)
+                    // If the user just selected something before which triggered an Ajax query,
+                    // don't show the suggestion list
+                    ! this.justMadeSelection
                     // Update the list only of the control has the focus, as updating the list will show the suggestion list
                     // and we only want to show the suggestion list if the user happens to be in that field
                     && this.yuiAutoComplete.isFocused();

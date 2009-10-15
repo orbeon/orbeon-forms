@@ -35,9 +35,10 @@
 
 /* Nicely position the help image */
 .xforms-help-image {
-    vertical-align: -0.2em;
+    vertical-align: middle;
     display: inline;
     margin: 0 .5em 0 -1px;/* move icon to the left a bit to align it better */
+    *margin-top: .25em;   /* help IE 6 position icon relatively to the label */
     padding: 0;
     float: left; /* HACK: Without the "float: left" on FF2/3 the mouseover event arrive on the label, not the help
                     image at the left of the label. */
@@ -358,8 +359,8 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 }
 
 .fr-grid-content .xforms-label {
-    margin-top: 1em;        /* Space between control and the one on top of this one */
-    margin-bottom: .8em;    /* Space between label control and control "field" */
+    margin-top: .25em;      /* Space between control and the one on top of this one */
+    margin-bottom: 0;       /* Space between label control and control "field" */
     display: block;         /* So the margin has an effect */
 }
 

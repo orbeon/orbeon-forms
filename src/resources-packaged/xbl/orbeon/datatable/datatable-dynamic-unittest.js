@@ -446,6 +446,47 @@ var testCase = {
         });
     },
 
+    test314379: function() {
+        var thiss = this;
+        thiss.openAccordionCase(thiss, '_314379', function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                ORBEON.xforms.Document.setValue("loading", "false");
+            }, function() {
+                var table = YAHOO.util.Dom.get('my-accordion$table-314379$table-314379-table');
+                var th = thiss.getSignificantElementByIndex(table.tHead.rows[0].cells, 1);
+                var width;
+                width = th.clientWidth;
+                // resize the first column
+                thiss.resizeColumn(th, 100, 10);
+                // check the result
+                YAHOO.util.Assert.areEqual(width + 100, th.clientWidth, "The width of the first column should be " + (width + 100) + ", not " + th.clientWidth);
+                width = th.clientWidth;
+
+                // Hide the table using the loading indicator
+                ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                    ORBEON.xforms.Document.setValue("loading", "true");
+                }, function() {
+
+                    // Test that the loading indicator is visible
+                    var loading = thiss.getLoadingIndicator(table);
+                    thiss.checkVisibility(loading, true);
+
+                    // Display the table again
+                    ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                        ORBEON.xforms.Document.setValue("loading", "false");
+                    }, function() {
+                        // Test that the column of the first column has been preserved
+                        YAHOO.util.Assert.areEqual(width, th.clientWidth, "The width of the first column should be " + width + ", not " + th.clientWidth);
+                        thiss.checkCellClasses(table, true);
+                        thiss.checkCellStyles(table, true);                        
+
+                        thiss.closeAccordionCase(thiss, '_314379');
+                    });
+                });
+            });
+        });
+    },
+
 
     EOS:""
 }

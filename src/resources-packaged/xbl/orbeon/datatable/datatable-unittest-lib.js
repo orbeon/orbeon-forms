@@ -139,8 +139,8 @@ ORBEON.widgets.datatable.unittests_lib = {
     },
 
     resizeColumn: function(th, offset, step) {
-        var resizerliner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(th, 'div', 'yui-dt-resizerliner');
-        var resizer = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-resizer');
+        var resizerliner = YAHOO.util.Dom.getElementsByClassName('yui-dt-resizerliner', 'div', th )[0];
+        var resizer = YAHOO.util.Dom.getElementsByClassName('yui-dt-resizer', 'div', th )[0];
         var region = YAHOO.util.Region.getRegion(resizer);
         YAHOO.util.UserAction.mousedown(resizer, {clientX: region.right, clientY: region.top});
         var x;
@@ -202,7 +202,7 @@ ORBEON.widgets.datatable.unittests_lib = {
 
     getBodyTable: function(table, isSplit) {
         if (isSplit) {
-            var container = table.parentNode.parentNode;
+            var container = YAHOO.util.Dom.getAncestorByClassName(table, 'yui-dt');
             return container.getElementsByTagName('table')[1];
         } else {
             return table;
@@ -336,7 +336,7 @@ ORBEON.widgets.datatable.unittests_lib = {
         for (var i = 0; i < headerCells.length; i++) {
             var cell = headerCells[i];
             if (this.isSignificant(cell)) {
-                var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
+                var liner = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell)[0];
                 colWidths.push(liner.style.width);
                 YAHOO.util.Assert.areNotEqual('', liner.style.width, 'Header cell for column ' + colWidths.length + ' should have a style width property in IE');
                 YAHOO.util.Assert.areNotEqual('auto', liner.style.width, 'Header cell for column ' + colWidths.length + ' should have a style width property in IE');

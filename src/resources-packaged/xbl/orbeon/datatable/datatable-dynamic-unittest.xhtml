@@ -71,6 +71,20 @@
                         <xforms:help>Used by tests that check external sort.</xforms:help>
                     </xforms:input>
                 </xhtml:p>
+                <xforms:input ref="loading" id="loading" appearance="full">
+                    <!--TODO: replace by a select1 when #314362 will be fixed -->
+                    <!--<xforms:item>
+                        <xforms:label>true</xforms:label>
+                        <xforms:value>true</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                        <xforms:label>false</xforms:label>
+                        <xforms:value>false</xforms:value>
+                        </xforms:item>-->
+                    <xforms:label>Loading in progress: </xforms:label>
+                    <xforms:help>Used by tests that check the loading indicator
+                        feature</xforms:help>
+                </xforms:input>
             </xforms:group>
             <xhtml:ol>
                 <xhtml:li>
@@ -369,7 +383,7 @@
                 </xhtml:div>
             </fr:case>-->
 
-           <fr:case selected="true" id="scrollH">
+            <fr:case selected="true" id="scrollH">
                 <fr:label>Testing a mixed datatable that is horizontally scrollable</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
@@ -489,7 +503,7 @@
                 </xhtml:div>
             </fr:case>
 
-           <fr:case selected="true" id="paginateMaxPage">
+            <fr:case selected="true" id="paginateMaxPage">
                 <fr:label>Testing paginated tables with a maximum number of pages to
                     display</fr:label>
                 <xhtml:div>
@@ -565,6 +579,46 @@
                                         <xhtml:td>
                                             <xforms:output value="position()"/>
                                         </xhtml:td>
+                                        <xforms:repeat nodeset="*">
+                                            <xhtml:td>
+                                                <xforms:output value="."/>
+                                            </xhtml:td>
+                                        </xforms:repeat>
+                                        <xhtml:td>
+                                            <xforms:output value="round(length div nb-words)"/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
+
+
+            <fr:case selected="true" id="_314379">
+                <fr:label>Bug #314379</fr:label>
+                <xhtml:div>
+                    <xhtml:p>Bug <xhtml:a
+                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314379&amp;group_id=168&amp;atid=350207"
+                            >#314379</xhtml:a>: Scrollable datatables with dynamic columns get
+                        desynchronized after de hide/show cycle</xhtml:p>
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <fr:datatable id="table-314379" scrollable="both" height="200px"
+                            width="600px" loading="xxforms:instance('controls')/loading = 'true'">
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xforms:repeat nodeset="line[1]/*">
+                                        <xhtml:th fr:resizeable="true">
+                                            <xforms:output value="name()"/>
+                                        </xhtml:th>
+                                    </xforms:repeat>
+                                    <xhtml:th>Characters per word</xhtml:th>
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="line[length > 60]">
+                                    <xhtml:tr>
                                         <xforms:repeat nodeset="*">
                                             <xhtml:td>
                                                 <xforms:output value="."/>

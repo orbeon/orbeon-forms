@@ -56,7 +56,6 @@ public class XFormsProperties {
 //    private static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "optimize-local-instance-loads";
     private static final String OPTIMIZE_RELEVANCE_PROPERTY = "optimize-relevance";
     private static final String EXPOSE_XPATH_TYPES_PROPERTY = "expose-xpath-types";
-    private static final String PLAIN_VALUE_CHANGE_PROPERTY = "server.events.plain-value-change";
     private static final String INITIAL_REFRESH_EVENTS_PROPERTY = "server.events.initial-refresh-events";
     private static final String EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY = "exception-invalid-client-control";
     private static final String AJAX_SHOW_LOADING_ICON_PROPERTY = "ajax.show-loading-icon";
@@ -192,7 +191,6 @@ public class XFormsProperties {
             new PropertyDefinition(OPTIMIZE_LOCAL_INSTANCE_INCLUDE_PROPERTY, false, false),
             new PropertyDefinition(OPTIMIZE_RELEVANCE_PROPERTY, false, false),
             new PropertyDefinition(EXPOSE_XPATH_TYPES_PROPERTY, false, false),
-            new PropertyDefinition(PLAIN_VALUE_CHANGE_PROPERTY, false, false),
             new PropertyDefinition(INITIAL_REFRESH_EVENTS_PROPERTY, true, false),
             new PropertyDefinition(EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY, false, false),
             new PropertyDefinition(AJAX_SHOW_LOADING_ICON_PROPERTY, true, false),
@@ -453,10 +451,6 @@ public class XFormsProperties {
 
     public static boolean isOptimizeRelevance(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, OPTIMIZE_RELEVANCE_PROPERTY);
-    }
-
-    public static boolean isPlainValueChange(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, PLAIN_VALUE_CHANGE_PROPERTY);
     }
 
     public static boolean isInitialRefreshEvents(XFormsContainingDocument containingDocument) {

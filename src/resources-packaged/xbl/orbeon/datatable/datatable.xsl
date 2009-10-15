@@ -567,32 +567,34 @@
 
             <xsl:copy-of select="$pagination"/>
 
+            <xxforms:variable name="group-ref" xxbl:scope="inner">
+                <xxforms:sequence
+                    select=".{if ($hasLoadingFeature) then '[not($fr-dt-loading = true())]' else ''}"
+                    xxbl:scope="outer"/>
+            </xxforms:variable>
 
-            <xforms:group>
-                <xsl:attribute name="ref">
-                    <xsl:text>xxforms:component-context()</xsl:text>
-                    <xsl:if test="$hasLoadingFeature">[not($fr-dt-loading = true())]</xsl:if>
-                </xsl:attribute>
+            <xxforms:script ev:event="xforms-enabled" ev:target="fr-dt-group" xxbl:scope="inner">
+                YAHOO.log("Enabling datatable id <xsl:value-of select="$id"/>","info");
+                ORBEON.widgets.datatable.init(this, <xsl:value-of select="$innerTableWidth"/>); </xxforms:script>
 
-                <xforms:action ev:event="xforms-enabled">
-                    <xxforms:script> YAHOO.log("Enabling datatable id <xsl:value-of select="$id"
-                        />","info"); ORBEON.widgets.datatable.init(this, <xsl:value-of
-                            select="$innerTableWidth"/>); </xxforms:script>
-                </xforms:action>
+            <xforms:group ref="$group-ref" id="fr-dt-group" xxbl:scope="inner">
 
-                <xhtml:table id="{$id}-table"
-                    class="datatable datatable-{$id} yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
-                    style="{$height} {$width}">
-                    <!-- Copy attributes that are not parameters! -->
-                    <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id' ))]"
-                        mode="dynamic"/>
-                    <xhtml:thead id="{$id}-thead">
-                        <xhtml:tr class="yui-dt-first yui-dt-last {@class}" id="{$id}-thead-tr">
-                            <xsl:apply-templates select="$columns/*" mode="dynamic"/>
-                        </xhtml:tr>
-                    </xhtml:thead>
-                    <xsl:apply-templates select="xhtml:tbody" mode="dynamic"/>
-                </xhtml:table>
+                <!--  <xforms:group appearance="xxforms:internal" xxbl:scope="outer"> would be better but doesn't work! -->
+                <xforms:group xxbl:scope="outer">
+                    <xhtml:table id="{$id}-table"
+                        class="datatable datatable-{$id} yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
+                        style="{$height} {$width}">
+                        <!-- Copy attributes that are not parameters! -->
+                        <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id' ))]"
+                            mode="dynamic"/>
+                        <xhtml:thead id="{$id}-thead">
+                            <xhtml:tr class="yui-dt-first yui-dt-last {@class}" id="{$id}-thead-tr">
+                                <xsl:apply-templates select="$columns/*" mode="dynamic"/>
+                            </xhtml:tr>
+                        </xhtml:thead>
+                        <xsl:apply-templates select="xhtml:tbody" mode="dynamic"/>
+                    </xhtml:table>
+                </xforms:group>
 
             </xforms:group>
 
@@ -858,8 +860,8 @@
         </xsl:choose>
 
 
-        <xxforms:script ev:event="xxforms-nodeset-changed" ev:target="fr-datatable-repeat">
-            ORBEON.widgets.datatable.update(this); </xxforms:script>
+        <xxforms:script ev:event="xxforms-nodeset-changed" ev:target="fr-datatable-repeat"
+            xxbl:scope="inner"> ORBEON.widgets.datatable.update(this); </xxforms:script>
 
         <xforms:repeat id="fr-datatable-repeat" nodeset="$rewrittenNodeset" xxbl:scope="inner">
             <xsl:apply-templates select="@*[not(name()='nodeset')]|node()" mode="dynamic"/>

@@ -337,6 +337,43 @@
                 </xhtml:div>
             </fr:case>
 
+            <fr:case selected="true" id="sorted">
+                <fr:label>Testing sortable columns on a mixed datatable with a sorted
+                    column</fr:label>
+                <xhtml:div>
+                    <xhtml:p/>
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <fr:datatable id="sorted-table" debug="true">
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xforms:repeat nodeset="line[1]/*[not(self::position)]">
+                                        <xhtml:th fr:sortable="true">
+                                            <xforms:output value="name()"/>
+                                        </xhtml:th>
+                                    </xforms:repeat>
+                                    <xhtml:th fr:sortable="true" fr:sorted="ascending"
+                                        >position</xhtml:th>
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="line[length &lt; 20]">
+                                    <xhtml:tr>
+                                        <xforms:repeat nodeset="*[not(self::position)]">
+                                            <xhtml:td>
+                                                <xforms:output value="."/>
+                                            </xhtml:td>
+                                        </xforms:repeat>
+                                        <xhtml:td>
+                                            <xforms:output value="position"/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
+
             <!--<fr:case selected="true" id="sortableExternal">
                 <fr:label>Testing sortable columns on a mixed datatable processed by the
                     application</fr:label>

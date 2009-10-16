@@ -60,7 +60,7 @@
             <xsl:if test="position() >1">,</xsl:if>
             <xsl:text>resolve-QName('</xsl:text>
             <xsl:value-of select="."/>
-            <xsl:text>',.)</xsl:text>
+            <xsl:text>', $fr-dt-datatable-instance)</xsl:text>
         </xsl:for-each>
     </xsl:variable>
 
@@ -300,7 +300,7 @@
 
             <xforms:model id="datatable-model" xxbl:scope="inner">
                 <xforms:instance id="datatable-instance">
-                    <columns xmlns="" currentSortColumn="-1">
+                    <columns xmlns="" currentSortColumn="-1" default="true">
                         <xsl:for-each select="$columns/*">
                             <xsl:copy>
                                 <xsl:attribute name="nbColumns"/>
@@ -318,9 +318,9 @@
                 <xforms:bind nodeset="columnSet/@nbColumns" calculate="count(../column)"/>
                 <xforms:bind nodeset="//@index" calculate="count(../preceding::column) + 1"/>
                 <xforms:bind nodeset="//column/@currentSortOrder"
-                    calculate="if (../@index = /*/@currentSortColumn) then . else 'none'"/>
+                    calculate="if (/*/@default='true' and ../@fr:sorted) then ../@fr:sorted else if (../@index = /*/@currentSortColumn) then . else 'none'"/>
                 <xforms:bind nodeset="//column/@nextSortOrder"
-                    calculate="if (../@index = /*/@currentSortColumn) then if (../@currentSortOrder = 'ascending') then 'descending' else 'ascending' else 'ascending'"/>
+                    calculate="if (../@currentSortOrder = 'ascending') then 'descending' else 'ascending'"/>
                 <xxforms:variable name="repeatNodeset">
                     <xsl:value-of select="$repeatNodeset"/>
                 </xxforms:variable>
@@ -680,6 +680,8 @@
                             <xforms:hint xxbl:scope="inner">Click to sort <xforms:output
                                     value="$columnDesc/@nextSortOrder"/></xforms:hint>
                             <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="$columnDesc/ancestor::columns/@default"
+                                    xxbl:scope="inner">false</xforms:setvalue>
                                 <xforms:setvalue ref="$columnDesc/@currentSortOrder"
                                     value="$columnDesc/@nextSortOrder" xxbl:scope="inner"/>
                                 <xforms:setvalue ref="$currentSortColumn" value="$columnDesc/@index"
@@ -801,6 +803,9 @@
             </xsl:when>
 
             <xsl:otherwise>
+                <xxforms:variable name="fr-dt-datatable-instance" xxbl:scope="outer">
+                    <xxforms:sequence select="instance('datatable-instance')" xxbl:scope="inner"/>
+                </xxforms:variable>
                 <xxforms:variable name="currentSortColumnIndex"
                     select="instance('datatable-instance')/@currentSortColumn" xxbl:scope="inner"/>
 
@@ -809,6 +814,15 @@
                         select="(instance('datatable-instance')//column)[@index=$currentSortColumnIndex]"
                         xxbl:scope="inner"/>
                 </xxforms:variable>
+
+                <xxforms:variable name="fr-dt-isDefault" xxbl:scope="outer">
+                    <xxforms:sequence select="instance('datatable-instance')/@default = 'true'"
+                        xxbl:scope="inner"/>
+                </xxforms:variable>
+
+                <xxforms:variable name="fr-dt-isSorted"
+                    select="$fr-dt-isDefault or $currentSortColumn[@currentSortOrder = @fr:sorted]"
+                    xxbl:scope="outer"/>
 
                 <xxforms:variable name="currentSortColumnType" xxbl:scope="outer"
                     select="
@@ -840,7 +854,7 @@
                 
                 {if ($paginated) then '(' else ''}
                 
-                if (not($currentSortColumn) or $currentSortColumn/@currentSortOrder = 'none') 
+                if (not($currentSortColumn) or $currentSortColumn/@currentSortOrder = 'none' or $fr-dt-isSorted) 
                     then $nodeset
                     else exf:sort($nodeset,  $currentSortColumn/@sortKey , $currentSortColumnType, $currentSortColumn/@currentSortOrder)
                 

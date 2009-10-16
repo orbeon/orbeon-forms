@@ -303,6 +303,57 @@ var testCase = {
 
     },
 
+    testSorted: function() {
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'sorted', function() {
+            // Check the table structure
+            var table = YAHOO.util.Dom.get('my-accordion$sorted-table$sorted-table-table');
+            thiss.checkTableStructure(table, 4);
+            thiss.checkTableAndContainerWidths(table);
+            thiss.checkRowWidth(table.tHead.rows[0]);
+
+            // Check significant values in the datatable local instance before any sort action
+            var columnsDiv = YAHOO.util.Dom.get('my-accordion$sorted-table$debug-columns');
+            thiss.checkColTypeValue(columnsDiv, 'columns');
+            thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', -1); // not sugnificant at that point
+            thiss.checkColDebugValue(columnsDiv, 'default', 'true');
+            thiss.checkActualSortOrder(table, 4, 'ascending', 'number')
+
+            var col1Div = YAHOO.util.Dom.get('my-accordion$sorted-table$debug-column·2');
+            thiss.checkColTypeValue(col1Div, 'column');
+            thiss.checkColDebugValue(col1Div, 'currentSortOrder', 'none');
+            thiss.checkColDebugValue(col1Div, 'nextSortOrder', 'ascending');
+
+            var col2Div = YAHOO.util.Dom.get('my-accordion$sorted-table$debug-column·3');
+            thiss.checkColTypeValue(col2Div, 'column');
+            thiss.checkColDebugValue(col2Div, 'currentSortOrder', 'none');
+            thiss.checkColDebugValue(col2Div, 'nextSortOrder', 'ascending');
+
+            var col3Div = YAHOO.util.Dom.get('my-accordion$sorted-table$debug-column·4');
+            thiss.checkColTypeValue(col3Div, 'column');
+            thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'none');
+            thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'ascending');
+
+            var col4Div = YAHOO.util.Dom.get('my-accordion$sorted-table$debug-column·5');
+            thiss.checkColTypeValue(col4Div, 'column');
+            thiss.checkColDebugValue(col4Div, 'currentSortOrder', 'ascending');
+            thiss.checkColDebugValue(col4Div, 'fr:sorted', 'ascending');
+            thiss.checkColDebugValue(col4Div, 'nextSortOrder', 'descending');
+
+            // Click to sort the 4th column
+            thiss.clickAndCheckSortOrder(table, 4, 'descending', 'number', function() {
+                thiss.checkColDebugValue(columnsDiv, 'default', 'false');
+                thiss.checkColDebugValue(columnsDiv, 'currentSortColumn', 4);
+                thiss.checkColDebugValue(col4Div, 'currentSortOrder', 'descending');
+                thiss.checkColDebugValue(col4Div, 'nextSortOrder', 'ascending');
+
+                thiss.closeAccordionCase(thiss, 'sorted');
+
+            });
+        });
+
+    },
+
     testScrollH: function() {
         var thiss = this;
         thiss.openAccordionCase(thiss, 'scrollH', function() {

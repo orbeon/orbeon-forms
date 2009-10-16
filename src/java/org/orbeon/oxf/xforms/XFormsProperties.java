@@ -310,8 +310,10 @@ public class XFormsProperties {
     }
 
     public  static Object parseProperty(String propertyName, String propertyValue) {
+        assert propertyName != null && propertyValue != null;
+        
         final PropertyDefinition propertyDefinition = getPropertyDefinition(propertyName);
-        return propertyDefinition.parseProperty(propertyValue);
+        return (propertyDefinition == null) ? null : propertyDefinition.parseProperty(propertyValue);
     }
 
     public static String getXFormsPassword() {

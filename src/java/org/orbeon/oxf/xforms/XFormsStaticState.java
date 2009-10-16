@@ -307,8 +307,13 @@ public class XFormsStaticState {
                 if (propertiesElement != null) {
                     for (Iterator i = propertiesElement.attributeIterator(); i.hasNext();) {
                         final Attribute currentAttribute = (Attribute) i.next();
-                        final Object propertyValue = XFormsProperties.parseProperty(currentAttribute.getName(), currentAttribute.getValue());
-                        nonDefaultProperties.put(currentAttribute.getName(), propertyValue);
+                        final String propertyName = currentAttribute.getName();
+                        final Object propertyValue = XFormsProperties.parseProperty(propertyName, currentAttribute.getValue());
+                        if (propertyValue != null) {
+                            nonDefaultProperties.put(currentAttribute.getName(), propertyValue);
+                        } else {
+                            indentedLogger.logWarning("", "ignoring global property", "name", propertyName);
+                        }
                     }
                 }
             }
@@ -320,9 +325,13 @@ public class XFormsStaticState {
                     if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(currentAttribute.getNamespaceURI())) {
                         final String propertyName = currentAttribute.getName();
                         final Object propertyValue = XFormsProperties.parseProperty(propertyName, currentAttribute.getValue());
-                        // Only take the first occurrence into account, and make sure the property is supported
-                        if (nonDefaultProperties.get(propertyName) == null && XFormsProperties.getPropertyDefinition(propertyName) != null)
-                            nonDefaultProperties.put(propertyName, propertyValue);
+                        if (propertyValue != null) {
+                            // Only take the first occurrence into account, and make sure the property is supported
+                            if (nonDefaultProperties.get(propertyName) == null && XFormsProperties.getPropertyDefinition(propertyName) != null)
+                                nonDefaultProperties.put(propertyName, propertyValue);
+                        } else {
+                            indentedLogger.logWarning("", "ignoring property on xforms:model element", "name", propertyName);
+                        }
                     }
                 }
             }

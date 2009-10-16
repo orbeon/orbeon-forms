@@ -110,7 +110,6 @@
     <property as="xs:integer" name="oxf.xforms.delay-before-force-incremental-request"      value="2000"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"                value="500"/>
 
-    <property as="xs:boolean" name="oxf.xforms.server.events.plain-value-change"            value="false"/>
     <property as="xs:boolean" name="oxf.xforms.server.events.initial-refresh-events"        value="true"/>
 
     <property as="xs:string"  name="oxf.xforms.client.events.mode"                          value="default"/>   <!-- default | deferred -->

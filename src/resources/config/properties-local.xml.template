@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    This file is an empty template for your own properties-local.xml file. Please follow the instructions here:
+
+    http://wiki.orbeon.com/forms/doc/developer-guide/configuration-properties
+-->
+<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <!-- This is an example of property which overrides an existing property's default value:
+    <property as="xs:NMTOKENS"
+              name="oxf.xforms.logging.debug"
+              value="document model submission submission-details control event action analysis server html"/>
+    -->
+
+</properties>

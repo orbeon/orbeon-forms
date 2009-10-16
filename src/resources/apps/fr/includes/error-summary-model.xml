@@ -41,7 +41,7 @@
 
     <!-- Template for error information -->
     <xforms:instance id="fr-error-template" xxforms:readonly="true">
-        <error xmlns="" id="" indexes="" label="" alert="" binds=""/>
+        <error xmlns="" id="" indexes="" label="" alert="" binds="" position=""/>
     </xforms:instance>
 
     <!-- Instance containing visited controls -->
@@ -90,14 +90,20 @@
         </xforms:action>
         <!-- Otherwise insert new element and sets its values -->
         <xforms:action if="not(exists($current-error))">
+            <!-- Remember that the instance is no longer valid -->
             <xforms:setvalue ref="instance('fr-form-valid-instance')">false</xforms:setvalue>
-            <xforms:insert context="." nodeset="error" origin="instance('fr-error-template')"/>
-            <xforms:action context="error[last()]">
+            <!-- Find insertion position based on instance node order -->
+            <!-- NOTE: This could be different from UI order. In the future, this should somehow be based on UI order instead. -->
+            <xxforms:variable name="node-position" select="count(xxforms:event('xxforms:binding')/preceding::*)" as="xs:integer"/>
+            <xxforms:variable name="insert-position" select="count(error[xs:integer(@position) lt $node-position])" as="xs:integer"/>
+            <xforms:insert context="." nodeset="error[$insert-position]" origin="instance('fr-error-template')"/>
+            <xforms:action context="error[$insert-position + 1]">
                 <xforms:setvalue ref="@id" value="$target"/>
                 <xforms:setvalue ref="@indexes" value="string-join(xxforms:event('xxforms:repeat-indexes'), '-')"/>
                 <xforms:setvalue ref="@alert" value="xxforms:event('xxforms:alert')"/>
                 <xforms:setvalue ref="@label" value="xxforms:event('xxforms:label')"/>
                 <xforms:setvalue ref="@binds" value="string-join(xxforms:invalid-binds(xxforms:event('xxforms:binding')), ' ')"/>
+                <xforms:setvalue ref="@position" value="$node-position"/>
             </xforms:action>
         </xforms:action>
     </xforms:action>

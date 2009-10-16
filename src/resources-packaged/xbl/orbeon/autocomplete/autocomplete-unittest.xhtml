@@ -35,6 +35,12 @@
             <xforms:instance id="all-countries" src="oxf:/apps/xforms-controls/services/countries.xml"/>
             <!-- Instance with subset of the countries to show in the auto-complete -->
             <xforms:instance id="searched-countries"><empty/></xforms:instance>
+            <xforms:instance id="second-us">
+                <country>
+                    <name>United States</name>
+                    <us-code>us2</us-code>
+                </country>
+            </xforms:instance>
 
             <!-- Internal state for this test -->
             <xforms:instance id="selected-countries">
@@ -49,6 +55,10 @@
             <!-- Submission getting list of updated countries -->
             <xforms:submission ref="instance('search-dynamic')" id="update-countries" validate="false"
                 method="post" resource="/xforms-controls/services/countries" replace="instance" instance="searched-countries"/>
+
+            <!-- Add second US for testing to list of all countries -->
+            <xforms:insert ev:event="xforms-model-construct-done"
+                nodeset="instance('all-countries')/country" origin="instance('second-us')"/>
 
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
@@ -92,6 +102,8 @@
                     <xxforms:variable name="make-suggestion" select="string-length() >= 2"/>
                     <xforms:setvalue ref="instance('search-dynamic')/country-name" value="$search-value"/>
                     <xforms:send submission="update-countries"/>
+                    <xforms:insert if="starts-with(instance('second-us')/name, $search-value)"
+                        nodeset="instance('searched-countries')/country" origin="instance('second-us')" at="last()" position="after"/>
                 </xforms:action>
                 <xforms:action if="not($make-suggestion)">
                     <!-- Delete itemset -->

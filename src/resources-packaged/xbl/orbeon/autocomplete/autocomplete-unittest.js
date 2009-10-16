@@ -6,10 +6,10 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
 
         /**
          * Runs the function for both the static and dynamic cases.
-         * 
+         *
          * @param f     function(staticDynamic, continuation)
          *              @param staticDynamic    Either "static" or "dynamic"
-         *              @param continuation     Function with no parameter, but the caller needs to make sure 
+         *              @param continuation     Function with no parameter, but the caller needs to make sure
          *                                      to keep the this
          */
         runForStaticDynamic: function(f) {
@@ -17,7 +17,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 f.call(this, "dynamic", function(){});
             });
         },
-        
+
         /**
          * Runs the function on all the active lis in the suggestion list.
          *
@@ -43,7 +43,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             searchInput.value = newValue;
             YAHOO.util.UserAction.keyup(searchInput);
         },
-        
+
         simulateClickItem: function(staticDynamic, position) {
             var liIndex = 0;
             this.runOnLis(staticDynamic, function(li) {
@@ -53,7 +53,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 liIndex++;
             });
         },
-        
+
         /**
          * Checks that the external value is what we expect it to be.
          */
@@ -61,7 +61,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             var outputValue = ORBEON.xforms.Document.getValue(staticDynamic + "-output");
             YAHOO.util.Assert.areEqual(expectedValue, outputValue, staticDynamic);
         },
-        
+
         /**
          * Checks that the items we get in the suggestion list are the one we expect.
          */
@@ -70,7 +70,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 YAHOO.util.Assert.areEqual(expectedValues[liIndex], li.innerHTML, staticDynamic + " at index " + liIndex);
             });
         },
-        
+
         /**
          * Test that when we type the full value "Switzerland", the value of the node becomes "sz",
          * because "Switzerland" shows in the list of possible values, so the value should be selected
@@ -86,7 +86,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-        
+
         /**
          * Test that entering a partial match "Sw", we get the expected list of countries in the suggestion list.
          */
@@ -104,7 +104,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-        
+
         testAlertShown: function() {
             this.runForStaticDynamic(function(staticDynamic, continuation) {
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
@@ -129,11 +129,36 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                             "after setting value, should not have xforms-alert-active for " + staticDynamic);
                         continuation.call(this);
                     });
-                    continuation.call(this);
-                    
                 });
             });
-            
+        },
+
+        testDuplicateItemLabel: function() {
+            this.runForStaticDynamic(function(staticDynamic, continuation) {
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    // By typing the full country name, we already check that the suggestion comes and that it is
+                    // not one of the 2 possibilities that is automatically selected
+                    this.simulateTypeInField(staticDynamic, "United States");
+                }, function() {
+                    ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                        // Click on the first US
+                        this.simulateClickItem(staticDynamic, 0);
+                    }, function() {
+                        this.checkExternalValue(staticDynamic, "us");
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            this.simulateTypeInField(staticDynamic, "United States");
+                        }, function() {
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                // Click on the second US
+                                this.simulateClickItem(staticDynamic, 1);
+                            }, function() {
+                                this.checkExternalValue(staticDynamic, "us2");
+                                continuation.call(this);
+                            });
+                        });
+                    });
+                });
+            });
         }
 
     }));

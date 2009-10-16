@@ -417,14 +417,16 @@
                     <xforms:label>Auto-Complete</xforms:label>
                     <xhtml:p>
                         <!-- Auto-complete for country name -->
-                        <fr:autocomplete ref="instance('instance')/country-name" id="country-name" incremental="true" dynamic-itemset="true" style="width: 15em">
+                        <!--
+                        <fr:autocomplete ref="instance('instance')/country-name" id="country-name" dynamic-itemset="true" style="width: 15em">
                             <xforms:label class="label">Enter a country name: </xforms:label>
                             <xforms:itemset nodeset="instance('countries-names-instance')/country">
                                 <xforms:label ref="name"/>
                                 <xforms:value ref="name"/>
                             </xforms:itemset>
-                            <xforms:send submission="country-name-updated" ev:event="xforms-value-changed"/>
+                            <xforms:send submission="country-name-updated" ev:event="fr-search-changed"/>
                         </fr:autocomplete>
+                        -->
                     </xhtml:p>
                     <xhtml:p class="flag-container">
                         <!-- Display flag of selected country -->

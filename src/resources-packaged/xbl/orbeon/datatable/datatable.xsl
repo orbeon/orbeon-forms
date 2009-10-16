@@ -792,15 +792,13 @@
 
     <xsl:template match="/*/xhtml:tbody/xforms:repeat" mode="dynamic">
 
-        <xxforms:variable name="nodeset" xxbl:scope="outer" select="{$repeatNodeset}"/>
+        <xxforms:variable name="fr-dt-nodeset" xxbl:scope="outer" select="{$repeatNodeset}"/>
 
         <xsl:choose>
 
             <xsl:when test="$sortAndPaginationMode = 'external'">
-                <xxforms:variable name="rewrittenNodeset" xxbl:scope="inner">
-                    <xxforms:sequence xxbl:scope="outer" select="$nodeset"/>
-                </xxforms:variable>
-            </xsl:when>
+                <xxforms:variable name="fr-dt-rewrittenNodeset" select="$fr-dt-nodeset"/>
+             </xsl:when>
 
             <xsl:otherwise>
                 <xxforms:variable name="fr-dt-datatable-instance" xxbl:scope="outer">
@@ -809,7 +807,7 @@
                 <xxforms:variable name="currentSortColumnIndex"
                     select="instance('datatable-instance')/@currentSortColumn" xxbl:scope="inner"/>
 
-                <xxforms:variable name="currentSortColumn" xxbl:scope="outer">
+                <xxforms:variable name="fr-dt-currentSortColumn" xxbl:scope="outer">
                     <xxforms:sequence
                         select="(instance('datatable-instance')//column)[@index=$currentSortColumnIndex]"
                         xxbl:scope="inner"/>
@@ -821,16 +819,16 @@
                 </xxforms:variable>
 
                 <xxforms:variable name="fr-dt-isSorted"
-                    select="$fr-dt-isDefault or $currentSortColumn[@currentSortOrder = @fr:sorted]"
+                    select="$fr-dt-isDefault or $fr-dt-currentSortColumn[@currentSortOrder = @fr:sorted]"
                     xxbl:scope="outer"/>
 
-                <xxforms:variable name="currentSortColumnType" xxbl:scope="outer"
+                <xxforms:variable name="fr-dt-currentSortColumnType" xxbl:scope="outer"
                     select="
             
-            if ($currentSortColumn)
-                then if ($currentSortColumn/@type != '')
-                    then $currentSortColumn/@type
-                    else for $value in xxforms:evaluate($currentSortColumn/@pathToFirstNode)
+            if ($fr-dt-currentSortColumn)
+                then if ($fr-dt-currentSortColumn/@type != '')
+                    then $fr-dt-currentSortColumn/@type
+                    else for $value in xxforms:evaluate($fr-dt-currentSortColumn/@pathToFirstNode)
                         return if ($value instance of node())
                             then if (xxforms:type($value) = ({$numberTypesEnumeration}))
                                 then 'number'
@@ -844,40 +842,38 @@
 
 
                 <xsl:if test="$paginated">
-                    <xxforms:variable name="page" xxbl:scope="outer">
+                    <xxforms:variable name="fr-dt-page" xxbl:scope="outer">
                         <xxforms:sequence select="$page" xxbl:scope="inner"/>
                     </xxforms:variable>
                 </xsl:if>
-                <xxforms:variable name="rewrittenNodeset" xxbl:scope="inner">
-                    <xxforms:sequence xxbl:scope="outer"
-                        select="
+
+                <xxforms:variable name="fr-dt-rewrittenNodeset"
+                    select="
                 
                 {if ($paginated) then '(' else ''}
                 
-                if (not($currentSortColumn) or $currentSortColumn/@currentSortOrder = 'none' or $fr-dt-isSorted) 
-                    then $nodeset
-                    else exf:sort($nodeset,  $currentSortColumn/@sortKey , $currentSortColumnType, $currentSortColumn/@currentSortOrder)
+                if (not($fr-dt-currentSortColumn) or $fr-dt-currentSortColumn/@currentSortOrder = 'none' or $fr-dt-isSorted) 
+                    then $fr-dt-nodeset
+                    else exf:sort($fr-dt-nodeset,  $fr-dt-currentSortColumn/@sortKey , $fr-dt-currentSortColumnType, $fr-dt-currentSortColumn/@currentSortOrder)
                 
                 {if ($paginated) 
                     then concat(
-                        ')[position() >= ($page - 1) * '
+                        ')[position() >= ($fr-dt-page - 1) * '
                         , $rowsPerPage 
-                        , ' + 1 and position() &lt;= $page *'
+                        , ' + 1 and position() &lt;= $fr-dt-page *'
                         , $rowsPerPage
                         ,']') 
                     else ''}
                 
                 "
-                    />
-                </xxforms:variable>
+                />
             </xsl:otherwise>
         </xsl:choose>
 
 
-        <xxforms:script ev:event="xxforms-nodeset-changed" ev:target="fr-datatable-repeat"
-            xxbl:scope="inner"> ORBEON.widgets.datatable.update(this); </xxforms:script>
-
-        <xforms:repeat id="fr-datatable-repeat" nodeset="$rewrittenNodeset" xxbl:scope="inner">
+        <xforms:repeat nodeset="$fr-dt-rewrittenNodeset">
+            <xxforms:script ev:event="xxforms-nodeset-changed">
+                ORBEON.widgets.datatable.update(this); </xxforms:script>
             <xsl:apply-templates select="@*[not(name()='nodeset')]|node()" mode="dynamic"/>
         </xforms:repeat>
 
@@ -897,15 +893,17 @@
     </xsl:template>
 
     <xsl:template match="/*/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td" mode="dynamic">
-        <xxforms:variable name="index" select="{count(preceding-sibling::*) + 1}"/>
-        <xxforms:variable name="columnDesc" model="datatable-model"
-            select="instance('datatable-instance')/*[position() = $index]"/>
+        <xxforms:variable name="index" select="{count(preceding-sibling::*) + 1}" xxbl:scope="inner"/>
+        <xxforms:variable name="fr-dt-columnDesc" model="datatable-model" xxbl:scope="outer">
+            <xxforms:sequence select="instance('datatable-instance')/*[position() = $index]"
+                xxbl:scope="inner"/>
+        </xxforms:variable>
 
         <xhtml:td
             class="
             {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
-            {{if ($columnDesc/@currentSortOrder = 'ascending') then 'yui-dt-asc'
-            else if ($columnDesc/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
+            {{if ($fr-dt-columnDesc/@currentSortOrder = 'ascending') then 'yui-dt-asc'
+            else if ($fr-dt-columnDesc/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
             {@class}            
             ">
 
@@ -918,19 +916,23 @@
 
     <xsl:template match="/*/xhtml:tbody/xforms:repeat/xhtml:tr/xforms:repeat/xhtml:td"
         mode="dynamic">
-        <xxforms:variable name="position" select="position()"/>
-        <xxforms:variable name="index" select="{count(../preceding-sibling::*) + 1}"/>
+        <xxforms:variable name="position" select="position()" xxbl:scope="inner">
+            <xxforms:sequence select="position()" xxbl:scope="outer"/>
+        </xxforms:variable>
+        <xxforms:variable name="index" select="{count(../preceding-sibling::*) + 1}"
+            xxbl:scope="inner"/>
         <xxforms:variable name="columnSet" model="datatable-model"
-            select="instance('datatable-instance')/*[position() = $index]"/>
+            select="instance('datatable-instance')/*[position() = $index]" xxbl:scope="inner"/>
         <xxforms:variable name="columnIndex" model="datatable-model"
-            select="$columnSet/@index + $position - 1"/>
-        <xxforms:variable name="column" model="datatable-model"
-            select="$columnSet/column[@index = $columnIndex]"/>
+            select="$columnSet/@index + $position - 1" xxbl:scope="inner"/>
+        <xxforms:variable name="fr-dt-column" model="datatable-model" xxbl:scope="outer">
+            <xxforms:sequence select="$columnSet/column[@index = $columnIndex]" xxbl:scope="inner"/>
+        </xxforms:variable>
         <xhtml:td
             class="
             {if (@fr:sortable = 'true') then 'yui-dt-sortable' else ''} 
-            {{if ($column/@currentSortOrder = 'ascending') then 'yui-dt-asc'
-            else if ($column/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
+            {{if ($fr-dt-column/@currentSortOrder = 'ascending') then 'yui-dt-asc'
+            else if ($fr-dt-column/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
             {@class}            
             ">
 

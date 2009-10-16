@@ -71,6 +71,12 @@
                         <xforms:help>Used by tests that check external sort.</xforms:help>
                     </xforms:input>
                 </xhtml:p>
+                <xhtml:p>
+                    <xforms:input ref="sortedColumn" id="sortedColumn">
+                        <xforms:label>Sorted column: </xforms:label>
+                        <xforms:help>Used by tests that check external sort.</xforms:help>
+                    </xforms:input>
+                </xhtml:p>
                 <xforms:input ref="loading" id="loading" appearance="full">
                     <!--TODO: replace by a select1 when #314362 will be fixed -->
                     <!--<xforms:item>
@@ -374,7 +380,7 @@
                 </xhtml:div>
             </fr:case>
 
-            <!--<fr:case selected="true" id="sortableExternal">
+            <fr:case selected="true" id="sortableExternal">
                 <fr:label>Testing sortable columns on a mixed datatable processed by the
                     application</fr:label>
                 <xhtml:div>
@@ -382,6 +388,9 @@
                     <xforms:group ref="instance('detailed-lorem')">
                         <xxforms:variable name="mySortOrder" select="instance('controls')/sortOrder"
                             xxbl:scope="outer" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"/>
+
+                        <xxforms:variable name="sortOrder" select="instance('controls')/sortOrder"/>
+                        <xxforms:variable name="nodeset" select="line[length &lt; 20]"/>
                         
                         <fr:datatable id="sortableExternal-table" debug="true"
                             sortAndPaginationMode="external">
@@ -397,7 +406,7 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                 <xforms:repeat nodeset="line[length &lt; 20]">
+                                <xforms:repeat nodeset="$nodeset">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="position()"/>
@@ -407,9 +416,9 @@
                                                 <xforms:output value="."/>
                                             </xhtml:td>
                                         </xforms:repeat>
-                                        <xhtml:td 
-                                            class="{if(instance('controls')/sortOrder='ascending') then 'yui-dt-asc' else if (instance('controls')/sortOrder='descending') then 'yui-dt-desc' else ''}"
-                                            fr:sortMessage="if(instance('controls')/sortOrder='ascending') then 'click to sort descending' else if (instance('controls')/sortOrder='descending') then 'click to cancel sort' else 'click to sort ascending'">
+                                        <xhtml:td
+                                            class="{if ($sortOrder='ascending') then 'yui-dt-asc' else if ($sortOrder='descending') then 'yui-dt-desc' else ''}"
+                                            fr:sortMessage="if ($sortOrder='ascending') then 'Hey you, click to sort descending' else if ($sortOrder='descending') then 'Hey you, click to cancel sort' else 'Hey you, click to sort ascending'">
                                             <xforms:output value="round(length div nb-words)"/>
                                         </xhtml:td>
                                     </xhtml:tr>
@@ -418,7 +427,7 @@
                         </fr:datatable>
                     </xforms:group>
                 </xhtml:div>
-            </fr:case>-->
+            </fr:case>
 
             <fr:case selected="true" id="scrollH">
                 <fr:label>Testing a mixed datatable that is horizontally scrollable</fr:label>

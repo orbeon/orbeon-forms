@@ -139,8 +139,8 @@ ORBEON.widgets.datatable.unittests_lib = {
     },
 
     resizeColumn: function(th, offset, step) {
-        var resizerliner = YAHOO.util.Dom.getElementsByClassName('yui-dt-resizerliner', 'div', th )[0];
-        var resizer = YAHOO.util.Dom.getElementsByClassName('yui-dt-resizer', 'div', th )[0];
+        var resizerliner = YAHOO.util.Dom.getElementsByClassName('yui-dt-resizerliner', 'div', th)[0];
+        var resizer = YAHOO.util.Dom.getElementsByClassName('yui-dt-resizer', 'div', th)[0];
         var region = YAHOO.util.Region.getRegion(resizer);
         YAHOO.util.UserAction.mousedown(resizer, {clientX: region.right, clientY: region.top});
         var x;
@@ -468,7 +468,7 @@ ORBEON.widgets.datatable.unittests_lib = {
         }
     },
 
-    clickAndCheckSortOrder: function(table, columnIndex, expectedOrder, sortType, callback) {
+    clickAndCheckSortOrder: function(table, columnIndex, expectedOrder, sortType, callback, expectedHintBefore, expectedHintAfter) {
         //TODO: support scrollable tables
         var className;
         if (expectedOrder == 'ascending') {
@@ -476,11 +476,25 @@ ORBEON.widgets.datatable.unittests_lib = {
         } else if (expectedOrder = 'descending') {
             className = 'yui-dt-desc';
         }
+        if (expectedHintBefore == undefined) {
+            expectedHintBefore = 'Click to sort ' + expectedOrder ;
+        }
+        if (expectedHintAfter == undefined) {
+            if (expectedOrder == 'ascending') {
+                expectedHintAfter = 'Click to sort descending';
+            } else {
+                expectedHintAfter = 'Click to sort ascending';
+            }
+        }
+
         var headerCell = this.getSignificantElementByIndex(table.tHead.rows[0].cells, columnIndex);
         var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
+        var a = liner.getElementsByTagName('a')[0];
+        YAHOO.util.Assert.areEqual(expectedHintBefore, a.title, 'Before click, hint should be ' + expectedHintBefore + ' not ' + a.title);
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             YAHOO.util.UserAction.click(liner, {clientX: 1});
         }, function() {
+            YAHOO.util.Assert.areEqual(expectedHintAfter, a.title, 'After click, hint should be ' + expectedHintAfter + ' not ' + a.title);
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(headerCell, className), 'Column ' + columnIndex + ' header cell should now have a class ' + className);
             var firstRow = this.getSignificantElementByIndex(table.tBodies[0].rows, 1);
             var bodyCell = this.getSignificantElementByIndex(firstRow.cells, columnIndex);

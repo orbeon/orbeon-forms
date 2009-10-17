@@ -13,66 +13,45 @@
   -->
 <form>
     <text-controls>
-        <textarea>Team of Rivals: The Political Genius of Abraham Lincoln is a non-fiction book written by historian Doris Kearns Goodwin, first published by Simon &amp; Schuster on October 25, 2005. The book is a biographical portrait of U.S. President Abraham Lincoln and some of the men who served with him in his Cabinet from 1861 to 1865. Three of his Cabinet members had previously run against Lincoln in the 1860 election: Edward Bates (Attorney General), Salmon Chase (Treasury), and William H. Seward (State). The book focuses on Lincoln's mostly successful attempts to reconcile conflicting personalities and political factions on the path to abolition and victory in the US Civil War.
+        <textarea>Music is an art form whose medium is sound. Common elements of music are pitch (which governs melody and harmony), rhythm (and its associated concepts tempo, meter, and articulation), dynamics, and the sonic qualities of timbre and texture. The word derives from Greek μουσική (mousike), "(art) of the Muses".
 
-Text is available under the Creative Commons Attribution/Share-Alike License; additional terms may apply. See Terms of Use for details.</textarea>
-        <htmlarea>
-            &lt;i>
-                &lt;b>Team of Rivals: The Political Genius of Abraham Lincoln&lt;/b>
-            &lt;/i>
-            is a
-            &lt;a shape=&quot;rect&quot; href=&quot;http://en.wikipedia.org/wiki/Non-fiction&quot; title=&quot;Non-fiction&quot;>non-fiction&lt;/a>
-            book written by
-            &lt;a shape=&quot;rect&quot; href=&quot;http://en.wikipedia.org/wiki/Historian&quot; title=&quot;Historian&quot;>historian&lt;/a>
-            &lt;a shape=&quot;rect&quot; href=&quot;http://en.wikipedia.org/wiki/Doris_Kearns_Goodwin&quot; title=&quot;Doris Kearns Goodwin&quot;>Doris
-                Kearns Goodwin&lt;/a>, first published by
-            &lt;a shape=&quot;rect&quot; href=&quot;http://en.wikipedia.org/wiki/Simon_%26_Schuster&quot; title=&quot;Simon &amp; Schuster&quot;>Simon
-                &amp; Schuster
-            &lt;/a>
-            on October 25, 2005. The book is a biographical portrait of
-            &lt;a shape=&quot;rect&quot; href=&quot;http://en.wikipedia.org/wiki/President_of_the_United_States&quot;
-               title=&quot;President of the United States&quot;>U.S. President
-            &lt;/a>
-            &lt;a shape=&quot;rect&quot; href=&quot;http://en.wikipedia.org/wiki/Abraham_Lincoln&quot; title=&quot;Abraham Lincoln&quot;>Abraham
-                Lincoln
-            &lt;/a>
-            and some of the men who served with him in his
-            &lt;a shape=&quot;rect&quot; href=&quot;http://en.wikipedia.org/wiki/United_States_Cabinet&quot; title=&quot;United States Cabinet&quot;>
-                Cabinet
-            &lt;/a>
-            from 1861 to 1865. Three of his Cabinet members had previously run against Lincoln in the&lt;a shape=&quot;rect&quot;
-                                                                                                        href=&quot;http://en.wikipedia.org/wiki/United_States_presidential_election,_1860&quot;
-                                                                                                        title=&quot;United States presidential election, 1860&quot;>
-            1860 election&lt;/a>:
-            &lt;a shape=&quot;rect&quot; href=&quot;http://en.wikipedia.org/wiki/Edward_Bates&quot; title=&quot;Edward Bates&quot;>Edward Bates&lt;/a>
-            (&lt;a shape=&quot;rect&quot; href=&quot;http://en.wikipedia.org/wiki/United_States_Attorney_General&quot;
-                title=&quot;United States Attorney General&quot;>Attorney General&lt;/a>),
-            &lt;a shape=&quot;rect&quot; class=&quot;mw-redirect&quot; href=&quot;http://en.wikipedia.org/wiki/Salmon_Chase&quot; title=&quot;Salmon Chase&quot;>
-                Salmon Chase
-            &lt;/a>
-            (&lt;a shape=&quot;rect&quot; href=&quot;http://en.wikipedia.org/wiki/United_States_Secretary_of_the_Treasury&quot;
-                title=&quot;United States Secretary of the Treasury&quot;>Treasury&lt;/a>), and
-            &lt;a shape=&quot;rect&quot; href=&quot;http://en.wikipedia.org/wiki/William_H._Seward&quot; title=&quot;William H. Seward&quot;>William H.
-                Seward
-            &lt;/a>
-            (&lt;a shape=&quot;rect&quot; href=&quot;http://en.wikipedia.org/wiki/United_States_Secretary_of_State&quot;
-                title=&quot;United States Secretary of State&quot;>State&lt;/a>). The book focuses on Lincoln's mostly successful
-            attempts to reconcile conflicting personalities and political factions on the path to
-            &lt;a shape=&quot;rect&quot; href=&quot;http://en.wikipedia.org/wiki/Abolitionism&quot; title=&quot;Abolitionism&quot;>abolition&lt;/a>
-            and victory in the&lt;a shape=&quot;rect&quot; class=&quot;mw-redirect&quot; href=&quot;http://en.wikipedia.org/wiki/US_Civil_War&quot;
-                                 title=&quot;US Civil War&quot;>US Civil War&lt;/a>.
-            &lt;br clear=&quot;none&quot;/>
-            &lt;br clear=&quot;none&quot;/>Text is available under the&lt;a shape=&quot;rect&quot;
-                                                            href=&quot;http://creativecommons.org/licenses/by-sa/3.0/&quot;>
-            Creative Commons Attribution/Share-Alike License&lt;/a>; additional terms may apply. See
-            &lt;a shape=&quot;rect&quot; href=&quot;http://wikimediafoundation.org/wiki/Terms_of_Use&quot;>Terms of Use&lt;/a>
-            for details.
-        </htmlarea>
+The creation, performance, significance, and even the definition of music vary according to culture and social context. Music ranges from strictly organized compositions (and their recreation in performance), through improvisational music to aleatoric forms. Music can be divided into genres and subgenres, although the dividing lines and relationships between music genres are often subtle, sometimes open to individual interpretation, and occasionally controversial. Within "the arts", music may be classified as a performing art, a fine art, and auditory art.</textarea>
+        <htmlarea>&lt;div style="text-align: left;"&gt;&lt;b&gt;Pyotr Ilyich
+Tchaikovsky&lt;/b&gt;&lt;a shape="rect"
+href="http://en.wikipedia.org/wiki/Pyotr_Ilyich_Tchaikovsky#cite_note-0"&gt;&lt;span&gt; &lt;/span&gt;&lt;/a&gt;(&lt;a
+shape="rect" href="http://en.wikipedia.org/wiki/Russian_language" title="Russian language"&gt;Russian&lt;/a&gt;:
+&lt;span lang="ru" xml:lang="ru"&gt;Пётр Ильи́ч Чайко́вский&lt;/span&gt;, &lt;i&gt;Pëtr Il'íč Čajkóvskij&lt;/i&gt;
+pronounced &lt;span class="IPA" title="Pronunciation in IPA"&gt;&lt;a shape="rect"
+href="http://en.wikipedia.org/wiki/Wikipedia:IPA_for_Russian" title="Wikipedia:IPA for Russian"&gt;[ˈpʲɵtr
+ɪlʲˈjitɕ tɕɪjˈkofskʲɪj]&lt;/a&gt;&lt;/span&gt;; 7 May 1840 [&lt;a shape="rect"
+href="http://en.wikipedia.org/wiki/Old_Style_and_New_Style_dates" title="Old Style and New Style dates"&gt;O.S.&lt;/a&gt;
+25 April] – 6 November 1893 [&lt;a shape="rect"
+href="http://en.wikipedia.org/wiki/Old_Style_and_New_Style_dates" title="Old Style and New Style dates"&gt;O.S.&lt;/a&gt;
+25 October])&lt;a shape="rect" href="http://en.wikipedia.org/wiki/Pyotr_Ilyich_Tchaikovsky#cite_note-1"&gt;&lt;span&gt;&lt;span/&gt;&lt;/span&gt;&lt;/a&gt;
+was a Russian &lt;a shape="rect" href="http://en.wikipedia.org/wiki/Composer" title="Composer"&gt;composer&lt;/a&gt;
+of the &lt;a shape="rect" href="http://en.wikipedia.org/wiki/Romantic_music" title="Romantic music"&gt;Romantic&lt;/a&gt;
+era. He wrote some of the most popular concert and theatrical music in the current classical repertoire,
+including the ballets &lt;i&gt;&lt;a shape="rect" href="http://en.wikipedia.org/wiki/Swan_Lake"
+title="Swan Lake"&gt;Swan Lake&lt;/a&gt;&lt;/i&gt;, &lt;a shape="rect"
+href="http://en.wikipedia.org/wiki/The_Sleeping_Beauty_%28ballet%29" title="The Sleeping Beauty
+(ballet)"&gt;&lt;i&gt;The Sleeping Beauty&lt;/i&gt;&lt;/a&gt; and &lt;i&gt;&lt;a shape="rect"
+href="http://en.wikipedia.org/wiki/The_Nutcracker" title="The Nutcracker"&gt;The Nutcracker&lt;/a&gt;&lt;/i&gt;,
+the &lt;i&gt;&lt;a shape="rect" href="http://en.wikipedia.org/wiki/1812_Overture" title="1812 Overture"&gt;1812
+Overture&lt;/a&gt;&lt;/i&gt;, his &lt;a shape="rect"
+href="http://en.wikipedia.org/wiki/Piano_Concerto_No._1_%28Tchaikovsky%29" title="Piano Concerto No. 1
+(Tchaikovsky)"&gt;First Piano Concerto&lt;/a&gt;, seven &lt;a shape="rect"
+href="http://en.wikipedia.org/wiki/Symphony" title="Symphony"&gt;symphonies&lt;/a&gt;, and the opera
+&lt;i&gt;&lt;a shape="rect" href="http://en.wikipedia.org/wiki/Eugene_Onegin_%28opera%29" title="Eugene
+Onegin (opera)"&gt;Eugene Onegin&lt;/a&gt;&lt;/i&gt;.&lt;br clear="none"/&gt;&lt;br clear="none"/&gt;Text
+is available under the &lt;a shape="rect" rel="license"
+href="http://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License"&gt;Creative
+Commons Attribution-ShareAlike License&lt;/a&gt;;
+additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
         <input>Michelle</input>
         <number>888</number>
         <secret>42</secret>
-        <inplace-input/>
-        <output>Today's weather is great!</output>
+        <inplace-input>Be kind whenever possible. It is always possible.</inplace-input>
+        <output>Great love and great achievements involve great risk.</output>
     </text-controls>
     <typed-controls>
         <email>info@orbeon.com</email>

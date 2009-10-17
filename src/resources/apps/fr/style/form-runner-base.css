@@ -396,7 +396,7 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 /* NOTE: This doesn't work well with IE 6/7, see below hand-tuned widths for IE */
 .fr-grid .xforms-input input.xforms-type-date,
     .fr-grid .xforms-input input.xforms-type-time {
-    width: 8em;
+    width: 7.5em;
 }
 
 /* Radio buttons */

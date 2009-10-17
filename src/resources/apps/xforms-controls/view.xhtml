@@ -35,9 +35,10 @@
                         <textarea/>
                         <htmlarea/>
                         <input>Michelle</input>
-                        <output>Today's weather is great!</output>
+                        <number/>
                         <secret/>
                         <inplace-input/>
+                        <output>Today's weather is great!</output>
                     </text-controls>
                     <typed-controls>
                         <email/>
@@ -79,33 +80,25 @@
             <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')">
                 <xforms:bind id="text-controls-bind" nodeset="text-controls" name="text-controls">
                     <xforms:bind id="input-bind" nodeset="input" name="input"/>
-                    <xforms:bind id="output-bind" nodeset="output" name="output"/>
-
                     <xforms:bind id="textarea-bind" nodeset="textarea" name="textarea"/>
                     <xforms:bind id="htmlarea-bind" nodeset="htmlarea" name="htmlarea"/>
-                    <xforms:bind id="inplace-input-bind" nodeset="inplace-input" name="inplace-input"/>
+                    <xforms:bind id="number-bind" nodeset="number" name="number" type="xforms:positiveInteger"/>
+                    <xforms:bind id="output-bind" nodeset="output" name="output"/>
                     <xforms:bind id="secret-bind" nodeset="secret" name="secret" type="xs:string"
                                  required="true()"
                                  constraint=". = '42'"/>
+                    <xforms:bind id="inplace-input-bind" nodeset="inplace-input" name="inplace-input"/>
                 </xforms:bind>
                 <xforms:bind id="typed-controls-bind" nodeset="typed-controls" name="typed-controls">
                     <xforms:bind id="date-bind" nodeset="date" type="xforms:date" name="date"/>
                     <xforms:bind id="time-bind" nodeset="time" type="xforms:time" name="time"/>
                     <xforms:bind id="datetime-bind" nodeset="datetime" type="xforms:dateTime" name="datetime"/>
-
-
-
                     <xforms:bind id="dropdown-date-bind" nodeset="dropdown-date" type="xforms:date"
                                  name="dropdown-date"/>
                     <xforms:bind id="fields-date-bind" nodeset="fields-date" type="xforms:date"
                                  name="fields-date"/>
                     <xforms:bind id="date-picker-bind" nodeset="date-picker" type="xforms:date"
                                  name="date-picker"/>
-
-
-
-
-
                     <xforms:bind id="email-bind" nodeset="email" type="xforms:email" name="email"/>
                     <xforms:bind id="us-phone-bind" nodeset="us-phone" type="xforms:nonNegativeInteger"
                                  name="us-phone"/>
@@ -214,9 +207,6 @@
                             <help/>
                             <alert/>
                         </dollars>
-
-
-
                         <button>
                             <label>Button</label>
                             <hint>Standard browser button</hint>
@@ -247,10 +237,6 @@
                             <item>
                                 <label>Dog</label>
                                 <value>dog</value>
-
-
-
-
                             </item>
                             <item>
                                 <label>Bird</label>
@@ -537,12 +523,12 @@
                             <help/>
                             <alert/>
                         </input>
-                        <output>
-                            <label>Text Output</label>
-                            <hint/>
+                        <number>
+                            <label>Number Field</label>
+                            <hint>Number field with validation</hint>
                             <help/>
                             <alert/>
-                        </output>
+                        </number>
                         <secret>
                             <label>Password Field</label>
                             <hint>The password is 42 ;)</hint>
@@ -551,11 +537,16 @@
                         </secret>
                         <inplace-input>
                             <label>In-place Input</label>
-                            <hint>Please enter some text</hint>
+                            <hint>Click to enter some text</hint>
                             <help/>
                             <alert/>
                         </inplace-input>
-
+                        <output>
+                            <label>Text Output</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </output>
                         <typed-controls>
                             <label>Typed Controls</label>
                             <help/>
@@ -874,12 +865,12 @@
                             <help/>
                             <alert/>
                         </input>
-                        <output>
-                            <label>Sortie texte</label>
+                        <number>
+                            <label/>
                             <hint/>
                             <help/>
                             <alert/>
-                        </output>
+                        </number>
                         <secret>
                             <label/>
                             <hint/>
@@ -892,7 +883,12 @@
                             <help/>
                             <alert/>
                         </inplace-input>
-
+                        <output>
+                            <label>Sortie texte</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </output>
                         <typed-controls>
                             <label>Contrôles typés</label>
                             <help/>
@@ -939,7 +935,7 @@
                 <fr:section id="text-controls-section" bind="text-controls-bind">
                     <xforms:label ref="$form-resources/text-controls/label"/>
                     <xforms:help ref="$form-resources/text-controls/help"/>
-                    <fr:grid columns="2">
+                    <fr:grid columns="3">
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:input bind="input-bind" id="input-control">
@@ -950,34 +946,30 @@
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:output xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:xbl="http://www.w3.org/ns/xbl"
-                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                               bind="output-bind"
-                                               id="output-control">
-                                    <xforms:label ref="$form-resources/output/label"/>
-                                    <xforms:help ref="$form-resources/output/help"/>
-
+                                <xforms:input xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                              xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                              xmlns:xbl="http://www.w3.org/ns/xbl"
+                                              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              id="number-control"
+                                              bind="number-bind">
+                                    <xforms:label ref="$form-resources/number/label"/>
+                                    <xforms:hint ref="$form-resources/number/hint"/>
+                                    <xforms:help ref="$form-resources/number/help"/>
                                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:output>
+                                </xforms:input>
                             </xhtml:td>
-
-                        </xhtml:tr>
-                        <xhtml:tr>
                             <xhtml:td>
-                                <xforms:secret xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:xbl="http://www.w3.org/ns/xbl"
-                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                               id="secret-control"
+                                <xforms:secret xmlns="http://orbeon.org/oxf/xml/form-builder" id="secret-control"
                                                bind="secret-bind">
                                     <xforms:label ref="$form-resources/secret/label"/>
                                     <xforms:hint ref="$form-resources/secret/hint"/>
                                     <xforms:help ref="$form-resources/secret/help"/>
                                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xforms:secret>
+
                             </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
                             <xhtml:td>
                                 <fr:inplace-input xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                                                   xmlns="http://orbeon.org/oxf/xml/form-builder"
@@ -991,6 +983,18 @@
                                     <xforms:help ref="$form-resources/inplace-input/help"/>
                                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:inplace-input>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:output xmlns="http://orbeon.org/oxf/xml/form-builder" bind="output-bind"
+                                               id="output-control">
+                                    <xforms:label ref="$form-resources/output/label"/>
+                                    <xforms:help ref="$form-resources/output/help"/>
+
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:output>
+                            </xhtml:td>
+                            <xhtml:td>
+
                             </xhtml:td>
                         </xhtml:tr>
                     </fr:grid>

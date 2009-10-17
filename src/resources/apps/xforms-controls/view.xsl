@@ -42,8 +42,11 @@
                 #maincontent { line-height: 1.231 }
                 /* More padding within tabs */
                 .yui-skin-sam .yui-navset .yui-content, .yui-skin-sam .yui-navset .yui-navset-top .yui-content {
-                    padding-top: .5em; padding-bottom: 1em 
+                    padding-top: .5em; padding-bottom: 1em;
+                    /*min-height: 40em;*/
                 }
+
+                textarea.xforms-textarea, .xforms-textarea textarea { height: 8em } 
 
                 /* ***** Styles from form-runner-orbeon.css ***********************************************************/
                 .xforms-input input, textarea.xforms-textarea, input.xforms-secret, .xforms-textarea textarea, .xforms-secret input {
@@ -103,6 +106,12 @@
                 </resources>
             </xforms:instance>
 
+            <!-- Initial instance -->
+            <xforms:send ev:event="xforms-model-construct-done" submission="load-submission"/>
+            <xforms:submission id="load-submission" serialization="none"
+                               method="get" resource="oxf:/apps/xforms-controls/initial-instance.xml"
+                               replace="instance" targetref="instance('fr-form-instance')"/>
+
             <!-- Perform background submission upon xforms-select for xforms:upload -->
             <xforms:action ev:observer="fr-form-group" ev:event="xforms-select"
                     if="for $b in xxforms:event('xxforms:binding') return $b/(@filename and @mediatype and @size)">
@@ -129,6 +138,8 @@
                     <xsl:apply-templates/>
                 </xforms:group>
             </xhtml:div>
+
+            <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
         </xsl:copy>
     </xsl:template>
 

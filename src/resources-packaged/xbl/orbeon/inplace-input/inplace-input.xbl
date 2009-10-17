@@ -57,6 +57,8 @@
                 .xbl-fr-inplace-input .xforms-input input { background-color: #FFFF88; background-image: none; border: none }
                 .xbl-fr-inplace-input .fr-inplace-buttons { display: block; margin-top:0.5em }
                 .xbl-fr-inplace-input .fr-inplace-buttons .xforms-control { display: inline }
+
+                .fr-grid-content .xbl-fr-inplace-input { width: 100% }
             </xbl:style>
         </xbl:resources>
         <xbl:implementation>

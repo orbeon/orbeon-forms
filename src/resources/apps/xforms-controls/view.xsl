@@ -46,7 +46,8 @@
                     /*min-height: 40em;*/
                 }
 
-                textarea.xforms-textarea, .xforms-textarea textarea { height: 8em } 
+                .fr-grid-content .xforms-label { margin-top: 0.7em; }
+                .fr-grid-content textarea.xforms-textarea, .xforms-textarea textarea { height: 9em } 
 
                 /* ***** Styles from form-runner-orbeon.css ***********************************************************/
                 .xforms-input input, textarea.xforms-textarea, input.xforms-secret, .xforms-textarea textarea, .xforms-secret input {

@@ -71,6 +71,14 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             });
         },
 
+        checkSuggestionCount: function(staticDynamic, expectedCount) {
+            var actualCount = 0;
+            this.runOnLis(staticDynamic, function(li) {
+                actualCount++;
+            });
+            YAHOO.util.Assert.areEqual(actualCount, expectedCount, staticDynamic + " suggestions shows");
+        },
+
         /**
          * Test that when we type the full value "Switzerland", the value of the node becomes "sz",
          * because "Switzerland" shows in the list of possible values, so the value should be selected
@@ -157,6 +165,25 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                             });
                         });
                     });
+                });
+            });
+        },
+
+        /**
+         * The max-results-displayed is set to 4 in the markup with an attribute for the static case and an element
+         * for the dynamic case.
+         */
+        testMaxResultsDisplayed: function() {
+            this.runForStaticDynamic(function(staticDynamic, continuation) {
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    // There are more than 4 countries that start with "Ba"
+                    // Enter 2 letters, because the dynamic case requires 2 letters before it gives suggestions
+                    this.simulateTypeInField(staticDynamic, "Ba");
+                }, function() {
+                    this.checkSuggestionCount(staticDynamic, 4);
+                    // Select one of the items just to close the suggestion list
+                    this.simulateClickItem(staticDynamic, 1);
+                    continuation.call(this);
                 });
             });
         }

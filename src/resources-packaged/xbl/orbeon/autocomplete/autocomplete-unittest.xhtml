@@ -52,6 +52,12 @@
             <!-- Constraint on selected country -->
             <xforms:bind nodeset="instance('selected-countries')/*" constraint="starts-with(., 's')"/>
 
+            <xforms:instance id="configuration">
+                <configuration>
+                    <max-results-displayed>4</max-results-displayed>
+                </configuration>
+            </xforms:instance>
+
             <!-- Submission getting list of updated countries -->
             <xforms:submission ref="instance('search-dynamic')" id="update-countries" validate="false"
                 method="post" resource="/xforms-controls/services/countries" replace="instance" instance="searched-countries"/>
@@ -75,7 +81,7 @@
         </xforms:output>
 
         <fr:autocomplete ref="instance('selected-countries')/static" id="static-autocomplete"
-                         dynamic-itemset="false" style="width: 15em">
+                         dynamic-itemset="false" style="width: 15em" max-results-displayed="4">
             <xforms:label>Country code: </xforms:label>
             <xforms:itemset nodeset="instance('all-countries')/country">
                 <xforms:label ref="name"/>
@@ -117,6 +123,7 @@
                 <xforms:value ref="us-code"/>
             </xforms:itemset>
             <xforms:alert>Value is mandatory</xforms:alert>
+            <fr:max-results-displayed ref="instance('configuration')/max-results-displayed"/>
         </fr:autocomplete>
 
     </xhtml:body>

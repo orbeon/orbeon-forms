@@ -186,8 +186,28 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                     continuation.call(this);
                 });
             });
-        }
+        },
 
+        /**
+         * Test that the left border of the suggestion box is aligned with the left border of the text field.
+         */
+        testAlignment: function() {
+            this.runForStaticDynamic(function(staticDynamic, continuation) {
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    // There are more than 4 countries that start with "Ba"
+                    // Enter 2 letters, because the dynamic case requires 2 letters before it gives suggestions
+                    this.simulateTypeInField(staticDynamic, "Ba");
+                }, function() {
+                    var container = YAHOO.util.Dom.get(staticDynamic + "-autocomplete");
+                    var suggestions = YAHOO.util.Dom.getElementsByClassName("yui-ac-container", null, container)[0];
+                    var input = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-search", null, container)[0];
+                    YAHOO.util.Assert.areEqual(YAHOO.util.Dom.getX(suggestions), YAHOO.util.Dom.getX(input));
+                    // Select one of the items just to close the suggestion list
+                    this.simulateClickItem(staticDynamic, 1);
+                    continuation.call(this);
+                });
+            });
+        }
     }));
 
     if (parent && parent.TestManager) {

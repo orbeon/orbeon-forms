@@ -663,7 +663,8 @@ public class XFormsStaticState {
     }
 
     public Element getControlElement(String prefixedId) {
-        return controlInfoMap.get(prefixedId).element;
+        final ControlInfo controlInfo = controlInfoMap.get(prefixedId);
+        return (controlInfo == null) ? null : controlInfo.element;
     }
 
     public Element getLabelElement(String prefixedId) {

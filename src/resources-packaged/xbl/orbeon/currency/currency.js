@@ -1,118 +1,125 @@
 YAHOO.namespace("xbl.fr");
-YAHOO.xbl.fr.Currency = {
-    _instances: {},
+YAHOO.xbl.fr.Currency = function() {};
+ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Currency, "xbl-fr-currency");
+YAHOO.xbl.fr.Currency.prototype = {
 
-    _getInstance: function(target) {
-        var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-currency");
-        return this._instances[container.id];
+    cssClass: "xbl-fr-currency",
+    initialized: false,
+    xformsInputElement: null,
+    groupElement: null,
+    visibleInputElement: null,
+    symbolElement: null,
+    prefix: null,
+    digitsAfterDecimalElement: null,
+    digitsAfterDecimal: null,
+    hasFocus: false,
+
+    init: function() {
+        if (this.initialized) return;
+        this.initialized = true;
+        // Get information from the DOM
+        this.xformsInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-xforms-input", null, this.container)[0];
+        this.groupElement = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, this.container)[0];
+        this.visibleInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, this.container)[0];
+        this.symbolElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-prefix", null, this.container)[0];
+        this.prefix = ORBEON.xforms.Document.getValue(this.symbolElement.id);
+        this.digitsAfterDecimalElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-digits-after-decimal", null, this.container)[0];
+        this.digitsAfterDecimal = ORBEON.xforms.Document.getValue(this.digitsAfterDecimalElement.id);
+        this.hasFocus = false;
+
+        // Initialize value of visible input
+        this.xformsToVisible();
+
+        // Register listener
+        YAHOO.util.Event.addFocusListener(this.visibleInputElement, this.focus, this, true);
+        YAHOO.util.Event.addBlurListener(this.visibleInputElement, this.blur, this, true);
     },
 
-    init: function(target) {
-        var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-currency");
-        var instance = this._instances[container.id];
-        if (instance == null || instance.container != container) {
+    focus: function() {
+        this.hasFocus = true;
+        this.visibleInputElement.value = this.currencyToNumber(this.visibleInputElement.value);
+    },
 
-            // Get information from the DOM
-            var xformsInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-xforms-input", null, container)[0];
-            var groupElement = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, container)[0];
-            var visibleInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, container)[0];
-            var symbolElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-prefix", null, container)[0];
-            var prefix = ORBEON.xforms.Document.getValue(symbolElement.id);
-            var digitsAfterDecimalElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-digits-after-decimal", null, container)[0];
-            var digitsAfterDecimal = ORBEON.xforms.Document.getValue(digitsAfterDecimalElement.id);
-            var hasFocus = false;
-
-            // Create instance
-            instance = {
-                container: container,
-                focus: function() {
-                    hasFocus = true;
-                    visibleInputElement.value = instance.currencyToNumber(visibleInputElement.value);
-                },
-                blur: function() {
-                    hasFocus = false;
-                    var cleanString = visibleInputElement.value.replace(new RegExp("[\\s,]", "g"), "");
-                    // Remove prefix if at the beginning of the string
-                    if (cleanString.indexOf(prefix) == 0)
-                        cleanString = cleanString.substring(prefix.length);
-                    var cleanNumber = new Number(cleanString).toString();
-                    var newValue = visibleInputElement.value == "" || cleanNumber == "NaN" ? visibleInputElement.value : cleanNumber;
-                    ORBEON.xforms.Document.setValue(xformsInputElement.id, newValue);
-                    visibleInputElement.value = instance.numberToCurrency(visibleInputElement.value);
-                    // Update xforms-required-empty/xforms-required-filled and xforms-visited
-                    ORBEON.xforms.Controls.updateRequiredEmpty(groupElement, newValue);
-                    if (! ORBEON.util.Dom.hasClass(groupElement, "xforms-visited"))
-                        ORBEON.xforms.Events.runOnNext(ORBEON.xforms.Events.ajaxResponseProcessedEvent,
-                            function() { ORBEON.xforms.Controls.updateInvalidVisited(groupElement); });
-                },
-                currencyToNumber: function(currency) {
-                    if (currency.indexOf(prefix) == 0) {
-                        var cleaned = currency.substring(prefix.length);
-                        cleaned = cleaned.replace(new RegExp("[\\s,]", "g"), "");
-                        return isNaN(new Number(cleaned)) ? currency : cleaned;
-                    } else {
-                        return currency;
-                    }
-                },
-                numberToCurrency: function(number) {
-                    var cleaned = number.replace(new RegExp("[\\s,]", "g"), "");
-                    if (cleaned == "") {
-                        return number;
-                    } else {
-                        var numberObject = new Number(cleaned);
-                        if (isNaN(numberObject)) {
-                            return number;
-                        } else {
-                            var fixed = numberObject.toFixed(digitsAfterDecimal);
-                            var parts = fixed.split(".");
-                            var regExp = /(\d+)(\d{3})/;
-                            while (regExp.test(parts[0])) {
-                                parts[0] = parts[0].replace(regExp, "$1" + "," + "$2");
-                            }
-                            var result = prefix == "" ? "" : prefix + " ";
-                            result += parts[0];
-                            if (parts.length > 1)
-                                result += "." + parts[1];
-                            return result;
-                        }
-                    }
-                },
-                xformsToVisible: function() {
-                    var xformsValue = ORBEON.xforms.Document.getValue(xformsInputElement.id);
-                    // If there is an update in the value, and the field already has the focus, just populate with the
-                    // XForms value without currency formatting
-                    var currencyFormattedValue = this.numberToCurrency(xformsValue);
-                    visibleInputElement.value = hasFocus ? this.currencyToNumber(currencyFormattedValue) : currencyFormattedValue;
-                },
-                readonly: function() {
-                    visibleInputElement.disabled = true;
-                },
-                readwrite: function() {
-                    visibleInputElement.disabled = false;
-                },
-                propertyPrefixChanged: function() {
-                    prefix = ORBEON.xforms.Document.getValue(symbolElement.id);
-                    instance.xformsToVisible();
-                },
-                propertyDigitsAfterDecimalChanged: function() {
-                    digitsAfterDecimal = ORBEON.xforms.Document.getValue(digitsAfterDecimalElement.id);
-                    instance.xformsToVisible();
-                }
-            };
-
-            // Initialize value of visible input
-            instance.xformsToVisible();
-
-            // Register listener
-            YAHOO.util.Event.addFocusListener(visibleInputElement, instance.focus);
-            YAHOO.util.Event.addBlurListener(visibleInputElement, instance.blur);
-            this._instances[container.id] = instance;
+    blur: function() {
+        this.hasFocus = false;
+        var cleanString = this.visibleInputElement.value.replace(new RegExp("[\\s,]", "g"), "");
+        // Remove prefix if at the beginning of the string
+        if (cleanString.indexOf(this.prefix) == 0)
+            cleanString = cleanString.substring(this.prefix.length);
+        var cleanNumber = new Number(cleanString).toString();
+        var newValue = this.visibleInputElement.value == "" || cleanNumber == "NaN" ? this.visibleInputElement.value : cleanNumber;
+        ORBEON.xforms.Document.setValue(this.xformsInputElement.id, newValue);
+        this.visibleInputElement.value = this.numberToCurrency(this.visibleInputElement.value);
+        // Update xforms-required-empty/xforms-required-filled and xforms-visited
+        ORBEON.xforms.Controls.updateRequiredEmpty(this.groupElement, newValue);
+        if (! ORBEON.util.Dom.hasClass(this.groupElement, "xforms-visited")) {
+            ORBEON.xforms.Events.runOnNext(ORBEON.xforms.Events.ajaxResponseProcessedEvent,
+                function() { ORBEON.xforms.Controls.updateInvalidVisited(this.groupElement); },
+                this, true);
         }
     },
 
-    valueChanged:                           function(target) { this._getInstance(target).xformsToVisible(); },
-    readonly:                               function(target) { this._getInstance(target).readonly(); },
-    readwrite:                              function(target) { this._getInstance(target).readwrite(); },
-    propertyPrefixChanged:                  function(target) { this._getInstance(target).propertyPrefixChanged(); },
-    propertyDigitsAfterDecimalChanged:      function(target) { this._getInstance(target).propertyDigitsAfterDecimalChanged(); }
+    currencyToNumber: function(currency) {
+        if (currency.indexOf(this.prefix) == 0) {
+            var cleaned = currency.substring(this.prefix.length);
+            cleaned = cleaned.replace(new RegExp("[\\s,]", "g"), "");
+            return isNaN(new Number(cleaned)) ? currency : cleaned;
+        } else {
+            return currency;
+        }
+    },
+
+    numberToCurrency: function(number) {
+        var cleaned = number.replace(new RegExp("[\\s,]", "g"), "");
+        if (cleaned == "") {
+            return number;
+        } else {
+            var numberObject = new Number(cleaned);
+            if (isNaN(numberObject)) {
+                return number;
+            } else {
+                var fixed = numberObject.toFixed(this.digitsAfterDecimal);
+                var parts = fixed.split(".");
+                var regExp = /(\d+)(\d{3})/;
+                while (regExp.test(parts[0])) {
+                    parts[0] = parts[0].replace(regExp, "$1" + "," + "$2");
+                }
+                var result = this.prefix == "" ? "" : this.prefix + " ";
+                result += parts[0];
+                if (parts.length > 1)
+                    result += "." + parts[1];
+                return result;
+            }
+        }
+    },
+
+    xformsToVisible: function() {
+        var xformsValue = ORBEON.xforms.Document.getValue(this.xformsInputElement.id);
+        // If there is an update in the value, and the field already has the focus, just populate with the
+        // XForms value without currency formatting
+        var currencyFormattedValue = this.numberToCurrency(xformsValue);
+        this.visibleInputElement.value = this.hasFocus ? this.currencyToNumber(currencyFormattedValue) : currencyFormattedValue;
+    },
+
+    valueChanged: function() {
+        this.xformsToVisible();
+    },
+
+    readonly: function() {
+        this.visibleInputElement.disabled = true;
+    },
+
+    readwrite: function() {
+        this.visibleInputElement.disabled = false;
+    },
+
+    propertyPrefixChanged: function() {
+        this.prefix = ORBEON.xforms.Document.getValue(this.symbolElement.id);
+        this.xformsToVisible();
+    },
+
+    propertyDigitsAfterDecimalChanged: function() {
+        this.digitsAfterDecimal = ORBEON.xforms.Document.getValue(this.digitsAfterDecimalElement.id);
+        this.xformsToVisible();
+    }
 };

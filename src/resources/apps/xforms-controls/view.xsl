@@ -46,8 +46,11 @@
                     /*min-height: 40em;*/
                 }
 
-                .fr-grid-content .xforms-label { margin-top: 0.7em; }
-                .fr-grid-content textarea.xforms-textarea, .xforms-textarea textarea { height: 9em } 
+                .fr-grid-content .xforms-label,
+                    .fr-grid-content .xbl-fr-button,
+                    .fr-grid .fr-grid-content button.xforms-trigger  { margin-top: .7em }
+                .fr-grid .fr-grid-content .xbl-fr-button button.xforms-trigger  { margin-top: 0 }
+                .fr-grid-content textarea.xforms-textarea, .xforms-textarea textarea { height: 9em }
 
                 /* ***** Styles from form-runner-orbeon.css ***********************************************************/
                 .xforms-input input, textarea.xforms-textarea, input.xforms-secret, .xforms-textarea textarea, .xforms-secret input {

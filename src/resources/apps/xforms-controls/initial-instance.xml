@@ -80,9 +80,10 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
         <file-attachment filename="" mediatype="" size=""/>
     </attachment-controls>
     <other-controls>
-        <button/>
-        <cross-browser-button/>
-        <slider/>
+        <browser-button-description>A browser button's look and feel is controlled by each browser individually</browser-button-description>
+        <browser-button/>
+        <standardized-button-description>A "standardized" button's appearance is meant to be the same on every browser</standardized-button-description>
+        <standardized-button/>
     </other-controls>
     <us-address/>
     <personal-information/>

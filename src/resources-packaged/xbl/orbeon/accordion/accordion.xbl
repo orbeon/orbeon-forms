@@ -73,13 +73,13 @@
                         </xforms:model>
 
                         <!-- Event handlers -->
-                        <xxforms:script ev:event="xforms-enabled" ev:target="fr-accordion-group">YAHOO.xbl.fr.Accordion.init(this);</xxforms:script>
+                        <xxforms:script ev:event="xforms-enabled" ev:target="fr-accordion-group">YAHOO.xbl.fr.Accordion.instance(this).init();</xxforms:script>
                         <xforms:action ev:event="fr-accordion-toggle-all">
                             <xforms:setvalue model="accordion-model" ref="selected" value="event('selected')"/>
-                            <xxforms:script>YAHOO.xbl.fr.Accordion.toggleAll(this);</xxforms:script>
+                            <xxforms:script>YAHOO.xbl.fr.Accordion.instance(this).toggleAll();</xxforms:script>
                         </xforms:action>
                         <xforms:action ev:event="fr-accordion-toggle">
-                            <xxforms:script>YAHOO.xbl.fr.Accordion.toggle(arguments[0].target);</xxforms:script>
+                            <xxforms:script>YAHOO.xbl.fr.Accordion.instance(this).toggle(arguments[0].target);</xxforms:script>
                         </xforms:action>
 
                         <!-- Dummy controls so JavaScript can access the local instance -->

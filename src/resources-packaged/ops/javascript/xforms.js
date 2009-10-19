@@ -3568,7 +3568,7 @@ ORBEON.xforms.Events = {
                 listener(obj);
             }
         }
-        event.subscribe(listener);
+        event.subscribe(worker);
     },
 
     orbeonLoadedEvent: new YAHOO.util.CustomEvent("orbeonLoaded"),
@@ -3577,6 +3577,42 @@ ORBEON.xforms.Events = {
     errorEvent: new YAHOO.util.CustomEvent("errorEvent"),
     yuiCalendarCreated: new YAHOO.util.CustomEvent("yuiCalendarCreated")
 };
+
+ORBEON.xforms.XBL = {
+
+    /**
+     * To be documented on Wiki.
+     */
+    declareClass: function(xblClass, cssClass) {
+        var doNothingSingleton = null;
+        xblClass.instance = function(target) {
+            if (target == null || ! YAHOO.util.Dom.inDocument(target, document)) {
+                // If we get an event for a target which is not in the document, return an instance
+                // which won't do anything when its methods are called
+                if (doNothingSingleton == null) {
+                    doNothingSingleton = {};
+                    for (methodName in xblClass.prototype)
+                        doNothingSingleton[methodName] = function(){};
+                }
+                return doNothingSingleton;
+            } else {
+                // Get the top-level element in the HTML DOM corresponding to this control
+                var container = YAHOO.util.Dom.getAncestorByClassName(target, cssClass);
+                // Create object holding instances
+                if (YAHOO.lang.isUndefined(this._instances))
+                    this._instances = {};
+                // Get or create instance
+                var instance = this._instances[container.id];
+                if (YAHOO.lang.isUndefined(instance) || instance.container != container) {
+                    instance = new xblClass(container);
+                    instance.container = container;
+                    this._instances[container.id] = instance;
+                }
+                return instance;
+            }
+        };
+    }
+}
 
 ORBEON.widgets.Base = function() {
     return {
@@ -4078,7 +4114,6 @@ ORBEON.widgets.RTE = function() {
                                 ]
                             },
                             { type: 'separator' },
-
                             { group: 'indentlist2', label: 'Indenting and Lists',
                                 buttons: [
                                     { type: 'push', label: 'Indent', value: 'indent', disabled: true },

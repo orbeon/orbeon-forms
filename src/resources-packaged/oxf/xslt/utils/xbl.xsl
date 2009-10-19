@@ -34,9 +34,9 @@
                         <xsl:value-of select="$prefix"/>
                         <xsl:text>.</xsl:text>
                         <xsl:value-of select="xxbl:to-camel-case($component)"/>
-                        <xsl:text>.property</xsl:text>
+                        <xsl:text>.instance(this).property</xsl:text>
                         <xsl:value-of select="xxbl:to-camel-case($property)"/>
-                        <xsl:text>Changed(this);</xsl:text>
+                        <xsl:text>Changed();</xsl:text>
                     </xxforms:script>
                 </xforms:input>
             </xsl:when>

@@ -39,7 +39,7 @@
                     <xforms:group xbl:attr="model context ref bind">
                         <xbl:content includes="xforms|label"/>
                         <!-- Init event -->
-                        <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Currency.init(this);</xxforms:script>
+                        <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Currency.instance(this).init();</xxforms:script>
                         <xforms:group appearance="xxforms:internal">
 
                             <!-- Stop propagation of all local UI events -->
@@ -47,9 +47,12 @@
 
                             <!-- Access to XForms value, and xforms-value-changed event -->
                             <xforms:input ref="." class="xbl-fr-currency-xforms-input">
-                                <xxforms:script id="xf-ch" ev:event="xforms-value-changed">YAHOO.xbl.fr.Currency.valueChanged(this);</xxforms:script>
-                                <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Currency.readonly(this);</xxforms:script>
-                                <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Currency.readwrite(this);</xxforms:script>
+                                <xxforms:script id="xf-ch" ev:event="xforms-value-changed">YAHOO.xbl.fr.Currency.instance(this).valueChanged();</xxforms:script>
+                                <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Currency.instance(this).readonly();</xxforms:script>
+                                <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Currency.instance(this).readwrite();</xxforms:script>
+
+                                YAHOO.xbl.fr.Currency.
+
                             </xforms:input>
                             <!-- Access to parameters -->
                             <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'currency', 'prefix')"/>

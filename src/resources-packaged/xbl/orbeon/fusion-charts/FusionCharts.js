@@ -190,10 +190,7 @@ infosoftglobal.FusionCharts.prototype = {
 			//Else, we update the chart data using External Interface
 			//Get reference to chart object
 			var chartObj = infosoftglobal.FusionChartsUtil.getChartObject(this.getAttribute('id'));
-            console.log("chartObj", chartObj);
-            console.log("chartObj.setDataXML", chartObj.setDataXML);
 			var result = chartObj.setDataXML(strDataXML);
-            console.log("result", result);
 		}
 	},
 	setTransparent: function(isTransparent){

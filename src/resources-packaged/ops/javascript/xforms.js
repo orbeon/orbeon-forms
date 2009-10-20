@@ -3581,6 +3581,20 @@ ORBEON.xforms.Events = {
 ORBEON.xforms.XBL = {
 
     /**
+     * Base class for classes implementing an XBL component.
+     */
+    _BaseClass: function() {
+        var BaseClass = function() {};
+        BaseClass.prototype = {
+
+            /**
+             * The HTML element that contains the component on the page.
+             */
+            container: null
+        }
+    }(),
+
+    /**
      * To be documented on Wiki.
      */
     declareClass: function(xblClass, cssClass) {

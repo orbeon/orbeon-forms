@@ -35,7 +35,7 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
                     <xforms:group xbl:attr="model context ref bind">
-                        <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.FusionCharts.init(this);</xxforms:script>
+                        <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.FusionCharts.instance(this).init();</xxforms:script>
                         <!-- Div in which the chart is rendered -->
                         <xhtml:div id="chart-div" class="xbl-fr-fusion-charts-chart-div">The chart will appear within this DIV. This text will be replaced by the chart.</xhtml:div>
                         <!-- XML -->

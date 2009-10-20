@@ -17,6 +17,9 @@ ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.FusionCharts, "xbl-fr-fusion-charts"
 YAHOO.xbl.fr.FusionCharts.prototype = {
 
     initialized: false,
+    xmlSpan: null,
+    xml: null,
+    fusionChart: null,
 
     init: function() {
 
@@ -24,34 +27,30 @@ YAHOO.xbl.fr.FusionCharts.prototype = {
         this.initialized = true;
 
         // Get information from the DOM
-        var chartDiv = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-chart-div", null, container)[0];
-        var xmlSpan = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-xml", null, container)[0];
-        var uriToSwfElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-uri-to-swf", null, container)[0];
+        var chartDiv = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-chart-div", null, this.container)[0];
+        this.xmlSpan = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-xml", null, this.container)[0];
+        var uriToSwfElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-uri-to-swf", null, this.container)[0];
         var uriToSwf = ORBEON.xforms.Document.getValue(uriToSwfElement.id);
-        var swfElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-swf", null, container)[0];
+        var swfElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-swf", null, this.container)[0];
         var swf = ORBEON.xforms.Document.getValue(swfElement.id);
-        var widthElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-width", null, container)[0];
+        var widthElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-width", null, this.container)[0];
         var width = ORBEON.xforms.Document.getValue(widthElement.id);
-        var heightElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-height", null, container)[0];
+        var heightElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-height", null, this.container)[0];
         var height = ORBEON.xforms.Document.getValue(heightElement.id);
 
         var pathToSwf = ORBEON.xforms.Globals.resourcesBaseURL + uriToSwf + "/" + swf + ".swf?registerWithJS=1";
-        var fusionChart = new FusionCharts(pathToSwf, container.id + "-fusion", width, height, "0", "0");
-        var xml = null;
+        this.fusionChart = new FusionCharts(pathToSwf, this.container.id + "-fusion", width, height, "0", "0");
 
-        // Create instance
-        var instance = {
-            updateChart: function() {
-                var newXML = ORBEON.util.Dom.getStringValue(xmlSpan);
-                if (newXML != xml) {
-                    xml = newXML;
-                    fusionChart.setDataXML(xml);
-                }
-            }
-        };
-        instance.updateChart();
-        fusionChart.render(chartDiv.id);
-        ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(function() { instance.updateChart(); });
-        this._instances[container.id] = instance;
+        this.updateChart();
+        this.fusionChart.render(chartDiv.id);
+        ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(function() { this.updateChart(); }, this, true);
+    },
+
+    updateChart: function() {
+        var newXML = ORBEON.util.Dom.getStringValue(this.xmlSpan);
+        if (newXML != this.xml) {
+            this.xml = newXML;
+            this.fusionChart.setDataXML(this.xml);
+        }
     }
 };

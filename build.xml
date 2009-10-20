@@ -111,7 +111,13 @@
         <include name="mail-1_3_2.jar"/>
 
         <include name="pdfbox-0_7_1.jar"/>
+
+        <!-- For directory scanner and SSH support -->
         <include name="ant-1_6_5.jar"/>
+
+        <!-- For SSH support (currently in oxf:file processor) -->
+        <include name="ant-jsch-1_6_5.jar"/>
+        <include name="jsch-0.1.42.jar"/>
     </fileset>
     <fileset id='war.libs.private' dir="${lib.dir}">
         <include name="xerces-xercesImpl-2_9_orbeon_20070711.jar"/>

@@ -61,7 +61,7 @@
                         <xsl:copy-of select="@class"/>
 
                         <!-- Access to parameters -->
-                        <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'accordion', 'open-closes-others')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'open-closes-others')"/>
 
                         <!-- Local model -->
                         <xforms:model id="accordion-model">

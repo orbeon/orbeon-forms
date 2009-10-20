@@ -50,13 +50,10 @@
                                 <xxforms:script id="xf-ch" ev:event="xforms-value-changed">YAHOO.xbl.fr.Currency.instance(this).valueChanged();</xxforms:script>
                                 <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Currency.instance(this).readonly();</xxforms:script>
                                 <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Currency.instance(this).readwrite();</xxforms:script>
-
-                                YAHOO.xbl.fr.Currency.
-
                             </xforms:input>
                             <!-- Access to parameters -->
-                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'currency', 'prefix')"/>
-                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'currency', 'digits-after-decimal')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'prefix')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'digits-after-decimal')"/>
                             <!-- The visible input -->
                             <xhtml:input class="xbl-fr-currency-visible-input"/>
                         </xforms:group>

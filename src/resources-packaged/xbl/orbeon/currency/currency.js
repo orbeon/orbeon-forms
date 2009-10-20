@@ -125,12 +125,12 @@ YAHOO.xbl.fr.Currency.prototype = {
         this.visibleInputElement.disabled = false;
     },
 
-    propertyPrefixChanged: function() {
+    parameterPrefixChanged: function() {
         this.prefix = ORBEON.xforms.Document.getValue(this.symbolElement.id);
         this.xformsToVisible();
     },
 
-    propertyDigitsAfterDecimalChanged: function() {
+    parameterDigitsAfterDecimalChanged: function() {
         this.digitsAfterDecimal = ORBEON.xforms.Document.getValue(this.digitsAfterDecimalElement.id);
         this.xformsToVisible();
     }

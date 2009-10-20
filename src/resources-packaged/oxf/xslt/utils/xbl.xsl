@@ -21,10 +21,11 @@
 
     <xsl:function name="xxbl:parameter">
         <xsl:param name="context" as="element()"/>
-        <xsl:param name="prefix" as="xs:string"/>
-        <xsl:param name="namespace" as="xs:string"/>
-        <xsl:param name="component" as="xs:string"/>
         <xsl:param name="property" as="xs:string"/>
+        
+        <xsl:variable name="prefix" select="prefix-from-QName(node-name($context))"/>
+        <xsl:variable name="namespace" select="namespace-uri($context)"/>
+        <xsl:variable name="component" select="local-name($context)"/>
 
         <xsl:choose>
             <xsl:when test="exists($context/*[local-name() = $property and namespace-uri() = $namespace])">
@@ -34,7 +35,7 @@
                         <xsl:value-of select="$prefix"/>
                         <xsl:text>.</xsl:text>
                         <xsl:value-of select="xxbl:to-camel-case($component)"/>
-                        <xsl:text>.instance(this).property</xsl:text>
+                        <xsl:text>.instance(this).parameter</xsl:text>
                         <xsl:value-of select="xxbl:to-camel-case($property)"/>
                         <xsl:text>Changed();</xsl:text>
                     </xxforms:script>

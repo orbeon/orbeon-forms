@@ -40,9 +40,9 @@
                             <xbl:content includes="xforms|label"/>
                             <xsl:variable name="fr-prefix" as="xs:string" select="namespace::*[. = 'http://orbeon.org/oxf/xml/form-runner']/local-name()"/>
                             <!-- Properties -->
-                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'date', 'mindate')"/>
-                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'date', 'maxdate')"/>
-                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'date', 'pagedate')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'mindate')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'maxdate')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'pagedate')"/>
                             <xsl:choose>
                                 <!-- Inline data picker-->
                                 <xsl:when test="@appearance = concat($fr-prefix, ':', 'inline')">

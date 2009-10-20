@@ -60,19 +60,19 @@ YAHOO.xbl.fr.Date.prototype = {
         yuiCalendar.render();
     },
 
-    propertyMindateChanged: function() {
+    parameterMindateChanged: function() {
         yuiCalendar.cfg.setProperty("mindate", this.mindateElement == null ? null :
             ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Document.getValue(this.mindateElement.id)));
         yuiCalendar.render();
     },
 
-    propertyMaxdateChanged: function() {
+    parameterMaxdateChanged: function() {
         yuiCalendar.cfg.setProperty("maxdate", this.maxdateElement == null ? null :
             ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Document.getValue(this.maxdateElement.id)));
         yuiCalendar.render();
     },
 
-    propertyPagedateChanged: function() {
+    parameterPagedateChanged: function() {
         yuiCalendar.cfg.setProperty("pagedate", this.maxdateElement == null ? null :
             ORBEON.util.DateTime.magicDateToJSDate(ORBEON.xforms.Document.getValue(this.pagedateElement.id)));
         yuiCalendar.render();

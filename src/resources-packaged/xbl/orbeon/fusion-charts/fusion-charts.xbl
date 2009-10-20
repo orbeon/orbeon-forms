@@ -41,10 +41,10 @@
                         <!-- XML -->
                         <xforms:output value="saxon:serialize(., 'xml')" style="display: none" class="xbl-fr-fusion-charts-xml"/>
                         <!-- Access to parameters -->
-                        <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'fusion-charts', 'uri-to-swf')"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'fusion-charts', 'swf')"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'fusion-charts', 'width')"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'fusion-charts', 'height')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'uri-to-swf')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'swf')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'width')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'height')"/>
                     </xforms:group>
                 </xsl:template>
             </xsl:transform>

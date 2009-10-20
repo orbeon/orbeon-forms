@@ -62,7 +62,7 @@
                             <xxforms:variable name="class" xbl:attr="xbl:text=class"/>
                             <xxforms:variable name="dynamic-itemset" xbl:attr="xbl:text=dynamic-itemset"/>
                             <xforms:output class="fr-autocomplete-dynamic-itemset" value="$dynamic-itemset" style="display: none"/>
-                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'autocomplete', 'max-results-displayed')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'max-results-displayed')"/>
 
                             <!-- Controls -->
                             <!-- Dropdown with value shown by autocomplete -->

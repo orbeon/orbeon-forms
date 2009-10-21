@@ -2,7 +2,8 @@
 <project relativePaths="true" version="4">
   <component name="DependencyValidationManager">
     <scope name="IntelliJ project files" pattern="file[Orbeon Forms]:.idea//*" />
-    <scope name="Source files" pattern="file[Orbeon Forms]:test/src//*||file[Orbeon Forms]:src//*" />
+    <scope name="Source files" pattern="(file[Orbeon Forms]:test/src//*||file[Orbeon Forms]:src//*)&amp;&amp;!file[Orbeon Forms]:src/resources/apps/xforms-sandbox/samples//*" />
+    <scope name="Samples" pattern="file[Orbeon Forms]:src/resources/apps/xforms-sandbox/samples/*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="IdProvider" IDEtalkID="11F1F6BCFCEF250CF8C992303A792A29" />

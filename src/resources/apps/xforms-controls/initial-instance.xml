@@ -75,7 +75,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
         <box-select/>
     </selection-controls>
     <attachment-controls>
-        <image-attachment filename="" mediatype="" size=""/>
+        <image-attachment filename="egg.jpg" mediatype="image/jpeg" size="11944">oxf:/apps/xforms-controls/images/egg.jpg</image-attachment>
         <static-image filename="bubbles.jpg" mediatype="image/jpeg" size="35670">oxf:/apps/xforms-controls/images/bubbles.jpg</static-image>
         <file-attachment filename="" mediatype="" size=""/>
     </attachment-controls>

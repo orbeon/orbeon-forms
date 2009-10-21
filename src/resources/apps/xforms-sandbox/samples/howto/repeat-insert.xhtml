@@ -18,8 +18,8 @@
             </xforms:instance>
         </xforms:model>
         <style type="text/css">
-            .xforms-repeat-selected-item-1 .xforms-input input { background-color: #FFFFCC }
             .xforms-input input { margin-bottom: .5em; background-color: white }
+            .xforms-repeat-selected-item-1 input { background-color: orange }
             button.xforms-trigger, .xforms-trigger button { width: 12.5em }
         </style>
     </head>
@@ -34,7 +34,7 @@
         </fieldset>
         <fieldset>
             <legend>Insert</legend>
-            
+
             <xforms:trigger>
                 <xforms:label>At the end</xforms:label>
                 <xforms:insert ev:event="DOMActivate"

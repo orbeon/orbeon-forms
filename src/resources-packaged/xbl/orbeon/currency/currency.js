@@ -82,13 +82,23 @@ YAHOO.xbl.fr.Currency.prototype = {
     },
 
     numberToCurrency: function(number) {
-        var cleaned = number.replace(new RegExp("[\\s,]", "g"), "");
+        // Cleaning number (might be entered by the user with all kind of formatting)
+        var cleaned = function() {
+            var result = number;
+            // Remove currency prefix, if present anywhere in the string
+            var indexOfPrefix = result.indexOf(this.prefix);
+            if (indexOfPrefix != -1) result = result.split(this.prefix).join("");
+            // Remove spaces and comas
+            result = result.replace(new RegExp("[\\s,]", "g"), "");
+            return result;
+        }.call(this);
+        var result;
         if (cleaned == "") {
-            return number;
+            result = number;
         } else {
             var numberObject = new Number(cleaned);
             if (isNaN(numberObject)) {
-                return number;
+                result = number;
             } else {
                 var fixed = numberObject.toFixed(this.digitsAfterDecimal);
                 var parts = fixed.split(".");
@@ -96,13 +106,13 @@ YAHOO.xbl.fr.Currency.prototype = {
                 while (regExp.test(parts[0])) {
                     parts[0] = parts[0].replace(regExp, "$1" + "," + "$2");
                 }
-                var result = this.prefix == "" ? "" : this.prefix + " ";
+                result = this.prefix == "" ? "" : this.prefix + " ";
                 result += parts[0];
                 if (parts.length > 1)
                     result += "." + parts[1];
-                return result;
             }
         }
+        return result;
     },
 
     xformsToVisible: function() {

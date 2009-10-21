@@ -121,10 +121,19 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         testCleanupPrefix: function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 valueInput.focus();
-                valueInput.value = "$ 42";
+                valueInput.value = "$4242";
                 doubleInput.focus();
             }, function() {
-                YAHOO.util.Assert.areEqual("42", ORBEON.xforms.Controls.getCurrentValue(valueOutput));
+                YAHOO.util.Assert.areEqual("$ 4,242.00", valueInput.value, "1st attempt, value in field");
+                YAHOO.util.Assert.areEqual("4242", ORBEON.xforms.Controls.getCurrentValue(valueOutput), "1st attempt, value in instance");
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    valueInput.focus();
+                    valueInput.value = "$4242";
+                    doubleInput.focus();
+                }, function() {
+                    YAHOO.util.Assert.areEqual("$ 4,242.00", valueInput.value, "2nd attempt, value in field");
+                    YAHOO.util.Assert.areEqual("4242", ORBEON.xforms.Controls.getCurrentValue(valueOutput), "2nd attempt, value in instance");
+                });
             });
         },
         testNoPrefix: function() {

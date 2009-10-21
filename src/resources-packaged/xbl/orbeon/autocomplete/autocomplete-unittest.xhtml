@@ -89,6 +89,18 @@
             </xforms:itemset>
             <xforms:alert>Value is mandatory</xforms:alert>
         </fr:autocomplete>
+        <xforms:trigger appearance="minimal" id="static-set-to-canada">
+            <xforms:label>Set label to Canada</xforms:label>
+            <xforms:dispatch ev:event="DOMActivate" target="static-autocomplete" name="fr-set-label">
+                <xxforms:context name="label" select="'Canada'"/>
+            </xforms:dispatch>
+        </xforms:trigger> |
+        <xforms:trigger appearance="minimal" id="static-set-to-utopia">
+            <xforms:label>Set label to Utopia</xforms:label>
+            <xforms:dispatch ev:event="DOMActivate" target="static-autocomplete" name="fr-set-label">
+                <xxforms:context name="label" select="'Utopia'"/>
+            </xforms:dispatch>
+        </xforms:trigger>
 
         <xhtml:h2>Dynamic itemset</xhtml:h2>
 
@@ -125,6 +137,18 @@
             <xforms:alert>Value is mandatory</xforms:alert>
             <fr:max-results-displayed ref="instance('configuration')/max-results-displayed"/>
         </fr:autocomplete>
+        <xforms:trigger appearance="minimal" id="dynamic-set-to-canada">
+            <xforms:label>Set label to Canada</xforms:label>
+            <xforms:dispatch ev:event="DOMActivate" target="dynamic-autocomplete" name="fr-set-label">
+                <xxforms:context name="label" select="'Canada'"/>
+            </xforms:dispatch>
+        </xforms:trigger> |
+        <xforms:trigger appearance="minimal" id="dynamic-set-to-utopia">
+            <xforms:label>Set label to Utopia</xforms:label>
+            <xforms:dispatch ev:event="DOMActivate" target="dynamic-autocomplete" name="fr-set-label">
+                <xxforms:context name="label" select="'Utopia'"/>
+            </xforms:dispatch>
+        </xforms:trigger>
 
     </xhtml:body>
 </xhtml:html>

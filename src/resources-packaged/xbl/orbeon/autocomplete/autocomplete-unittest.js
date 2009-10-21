@@ -207,6 +207,18 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                     continuation.call(this);
                 });
             });
+        },
+
+        testSetLabel: function() {
+            // Disabled for now, as not fully implemented
+            return;
+            this.runForStaticDynamic(function(staticDynamic, continuation) {
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamic + "-set-to-canada"));
+                }, function() {
+                    continuation.call(this);
+                });
+            });
         }
     }));
 

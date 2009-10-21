@@ -34,6 +34,13 @@
             <xbl:style src="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css"/>
             <xbl:style src="/xbl/orbeon/autocomplete/autocomplete.css"/>
         </xbl:resources>
+        <xbl:handlers>
+            <xbl:handler event="fr-set-label" phase="target">
+                <xforms:dispatch target="autocomplete-container" name="fr-set-label">
+                    <xxforms:context name="label" select="event('label')"/>
+                </xforms:dispatch>
+            </xbl:handler>
+        </xbl:handlers>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
@@ -53,8 +60,14 @@
 
                         <xxforms:variable name="external-value" select="."/>
                         <xbl:content includes="fr|autocomplete > xforms|label, fr|autocomplete > xforms|help, fr|autocomplete > xforms|hint, fr|autocomplete > xforms|alert"/>
-                        <!-- Init event -->
+
+                        <!-- Events on controls -->
                         <xxforms:script ev:event="xforms-enabled" ev:observer="autocomplete-container">YAHOO.xbl.fr.Autocomplete.instance(this).init();</xxforms:script>
+                        <xforms:action ev:event="fr-set-label">
+                            <xforms:setvalue model="autocomplete-model" ref="textfield-value" value="event('label')"/>
+                            <xxforms:script>YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xxforms:script>
+                        </xforms:action>
+
                         <xforms:group appearance="xxforms:internal">
                             <!-- Stop propagation of all local UI events -->
                             <xforms:action ev:event="#all" ev:propagate="stop"/>

@@ -21,13 +21,15 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents an XForms (or just plain XML Events) event handler implementation.
  */
 public class XFormsEventHandlerImpl implements XFormsEventHandler {
+
+    // Special target id indicating that the target is the observer
+    public static final String TARGET_IS_OBSERVER = "#observer";
 
     private final Element eventHandlerElement;
     private final String ancestorObserverStaticId;
@@ -35,7 +37,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     private final Map<String, String> eventNames;
     private final boolean isAllEvents;
     private final String[] observerStaticIds;
-    private final Map<String, String> targetStaticIds;
+    private final Set<String> targetStaticIds;
     //private final String handler;
     private final boolean isBubblingPhase;        // "true" means "default" (bubbling), "false" means "capture"
     private final boolean isPropagate;            // "true" means "continue", "false" means "stop"
@@ -116,10 +118,16 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         if (targets == null) {
             targetStaticIds = null;
         } else {
-            targetStaticIds = new HashMap<String, String>();
-            final String[] targetIdsArray = StringUtils.split(targets);
-            for (String aTargetIdsArray: targetIdsArray) {
-                targetStaticIds.put(aTargetIdsArray, "");
+            targetStaticIds = new HashSet<String>();
+            final String[] targetIds = StringUtils.split(targets);
+            for (String targetId: targetIds) {
+                if (TARGET_IS_OBSERVER.equals(targetId)) {
+                    // Add all observer ids as targets
+                    targetStaticIds.addAll(Arrays.asList(observerStaticIds));
+                } else {
+                    // Add id as target
+                    targetStaticIds.add(targetId);
+                }
             }
         }
 
@@ -174,8 +182,8 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     }
 
     public boolean isMatchTarget(String targetStaticId) {
-        // Match if no target id is specified, or if any specifed target matches
-        return targetStaticIds == null || targetStaticIds.get(targetStaticId) != null;
+        // Match if no target id is specified, or if any specified target matches
+        return targetStaticIds == null || targetStaticIds.contains(targetStaticId);
     }
 
     public boolean isAllEvents() {

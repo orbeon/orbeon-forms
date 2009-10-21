@@ -149,7 +149,7 @@ public class XFormsActionInterpreter {
         if (!XFormsActions.isActionName(actionNamespaceURI, actionName)) {
             throw new ValidationException("Invalid action: " + XMLUtils.buildExplodedQName(actionNamespaceURI, actionName),
                     new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
-                            new String[] { "action name", XMLUtils.buildExplodedQName(actionNamespaceURI, actionName) }));
+                            "action name", XMLUtils.buildExplodedQName(actionNamespaceURI, actionName)));
         }
 
         try {
@@ -236,7 +236,7 @@ public class XFormsActionInterpreter {
             }
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
-                    new String[] { "action name", XMLUtils.buildExplodedQName(actionNamespaceURI, actionName) }));
+                    "action name", XMLUtils.buildExplodedQName(actionNamespaceURI, actionName)));
         }
     }
 

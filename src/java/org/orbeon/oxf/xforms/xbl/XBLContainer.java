@@ -798,8 +798,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                 XFormsEventObserver eventObserver
                         = (targetObject instanceof XFormsEventObserver) ? (XFormsEventObserver) targetObject : targetObject.getParentEventObserver(this);
                 while (eventObserver != null) {
-                    if (!(eventObserver instanceof XFormsRepeatControl || eventObserver instanceof XXFormsRootControl)) {
-                        // Repeat is not an observer (repeat iterations are)
+                    if (!((eventObserver instanceof XFormsRepeatControl && targetObject != eventObserver) || eventObserver instanceof XXFormsRootControl)) {
+                        // Repeat is not an observer (repeat iterations are) UNLESS it is the direct target of the event
 
                         if (eventObserver instanceof XFormsComponentControl && targetObject != eventObserver) {
                             // Either retarget, or stop propagation if the event is trying to go through the component boundary

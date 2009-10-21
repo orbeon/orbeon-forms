@@ -11,19 +11,19 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:sql="http://orbeon.org/oxf/xml/sql"
-            xmlns:xi="http://www.w3.org/2001/XInclude"
-            xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-            xmlns:saxon="http://saxon.sf.net/"
+<xhtml:html xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
             xmlns:xforms="http://www.w3.org/2002/xforms"
-            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:sql="http://orbeon.org/oxf/xml/sql"
             xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-            xmlns:exforms="http://www.exforms.org/exf/1-0"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:saxon="http://saxon.sf.net/"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-            xmlns:ev="http://www.w3.org/2001/xml-events">
+            xmlns:xi="http://www.w3.org/2001/XInclude"
+            xmlns:exforms="http://www.exforms.org/exf/1-0">
     <xhtml:head>
         <xhtml:title>Form Builder Controls</xhtml:title>
         <xforms:model id="fr-form-model">
@@ -60,6 +60,8 @@
                         <multiple-list/>
                         <link-select1/>
                         <box-select/>
+                        <single-tree-selector/>
+                        <multiple-tree-selector/>
                     </selection-controls>
                     <attachment-controls>
                         <image-attachment filename="" mediatype="" size=""/>
@@ -121,6 +123,10 @@
                                  name="multiple-list"/>
                     <xforms:bind id="link-select1-bind" nodeset="link-select1" name="link-select1"/>
                     <xforms:bind id="box-select-bind" nodeset="box-select" name="box-select"/>
+                    <xforms:bind id="single-tree-selector-bind" nodeset="single-tree-selector"
+                                 name="single-tree-selector"/>
+                    <xforms:bind id="multiple-tree-selector-bind" nodeset="multiple-tree-selector"
+                                 name="multiple-tree-selector"/>
                 </xforms:bind>
                 <xforms:bind id="other-controls-bind" nodeset="other-controls" name="other-controls">
 
@@ -466,6 +472,74 @@
 
                             </item>
                         </box-select>
+                        <single-tree-selector>
+                            <label>Single Tree Selector</label>
+                            <hint>Single-selection tree</hint>
+                            <help/>
+                            <alert/>
+                            <item>
+                                <label>Cat</label>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label>Dog</label>
+                                <value>dog</value>
+
+
+
+
+                            </item>
+                            <item>
+                                <label>Bird</label>
+                                <value>bird</value>
+
+
+
+
+                            </item>
+                            <item>
+                                <label>Fish</label>
+                                <value>fish</value>
+
+
+
+
+                            </item>
+                        </single-tree-selector>
+                        <multiple-tree-selector>
+                            <label>Multiple tree Selector</label>
+                            <hint>Multiple-selection tree</hint>
+                            <help/>
+                            <alert/>
+                            <item>
+                                <label>Cat</label>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label>Dog</label>
+                                <value>dog</value>
+
+
+
+
+                            </item>
+                            <item>
+                                <label>Bird</label>
+                                <value>bird</value>
+
+
+
+
+                            </item>
+                            <item>
+                                <label>Fish</label>
+                                <value>fish</value>
+
+
+
+
+                            </item>
+                        </multiple-tree-selector>
                         <date>
                             <label>Date</label>
                             <hint>Standard date field</hint>
@@ -820,6 +894,72 @@
 
                             </item>
                         </box-select>
+                        <single-tree-selector>
+                            <label/>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                            <item>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label/>
+                                <value>dog</value>
+
+
+
+
+                            </item>
+                            <item>
+                                <label/>
+                                <value>bird</value>
+
+
+
+
+                            </item>
+                            <item>
+                                <label/>
+                                <value>fish</value>
+
+
+
+
+                            </item>
+                        </single-tree-selector>
+                        <multiple-tree-selector>
+                            <label/>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                            <item>
+                                <value>cat</value>
+                            </item>
+                            <item>
+                                <label/>
+                                <value>dog</value>
+
+
+
+
+                            </item>
+                            <item>
+                                <label/>
+                                <value>bird</value>
+
+
+
+
+                            </item>
+                            <item>
+                                <label/>
+                                <value>fish</value>
+
+
+
+
+                            </item>
+                        </multiple-tree-selector>
                         <date>
                             <label>Date</label>
                             <hint/>
@@ -968,10 +1108,10 @@
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                               xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              xmlns:xbl="http://www.w3.org/ns/xbl"
                                               id="number-control"
                                               bind="number-bind">
                                     <xforms:label ref="$form-resources/number/label"/>
@@ -996,9 +1136,9 @@
                             <xhtml:td>
                                 <fr:inplace-input xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                                                   xmlns:exf="http://www.exforms.org/exf/1-0"
+                                                  xmlns="http://orbeon.org/oxf/xml/form-builder"
                                                   xmlns:oxf="http://www.orbeon.com/oxf/processors"
                                                   xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                                  xmlns="http://orbeon.org/oxf/xml/form-builder"
                                                   bind="inplace-input-bind"
                                                   id="inplace-input-control">
                                     <xforms:label ref="$form-resources/inplace-input/label"/>
@@ -1025,10 +1165,10 @@
                     <fr:grid columns="1">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:textarea xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                 xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:textarea xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                                  xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                 xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                 xmlns:xbl="http://www.w3.org/ns/xbl"
                                                  bind="textarea-bind"
                                                  id="textarea-control">
                                     <xforms:label ref="$form-resources/textarea/label"/>
@@ -1040,10 +1180,10 @@
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:textarea xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                 xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:textarea xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                                  xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                 xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                 xmlns:xbl="http://www.w3.org/ns/xbl"
                                                  mediatype="text/html"
                                                  bind="htmlarea-bind"
                                                  id="htmlarea-control">
@@ -1062,10 +1202,10 @@
                     <fr:grid columns="4">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:input xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                               xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              xmlns:xbl="http://www.w3.org/ns/xbl"
                                               bind="date-bind"
                                               id="date-control">
                                     <xforms:label ref="$form-resources/date/label"/>
@@ -1075,10 +1215,10 @@
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                               xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              xmlns:xbl="http://www.w3.org/ns/xbl"
                                               bind="time-bind"
                                               id="time-control">
                                     <xforms:label ref="$form-resources/time/label"/>
@@ -1088,10 +1228,10 @@
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                               xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              xmlns:xbl="http://www.w3.org/ns/xbl"
                                               bind="datetime-bind"
                                               id="datetime-control">
                                     <xforms:label ref="$form-resources/datetime/label"/>
@@ -1105,10 +1245,10 @@
 
                         <xhtml:tr>
                             <xhtml:td>
-                                <fr:dropdown-date xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                  xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <fr:dropdown-date xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                  xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                                   xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                  xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                  xmlns:xbl="http://www.w3.org/ns/xbl"
                                                   bind="dropdown-date-bind"
                                                   id="dropdown-date-control">
                                     <xforms:label ref="$form-resources/dropdown-date/label"/>
@@ -1118,10 +1258,10 @@
                                 </fr:dropdown-date>
                             </xhtml:td>
                             <xhtml:td>
-                                <fr:fields-date xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <fr:fields-date xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                                 xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                xmlns:xbl="http://www.w3.org/ns/xbl"
                                                 bind="fields-date-bind"
                                                 id="fields-date-control">
                                     <xforms:label ref="$form-resources/fields-date/label"/>
@@ -1131,10 +1271,10 @@
                                 </fr:fields-date>
                             </xhtml:td>
                             <xhtml:td>
-                                <fr:date-picker xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <fr:date-picker xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                                 xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                xmlns:xbl="http://www.w3.org/ns/xbl"
                                                 bind="date-picker-bind"
                                                 id="date-picker-control">
                                     <xforms:label ref="$form-resources/date-picker/label"/>
@@ -1159,10 +1299,10 @@
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                               xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              xmlns:xbl="http://www.w3.org/ns/xbl"
                                               bind="boolean-bind"
                                               id="boolean-control">
                                     <xforms:label ref="$form-resources/boolean/label"/>
@@ -1244,10 +1384,10 @@
                     <fr:grid columns="3">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:select1 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:select1 xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                                 xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                xmlns:xbl="http://www.w3.org/ns/xbl"
                                                 appearance="minimal"
                                                 bind="dropdown-bind"
                                                 id="dropdown-control">
@@ -1322,14 +1462,14 @@
                                 </xforms:select>
                             </xhtml:td>
                             <xhtml:td>
-                                <fr:link-select1 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                                                 xmlns:exf="http://www.exforms.org/exf/1-0"
+                                <fr:link-select1 xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                                                  xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                 xmlns:oxf="http://www.orbeon.com/oxf/processors"
-                                                 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                                 xmlns:xbl="http://www.w3.org/ns/xbl"
+                                                 xmlns:exf="http://www.exforms.org/exf/1-0"
                                                  xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                 xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                 xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                                                 xmlns:xbl="http://www.w3.org/ns/xbl"
+                                                 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                                  bind="link-select1-bind"
                                                  id="link-select1-control">
                                     <xforms:label ref="$form-resources/link-select1/label"/>
@@ -1345,14 +1485,14 @@
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:td>
-                                <fr:box-select xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                                               xmlns:exf="http://www.exforms.org/exf/1-0"
+                                <fr:box-select xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                               xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:oxf="http://www.orbeon.com/oxf/processors"
-                                               xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                               xmlns:xbl="http://www.w3.org/ns/xbl"
+                                               xmlns:exf="http://www.exforms.org/exf/1-0"
                                                xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                               xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                                               xmlns:xbl="http://www.w3.org/ns/xbl"
+                                               xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
                                                bind="box-select-bind"
                                                id="box-select-control">
                                     <xforms:label ref="$form-resources/box-select/label"/>
@@ -1365,8 +1505,38 @@
                                     </xforms:itemset>
                                 </fr:box-select>
                             </xhtml:td>
-                            <xhtml:td/>
-                            <xhtml:td/>
+                            <xhtml:td>
+                                <xforms:select1 xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                                xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                xmlns:xbl="http://www.w3.org/ns/xbl"
+                                                appearance="xxforms:tree"
+                                                bind="single-tree-selector-bind"
+                                                id="single-tree-selector-control">
+                                    <xforms:label ref="$form-resources/single-tree-selector/label"/>
+                                    <xforms:hint ref="$form-resources/single-tree-selector/hint"/>
+                                    <xforms:help ref="$form-resources/single-tree-selector/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xforms:itemset nodeset="$form-resources/single-tree-selector/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:select xmlns="http://orbeon.org/oxf/xml/form-builder" appearance="xxforms:tree"
+                                               bind="multiple-tree-selector-bind"
+                                               id="multiple-tree-selector-control">
+                                    <xforms:label ref="$form-resources/multiple-tree-selector/label"/>
+                                    <xforms:hint ref="$form-resources/multiple-tree-selector/hint"/>
+                                    <xforms:help ref="$form-resources/multiple-tree-selector/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xforms:itemset nodeset="$form-resources/multiple-tree-selector/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select>
+                            </xhtml:td>
                         </xhtml:tr>
                     </fr:grid>
                 </fr:section>
@@ -1376,10 +1546,10 @@
                     <fr:grid columns="2">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:output xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:output xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                                xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                               xmlns:xbl="http://www.w3.org/ns/xbl"
                                                bind="browser-button-description-bind"
                                                id="browser-button-description-control">
                                     <xforms:label ref="$form-resources/browser-button-description/label"/>
@@ -1400,10 +1570,10 @@
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:output xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:xbl="http://www.w3.org/ns/xbl"
+                                <xforms:output xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                                xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                               xmlns:xbl="http://www.w3.org/ns/xbl"
                                                bind="standardized-button-description-bind"
                                                id="standardized-button-description-control">
                                     <xforms:label ref="$form-resources/standardized-button-description/label"/>
@@ -1428,21 +1598,21 @@
                 <fr:section id="us-address-section" bind="us-address-bind">
                     <xforms:label ref="$form-resources/us-address/label"/>
                     <xforms:help ref="$form-resources/us-address/help"/>
-                    <component:us-address xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                          xmlns:xbl="http://www.w3.org/ns/xbl"
-                                          xmlns="http://orbeon.org/oxf/xml/form-builder"
+                    <component:us-address xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"
                                           xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                          xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"/>
+                                          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                          xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                          xmlns:xbl="http://www.w3.org/ns/xbl"/>
 
                 </fr:section>
                 <fr:section id="personal-information-section" bind="personal-information-bind">
                     <xforms:label ref="$form-resources/personal-information/label"/>
                     <xforms:help ref="$form-resources/personal-information/help"/>
-                    <component:personal-information xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                    xmlns:xbl="http://www.w3.org/ns/xbl"
-                                                    xmlns="http://orbeon.org/oxf/xml/form-builder"
+                    <component:personal-information xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"
                                                     xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                                    xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"/>
+                                                    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                                    xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                                    xmlns:xbl="http://www.w3.org/ns/xbl"/>
 
                 </fr:section>
             </fr:body>

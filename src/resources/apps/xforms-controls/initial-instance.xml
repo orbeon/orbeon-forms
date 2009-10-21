@@ -73,6 +73,8 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
         <multiple-list/>
         <link-select1/>
         <box-select/>
+        <single-tree-selector/>
+        <multiple-tree-selector/>
     </selection-controls>
     <attachment-controls>
         <image-attachment filename="egg.jpg" mediatype="image/jpeg" size="11944">oxf:/apps/xforms-controls/images/egg.jpg</image-attachment>

@@ -1416,6 +1416,12 @@ public class XFormsUtils {
                     protected XFormsContextStack getContextStack() {
                         return LHHAElementVisitorListener.this.contextStack;
                     }
+
+                    @Override
+                    public String getEffectiveId() {
+                        // Return given source effective id, so we have a source effective id for resolution of index(), etc.
+                        return sourceEffectiveId;
+                    }
                 };
                 contextStack.pushBinding(pipelineContext, element, sourceEffectiveId, outputControl.getChildElementScope(element));
                 {

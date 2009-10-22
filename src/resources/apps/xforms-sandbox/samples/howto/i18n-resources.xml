@@ -24,4 +24,16 @@
             <change>Choisissez votre language:</change>
         </language>
     </resources>
+    <resources xml:lang="zh-Hans">
+        <label>中文 (简化字)</label>
+        <registration>
+            <first-name>名字</first-name>
+            <last-name>姓</last-name>
+            <register>注册</register>
+            <thank-you>谢谢你的注册</thank-you>
+        </registration>
+        <language>
+            <change>选择语言:</change>
+        </language>
+    </resources>
 </resources>

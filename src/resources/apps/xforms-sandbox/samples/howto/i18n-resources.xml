@@ -13,7 +13,7 @@
         </language>
     </resources>
     <resources xml:lang="fr">
-        <label>Français</label>o
+        <label>Français</label>
         <registration>
             <first-name>Prénom</first-name>
             <last-name>Nom de famille</last-name>

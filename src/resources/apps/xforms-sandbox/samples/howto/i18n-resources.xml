@@ -3,6 +3,7 @@
     <resources xml:lang="en">
         <label>English</label>
         <registration>
+            <title>Registration</title>
             <first-name>First name</first-name>
             <last-name>Last name</last-name>
             <register>Register</register>
@@ -15,6 +16,7 @@
     <resources xml:lang="fr">
         <label>Français</label>
         <registration>
+            <title>Enregistrement</title>
             <first-name>Prénom</first-name>
             <last-name>Nom de famille</last-name>
             <register>Enregistrer</register>
@@ -27,6 +29,7 @@
     <resources xml:lang="zh-Hans">
         <label>中文 (简化字)</label>
         <registration>
+            <title>注册</title>
             <first-name>名</first-name>
             <last-name>姓</last-name>
             <register>注册</register>

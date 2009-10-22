@@ -915,9 +915,10 @@
 
 
         <xforms:repeat nodeset="$fr-dt-rewrittenNodeset">
+            <xsl:apply-templates select="@*[not(name()='nodeset')]" mode="dynamic"/>
             <xxforms:script ev:event="xxforms-nodeset-changed" ev:target="#observer#nop">
                 ORBEON.widgets.datatable.update(this); </xxforms:script>
-            <xsl:apply-templates select="@*[not(name()='nodeset')]|node()" mode="dynamic"/>
+            <xsl:apply-templates select="node()" mode="dynamic"/>
         </xforms:repeat>
 
     </xsl:template>

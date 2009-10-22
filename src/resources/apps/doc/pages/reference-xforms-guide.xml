@@ -2087,6 +2087,14 @@
                     ways to initialize XForms instances.
                 </p>
             </section>
+            <a name="xforms-instance-initialization-recommended"/>
+            <section>
+                <title>Recommended methods</title>
+                <p>
+                    See <a href="http://wiki.orbeon.com/forms/how-to/load-initial-form-data">the Orbeon Forms wiki</a>
+                    for a guide to initializing instances.
+                </p>
+            </section>
             <a name="xforms-instance-initialization-pfc"/>
             <section>
                 <title>Initializing XForms Instances from the PFC</title>
@@ -2117,31 +2125,6 @@
                         output. These mechanisms are described in details in the <a
                         href="reference-page-flow#page-model-page-view">PFC documentation</a>.
                     </p>
-                </section>
-                <a name="xforms-instance-initialization-src"/>
-                <section>
-                    <title>Using the <code>src</code> Attribute</title>
-                    <p>
-                        The <code>&lt;xforms:instance></code> element supports an <code>src</code> attribute, able to
-                        access the current XML submission using the <code>input:instance</code> URI, as well as the page
-                        model data using the <code>input:data</code> URI.
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <html xmlns:xforms="http://www.w3.org/2002/xforms"
-                              xmlns:xi="http://www.w3.org/2001/XInclude-doc"
-                              xmlns="http://www.w3.org/1999/xhtml">
-                            <head>
-                                <title>Summary</title>
-                                <xforms:model>
-                                    <xforms:instance id="document-infos-instance" src="input:instance"/>
-                                    ...
-                                </xforms:model>
-                            </head>
-                            <body>
-                                ...
-                            </body>
-                        </html>
-                    </xml-source>
                 </section>
                 <a name="xforms-instance-initialization-xinclude"/>
                 <section>
@@ -2251,12 +2234,6 @@
                         </p>
                     </note>
                 </section>
-            </section>
-            <section>
-                <title>Initializing XForms Instances with an XForms Submission</title>
-                <p>
-                    [TODO]
-                </p>
             </section>
         </section>
         <!--

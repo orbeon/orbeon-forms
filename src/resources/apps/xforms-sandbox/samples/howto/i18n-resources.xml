@@ -29,7 +29,7 @@
     <resources xml:lang="zh-Hans">
         <label>中文 (简化字)</label>
         <registration>
-            <title>注册</title>
+            <title>注册表格</title>
             <first-name>名</first-name>
             <last-name>姓</last-name>
             <register>注册</register>

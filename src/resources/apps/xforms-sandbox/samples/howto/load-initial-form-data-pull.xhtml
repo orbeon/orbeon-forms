@@ -3,7 +3,7 @@
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events">
     <head>
-        <title>Push initial form data to XForms from Java</title>
+        <title>Pull initial form data from a service</title>
         <xforms:model id="main-model">
 
             <!-- User in which user data is collected -->
@@ -21,15 +21,12 @@
                 </registration>
             </xforms:instance>
 
-            <!-- Just for the demo: store data into request first -->
-            <xforms:insert ev:event="xforms-model-construct-done"
-                           if="empty(xxforms:get-request-attribute('my-user-data'))"
-                           context="."
-                           origin="xxforms:set-request-attribute('my-user-data', instance('demo-user-data'))"/>
-
-            <!-- Load initial data from the request -->
-            <xforms:insert ev:event="xforms-model-construct-done"
-                           nodeset="instance('user-data')" origin="xxforms:get-request-attribute('my-user-data')"/>
+            <!-- Load initial data from a service -->
+            <xforms:send ev:event="xforms-model-construct-done" submission="load-data-submission"/>
+            <xforms:submission id="load-data-submission"
+                               method="get" serialization="none"
+                               resource="http://github.com/orbeon/orbeon-forms/raw/development/src/resources/apps/xforms-sandbox/samples/howto/load-initial-form-data-pull-instance.xml"
+                               replace="instance" instance="user-data"/>
 
         </xforms:model>
         <style type="text/css">

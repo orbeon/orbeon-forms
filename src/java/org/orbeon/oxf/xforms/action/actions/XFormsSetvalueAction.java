@@ -61,17 +61,6 @@ public class XFormsSetvalueAction extends XFormsAction {
                     // If @ref doesn't point to anything, don't even try to compute the value
                     valueToSet = null;
                 }
-
-                // TODO: this note is most likely out of date:
-                // NOTE: The above is actually not correct: the context should not become null or empty. This is
-                // therefore just a workaround for a bug we hit:
-
-                // o Do 2 setvalue in sequence
-                // o The first one changes the context around the control containing the actions
-                // o When the second one runs, context is empty, and setvalue either crashes or does nothing
-                //
-                // The correct solution is probably to NOT reevaluate the context of actions unless a rebuild is done.
-                // This would require an update to the way we implement the processing model.
             }
         } else {
             // Value to set is static content

@@ -47,7 +47,7 @@ public class XFormsContextStack {
     // future, we should allow running expressions with no context, possibly after statically checking that they do not
     // depend on the context, as well as prevent evaluations within non-relevant content by other means.
 //    final List<Item> DEFAULT_CONTEXT = XFormsConstants.EMPTY_ITEM_LIST;
-    final List<Item> DEFAULT_CONTEXT = Collections.singletonList((Item) XFormsUtils.DUMMY_CONTEXT);
+    public static final List<Item> DEFAULT_CONTEXT = Collections.singletonList((Item) XFormsUtils.DUMMY_CONTEXT);
 
     private XBLContainer container;
     private XFormsContainingDocument containingDocument;
@@ -386,32 +386,83 @@ public class XFormsContextStack {
                             evaluationContextBinding = baseBindingContext;
                         }
 
-                        if (evaluationContextBinding.getNodeset().size() > 0) {
-                             // Evaluate new XPath in context if the current context is not empty
+                        if (false) {
+                            // NOTE: This is an attempt at allowing evaluating a binding even if no context is present.
+                            // But this doesn't work properly. E.g.:
+                            //
+                            // <xf:group ref="()">
+                            //   <xf:input ref="."/>
+                            //
+                            // Above must end up with an empty binding for xf:input, while:
+                            //
+                            // <xf:group ref="()">
+                            //   <xf:input ref="instance('foobar')"/>
+                            //
+                            // Above must end up with a non-empty binding IF it was to be evaluated.
+                            //
+                            // Now the second condition above should not happen anyway, because the content of the group
+                            // is non-relevant anyway. But we do have cases now where this happens, so we can't enable
+                            // the code below naively.
+                            //
+                            // We could enable it if we knew statically that the expression did not depend on the
+                            // context though, but right now we don't.
 
-                            // TODO: in the future, we should allow null context for expressions that do not depend on the context
-                            // NOTE: We prevent evaluation if the context was empty. However there are cases where this
-                            // should be allowed, if the expression does not depend on the context. Ideally, we would know
-                            // statically whether an expression depends on the context or not, and take separate action if
-                            // that's the case. Currently, such an expression will produce a DynamicError.
+                            final boolean isDefaultContext;
+                            final List<Item> evaluationNodeset;
+                            final int evaluationPosition;
+                            if (evaluationContextBinding.getNodeset().size() > 0) {
+                                isDefaultContext = false;
+                                evaluationNodeset = evaluationContextBinding.getNodeset();
+                                evaluationPosition = evaluationContextBinding.getPosition();
+                            } else {
+                                isDefaultContext = true;
+                                evaluationNodeset = XFormsContextStack.DEFAULT_CONTEXT;
+                                evaluationPosition = 1;
+                            }
 
-                            // It might be the case that when we implement non-evaluation of relevant subtrees, this won't
-                            // be an issue anymore, and we can simply allow evaluation of such expressions. Otherwise,
-                            // static analysis of expressions might provide enough information to handle the two situations.
-
-                            pushTemporaryContext(currentBindingContext, evaluationContextBinding, evaluationContextBinding.getSingleItem());// provide context information for the context() function
+                            if (!isDefaultContext) {
+                                // Provide context information for the context() function
+                                pushTemporaryContext(currentBindingContext, evaluationContextBinding, evaluationContextBinding.getSingleItem());
+                            }
 
                             // Use updated binding context to set model
                             functionContext.setModel(evaluationContextBinding.model);
 
-                            newNodeset = XPathCache.evaluateKeepItems(propertyContext, evaluationContextBinding.getNodeset(), evaluationContextBinding.getPosition(),
+                            newNodeset = XPathCache.evaluateKeepItems(propertyContext, evaluationNodeset, evaluationPosition,
                                     ref != null ? ref : nodeset, bindingElementNamespaceContext, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
                                     functionContext, null, locationData);
 
-                            popBinding();
+                            if (!isDefaultContext) {
+                                popBinding();
+                            }
                         } else {
-                            // Otherwise we consider we can't evaluate
-                            newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
+                            if (evaluationContextBinding.getNodeset().size() > 0) {
+                                // Evaluate new XPath in context if the current context is not empty
+
+                                // TODO: in the future, we should allow null context for expressions that do not depend on the context
+                                // NOTE: We prevent evaluation if the context was empty. However there are cases where this
+                                // should be allowed, if the expression does not depend on the context. Ideally, we would know
+                                // statically whether an expression depends on the context or not, and take separate action if
+                                // that's the case. Currently, such an expression will produce a DynamicError.
+
+                                // It might be the case that when we implement non-evaluation of relevant subtrees, this won't
+                                // be an issue anymore, and we can simply allow evaluation of such expressions. Otherwise,
+                                // static analysis of expressions might provide enough information to handle the two situations.
+
+                                pushTemporaryContext(currentBindingContext, evaluationContextBinding, evaluationContextBinding.getSingleItem());// provide context information for the context() function
+
+                                // Use updated binding context to set model
+                                functionContext.setModel(evaluationContextBinding.model);
+
+                                newNodeset = XPathCache.evaluateKeepItems(propertyContext, evaluationContextBinding.getNodeset(), evaluationContextBinding.getPosition(),
+                                        ref != null ? ref : nodeset, bindingElementNamespaceContext, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                                        functionContext, null, locationData);
+
+                                popBinding();
+                            } else {
+                                // Otherwise we consider we can't evaluate
+                                newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
+                            }
                         }
 
                         // Restore optional context

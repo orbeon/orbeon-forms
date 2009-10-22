@@ -354,6 +354,33 @@ var testCase = {
 
     },
 
+    testSortableExternal: function() {
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'sortableExternal', function() {
+
+            ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                ORBEON.xforms.Document.setValue("sortedColumn", "-1");
+                ORBEON.xforms.Document.setValue("sortOrder", "none");
+            }, function() {
+
+                // Check the table structure
+                var table = YAHOO.util.Dom.get('my-accordion$sortableExternal-table$sortableExternal-table-table');
+                thiss.checkTableStructure(table, 6);
+                thiss.checkTableAndContainerWidths(table);
+                thiss.checkRowWidth(table.tHead.rows[0]);
+
+                thiss.checkHint(table, 6, 'Hey you, click to sort ascending');
+
+                // Click to sort the 6th column
+                thiss.clickAndCheckSortOrder(table, 6, 'ascending', 'number', function() {
+                    thiss.closeAccordionCase(thiss, 'sortableExternal');
+                }, 'Hey you, click to sort ascending', 'Hey you, click to sort descending');
+
+            });
+        });
+
+    },
+
     testScrollH: function() {
         var thiss = this;
         thiss.openAccordionCase(thiss, 'scrollH', function() {
@@ -529,7 +556,7 @@ var testCase = {
                         // Test that the column of the first column has been preserved
                         YAHOO.util.Assert.areEqual(width, th.clientWidth, "The width of the first column should be " + width + ", not " + th.clientWidth);
                         thiss.checkCellClasses(table, true);
-                        thiss.checkCellStyles(table, true);                        
+                        thiss.checkCellStyles(table, true);
 
                         thiss.closeAccordionCase(thiss, '_314379');
                     });

@@ -468,6 +468,16 @@ ORBEON.widgets.datatable.unittests_lib = {
         }
     },
 
+    checkHint: function(table, columnIndex, expectedHint, msgIntro) {
+        var headerCell = this.getSignificantElementByIndex(table.tHead.rows[0].cells, columnIndex);
+        if (msgIntro == undefined) {
+            msgIntro = '';
+        }
+        var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
+        var a = liner.getElementsByTagName('a')[0];
+        YAHOO.util.Assert.areEqual(expectedHint, a.title, msgIntro + 'Hint should be ' + expectedHint + ' not ' + a.title);
+    },
+
     clickAndCheckSortOrder: function(table, columnIndex, expectedOrder, sortType, callback, expectedHintBefore, expectedHintAfter) {
         //TODO: support scrollable tables
         var className;
@@ -477,7 +487,7 @@ ORBEON.widgets.datatable.unittests_lib = {
             className = 'yui-dt-desc';
         }
         if (expectedHintBefore == undefined) {
-            expectedHintBefore = 'Click to sort ' + expectedOrder ;
+            expectedHintBefore = 'Click to sort ' + expectedOrder;
         }
         if (expectedHintAfter == undefined) {
             if (expectedOrder == 'ascending') {
@@ -487,14 +497,14 @@ ORBEON.widgets.datatable.unittests_lib = {
             }
         }
 
+        this.checkHint(table, columnIndex, expectedHintBefore, 'Before click: ');
+
         var headerCell = this.getSignificantElementByIndex(table.tHead.rows[0].cells, columnIndex);
         var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
-        var a = liner.getElementsByTagName('a')[0];
-        YAHOO.util.Assert.areEqual(expectedHintBefore, a.title, 'Before click, hint should be ' + expectedHintBefore + ' not ' + a.title);
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             YAHOO.util.UserAction.click(liner, {clientX: 1});
         }, function() {
-            YAHOO.util.Assert.areEqual(expectedHintAfter, a.title, 'After click, hint should be ' + expectedHintAfter + ' not ' + a.title);
+            this.checkHint(table, columnIndex, expectedHintAfter, 'After click: ');
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(headerCell, className), 'Column ' + columnIndex + ' header cell should now have a class ' + className);
             var firstRow = this.getSignificantElementByIndex(table.tBodies[0].rows, 1);
             var bodyCell = this.getSignificantElementByIndex(firstRow.cells, columnIndex);

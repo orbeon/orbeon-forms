@@ -79,5 +79,13 @@
             </xforms:case>
         </xforms:switch>
 
+        <!-- Button to remove resources from cache -->
+        <p>
+            <xforms:trigger appearance="minimal">
+                <xforms:label>Remove resources from cache</xforms:label>
+                <xxforms:invalidate-instances ev:event="DOMActivate"/>
+            </xforms:trigger>
+        </p>
+
     </xhtml:body>
 </xhtml:html>

@@ -27,7 +27,7 @@
     <resources xml:lang="zh-Hans">
         <label>中文 (简化字)</label>
         <registration>
-            <first-name>名字</first-name>
+            <first-name>名</first-name>
             <last-name>姓</last-name>
             <register>注册</register>
             <thank-you>谢谢你的注册</thank-you>

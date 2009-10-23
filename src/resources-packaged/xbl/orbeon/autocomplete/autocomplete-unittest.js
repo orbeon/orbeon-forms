@@ -57,9 +57,10 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         /**
          * Checks that the external value is what we expect it to be.
          */
-        checkExternalValue: function(staticDynamic, expectedValue) {
+        checkExternalValue: function(staticDynamic, expectedValue, message) {
             var outputValue = ORBEON.xforms.Document.getValue(staticDynamic + "-output");
-            YAHOO.util.Assert.areEqual(expectedValue, outputValue, staticDynamic);
+            YAHOO.util.Assert.areEqual(expectedValue, outputValue, staticDynamic +
+                (YAHOO.lang.isUndefined(message) ? "" : " - " + message));
         },
 
         /**
@@ -210,14 +211,22 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         },
 
         testSetLabel: function() {
-            // Disabled for now, as not fully implemented
-            return;
             this.runForStaticDynamic(function(staticDynamic, continuation) {
-                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                    YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamic + "-set-to-canada"));
-                }, function() {
+                if (staticDynamic == "dynamic") {
+                    ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                        YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamic + "-set-to-canada"));
+                    }, function() {
+                        this.checkExternalValue(staticDynamic, "ca", "external value is 'ca' because Canada exists in the itemset");
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamic + "-set-to-utopia"));
+                        }, function() {
+                            this.checkExternalValue(staticDynamic, "", "external value is empty string because Utopia does not exist in the itemset");
+                            continuation.call(this);
+                        });
+                    });
+                } else {
                     continuation.call(this);
-                });
+                }
             });
         }
     }));

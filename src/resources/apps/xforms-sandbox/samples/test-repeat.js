@@ -44,6 +44,35 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 YAHOO.util.Assert.areEqual(delimiters[2], window.observerElement, "delimiter before first input");
             });
         });
+    },
+    
+    testObserverInRepeatsObserver: function() {
+        var delimiters = YAHOO.util.Dom.getElementsByClassName("xforms-repeat-delimiter", null, "table-observer");
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            ORBEON.xforms.Document.setValue("show", "false");
+        }, function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                ORBEON.xforms.Document.setValue("show", "true");
+            }, function() {
+                YAHOO.util.Assert.areEqual(delimiters[0], window.observerElement, "delimiter before first input");
+            });
+        });
+    },
+    
+    testObserverInRepeatsInXbl: function() {
+        var delimiters = YAHOO.util.Dom.getElementsByClassName("xforms-repeat-delimiter", null, "table-xbl");
+        var firstInput = YAHOO.util.Dom.get("xbl-component$name-xbl" + XFORMS_SEPARATOR_1 + "1").getElementsByTagName("input")[0];
+        var thirdInput = YAHOO.util.Dom.get("xbl-component$name-xbl" + XFORMS_SEPARATOR_1 + "3").getElementsByTagName("input")[0];
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            firstInput.focus();
+        }, function() {
+            YAHOO.util.Assert.areEqual(delimiters[0], window.observerElement, "delimiter before first input");
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                thirdInput.focus();
+            }, function() {
+                YAHOO.util.Assert.areEqual(delimiters[2], window.observerElement, "delimiter before first input");
+            });
+        });
     }
 }));
 

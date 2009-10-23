@@ -2656,10 +2656,6 @@ ORBEON.xforms.Controls = {
         yuiDialog.element.style.display = "block";
         // Show the dialog
         yuiDialog.show();
-        // By default try to display the dialog inside the viewport, but this can be overridden with constrain="false"
-        // This doesn't get the "constrain" attribute from the right place anyway
-//        var constrain = ORBEON.util.Dom.getAttribute(divElement, "constrain") == "false" ? false : true;
-//        yuiDialog.cfg.setProperty("constraintoviewport", constrain);
         // Make sure that this dialog is on top of everything else
         yuiDialog.cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex++);
         // Position the dialog either at the center of the viewport or relative of a neighbor
@@ -2670,7 +2666,6 @@ ORBEON.xforms.Controls = {
             // Align dialog relative to neighbor
             yuiDialog.cfg.setProperty("context", [neighbor, "tl", "bl"]);
             yuiDialog.align();
-            ORBEON.xforms.Globals.dialogMinimalVisible[controlId] = true;
         }
         // Take out the focus from the current control. This is particulary important with non-modal dialogs
         // opened with a minimal trigger, otherwise we have a dotted line around the link after it opens.
@@ -2701,7 +2696,6 @@ ORBEON.xforms.Controls = {
         ORBEON.xforms.Globals.alertTooltipForControl[control.id] = null;
         ORBEON.xforms.Globals.helpTooltipForControl[control.id] = null;
         ORBEON.xforms.Globals.dialogs[control.id] = null;
-        ORBEON.xforms.Globals.dialogMinimalVisible[control.id] = null;
         ORBEON.xforms.Globals.dialogMinimalLastMouseOut[control.id] = null;
     }
 };
@@ -3506,7 +3500,7 @@ ORBEON.xforms.Events = {
      */
     dialogMinimalBodyClick: function(event, yuiDialog) {
         // If this dialog is visible
-        if (ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id]) {
+        if (yuiDialog.element.style.display == "block") {
             // Abord if one of the parents is drop-down dialog
             var current = YAHOO.util.Event.getTarget(event);
             var foundDropDownParent = false;
@@ -3518,7 +3512,7 @@ ORBEON.xforms.Events = {
                 current = current.parentNode;
             }
             if (!foundDropDownParent) {
-                var event = new ORBEON.xforms.Server.Event(null, yuiDialog.element.id, null, null, "xxforms-dialog-close");
+                var event = new ORBEON.xforms.Server.Event(null, yuiDialog.id, null, null, "xxforms-dialog-close");
                 ORBEON.xforms.Server.fireEvents([event], false);
             }
         }
@@ -3530,7 +3524,7 @@ ORBEON.xforms.Events = {
      */
     dialogMinimalCheckMouseIn: function(yuiDialog) {
         var current = new Date().getTime();
-        if (ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id]
+        if (yuiDialog.element.style.display == "block"
                 && ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] != -1
                 && current - ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] >= ORBEON.util.Utils.getProperty(DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY)) {
             var event = new ORBEON.xforms.Server.Event(null, yuiDialog.element.id, null, null, "xxforms-dialog-close");
@@ -4405,7 +4399,6 @@ ORBEON.xforms.Init = {
             fckEditorLoading: false,             // True if  a FCK editor is currently loading
             fckEditorsToLoad: [],                // Queue of FCK editor to load
             dialogs: {},                         // Map for dialogs: id -> YUI dialog object
-            dialogMinimalVisible: {},            // Map for minimal dialog id -> boolean isVisible
             dialogMinimalLastMouseOut: {},       // Map for minimal dialog id -> -1 or timestamp of last time the mouse got out of the dialog
             hintTooltipForControl: {},           // Map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
             alertTooltipForControl: {},          // Map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
@@ -5046,12 +5039,13 @@ ORBEON.xforms.Init = {
         var yuiDialog;
         if (isMinimal) {
             // Create minimal dialog
-            yuiDialog = new YAHOO.widget.Panel(dialog.id, {
-                close: false,
+            yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
                 modal: isModal,
+                close: false,
                 visible: false,
-                constraintoviewport: true,
-                iframe: true,
+                draggable: false,
+                fixedcenter: false,
+                constraintoviewport: false,
                 underlay: "none"
             });
             // Close the dialog when users click on document
@@ -6532,9 +6526,6 @@ ORBEON.xforms.Server = {
                                                 yuiDialog.hide();
                                                 // Fixes cursor Firefox issue; more on this in dialog init code
                                                 yuiDialog.element.style.display = "none";
-                                                // Remember the server knows that this dialog is closed so we don't close it again later
-                                                if (ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id])
-                                                    ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id] = false;
                                             }
                                         }
 

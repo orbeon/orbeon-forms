@@ -1082,6 +1082,9 @@ ORBEON.util.Utils = {
         return prefixedId + ending + ORBEON.util.Utils.getEffectiveIdSuffixWithSeparator(effectiveId);
     },
 
+    /**
+     * For example: getEffectiveIdNoSuffix("foo·1-2") returns "foo"
+     */
     getEffectiveIdNoSuffix: function(effectiveId) {
         if (effectiveId == null)
             return null;
@@ -1094,6 +1097,9 @@ ORBEON.util.Utils = {
         }
     },
 
+    /**
+     * For example: getEffectiveIdNoSuffix("foo·1-2") returns "·1-2"
+     */
     getEffectiveIdSuffixWithSeparator: function(effectiveId) {
         if (effectiveId == null)
             return null;
@@ -6793,8 +6799,23 @@ ORBEON.xforms.Server = {
     },
 
     callUserScript: function(functionName, targetId, observerId) {
-        var targetElement = ORBEON.util.Dom.getElementById(targetId);
-        var observer = ORBEON.util.Dom.getElementById(observerId);
+
+        function getElement(id) {
+            var element = YAHOO.util.Dom.get(id);
+            if (element == null) {
+                // Try getting repeat delimiter
+                var separatorPosition = Math.max(id.lastIndexOf(XFORMS_SEPARATOR_1), id.lastIndexOf(XFORMS_SEPARATOR_2));
+                if (separatorPosition != -1) {
+                    var repeatID = id.substring(0, separatorPosition);
+                    var iteration = id.substring(separatorPosition + 1);
+                    element = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration)
+                }
+            }
+            return element;
+        }
+
+        var targetElement = getElement(targetId);
+        var observer = getElement(observerId);
         var event = { "target" : targetElement };
         var theFunction = eval(functionName);
         theFunction.call(observer, event);

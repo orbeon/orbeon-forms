@@ -7,7 +7,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
      * another time. When we show it, if the server value was kept, no update will be done, and the
      * fields will show empty. We are testing here that the value is indeed updated.
      */
-    testSetValueAfterRecreate: function(htmlIn, htmlOut) {
+    xtestSetValueAfterRecreate: function(htmlIn, htmlOut) {
         var testCase = this;
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             ORBEON.xforms.Document.setValue("show", "false");
@@ -24,12 +24,26 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                         var actualValue = ORBEON.xforms.Document.getValue("name" + XFORMS_SEPARATOR_1 + "1");
                         YAHOO.util.Assert.areEqual("Wal Mart", actualValue);
                     });
-                
+
                 });
             });
         });
-        
+    },
 
+    testObserverInRepeats: function() {
+        var delimiters = YAHOO.util.Dom.getElementsByClassName("xforms-repeat-delimiter", null, "table");
+        var firstInput = YAHOO.util.Dom.get("name" + XFORMS_SEPARATOR_1 + "1").getElementsByTagName("input")[0];
+        var thirdInput = YAHOO.util.Dom.get("name" + XFORMS_SEPARATOR_1 + "3").getElementsByTagName("input")[0];
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            firstInput.focus();
+        }, function() {
+            YAHOO.util.Assert.areEqual(delimiters[0], window.observerElement, "delimiter before first input");
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                thirdInput.focus();
+            }, function() {
+                YAHOO.util.Assert.areEqual(delimiters[2], window.observerElement, "delimiter before first input");
+            });
+        });
     }
 }));
 

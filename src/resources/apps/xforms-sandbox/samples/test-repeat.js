@@ -7,7 +7,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
      * another time. When we show it, if the server value was kept, no update will be done, and the
      * fields will show empty. We are testing here that the value is indeed updated.
      */
-    xtestSetValueAfterRecreate: function(htmlIn, htmlOut) {
+    testSetValueAfterRecreate: function(htmlIn, htmlOut) {
         var testCase = this;
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             ORBEON.xforms.Document.setValue("show", "false");

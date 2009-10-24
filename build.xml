@@ -17,6 +17,11 @@
 
     <!--<echoproperties/>-->
 
+    <!-- Used by hotswap task
+    <!-- Usage: get the hotswap task (http://code.google.com/p/hotswap/).
+         On Mac OS X add the jar file in /usr/share/ant/lib -->
+    <taskdef name="hotswap" classname="dak.ant.taskdefs.Hotswap"/>
+
     <!-- set global build.root to be dir containing this file. -->
     <dirname property="build.root" file="${ant.file}"/>
     <property name="lib.dir" location="lib"/>
@@ -228,6 +233,19 @@
             <src path="${java-src.dir}"/>
             <exclude name="org/orbeon/oxf/common/Version.java"/>
         </javac>
+    </target>
+
+    <!-- Compile with hotswap -->
+    <target name="hotswap" depends="init">
+        <tstamp>
+            <format property="class.tstamp" pattern="MM/dd/yyyy kk:mm:ss" />
+        </tstamp>
+        <antcall target="classes"/>
+        <hotswap verbose="true" port="61155">
+            <fileset dir="${build.classes.dir}" includes="**/*.class">
+                <date datetime="${class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+            </fileset>
+        </hotswap>
     </target>
 
     <!-- Compile test source -->

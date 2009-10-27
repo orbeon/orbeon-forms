@@ -17,7 +17,7 @@
 
     <!--<echoproperties/>-->
 
-    <!-- Used by hotswap task
+    <!-- Used by hotswap task -->
     <!-- Usage: get the hotswap task (http://code.google.com/p/hotswap/).
          On Mac OS X add the jar file in /usr/share/ant/lib -->
     <taskdef name="hotswap" classname="dak.ant.taskdefs.Hotswap"/>

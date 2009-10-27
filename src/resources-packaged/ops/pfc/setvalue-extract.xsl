@@ -43,7 +43,7 @@
     <xsl:template match="*[generate-id() = $param-nodes-ids]">
         <xsl:variable name="value" select="function:getvalue(.)" as="xs:string?"/>
         <xsl:choose>
-            <xsl:when test="$value">
+            <xsl:when test="exists($value)">
                 <xsl:copy>
                     <xsl:copy-of select="@*"/>
                     <xsl:value-of select="$value"/>

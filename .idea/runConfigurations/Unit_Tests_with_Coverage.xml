@@ -1,5 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Unit Tests with Coverage" type="JUnit" factoryName="JUnit" enabled="true" merge="false" sample_coverage="true" runner="emma">
+  <configuration default="false" name="Unit Tests with Coverage" type="JUnit" factoryName="JUnit">
+    <extension name="coverage" enabled="false" merge="false" />
     <module name="Orbeon Forms" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" value="" />

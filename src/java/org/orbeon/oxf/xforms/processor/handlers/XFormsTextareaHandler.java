@@ -27,7 +27,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * Handle xforms:textarea.
- *
+ * 
  * TODO: Subclasses per appearance.
  */
 public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
@@ -60,6 +60,8 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                     textareaControl.addExtensionAttributes(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
                 }
 
+                handleReadOnlyAttribute(reusableAttributes, containingDocument, textareaControl);
+
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, containerAttributes);
                 if (isConcreteControl) {
                     final String value = textareaControl.getExternalValue(pipelineContext);
@@ -68,6 +70,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                 }
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName);
             } else {
+                // Static readonly
                 final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);

@@ -35,12 +35,13 @@
                     <readonly is-readonly="true">42</readonly>
                     <no-prefix>42</no-prefix>
                     <repeat show="true">42</repeat>
-                    <required/>
+                    <required-empty/>
+                    <required-filled>42</required-filled>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="double" readonly="false()" calculate="for $value in ../value return if ($value castable as xs:decimal) then ../value * 2 else ''"/>
             <xforms:bind nodeset="readonly" readonly="@is-readonly = 'true'"/>
-            <xforms:bind nodeset="required" required="true()"/>
+            <xforms:bind nodeset="required-empty | required-filled" required="true()"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .xbl-fr-currency .xforms-label { display: inline-block; width: 10em; }
@@ -136,8 +137,14 @@
             </xforms:trigger>
         </xhtml:div>
         <xhtml:div>
-            <fr:currency ref="required" id="required" prefix="">
-                <xforms:label>Required</xforms:label>
+            <fr:currency ref="required-empty" id="required-empty" prefix="">
+                <xforms:label>Required empty</xforms:label>
+                <xforms:alert>Value is required</xforms:alert>
+            </fr:currency>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="required-filled" id="required-filled" prefix="">
+                <xforms:label>Required filled</xforms:label>
                 <xforms:alert>Value is required</xforms:alert>
             </fr:currency>
         </xhtml:div>

@@ -153,36 +153,40 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             });
         },
         testClasses: function() {
-            var requiredControl = YAHOO.util.Dom.get("required");
-            var requiredGroup = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, requiredControl)[0];
-            var requiredInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, requiredGroup)[0];
+            var requiredEmptyControl = YAHOO.util.Dom.get("required-empty");
+            var requiredEmptyGroup = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, requiredEmptyControl)[0];
+            var requiredEmptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, requiredEmptyGroup)[0];
             var emptyControl = YAHOO.util.Dom.get("empty");
             var emptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, emptyControl)[0];
 
-            function checkClasses(invalid, required, invalidVisited, requiredFilled, situation) {
-                YAHOO.util.Assert.areEqual(invalid, YAHOO.util.Dom.hasClass(requiredGroup, "xforms-invalid"), situation + " for xforms-invalid");
-                YAHOO.util.Assert.areEqual(required, YAHOO.util.Dom.hasClass(requiredGroup, "xforms-required"), situation + " for xforms-required");
-                YAHOO.util.Assert.areEqual(invalidVisited, YAHOO.util.Dom.hasClass(requiredGroup, "xforms-invalid-visited"), situation + " for xforms-invalid-visited");
-                YAHOO.util.Assert.areEqual(requiredFilled, YAHOO.util.Dom.hasClass(requiredGroup, "xforms-required-filled"), situation + " for xforms-required-filled");
+            var requiredFilledControl = YAHOO.util.Dom.get("required-filled");
+            var requiredFilledGroup = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, requiredFilledControl)[0];
+
+            function checkClasses(group, invalid, required, invalidVisited, requiredFilled, situation) {
+                YAHOO.util.Assert.areEqual(invalid, YAHOO.util.Dom.hasClass(group, "xforms-invalid"), situation + " for xforms-invalid");
+                YAHOO.util.Assert.areEqual(required, YAHOO.util.Dom.hasClass(group, "xforms-required"), situation + " for xforms-required");
+                YAHOO.util.Assert.areEqual(invalidVisited, YAHOO.util.Dom.hasClass(group, "xforms-invalid-visited"), situation + " for xforms-invalid-visited");
+                YAHOO.util.Assert.areEqual(requiredFilled, YAHOO.util.Dom.hasClass(group, "xforms-required-filled"), situation + " for xforms-required-filled");
             }
 
             // Check classes with no change
-            checkClasses(true, true, false, false, "initially");
+            checkClasses(requiredEmptyGroup, true, true, false, false, "initially empty");
+            checkClasses(requiredFilledGroup, false, true, false, true, "initially filled");
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                requiredInput.focus();
-                requiredInput.blur();
+                requiredEmptyInput.focus();
+                requiredEmptyInput.blur();
                 emptyInput.focus();
             }, function() {
                 //  Check we now have the class xforms-invalid-visited
-                checkClasses(true, true, true, false, "after visited");
+                checkClasses(requiredEmptyGroup, true, true, true, false, "after visited empty");
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                    requiredInput.focus();
-                    requiredInput.value = "42";
-                    requiredInput.blur();
+                    requiredEmptyInput.focus();
+                    requiredEmptyInput.value = "42";
+                    requiredEmptyInput.blur();
                     emptyInput.focus();
                 }, function() {
                     // Check it is now marked valid and filled
-                    checkClasses(false, true, false, true, "after filled");
+                    checkClasses(requiredEmptyGroup, false, true, false, true, "after filled empty");
                 });
             });
         }

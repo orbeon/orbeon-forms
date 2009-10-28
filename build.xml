@@ -17,11 +17,6 @@
 
     <!--<echoproperties/>-->
 
-    <!-- Used by hotswap task -->
-    <!-- Usage: get the hotswap task (http://code.google.com/p/hotswap/).
-         On Mac OS X add the jar file in /usr/share/ant/lib -->
-    <taskdef name="hotswap" classname="dak.ant.taskdefs.Hotswap"/>
-
     <!-- set global build.root to be dir containing this file. -->
     <dirname property="build.root" file="${ant.file}"/>
     <property name="lib.dir" location="lib"/>
@@ -237,6 +232,9 @@
 
     <!-- Compile with hotswap -->
     <target name="hotswap" depends="init">
+        <!-- Usage: get the hotswap task (http://code.google.com/p/hotswap/).
+             On Mac OS X add the jar file in /usr/share/ant/lib -->
+        <taskdef name="hotswap" classname="dak.ant.taskdefs.Hotswap"/>
         <tstamp>
             <format property="class.tstamp" pattern="MM/dd/yyyy kk:mm:ss" />
         </tstamp>

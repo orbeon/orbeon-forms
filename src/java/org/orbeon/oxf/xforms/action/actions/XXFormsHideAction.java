@@ -46,7 +46,7 @@ public class XXFormsHideAction extends XFormsAction {
         if (dialogStaticId != null) {
             // Dispatch xxforms-dialog-close event to dialog
             // TODO: use container.getObjectByEffectiveId() once XBLContainer is able to have local controls
-            final Object controlObject = resolveEffectiveControl(actionInterpreter, propertyContext, eventObserver.getEffectiveId(), dialogStaticId, actionElement);
+            final Object controlObject = resolveEffectiveControl(actionInterpreter, propertyContext, actionInterpreter.getObserverPseudoEffectiveId(), dialogStaticId, actionElement);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XFormsEventTarget eventTarget = (XFormsEventTarget) controlObject;
                 final XFormsEvent newEvent = new XXFormsDialogCloseEvent(containingDocument, eventTarget);

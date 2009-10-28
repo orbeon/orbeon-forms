@@ -161,12 +161,12 @@ public abstract class XFormsAction {
      *
      * @param actionInterpreter current XFormsActionInterpreter
      * @param propertyContext   current context
-     * @param sourceEffectiveId effective id of the source action
+     * @param observerPseudoEffectiveId effective id of the source action, possibly ending with a "$" if <xbl:handler>
      * @param targetStaticId    target to resolve
      * @param actionElement     current action element
      * @return                  effective control if found
      */
-    protected Object resolveEffectiveControl(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String sourceEffectiveId, String targetStaticId, Element actionElement) {
+    protected Object resolveEffectiveControl(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String observerPseudoEffectiveId, String targetStaticId, Element actionElement) {
 
         final XFormsControls controls = actionInterpreter.getXFormsControls();
 
@@ -177,7 +177,7 @@ public abstract class XFormsAction {
             return controls.getObjectByEffectiveId(actionInterpreter.getXBLContainer().getFullPrefix() + targetStaticId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(StringUtils.split(repeatindexes), XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
         } else {
             // Figure out effective id
-            return actionInterpreter.getXBLContainer().resolveObjectById(sourceEffectiveId, targetStaticId);
+            return actionInterpreter.getXBLContainer().resolveObjectById(observerPseudoEffectiveId, targetStaticId);
         }
     }
 
@@ -186,14 +186,13 @@ public abstract class XFormsAction {
      *
      * @param actionInterpreter current XFormsActionInterpreter
      * @param propertyContext   current context
-     * @param eventObserver     event observer
      * @param objectStaticId    target to resolve
      * @param actionElement     current action element
      * @return                  effective control if found
      */
-    protected Object resolveEffectiveObject(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventObserver eventObserver, String objectStaticId, Element actionElement) {
+    protected Object resolveEffectiveObject(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String objectStaticId, Element actionElement) {
         // First try controls as we want to check on explicit repeat indexes first
-        final Object tempXFormsEventTarget = resolveEffectiveControl(actionInterpreter, propertyContext, eventObserver.getEffectiveId(), objectStaticId, actionElement);
+        final Object tempXFormsEventTarget = resolveEffectiveControl(actionInterpreter, propertyContext, actionInterpreter.getObserverPseudoEffectiveId(), objectStaticId, actionElement);
         if (tempXFormsEventTarget != null) {
             // Object with this id exists
             return tempXFormsEventTarget;

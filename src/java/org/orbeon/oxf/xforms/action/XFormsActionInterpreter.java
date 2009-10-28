@@ -41,16 +41,20 @@ public class XFormsActionInterpreter {
     private final XBLContainer container;
     private final XFormsContainingDocument containingDocument;
 
+    private final String observerPseudoEffectiveId;
+
     private final IndentedLogger indentedLogger;
 
     private final XFormsControls xformsControls;
     private final XFormsContextStack contextStack;
 
     public XFormsActionInterpreter(PropertyContext propertyContext, XBLContainer container,
-                                   XFormsEventObserver eventObserver, Element actionElement, String ancestorObserverStaticId) {
+                                   XFormsEventObserver eventObserver, String observerPseudoEffectiveId, Element actionElement, String ancestorObserverStaticId) {
 
         this.container = container;
         this.containingDocument = container.getContainingDocument();
+
+        this.observerPseudoEffectiveId = observerPseudoEffectiveId;
 
         this.indentedLogger = containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY);
 
@@ -120,6 +124,10 @@ public class XFormsActionInterpreter {
 
         // Push binding for outermost action
         contextStack.pushBinding(propertyContext, actionElement);
+    }
+
+    public String getObserverPseudoEffectiveId() {
+        return observerPseudoEffectiveId;
     }
 
     public XBLContainer getXBLContainer() {

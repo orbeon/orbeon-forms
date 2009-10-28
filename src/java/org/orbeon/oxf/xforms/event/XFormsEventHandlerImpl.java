@@ -146,11 +146,11 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
             final XBLContainer nestedContainer = ((XFormsComponentControl) eventObserver).getNestedContainer();
 
             // Run action
-            new XFormsActionInterpreter(propertyContext, nestedContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId)
+            new XFormsActionInterpreter(propertyContext, nestedContainer, eventObserver, eventObserver.getEffectiveId() + XFormsConstants.COMPONENT_SEPARATOR, eventHandlerElement, ancestorObserverStaticId)
                     .runAction(propertyContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
         } else {
             // Run normally
-            new XFormsActionInterpreter(propertyContext, container, eventObserver, eventHandlerElement, ancestorObserverStaticId)
+            new XFormsActionInterpreter(propertyContext, container, eventObserver, eventObserver.getEffectiveId(), eventHandlerElement, ancestorObserverStaticId)
                     .runAction(propertyContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
         }
     }

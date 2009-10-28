@@ -50,7 +50,7 @@ public class XFormsToggleAction extends XFormsAction {
             caseStaticId = caseAttribute;
         }
 
-        final XFormsCaseControl caseControl = (XFormsCaseControl) resolveEffectiveControl(actionInterpreter, propertyContext, eventObserver.getEffectiveId(), caseStaticId, actionElement);
+        final XFormsCaseControl caseControl = (XFormsCaseControl) resolveEffectiveControl(actionInterpreter, propertyContext, actionInterpreter.getObserverPseudoEffectiveId(), caseStaticId, actionElement);
         if (caseControl != null) { // can be null if the switch is not relevant
             // Found control
             if (!caseControl.isSelected()) {

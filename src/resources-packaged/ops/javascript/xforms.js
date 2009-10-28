@@ -6213,7 +6213,7 @@ ORBEON.xforms.Server = {
                                                 function insertIntoDocument(nodes) {
                                                     if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {
                                                         // New markup: insert after "last label" (we remembered the position of the label after which there is real content)
-                                                        if (childElements.length == 0) {
+                                                        if (YAHOO.util.Dom.getChildren(documentElement).length == 0) {
                                                             for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
                                                                 documentElement.appendChild(nodes[nodeIndex]);
                                                         } else if (lastLabelPosition == -1) {

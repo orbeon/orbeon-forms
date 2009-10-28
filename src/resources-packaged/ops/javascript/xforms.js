@@ -1863,6 +1863,28 @@ ORBEON.xforms.Controls = {
             // Text area
             var textarea = control.tagName.toLowerCase() == "textarea" ? control : control.getElementsByTagName("textarea")[0];
             textarea.value = newControlValue;
+
+            // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be the best thing to do.
+            // NOTE: There is no "maxlength" attribute in HTML 4, but there is one in HTML 5. Should we add it anyway?
+//            if (attribute1 != null) {
+//                if (attribute1 == "")
+//                    textarea.removeAttribute("maxlength");
+//                else
+//                    textarea.maxlength = attribute1;
+//            }
+            if (attribute2 != null) {
+                if (attribute2 == "")
+                    textarea.removeAttribute("cols");
+                else
+                    textarea.cols = attribute2;
+            }
+            if (attribute3 != null) {
+                if (attribute2 == "")
+                    textarea.removeAttribute("rows");
+                else
+                    textarea.rows = attribute3;
+            }
+
             // Autosize textarea
             if (ORBEON.util.Dom.hasClass(control, "xforms-textarea-appearance-xxforms-autosize")) {
                 ORBEON.xforms.Controls.autosizeTextarea(control);
@@ -2484,7 +2506,7 @@ ORBEON.xforms.Controls = {
                 textarea.rows = textarea.rows + 1;
                 if (textarea.clientHeight <= clientHeight) {
                     // If adding a row didn't increase the height if the text area, there is nothing we can do, so stop here.
-                    // This prevents an infinite loops happening with IE when the constrol is disabled.
+                    // This prevents an infinite loops happening with IE when the control is disabled.
                     break;
                 }
                 clientHeight = textarea.clientHeight;
@@ -2496,8 +2518,8 @@ ORBEON.xforms.Controls = {
             while (textarea.rows > XFORMS_WIDE_TEXTAREA_MIN_ROWS && scrollHeight < clientHeight - rowHeight) {
                 textarea.rows = textarea.rows - 1;
                 if (textarea.clientHeight >= clientHeight) {
-                    // If adding a row didn't decrease the height if the text area, there is nothing we can do, so stop here.
-                    // This prevents an infinite loops happening with IE when the constrol is disabled.
+                    // If removing a row didn't decrease the height if the text area, there is nothing we can do, so stop here.
+                    // This prevents an infinite loops happening with IE when the control is disabled.
                     break;
                 }
                 clientHeight = textarea.clientHeight;
@@ -6342,8 +6364,13 @@ ORBEON.xforms.Server = {
 
                                                     var isInput = ORBEON.util.Dom.hasClass(documentElement, "xforms-input");
                                                     var inputSize = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "size") : null;
-                                                    var inputlength = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "maxlength") : null;
+                                                    var inputLength = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "maxlength") : null;
                                                     var inputAutocomplete = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "autocomplete") : null;
+
+                                                    var isTextarea = ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea");
+                                                    var textareaMaxlength = isTextarea ? ORBEON.util.Dom.getAttribute(controlElement, "maxlength") : null;
+                                                    var textareaCols = isTextarea ? ORBEON.util.Dom.getAttribute(controlElement, "cols") : null;
+                                                    var textareaRows = isTextarea ? ORBEON.util.Dom.getAttribute(controlElement, "rows") : null;
 
                                                     var doUpdate =
                                                             // If this was an input that was recreated because of a type change, we always set its value
@@ -6358,13 +6385,14 @@ ORBEON.xforms.Server = {
                                                                 && (previousServerValue == null || currentValue == previousServerValue)
                                                             ) ||
                                                             // Special xforms:input attributes
-                                                            (isInput && (inputSize != null || inputlength != null || inputAutocomplete != null));
+                                                            (isInput && (inputSize != null || inputLength != null || inputAutocomplete != null)) ||
+                                                            // Special xforms:textarea attributes
+                                                            (isTextarea && (textareaMaxlength != null || textareaCols != null || textareaRows != null));
                                                     if (doUpdate) {
                                                         if (isInput) {
                                                             // Additional attributes for xforms:input
-                                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, inputSize, inputlength, inputAutocomplete);
-                                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
-                                                                && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, inputSize, inputLength, inputAutocomplete);
+                                                        } else if (isTextarea && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                             ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
                                                             // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
                                                             // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
@@ -6373,6 +6401,9 @@ ORBEON.xforms.Server = {
                                                             // the server value to the content of the field. So storing the value as seen by the field vs. as seen by
                                                             // server accounts for the slight difference there might be in those 2 representations.
                                                             ORBEON.xforms.Globals.serverValue[documentElement.id] = ORBEON.xforms.Controls.getCurrentValue(documentElement);
+                                                        } else if (isTextarea) {
+                                                            // Additional attributes for xforms:textarea
+                                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, textareaMaxlength, textareaCols, textareaRows);
                                                         } else {
                                                             // Other control just have a new value
                                                             ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);

@@ -81,9 +81,6 @@
     </xhtml:head>
     <xhtml:body>
 
-        <!-- Link to start Firebug Lite -->
-        <xhtml:a href="javascript:var firebug=document.createElement('script');firebug.setAttribute('src','http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js');document.body.appendChild(firebug);(function(){{if(window.firebug.version){{firebug.init();}}else{{setTimeout(arguments.callee);}}}})();void(firebug);">Start Firebug Lite</xhtml:a>
-
         <xhtml:h2>Global properties</xhtml:h2>
         <xhtml:p>
             <xforms:input ref="@repeat-shown" id="repeat-shown">
@@ -273,7 +270,7 @@
             </xhtml:p>
             
             <!-- Link -->
-            <xhtml:h2>xforms:trigger appearance minimal</xhtml:h2>
+            <xhtml:h2>xforms:trigger appearance="minimal"</xhtml:h2>
             <xhtml:p>
                 <xforms:trigger ref="." id="trigger-minimal" appearance="minimal">
                     <xforms:label ref="label"/>
@@ -281,7 +278,7 @@
             </xhtml:p>
 
             <!-- Download -->
-            <xhtml:h2>xforms:output type xs:anyURI</xhtml:h2>
+            <xhtml:h2>xforms:output appearance="xxforms:download"</xhtml:h2>
             <xforms:group ref="output-file">
                 <xhtml:p>
                     <xforms:output ref="uri" appearance="xxforms:download" id="output-file-value" xxforms:target="gaga">

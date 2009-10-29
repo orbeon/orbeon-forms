@@ -1441,7 +1441,7 @@ public class XFormsUtils {
                         if (hostLanguageAVTs && currentAttributeValue.indexOf('{') != -1) {
                             // This is an AVT, use attribute control to produce the output
                             final XXFormsAttributeControl attributeControl
-                                    = new XXFormsAttributeControl(container, element, currentAttributeValue);
+                                    = new XXFormsAttributeControl(container, element, currentAttributeName, currentAttributeValue);
 
                             contextStack.pushBinding(pipelineContext, element);
                             {

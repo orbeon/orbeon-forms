@@ -30,7 +30,7 @@ var testCase = {
                 var container = YAHOO.util.Dom.get('my-accordion$_314422-table$_314422-table-container');
                 thiss.checkPaginationLinks(container, ['-<< first', '-< prev', '-1', '+2', '+3', '+4', '+5', '+6', '+7', '+8', '+next >', '+last >>']);
 
-                var link6 = YAHOO.util.Dom.get('my-accordion$_314422-table$xf-26·6');
+                var link6 = YAHOO.util.Dom.get('my-accordion$_314422-table$xf-30·6');
                 ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                     YAHOO.util.UserAction.click(link6, {clientX: 1});
                 }, function() {

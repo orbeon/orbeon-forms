@@ -111,11 +111,13 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat nodeset="line[length &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
+                                <xforms:repeat
+                                    nodeset="line[length &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="position"/>
-                                        </xhtml:td><xhtml:td>
+                                        </xhtml:td>
+                                        <xhtml:td>
                                             <xforms:output value="text"/>
                                         </xhtml:td>
                                     </xhtml:tr>

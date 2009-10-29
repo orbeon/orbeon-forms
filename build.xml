@@ -157,6 +157,7 @@
                 </tokenfilter>
             </filterchain>
         </loadproperties>
+        <delete file="${ops-temp-version-file}"/>
 
         <!-- Provide custom version number to TeamCity -->
         <echo message="##teamcity[buildNumber '${orbeon-version}']"/>

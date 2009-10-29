@@ -64,6 +64,9 @@
                         <!-- Events on controls -->
                         <xxforms:script ev:event="xforms-enabled" ev:observer="autocomplete-container">YAHOO.xbl.fr.Autocomplete.instance(this).init();</xxforms:script>
                         <xforms:action ev:event="fr-set-label">
+                            <!--  HACK: Force a refresh so the setvalue will have an effect in the case where the fr-set-value is sent on xforms-ready. -->
+                            <!--  This case is tested by the unit test testSetLabelOnXFormsReady, and we'll hopefully soon be able to remove this refresh. -->
+                            <xforms:refresh/>
                             <xforms:setvalue model="autocomplete-model" ref="textfield-value" value="event('label')"/>
                             <xxforms:script>YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xxforms:script>
                         </xforms:action>

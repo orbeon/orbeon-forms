@@ -81,6 +81,21 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         },
 
         /**
+         * This test needs to be first, as we test that setting the label to Canada on xforms-ready by dispatching
+         * the fr-set-label event, we indeed get the value 'ca' in the node bound to the control.
+         */
+        testSetLabelOnXFormsReady: function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                // Nothing is done in JS, but the fr-set-label we dispatch on xforms-ready will create some Ajax traffic
+            }, function() {
+                this.runForStaticDynamic(function(staticDynamic, continuation) {
+                    this.checkExternalValue(staticDynamic, "ca");
+                    continuation.call(this);
+                });
+            });
+        },
+
+        /**
          * Test that when we type the full value "Switzerland", the value of the node becomes "sz",
          * because "Switzerland" shows in the list of possible values, so the value should be selected
          * even if it wasn't "clicked on" by the user.
@@ -212,21 +227,17 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
 
         testSetLabel: function() {
             this.runForStaticDynamic(function(staticDynamic, continuation) {
-                if (staticDynamic == "dynamic") {
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamic + "-set-to-canada"));
+                }, function() {
+                    this.checkExternalValue(staticDynamic, "ca", "external value is 'ca' because Canada exists in the itemset");
                     ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                        YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamic + "-set-to-canada"));
+                        YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamic + "-set-to-utopia"));
                     }, function() {
-                        this.checkExternalValue(staticDynamic, "ca", "external value is 'ca' because Canada exists in the itemset");
-                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                            YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamic + "-set-to-utopia"));
-                        }, function() {
-                            this.checkExternalValue(staticDynamic, "", "external value is empty string because Utopia does not exist in the itemset");
-                            continuation.call(this);
-                        });
+                        this.checkExternalValue(staticDynamic, "", "external value is empty string because Utopia does not exist in the itemset");
+                        continuation.call(this);
                     });
-                } else {
-                    continuation.call(this);
-                }
+                });
             });
         }
     }));

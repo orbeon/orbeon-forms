@@ -16,12 +16,9 @@ YAHOO.xbl.fr.Accordion = function() {};
 ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Accordion, "xbl-fr-accordion");
 YAHOO.xbl.fr.Accordion.prototype = {
 
-    initialized: false,
     selectedElement: null,
 
     init: function() {
-        if (this.initialized) return;
-        this.initialized = true;
         var dlElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-accordion-dl", null, this.container)[0];
         this.selectedElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-accordion-selected", null, this.container)[0];
         var openClosesOthersElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-accordion-open-closes-others", null, this.container)[0];

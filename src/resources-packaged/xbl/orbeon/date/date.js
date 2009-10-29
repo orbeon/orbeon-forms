@@ -16,7 +16,6 @@ YAHOO.xbl.fr.Date = function() {};
 ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Date, "xbl-fr-date");
 YAHOO.xbl.fr.Date.prototype = {
 
-    initialized: false,
     inputElement: null,
     mindateElement: null,
     maxdateElement: null,

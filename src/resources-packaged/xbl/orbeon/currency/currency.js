@@ -16,7 +16,6 @@ YAHOO.xbl.fr.Currency = function() {};
 ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Currency, "xbl-fr-currency");
 YAHOO.xbl.fr.Currency.prototype = {
 
-    initialized: false,
     xformsInputElement: null,
     groupElement: null,
     visibleInputElement: null,
@@ -27,8 +26,6 @@ YAHOO.xbl.fr.Currency.prototype = {
     hasFocus: false,
 
     init: function() {
-        if (this.initialized) return;
-        this.initialized = true;
         // Get information from the DOM
         this.xformsInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-xforms-input", null, this.container)[0];
         this.groupElement = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, this.container)[0];

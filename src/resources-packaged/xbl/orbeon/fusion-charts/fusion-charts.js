@@ -16,16 +16,11 @@ YAHOO.xbl.fr.FusionCharts = function() {};
 ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.FusionCharts, "xbl-fr-fusion-charts");
 YAHOO.xbl.fr.FusionCharts.prototype = {
 
-    initialized: false,
     xmlSpan: null,
     xml: null,
     fusionChart: null,
 
     init: function() {
-
-        if (this.initialized) return;
-        this.initialized = true;
-
         // Get information from the DOM
         var chartDiv = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-chart-div", null, this.container)[0];
         this.xmlSpan = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-xml", null, this.container)[0];

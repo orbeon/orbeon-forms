@@ -266,9 +266,21 @@
                     />
                 </xsl:for-each>
                 <xsl:if test="$paginated">
+
                     <xforms:instance id="page">
-                        <page xmlns="">1</page>
+                        <page xmlns="" nbPages="">1</page>
                     </xforms:instance>
+                    <xsl:if test="not($sortAndPaginationMode='external')">
+                        <xxforms:variable name="nbRows" select="count($nodeset)"/>
+                        <xxforms:variable name="nbPages"
+                            select="ceiling($nbRows div {$rowsPerPage}) cast as xs:integer"/>
+                        <xforms:bind model="datatable-model" nodeset="instance('page')">
+                            <xforms:bind nodeset="@nbPages" calculate="$nbPages"/>
+                            <!--<xforms:bind nodeset="."
+                                calculate="if (. cast as xs:integer > $nbPages) then $nbPages else ."
+                            />-->
+                        </xforms:bind>
+                    </xsl:if>
                 </xsl:if>
                 <xforms:bind nodeset="@currentId" type="xs:integer"/>
 
@@ -276,6 +288,16 @@
 
             <xsl:choose>
                 <xsl:when test="$paginated and not($sortAndPaginationMode='external')">
+                    <!--<xforms:group model="datatable-model" ref="instance('page')"
+                        appearance="xxforms:internal">
+                        <xforms:input ref="@nbPages" style="display:none;">
+                            <!-\- Workaround, see https://forge.ow2.org/tracker/index.php?func=detail&aid=314429&group_id=168&atid=350207 -\->
+                            <xforms:setvalue ref=".." ev:event="xforms-value-changed"
+                                value="if (. cast as xs:integer &gt; @nbPages) then @nbPages else ."
+                            />
+                        </xforms:input>
+                    </xforms:group>
+-->
                     <xxforms:variable name="page" model="datatable-model" select="instance('page')"/>
                     <xxforms:variable name="nbRows"
                         select="count({$pass5//xforms:repeat[1]/@nodeset})"/>
@@ -511,7 +533,17 @@
 
             <xsl:copy-of select="$pagination"/>
 
-
+            <xsl:if test="$paginated and not($sortAndPaginationMode='external')">
+                <xforms:group model="datatable-model" ref="instance('page')"
+                    appearance="xxforms:internal">
+                    <xforms:input ref="@nbPages" style="display:none;">
+                        <!-- Workaround, see https://forge.ow2.org/tracker/index.php?func=detail&aid=314429&group_id=168&atid=350207 -->
+                        <xforms:setvalue ref=".." ev:event="xforms-value-changed"
+                            value="if (. cast as xs:integer &gt; @nbPages) then @nbPages else ."
+                        />
+                    </xforms:input>
+                </xforms:group>
+            </xsl:if>
 
         </xhtml:div>
 
@@ -682,8 +714,16 @@
                 </xsl:choose>
             </xsl:attribute>
         </xxforms:variable>
-        <xxforms:script ev:event="xxforms-nodeset-changed" ev:target="fr-datatable-repeat">
-            ORBEON.widgets.datatable.update(this); </xxforms:script>
+        <xforms:action ev:event="xxforms-nodeset-changed" ev:target="fr-datatable-repeat">
+            <xxforms:script> ORBEON.widgets.datatable.update(this); </xxforms:script>
+            <xsl:if test="$paginated and not($sortAndPaginationMode='external')">
+                <!-- Workaround, see https://forge.ow2.org/tracker/index.php?func=detail&aid=314429&group_id=168&atid=350207 -->
+                <xforms:setvalue model="datatable-model" ref="instance('page')/@nbPages"
+                    value="$nbPages"/>
+                <!-- <xforms:setvalue model="datatable-model" ref="instance('page')"
+                    value="if (. cast as xs:integer > $nbPages) then $nbPages else ."/>-->
+            </xsl:if>
+        </xforms:action>
         <xforms:repeat id="fr-datatable-repeat" nodeset="$nodeset">
             <xsl:apply-templates select="@*[not(name()=('nodeset', 'id'))]|node()" mode="YUI"/>
         </xforms:repeat>

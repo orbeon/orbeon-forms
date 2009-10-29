@@ -16,7 +16,6 @@ YAHOO.xbl.fr.Autocomplete = function() {};
 ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Autocomplete, "xbl-fr-autocomplete");
 YAHOO.xbl.fr.Autocomplete.prototype = {
 
-    initialized: false,
     dynamicItemset: null,       // Do we need to wait for the itemset to change before we update the auto-complete?
     yuiAutoComplete: null,      // YUI object for the auto-complete
     searchControl: null,        // xforms:input control in which users type
@@ -29,8 +28,6 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
      * Constructor
      */
     init: function() {
-        if (this.initialized) return;
-        this.initialized = true;
         this.searchControl = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-search", null, this.container)[0];
         this.searchField = YAHOO.util.Dom.getChildren(this.searchControl)[0];
         var yuiDiv = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-yui-div", null, this.container)[0];

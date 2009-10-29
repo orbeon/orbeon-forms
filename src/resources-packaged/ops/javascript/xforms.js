@@ -2292,7 +2292,8 @@ ORBEON.xforms.Controls = {
             } else {
                 ORBEON.util.Dom.removeClass(control, "xforms-readonly");
             }
-        } else if ((ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))
+        } else if ((ORBEON.util.Dom.hasClass(control, "xforms-input"))
+                || ORBEON.util.Dom.hasClass(control, "xforms-secret")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")) {
             // Input fields, radio buttons, or checkboxes
@@ -2307,6 +2308,8 @@ ORBEON.xforms.Controls = {
                 var input = inputs[inputIndex];
                 setReadonlyOnFormElement(input, isReadonly);
             }
+            if (control.tagName.toLowerCase() == "input")
+                setReadonlyOnFormElement(control, isReadonly);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output")
                 || ORBEON.util.Dom.hasClass(control, "xforms-group")) {
             // XForms output and group
@@ -2321,18 +2324,20 @@ ORBEON.xforms.Controls = {
             var htmlEditor = FCKeditorAPI.GetInstance(control.name);
             if (isReadonly) {
                 htmlEditor.ToolbarSet.Collapse();
-                    // TO-DO
+                // TO-DO
             } else {
                 htmlEditor.ToolbarSet.Expand();
-                    // TO-DO
+                // TO-DO
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-upload")) {
             // Upload control
             setReadonlyOnFormElement(
                     ORBEON.util.Dom.getChildElementByClass(control, "xforms-upload-select"), isReadonly);
-        } else {
-            // Other controls
-            setReadonlyOnFormElement(control, isReadonly);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")) {
+            // Textarea
+            var textarea = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                ? control.getElementsByTagName("textarea")[0] : control;
+            setReadonlyOnFormElement(textarea, isReadonly);
         }
     },
 

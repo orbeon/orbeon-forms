@@ -66,6 +66,15 @@
             <xforms:insert ev:event="xforms-model-construct-done"
                 nodeset="instance('all-countries')/country" origin="instance('second-us')"/>
 
+            <xforms:action ev:event="xforms-ready">
+                <xforms:dispatch target="static-autocomplete" name="fr-set-label">
+                    <xxforms:context name="label" select="'Canada'"/>
+                </xforms:dispatch>
+                <xforms:dispatch target="dynamic-autocomplete" name="fr-set-label">
+                    <xxforms:context name="label" select="'Canada'"/>
+                </xforms:dispatch>
+			</xforms:action>
+
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
@@ -73,6 +82,34 @@
         <xhtml:script type="text/javascript" src="/xbl/orbeon/autocomplete/autocomplete-unittest.js"/>
     </xhtml:head>
     <xhtml:body>
+
+        <xhtml:h2>Static itemset</xhtml:h2>
+
+        <xforms:output value="instance('selected-countries')/static" id="static-output">
+            <xforms:label>Code of selected country: </xforms:label>
+        </xforms:output>
+
+        <fr:autocomplete ref="instance('selected-countries')/static" id="static-autocomplete"
+                         dynamic-itemset="false" style="width: 15em" max-results-displayed="4">
+            <xforms:label>Country code: </xforms:label>
+            <xforms:itemset nodeset="instance('all-countries')/country">
+                <xforms:label ref="name"/>
+                <xforms:value ref="us-code"/>
+            </xforms:itemset>
+            <xforms:alert>Value is mandatory</xforms:alert>
+        </fr:autocomplete>
+        <xforms:trigger appearance="minimal" id="static-set-to-canada">
+            <xforms:label>Set label to Canada</xforms:label>
+            <xforms:dispatch ev:event="DOMActivate" target="static-autocomplete" name="fr-set-label">
+                <xxforms:context name="label" select="'Canada'"/>
+            </xforms:dispatch>
+        </xforms:trigger> |
+        <xforms:trigger appearance="minimal" id="static-set-to-utopia">
+            <xforms:label>Set label to Utopia</xforms:label>
+            <xforms:dispatch ev:event="DOMActivate" target="static-autocomplete" name="fr-set-label">
+                <xxforms:context name="label" select="'Utopia'"/>
+            </xforms:dispatch>
+        </xforms:trigger>
 
         <xhtml:h2>Dynamic itemset</xhtml:h2>
 
@@ -118,34 +155,6 @@
         <xforms:trigger appearance="minimal" id="dynamic-set-to-utopia">
             <xforms:label>Set label to Utopia</xforms:label>
             <xforms:dispatch ev:event="DOMActivate" target="dynamic-autocomplete" name="fr-set-label">
-                <xxforms:context name="label" select="'Utopia'"/>
-            </xforms:dispatch>
-        </xforms:trigger>
-
-        <xhtml:h2>Static itemset</xhtml:h2>
-
-        <xforms:output value="instance('selected-countries')/static" id="static-output">
-            <xforms:label>Code of selected country: </xforms:label>
-        </xforms:output>
-
-        <fr:autocomplete ref="instance('selected-countries')/static" id="static-autocomplete"
-                         dynamic-itemset="false" style="width: 15em" max-results-displayed="4">
-            <xforms:label>Country code: </xforms:label>
-            <xforms:itemset nodeset="instance('all-countries')/country">
-                <xforms:label ref="name"/>
-                <xforms:value ref="us-code"/>
-            </xforms:itemset>
-            <xforms:alert>Value is mandatory</xforms:alert>
-        </fr:autocomplete>
-        <xforms:trigger appearance="minimal" id="static-set-to-canada">
-            <xforms:label>Set label to Canada</xforms:label>
-            <xforms:dispatch ev:event="DOMActivate" target="static-autocomplete" name="fr-set-label">
-                <xxforms:context name="label" select="'Canada'"/>
-            </xforms:dispatch>
-        </xforms:trigger> |
-        <xforms:trigger appearance="minimal" id="static-set-to-utopia">
-            <xforms:label>Set label to Utopia</xforms:label>
-            <xforms:dispatch ev:event="DOMActivate" target="static-autocomplete" name="fr-set-label">
                 <xxforms:context name="label" select="'Utopia'"/>
             </xforms:dispatch>
         </xforms:trigger>

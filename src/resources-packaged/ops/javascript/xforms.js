@@ -3626,10 +3626,30 @@ ORBEON.xforms.XBL = {
      */
     declareClass: function(xblClass, cssClass) {
         var doNothingSingleton = null;
+        var instanceAlreadyCalled = false;
+
+        // Define factory function for this class
         xblClass.instance = function(target) {
+            var hasInit = ! YAHOO.lang.isUndefined(xblClass.prototype.init);
+
+            // The first time instance() is called for this class, override init() on the class object
+            // to make sure that the init method is not called more than once
+            if (! instanceAlreadyCalled) {
+                instanceAlreadyCalled = true;
+                if (hasInit) {
+                    var originalInit = this.prototype.init;
+                    this.prototype.init = function() {
+                        if (! this.initialized) {
+                            originalInit.call(this);
+                            this.initialized = true;
+                        }
+                    }
+                }
+            }
+
             if (target == null || ! YAHOO.util.Dom.inDocument(target, document)) {
-                // If we get an event for a target which is not in the document, return an instance
-                // which won't do anything when its methods are called
+                // If we get an event for a target which is not in the document, return a mock object
+                // that won't do anything when its methods are called
                 if (doNothingSingleton == null) {
                     doNothingSingleton = {};
                     for (methodName in xblClass.prototype)
@@ -3647,6 +3667,10 @@ ORBEON.xforms.XBL = {
                 if (YAHOO.lang.isUndefined(instance) || instance.container != container) {
                     instance = new xblClass(container);
                     instance.container = container;
+                    if (hasInit) {
+                        instance.initialized = false;
+                        instance.init();
+                    }
                     this._instances[container.id] = instance;
                 }
                 return instance;

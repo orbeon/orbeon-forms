@@ -29,12 +29,52 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             });
         });
    },
-   
+
    testInput: function() { this.repeatRebuildWorker("input"); },
    testTextarea: function() { this.repeatRebuildWorker("textarea"); },
    testSecret: function() { this.repeatRebuildWorker("secret"); },
    testInputBoolean: function() { this.repeatRebuildWorker("input-boolean"); }
-   
+
+}));
+
+YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+    name: "Input",
+
+    testReadonly: function() {
+        var input = YAHOO.util.Dom.get("input" + XFORMS_SEPARATOR_1 + "1").getElementsByTagName("input")[0];
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            ORBEON.xforms.Document.setValue("readonly", "true");
+        }, function() {
+            YAHOO.util.Assert.isTrue(input.disabled, "input should be disabled");
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                ORBEON.xforms.Document.setValue("readonly", "false");
+            }, function() {
+                YAHOO.util.Assert.isFalse(input.disabled, "input should be enabled");
+            });
+        });
+    }
+}));
+
+YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+    name: "Textarea",
+
+    testReadonly: function() {
+        var control = YAHOO.util.Dom.get("textarea" + XFORMS_SEPARATOR_1 + "1");
+        var textarea = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+            ? control.getElementsByTagName("textarea")[0] : control;
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            ORBEON.xforms.Document.setValue("readonly", "true");
+        }, function() {
+            YAHOO.util.Assert.isTrue(textarea.disabled, "textarea should be disabled");
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                ORBEON.xforms.Document.setValue("readonly", "false");
+            }, function() {
+                YAHOO.util.Assert.isFalse(textarea.disabled, "textarea should be enabled");
+            });
+        });
+    }
 }));
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
@@ -79,7 +119,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
              YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected);
         });
     },
-    
+
     testUpdateList: function() {
          ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
              // Set value in list to TNT
@@ -95,7 +135,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
              YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[3].selected);
         });
     },
-    
+
     testUpdateCheckbox: function() {
          ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
              // Click on DHL checkbox (in addition to already selected TNT)
@@ -233,7 +273,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 ORBEON.xforms.Document.setValue("repeat-shown", "true");
             }, function() {
                 var trigger = YAHOO.util.Dom.get(this.triggerId);
-                var link = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) 
+                var link = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
                     ? YAHOO.util.Dom.getFirstChild(trigger) : trigger;
                 YAHOO.util.Assert.areEqual("a", link.tagName.toLowerCase());
                 YAHOO.util.Assert.areEqual("Label", link.innerHTML);

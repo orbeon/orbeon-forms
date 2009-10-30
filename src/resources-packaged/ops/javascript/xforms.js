@@ -3371,15 +3371,18 @@ ORBEON.xforms.Events = {
      * Called upon resizing.
      */
     _resize: function() {
-        // destroy the tooltips since they could justify a scrollbar
+        // Move hidden tooltips to the top-left of the document to avoid having a useless scrollbar show up in
+        // case they are outside of the viewport.
         var collections = [ORBEON.xforms.Globals.hintTooltipForControl, ORBEON.xforms.Globals.helpTooltipForControl, ORBEON.xforms.Globals.alertTooltipForControl];
         for (var i = 0; i < 3; i++) {
             var collection = collections[i];
             for (var control in collection) {
                 var tooltip = collection[control];
-                if (tooltip && tooltip != true) {
-                    collection[control] = null;
-                    tooltip.destroy();
+                if (tooltip != null && tooltip != true) {
+                    if (YAHOO.lang.isObject(tooltip.element) && tooltip.element.style.visibility == "hidden") {
+                        tooltip.element.style.top = 0;
+                        tooltip.element.style.left = 0;
+                    }
                 }
             }
         }

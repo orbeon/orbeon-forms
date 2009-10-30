@@ -550,6 +550,34 @@ ORBEON.util.Dom = {
                 }
             }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
         }
+    },
+
+    /**
+     * Similar to root.getElementsByTagName(tagName), but:
+     *      Returns only one element.
+     *      Returns root if root.tagName == tagName.
+     *      Can take an array of tagName if there are alternatives.
+     */
+    getElementByTagName: function(root, tagName) {
+        var result = null;
+
+        if (YAHOO.lang.isArray(tagName)) {
+            // Multiple possible tag name, try each one
+            var tagNames = tagName;
+            for (var tagNameIndex = 0; tagNameIndex < tagNames.length; tagNameIndex++) {
+                var tagName = tagNames[tagNameIndex];
+                var result = ORBEON.util.Dom.getElementByTagName(root, tagName);
+                if (result != null) break
+            };
+        } else {
+            if (root.tagName.toLowerCase() == tagName) {
+                result = root;
+            } else {
+                var matches = root.getElementsByTagName(tagName);
+                if (matches.length == 1) result = matches[0];
+            }
+        }
+        return result;
     }
 };
 
@@ -2372,7 +2400,8 @@ ORBEON.xforms.Controls = {
 
     getHintMessage: function(control) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")) {
-            return control.title;
+            var formElement = ORBEON.util.Dom.getElementByTagName(control, ["a", "button"]);
+            return formElement.title;
         } else {
             // Element for hint
             var hintElement = ORBEON.xforms.Controls._getControlLHHA(control, "hint");
@@ -2388,7 +2417,8 @@ ORBEON.xforms.Controls = {
                 // If we do, updating the value in the YUI widget is enough. The YUI widget empties the content of the
                 // title attribute to avoid the text in the title from showing. If we set the title, we might have
                 // both the title shown by the browser and the YUI hint widget.
-                control.title = message;
+                var formElement = ORBEON.util.Dom.getElementByTagName(control, ["a", "button"]);
+                formElement.title = message;
             }
         } else {
             ORBEON.xforms.Controls._setMessage(control, "hint", message);
@@ -3100,6 +3130,11 @@ ORBEON.xforms.Events = {
             // Control tooltip
             if (! ORBEON.util.Dom.hasClass(document.body, "xforms-disable-hint-as-tooltip")) {
                 var message = ORBEON.xforms.Controls.getHintMessage(target);
+                if (YAHOO.util.Dom.hasClass(target, "xforms-trigger")) {
+                    // Remove the title, to avoid having both the YUI tooltip and the browser tooltip based on the title showing up
+                    var formElement = ORBEON.util.Dom.getElementByTagName(target, ["a", "button"]);
+                    formElement.title = "";
+                }
                 ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.hintTooltipForControl, target, target, "-orbeon-hint-tooltip", message, 200, event);
             }
 

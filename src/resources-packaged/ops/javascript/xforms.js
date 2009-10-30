@@ -2184,7 +2184,10 @@ ORBEON.xforms.Controls = {
         // If the control is now valid and there is an alert tooltip for this control, destroy it
         var alertTooltip = ORBEON.xforms.Globals.alertTooltipForControl[control.id];
         if (newValid && alertTooltip != null) {
-            alertTooltip.destroy();
+            if (alertTooltip != true) {
+                // Hum, the tooltip can be null, true, or an actual tooltip object!
+                alertTooltip.destroy();
+            }
             ORBEON.xforms.Globals.alertTooltipForControl[control.id] = null;
         }
     },
@@ -2485,7 +2488,7 @@ ORBEON.xforms.Controls = {
             if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
                 ORBEON.widgets.RTE.setFocus(control);
             } else {
-                // TODO: can we do anything meaninful for FCK?
+                // TODO: can we do anything meaningful for FCK?
             }
         } else if (typeof control.focus != "undefined") {
             control.focus();

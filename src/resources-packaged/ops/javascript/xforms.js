@@ -3052,31 +3052,44 @@ ORBEON.xforms.Events = {
         }
     },
 
-    _showToolTip: function(tooltipForControl, controlId, targetId, toolTipSuffix, message, delay, event) {
-        if (message != "") {
-            // We have a hint, initialize YUI tooltip
-            var yuiTooltip =
-                    new YAHOO.widget.Tooltip(controlId + toolTipSuffix, {
-                        context: targetId,
-                        text: message,
-                        showDelay: delay,
-                        effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2},
-                        // We provide here a "high" zIndex value so the tooltip is "always" displayed on top over everything else.
-                        // Otherwise, with dialogs, the tooltip might end up being below the dialog and be invisible.
-                        zIndex: 1000
-                    });
-            var context = ORBEON.util.Dom.getElementById(targetId);
-            // Send the mouse move event, because the tooltip gets positioned when receiving a mouse move.
-            // Without this, sometimes the first time the tooltip is shows at the top left of the screen
-            yuiTooltip.onContextMouseMove.call(context, event, yuiTooltip);
-            // Send the mouse over event to the tooltip, since the YUI tooltip didn't receive it as it didn't
-            // exist yet when the event was dispatched by the browser
-            yuiTooltip.onContextMouseOver.call(context, event, yuiTooltip);
-            // Save reference to YUI tooltip
-            tooltipForControl[controlId] = yuiTooltip;
-        } else {
-            // Remember we looked at this control already
-            tooltipForControl[controlId] = true;
+    _showToolTip: function(tooltipForControl, control, target, toolTipSuffix, message, delay, event) {
+
+        // If we already have a tooltip for this control, but that the control is not in the page anymore, destroy the tooltip
+        if (YAHOO.lang.isObject(tooltipForControl[control.id])) {
+            if (! YAHOO.util.Dom.inDocument(tooltipForControl[control.id].orbeonControl, document)) {
+                tooltipForControl[control.id].destroy();
+                tooltipForControl[control.id] = null;
+            }
+        }
+
+        // Create tooltip if have never "seen" this control
+        if (tooltipForControl[control.id] == null) {
+            if (message != "") {
+                // We have a hint, initialize YUI tooltip
+                var yuiTooltip =
+                        new YAHOO.widget.Tooltip(control.id + toolTipSuffix, {
+                            context: target.id,
+                            text: message,
+                            showDelay: delay,
+                            effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2},
+                            // We provide here a "high" zIndex value so the tooltip is "always" displayed on top over everything else.
+                            // Otherwise, with dialogs, the tooltip might end up being below the dialog and be invisible.
+                            zIndex: 1000
+                        });
+                yuiTooltip.orbeonControl = control;
+                var context = ORBEON.util.Dom.getElementById(target.id);
+                // Send the mouse move event, because the tooltip gets positioned when receiving a mouse move.
+                // Without this, sometimes the first time the tooltip is shows at the top left of the screen
+                yuiTooltip.onContextMouseMove.call(context, event, yuiTooltip);
+                // Send the mouse over event to the tooltip, since the YUI tooltip didn't receive it as it didn't
+                // exist yet when the event was dispatched by the browser
+                yuiTooltip.onContextMouseOver.call(context, event, yuiTooltip);
+                // Save reference to YUI tooltip
+                tooltipForControl[control.id] = yuiTooltip;
+            } else {
+                // Remember we looked at this control already
+                tooltipForControl[control.id] = true;
+            }
         }
     },
 
@@ -3085,10 +3098,9 @@ ORBEON.xforms.Events = {
         if (target != null) {
 
             // Control tooltip
-            if (ORBEON.xforms.Globals.hintTooltipForControl[target.id] == null
-                    && ! ORBEON.util.Dom.hasClass(document.body, "xforms-disable-hint-as-tooltip")) {
+            if (! ORBEON.util.Dom.hasClass(document.body, "xforms-disable-hint-as-tooltip")) {
                 var message = ORBEON.xforms.Controls.getHintMessage(target);
-                ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.hintTooltipForControl, target.id, target.id, "-orbeon-hint-tooltip", message, 200, event);
+                ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.hintTooltipForControl, target, target, "-orbeon-hint-tooltip", message, 200, event);
             }
 
             // Alert tooltip
@@ -3103,10 +3115,10 @@ ORBEON.xforms.Events = {
                     // The 'for' can point to a form field which is inside the element representing the control
                     if (! YAHOO.util.Dom.hasClass(control, "xforms-control"))
                         control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
-                    if (control && ORBEON.xforms.Globals.alertTooltipForControl[control.id] == null) {
+                    if (control) {
                         var message = ORBEON.xforms.Controls.getAlertMessage(control);
                         YAHOO.util.Dom.generateId(target);
-                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control.id, target.id, "-orbeon-alert-tooltip", message, 10, event);
+                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control, target, "-orbeon-alert-tooltip", message, 10, event);
                     }
                 }
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-dialog-appearance-minimal")) {
@@ -3128,11 +3140,9 @@ ORBEON.xforms.Events = {
                     // The xforms:input is a unique case where the 'for' points to the input field, not the element representing the control
                     if (YAHOO.util.Dom.hasClass(control, "xforms-input-input"))
                         control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
-                    if (ORBEON.xforms.Globals.helpTooltipForControl[control.id] == null) {
-                        var message = ORBEON.xforms.Controls.getHelpMessage(control);
-                        YAHOO.util.Dom.generateId(target);
-                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control.id, target.id, "-orbeon-help-tooltip", message, 0, event);
-                    }
+                    var message = ORBEON.xforms.Controls.getHelpMessage(control);
+                    YAHOO.util.Dom.generateId(target);
+                    ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control, target, "-orbeon-help-tooltip", message, 0, event);
                 }
             }
 

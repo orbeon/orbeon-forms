@@ -1038,11 +1038,12 @@ public class XFormsContainingDocument extends XBLContainer {
                 } else if (event instanceof XXFormsValueChangeWithFocusChangeEvent) {
                     // 4.6.7 Sequence: Value Change
 
+                    // TODO: Not sure if this comment makes sense anymore.
                     // What we want to do here is set the value on the initial controls tree, as the value has already been
                     // changed on the client. This means that this event(s) must be the first to come!
 
                     final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) event;
-                    {
+                    if (checkEventTarget(event)) {
                         // Store value into instance data through the control
                         final XFormsValueControl valueXFormsControl = (XFormsValueControl) eventTarget;
                         // NOTE: filesElement is only used by the upload control at the moment
@@ -1083,10 +1084,29 @@ public class XFormsContainingDocument extends XBLContainer {
         }
     }
 
+    /**
+     * Dispatch the event and check its target first.
+     *
+     * @param pipelineContext   current context
+     * @param event             event to dispatch
+     */
     private void dispatchEventCheckTarget(PipelineContext pipelineContext, XFormsEvent event) {
+        if (checkEventTarget(event)) {
+            dispatchEvent(pipelineContext, event);
+        }
+    }
 
+    /**
+     * Check whether an event can be be dispatched to the given object. This only checks:
+     *
+     * o the the target is still live
+     * o that the target is not a non-relevant or readonly control
+     *
+     * @param event         event
+     * @return              true iif the event target is allowed
+     */
+    private boolean checkEventTarget(XFormsEvent event) {
         final XFormsEventTarget eventTarget = event.getTargetObject();
-
         final Object newReference = getObjectByEffectiveId(eventTarget.getEffectiveId());
         if (eventTarget != newReference) {
 
@@ -1113,7 +1133,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on ghost target",
                         "control id", eventTarget.getEffectiveId(), "event name", event.getEventName());
             }
-            return;
+            return false;
         }
 
         if (eventTarget instanceof XFormsControl) {
@@ -1124,7 +1144,7 @@ public class XFormsContainingDocument extends XBLContainer {
                     indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on non-relevant control",
                             "control id", eventTarget.getEffectiveId(), "event name", event.getEventName());
                 }
-                return;
+                return false;
             }
             if (eventTarget instanceof XFormsSingleNodeControl) {
                 final XFormsSingleNodeControl xformsSingleNodeControl = (XFormsSingleNodeControl) eventTarget;
@@ -1134,12 +1154,11 @@ public class XFormsContainingDocument extends XBLContainer {
                         indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on read-only control",
                                 "control id", eventTarget.getEffectiveId(), "event name", event.getEventName());
                     }
-                    return;
+                    return false;
                 }
             }
         }
-
-        dispatchEvent(pipelineContext, event);
+        return true;
     }
 
     @Override

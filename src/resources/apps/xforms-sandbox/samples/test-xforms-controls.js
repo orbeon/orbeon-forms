@@ -39,39 +39,41 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "Input",
+    name: "Readonly and relevant",
+
+    getFormControls: function() {
+        var controlsContainer = YAHOO.util.Dom.get("controls");
+        var formTagNames = [ "input", "textarea", "select", "button" ];
+        var formElements = [];
+        for (var formTagNameIndex = 0; formTagNameIndex < formTagNames.length; formTagNameIndex++) {
+            var formTagName = formTagNames[formTagNameIndex];
+            var thisTagElements = controlsContainer.getElementsByTagName(formTagName);
+            for (var thisTagElementIndex = 0; thisTagElementIndex < thisTagElements.length; thisTagElementIndex++) {
+                var thisTagElement = thisTagElements[thisTagElementIndex];
+                if (YAHOO.util.Dom.getAncestorByClassName(thisTagElement, "xforms-repeat-template") == null)
+                    formElements.push(thisTagElement);
+            };
+        };
+        return formElements;
+    },
+
+    checkDisabled: function(disabled) {
+        var elements = this.getFormControls();
+        for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
+            var element = elements[elementIndex];
+            YAHOO.util.Assert.areEqual(disabled, element.disabled, "element " + element.id + " supposed to have disabled = " + disabled);
+        };
+    },
 
     testReadonly: function() {
-        var input = YAHOO.util.Dom.get("input" + XFORMS_SEPARATOR_1 + "1").getElementsByTagName("input")[0];
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             ORBEON.xforms.Document.setValue("readonly", "true");
         }, function() {
-            YAHOO.util.Assert.isTrue(input.disabled, "input should be disabled");
+            this.checkDisabled(true);
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 ORBEON.xforms.Document.setValue("readonly", "false");
             }, function() {
-                YAHOO.util.Assert.isFalse(input.disabled, "input should be enabled");
-            });
-        });
-    }
-}));
-
-YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
-
-    name: "Textarea",
-
-    testReadonly: function() {
-        var control = YAHOO.util.Dom.get("textarea" + XFORMS_SEPARATOR_1 + "1");
-        var textarea = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
-            ? control.getElementsByTagName("textarea")[0] : control;
-        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-            ORBEON.xforms.Document.setValue("readonly", "true");
-        }, function() {
-            YAHOO.util.Assert.isTrue(textarea.disabled, "textarea should be disabled");
-            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                ORBEON.xforms.Document.setValue("readonly", "false");
-            }, function() {
-                YAHOO.util.Assert.isFalse(textarea.disabled, "textarea should be enabled");
+                this.checkDisabled(false);
             });
         });
     }

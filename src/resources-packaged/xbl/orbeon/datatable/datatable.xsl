@@ -349,8 +349,26 @@
 
                 <xsl:if test="$paginated">
                     <xforms:instance id="page">
-                        <page xmlns="">1</page>
+                        <page nbPages="" xmlns="">1</page>
                     </xforms:instance>
+
+
+                   <!-- 
+                       Uncomment when https://forge.ow2.org/tracker/index.php?func=detail&aid=314437&group_id=168&atid=350207 will be fixed
+                       <xsl:if test="not($sortAndPaginationMode='external')">
+                        <xxforms:variable name="nbRows">
+                            <xxforms:sequence select="count({$repeatNodeset})" xxbl:scope="outer"/>
+                        </xxforms:variable>
+                        <xxforms:variable name="nbPages"
+                            select="ceiling($nbRows div {$rowsPerPage}) cast as xs:integer"/>
+                        <xforms:bind nodeset="instance('page')">
+                            <xforms:bind nodeset="@nbPages" calculate="$nbPages"/>
+                            <!-\-<xforms:bind nodeset="."
+                               calculate="if (. cast as xs:integer > $nbPages) then $nbPages else ."
+                               />-\->
+                        </xforms:bind>
+                    </xsl:if>-->
+
                 </xsl:if>
 
             </xforms:model>
@@ -665,6 +683,17 @@
 
             <xsl:copy-of select="$pagination"/>
 
+            <xsl:if test="$paginated and not($sortAndPaginationMode='external')">
+                <xforms:group model="datatable-model" ref="instance('page')"
+                    appearance="xxforms:internal" xxbl:scope="inner">
+                    <xforms:input ref="@nbPages" style="display:none;">
+                        <!-- Workaround, see https://forge.ow2.org/tracker/index.php?func=detail&aid=314429&group_id=168&atid=350207 -->
+                        <xforms:setvalue ref=".." ev:event="xforms-value-changed"
+                            value="if (. cast as xs:integer &gt; @nbPages) then @nbPages else ."
+                        />
+                    </xforms:input>
+                </xforms:group>
+            </xsl:if>
 
         </xforms:group>
         <!-- End of template on the bound element -->
@@ -916,8 +945,17 @@
 
         <xforms:repeat nodeset="$fr-dt-rewrittenNodeset">
             <xsl:apply-templates select="@*[not(name()='nodeset')]" mode="dynamic"/>
-            <xxforms:script ev:event="xxforms-nodeset-changed" ev:target="#observer#nop">
-                ORBEON.widgets.datatable.update(this); </xxforms:script>
+   
+            <xforms:action ev:event="xxforms-nodeset-changed" ev:target="#observer">
+                <xxforms:script> ORBEON.widgets.datatable.update(this); </xxforms:script>
+                <xsl:if test="$paginated and not($sortAndPaginationMode='external')">
+                    <!-- Workaround, see https://forge.ow2.org/tracker/index.php?func=detail&aid=314429&group_id=168&atid=350207 -->
+                    <xforms:setvalue model="datatable-model" ref="instance('page')/@nbPages"
+                        value="$nbPages" xxbl:scope="inner"/>
+                    <!-- <xforms:setvalue model="datatable-model" ref="instance('page')"
+                                         value="if (. cast as xs:integer > $nbPages) then $nbPages else ."/>-->
+                </xsl:if>
+            </xforms:action>
             <xsl:apply-templates select="node()" mode="dynamic"/>
         </xforms:repeat>
 

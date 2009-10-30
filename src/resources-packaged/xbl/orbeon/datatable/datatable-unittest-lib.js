@@ -292,7 +292,9 @@ ORBEON.widgets.datatable.unittests_lib = {
     isSignificant: function(element) {
         return !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-begin-end')
                 && !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-delimiter')
-                && !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-template');
+                && !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-template')
+                && !YAHOO.util.Dom.hasClass(element, 'xforms-disabled')
+                && !YAHOO.util.Dom.hasClass(element, 'xforms-group-begin-end');
     },
 
     checkCellClassesInARow: function(row, classPrefix) {

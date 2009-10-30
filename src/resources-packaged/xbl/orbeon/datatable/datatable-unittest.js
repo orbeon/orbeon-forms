@@ -17,6 +17,41 @@ var testCase = {
 
     name: "datatable",
 
+    test314422: function() {
+        var thiss = this;
+        thiss.openAccordionCase(thiss, '_314422', function() {
+
+            ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                ORBEON.xforms.Document.setValue("maxLength", "1000");
+            }, function() {
+                // Check the table structure
+                var table = YAHOO.util.Dom.get('my-accordion$_314422-table$_314422-table-table');
+                thiss.checkColumnValues(table, 1, false, [0, 1, 2, 3, 4]);
+                var container = YAHOO.util.Dom.get('my-accordion$_314422-table$_314422-table-container');
+                thiss.checkPaginationLinks(container, ['-<< first', '-< prev', '-1', '+2', '+3', '+4', '+5', '+6', '+7', '+8', '+next >', '+last >>']);
+
+                var link6 = thiss.getPaginateLink(container, 'last >>');
+                ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                    YAHOO.util.UserAction.click(link6, {clientX: 1});
+                }, function() {
+                    thiss.checkColumnValues(table, 1, false, [35, 36, 37]);
+                    thiss.checkPaginationLinks(container, ['+<< first', '+< prev', '+1', '+2', '+3', '+4', '+5', '+6', '+7', '-8', '-next >', '-last >>']);
+                    ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                        ORBEON.xforms.Document.setValue("maxLength", "30");
+                    }, function() {
+                        // Test the status after clicking on "last"
+                        thiss.checkColumnValues(table, 1, false, [35, 37]);
+                        thiss.checkPaginationLinks(container, ['+<< first', '+< prev', '+1', '-2', '-next >', '-last >>']);
+
+                        thiss.closeAccordionCase(thiss, '_314422');
+                    });
+                });
+            });
+
+        });
+    },
+
+
     test314359: function() {
         var thiss = this;
         thiss.openAccordionCase(thiss, '_314359', function() {

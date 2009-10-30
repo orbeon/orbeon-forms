@@ -1166,6 +1166,8 @@ public class XFormsContainingDocument extends XBLContainer {
         // xforms:output though).
         // This is also a security measure that also ensures that somebody is not able to change values in an instance
         // by hacking external events.
+
+        // TODO: should do this by asking each control what event it supports!
         final String eventTargetEffectiveId = eventTarget.getEffectiveId();
         if (eventTarget instanceof XFormsControl) {
             // Target is a control

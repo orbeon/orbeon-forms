@@ -303,7 +303,7 @@ public class XFormsServer extends ProcessorImpl {
                     // Iterate through events to:
                     // 1. Reorder events if needed for noscript mode
                     // 2. Detect whether we got xxforms-online
-                    boolean hasXXFormsOnline = reorderEventsForOffline(eventElements, containingDocument, eventsIndentedLogger, isNoscript);
+                    boolean hasXXFormsOnline = processEventsForNoscript(eventElements, containingDocument, eventsIndentedLogger, isNoscript);
 
                     // Start external events
                     containingDocument.startExternalEventsSequence(pipelineContext, response, hasXXFormsOnline);
@@ -517,6 +517,8 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         // Rewrite event type. This is special handling of xxforms-value-or-activate for noscript mode.
+        // NOTE: We do this here, because we need to know the actual type of the target. Could do this statically if
+        // the static state kept type information for each control.
         if (XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE.equals(eventName)) {
             // In this case, we translate the event depending on the control type
             if (eventTarget instanceof XFormsTriggerControl) {
@@ -580,7 +582,7 @@ public class XFormsServer extends ProcessorImpl {
                 bubbles, cancelable, valueString, filesElement, new String[] { dndStart, dndEnd} ));
     }
 
-    private boolean reorderEventsForOffline(List<Element> eventElements, XFormsContainingDocument containingDocument, IndentedLogger eventsIndentedLogger, boolean noscript) {
+    private boolean processEventsForNoscript(List<Element> eventElements, XFormsContainingDocument containingDocument, IndentedLogger eventsIndentedLogger, boolean noscript) {
 
         boolean hasXXFormsOnline = false;
 

@@ -1638,7 +1638,7 @@ ORBEON.xforms.Controls = {
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-compact")) {
             // Drop-down and list
             var options = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
-                          ? YAHOO.util.Dom.getElementsByClassName("", "select", control)[0].options
+                          ? control.getElementsByTagName("select")[0].options
                           : control.options;
             var selectValue = "";
             for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
@@ -2276,11 +2276,16 @@ ORBEON.xforms.Controls = {
         function setReadonlyOnFormElement(element, isReadonly) {
             if (isReadonly) {
                 element.setAttribute("disabled", "disabled");
-                ORBEON.util.Dom.addClass(element, "xforms-readonly");
             } else {
                 element.removeAttribute("disabled");
-                ORBEON.util.Dom.removeClass(element, "xforms-readonly");
             }
+        }
+
+        // Update class
+        if (isReadonly) {
+            ORBEON.util.Dom.addClass(control, "xforms-readonly");
+        } else {
+            ORBEON.util.Dom.removeClass(control, "xforms-readonly");
         }
 
         if (ORBEON.util.Dom.hasClass(control, "xforms-group-begin-end")) {
@@ -2310,6 +2315,15 @@ ORBEON.xforms.Controls = {
             }
             if (control.tagName.toLowerCase() == "input")
                 setReadonlyOnFormElement(control, isReadonly);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")
+                || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-minimal")
+                || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-compact")
+                || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")
+                || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-compact")) {
+            // Lists
+            var select = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                ? control.getElementsByTagName("select")[0] : control;
+            setReadonlyOnFormElement(select, isReadonly);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output")
                 || ORBEON.util.Dom.hasClass(control, "xforms-group")) {
             // XForms output and group
@@ -2338,6 +2352,11 @@ ORBEON.xforms.Controls = {
             var textarea = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
                 ? control.getElementsByTagName("textarea")[0] : control;
             setReadonlyOnFormElement(textarea, isReadonly);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")
+                && ! ORBEON.util.Dom.hasClass(control, "xforms-trigger-appearance-minimal")) {
+            // Button
+            var button = control.tagName.toLowerCase() == "button" ? control : control.getElementsByTagName("button")[0];
+            setReadonlyOnFormElement(button, isReadonly);
         }
     },
 

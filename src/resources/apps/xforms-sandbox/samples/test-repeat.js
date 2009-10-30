@@ -47,14 +47,14 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     },
     
     testObserverInRepeatsObserver: function() {
-        var delimiters = YAHOO.util.Dom.getElementsByClassName("xforms-repeat-delimiter", null, "table-observer");
+        var beginEnds = YAHOO.util.Dom.getElementsByClassName("xforms-repeat-begin-end", null, "table-observer");
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             ORBEON.xforms.Document.setValue("show", "false");
         }, function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 ORBEON.xforms.Document.setValue("show", "true");
             }, function() {
-                YAHOO.util.Assert.areEqual(delimiters[0], window.observerElement, "delimiter before first input");
+                YAHOO.util.Assert.areEqual(beginEnds[0], window.observerElement, "xforms-repeat-begin-end");
             });
         });
     },

@@ -6811,7 +6811,11 @@ ORBEON.xforms.Server = {
                 if (separatorPosition != -1) {
                     var repeatID = id.substring(0, separatorPosition);
                     var iteration = id.substring(separatorPosition + 1);
-                    element = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration)
+                    element = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration);
+                    if (element == null) {
+                        // If everything else has failed, the id might be an xforms:repeat id!
+                        element = YAHOO.util.Dom.get('repeat-begin-' + id);
+                    }
                 }
             }
             return element;

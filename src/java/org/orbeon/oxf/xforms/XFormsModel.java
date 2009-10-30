@@ -56,21 +56,21 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     private final Document modelDocument;
 
     // Model attributes
-    private String staticId;
-    private String prefixedId;
-    private String effectiveId;
+    private final String staticId;
+    private String prefixedId;  // not final because can change if model within repeat iteration
+    private String effectiveId; // not final because can change if model within repeat iteration
 
     // Instances
-    private List<String> instanceIds;
-    private List<XFormsInstance> instances;
-    private Map<String, XFormsInstance> instancesMap;   // Map<String instanceStaticId, XFormsInstance>
+    private final List<String> instanceIds;
+    private final List<XFormsInstance> instances;
+    private final Map<String, XFormsInstance> instancesMap;
 
     // Submissions
-    private Map<String, XFormsModelSubmission> submissions;    // Map<String submissionStaticId, XFormsModelSubmission>
+    private final Map<String, XFormsModelSubmission> submissions;
 
     // Binds
-    private XFormsModelBinds binds;
-    private boolean mustBindValidate;
+    private final XFormsModelBinds binds;
+    private final boolean mustBindValidate;
 
     // Schema validation
     private XFormsModelSchemaValidator schemaValidator;
@@ -78,7 +78,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     // Container
     private final XBLContainer container;
-    private XFormsContextStack contextStack;    // context stack for evaluation, used by binds, submissions, event handlers
+    private final XFormsContextStack contextStack;    // context stack for evaluation, used by binds, submissions, event handlers
 
     // Containing document
     private final XFormsContainingDocument containingDocument;
@@ -109,23 +109,36 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Extract list of instances ids
         {
             final List<Element> instanceContainers = Dom4jUtils.elements(modelElement, XFormsConstants.XFORMS_INSTANCE_QNAME);
-            instanceIds = new ArrayList<String>(instanceContainers.size());
-            for (Element instanceContainer: instanceContainers) {
-                final String instanceId = XFormsInstance.getInstanceStaticId(instanceContainer);
-                instanceIds.add(instanceId);
+            if (instanceContainers.isEmpty()) {
+                // No instance in this model
+                instanceIds = Collections.emptyList();
+                instances = Collections.emptyList();
+                instancesMap = Collections.emptyMap();
+            } else {
+                // At least one instance in this model
+                instanceIds = new ArrayList<String>(instanceContainers.size());
+                for (Element instanceContainer: instanceContainers) {
+                    final String instanceId = XFormsInstance.getInstanceStaticId(instanceContainer);
+                    instanceIds.add(instanceId);
+                }
+                instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
+                instancesMap = new HashMap<String, XFormsInstance>(instanceIds.size());
             }
         }
 
         // Get <xforms:submission> elements (may be missing)
         {
             final List<Element> submissionElements = Dom4jUtils.elements(modelElement, XFormsConstants.XFORMS_SUBMISSION_QNAME);
-            for (Element submissionElement: submissionElements) {
-                final String submissionId = submissionElement.attributeValue("id");
-
-                if (this.submissions == null)
-                    this.submissions = new HashMap<String, XFormsModelSubmission>();
-
-                this.submissions.put(submissionId, new XFormsModelSubmission(this.container, submissionId, submissionElement, this));
+            if (submissionElements.isEmpty()) {
+                // No submission in this model
+                submissions = Collections.emptyMap();
+            } else {
+                // At least one submission in this model
+                submissions = new HashMap<String, XFormsModelSubmission>();
+                for (Element submissionElement: submissionElements) {
+                    final String submissionId = submissionElement.attributeValue("id");
+                    submissions.put(submissionId, new XFormsModelSubmission(this.container, submissionId, submissionElement, this));
+                }
             }
         }
 
@@ -141,11 +154,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         this.effectiveId = effectiveId;
 
         // Update effective ids of all nested instances
-        if (instances != null) {
-            for (XFormsInstance currentInstance: instances) {
-                // NOTE: we pass the new model id, not the instance id
-                currentInstance.updateModelEffectiveId(effectiveId);
-            }
+        for (XFormsInstance currentInstance: instances) {
+            // NOTE: we pass the new model id, not the instance id
+            currentInstance.updateModelEffectiveId(effectiveId);
         }
     }
 
@@ -214,11 +225,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             return this;
 
         // Search instances
-        if (instancesMap != null) {
-            final XFormsInstance instance = instancesMap.get(targetStaticId);
-            if (instance != null)
-                return instance;
-        }
+        final XFormsInstance instance = instancesMap.get(targetStaticId);
+        if (instance != null)
+            return instance;
 
         // Search submissions
         if (submissions != null) {
@@ -244,7 +253,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      * @return  XFormsInstance or null
      */
     public XFormsInstance getDefaultInstance() {
-        return (instances != null && instances.size() > 0) ? instances.get(0) : null;
+        return instances.size() > 0 ? instances.get(0) : null;
     }
 
     /**
@@ -258,7 +267,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      * Return the XFormsInstance with given id, null if not found.
      */
     public XFormsInstance getInstance(String instanceStaticId) {
-        return (instancesMap == null) ? null : instancesMap.get(instanceStaticId);
+        return instancesMap.get(instanceStaticId);
     }
 
     /**
@@ -268,11 +277,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         final DocumentInfo documentInfo = nodeInfo.getDocumentRoot();
 
-        if (instances != null) {
-            for (XFormsInstance currentInstance: instances) {
-                if (currentInstance.getDocumentInfo().isSameNodeInfo(documentInfo))
-                    return currentInstance;
-            }
+        for (XFormsInstance currentInstance: instances) {
+            if (currentInstance.getDocumentInfo().isSameNodeInfo(documentInfo))
+                return currentInstance;
         }
 
         return null;
@@ -284,11 +291,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      */
     public XFormsInstance setInstanceDocument(Object instanceDocument, String modelEffectiveId, String instanceStaticId, String instanceSourceURI,
                                               String username, String password, boolean cached, long timeToLive, String validation, boolean handleXInclude) {
-        // Initialize containers if needed
-        if (instances == null) {
-            instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
-            instancesMap = new HashMap<String, XFormsInstance>(instanceIds.size());
-        }
+
         // Prepare and set instance
         final int instancePosition = instanceIds.indexOf(instanceStaticId);
         final XFormsInstance newInstance;
@@ -323,11 +326,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Mark the instance as replaced if needed
         instance.setReplaced(replaced);
 
-        // Initialize containers if needed
-        if (instances == null) {
-            instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
-            instancesMap = new HashMap<String, XFormsInstance>(instanceIds.size());
-        }
         // Prepare and set instance
         final String instanceId = instance.getId();// use static id as instanceIds contains static ids
         final int instancePosition = instanceIds.indexOf(instanceId);
@@ -410,25 +408,23 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      * @param instancesElement  container element for serialized instances
      */
     public void serializeInstances(Element instancesElement) {
-        if (instances != null) {
-            for (XFormsInstance currentInstance: instances) {
+        for (XFormsInstance currentInstance: instances) {
 
-                // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
+            // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
 
-                final boolean isReadonlyNonReplacedInline = currentInstance.isReadOnly() && !currentInstance.isReplaced() && currentInstance.getSourceURI() == null;
-                if (!isReadonlyNonReplacedInline) {
-                    // Serialize full instance of instance metadata (latter if instance is cached)
-                    // If it is readonly, not replaced, and inline, then don't even add information to the dynamic state
+            final boolean isReadonlyNonReplacedInline = currentInstance.isReadOnly() && !currentInstance.isReplaced() && currentInstance.getSourceURI() == null;
+            if (!isReadonlyNonReplacedInline) {
+                // Serialize full instance of instance metadata (latter if instance is cached)
+                // If it is readonly, not replaced, and inline, then don't even add information to the dynamic state
 
-                    instancesElement.add(currentInstance.createContainerElement(!currentInstance.isCache()));
+                instancesElement.add(currentInstance.createContainerElement(!currentInstance.isCache()));
 
-                    indentedLogger.logDebug("serialize", currentInstance.isCache() ? "storing instance metadata to dynamic state" : "storing full instance to dynamic state",
-                        "model effective id", effectiveId, "instance static id", currentInstance.getId());
+                indentedLogger.logDebug("serialize", currentInstance.isCache() ? "storing instance metadata to dynamic state" : "storing full instance to dynamic state",
+                    "model effective id", effectiveId, "instance static id", currentInstance.getId());
 
-                    // Log instance if needed
-                    if (XFormsProperties.getDebugLogging().contains("model-serialized-instance"))
-                        currentInstance.logInstance(indentedLogger, "serialized instance");
-                }
+                // Log instance if needed
+                if (XFormsProperties.getDebugLogging().contains("model-serialized-instance"))
+                    currentInstance.logInstance(indentedLogger, "serialized instance");
             }
         }
     }
@@ -559,10 +555,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // 2. Create XPath data model from instance (inline or external) (throws xforms-link-exception)
         //    Instance may not be specified.
 
-        if (instances == null) {
-            instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
-            instancesMap = new HashMap<String, XFormsInstance>(instanceIds.size());
-        }
         {
             // Build initial instance documents
             final List<Element> instanceContainers = Dom4jUtils.elements(modelElement, XFormsConstants.XFORMS_INSTANCE_QNAME);
@@ -952,7 +944,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     public void doRecalculate(PropertyContext propertyContext) {
 
         // Recalculate only if needed
-        if (instances != null && binds != null && deferredActionContext.recalculate) {
+        if (instances.size() > 0 && binds != null && deferredActionContext.recalculate) {
             // Apply calculate binds
             binds.applyCalculateBinds(propertyContext);
         }
@@ -967,7 +959,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Validate only if needed, including checking the flags, because if validation state is clean, validation
         // being idempotent, revalidating is not needed.
-        if (instances != null && (mustBindValidate || mustSchemaValidate) && deferredActionContext.revalidate) {
+        if (instances.size() > 0 && (mustBindValidate || mustSchemaValidate) && deferredActionContext.revalidate) {
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.startHandleOperation("validation", "performing revalidate", "model id", getEffectiveId());
 

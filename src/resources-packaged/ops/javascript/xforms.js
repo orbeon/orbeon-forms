@@ -2505,6 +2505,8 @@ ORBEON.xforms.Controls = {
     },
 
     autosizeTextarea: function(textarea) {
+        if (textarea.tagName.toLowerCase() != "textarea")
+            textarea = textarea.getElementsByTagName("textarea")[0];
         var scrollHeight = textarea.scrollHeight;
         var clientHeight = textarea.clientHeight;
 

@@ -1001,6 +1001,10 @@
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <!--
+                        The two events must end up on controls on the same repeat iteration, even though the first
+                        event causes its iteration to move.
+                     -->
                     <p:input name="action">
                         <xxforms:action>
                             <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="plate·3">7FOOBAR</xxforms:event>
@@ -1104,6 +1108,11 @@
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <!--
+                        The first event doesn't cause the other controls to block incoming values. So all first three
+                        "good" values must make it into the instance. But value "42" blocks the other controls, so the
+                        "bad" values must be rejected.
+                     -->
                     <p:input name="action">
                         <xxforms:action>
                             <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">888</xxforms:event>

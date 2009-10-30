@@ -1484,7 +1484,7 @@ ORBEON.xforms.Document = {
 
     /**
      * Is it possible to take forms offline. This will require Gears to be installed. If Gears is not installed, it
-     * is the responsability of the application (not the XForms engine) to detect if Gears can be installed and to
+     * is the responsibility of the application (not the XForms engine) to detect if Gears can be installed and to
      * guide the user through the installation of Gears.
      */
     isOfflineAvailable: function() {
@@ -5770,9 +5770,13 @@ ORBEON.xforms.Server = {
                 responseXML = ORBEON.util.Dom.stringToDom(xmlString);
             }
             var formID = ORBEON.xforms.Globals.requestForm.id;
-            // Remove modal progress panel before handling DOM response, as e.g. xxf:script may dispatch events and we
-            // don't want them to be filtered.
-            ORBEON.util.Utils.hideModalProgressPanel();
+            var hasServerEvents = ORBEON.xforms.Server.hasReturningServerEvents(responseXML);
+            if (!hasServerEvents) {
+                // Remove modal progress panel before handling DOM response, as e.g. xxf:script may dispatch events and
+                // we don't want them to be filtered. If there are server events, we don't remove the panel until they
+                // have been processed, i.e. the request sending the server events returns.
+                ORBEON.util.Utils.hideModalProgressPanel();
+            }
             ORBEON.xforms.Server.handleResponseDom(responseXML, formID);
             // Reset changes, as changes are included in this bach of events
             ORBEON.xforms.Globals.changedIdsRequest = {};
@@ -5784,6 +5788,52 @@ ORBEON.xforms.Server = {
             ORBEON.xforms.Globals.executeEventFunctionQueued++;
             ORBEON.xforms.Server.executeNextRequest(false);
         }
+    },
+
+    hasReturningServerEvents: function(responseXML) {
+        if (responseXML && responseXML.documentElement
+                    && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
+            var responseRoot = responseXML.documentElement;
+            // The verbose code below implements this XPath expression:
+            // exists(/*/xxf:action[xxf:server-events and (not(xxf:submission) or xxf:submission[@replace == 'instance' or (@replace == 'all' && not(@target))])])
+            for (var i = 0; i < responseRoot.childNodes.length; i++) {
+                if (ORBEON.util.Utils.getLocalName(responseRoot.childNodes[i]) == "action") {
+                    var actionElement = responseRoot.childNodes[i];
+                    var serverEventsElement = null;
+                    var submissionElement = null;
+                    for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
+                        var currentActionElement = actionElement.childNodes[actionIndex];
+                        var currentActionName = ORBEON.util.Utils.getLocalName(currentActionElement);
+                        if (currentActionName == "server-events") {
+                            serverEventsElement = currentActionElement;
+                        } else if (currentActionName == "submission") {
+                            submissionElement = currentActionElement;
+                        }
+                        // Don't look further if we got both
+                        if (serverEventsElement && submissionElement)
+                            break;
+                    }
+
+                    if (serverEventsElement && !submissionElement) {
+                        // There is no submission (should probably not happen!)
+                        return true;
+                    } else if (serverEventsElement) {
+                        // There is a submission
+                        var replaceAttribute = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
+                        if (replaceAttribute == "instance" || replaceAttribute == "all" && ORBEON.util.Dom.getAttribute(submissionElement, "target") == null) {
+                            // Server events will return for sure with replace="instance". With replace="all", they will
+                            // return if there is no target. They could return as well with a target, but should we
+                            // take the risk?
+                            return true;
+                        }
+                    }
+
+                    // Done iterating actions
+                    break;
+                }
+            }
+        }
+        return false;
     },
 
     /**
@@ -6210,9 +6260,9 @@ ORBEON.xforms.Server = {
                                 case "control-values": {
                                     var controlValuesElement = actionElement.childNodes[actionIndex];
                                     var controlElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "control", xmlNamespace);
-                                    var controlElementslength = controlElements.length;
+                                    var controlElementsLength = controlElements.length;
                                     // Update control value and MIPs
-                                    for (var j = 0; j < controlElementslength; j++) {
+                                    for (var j = 0; j < controlElementsLength; j++) {
                                         var controlElement = controlElements[j];
                                         var newControlValue = ORBEON.util.Dom.getStringValue(controlElement);
                                         var controlId = ORBEON.util.Dom.getAttribute(controlElement, "id");

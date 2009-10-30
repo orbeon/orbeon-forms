@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.control.controls.XXFormsRootControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsValueChangeWithFocusChangeEvent;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -777,6 +778,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      * Main event dispatching entry.
      */
     public void dispatchEvent(PropertyContext propertyContext, XFormsEvent originalEvent) {
+
+        // XXFormsValueChangeWithFocusChangeEvent is always transformed into DOMFocusIn/Out
+        assert !(originalEvent instanceof XXFormsValueChangeWithFocusChangeEvent);
 
         final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
 

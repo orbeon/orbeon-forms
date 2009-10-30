@@ -37,13 +37,13 @@ public abstract class BaseControlsComparator implements ControlsComparator {
     protected final XFormsContainingDocument containingDocument;
     protected final Map<String, Itemset> itemsetsFull1;
     protected final Map<String, Itemset> itemsetsFull2;
-    protected final Map valueChangeControlIds;
+    protected final Set<String> valueChangeControlIds;
 
     protected final boolean isStaticReadonly;
 
     public BaseControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
                                   Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2,
-                                  Map valueChangeControlIds) {
+                                  Set<String> valueChangeControlIds) {
         this.pipelineContext = pipelineContext;
         this.ch = ch;
         this.containingDocument = containingDocument;

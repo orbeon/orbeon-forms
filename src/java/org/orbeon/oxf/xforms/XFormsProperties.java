@@ -57,7 +57,6 @@ public class XFormsProperties {
     private static final String OPTIMIZE_RELEVANCE_PROPERTY = "optimize-relevance";
     private static final String EXPOSE_XPATH_TYPES_PROPERTY = "expose-xpath-types";
     private static final String INITIAL_REFRESH_EVENTS_PROPERTY = "server.events.initial-refresh-events";
-    private static final String EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY = "exception-invalid-client-control";
     private static final String AJAX_SHOW_LOADING_ICON_PROPERTY = "ajax.show-loading-icon";
     private static final String AJAX_SHOW_ERRORS_PROPERTY = "ajax.show-errors";
 
@@ -192,7 +191,6 @@ public class XFormsProperties {
             new PropertyDefinition(OPTIMIZE_RELEVANCE_PROPERTY, false, false),
             new PropertyDefinition(EXPOSE_XPATH_TYPES_PROPERTY, false, false),
             new PropertyDefinition(INITIAL_REFRESH_EVENTS_PROPERTY, true, false),
-            new PropertyDefinition(EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY, false, false),
             new PropertyDefinition(AJAX_SHOW_LOADING_ICON_PROPERTY, true, false),
             new PropertyDefinition(AJAX_SHOW_ERRORS_PROPERTY, true, false),
             new PropertyDefinition(MINIMAL_RESOURCES_PROPERTY, true, false),
@@ -429,10 +427,6 @@ public class XFormsProperties {
 
     public static boolean isOptimizeLocalInstanceInclude(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, OPTIMIZE_LOCAL_INSTANCE_INCLUDE_PROPERTY);
-    }
-
-    public static boolean isExceptionOnInvalidClientControlId(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY);
     }
 
     public static boolean isAjaxShowLoadingIcon(XFormsContainingDocument containingDocument) {

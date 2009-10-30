@@ -29,10 +29,12 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class NewControlsComparator extends BaseControlsComparator {
 
-    public NewControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2, Map valueChangeControlIds) {
+    public NewControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
+                                 Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2, Set<String> valueChangeControlIds) {
         super(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
     }
 
@@ -88,7 +90,7 @@ public class NewControlsComparator extends BaseControlsComparator {
 
                     if (xformsSingleNodeControl2 != null) {
 
-                        final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(leadingControl.getEffectiveId()) != null;
+                        final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.contains(leadingControl.getEffectiveId());
                         if ((!xformsSingleNodeControl2.equalsExternal(pipelineContext, xformsSingleNodeControl1) || isValueChangeControl)
                                 && !(isStaticReadonly && xformsSingleNodeControl2.isReadonly() && xformsSingleNodeControl2 instanceof XFormsTriggerControl)
                                 && !(xformsSingleNodeControl2 instanceof XFormsGroupControl && XFormsGroupControl.INTERNAL_APPEARANCE.equals(xformsSingleNodeControl2.getAppearance()))) {

@@ -28,15 +28,12 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OldControlsComparator extends BaseControlsComparator {
 
     public OldControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
-                                 Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2, Map valueChangeControlIds) {
+                                 Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2, Set<String> valueChangeControlIds) {
         super(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
     }
 
@@ -73,7 +70,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                 if (!(isStaticReadonly && xformsSingleNodeControl2.isReadonly() && xformsSingleNodeControl2 instanceof XFormsTriggerControl)
                         && !(xformsSingleNodeControl2 instanceof XFormsGroupControl && XFormsGroupControl.INTERNAL_APPEARANCE.equals(xformsSingleNodeControl2.getAppearance()))) {
                     // Output diffs between controlInfo1 and controlInfo2
-                    final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(xformsSingleNodeControl2.getEffectiveId()) != null;
+                    final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.contains(xformsSingleNodeControl2.getEffectiveId());
                     if ((!xformsSingleNodeControl2.equalsExternal(pipelineContext, xformsSingleNodeControl1) || isValueChangeControl)) {
                         // Don't send anything if nothing has changed
                         // But we force a change for controls whose values changed in the request

@@ -107,7 +107,7 @@ public class XFormsEventFactory {
         });
         nameToClassMap.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, new Factory() {
             public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement, String[] parameters) {
-                return new XXFormsValueChangeWithFocusChangeEvent(containingDocument, targetObject, otherTargetObject, contextString);
+                return new XXFormsValueChangeWithFocusChangeEvent(containingDocument, targetObject, otherTargetObject, contextString, filesElement);
             }
         });
         nameToClassMap.put(XFormsEvents.XXFORMS_SUBMIT, new Factory() {
@@ -299,7 +299,7 @@ public class XFormsEventFactory {
     public static XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable,
                                            String contextString, Element filesElement, String[] parameters) {
 
-        return createEvent(containingDocument, eventName, targetObject, otherTargetObject, allowCustomEvents, bubbles, cancelable, contextString, null ,null, filesElement, parameters);
+        return createEvent(containingDocument, eventName, targetObject, otherTargetObject, allowCustomEvents, bubbles, cancelable, contextString, null, null, filesElement, parameters);
     }
 
     private static XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable,

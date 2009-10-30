@@ -79,9 +79,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "xforms:select1 appearance=full",
-
-    dateValueInputId: "date$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    name: "xforms:select and xforms:select1 appearance=full",
 
     getSelect: function(controlId) {
         var control = YAHOO.util.Dom.get(controlId);
@@ -145,6 +143,63 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
              // Check DHL and TNT are selected in the list
              YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected);
              YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[3].selected);
+             // Get back to initial state
+             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                 ORBEON.xforms.Document.setValue("carrier-select1-compact" + XFORMS_SEPARATOR_1 + "1", "f");
+             }, function() {});
+        });
+    }
+}));
+
+YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+    name: "xforms:select and xforms:select1 appearance=full",
+
+    /**
+     * Test if setting values of one list updates the other lists, after making the lists non-relevant and relevant
+     * again. When the list become relevant, they are re-built which can cause some problems on IE if the listeners on
+     * on "change" are not re-registered.
+     */
+    testValueChange: function() {
+        var selectIds = ["carrier-select1-compact" + XFORMS_SEPARATOR_1 + "1",
+            "carrier-select-compact" + XFORMS_SEPARATOR_1 + "1",
+            "carrier-select-compact" + XFORMS_SEPARATOR_1 + "1"];
+
+        /**
+         * This function simulates the user selecting a value and sending the change event to the select.
+         */
+        function setSelectValue(index, value) {
+            var select = YAHOO.util.Dom.get(selectIds[index]);
+            if (select.tagName.toLowerCase() != "select") select = select.getElementsByTagName("select")[0];
+            select.value = value;
+            xformsDispatchEvent(select, "change");
+        }
+
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            ORBEON.xforms.Document.setValue("relevant", "false");
+        }, function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                ORBEON.xforms.Document.setValue("relevant", "true");
+            }, function() {
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    setSelectValue(0, "u");
+                }, function() {
+                    YAHOO.util.Assert.areEqual("u", ORBEON.xforms.Document.getValue(selectIds[1]));;
+                    YAHOO.util.Assert.areEqual("u", ORBEON.xforms.Document.getValue(selectIds[2]));;
+                    ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                        setSelectValue(1, "f");
+                    }, function() {
+                        YAHOO.util.Assert.areEqual("f", ORBEON.xforms.Document.getValue(selectIds[0]));;
+                        YAHOO.util.Assert.areEqual("f", ORBEON.xforms.Document.getValue(selectIds[2]));;
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            setSelectValue(2, "d");
+                        }, function() {
+                            YAHOO.util.Assert.areEqual("d", ORBEON.xforms.Document.getValue(selectIds[0]));;
+                            YAHOO.util.Assert.areEqual("d", ORBEON.xforms.Document.getValue(selectIds[1]));;
+                        });
+                    });
+                });
+            });
         });
     }
 }));

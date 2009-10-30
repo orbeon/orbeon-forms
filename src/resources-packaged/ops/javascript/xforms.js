@@ -6054,7 +6054,9 @@ ORBEON.xforms.Server = {
                                                 var selectOpeningTag = select.outerHTML.substring(0, select.outerHTML.indexOf(">") + 1);
                                                 select.outerHTML = selectOpeningTag + sb.join("") + "</select>";
                                                 // Get again control, as it has been re-created
-                                                select = ORBEON.util.Dom.getElementByIdNoCache(controlId);
+                                                select = YAHOO.util.Dom.get(controlId);
+                                                if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY))
+                                                    select = documentElement.getElementsByTagName("select")[0];
                                                 // Must now update the cache
                                                 ORBEON.xforms.Globals.idToElement[controlId] = select;
                                                 // For non-W3C compliant browsers we must re-register a listener on the new element we just created

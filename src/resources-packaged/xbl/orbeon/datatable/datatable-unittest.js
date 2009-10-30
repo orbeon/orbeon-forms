@@ -30,12 +30,12 @@ var testCase = {
                 var container = YAHOO.util.Dom.get('my-accordion$_314422-table$_314422-table-container');
                 thiss.checkPaginationLinks(container, ['-<< first', '-< prev', '-1', '+2', '+3', '+4', '+5', '+6', '+7', '+8', '+next >', '+last >>']);
 
-                var link6 = YAHOO.util.Dom.get('my-accordion$_314422-table$xf-26·6');
+                var link6 = thiss.getPaginateLink(container, 'last >>');
                 ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                     YAHOO.util.UserAction.click(link6, {clientX: 1});
                 }, function() {
-                    thiss.checkColumnValues(table, 1, false, [25, 26, 27, 28, 29]);
-                    thiss.checkPaginationLinks(container, ['+<< first', '+< prev', '+1', '+2', '+3', '+4', '+5', '-6', '+7', '+8', '+next >', '+last >>']);
+                    thiss.checkColumnValues(table, 1, false, [35, 36, 37]);
+                    thiss.checkPaginationLinks(container, ['+<< first', '+< prev', '+1', '+2', '+3', '+4', '+5', '+6', '+7', '-8', '-next >', '-last >>']);
                     ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                         ORBEON.xforms.Document.setValue("maxLength", "30");
                     }, function() {

@@ -1060,7 +1060,7 @@ ORBEON.util.Utils = {
     hideModalProgressPanel: function() {
         if (ORBEON.xforms.Globals.modalProgressPanel) {
             ORBEON.xforms.Globals.modalProgressPanel.hide();
-            // We set it to null when hidding so we have an easy way of knowing of the panel is visible or not.
+            // We set it to null when hiding so we have an easy way of knowing of the panel is visible or not.
             // See: http://www.nabble.com/Is-Panel-visible--td22139417.html
             ORBEON.xforms.Globals.modalProgressPanel = null;
         }

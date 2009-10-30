@@ -946,7 +946,7 @@
         <xforms:repeat nodeset="$fr-dt-rewrittenNodeset">
             <xsl:apply-templates select="@*[not(name()='nodeset')]" mode="dynamic"/>
    
-            <xforms:action ev:event="xxforms-nodeset-changed" ev:target="#observer#nop">
+            <xforms:action ev:event="xxforms-nodeset-changed" ev:target="#observer">
                 <xxforms:script> ORBEON.widgets.datatable.update(this); </xxforms:script>
                 <xsl:if test="$paginated and not($sortAndPaginationMode='external')">
                     <!-- Workaround, see https://forge.ow2.org/tracker/index.php?func=detail&aid=314429&group_id=168&atid=350207 -->

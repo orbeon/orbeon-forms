@@ -52,6 +52,9 @@
                 .fr-grid .fr-grid-content .xbl-fr-button button.xforms-trigger  { margin-top: 0 }
                 .fr-grid-content textarea.xforms-textarea, .xforms-textarea textarea { height: 9em }
 
+                .xbl-fr-link-select1 { display: block; text-align: right }
+                .xbl-fr-link-select1 .xforms-label { margin-right: .5em }
+
                 /* ***** Styles from form-runner-orbeon.css ***********************************************************/
                 .xforms-input input, textarea.xforms-textarea, input.xforms-secret, .xforms-textarea textarea, .xforms-secret input {
                     border: 1px solid #ccc;
@@ -103,11 +106,24 @@
                     <resource xml:lang="en">
                         <detail>
                             <labels>
+                                <language>Language:</language>
                                 <alert>Invalid value</alert>
                             </labels>
                         </detail>
                     </resource>
+                    <resource xml:lang="fr">
+                        <detail>
+                            <labels>
+                                <language>Langue:</language>
+                                <alert>Valeur invalide</alert>
+                            </labels>
+                        </detail>
+                    </resource>
                 </resources>
+            </xforms:instance>
+
+            <xforms:instance id="fr-language-instance">
+                <language>en</language>
             </xforms:instance>
 
             <!-- Initial instance -->
@@ -134,10 +150,18 @@
             <xsl:copy-of select="@*"/>
             <xsl:attribute name="class" select="string-join((tokenize(@class, '\s+'), 'xforms-disable-hint-as-tooltip'), ' ')"/>
             <!-- Expose resources variables -->
-            <xxforms:variable name="fr-resources" select="instance('fr-fr-resources')/resource[1]"/>
-            <xxforms:variable name="form-resources" select="instance('fr-form-resources')/resource[1]"/>
-
+            <xxforms:variable name="fr-resources" select="instance('fr-fr-resources')/resource[@xml:lang = instance('fr-language-instance')]"/>
+            <xxforms:variable name="form-resources" select="instance('fr-form-resources')/resource[@xml:lang = instance('fr-language-instance')]"/>
             <xhtml:div id="doc4">
+                <!-- Language selector -->
+                <fr:link-select1 ref="instance('fr-language-instance')">
+                    <xforms:label ref="$fr-resources/detail/labels/language"/>
+                    <xforms:itemset nodeset="instance('fr-form-resources')/resource/@xml:lang">
+                        <xforms:label ref="."/>
+                        <xforms:value ref="."/>
+                    </xforms:itemset>
+                </fr:link-select1>
+                <!-- Form -->
                 <xforms:group id="fr-form-group" appearance="xxforms:internal">
                     <xsl:apply-templates/>
                 </xforms:group>

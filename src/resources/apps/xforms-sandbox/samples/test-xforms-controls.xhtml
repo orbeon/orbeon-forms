@@ -47,6 +47,7 @@
                     <time>15:00:00</time>
                     <date-time>2009-03-19T15:00:00</date-time>
                     <trigger/>
+                    <submit/>
                     <output-file>
                         <uri>file:///tmp/dummy</uri>
                     </output-file>
@@ -276,10 +277,21 @@
                 <xhtml:p>
                     <xforms:trigger ref="trigger" id="trigger-default">
                         <xforms:label ref="../label"/>
+                        <xforms:hint>Hint</xforms:hint>
                     </xforms:trigger>
                     <xforms:trigger ref="trigger" id="trigger-minimal" appearance="minimal">
                         <xforms:label ref="../label"/>
+                        <xforms:hint>Hint</xforms:hint>
                     </xforms:trigger>
+                </xhtml:p>
+
+                <!-- Submit -->
+                <xhtml:h2>xforms:submit</xhtml:h2>
+                <xhtml:p>
+                    <xforms:submit ref="submit" id="submit">
+                        <xforms:label ref="../label"/>
+                        <xforms:hint>Hint</xforms:hint>
+                    </xforms:submit>
                 </xhtml:p>
 
                 <!-- Download -->

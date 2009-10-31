@@ -353,7 +353,7 @@
                     </xforms:instance>
 
 
-                   <!-- 
+                    <!-- 
                        Uncomment when https://forge.ow2.org/tracker/index.php?func=detail&aid=314437&group_id=168&atid=350207 will be fixed
                        <xsl:if test="not($sortAndPaginationMode='external')">
                         <xxforms:variable name="nbRows">
@@ -760,6 +760,10 @@
     </xsl:template>
 
     <xsl:template match="header/xhtml:th" mode="dynamic">
+        <xsl:if test="$sortAndPaginationMode = 'external' and not(@fr:sortMessage)">
+            <xsl:message terminate="yes">In datatables with sortAndPaginationMode set to "external",
+                sortable columns must have fr:sortMessage attributes.</xsl:message>
+        </xsl:if>
         <xxforms:variable name="index" select="{count(../../preceding-sibling::*) + 1}"
             xxbl:scope="inner"/>
         <xxforms:variable name="columnDesc" model="datatable-model"
@@ -783,6 +787,11 @@
     </xsl:template>
 
     <xsl:template match="header/xforms:repeat/xhtml:th" mode="dynamic">
+        <xsl:if test="$sortAndPaginationMode = 'external' and not(@fr:sortMessage)">
+            <xsl:message terminate="yes">In datatables with sortAndPaginationMode set to "external",
+                sortable columns must have fr:sortMessage attributes.</xsl:message>
+        </xsl:if>
+        
         <xxforms:variable name="position" xxbl:scope="inner">
             <xxforms:sequence select="position()" xxbl:scope="outer"/>
         </xxforms:variable>
@@ -945,7 +954,7 @@
 
         <xforms:repeat nodeset="$fr-dt-rewrittenNodeset">
             <xsl:apply-templates select="@*[not(name()='nodeset')]" mode="dynamic"/>
-   
+
             <xforms:action ev:event="xxforms-nodeset-changed" ev:target="#observer">
                 <xxforms:script> ORBEON.widgets.datatable.update(this); </xxforms:script>
                 <xsl:if test="$paginated and not($sortAndPaginationMode='external')">

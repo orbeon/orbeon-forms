@@ -159,6 +159,7 @@ p, fieldset, table { margin-bottom: 1em }
 
 .xforms-hint {
     display: block;
+    clear: both;
     font-size: smaller;
     margin-top: .2em;
     margin-left: 0;/* used to have margin here but with new colors no margin seems better */

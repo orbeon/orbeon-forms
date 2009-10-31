@@ -46,13 +46,18 @@
                 /* More padding within tabs */
                 .yui-skin-sam .yui-navset .yui-content, .yui-skin-sam .yui-navset .yui-navset-top .yui-content {
                     padding-top: .5em; padding-bottom: 1em;
-                    /*min-height: 40em;*/
                 }
 
+                /* YUI sets this to a color, but it is hindering more than anything else */
                 .ygtvfocus { background-color: transparent }
-                .edit-items-trigger { font-size: smaller }
+
+                /* Itemset editor */
                 #fb-itemset-editor-dialog .xbl-fr-link-select1 { margin-bottom: .5em }
                 #fb-itemset-editor-dialog .xbl-fr-link-select1 .xforms-label { display: none }
+
+                /* Edit Items trigger */
+                .edit-items-trigger { font-size: smaller }
+                .fr-grid-content .edit-items-trigger, .fr-grid-content .edit-items-trigger:hover { text-decoration: none; display: inline-block; clear: both }
 
                 .fr-grid-content .xforms-label,
                     .fr-grid-content .xbl-fr-button,
@@ -60,7 +65,9 @@
                 .fr-grid .fr-grid-content .xbl-fr-button button.xforms-trigger  { margin-top: 0 }
                 .fr-grid-content textarea.xforms-textarea, .xforms-textarea textarea { height: 9em }
 
+                /* fr:link-select1 displays to the right, except in the grid */
                 .xbl-fr-link-select1 { display: block; text-align: right }
+                .fr-grid .xbl-fr-link-select1 { text-align: left }
                 .xbl-fr-link-select1 .xforms-label { margin-right: .5em }
 
                 /* ***** Styles from form-runner-orbeon.css ***********************************************************/
@@ -87,6 +94,7 @@
 
                 .xforms-hint {
                     display: block;
+                    clear: both;
                     font-size: smaller;
                     margin-top: .2em;
                     margin-left: 0;/* used to have margin here but with new colors no margin seems better */
@@ -130,6 +138,7 @@
                             <labels>
                                 <language>Language:</language>
                                 <alert>Invalid value</alert>
+                                <edit-items>Edit Items</edit-items>
                             </labels>
                         </detail>
                     </resource>
@@ -138,6 +147,7 @@
                             <labels>
                                 <language>Langue:</language>
                                 <alert>Valeur invalide</alert>
+                                <edit-items>Editer la liste</edit-items>
                             </labels>
                         </detail>
                     </resource>
@@ -248,8 +258,12 @@
         <xsl:next-match/>
         <xforms:trigger appearance="minimal" class="edit-items-trigger">
             <xforms:label>Edit Items</xforms:label>
+            <xforms:label>
+                <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/edit-items"/></xhtml:span>
+            </xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xxforms:show dialog="fb-itemset-editor-dialog">
+                <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="{@id}">
                     <xxforms:context name="fb:resource-id" select="'{substring-before(@id, '-control')}'"/>
                 </xxforms:show>
             </xforms:action>

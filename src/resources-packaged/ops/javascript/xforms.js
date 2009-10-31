@@ -2383,8 +2383,9 @@ ORBEON.xforms.Controls = {
             var textarea = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
                 ? control.getElementsByTagName("textarea")[0] : control;
             setReadonlyOnFormElement(textarea, isReadonly);
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")
-                && ! ORBEON.util.Dom.hasClass(control, "xforms-trigger-appearance-minimal")) {
+        } else if ((ORBEON.util.Dom.hasClass(control, "xforms-trigger")
+                && ! ORBEON.util.Dom.hasClass(control, "xforms-trigger-appearance-minimal"))
+                || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
             // Button
             var button = control.tagName.toLowerCase() == "button" ? control : control.getElementsByTagName("button")[0];
             setReadonlyOnFormElement(button, isReadonly);
@@ -2402,7 +2403,7 @@ ORBEON.xforms.Controls = {
     },
 
     getHintMessage: function(control) {
-        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")) {
+        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger") || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
             var formElement = ORBEON.util.Dom.getElementByTagName(control, ["a", "button"]);
             return formElement.title;
         } else {
@@ -2413,7 +2414,7 @@ ORBEON.xforms.Controls = {
     },
 
     setHintMessage: function(control, message) {
-        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")) {
+        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger") || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
             // For triggers, the value is stored in the title for the control
             if (ORBEON.xforms.Globals.hintTooltipForControl[control.id] == null) {
                 // We only update the title if we don't have already a YUI hint widget.
@@ -3133,7 +3134,7 @@ ORBEON.xforms.Events = {
             // Control tooltip
             if (! ORBEON.util.Dom.hasClass(document.body, "xforms-disable-hint-as-tooltip")) {
                 var message = ORBEON.xforms.Controls.getHintMessage(target);
-                if (YAHOO.util.Dom.hasClass(target, "xforms-trigger")) {
+                if (YAHOO.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit")) {
                     // Remove the title, to avoid having both the YUI tooltip and the browser tooltip based on the title showing up
                     var formElement = ORBEON.util.Dom.getElementByTagName(target, ["a", "button"]);
                     formElement.title = "";

@@ -27,7 +27,7 @@
         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <!-- Helper for repeats -->
-    <xsl:template match="xhtml:body//fr:repeat | xbl:binding/xbl:template//fr:repeat">
+    <xsl:template match="xhtml:body//fr:repeat | xxforms:dialog//fr:repeat | xbl:binding/xbl:template//fr:repeat">
         <xsl:variable name="fr-repeat" select="."/>
         <!-- TODO: handle @bind here, probably not relevant -->
         <xsl:variable name="tokenized-path" select="tokenize(@nodeset, '/')"/>

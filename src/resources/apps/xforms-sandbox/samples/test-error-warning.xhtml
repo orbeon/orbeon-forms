@@ -1,0 +1,109 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        xmlns:widget="http://orbeon.org/oxf/xml/widget"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Error and warning</xhtml:title>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" id="main" xxforms:new-xhtml-layout="true">
+            <xforms:instance>
+                <instance>
+                    <currency-empty/>
+                    <currency-filled>42</currency-filled>
+                    <input-empty/>
+                    <input-filled>42</input-filled>
+                    <select1-minimal-empty/>
+                    <select1-minimal-filled>42</select1-minimal-filled>
+                    <textarea-empty/>
+                    <textarea-filled>42</textarea-filled>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="*" required="true()"/>
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-label { display: inline-block; width: 15em; }
+            .xforms-control, .xbl-fr-currency { line-height: 2.5em; }
+
+            .xforms-alert-active { display: none; }
+
+            .xforms-required, 
+            .xbl-fr-currency .xforms-required  
+                { background: url('../../ops/images/xforms/error.png') right top no-repeat; padding: 0 20px 1px 0; }
+
+            .xforms-required-filled, 
+            .xbl-fr-currency .xforms-required-filled 
+                { background-image: none; }
+
+            .xforms-invalid-visited, 
+            .xbl-fr-currency .xforms-invalid-visited 
+                { background: url('../../ops/images/xforms/exclamation.png') right top no-repeat; padding-right: 0 20px 1px 0; }
+                
+        </xhtml:style>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <!-- <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-control-xhtml-area.js"/> -->
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:div>
+            <fr:currency ref="currency-empty">
+                <xforms:label>Currency initially empty</xforms:label>
+            </fr:currency>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="currency-filled">
+                <xforms:label>Currency initially filled</xforms:label>
+            </fr:currency>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:input ref="input-empty">
+                <xforms:label>Input initially empty</xforms:label>
+            </xforms:input>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:input ref="input-filled">
+                <xforms:label>Input initially filled</xforms:label>
+            </xforms:input>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:select1 ref="select1-minimal-empty" appearance="minimal">
+                <xforms:label>Drop-down initially empty</xforms:label>
+                <xforms:item>
+                    <xforms:value/>
+                    <xforms:label>-- Make a section --</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>42</xforms:value>
+                    <xforms:label>42</xforms:label>
+                </xforms:item>
+            </xforms:select1>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:select1 ref="select1-minimal-filled" appearance="minimal">
+                <xforms:label>Drop-down initially filled</xforms:label>
+                <xforms:item>
+                    <xforms:value/>
+                    <xforms:label>-- Make a section --</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>42</xforms:value>
+                    <xforms:label>42</xforms:label>
+                </xforms:item>
+            </xforms:select1>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:textarea ref="textarea-empty">
+                <xforms:label>Textarea initially empty</xforms:label>
+            </xforms:textarea>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:textarea ref="textarea-filled">
+                <xforms:label>Textarea initially filled</xforms:label>
+            </xforms:textarea>
+        </xhtml:div>
+    </xhtml:body>
+</xhtml:html>

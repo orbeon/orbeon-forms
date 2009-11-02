@@ -760,7 +760,7 @@
     </xsl:template>
 
     <xsl:template match="header/xhtml:th" mode="dynamic">
-        <xsl:if test="$sortAndPaginationMode = 'external' and not(@fr:sortMessage)">
+        <xsl:if test="$sortAndPaginationMode = 'external' and @fr:sortable and not(@fr:sortMessage)">
             <xsl:message terminate="yes">In datatables with sortAndPaginationMode set to "external",
                 sortable columns must have fr:sortMessage attributes.</xsl:message>
         </xsl:if>
@@ -787,7 +787,7 @@
     </xsl:template>
 
     <xsl:template match="header/xforms:repeat/xhtml:th" mode="dynamic">
-        <xsl:if test="$sortAndPaginationMode = 'external' and not(@fr:sortMessage)">
+        <xsl:if test="$sortAndPaginationMode = 'external' and @fr:sortable and not(@fr:sortMessage)">
             <xsl:message terminate="yes">In datatables with sortAndPaginationMode set to "external",
                 sortable columns must have fr:sortMessage attributes.</xsl:message>
         </xsl:if>

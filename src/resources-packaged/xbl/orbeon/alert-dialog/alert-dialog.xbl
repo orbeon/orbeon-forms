@@ -1,0 +1,80 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <xbl:binding id="fr-alert-dialog" element="fr|alert-dialog">
+        <xbl:resources>
+            <xbl:style src="/ops/yui/alert-dialog/assets/skins/sam/alert-dialog.css"/>
+            <xbl:style src="/xbl/orbeon/alert-dialog/alert-dialog.css"/>
+        </xbl:resources>
+        <xbl:implementation>
+            <!-- Local model -->
+            <xforms:model id="alert-dialog-model">
+                <xforms:instance id="alert-dialog-instance">
+                    <alert-dialog>
+                        <textfield-value/>
+                    </alert-dialog>
+                </xforms:instance>
+            </xforms:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xsl:transform version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
+                <xsl:template match="/*">
+                    <xxforms:dialog xxbl:scope="outer" id="dialog" level="modal" class="fr-alert-dialog-container" appearance="full">
+                        <xforms:label><xsl:copy-of select="fr:title/(@* | node())"/></xforms:label>
+                        <xhtml:div>
+                            <xhtml:img src="/apps/fr/style/question-large.gif" alt="" class="fr-alert-dialog-icon"/>
+                            <xhtml:div class="fr-alert-dialog-message">
+                                <xforms:output value="$fr-resources/detail/messages/clear-confirm-message"/>
+                            </xhtml:div>
+                        </xhtml:div>
+                        <xhtml:div class="fr-alert-dialog-buttons">
+                            <xforms:group>
+                                <xxforms:hide ev:event="DOMActivate" dialog="fr-clear-confirm-dialog"/>
+                                <xforms:trigger>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
+                                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/clear"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:dispatch ev:event="DOMActivate" name="fr-clear" target="fr-persistence-model"/>
+                                </xforms:trigger>
+                                <xforms:trigger>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/cancel"/></xhtml:span>
+                                    </xforms:label>
+                                </xforms:trigger>
+                            </xforms:group>
+                        </xhtml:div>
+                    </xxforms:dialog>
+                </xsl:template>
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

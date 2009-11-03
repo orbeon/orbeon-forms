@@ -1,0 +1,9 @@
+.fr-alert-dialog { width: 400px }
+.fr-alert-dialog ol { padding-left: 3em }
+.fr-alert-dialog li { list-style-type: decimal }/* overrides YUI reset so numbers in enumeration do show */
+.fr-alert-dialog .bd p { margin: .5em 0 .5em 0 }
+.fr-alert-dialog .hd { background-color: #666699 }
+.fr-alert-dialog .bd { margin: 0 .5em .5em .5em }
+.fr-alert-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em }
+.fr-alert-dialog-message { margin-top: .5em; padding-top: 0.5em }
+.fr-alert-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }

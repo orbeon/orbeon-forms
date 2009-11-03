@@ -68,6 +68,7 @@ var CLIENT_EVENTS_FILTER_PROPERTY = "client.events.filter";
 var RESOURCES_VERSIONED = "oxf.resources.versioned";
 var APPLICATION_RESOURCES_VERSION_PROPERTY = "oxf.resources.version-number";
 var NEW_XHTML_LAYOUT_PROPERTY = "new-xhtml-layout";
+var XHTML_LAYOUT_PROPERTY = "xhtml-layout";
 
 // Parameter defaults
 // NOTE: Default values below MUST match the ones in XFormsProperties
@@ -97,6 +98,7 @@ var XFORMS_DATEPICKER_TWO_MONTHS = false;
 var XFORMS_HTMLEDITOR = "yui";
 var XFORMS_CLIENT_EVENTS_MODE = "default";
 var XFORMS_CLIENT_EVENTS_FILTER = "";
+var XHTML_LAYOUT_NOSPAN = "nospan";
 
 /**
  * Constants
@@ -1052,9 +1054,15 @@ ORBEON.util.Utils = {
             case CLIENT_EVENTS_FILTER_PROPERTY: { return XFORMS_CLIENT_EVENTS_FILTER; }
             case RESOURCES_VERSIONED: { return "false"; }
             case NEW_XHTML_LAYOUT_PROPERTY: { return false; }
+            case XHTML_LAYOUT_PROPERTY: { return XHTML_LAYOUT_NOSPAN; }
         }
     	// Neither the property's value was supplied, nor a default value exists for the property
         return null;
+    },
+
+    isNewXHTMLLayout: function() {
+        return ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+            || ORBEON.util.Utils.getProperty(XHTML_LAYOUT_PROPERTY) != XHTML_LAYOUT_NOSPAN;
     },
 
     hideModalProgressPanel: function() {
@@ -1665,7 +1673,7 @@ ORBEON.xforms.Controls = {
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-compact")) {
             // Drop-down and list
-            var options = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+            var options = ORBEON.util.Utils.isNewXHTMLLayout()
                           ? control.getElementsByTagName("select")[0].options
                           : control.options;
             var selectValue = "";
@@ -1699,7 +1707,7 @@ ORBEON.xforms.Controls = {
             } else if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
                 return control.innerHTML;
             } else {
-                var spanWithValue = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                var spanWithValue = ORBEON.util.Utils.isNewXHTMLLayout()
                     ? control.getElementsByTagName("span")[0]
                     : control;
                 return ORBEON.util.Dom.getStringValue(spanWithValue);
@@ -1756,12 +1764,12 @@ ORBEON.xforms.Controls = {
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
             // XForms output or "static readonly" mode
             if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-image")) {
-                var image = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                var image = ORBEON.util.Utils.isNewXHTMLLayout()
                     ? YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0]
                     : ORBEON.util.Dom.getChildElementByIndex(control, 0);
                 image.src = newControlValue;
             } else {
-                var output = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                var output = ORBEON.util.Utils.isNewXHTMLLayout()
                         ? YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0]
                         : control;
                 if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
@@ -1851,7 +1859,7 @@ ORBEON.xforms.Controls = {
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
             // Handle lists and comboboxes
             var selectedValues = ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")  ? newControlValue.split(" ") : new Array(newControlValue);
-            var select = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) ? control.getElementsByTagName("select")[0] : control;
+            var select = ORBEON.util.Utils.isNewXHTMLLayout() ? control.getElementsByTagName("select")[0] : control;
             var options = select.options;
             if (options != null) {
                 for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
@@ -1894,12 +1902,6 @@ ORBEON.xforms.Controls = {
 
             // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be the best thing to do.
             // NOTE: There is no "maxlength" attribute in HTML 4, but there is one in HTML 5. Should we add it anyway?
-//            if (attribute1 != null) {
-//                if (attribute1 == "")
-//                    textarea.removeAttribute("maxlength");
-//                else
-//                    textarea.maxlength = attribute1;
-//            }
             if (attribute2 != null) {
                 if (attribute2 == "")
                     textarea.removeAttribute("cols");
@@ -2034,7 +2036,7 @@ ORBEON.xforms.Controls = {
     _getControlLHHA: function(control, lhhaType) {
 
         // For new layout, try to look for label under the control element
-        if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {
+        if (ORBEON.util.Utils.isNewXHTMLLayout()) {
             var lhhaElements = YAHOO.util.Dom.getElementsByClassName("xforms-" + lhhaType, null, control);
             if (lhhaElements.length > 0) return lhhaElements[0];
         }
@@ -2108,7 +2110,7 @@ ORBEON.xforms.Controls = {
     setLabelMessage: function(control, message) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")
                 || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
-            var linkButtonElement = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+            var linkButtonElement = ORBEON.util.Utils.isNewXHTMLLayout()
                 ? YAHOO.util.Dom.getFirstChild(control) : control;
             if (linkButtonElement.tagName.toLowerCase() == "input") {
                 // Image
@@ -2352,7 +2354,7 @@ ORBEON.xforms.Controls = {
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-compact")) {
             // Lists
-            var select = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+            var select = ORBEON.util.Utils.isNewXHTMLLayout()
                 ? control.getElementsByTagName("select")[0] : control;
             setReadonlyOnFormElement(select, isReadonly);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output")
@@ -2369,10 +2371,10 @@ ORBEON.xforms.Controls = {
             var htmlEditor = FCKeditorAPI.GetInstance(control.name);
             if (isReadonly) {
                 htmlEditor.ToolbarSet.Collapse();
-                // TO-DO
+                    // TO-DO
             } else {
                 htmlEditor.ToolbarSet.Expand();
-                // TO-DO
+                    // TO-DO
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-upload")) {
             // Upload control
@@ -2380,7 +2382,7 @@ ORBEON.xforms.Controls = {
                     ORBEON.util.Dom.getChildElementByClass(control, "xforms-upload-select"), isReadonly);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")) {
             // Textarea
-            var textarea = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+            var textarea = ORBEON.util.Utils.isNewXHTMLLayout()
                 ? control.getElementsByTagName("textarea")[0] : control;
             setReadonlyOnFormElement(textarea, isReadonly);
         } else if ((ORBEON.util.Dom.hasClass(control, "xforms-trigger")
@@ -2702,7 +2704,7 @@ ORBEON.xforms.Controls = {
 
         // Show and reposition dialog when needed
         if (showAndRepositionPanel) {
-            var controlContainer = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) ? control : control.parentNode;
+            var controlContainer = ORBEON.util.Utils.isNewXHTMLLayout() ? control : control.parentNode;
             var helpImage = ORBEON.util.Dom.getChildElementByClass(controlContainer, "xforms-help-image");
             ORBEON.xforms.Globals.formHelpPanel[form.id].element.style.display = "block";
             ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("context", [helpImage, "bl", "tl"]);
@@ -2954,7 +2956,7 @@ ORBEON.xforms.Events = {
 
                 if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-compact")) {
                     // For select1 list, make sure we have exactly one value selected
-                    var select = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                    var select = ORBEON.util.Utils.isNewXHTMLLayout()
                                   ? YAHOO.util.Dom.getElementsByClassName("", "select", target)[0]
                                   : target;
                     if (select.value == "") {
@@ -3098,30 +3100,30 @@ ORBEON.xforms.Events = {
 
         // Create tooltip if have never "seen" this control
         if (tooltipForControl[control.id] == null) {
-            if (message != "") {
-                // We have a hint, initialize YUI tooltip
-                var yuiTooltip =
+        if (message != "") {
+            // We have a hint, initialize YUI tooltip
+            var yuiTooltip =
                         new YAHOO.widget.Tooltip(control.id + toolTipSuffix, {
                             context: target.id,
-                            text: message,
-                            showDelay: delay,
-                            effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2},
-                            // We provide here a "high" zIndex value so the tooltip is "always" displayed on top over everything else.
-                            // Otherwise, with dialogs, the tooltip might end up being below the dialog and be invisible.
-                            zIndex: 1000
-                        });
+                        text: message,
+                        showDelay: delay,
+                        effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2},
+                        // We provide here a "high" zIndex value so the tooltip is "always" displayed on top over everything else.
+                        // Otherwise, with dialogs, the tooltip might end up being below the dialog and be invisible.
+                        zIndex: 1000
+                    });
                 yuiTooltip.orbeonControl = control;
                 var context = ORBEON.util.Dom.getElementById(target.id);
-                // Send the mouse move event, because the tooltip gets positioned when receiving a mouse move.
-                // Without this, sometimes the first time the tooltip is shows at the top left of the screen
-                yuiTooltip.onContextMouseMove.call(context, event, yuiTooltip);
-                // Send the mouse over event to the tooltip, since the YUI tooltip didn't receive it as it didn't
-                // exist yet when the event was dispatched by the browser
-                yuiTooltip.onContextMouseOver.call(context, event, yuiTooltip);
-                // Save reference to YUI tooltip
+            // Send the mouse move event, because the tooltip gets positioned when receiving a mouse move.
+            // Without this, sometimes the first time the tooltip is shows at the top left of the screen
+            yuiTooltip.onContextMouseMove.call(context, event, yuiTooltip);
+            // Send the mouse over event to the tooltip, since the YUI tooltip didn't receive it as it didn't
+            // exist yet when the event was dispatched by the browser
+            yuiTooltip.onContextMouseOver.call(context, event, yuiTooltip);
+            // Save reference to YUI tooltip
                 tooltipForControl[control.id] = yuiTooltip;
-            } else {
-                // Remember we looked at this control already
+        } else {
+            // Remember we looked at this control already
                 tooltipForControl[control.id] = true;
             }
         }
@@ -3179,8 +3181,8 @@ ORBEON.xforms.Events = {
                     // The xforms:input is a unique case where the 'for' points to the input field, not the element representing the control
                     if (YAHOO.util.Dom.hasClass(control, "xforms-input-input"))
                         control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
-                    var message = ORBEON.xforms.Controls.getHelpMessage(control);
-                    YAHOO.util.Dom.generateId(target);
+                        var message = ORBEON.xforms.Controls.getHelpMessage(control);
+                        YAHOO.util.Dom.generateId(target);
                     ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control, target, "-orbeon-help-tooltip", message, 0, event);
                 }
             }
@@ -3416,7 +3418,7 @@ ORBEON.xforms.Events = {
     sliderValueChange: function(offset) {
         // Notify server that value changed
         var rangeControl = ORBEON.util.Dom.getElementById(this.id);
-        if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY))
+        if (ORBEON.util.Utils.isNewXHTMLLayout())
             rangeControl = rangeControl.parentNode;
 
         var value = offset / 200;
@@ -4277,7 +4279,7 @@ ORBEON.widgets.RTE = function() {
                 };
 
             // Create RTE object
-            var textarea = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+            var textarea = ORBEON.util.Utils.isNewXHTMLLayout()
                 ? control.getElementsByTagName("textarea")[0] : control;
             var yuiRTE = new YAHOO.widget.Editor(textarea, rteConfig);
 
@@ -4298,7 +4300,7 @@ ORBEON.widgets.RTE = function() {
             isIncremental[control.id] = ORBEON.util.Dom.hasClass(control, "xforms-incremental");
             // Transform text area into RTE on the page
             yuiRTE.on("editorContentLoaded", function() {
-                if (!ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {
+                if (!ORBEON.util.Utils.isNewXHTMLLayout()) {
                     var rteContainer = control.parentNode;
                     rteContainer.className += " " + control.className;
                 }
@@ -4814,7 +4816,7 @@ ORBEON.xforms.Init = {
         ORBEON.xforms.Globals.topLevelListenerRegistered = true;
 
         // We don't call ORBEON.xforms.Events.orbeonLoadedEvent.fire() directly, as without this, in some cases in IE,
-        // YUI event.js�s call to this.subscribers.length in fire method hangs.
+        // YUI event.js's call to this.subscribers.length in fire method hangs.
         window.setTimeout(function() {
             ORBEON.xforms.Events.orbeonLoadedEvent.fire();
         }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
@@ -4931,7 +4933,7 @@ ORBEON.xforms.Init = {
 
         // In both cases the background <div> element must already have an id
         var backgroundDiv;
-        if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {
+        if (ORBEON.util.Utils.isNewXHTMLLayout()) {
             backgroundDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-background", "div", range)[0];
         } else {
             backgroundDiv = range;
@@ -5136,7 +5138,7 @@ ORBEON.xforms.Init = {
      */
     _list: function(list) {
         var value = "";
-        if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY))
+        if (ORBEON.util.Utils.isNewXHTMLLayout())
             list = YAHOO.util.Dom.getElementsByClassName("", "select", list)[0];
         for (var i = 0; i < list.options.length; i++) {
             var option = list.options[i];
@@ -5776,7 +5778,7 @@ ORBEON.xforms.Server = {
                 // Remove modal progress panel before handling DOM response, as e.g. xxf:script may dispatch events and
                 // we don't want them to be filtered. If there are server events, we don't remove the panel until they
                 // have been processed, i.e. the request sending the server events returns.
-                ORBEON.util.Utils.hideModalProgressPanel();
+            ORBEON.util.Utils.hideModalProgressPanel();
             }
             ORBEON.xforms.Server.handleResponseDom(responseXML, formID);
             // Reset changes, as changes are included in this bach of events
@@ -6126,7 +6128,7 @@ ORBEON.xforms.Server = {
                                                 || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-minimal")) {
 
                                             // Case of list / combobox
-                                            var select = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                                            var select = ORBEON.util.Utils.isNewXHTMLLayout()
                                                 ? documentElement.getElementsByTagName("select")[0]
                                                 : documentElement;
                                             var options = select.options;
@@ -6178,7 +6180,7 @@ ORBEON.xforms.Server = {
                                                 select.outerHTML = selectOpeningTag + sb.join("") + "</select>";
                                                 // Get again control, as it has been re-created
                                                 select = YAHOO.util.Dom.get(controlId);
-                                                if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY))
+                                                if (ORBEON.util.Utils.isNewXHTMLLayout())
                                                     select = documentElement.getElementsByTagName("select")[0];
                                                 // Must now update the cache
                                                 ORBEON.xforms.Globals.idToElement[controlId] = select;
@@ -6206,7 +6208,7 @@ ORBEON.xforms.Server = {
                                             template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
 
                                             // Get the span that contains the one span per checkbox/radio
-                                            var spanContainer = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                                            var spanContainer = ORBEON.util.Utils.isNewXHTMLLayout()
                                                 ? documentElement.getElementsByTagName("span")[0]
                                                 : documentElement;
 
@@ -6387,7 +6389,7 @@ ORBEON.xforms.Server = {
                                                 }
 
                                                 function insertIntoDocument(nodes) {
-                                                    if (ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)) {
+                                                    if (ORBEON.util.Utils.isNewXHTMLLayout()) {
                                                         // New markup: insert after "last label" (we remembered the position of the label after which there is real content)
                                                         if (YAHOO.util.Dom.getChildren(documentElement).length == 0) {
                                                             for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
@@ -7025,7 +7027,11 @@ ORBEON.xforms.Server = {
                 if (separatorPosition != -1) {
                     var repeatID = id.substring(0, separatorPosition);
                     var iteration = id.substring(separatorPosition + 1);
-                    element = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration)
+                    element = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration);
+                    if (element == null) {
+                        // If everything else has failed, the id might be an xforms:repeat id!
+                        element = YAHOO.util.Dom.get('repeat-begin-' + id);
+                    }
                 }
             }
             return element;
@@ -7092,7 +7098,7 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
     /**
      * Renumber the IDs for a given repeat ID, for all the elements between the begin and end marker for that repeat
-     * @param repeatID      E.g. repeat-begin-todo�1 for the repeat on to-dos in the first to-do list.
+     * @param repeatID      E.g. repeat-begin-todo·1 for the repeat on to-dos in the first to-do list.
      */
     _renumberIDs: function(repeatID) {
 

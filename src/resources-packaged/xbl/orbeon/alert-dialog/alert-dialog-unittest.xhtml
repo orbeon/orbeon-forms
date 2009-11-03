@@ -34,15 +34,31 @@
         <!-- <xhtml:script type="text/javascript" src="/xbl/orbeon/alert-dialog/alert-dialog-unittest.js"/> -->
     </xhtml:head>
     <xhtml:body>
-        
-        <fr:alert-dialog>
+
+        <xhtml:h2>Confirmation dialog</xhtml:h2>
+
+        <xforms:trigger appearance="minimal">
+            <xforms:label>Ask to confirm</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:toggle case="replaces-start-case"/>
+                <xforms:dispatch target="confirm-dialog" name="fr-show"/>
+            </xforms:action>
+        </xforms:trigger>
+
+        <fr:alert-dialog id="confirm-dialog">
             <fr:title>Copy</fr:title>
             <fr:message>An item with the same name already exists. Do you want to replace it with the one you're moving?</fr:message>
-            <fr:positive-choice>
-                <name></name>
-            </fr:positive-choice>
             <fr:negative-choice/>
+            <fr:positive-choice>
+                <xforms:toggle ev:event="DOMActivate" case="replaced-case"/>
+            </fr:positive-choice>
         </fr:alert-dialog>
+
+        <xforms:switch>
+            <xforms:case id="replaces-start-case"/>
+            <xforms:case id="replaced-case">Your original file has been replaced.</xforms:case>
+        </xforms:switch>
+
 
     </xhtml:body>
 </xhtml:html>

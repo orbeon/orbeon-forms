@@ -30,43 +30,42 @@
             <xbl:style src="/ops/yui/alert-dialog/assets/skins/sam/alert-dialog.css"/>
             <xbl:style src="/xbl/orbeon/alert-dialog/alert-dialog.css"/>
         </xbl:resources>
-        <xbl:implementation>
-            <!-- Local model -->
-            <xforms:model id="alert-dialog-model">
-                <xforms:instance id="alert-dialog-instance">
-                    <alert-dialog>
-                        <textfield-value/>
-                    </alert-dialog>
-                </xforms:instance>
-            </xforms:model>
-        </xbl:implementation>
-        <xbl:template>
+        <xbl:handlers>
+            <xbl:handler event="fr-show" phase="target">
+                <xxforms:show dialog="diaog" xxbl:scope="inner"/>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
-                    <xxforms:dialog xxbl:scope="outer" id="dialog" level="modal" class="fr-alert-dialog-container" appearance="full">
+                    <xxforms:dialog xxbl:scope="inner" id="dialog" level="modal" class="fr-alert-dialog-container" appearance="full">
                         <xforms:label><xsl:copy-of select="fr:title/(@* | node())"/></xforms:label>
                         <xhtml:div>
                             <xhtml:img src="/apps/fr/style/question-large.gif" alt="" class="fr-alert-dialog-icon"/>
                             <xhtml:div class="fr-alert-dialog-message">
-                                <xforms:output value="$fr-resources/detail/messages/clear-confirm-message"/>
+                                <xforms:output value="''">
+                                    <xforms:label><xsl:copy-of select="fr:message/(@* | node())"/></xforms:label>
+                                </xforms:output>
                             </xhtml:div>
                         </xhtml:div>
                         <xhtml:div class="fr-alert-dialog-buttons">
                             <xforms:group>
-                                <xxforms:hide ev:event="DOMActivate" dialog="fr-clear-confirm-dialog"/>
+                                <xxforms:hide ev:event="DOMActivate" dialog="dialog"/>
+                                <!-- <xsl:for-each select="">
+
+                                </xsl:for-each> -->
                                 <xforms:trigger>
                                     <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
-                                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/clear"/></xhtml:span>
+                                        <xhtml:img src="/apps/fr/style/images/silk/bin.png" alt=""/>
+                                        <xhtml:span>OK</xhtml:span>
                                     </xforms:label>
-                                    <xforms:dispatch ev:event="DOMActivate" name="fr-clear" target="fr-persistence-model"/>
                                 </xforms:trigger>
                                 <xforms:trigger>
                                     <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/cancel"/></xhtml:span>
+                                        <xhtml:img src="/apps/fr/style/images/silk/bin.png" alt=""/>
+                                        <xhtml:span>OK</xhtml:span>
                                     </xforms:label>
                                 </xforms:trigger>
                             </xforms:group>

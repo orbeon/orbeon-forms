@@ -38,45 +38,68 @@
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
+
                 <xsl:template match="/*">
-                    <xxforms:dialog xxbl:scope="inner" id="dialog" level="modal" class="fr-alert-dialog" appearance="full">
+                    <xsl:variable name="has-multiple-choices" select="count(fr:positive-choice | fr:negative-choice | fr:neutral-choice) > 1"/>
+                    <xxforms:dialog xxbl:scope="inner" id="dialog" level="modal" appearance="full"
+                            class="xbl-fr-alert-dialog xbl-fr-alert-dialog-{if ($has-multiple-choices) then 'question' else 'info'}">
                         <xforms:label xxbl:scope="outer"><xsl:copy-of select="fr:title/(@* | node())"/></xforms:label>
                         <xforms:group appearance="xxforms:internal">
                             <xxforms:hide ev:event="DOMActivate" dialog="dialog"/>
-                            <xforms:group appearance="xxforms:internal" xxbl:scope="outer">
-                                <xhtml:div>
-                                    <xhtml:img src="/apps/fr/style/images/pixelmixer/info_64.png" alt="" class="fr-alert-dialog-icon"/>
-                                    <xhtml:div class="fr-alert-dialog-message">
-                                        <xforms:output value="''">
-                                            <xforms:label><xsl:copy-of select="fr:message/(@* | node())"/></xforms:label>
-                                        </xforms:output>
-                                    </xhtml:div>
-                                </xhtml:div>
-                                <xhtml:div class="fr-alert-dialog-buttons">
-                                    <xsl:apply-templates/>
-                                </xhtml:div>
-                            </xforms:group>
+                            <xhtml:div class="xbl-fr-alert-dialog-message">
+                                <xforms:output value="''" xxbl:scope="outer">
+                                    <xforms:label><xsl:copy-of select="fr:message/(@* | node())"/></xforms:label>
+                                </xforms:output>
+                            </xhtml:div>
+                            <xhtml:div class="xbl-fr-alert-dialog-buttons">
+                                <xsl:apply-templates/>
+                            </xhtml:div>
                         </xforms:group>
                     </xxforms:dialog>
                 </xsl:template>
-                <xsl:template match="fr:negative-choice">
-                    <fr:button id="negative-button" ref=".">
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/images/silk/cancel.png" alt=""/>
-                            <xhtml:span>Cancel</xhtml:span>
-                        </xforms:label>
-                        <xsl:copy-of select="*"/>
-                    </fr:button>
-                </xsl:template>
+
                 <xsl:template match="fr:positive-choice">
-                    <fr:button id="positive-button" ref=".">
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/images/silk/accept.png" alt=""/>
-                            <xhtml:span>OK</xhtml:span>
-                        </xforms:label>
-                        <xsl:copy-of select="*"/>
-                    </fr:button>
+                    <xhtml:span class="xbl-fr-alert-dialog-positive">
+                        <fr:button ref="." xxbl:scope="outer">
+                            <xsl:if test="empty(xforms:label)">
+                                <xforms:label>Yes</xforms:label>
+                            </xsl:if>
+                            <xsl:copy-of select="*"/>
+                        </fr:button>
+                    </xhtml:span>
                 </xsl:template>
+
+                <xsl:template match="fr:negative-choice">
+                    <xhtml:span class="xbl-fr-alert-dialog-negative">
+                        <fr:button ref="." xxbl:scope="outer" class="xbl-fr-alert-dialog-negative">
+                            <xsl:if test="empty(xforms:label)">
+                                <xforms:label>No</xforms:label>
+                            </xsl:if>
+                            <xsl:copy-of select="*"/>
+                        </fr:button>
+                    </xhtml:span>
+                </xsl:template>
+
+                <xsl:template match="fr:neutral-choice">
+                    <xhtml:span class="xbl-fr-alert-dialog-neutral">
+                        <fr:button ref="." xxbl:scope="outer">
+                            <xsl:if test="empty(xforms:label)">
+                                <xforms:label>OK</xforms:label>
+                            </xsl:if>
+                            <xsl:copy-of select="*"/>
+                        </fr:button>
+                    </xhtml:span>
+                </xsl:template>
+
+                <xsl:template match="*" mode="in-outer-scope">
+                    <xsl:for-each select="*">
+                        <xsl:copy>
+                            <xsl:attribute name="xxbl:scope">outer</xsl:attribute>
+                            <xsl:copy-of select="@*|node()"></xsl:copy-of>
+                        </xsl:copy>
+                    </xsl:for-each>
+                </xsl:template>
+
                 <xsl:template match="@*|node()" priority="-100"/>
             </xsl:transform>
         </xbl:template>

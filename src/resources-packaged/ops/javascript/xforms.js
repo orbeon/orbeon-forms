@@ -3526,6 +3526,7 @@ ORBEON.xforms.Events = {
     treeLabelClick: function(node) {
         var yuiTree = this;
         var control = document.getElementById(yuiTree.id);
+        if (ORBEON.util.Utils.isNewXHTMLLayout()) control = control.parentNode;
         var allowMultipleSelection = ORBEON.util.Dom.hasClass(control, "xforms-select");
         if (allowMultipleSelection) {
             // If checked uncheck, if unchecked check
@@ -5005,6 +5006,9 @@ ORBEON.xforms.Init = {
 
     _tree: function(treeDiv) {
 
+        var controlId = treeDiv.id;
+        if (ORBEON.util.Utils.isNewXHTMLLayout())
+            treeDiv = treeDiv.getElementsByTagName("div")[0];
         // Save in the control if it allows multiple selection
         treeDiv.xformsAllowMultipleSelection = ORBEON.util.Dom.hasClass(treeDiv, "xforms-select");
         // Parse data put by the server in the div
@@ -5014,11 +5018,11 @@ ORBEON.xforms.Init = {
         treeDiv.value = "";
         // Create YUI tree and save a copy
         var yuiTree = new YAHOO.widget.TreeView(treeDiv.id);
-        ORBEON.xforms.Globals.treeYui[treeDiv.id] = yuiTree;
+        ORBEON.xforms.Globals.treeYui[controlId] = yuiTree;
         // Build the tree
         ORBEON.xforms.Init._initTreeDivFromArray(treeDiv, yuiTree, treeArray);
         // Save value in tree
-        ORBEON.xforms.Globals.serverValue[treeDiv.id] = treeDiv.value
+        ORBEON.xforms.Globals.serverValue[controlId] = treeDiv.value
         // Show the currently selected value
         if (!treeDiv.xformsAllowMultipleSelection) {
             var selectedNode = yuiTree.getNodeByProperty("value", treeDiv.value);
@@ -5029,7 +5033,7 @@ ORBEON.xforms.Init = {
         }
         // Register event handler for click on label
         yuiTree.subscribe("labelClick", ORBEON.xforms.Events.treeLabelClick);
-        ORBEON.util.Dom.removeClass(treeDiv, "xforms-initially-hidden");
+        ORBEON.util.Dom.removeClass(ORBEON.util.Utils.isNewXHTMLLayout() ? treeDiv.parentNode : treeDiv, "xforms-initially-hidden");
     },
 
     /**

@@ -25,8 +25,9 @@
     <xhtml:head>
         <xhtml:title>XBL - Alert Dialog</xhtml:title>
         <xforms:model id="main-model">
-
-
+            <xforms:instance>
+                <instance/>
+            </xforms:instance>
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
@@ -45,6 +46,7 @@
             </xforms:action>
         </xforms:trigger>
 
+
         <fr:alert-dialog id="confirm-dialog">
             <fr:title>Copy</fr:title>
             <fr:message>An item with the same name already exists. Do you want to replace it with the one you're moving?</fr:message>
@@ -53,6 +55,15 @@
                 <xforms:toggle ev:event="DOMActivate" case="replaced-case"/>
             </fr:positive-choice>
         </fr:alert-dialog>
+
+        <xforms:group ref="()">
+            <fr:button ref="." id="test-button">
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/images/silk/accept.png" alt=""/>
+                    <xhtml:span>OK</xhtml:span>
+                </xforms:label>
+            </fr:button>
+        </xforms:group>
 
         <xforms:switch>
             <xforms:case id="replaces-start-case"/>

@@ -32,46 +32,52 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-show" phase="target">
-                <xxforms:show dialog="diaog" xxbl:scope="inner"/>
+                <xxforms:show dialog="dialog" xxbl:scope="inner"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
-                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
-                    <xxforms:dialog xxbl:scope="inner" id="dialog" level="modal" class="fr-alert-dialog-container" appearance="full">
-                        <xforms:label><xsl:copy-of select="fr:title/(@* | node())"/></xforms:label>
-                        <xhtml:div>
-                            <xhtml:img src="/apps/fr/style/question-large.gif" alt="" class="fr-alert-dialog-icon"/>
-                            <xhtml:div class="fr-alert-dialog-message">
-                                <xforms:output value="''">
-                                    <xforms:label><xsl:copy-of select="fr:message/(@* | node())"/></xforms:label>
-                                </xforms:output>
-                            </xhtml:div>
-                        </xhtml:div>
-                        <xhtml:div class="fr-alert-dialog-buttons">
-                            <xforms:group>
-                                <xxforms:hide ev:event="DOMActivate" dialog="dialog"/>
-                                <!-- <xsl:for-each select="">
-
-                                </xsl:for-each> -->
-                                <xforms:trigger>
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/images/silk/bin.png" alt=""/>
-                                        <xhtml:span>OK</xhtml:span>
-                                    </xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger>
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/images/silk/bin.png" alt=""/>
-                                        <xhtml:span>OK</xhtml:span>
-                                    </xforms:label>
-                                </xforms:trigger>
+                    <xxforms:dialog xxbl:scope="inner" id="dialog" level="modal" class="fr-alert-dialog" appearance="full">
+                        <xforms:label xxbl:scope="outer"><xsl:copy-of select="fr:title/(@* | node())"/></xforms:label>
+                        <xforms:group appearance="xxforms:internal">
+                            <xxforms:hide ev:event="DOMActivate" dialog="dialog"/>
+                            <xforms:group appearance="xxforms:internal" xxbl:scope="outer">
+                                <xhtml:div>
+                                    <xhtml:img src="/apps/fr/style/images/pixelmixer/info_64.png" alt="" class="fr-alert-dialog-icon"/>
+                                    <xhtml:div class="fr-alert-dialog-message">
+                                        <xforms:output value="''">
+                                            <xforms:label><xsl:copy-of select="fr:message/(@* | node())"/></xforms:label>
+                                        </xforms:output>
+                                    </xhtml:div>
+                                </xhtml:div>
+                                <xhtml:div class="fr-alert-dialog-buttons">
+                                    <xsl:apply-templates/>
+                                </xhtml:div>
                             </xforms:group>
-                        </xhtml:div>
+                        </xforms:group>
                     </xxforms:dialog>
                 </xsl:template>
+                <xsl:template match="fr:negative-choice">
+                    <fr:button id="negative-button" ref=".">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/images/silk/cancel.png" alt=""/>
+                            <xhtml:span>Cancel</xhtml:span>
+                        </xforms:label>
+                        <xsl:copy-of select="*"/>
+                    </fr:button>
+                </xsl:template>
+                <xsl:template match="fr:positive-choice">
+                    <fr:button id="positive-button" ref=".">
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/images/silk/accept.png" alt=""/>
+                            <xhtml:span>OK</xhtml:span>
+                        </xforms:label>
+                        <xsl:copy-of select="*"/>
+                    </fr:button>
+                </xsl:template>
+                <xsl:template match="@*|node()" priority="-100"/>
             </xsl:transform>
         </xbl:template>
     </xbl:binding>

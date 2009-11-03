@@ -39,17 +39,17 @@
                         <xbl:content includes="xforms|label"/>
                         <xsl:variable name="fr-prefix" as="xs:string" select="namespace::*[. = 'http://orbeon.org/oxf/xml/form-runner']/local-name()"/>
                         <!-- Properties -->
-                        <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'date', 'mindate')"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'date', 'maxdate')"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'date', 'pagedate')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'mindate')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'maxdate')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'pagedate')"/>
                         <xsl:choose>
                             <!-- Inline data picker-->
                             <xsl:when test="@appearance = concat($fr-prefix, ':', 'inline')">
                                 <!-- Init event -->
-                                <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.Date.init(this);</xxforms:script>
+                                <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.Date.instance(this).init();</xxforms:script>
                                 <xhtml:div class="xbl-fr-date-calendar-div"/>
                                 <xforms:input ref="." class="xbl-fr-date-input">
-                                    <xxforms:script ev:event="xforms-value-changed">YAHOO.xbl.fr.Date.valueChanged(this);</xxforms:script>
+                                    <xxforms:script ev:event="xforms-value-changed">YAHOO.xbl.fr.Date.instance(this).valueChanged();</xxforms:script>
                                 </xforms:input>
                             </xsl:when>
                             <!-- Standard case with text field-->

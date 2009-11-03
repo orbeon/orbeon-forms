@@ -11,3 +11,7 @@
     *display: inline;
     vertical-align: middle;
 }
+
+/* Required so the left border of the suggestion box is aligned with the left border of the text field.
+   http://wiki.orbeon.com/forms/doc/contributor-guide/ie-bugs#TOC-IE6:-position:-absolute-div-acquiri */
+.xbl-fr-autocomplete .yui-ac-container { left: 0; }

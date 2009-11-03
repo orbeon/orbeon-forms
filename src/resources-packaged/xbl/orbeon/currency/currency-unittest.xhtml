@@ -35,17 +35,33 @@
                     <readonly is-readonly="true">42</readonly>
                     <no-prefix>42</no-prefix>
                     <repeat show="true">42</repeat>
-                    <required/>
+                    <required-empty/>
+                    <required-filled>42</required-filled>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="double" readonly="false()" calculate="for $value in ../value return if ($value castable as xs:decimal) then ../value * 2 else ''"/>
             <xforms:bind nodeset="readonly" readonly="@is-readonly = 'true'"/>
-            <xforms:bind nodeset="required" required="true()"/>
+            <xforms:bind nodeset="required-empty | required-filled" required="true()"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .xbl-fr-currency .xforms-label { display: inline-block; width: 10em; }
             .xbl-fr-currency { line-height: 2.5em; }
             .xforms-repeat-selected-item-1 { background-color: transparent; }
+
+            .xforms-alert-active { display: none; }
+
+            .xforms-input.xforms-required,
+            .xbl-fr-currency .xforms-required
+                { background: url('../../../../../ops/images/xforms/error.png') right top no-repeat; padding: 0 20px 1px 0; }
+
+            .xforms-input.xforms-required-filled,
+            .xbl-fr-currency .xforms-required-filled
+                { background-image: none; }
+
+            .xforms-input.xforms-invalid-visited,
+            .xbl-fr-currency .xforms-invalid-visited
+                { background: url('../../../../../ops/images/xforms/exclamation.png') right top no-repeat; padding-right: 0 20px 1px 0; }
+
         </xhtml:style>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
@@ -125,7 +141,7 @@
             </fr:currency>
         </xhtml:div>
         <xhtml:div>
-            <xforms:repeat nodeset="repeat[@show = 'true']">
+            <xforms:repeat nodeset="repeat[@show = 'true']" id="repeat">
                 <fr:currency ref="." id="in-repeat">
                     <xforms:label>In repeat</xforms:label>
                 </fr:currency>
@@ -136,8 +152,14 @@
             </xforms:trigger>
         </xhtml:div>
         <xhtml:div>
-            <fr:currency ref="required" id="required" prefix="">
-                <xforms:label>Required</xforms:label>
+            <fr:currency ref="required-empty" id="required-empty" prefix="">
+                <xforms:label>Required empty</xforms:label>
+                <xforms:alert>Value is required</xforms:alert>
+            </fr:currency>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="required-filled" id="required-filled" prefix="">
+                <xforms:label>Required filled</xforms:label>
                 <xforms:alert>Value is required</xforms:alert>
             </fr:currency>
         </xhtml:div>

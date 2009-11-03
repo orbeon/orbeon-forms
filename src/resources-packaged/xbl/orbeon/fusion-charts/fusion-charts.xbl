@@ -34,7 +34,7 @@
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
-                    <!--  Outer group-->
+                    <!--  Outer group -->
                     <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
 
                         <!-- Inner group -->
@@ -48,13 +48,13 @@
                             <xhtml:div id="chart-div" class="xbl-fr-fusion-charts-chart-div">The chart will appear within this DIV. This text will be replaced by the chart.</xhtml:div>
                             <!-- XML -->
                             <xforms:output value="saxon:serialize($result, 'xml')" style="display: none" class="xbl-fr-fusion-charts-xml">
-                                <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.FusionCharts.init(this);</xxforms:script>
+                                <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.FusionCharts.instance(this).init();</xxforms:script>
                             </xforms:output>
                             <!-- Access to parameters -->
-                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'fusion-charts', 'uri-to-swf')"/>
-                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'fusion-charts', 'swf')"/>
-                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'fusion-charts', 'width')"/>
-                            <xsl:copy-of select="xxbl:parameter(., 'fr', 'http://orbeon.org/oxf/xml/form-runner', 'fusion-charts', 'height')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'uri-to-swf')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'swf')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'width')"/>
+                            <xsl:copy-of select="xxbl:parameter(., 'height')"/>
                         </xforms:group>
                     </xforms:group>
                 </xsl:template>

@@ -57,9 +57,10 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         /**
          * Checks that the external value is what we expect it to be.
          */
-        checkExternalValue: function(staticDynamic, expectedValue) {
+        checkExternalValue: function(staticDynamic, expectedValue, message) {
             var outputValue = ORBEON.xforms.Document.getValue(staticDynamic + "-output");
-            YAHOO.util.Assert.areEqual(expectedValue, outputValue, staticDynamic);
+            YAHOO.util.Assert.areEqual(expectedValue, outputValue, staticDynamic +
+                (YAHOO.lang.isUndefined(message) ? "" : " - " + message));
         },
 
         /**
@@ -71,6 +72,29 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             });
         },
 
+        checkSuggestionCount: function(staticDynamic, expectedCount) {
+            var actualCount = 0;
+            this.runOnLis(staticDynamic, function(li) {
+                actualCount++;
+            });
+            YAHOO.util.Assert.areEqual(actualCount, expectedCount, staticDynamic + " suggestions shows");
+        },
+
+        /**
+         * This test needs to be first, as we test that setting the label to Canada on xforms-ready by dispatching
+         * the fr-set-label event, we indeed get the value 'ca' in the node bound to the control.
+         */
+        testSetLabelOnXFormsReady: function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                // Nothing is done in JS, but the fr-set-label we dispatch on xforms-ready will create some Ajax traffic
+            }, function() {
+                this.runForStaticDynamic(function(staticDynamic, continuation) {
+                    this.checkExternalValue(staticDynamic, "ca");
+                    continuation.call(this);
+                });
+            });
+        },
+        
         /**
          * Test that when we type the full value "Switzerland", the value of the node becomes "sz",
          * because "Switzerland" shows in the list of possible values, so the value should be selected
@@ -86,7 +110,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-
+        
         /**
          * Test that entering a partial match "Sw", we get the expected list of countries in the suggestion list.
          */
@@ -113,7 +137,8 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 }, function() {
                     // Check the alert is active
                     var control = YAHOO.util.Dom.get(staticDynamic + "-autocomplete");
-                    var container = YAHOO.util.Dom.get(staticDynamic + "-autocomplete$autocomplete-container");
+                    var container = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-container", null, control)[0];
+                    console.log(control, container);
                     YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(container, "xforms-invalid"));
                     var alert = YAHOO.util.Dom.getElementsByClassName("xforms-alert", null, control)[0];
                     YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(alert, "xforms-alert-active"),
@@ -159,8 +184,63 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                     });
                 });
             });
+        },
+        
+        /**
+         * The max-results-displayed is set to 4 in the markup with an attribute for the static case and an element
+         * for the dynamic case.
+         */
+        testMaxResultsDisplayed: function() {
+            this.runForStaticDynamic(function(staticDynamic, continuation) {
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    // There are more than 4 countries that start with "Ba"
+                    // Enter 2 letters, because the dynamic case requires 2 letters before it gives suggestions
+                    this.simulateTypeInField(staticDynamic, "Ba");
+                }, function() {
+                    this.checkSuggestionCount(staticDynamic, 4);
+                    // Select one of the items just to close the suggestion list
+                    this.simulateClickItem(staticDynamic, 1);
+                    continuation.call(this);
+                });
+            });
+        },
+        
+        /**
+         * Test that the left border of the suggestion box is aligned with the left border of the text field.
+         */
+        testAlignment: function() {
+            this.runForStaticDynamic(function(staticDynamic, continuation) {
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    // There are more than 4 countries that start with "Ba"
+                    // Enter 2 letters, because the dynamic case requires 2 letters before it gives suggestions
+                    this.simulateTypeInField(staticDynamic, "Ba");
+                }, function() {
+                    var container = YAHOO.util.Dom.get(staticDynamic + "-autocomplete");
+                    var suggestions = YAHOO.util.Dom.getElementsByClassName("yui-ac-container", null, container)[0];
+                    var input = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-search", null, container)[0];
+                    YAHOO.util.Assert.areEqual(YAHOO.util.Dom.getX(suggestions), YAHOO.util.Dom.getX(input));
+                    // Select one of the items just to close the suggestion list
+                    this.simulateClickItem(staticDynamic, 1);
+                    continuation.call(this);
+                });
+            });
+        },
+        
+        testSetLabel: function() {
+            this.runForStaticDynamic(function(staticDynamic, continuation) {
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamic + "-set-to-canada"));
+                }, function() {
+                    this.checkExternalValue(staticDynamic, "ca", "external value is 'ca' because Canada exists in the itemset");
+                    ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                        YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamic + "-set-to-utopia"));
+                    }, function() {
+                        this.checkExternalValue(staticDynamic, "", "external value is empty string because Utopia does not exist in the itemset");
+                        continuation.call(this);
+                    });
+                });
+            });
         }
-
     }));
 
     if (parent && parent.TestManager) {

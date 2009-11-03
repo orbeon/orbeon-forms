@@ -3733,7 +3733,8 @@ ORBEON.xforms.XBL = {
                 return doNothingSingleton;
             } else {
                 // Get the top-level element in the HTML DOM corresponding to this control
-                var container = YAHOO.util.Dom.getAncestorByClassName(target, cssClass);
+                var container = YAHOO.util.Dom.hasClass(target, cssClass) ? target
+                    : YAHOO.util.Dom.getAncestorByClassName(target, cssClass);
                 // Create object holding instances
                 if (YAHOO.lang.isUndefined(this._instances))
                     this._instances = {};

@@ -552,6 +552,34 @@ ORBEON.util.Dom = {
                 }
             }, ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY));
         }
+    },
+
+    /**
+     * Similar to root.getElementsByTagName(tagName), but:
+     *      Returns only one element.
+     *      Returns root if root.tagName == tagName.
+     *      Can take an array of tagName if there are alternatives.
+     */
+    getElementByTagName: function(root, tagName) {
+        var result = null;
+
+        if (YAHOO.lang.isArray(tagName)) {
+            // Multiple possible tag name, try each one
+            var tagNames = tagName;
+            for (var tagNameIndex = 0; tagNameIndex < tagNames.length; tagNameIndex++) {
+                var tagName = tagNames[tagNameIndex];
+                var result = ORBEON.util.Dom.getElementByTagName(root, tagName);
+                if (result != null) break
+            };
+        } else {
+            if (root.tagName.toLowerCase() == tagName) {
+                result = root;
+            } else {
+                var matches = root.getElementsByTagName(tagName);
+                if (matches.length == 1) result = matches[0];
+            }
+        }
+        return result;
     }
 };
 
@@ -1464,7 +1492,7 @@ ORBEON.xforms.Document = {
 
     /**
      * Is it possible to take forms offline. This will require Gears to be installed. If Gears is not installed, it
-     * is the responsability of the application (not the XForms engine) to detect if Gears can be installed and to
+     * is the responsibility of the application (not the XForms engine) to detect if Gears can be installed and to
      * guide the user through the installation of Gears.
      */
     isOfflineAvailable: function() {
@@ -1646,7 +1674,7 @@ ORBEON.xforms.Controls = {
                 || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-compact")) {
             // Drop-down and list
             var options = ORBEON.util.Utils.isNewXHTMLLayout()
-                          ? YAHOO.util.Dom.getElementsByClassName("", "select", control)[0].options
+                          ? control.getElementsByTagName("select")[0].options
                           : control.options;
             var selectValue = "";
             for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
@@ -1736,7 +1764,7 @@ ORBEON.xforms.Controls = {
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
             // XForms output or "static readonly" mode
             if (ORBEON.util.Dom.hasClass(control, "xforms-mediatype-image")) {
-                var image = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                var image = ORBEON.util.Utils.isNewXHTMLLayout()
                     ? YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0]
                     : ORBEON.util.Dom.getChildElementByIndex(control, 0);
                 image.src = newControlValue;
@@ -1871,6 +1899,22 @@ ORBEON.xforms.Controls = {
             // Text area
             var textarea = control.tagName.toLowerCase() == "textarea" ? control : control.getElementsByTagName("textarea")[0];
             textarea.value = newControlValue;
+
+            // NOTE: Below, we consider an empty value as an indication to remove the attribute. May or may not be the best thing to do.
+            // NOTE: There is no "maxlength" attribute in HTML 4, but there is one in HTML 5. Should we add it anyway?
+            if (attribute2 != null) {
+                if (attribute2 == "")
+                    textarea.removeAttribute("cols");
+                else
+                    textarea.cols = attribute2;
+            }
+            if (attribute3 != null) {
+                if (attribute2 == "")
+                    textarea.removeAttribute("rows");
+                else
+                    textarea.rows = attribute3;
+            }
+
             // Autosize textarea
             if (ORBEON.util.Dom.hasClass(control, "xforms-textarea-appearance-xxforms-autosize")) {
                 ORBEON.xforms.Controls.autosizeTextarea(control);
@@ -2265,11 +2309,16 @@ ORBEON.xforms.Controls = {
         function setReadonlyOnFormElement(element, isReadonly) {
             if (isReadonly) {
                 element.setAttribute("disabled", "disabled");
-                ORBEON.util.Dom.addClass(element, "xforms-readonly");
             } else {
                 element.removeAttribute("disabled");
-                ORBEON.util.Dom.removeClass(element, "xforms-readonly");
             }
+        }
+
+        // Update class
+        if (isReadonly) {
+            ORBEON.util.Dom.addClass(control, "xforms-readonly");
+        } else {
+            ORBEON.util.Dom.removeClass(control, "xforms-readonly");
         }
 
         if (ORBEON.util.Dom.hasClass(control, "xforms-group-begin-end")) {
@@ -2281,7 +2330,8 @@ ORBEON.xforms.Controls = {
             } else {
                 ORBEON.util.Dom.removeClass(control, "xforms-readonly");
             }
-        } else if ((ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))
+        } else if ((ORBEON.util.Dom.hasClass(control, "xforms-input"))
+                || ORBEON.util.Dom.hasClass(control, "xforms-secret")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")) {
             // Input fields, radio buttons, or checkboxes
@@ -2296,6 +2346,17 @@ ORBEON.xforms.Controls = {
                 var input = inputs[inputIndex];
                 setReadonlyOnFormElement(input, isReadonly);
             }
+            if (control.tagName.toLowerCase() == "input")
+                setReadonlyOnFormElement(control, isReadonly);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")
+                || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-minimal")
+                || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-compact")
+                || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-minimal")
+                || ORBEON.util.Dom.hasClass(control, "xforms-input-appearance-compact")) {
+            // Lists
+            var select = ORBEON.util.Utils.isNewXHTMLLayout()
+                ? control.getElementsByTagName("select")[0] : control;
+            setReadonlyOnFormElement(select, isReadonly);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output")
                 || ORBEON.util.Dom.hasClass(control, "xforms-group")) {
             // XForms output and group
@@ -2319,9 +2380,17 @@ ORBEON.xforms.Controls = {
             // Upload control
             setReadonlyOnFormElement(
                     ORBEON.util.Dom.getChildElementByClass(control, "xforms-upload-select"), isReadonly);
-        } else {
-            // Other controls
-            setReadonlyOnFormElement(control, isReadonly);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")) {
+            // Textarea
+            var textarea = ORBEON.util.Utils.isNewXHTMLLayout()
+                ? control.getElementsByTagName("textarea")[0] : control;
+            setReadonlyOnFormElement(textarea, isReadonly);
+        } else if ((ORBEON.util.Dom.hasClass(control, "xforms-trigger")
+                && ! ORBEON.util.Dom.hasClass(control, "xforms-trigger-appearance-minimal"))
+                || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
+            // Button
+            var button = control.tagName.toLowerCase() == "button" ? control : control.getElementsByTagName("button")[0];
+            setReadonlyOnFormElement(button, isReadonly);
         }
     },
 
@@ -2336,8 +2405,9 @@ ORBEON.xforms.Controls = {
     },
 
     getHintMessage: function(control) {
-        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")) {
-            return control.title;
+        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger") || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
+            var formElement = ORBEON.util.Dom.getElementByTagName(control, ["a", "button"]);
+            return formElement.title;
         } else {
             // Element for hint
             var hintElement = ORBEON.xforms.Controls._getControlLHHA(control, "hint");
@@ -2346,14 +2416,15 @@ ORBEON.xforms.Controls = {
     },
 
     setHintMessage: function(control, message) {
-        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")) {
+        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger") || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
             // For triggers, the value is stored in the title for the control
             if (ORBEON.xforms.Globals.hintTooltipForControl[control.id] == null) {
                 // We only update the title if we don't have already a YUI hint widget.
                 // If we do, updating the value in the YUI widget is enough. The YUI widget empties the content of the
                 // title attribute to avoid the text in the title from showing. If we set the title, we might have
                 // both the title shown by the browser and the YUI hint widget.
-                control.title = message;
+                var formElement = ORBEON.util.Dom.getElementByTagName(control, ["a", "button"]);
+                formElement.title = message;
             }
         } else {
             ORBEON.xforms.Controls._setMessage(control, "hint", message);
@@ -2470,6 +2541,8 @@ ORBEON.xforms.Controls = {
     },
 
     autosizeTextarea: function(textarea) {
+        if (textarea.tagName.toLowerCase() != "textarea")
+            textarea = textarea.getElementsByTagName("textarea")[0];
         var scrollHeight = textarea.scrollHeight;
         var clientHeight = textarea.clientHeight;
 
@@ -2495,7 +2568,7 @@ ORBEON.xforms.Controls = {
                 textarea.rows = textarea.rows + 1;
                 if (textarea.clientHeight <= clientHeight) {
                     // If adding a row didn't increase the height if the text area, there is nothing we can do, so stop here.
-                    // This prevents an infinite loops happening with IE when the constrol is disabled.
+                    // This prevents an infinite loops happening with IE when the control is disabled.
                     break;
                 }
                 clientHeight = textarea.clientHeight;
@@ -2507,8 +2580,8 @@ ORBEON.xforms.Controls = {
             while (textarea.rows > XFORMS_WIDE_TEXTAREA_MIN_ROWS && scrollHeight < clientHeight - rowHeight) {
                 textarea.rows = textarea.rows - 1;
                 if (textarea.clientHeight >= clientHeight) {
-                    // If adding a row didn't decrease the height if the text area, there is nothing we can do, so stop here.
-                    // This prevents an infinite loops happening with IE when the constrol is disabled.
+                    // If removing a row didn't decrease the height if the text area, there is nothing we can do, so stop here.
+                    // This prevents an infinite loops happening with IE when the control is disabled.
                     break;
                 }
                 clientHeight = textarea.clientHeight;
@@ -2667,10 +2740,6 @@ ORBEON.xforms.Controls = {
         yuiDialog.element.style.display = "block";
         // Show the dialog
         yuiDialog.show();
-        // By default try to display the dialog inside the viewport, but this can be overridden with constrain="false"
-        // This doesn't get the "constrain" attribute from the right place anyway
-//        var constrain = ORBEON.util.Dom.getAttribute(divElement, "constrain") == "false" ? false : true;
-//        yuiDialog.cfg.setProperty("constraintoviewport", constrain);
         // Make sure that this dialog is on top of everything else
         yuiDialog.cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex++);
         // Position the dialog either at the center of the viewport or relative of a neighbor
@@ -2681,7 +2750,6 @@ ORBEON.xforms.Controls = {
             // Align dialog relative to neighbor
             yuiDialog.cfg.setProperty("context", [neighbor, "tl", "bl"]);
             yuiDialog.align();
-            ORBEON.xforms.Globals.dialogMinimalVisible[controlId] = true;
         }
         // Take out the focus from the current control. This is particulary important with non-modal dialogs
         // opened with a minimal trigger, otherwise we have a dotted line around the link after it opens.
@@ -2712,7 +2780,6 @@ ORBEON.xforms.Controls = {
         ORBEON.xforms.Globals.alertTooltipForControl[control.id] = null;
         ORBEON.xforms.Globals.helpTooltipForControl[control.id] = null;
         ORBEON.xforms.Globals.dialogs[control.id] = null;
-        ORBEON.xforms.Globals.dialogMinimalVisible[control.id] = null;
         ORBEON.xforms.Globals.dialogMinimalLastMouseOut[control.id] = null;
     }
 };
@@ -3021,12 +3088,23 @@ ORBEON.xforms.Events = {
         }
     },
 
-    _showToolTip: function(tooltipForControl, controlId, targetId, toolTipSuffix, message, delay, event) {
+    _showToolTip: function(tooltipForControl, control, target, toolTipSuffix, message, delay, event) {
+
+        // If we already have a tooltip for this control, but that the control is not in the page anymore, destroy the tooltip
+        if (YAHOO.lang.isObject(tooltipForControl[control.id])) {
+            if (! YAHOO.util.Dom.inDocument(tooltipForControl[control.id].orbeonControl, document)) {
+                tooltipForControl[control.id].destroy();
+                tooltipForControl[control.id] = null;
+            }
+        }
+
+        // Create tooltip if have never "seen" this control
+        if (tooltipForControl[control.id] == null) {
         if (message != "") {
             // We have a hint, initialize YUI tooltip
             var yuiTooltip =
-                    new YAHOO.widget.Tooltip(controlId + toolTipSuffix, {
-                        context: targetId,
+                        new YAHOO.widget.Tooltip(control.id + toolTipSuffix, {
+                            context: target.id,
                         text: message,
                         showDelay: delay,
                         effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2},
@@ -3034,7 +3112,8 @@ ORBEON.xforms.Events = {
                         // Otherwise, with dialogs, the tooltip might end up being below the dialog and be invisible.
                         zIndex: 1000
                     });
-            var context = ORBEON.util.Dom.getElementById(targetId);
+                yuiTooltip.orbeonControl = control;
+                var context = ORBEON.util.Dom.getElementById(target.id);
             // Send the mouse move event, because the tooltip gets positioned when receiving a mouse move.
             // Without this, sometimes the first time the tooltip is shows at the top left of the screen
             yuiTooltip.onContextMouseMove.call(context, event, yuiTooltip);
@@ -3042,10 +3121,11 @@ ORBEON.xforms.Events = {
             // exist yet when the event was dispatched by the browser
             yuiTooltip.onContextMouseOver.call(context, event, yuiTooltip);
             // Save reference to YUI tooltip
-            tooltipForControl[controlId] = yuiTooltip;
+                tooltipForControl[control.id] = yuiTooltip;
         } else {
             // Remember we looked at this control already
-            tooltipForControl[controlId] = true;
+                tooltipForControl[control.id] = true;
+            }
         }
     },
 
@@ -3054,10 +3134,14 @@ ORBEON.xforms.Events = {
         if (target != null) {
 
             // Control tooltip
-            if (ORBEON.xforms.Globals.hintTooltipForControl[target.id] == null
-                    && ! ORBEON.util.Dom.hasClass(document.body, "xforms-disable-hint-as-tooltip")) {
+            if (! ORBEON.util.Dom.hasClass(document.body, "xforms-disable-hint-as-tooltip")) {
                 var message = ORBEON.xforms.Controls.getHintMessage(target);
-                ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.hintTooltipForControl, target.id, target.id, "-orbeon-hint-tooltip", message, 200, event);
+                if (YAHOO.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit")) {
+                    // Remove the title, to avoid having both the YUI tooltip and the browser tooltip based on the title showing up
+                    var formElement = ORBEON.util.Dom.getElementByTagName(target, ["a", "button"]);
+                    formElement.title = "";
+                }
+                ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.hintTooltipForControl, target, target, "-orbeon-hint-tooltip", message, 200, event);
             }
 
             // Alert tooltip
@@ -3072,10 +3156,10 @@ ORBEON.xforms.Events = {
                     // The 'for' can point to a form field which is inside the element representing the control
                     if (! YAHOO.util.Dom.hasClass(control, "xforms-control"))
                         control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
-                    if (control && ORBEON.xforms.Globals.alertTooltipForControl[control.id] == null) {
+                    if (control) {
                         var message = ORBEON.xforms.Controls.getAlertMessage(control);
                         YAHOO.util.Dom.generateId(target);
-                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control.id, target.id, "-orbeon-alert-tooltip", message, 10, event);
+                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control, target, "-orbeon-alert-tooltip", message, 10, event);
                     }
                 }
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-dialog-appearance-minimal")) {
@@ -3092,16 +3176,14 @@ ORBEON.xforms.Events = {
                 if (!ORBEON.util.Dom.isElement(helpElement))
                     helpElement = helpElement.nextSibling;
                 // Get control
-                var control = ORBEON.xforms.Controls.getControlForLHHA(helpElement, "help-image");
+                var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help-image");
                 if (control) {
                     // The xforms:input is a unique case where the 'for' points to the input field, not the element representing the control
                     if (YAHOO.util.Dom.hasClass(control, "xforms-input-input"))
                         control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
-                    if (ORBEON.xforms.Globals.helpTooltipForControl[control.id] == null) {
                         var message = ORBEON.xforms.Controls.getHelpMessage(control);
                         YAHOO.util.Dom.generateId(target);
-                        ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control.id, target.id, "-orbeon-help-tooltip", message, 0, event);
-                    }
+                    ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.helpTooltipForControl, control, target, "-orbeon-help-tooltip", message, 0, event);
                 }
             }
 
@@ -3295,15 +3377,18 @@ ORBEON.xforms.Events = {
      * Called upon resizing.
      */
     _resize: function() {
-        // destroy the tooltips since they could justify a scrollbar
+        // Move hidden tooltips to the top-left of the document to avoid having a useless scrollbar show up in
+        // case they are outside of the viewport.
         var collections = [ORBEON.xforms.Globals.hintTooltipForControl, ORBEON.xforms.Globals.helpTooltipForControl, ORBEON.xforms.Globals.alertTooltipForControl];
         for (var i = 0; i < 3; i++) {
             var collection = collections[i];
             for (var control in collection) {
                 var tooltip = collection[control];
-                if (tooltip && tooltip != true) {
-                    collection[control] = null;
-                    tooltip.destroy();
+                if (tooltip != null && tooltip != true) {
+                    if (YAHOO.lang.isObject(tooltip.element) && tooltip.element.style.visibility == "hidden") {
+                        tooltip.element.style.top = 0;
+                        tooltip.element.style.left = 0;
+                    }
                 }
             }
         }
@@ -3517,7 +3602,7 @@ ORBEON.xforms.Events = {
      */
     dialogMinimalBodyClick: function(event, yuiDialog) {
         // If this dialog is visible
-        if (ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id]) {
+        if (yuiDialog.element.style.display == "block") {
             // Abord if one of the parents is drop-down dialog
             var current = YAHOO.util.Event.getTarget(event);
             var foundDropDownParent = false;
@@ -3529,7 +3614,7 @@ ORBEON.xforms.Events = {
                 current = current.parentNode;
             }
             if (!foundDropDownParent) {
-                var event = new ORBEON.xforms.Server.Event(null, yuiDialog.element.id, null, null, "xxforms-dialog-close");
+                var event = new ORBEON.xforms.Server.Event(null, yuiDialog.id, null, null, "xxforms-dialog-close");
                 ORBEON.xforms.Server.fireEvents([event], false);
             }
         }
@@ -3541,7 +3626,7 @@ ORBEON.xforms.Events = {
      */
     dialogMinimalCheckMouseIn: function(yuiDialog) {
         var current = new Date().getTime();
-        if (ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id]
+        if (yuiDialog.element.style.display == "block"
                 && ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] != -1
                 && current - ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] >= ORBEON.util.Utils.getProperty(DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY)) {
             var event = new ORBEON.xforms.Server.Event(null, yuiDialog.element.id, null, null, "xxforms-dialog-close");
@@ -3585,7 +3670,7 @@ ORBEON.xforms.Events = {
                 listener(obj);
             }
         }
-        event.subscribe(listener);
+        event.subscribe(worker);
     },
 
     orbeonLoadedEvent: new YAHOO.util.CustomEvent("orbeonLoaded"),
@@ -3594,6 +3679,80 @@ ORBEON.xforms.Events = {
     errorEvent: new YAHOO.util.CustomEvent("errorEvent"),
     yuiCalendarCreated: new YAHOO.util.CustomEvent("yuiCalendarCreated")
 };
+
+ORBEON.xforms.XBL = {
+
+    /**
+     * Base class for classes implementing an XBL component.
+     */
+    _BaseClass: function() {
+        var BaseClass = function() {};
+        BaseClass.prototype = {
+
+            /**
+             * The HTML element that contains the component on the page.
+             */
+            container: null
+        }
+    }(),
+
+    /**
+     * To be documented on Wiki.
+     */
+    declareClass: function(xblClass, cssClass) {
+        var doNothingSingleton = null;
+        var instanceAlreadyCalled = false;
+
+        // Define factory function for this class
+        xblClass.instance = function(target) {
+            var hasInit = ! YAHOO.lang.isUndefined(xblClass.prototype.init);
+
+            // The first time instance() is called for this class, override init() on the class object
+            // to make sure that the init method is not called more than once
+            if (! instanceAlreadyCalled) {
+                instanceAlreadyCalled = true;
+                if (hasInit) {
+                    var originalInit = this.prototype.init;
+                    this.prototype.init = function() {
+                        if (! this.initialized) {
+                            originalInit.call(this);
+                            this.initialized = true;
+                        }
+                    }
+                }
+            }
+
+            if (target == null || ! YAHOO.util.Dom.inDocument(target, document)) {
+                // If we get an event for a target which is not in the document, return a mock object
+                // that won't do anything when its methods are called
+                if (doNothingSingleton == null) {
+                    doNothingSingleton = {};
+                    for (methodName in xblClass.prototype)
+                        doNothingSingleton[methodName] = function(){};
+                }
+                return doNothingSingleton;
+            } else {
+                // Get the top-level element in the HTML DOM corresponding to this control
+                var container = YAHOO.util.Dom.getAncestorByClassName(target, cssClass);
+                // Create object holding instances
+                if (YAHOO.lang.isUndefined(this._instances))
+                    this._instances = {};
+                // Get or create instance
+                var instance = this._instances[container.id];
+                if (YAHOO.lang.isUndefined(instance) || instance.container != container) {
+                    instance = new xblClass(container);
+                    instance.container = container;
+                    if (hasInit) {
+                        instance.initialized = false;
+                        instance.init();
+                    }
+                    this._instances[container.id] = instance;
+                }
+                return instance;
+            }
+        };
+    }
+}
 
 ORBEON.widgets.Base = function() {
     return {
@@ -4095,7 +4254,6 @@ ORBEON.widgets.RTE = function() {
                                 ]
                             },
                             { type: 'separator' },
-
                             { group: 'indentlist2', label: 'Indenting and Lists',
                                 buttons: [
                                     { type: 'push', label: 'Indent', value: 'indent', disabled: true },
@@ -4367,7 +4525,6 @@ ORBEON.xforms.Init = {
             fckEditorLoading: false,             // True if  a FCK editor is currently loading
             fckEditorsToLoad: [],                // Queue of FCK editor to load
             dialogs: {},                         // Map for dialogs: id -> YUI dialog object
-            dialogMinimalVisible: {},            // Map for minimal dialog id -> boolean isVisible
             dialogMinimalLastMouseOut: {},       // Map for minimal dialog id -> -1 or timestamp of last time the mouse got out of the dialog
             hintTooltipForControl: {},           // Map from element id -> YUI tooltip or true, that tells us if we have already created a Tooltip for an element
             alertTooltipForControl: {},          // Map from element id -> YUI alert or true, that tells us if we have already created a Tooltip for an element
@@ -5008,12 +5165,13 @@ ORBEON.xforms.Init = {
         var yuiDialog;
         if (isMinimal) {
             // Create minimal dialog
-            yuiDialog = new YAHOO.widget.Panel(dialog.id, {
-                close: false,
+            yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
                 modal: isModal,
+                close: false,
                 visible: false,
-                constraintoviewport: true,
-                iframe: true,
+                draggable: false,
+                fixedcenter: false,
+                constraintoviewport: false,
                 underlay: "none"
             });
             // Close the dialog when users click on document
@@ -5615,9 +5773,13 @@ ORBEON.xforms.Server = {
                 responseXML = ORBEON.util.Dom.stringToDom(xmlString);
             }
             var formID = ORBEON.xforms.Globals.requestForm.id;
-            // Remove modal progress panel before handling DOM response, as e.g. xxf:script may dispatch events and we
-            // don't want them to be filtered.
+            var hasServerEvents = ORBEON.xforms.Server.hasReturningServerEvents(responseXML);
+            if (!hasServerEvents) {
+                // Remove modal progress panel before handling DOM response, as e.g. xxf:script may dispatch events and
+                // we don't want them to be filtered. If there are server events, we don't remove the panel until they
+                // have been processed, i.e. the request sending the server events returns.
             ORBEON.util.Utils.hideModalProgressPanel();
+            }
             ORBEON.xforms.Server.handleResponseDom(responseXML, formID);
             // Reset changes, as changes are included in this bach of events
             ORBEON.xforms.Globals.changedIdsRequest = {};
@@ -5629,6 +5791,52 @@ ORBEON.xforms.Server = {
             ORBEON.xforms.Globals.executeEventFunctionQueued++;
             ORBEON.xforms.Server.executeNextRequest(false);
         }
+    },
+
+    hasReturningServerEvents: function(responseXML) {
+        if (responseXML && responseXML.documentElement
+                    && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
+            var responseRoot = responseXML.documentElement;
+            // The verbose code below implements this XPath expression:
+            // exists(/*/xxf:action[xxf:server-events and (not(xxf:submission) or xxf:submission[@replace == 'instance' or (@replace == 'all' && not(@target))])])
+            for (var i = 0; i < responseRoot.childNodes.length; i++) {
+                if (ORBEON.util.Utils.getLocalName(responseRoot.childNodes[i]) == "action") {
+                    var actionElement = responseRoot.childNodes[i];
+                    var serverEventsElement = null;
+                    var submissionElement = null;
+                    for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
+                        var currentActionElement = actionElement.childNodes[actionIndex];
+                        var currentActionName = ORBEON.util.Utils.getLocalName(currentActionElement);
+                        if (currentActionName == "server-events") {
+                            serverEventsElement = currentActionElement;
+                        } else if (currentActionName == "submission") {
+                            submissionElement = currentActionElement;
+                        }
+                        // Don't look further if we got both
+                        if (serverEventsElement && submissionElement)
+                            break;
+                    }
+
+                    if (serverEventsElement && !submissionElement) {
+                        // There is no submission (should probably not happen!)
+                        return true;
+                    } else if (serverEventsElement) {
+                        // There is a submission
+                        var replaceAttribute = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
+                        if (replaceAttribute == "instance" || replaceAttribute == "all" && ORBEON.util.Dom.getAttribute(submissionElement, "target") == null) {
+                            // Server events will return for sure with replace="instance". With replace="all", they will
+                            // return if there is no target. They could return as well with a target, but should we
+                            // take the risk?
+                            return true;
+                        }
+                    }
+
+                    // Done iterating actions
+                    break;
+                }
+            }
+        }
+        return false;
     },
 
     /**
@@ -5971,7 +6179,9 @@ ORBEON.xforms.Server = {
                                                 var selectOpeningTag = select.outerHTML.substring(0, select.outerHTML.indexOf(">") + 1);
                                                 select.outerHTML = selectOpeningTag + sb.join("") + "</select>";
                                                 // Get again control, as it has been re-created
-                                                select = ORBEON.util.Dom.getElementByIdNoCache(controlId);
+                                                select = YAHOO.util.Dom.get(controlId);
+                                                if (ORBEON.util.Utils.isNewXHTMLLayout())
+                                                    select = documentElement.getElementsByTagName("select")[0];
                                                 // Must now update the cache
                                                 ORBEON.xforms.Globals.idToElement[controlId] = select;
                                                 // For non-W3C compliant browsers we must re-register a listener on the new element we just created
@@ -6053,9 +6263,9 @@ ORBEON.xforms.Server = {
                                 case "control-values": {
                                     var controlValuesElement = actionElement.childNodes[actionIndex];
                                     var controlElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "control", xmlNamespace);
-                                    var controlElementslength = controlElements.length;
+                                    var controlElementsLength = controlElements.length;
                                     // Update control value and MIPs
-                                    for (var j = 0; j < controlElementslength; j++) {
+                                    for (var j = 0; j < controlElementsLength; j++) {
                                         var controlElement = controlElements[j];
                                         var newControlValue = ORBEON.util.Dom.getStringValue(controlElement);
                                         var controlId = ORBEON.util.Dom.getAttribute(controlElement, "id");
@@ -6181,7 +6391,7 @@ ORBEON.xforms.Server = {
                                                 function insertIntoDocument(nodes) {
                                                     if (ORBEON.util.Utils.isNewXHTMLLayout()) {
                                                         // New markup: insert after "last label" (we remembered the position of the label after which there is real content)
-                                                        if (childElements.length == 0) {
+                                                        if (YAHOO.util.Dom.getChildren(documentElement).length == 0) {
                                                             for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
                                                                 documentElement.appendChild(nodes[nodeIndex]);
                                                         } else if (lastLabelPosition == -1) {
@@ -6310,8 +6520,13 @@ ORBEON.xforms.Server = {
 
                                                     var isInput = ORBEON.util.Dom.hasClass(documentElement, "xforms-input");
                                                     var inputSize = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "size") : null;
-                                                    var inputlength = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "maxlength") : null;
+                                                    var inputLength = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "maxlength") : null;
                                                     var inputAutocomplete = isInput ? ORBEON.util.Dom.getAttribute(controlElement, "autocomplete") : null;
+
+                                                    var isTextarea = ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea");
+                                                    var textareaMaxlength = isTextarea ? ORBEON.util.Dom.getAttribute(controlElement, "maxlength") : null;
+                                                    var textareaCols = isTextarea ? ORBEON.util.Dom.getAttribute(controlElement, "cols") : null;
+                                                    var textareaRows = isTextarea ? ORBEON.util.Dom.getAttribute(controlElement, "rows") : null;
 
                                                     var doUpdate =
                                                             // If this was an input that was recreated because of a type change, we always set its value
@@ -6326,13 +6541,14 @@ ORBEON.xforms.Server = {
                                                                 && (previousServerValue == null || currentValue == previousServerValue)
                                                             ) ||
                                                             // Special xforms:input attributes
-                                                            (isInput && (inputSize != null || inputlength != null || inputAutocomplete != null));
+                                                            (isInput && (inputSize != null || inputLength != null || inputAutocomplete != null)) ||
+                                                            // Special xforms:textarea attributes
+                                                            (isTextarea && (textareaMaxlength != null || textareaCols != null || textareaRows != null));
                                                     if (doUpdate) {
                                                         if (isInput) {
                                                             // Additional attributes for xforms:input
-                                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, inputSize, inputlength, inputAutocomplete);
-                                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
-                                                                && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, inputSize, inputLength, inputAutocomplete);
+                                                        } else if (isTextarea && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                             ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
                                                             // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
                                                             // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
@@ -6341,6 +6557,9 @@ ORBEON.xforms.Server = {
                                                             // the server value to the content of the field. So storing the value as seen by the field vs. as seen by
                                                             // server accounts for the slight difference there might be in those 2 representations.
                                                             ORBEON.xforms.Globals.serverValue[documentElement.id] = ORBEON.xforms.Controls.getCurrentValue(documentElement);
+                                                        } else if (isTextarea) {
+                                                            // Additional attributes for xforms:textarea
+                                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, textareaMaxlength, textareaCols, textareaRows);
                                                         } else {
                                                             // Other control just have a new value
                                                             ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
@@ -6494,9 +6713,6 @@ ORBEON.xforms.Server = {
                                                 yuiDialog.hide();
                                                 // Fixes cursor Firefox issue; more on this in dialog init code
                                                 yuiDialog.element.style.display = "none";
-                                                // Remember the server knows that this dialog is closed so we don't close it again later
-                                                if (ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id])
-                                                    ORBEON.xforms.Globals.dialogMinimalVisible[yuiDialog.element.id] = false;
                                             }
                                         }
 

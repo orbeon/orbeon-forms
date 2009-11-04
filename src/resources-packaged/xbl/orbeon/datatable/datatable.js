@@ -726,11 +726,12 @@ ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
     var container = target.parentNode.parentNode;
     var id = container.id;
     if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled')) {
-        if (ORBEON.widgets.datatable.datatables[id] == undefined) {
+        if (ORBEON.widgets.datatable.datatables[id] == undefined || container.fr_dt_initialized == undefined) {
             var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
             var region = YAHOO.util.Region.getRegion(table);
             if (region.left >= 0 && region.top >= 0) {
                 ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id, innerTableWidth);
+                container.fr_dt_initialized = true;
             } else {
                 //Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
                 var cmd = "ORBEON.widgets.datatable.init(document.getElementById('" + target.id + "'), " + innerTableWidth + ");";

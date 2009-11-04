@@ -24,7 +24,6 @@ YAHOO.xbl.fr.FusionCharts.prototype = {
         // Get information from the DOM
         var chartDiv = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-chart-div", null, this.container)[0];
         this.xmlSpan = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-xml", null, this.container)[0];
-        console.log(this.xmlSpan);
         var uriToSwfElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-uri-to-swf", null, this.container)[0];
         var uriToSwf = ORBEON.xforms.Document.getValue(uriToSwfElement.id);
         var swfElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-swf", null, this.container)[0];

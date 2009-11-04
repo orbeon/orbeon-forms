@@ -1135,7 +1135,7 @@ public class XMLUtils {
      * @param newClasses    new classes to append
      * @return              new attributes
      */
-    public static Attributes appendToClassAttribute(Attributes attributes, String newClasses) {
+    public static AttributesImpl appendToClassAttribute(Attributes attributes, String newClasses) {
         final String oldClassAttribute = attributes.getValue("class");
         final String newClassAttribute = oldClassAttribute == null ? newClasses : oldClassAttribute + ' ' + newClasses;
         return addOrReplaceAttribute(attributes, "", "", "class", newClassAttribute);

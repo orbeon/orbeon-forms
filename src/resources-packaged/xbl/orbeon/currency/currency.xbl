@@ -37,7 +37,8 @@
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
-                    <xforms:group xbl:attr="model context ref bind" class="{{if (. != '' and exf:required()) then 'xforms-required-filled' else ''}}">
+                    <xforms:group xbl:attr="model context ref bind" class="{{
+                            if (exf:required()) then (if (. = '') then 'xforms-required-empty' else 'xforms-required-filled') else ''}}">
                         <xbl:content includes="xforms|label"/>
                         <!-- Init event -->
                         <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Currency.instance(this).init();</xxforms:script>

@@ -243,7 +243,7 @@ a.xforms-trigger img { vertical-align: middle; cursor: pointer }
 a.xforms-readonly img { cursor: default }
 a.xforms-trigger span { vertical-align: middle }
 
-a.xforms-readonly { color: gray; cursor: default }
+a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 
 /* Highlight of invalid input/textarea */
 /*

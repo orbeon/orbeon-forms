@@ -202,7 +202,7 @@ ORBEON.widgets.datatable.unittests_lib = {
 
     getBodyTable: function(table, isSplit) {
         if (isSplit) {
-            var container = table.parentNode.parentNode;
+            var container = YAHOO.util.Dom.getAncestorByClassName(table, 'yui-dt');
             return container.getElementsByTagName('table')[1];
         } else {
             return table;
@@ -298,7 +298,7 @@ ORBEON.widgets.datatable.unittests_lib = {
     },
 
     checkCellClassesInARow: function(row, classPrefix) {
-        var iActual = 0;
+        var iActual = 0;                                                                                                                                                      f
         for (var i = 0; i < row.cells.length; i++)
         {
             var cell = row.cells[i];

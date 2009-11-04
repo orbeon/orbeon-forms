@@ -298,7 +298,7 @@ ORBEON.widgets.datatable.unittests_lib = {
     },
 
     checkCellClassesInARow: function(row, classPrefix) {
-        var iActual = 0;
+        var iActual = 0;                                                                                                                                                      f
         for (var i = 0; i < row.cells.length; i++)
         {
             var cell = row.cells[i];

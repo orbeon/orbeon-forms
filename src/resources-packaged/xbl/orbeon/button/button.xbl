@@ -28,7 +28,7 @@
     <xbl:script type="text/javascript" src="/ops/yui/element/element-beta-min.js"/>
     <xbl:script type="text/javascript" src="/ops/yui/button/button.js"/>
     <!--<xbl:script type="text/javascript" src="/ops/yui/button/button-min.js"/>-->
-    <xbl:binding element="fr|button">
+    <xbl:binding id="fr-button" element="fr|button">
         <xbl:resources>
             <xbl:style src="/ops/yui/button/assets/skins/sam/button.css"/>
             <xbl:style>

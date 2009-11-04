@@ -47,7 +47,7 @@
                     </xforms:action>
                 </xforms:trigger>
                 <fr:alert-dialog id="yes-no-dialog">
-                    <fr:title>Copy</fr:title>
+                    <fr:label>Copy</fr:label>
                     <fr:message>An item with the same name already exists. Do you want to replace it with the one you're moving?</fr:message>
                     <fr:negative-choice/>
                     <fr:positive-choice>
@@ -67,10 +67,10 @@
                     <xforms:dispatch ev:event="DOMActivate" target="ok-cancel-dialog" name="fr-show"/>
                 </xforms:trigger>
                 <fr:alert-dialog id="ok-cancel-dialog">
-                    <fr:title>Copy</fr:title>
+                    <fr:label>Copy</fr:label>
                     <fr:message>An item with the same name already exists. The file you are copying will replace it.</fr:message>
-                    <fr:negative-choice><xforms:label>Cancel</xforms:label></fr:negative-choice>
-                    <fr:positive-choice><xforms:label>OK</xforms:label></fr:positive-choice>
+                    <fr:negative-choice><fr:label>Cancel</fr:label></fr:negative-choice>
+                    <fr:positive-choice><fr:label>OK</fr:label></fr:positive-choice>
                 </fr:alert-dialog>
             </xhtml:li>
 
@@ -88,16 +88,6 @@
             </xhtml:li>
 
         </xhtml:ol>
-
-        <!--  Dummy use of fr:button -->
-        <xforms:group ref="()">
-            <fr:button ref="." id="test-button">
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/accept.png" alt=""/>
-                    <xhtml:span>OK</xhtml:span>
-                </xforms:label>
-            </fr:button>
-        </xforms:group>
 
     </xhtml:body>
 </xhtml:html>

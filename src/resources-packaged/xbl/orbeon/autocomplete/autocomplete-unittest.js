@@ -138,7 +138,6 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                     // Check the alert is active
                     var control = YAHOO.util.Dom.get(staticDynamic + "-autocomplete");
                     var container = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-container", null, control)[0];
-                    console.log(control, container);
                     YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(container, "xforms-invalid"));
                     var alert = YAHOO.util.Dom.getElementsByClassName("xforms-alert", null, control)[0];
                     YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(alert, "xforms-alert-active"),

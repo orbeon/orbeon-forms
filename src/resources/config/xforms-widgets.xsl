@@ -38,7 +38,8 @@
                 <!-- Include fr:* widgets -->
                 <xsl:variable name="widgets-to-exclude"
                               select="tokenize(pipeline:property('oxf.epilogue.xforms.widgets.fr-elements-to-skip'), '\s+')"/>
-                <xsl:for-each-group select="//fr:*|//widget:table" group-by="name()">
+                <xsl:variable name="potential-elements" select="//fr:*|//widget:table"/>
+                <xsl:for-each-group select="$potential-elements" group-by="name()">
                     <xsl:if test="not( key('xbl:bindings', name())) and not( name() = $widgets-to-exclude )">
                         <!-- 
                         
@@ -51,6 +52,11 @@
                         <!-- NOTE: use XInclude to allow caching. doc() would disable caching here. -->
                         <xi:include href="oxf:/xbl/orbeon/{local-name()}/{local-name()}.xbl" xxi:omit-xml-base="true"/>
 
+                        <!-- We don't have a way to explicitly include an XBL file from another XBL file, so we handle
+                             dependencies between XBL components in a case-by-case basis here. -->
+                        <xsl:if test="local-name() = 'alert-dialog' and empty($potential-elements/self::fr:button)">
+                            <xi:include href="oxf:/xbl/orbeon/button/button.xbl" xxi:omit-xml-base="true"/>
+                        </xsl:if>
                     </xsl:if>
                 </xsl:for-each-group>
             </xsl:if>

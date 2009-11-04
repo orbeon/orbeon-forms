@@ -71,7 +71,7 @@
 
                 <xsl:template match="fr:negative-choice">
                     <xhtml:span class="xbl-fr-alert-dialog-negative">
-                        <fr:button ref="." xxbl:scope="outer" class="xbl-fr-alert-dialog-negative">
+                        <fr:button ref="." xxbl:scope="outer">
                             <xsl:if test="empty(xforms:label)">
                                 <xforms:label>No</xforms:label>
                             </xsl:if>

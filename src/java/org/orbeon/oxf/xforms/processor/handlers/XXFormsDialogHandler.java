@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -29,8 +28,6 @@ import org.xml.sax.SAXException;
  */
 public class XXFormsDialogHandler extends XFormsBaseHandler {
 
-    private boolean isMinimalAppearance;
-
     public XXFormsDialogHandler() {
         super(false, true);
     }
@@ -39,7 +36,6 @@ public class XXFormsDialogHandler extends XFormsBaseHandler {
 
         final String effectiveDialogId = handlerContext.getEffectiveId(attributes);
         final XXFormsDialogControl dialogXFormsControl = ((XXFormsDialogControl) containingDocument.getObjectByEffectiveId(effectiveDialogId));
-        isMinimalAppearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
 
         // Find classes to add
         final StringBuilder classes = getInitialClasses(uri, localname, attributes, null);
@@ -59,30 +55,20 @@ public class XXFormsDialogHandler extends XFormsBaseHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, getAttributes(attributes, classes.toString(), effectiveDialogId));
 
-        if (!isMinimalAppearance) {
-            // Child xhtml:div for label
-            final String labelValue = dialogXFormsControl.getLabel(pipelineContext);
-            if (labelValue != null) {
-                reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "hd xxforms-dialog-head");
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-                contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
-            }
-
-            // Child xhtml:div for body
+        // Child xhtml:div for label
+        final String labelValue = dialogXFormsControl.getLabel(pipelineContext);
+        if (labelValue != null) {
             reusableAttributes.clear();
-            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd xxforms-dialog-body");
+            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "hd xxforms-dialog-head");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-        } else {
-            // Two nested xhtml:div
-            reusableAttributes.clear();
-            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd1");
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-            reusableAttributes.clear();
-            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd2");
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+            contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
         }
+
+        // Child xhtml:div for body
+        reusableAttributes.clear();
+        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd xxforms-dialog-body");
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {
@@ -93,9 +79,5 @@ public class XXFormsDialogHandler extends XFormsBaseHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
-
-        // One more to close with minimal appearance
-        if (isMinimalAppearance)
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
     }
 }

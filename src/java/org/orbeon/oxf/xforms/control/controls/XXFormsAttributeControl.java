@@ -46,10 +46,12 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
      *
      * @param container             container
      * @param element               control element (should not be used here)
+     * @param nameAttribute         name of the attribute
      * @param avtExpression         attribute template expression
      */
-    public XXFormsAttributeControl(XBLContainer container, Element element, String avtExpression) {
+    public XXFormsAttributeControl(XBLContainer container, Element element, String nameAttribute, String avtExpression) {
         super(container, null, element, element.getName(), null);
+        this.nameAttribute = nameAttribute;
         this.valueAttribute = avtExpression;
     }
 

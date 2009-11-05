@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.generator;
 
@@ -25,22 +25,22 @@ import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.xml.sax.ContentHandler;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URLConnection;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -170,8 +170,8 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                 final ContentHandlerHelper helper = new ContentHandlerHelper(contentHandler);
                 ds.setEventListener(new DirectoryScanner.EventListener() {
 
-                    private List pathNames = new ArrayList();
-                    private List paths = new ArrayList();
+                    private List<String> pathNames = new ArrayList<String>();
+                    private List<String> paths = new ArrayList<String>();
                     private int pathLevel = 0;
 
                     private void enterDirectory(String path, String name, boolean included) {
@@ -208,8 +208,8 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                     private void outputPath() {
                         try {
                             for (int i = pathLevel; i < pathNames.size(); i++) {
-                                String name = (String) pathNames.get(i);
-                                String path = (String) paths.get(i);
+                                String name = pathNames.get(i);
+                                String path = paths.get(i);
                                 helper.startElement(DIRECTORY_ELEMENT, new String[] {"name", name, "path", path + name});
                             }
                             pathLevel = pathNames.size();
@@ -354,8 +354,8 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
     }
 
     private static class Config {
-        private List excludes;
-        private List includes;
+        private List<String> excludes;
+        private List<String> includes;
         private String baseDirectory;
         private boolean caseSensitive;
         private boolean defaultExcludes;
@@ -365,13 +365,13 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
 
         public void addInclude(String pattern) {
             if (includes == null)
-                includes = new ArrayList();
+                includes = new ArrayList<String>();
             includes.add(pattern);
         }
 
         public void addExclude(String pattern) {
             if (excludes == null)
-                excludes = new ArrayList();
+                excludes = new ArrayList<String>();
             excludes.add(pattern);
         }
 

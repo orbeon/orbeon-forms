@@ -22,6 +22,10 @@
     <xsl:function name="xxbl:parameter">
         <xsl:param name="context" as="element()"/>
         <xsl:param name="property" as="xs:string"/>
+        
+        <xsl:variable name="prefix" select="prefix-from-QName(node-name($context))"/>
+        <xsl:variable name="namespace" select="namespace-uri($context)"/>
+        <xsl:variable name="component" select="local-name($context)"/>
 
         <xsl:variable name="prefix" select="prefix-from-QName(node-name($context))"/>
         <xsl:variable name="namespace" select="namespace-uri($context)"/>

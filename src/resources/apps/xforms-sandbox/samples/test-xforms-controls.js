@@ -29,19 +29,59 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             });
         });
    },
-   
+
    testInput: function() { this.repeatRebuildWorker("input"); },
    testTextarea: function() { this.repeatRebuildWorker("textarea"); },
    testSecret: function() { this.repeatRebuildWorker("secret"); },
    testInputBoolean: function() { this.repeatRebuildWorker("input-boolean"); }
-   
+
 }));
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "xforms:select1 appearance=full",
+    name: "Readonly and relevant",
 
-    dateValueInputId: "date$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    getFormControls: function() {
+        var controlsContainer = YAHOO.util.Dom.get("controls");
+        var formTagNames = [ "input", "textarea", "select", "button" ];
+        var formElements = [];
+        for (var formTagNameIndex = 0; formTagNameIndex < formTagNames.length; formTagNameIndex++) {
+            var formTagName = formTagNames[formTagNameIndex];
+            var thisTagElements = controlsContainer.getElementsByTagName(formTagName);
+            for (var thisTagElementIndex = 0; thisTagElementIndex < thisTagElements.length; thisTagElementIndex++) {
+                var thisTagElement = thisTagElements[thisTagElementIndex];
+                if (YAHOO.util.Dom.getAncestorByClassName(thisTagElement, "xforms-repeat-template") == null)
+                    formElements.push(thisTagElement);
+            };
+        };
+        return formElements;
+    },
+
+    checkDisabled: function(disabled) {
+        var elements = this.getFormControls();
+        for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
+            var element = elements[elementIndex];
+            YAHOO.util.Assert.areEqual(disabled, element.disabled, "element " + element.id + " supposed to have disabled = " + disabled);
+        };
+    },
+
+    testReadonly: function() {
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            ORBEON.xforms.Document.setValue("readonly", "true");
+        }, function() {
+            this.checkDisabled(true);
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                ORBEON.xforms.Document.setValue("readonly", "false");
+            }, function() {
+                this.checkDisabled(false);
+            });
+        });
+    }
+}));
+
+YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+    name: "xforms:select and xforms:select1 appearance=full",
 
     getSelect: function(controlId) {
         var control = YAHOO.util.Dom.get(controlId);
@@ -79,7 +119,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
              YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected);
         });
     },
-    
+
     testUpdateList: function() {
          ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
              // Set value in list to TNT
@@ -95,7 +135,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
              YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[3].selected);
         });
     },
-    
+
     testUpdateCheckbox: function() {
          ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
              // Click on DHL checkbox (in addition to already selected TNT)
@@ -105,6 +145,63 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
              // Check DHL and TNT are selected in the list
              YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected);
              YAHOO.util.Assert.isTrue(this.getSelect("carrier-select-compact" + XFORMS_SEPARATOR_1 + "1").options[3].selected);
+             // Get back to initial state
+             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                 ORBEON.xforms.Document.setValue("carrier-select1-compact" + XFORMS_SEPARATOR_1 + "1", "f");
+             }, function() {});
+        });
+    }
+}));
+
+YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+    name: "xforms:select and xforms:select1 appearance=full",
+
+    /**
+     * Test if setting values of one list updates the other lists, after making the lists non-relevant and relevant
+     * again. When the list become relevant, they are re-built which can cause some problems on IE if the listeners on
+     * on "change" are not re-registered.
+     */
+    testValueChange: function() {
+        var selectIds = ["carrier-select1-compact" + XFORMS_SEPARATOR_1 + "1",
+            "carrier-select-compact" + XFORMS_SEPARATOR_1 + "1",
+            "carrier-select-compact" + XFORMS_SEPARATOR_1 + "1"];
+
+        /**
+         * This function simulates the user selecting a value and sending the change event to the select.
+         */
+        function setSelectValue(index, value) {
+            var select = YAHOO.util.Dom.get(selectIds[index]);
+            if (select.tagName.toLowerCase() != "select") select = select.getElementsByTagName("select")[0];
+            select.value = value;
+            xformsDispatchEvent(select, "change");
+        }
+
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            ORBEON.xforms.Document.setValue("relevant", "false");
+        }, function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                ORBEON.xforms.Document.setValue("relevant", "true");
+            }, function() {
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    setSelectValue(0, "u");
+                }, function() {
+                    YAHOO.util.Assert.areEqual("u", ORBEON.xforms.Document.getValue(selectIds[1]));;
+                    YAHOO.util.Assert.areEqual("u", ORBEON.xforms.Document.getValue(selectIds[2]));;
+                    ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                        setSelectValue(1, "f");
+                    }, function() {
+                        YAHOO.util.Assert.areEqual("f", ORBEON.xforms.Document.getValue(selectIds[0]));;
+                        YAHOO.util.Assert.areEqual("f", ORBEON.xforms.Document.getValue(selectIds[2]));;
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            setSelectValue(2, "d");
+                        }, function() {
+                            YAHOO.util.Assert.areEqual("d", ORBEON.xforms.Document.getValue(selectIds[0]));;
+                            YAHOO.util.Assert.areEqual("d", ORBEON.xforms.Document.getValue(selectIds[1]));;
+                        });
+                    });
+                });
+            });
         });
     }
 }));
@@ -233,7 +330,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 ORBEON.xforms.Document.setValue("repeat-shown", "true");
             }, function() {
                 var trigger = YAHOO.util.Dom.get(this.triggerId);
-                var link = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY) 
+                var link = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
                     ? YAHOO.util.Dom.getFirstChild(trigger) : trigger;
                 YAHOO.util.Assert.areEqual("a", link.tagName.toLowerCase());
                 YAHOO.util.Assert.areEqual("Label", link.innerHTML);

@@ -61,7 +61,8 @@ public class ZipProcessor extends ProcessorImpl {
 
                             // Get the URI to the file, store it
                             public void characters(char ch[], int start, int length) throws SAXException {
-                                uri.append(ch, start, length);
+                                if (uri != null)
+                                    uri.append(ch, start, length);
                             }
 
                             // Process file

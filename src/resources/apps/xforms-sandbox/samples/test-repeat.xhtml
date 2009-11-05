@@ -8,20 +8,30 @@
     <xhtml:head>
         <xhtml:title>Repeat Unit Tests</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
-            <xforms:instance>
+            <xforms:instance id="companies">
                 <companies show="true">
                     <company>
                         <name>Wal Mart</name>
+                        <incorporated>1969-10-31</incorporated>
                     </company>
                     <company>
                         <name>ExxonMobil</name>
+                        <incorporated>1999-11-30</incorporated>
                     </company>
                     <company>
                         <name>Royal Dutch Shell</name>
+                        <incorporated>1907-02-01</incorporated>
                     </company>
                 </companies>
             </xforms:instance>
+            <xforms:instance id="company-template">
+                <company>
+                    <name/>
+                    <incorporated/>
+                </company>
+            </xforms:instance>
             <xforms:bind nodeset="/companies/@show" type="xs:boolean"/>
+            <xforms:bind nodeset="/companies/company/incorporated" type="xs:date"/>
         </xforms:model>
 
         <xbl:xbl script-type="application/xhtml+xml">
@@ -48,11 +58,13 @@
         </xforms:input>
         <xhtml:table id="table">
             <xforms:repeat nodeset=".[@show = 'true']/company" id="company-repeat">
-                <xxforms:script ev:event="DOMFocusIn">window.observerElement =
-                    this;</xxforms:script>
+                <xxforms:script ev:event="DOMFocusIn">window.observerElement = this;</xxforms:script>
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:input ref="name" id="name"/>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:input ref="incorporated"/>
                     </xhtml:td>
                 </xhtml:tr>
             </xforms:repeat>

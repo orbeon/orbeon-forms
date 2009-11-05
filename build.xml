@@ -110,7 +110,13 @@
         <include name="mail-1_3_2.jar"/>
 
         <include name="pdfbox-0_7_1.jar"/>
+
+        <!-- For directory scanner and SSH support -->
         <include name="ant-1_6_5.jar"/>
+
+        <!-- For SSH support (currently in oxf:file processor) -->
+        <include name="ant-jsch-1_6_5.jar"/>
+        <include name="jsch-0.1.42.jar"/>
     </fileset>
     <fileset id="war.libs.private" dir="${lib.dir}">
         <include name="xerces-xercesImpl-2_9_orbeon_20070711.jar"/>
@@ -150,6 +156,7 @@
                 </tokenfilter>
             </filterchain>
         </loadproperties>
+        <delete file="${ops-temp-version-file}"/>
 
         <!-- Provide custom version number to TeamCity -->
         <echo message="##teamcity[buildNumber '${orbeon-version}']"/>
@@ -221,6 +228,22 @@
             <src path="${java-src.dir}"/>
             <exclude name="org/orbeon/oxf/common/Version.java"/>
         </javac>
+    </target>
+
+    <!-- Compile with hotswap -->
+    <target name="hotswap" depends="init">
+        <!-- Usage: get the hotswap task (http://code.google.com/p/hotswap/).
+             On Mac OS X add the jar file in /usr/share/ant/lib -->
+        <taskdef name="hotswap" classname="dak.ant.taskdefs.Hotswap"/>
+        <tstamp>
+            <format property="class.tstamp" pattern="MM/dd/yyyy kk:mm:ss" />
+        </tstamp>
+        <antcall target="classes"/>
+        <hotswap verbose="true" port="61155">
+            <fileset dir="${build.classes.dir}" includes="**/*.class">
+                <date datetime="${class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+            </fileset>
+        </hotswap>
     </target>
 
     <!-- Compile test source -->

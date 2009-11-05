@@ -45,9 +45,11 @@
                     <date>2009-03-19</date>
                     <time>15:00:00</time>
                     <date-time>2009-03-19T15:00:00</date-time>
+                    <trigger/>
+                    <submit/>
                     <output-file>
                         <uri>file:///tmp/dummy</uri>
-                    </output-file>                    
+                    </output-file>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="input | textarea | secret | input-boolean | date | time | date-time" constraint="false()"/>
@@ -80,9 +82,6 @@
     </xhtml:head>
     <xhtml:body>
 
-        <!-- Link to start Firebug Lite -->
-        <xhtml:a href="javascript:var firebug=document.createElement('script');firebug.setAttribute('src','http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js');document.body.appendChild(firebug);(function(){{if(window.firebug.version){{firebug.init();}}else{{setTimeout(arguments.callee);}}}})();void(firebug);">Start Firebug Lite</xhtml:a>
-
         <xhtml:h2>Global properties</xhtml:h2>
         <xhtml:p>
             <xforms:input ref="@repeat-shown" id="repeat-shown">
@@ -105,189 +104,205 @@
             </xforms:trigger>
         </xhtml:p>
 
-        <xforms:repeat nodeset=".[@repeat-shown = 'true']">
+        <xhtml:div id="controls">
+            <xforms:repeat nodeset=".[@repeat-shown = 'true']">
 
-            <!-- Input -->
-            <xhtml:h2>Input</xhtml:h2>
-            <xhtml:p>
-                <xforms:input ref="input" id="input">
-                    <xforms:label ref="../label"/>
-                    <xforms:help ref="../help"/>
-                    <xforms:hint ref="../hint"/>
-                    <xforms:alert ref="../alert"/>
-                </xforms:input>
-            </xhtml:p>
+                <!-- Input -->
+                <xhtml:h2>Input</xhtml:h2>
+                <xhtml:p>
+                    <xforms:input ref="input" id="input">
+                        <xforms:label ref="../label"/>
+                        <xforms:help ref="../help"/>
+                        <xforms:hint ref="../hint"/>
+                        <xforms:alert ref="../alert"/>
+                    </xforms:input>
+                </xhtml:p>
 
-            <!-- Text area -->
-            <xhtml:h2>Text area</xhtml:h2>
-            <xhtml:p>
-                <xforms:textarea ref="textarea" id="textarea">
-                    <xforms:label ref="../label"/>
-                    <xforms:help ref="../help"/>
-                    <xforms:hint ref="../hint"/>
-                    <xforms:alert ref="../alert"/>
-                </xforms:textarea>
-            </xhtml:p>
+                <!-- Text area -->
+                <xhtml:h2>Text area</xhtml:h2>
+                <xhtml:p>
+                    <xforms:textarea ref="textarea" id="textarea">
+                        <xforms:label ref="../label"/>
+                        <xforms:help ref="../help"/>
+                        <xforms:hint ref="../hint"/>
+                        <xforms:alert ref="../alert"/>
+                    </xforms:textarea>
+                </xhtml:p>
 
-            <!-- Secret -->
-            <xhtml:h2>Secret</xhtml:h2>
-            <xhtml:p>
-                <xforms:secret ref="secret" id="secret">
-                    <xforms:label ref="../label"/>
-                    <xforms:help ref="../help"/>
-                    <xforms:hint ref="../hint"/>
-                    <xforms:alert ref="../alert"/>
-                </xforms:secret>
-            </xhtml:p>
+                <!-- Secret -->
+                <xhtml:h2>Secret</xhtml:h2>
+                <xhtml:p>
+                    <xforms:secret ref="secret" id="secret">
+                        <xforms:label ref="../label"/>
+                        <xforms:help ref="../help"/>
+                        <xforms:hint ref="../hint"/>
+                        <xforms:alert ref="../alert"/>
+                    </xforms:secret>
+                </xhtml:p>
 
-            <!-- Boolean input -->
-            <xhtml:h2>xforms:input boolean</xhtml:h2>
-            <xhtml:p>
-                <xforms:input ref="input-boolean" id="input-boolean">
-                    <xforms:label ref="../label"/>
-                    <xforms:help ref="../help"/>
-                    <xforms:hint ref="../hint"/>
-                    <xforms:alert ref="../alert"/>
-                </xforms:input>
-            </xhtml:p>
+                <!-- Boolean input -->
+                <xhtml:h2>xforms:input boolean</xhtml:h2>
+                <xhtml:p>
+                    <xforms:input ref="input-boolean" id="input-boolean">
+                        <xforms:label ref="../label"/>
+                        <xforms:help ref="../help"/>
+                        <xforms:hint ref="../hint"/>
+                        <xforms:alert ref="../alert"/>
+                    </xforms:input>
+                </xhtml:p>
 
-            <!-- Select and Select1 -->
-            <xhtml:h2>xforms:select and xforms:select1</xhtml:h2>
-            <xforms:group ref="select">
-                <xhtml:p>
-                    <xforms:select1 appearance="full" ref="flavor" id="flavor-select1-full">
-                        <xforms:itemset nodeset="instance('flavors')/flavor">
-                            <xforms:label ref="."/>
-                            <xforms:value ref="@name"/>
-                        </xforms:itemset>
-                    </xforms:select1>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:select appearance="full" ref="flavor" id="flavor-select-full">
-                        <xforms:itemset nodeset="instance('flavors')/flavor">
-                            <xforms:label ref="."/>
-                            <xforms:value ref="@name"/>
-                        </xforms:itemset>
-                    </xforms:select>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:select1 appearance="full" ref="carrier" id="carrier-select1-full">
-                        <xforms:itemset nodeset="instance('carriers')/carrier">
-                            <xforms:label ref="."/>
-                            <xforms:value ref="@name"/>
-                        </xforms:itemset>
-                    </xforms:select1>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:select appearance="full" ref="carrier" id="carrier-select-full">
-                        <xforms:itemset nodeset="instance('carriers')/carrier">
-                            <xforms:label ref="."/>
-                            <xforms:value ref="@name"/>
-                        </xforms:itemset>
-                    </xforms:select>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:select1 appearance="compact" ref="carrier" id="carrier-select1-compact">
-                        <xforms:itemset nodeset="instance('carriers')/carrier">
-                            <xforms:label ref="."/>
-                            <xforms:value ref="@name"/>
-                        </xforms:itemset>
-                    </xforms:select1>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:select appearance="compact" ref="carrier" id="carrier-select-compact">
-                        <xforms:itemset nodeset="instance('carriers')/carrier">
-                            <xforms:label ref="."/>
-                            <xforms:value ref="@name"/>
-                        </xforms:itemset>
-                    </xforms:select>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:select1 appearance="minimal" ref="carrier" id="carrier-select-minimal">
-                        <xforms:itemset nodeset="instance('carriers')/carrier">
-                            <xforms:label ref="."/>
-                            <xforms:value ref="@name"/>
-                        </xforms:itemset>
-                    </xforms:select1>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:trigger appearance="minimal" id="add-flavor-carrier">
-                        <xforms:label>Add flavor and carrier</xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:insert nodeset="instance('flavors')/flavor"/>
-                            <xforms:action context="instance('flavors')/flavor[last()]">
-                                <xforms:setvalue ref=".">Key lime</xforms:setvalue>
-                                <xforms:setvalue ref="@name">k</xforms:setvalue>
+                <!-- Select and Select1 -->
+                <xhtml:h2>xforms:select and xforms:select1</xhtml:h2>
+                <xforms:group ref="select">
+                    <xhtml:p>
+                        <xforms:select1 appearance="full" ref="flavor" id="flavor-select1-full">
+                            <xforms:itemset nodeset="instance('flavors')/flavor">
+                                <xforms:label ref="."/>
+                                <xforms:value ref="@name"/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:select appearance="full" ref="flavor" id="flavor-select-full">
+                            <xforms:itemset nodeset="instance('flavors')/flavor">
+                                <xforms:label ref="."/>
+                                <xforms:value ref="@name"/>
+                            </xforms:itemset>
+                        </xforms:select>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:select1 appearance="full" ref="carrier" id="carrier-select1-full">
+                            <xforms:itemset nodeset="instance('carriers')/carrier">
+                                <xforms:label ref="."/>
+                                <xforms:value ref="@name"/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:select appearance="full" ref="carrier" id="carrier-select-full">
+                            <xforms:itemset nodeset="instance('carriers')/carrier">
+                                <xforms:label ref="."/>
+                                <xforms:value ref="@name"/>
+                            </xforms:itemset>
+                        </xforms:select>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:select1 appearance="compact" ref="carrier" id="carrier-select1-compact">
+                            <xforms:itemset nodeset="instance('carriers')/carrier">
+                                <xforms:label ref="."/>
+                                <xforms:value ref="@name"/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:select appearance="compact" ref="carrier" id="carrier-select-compact">
+                            <xforms:itemset nodeset="instance('carriers')/carrier">
+                                <xforms:label ref="."/>
+                                <xforms:value ref="@name"/>
+                            </xforms:itemset>
+                        </xforms:select>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:select1 appearance="minimal" ref="carrier" id="carrier-select-minimal">
+                            <xforms:itemset nodeset="instance('carriers')/carrier">
+                                <xforms:label ref="."/>
+                                <xforms:value ref="@name"/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:trigger appearance="minimal" id="add-flavor-carrier">
+                            <xforms:label>Add flavor and carrier</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:insert nodeset="instance('flavors')/flavor"/>
+                                <xforms:action context="instance('flavors')/flavor[last()]">
+                                    <xforms:setvalue ref=".">Key lime</xforms:setvalue>
+                                    <xforms:setvalue ref="@name">k</xforms:setvalue>
+                                </xforms:action>
+                                <xforms:insert nodeset="instance('carriers')/carrier"/>
+                                <xforms:action context="instance('carriers')/carrier[last()]">
+                                    <xforms:setvalue ref=".">TNT</xforms:setvalue>
+                                    <xforms:setvalue ref="@name">t</xforms:setvalue>
+                                </xforms:action>
                             </xforms:action>
-                            <xforms:insert nodeset="instance('carriers')/carrier"/>
-                            <xforms:action context="instance('carriers')/carrier[last()]">
-                                <xforms:setvalue ref=".">TNT</xforms:setvalue>
-                                <xforms:setvalue ref="@name">t</xforms:setvalue>
-                            </xforms:action>
-                        </xforms:action>
+                        </xforms:trigger>
+                    </xhtml:p>
+                </xforms:group>
+
+                <!-- Date -->
+                <xhtml:h2>xforms:input type xs:date (default appearance)</xhtml:h2>
+                <xhtml:p>
+                    <xforms:input ref="date" id="date">
+                        <xforms:label ref="../label"/>
+                        <xforms:help ref="../help"/>
+                        <xforms:hint ref="../hint"/>
+                        <xforms:alert ref="../alert"/>
+                    </xforms:input>
+                </xhtml:p>
+                <xhtml:h2>xforms:input type xs:date (minimal appearance)</xhtml:h2>
+                <xhtml:p>
+                    <xforms:input ref="date" appearance="minimal" id="date-minimal">
+                        <xforms:label ref="../label"/>
+                        <xforms:help ref="../help"/>
+                        <xforms:hint ref="../hint"/>
+                        <xforms:alert ref="../alert"/>
+                    </xforms:input>
+                </xhtml:p>
+
+                <!-- Time -->
+                <xhtml:h2>xforms:input type xs:time</xhtml:h2>
+                <xhtml:p>
+                    <xforms:input ref="time" id="time">
+                        <xforms:label ref="../label"/>
+                        <xforms:help ref="../help"/>
+                        <xforms:hint ref="../hint"/>
+                        <xforms:alert ref="../alert"/>
+                    </xforms:input>
+                </xhtml:p>
+
+                <!-- Date and time -->
+                <xhtml:h2>xforms:input type xs:dateTime</xhtml:h2>
+                <xhtml:p>
+                    <xforms:input ref="date-time" id="date-time">
+                        <xforms:label ref="../label"/>
+                        <xforms:help ref="../help"/>
+                        <xforms:hint ref="../hint"/>
+                        <xforms:alert ref="../alert"/>
+                    </xforms:input>
+                </xhtml:p>
+
+                <!-- Trigger -->
+                <xhtml:h2>xforms:trigger</xhtml:h2>
+                <xhtml:p>
+                    <xforms:trigger ref="trigger" id="trigger-default">
+                        <xforms:label ref="../label"/>
+                        <xforms:hint>Hint</xforms:hint>
+                    </xforms:trigger>
+                    <xforms:trigger ref="trigger" id="trigger-minimal" appearance="minimal">
+                        <xforms:label ref="../label"/>
+                        <xforms:hint>Hint</xforms:hint>
                     </xforms:trigger>
                 </xhtml:p>
-            </xforms:group>
 
-            <!-- Date -->
-            <xhtml:h2>xforms:input type xs:date (default appearance)</xhtml:h2>
-            <xhtml:p>
-                <xforms:input ref="date" id="date">
-                    <xforms:label ref="../label"/>
-                    <xforms:help ref="../help"/>
-                    <xforms:hint ref="../hint"/>
-                    <xforms:alert ref="../alert"/>
-                </xforms:input>
-            </xhtml:p>
-            <xhtml:h2>xforms:input type xs:date (minimal appearance)</xhtml:h2>
-            <xhtml:p>
-                <xforms:input ref="date" appearance="minimal" id="date-minimal">
-                    <xforms:label ref="../label"/>
-                    <xforms:help ref="../help"/>
-                    <xforms:hint ref="../hint"/>
-                    <xforms:alert ref="../alert"/>
-                </xforms:input>
-            </xhtml:p>
-
-            <!-- Time -->
-            <xhtml:h2>xforms:input type xs:time</xhtml:h2>
-            <xhtml:p>
-                <xforms:input ref="time" id="time">
-                    <xforms:label ref="../label"/>
-                    <xforms:help ref="../help"/>
-                    <xforms:hint ref="../hint"/>
-                    <xforms:alert ref="../alert"/>
-                </xforms:input>
-            </xhtml:p>
-
-            <!-- Date and time -->
-            <xhtml:h2>xforms:input type xs:dateTime</xhtml:h2>
-            <xhtml:p>
-                <xforms:input ref="date-time" id="date-time">
-                    <xforms:label ref="../label"/>
-                    <xforms:help ref="../help"/>
-                    <xforms:hint ref="../hint"/>
-                    <xforms:alert ref="../alert"/>
-                </xforms:input>
-            </xhtml:p>
-            
-            <!-- Link -->
-            <xhtml:h2>xforms:trigger appearance minimal</xhtml:h2>
-            <xhtml:p>
-                <xforms:trigger ref="." id="trigger-minimal" appearance="minimal">
-                    <xforms:label ref="label"/>
-                </xforms:trigger>
-            </xhtml:p>
-
-            <!-- Download -->
-            <xhtml:h2>xforms:output type xs:anyURI</xhtml:h2>
-            <xforms:group ref="output-file">
+                <!-- Submit -->
+                <xhtml:h2>xforms:submit</xhtml:h2>
                 <xhtml:p>
-                    <xforms:output ref="uri" appearance="xxforms:download" id="output-file-value" xxforms:target="gaga">
-                        <xforms:label>Download file</xforms:label>
-                    </xforms:output>
+                    <xforms:submit ref="submit" id="submit">
+                        <xforms:label ref="../label"/>
+                        <xforms:hint>Hint</xforms:hint>
+                    </xforms:submit>
                 </xhtml:p>
-            </xforms:group>
-        </xforms:repeat>
+
+                <!-- Download -->
+                <xhtml:h2>xforms:output appearance="xxforms:download"</xhtml:h2>
+                <xforms:group ref="output-file">
+                    <xhtml:p>
+                        <xforms:output ref="uri" appearance="xxforms:download" id="output-file-value" xxforms:target="gaga">
+                            <xforms:label>Download file</xforms:label>
+                        </xforms:output>
+                    </xhtml:p>
+                </xforms:group>
+            </xforms:repeat>
+        </xhtml:div>
     </xhtml:body>
 </xhtml:html>

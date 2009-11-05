@@ -1,29 +1,99 @@
 <!--
-    Copyright (C) 2006 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <element name="config" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
     xmlns="http://relaxng.org/ns/structure/1.0">
-    <element name="delete">
-        <interleave>
-            <element name="file">
-                <data type="string"/>
+    <zeroOrMore>
+        <choice>
+
+            <element name="delete">
+                <interleave>
+                    <element name="file">
+                        <data type="string"/>
+                    </element>
+                    <optional>
+                        <element name="directory">
+                            <data type="string"/>
+                        </element>
+                    </optional>
+                </interleave>
             </element>
-            <optional>
-                <element name="directory">
-                    <data type="string"/>
-                </element>
-            </optional>
-        </interleave>
-    </element>
-    <!-- In the future, we can support other operations -->
+            <element name="scp">
+                <optional>
+                    <attribute name="file"/>
+                </optional>
+                <optional>
+                    <attribute name="localFile"/>
+                </optional>
+                <optional>
+                    <attribute name="remoteFile"/>
+                </optional>
+                <optional>
+                    <attribute name="todir"/>
+                </optional>
+                <optional>
+                    <attribute name="localTodir"/>
+                </optional>
+                <optional>
+                    <attribute name="localTofile"/>
+                </optional>
+                <optional>
+                    <attribute name="remoteTodir"/>
+                </optional>
+                <optional>
+                    <attribute name="remoteTofile"/>
+                </optional>
+                <optional>
+                    <attribute name="port">
+                        <data type="positiveInteger"/>
+                    </attribute>
+                </optional>
+                <optional>
+                    <attribute name="trust">
+                        <data type="boolean"/>
+                    </attribute>
+                </optional>
+                <optional>
+                    <attribute name="knownhosts"/>
+                </optional>
+                <optional>
+                    <attribute name="failonerror">
+                        <data type="boolean"/>
+                    </attribute>
+                </optional>
+                <optional>
+                    <attribute name="password"/>
+                </optional>
+                <optional>
+                    <attribute name="keyfile"/>
+                </optional>
+                <optional>
+                    <attribute name="passphrase"/>
+                </optional>
+                <optional>
+                    <attribute name="verbose">
+                        <data type="boolean"/>
+                    </attribute>
+                </optional>
+                <!-- Since ant 1.7 -->
+                <optional>
+                    <attribute name="sftp">
+                        <data type="boolean"/>
+                    </attribute>
+                </optional>
+                <!-- TODO: allow for nested fileset -->
+            </element>
+            <!-- In the future, we can support other operations -->
+        </choice>
+    </zeroOrMore>
 </element>

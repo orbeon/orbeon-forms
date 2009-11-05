@@ -224,7 +224,7 @@
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
 
-            <!-- If the first model does't have an id, add fr-form-model -->
+            <!-- If the first model doesn't have an id, add fr-form-model -->
             <xsl:if test="not(@id)">
                 <xsl:attribute name="id" select="'fr-form-model'"/>
             </xsl:if>

@@ -74,6 +74,7 @@
         <controls>
             <maxLength>20</maxLength>
             <loading>true</loading>
+            <show>true</show>
         </controls>
     </xforms:instance>
 

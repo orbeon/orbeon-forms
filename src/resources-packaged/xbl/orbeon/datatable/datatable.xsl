@@ -380,8 +380,9 @@
                     <xxforms:variable name="nbRows" xxbl:scope="inner">
                         <xxforms:sequence select="count({$repeatNodeset})" xxbl:scope="outer"/>
                     </xxforms:variable>
+                    <!-- Workaround for a limitation where an expression refering to non relevant contexts returns an empty sequence -->
                     <xxforms:variable name="nbPages"
-                        select="ceiling($nbRows div {$rowsPerPage}) cast as xs:integer"
+                        select="if ($nbRows) then ceiling($nbRows div {$rowsPerPage}) cast as xs:integer else 0"
                         xxbl:scope="inner"/>
                 </xsl:when>
 

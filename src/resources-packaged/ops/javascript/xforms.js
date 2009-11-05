@@ -2391,6 +2391,10 @@ ORBEON.xforms.Controls = {
             // Button
             var button = control.tagName.toLowerCase() == "button" ? control : control.getElementsByTagName("button")[0];
             setReadonlyOnFormElement(button, isReadonly);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-trigger-appearance-minimal")) {
+            // Also update class xforms-trigger-readonly to style the a inside the span (in span layout, for IE6)
+            if (isReadonly) ORBEON.util.Dom.addClass(control, "xforms-trigger-readonly");
+            else            ORBEON.util.Dom.removeClass(control, "xforms-trigger-readonly");
         }
     },
 

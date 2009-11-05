@@ -174,6 +174,14 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             var select = YAHOO.util.Dom.get(selectIds[index]);
             if (select.tagName.toLowerCase() != "select") select = select.getElementsByTagName("select")[0];
             select.value = value;
+
+            // For IE6, setting the value of the select does not update option.selected
+            var options = select.options;
+            for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
+                var option = options[optionIndex];
+                option.selected = option.value == value;
+            }
+
             xformsDispatchEvent(select, "change");
         }
 
@@ -336,7 +344,24 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 YAHOO.util.Assert.areEqual("Label", link.innerHTML);
             });
         });
+    },
+
+    // Special testing for the minimal trigger
+    testReadonly: function() {
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            ORBEON.xforms.Document.setValue("readonly", "true");
+        }, function() {
+            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(this.triggerId, "xforms-trigger-readonly"),
+                "has class xforms-trigger-readonly when readonly");
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                ORBEON.xforms.Document.setValue("readonly", "false");
+            }, function() {
+                YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(this.triggerId, "xforms-trigger-readonly"),
+                    "does not have class xforms-trigger-readonly when not readonly");
+            });
+        });
     }
+
 }));
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({

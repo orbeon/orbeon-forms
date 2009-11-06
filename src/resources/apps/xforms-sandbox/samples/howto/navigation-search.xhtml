@@ -35,8 +35,7 @@
             <xforms:insert ev:event="xforms-model-construct-done" nodeset="instance('country')/*" origin="instance('input')"/>
             
             <!-- Submission to go back to the main form -->
-            <xforms:submission id="go-to-main" ref="instance('country')"  method="post" replace="all"
-                resource="http://www2.orbeon.com:8080/orbeon/xforms-sandbox/run?url=http://github.com/orbeon/orbeon-forms/raw/development/src/resources/apps/xforms-sandbox/samples/howto/navigation-main.xhtml"/>
+            <xforms:submission id="go-to-main" ref="instance('country')"  method="post" replace="all" resource="navigation-main"/>
             
         </xforms:model>
         <xhtml:style type="text/css">

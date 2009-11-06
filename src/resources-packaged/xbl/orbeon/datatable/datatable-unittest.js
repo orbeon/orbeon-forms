@@ -17,6 +17,46 @@ var testCase = {
 
     name: "datatable",
 
+    // Simple hide/show cycle
+    test314459: function() {
+        var thiss = this;
+        thiss.openAccordionCase(thiss, '_314459', function() {
+
+            ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                ORBEON.xforms.Document.setValue("maxLength", "30");
+                ORBEON.xforms.Document.setValue("show", "true");
+            }, function() {
+                // Check the table structure
+                var table = YAHOO.util.Dom.get('my-accordion$_314459-table$_314459-table-table');
+                thiss.checkTableStructure(table, 1, false);
+                var container = YAHOO.util.Dom.get('my-accordion$_314459-table$_314459-table-container');
+                thiss.checkPaginationLinks(container, ['-<< first', '-< prev', '-1', '+2', '+next >', '+last >>']);
+
+                ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                    ORBEON.xforms.Document.setValue("show", "false");
+                }, function() {
+                    table = YAHOO.util.Dom.get('my-accordion$_314459-table$_314459-table-table');
+                    thiss.checkTableStructure(table, 1, false);
+                    container = YAHOO.util.Dom.get('my-accordion$_314459-table$_314459-table-container');
+                    thiss.checkPaginationLinks(container, []);
+                    ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                        ORBEON.xforms.Document.setValue("show", "true");
+                    }, function() {
+                        // Check the table structure
+                        table = YAHOO.util.Dom.get('my-accordion$_314459-table$_314459-table-table');
+                        thiss.checkTableStructure(table, 1, false);
+                        container = YAHOO.util.Dom.get('my-accordion$_314459-table$_314459-table-container');
+                        thiss.checkPaginationLinks(container, ['-<< first', '-< prev', '-1', '+2', '+next >', '+last >>']);
+
+                        thiss.closeAccordionCase(thiss, '_314459');
+                    });
+                });
+
+            });
+
+        });
+    },
+
     test314415: function() {
         var thiss = this;
         thiss.openAccordionCase(thiss, '_314415', function() {

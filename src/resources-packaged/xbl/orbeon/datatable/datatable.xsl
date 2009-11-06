@@ -539,7 +539,7 @@
                     <xforms:input ref="@nbPages" style="display:none;">
                         <!-- Workaround, see https://forge.ow2.org/tracker/index.php?func=detail&aid=314429&group_id=168&atid=350207 -->
                         <xforms:setvalue ref=".." ev:event="xforms-value-changed"
-                            value="if (. cast as xs:integer &gt; @nbPages) then @nbPages else ."
+                            value="if (. cast as xs:integer &gt; @nbPages and @nbPages > 0) then @nbPages else ."
                         />
                     </xforms:input>
                 </xforms:group>

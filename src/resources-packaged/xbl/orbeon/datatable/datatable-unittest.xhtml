@@ -21,22 +21,6 @@
         <xhtml:title>Datatable</xhtml:title>
 
         <xi:include href="datatable-unittest-model.xml"/>
-        
-        <xforms:model id="lb">
-            <xforms:instance id="eventList-instance" src="oxf:/apps/logicblox-sandbox/events.xml"/>
-            <xforms:instance id="current-transactions-instancecurrent-transactions-instance"
-                src="oxf:/apps/logicblox-sandbox/transactions.xml"/>
-            <!-- Instance to control the checkbox-->
-            <xforms:instance id="tempInstance">
-                <instance xmlns="">
-                    <viewTransactions>false</viewTransactions>
-                </instance>
-            </xforms:instance>
-            
-            <xforms:bind nodeset="instance('tempInstance')">
-                <xforms:bind nodeset="viewTransactions" type="xs:boolean"/>
-            </xforms:bind>
-        </xforms:model>
 
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>

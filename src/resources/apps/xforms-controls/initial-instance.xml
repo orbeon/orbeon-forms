@@ -16,6 +16,13 @@
         <textarea>Music is an art form whose medium is sound. Common elements of music are pitch (which governs melody and harmony), rhythm (and its associated concepts tempo, meter, and articulation), dynamics, and the sonic qualities of timbre and texture. The word derives from Greek μουσική (mousike), "(art) of the Muses".
 
 The creation, performance, significance, and even the definition of music vary according to culture and social context. Music ranges from strictly organized compositions (and their recreation in performance), through improvisational music to aleatoric forms. Music can be divided into genres and subgenres, although the dividing lines and relationships between music genres are often subtle, sometimes open to individual interpretation, and occasionally controversial. Within "the arts", music may be classified as a performing art, a fine art, and auditory art.</textarea>
+        <input>Michelle</input>
+        <number>888</number>
+        <secret>42</secret>
+        <inplace-input>Be kind whenever possible. It is always possible.</inplace-input>
+        <output>Great love and great achievements involve great risk.</output>
+    </text-controls>
+    <rich-text-controls>
         <htmlarea>&lt;div style="text-align: left;"&gt;&lt;b&gt;Pyotr Ilyich
 Tchaikovsky&lt;/b&gt;&lt;a shape="rect"
 href="http://en.wikipedia.org/wiki/Pyotr_Ilyich_Tchaikovsky#cite_note-0"&gt;&lt;span&gt; &lt;/span&gt;&lt;/a&gt;(&lt;a
@@ -47,12 +54,7 @@ is available under the &lt;a shape="rect" rel="license"
 href="http://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License"&gt;Creative
 Commons Attribution-ShareAlike License&lt;/a&gt;;
 additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
-        <input>Michelle</input>
-        <number>888</number>
-        <secret>42</secret>
-        <inplace-input>Be kind whenever possible. It is always possible.</inplace-input>
-        <output>Great love and great achievements involve great risk.</output>
-    </text-controls>
+    </rich-text-controls>
     <typed-controls>
         <email>info@orbeon.com</email>
         <boolean>false</boolean>

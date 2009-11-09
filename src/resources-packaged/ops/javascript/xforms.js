@@ -2391,6 +2391,10 @@ ORBEON.xforms.Controls = {
             // Button
             var button = control.tagName.toLowerCase() == "button" ? control : control.getElementsByTagName("button")[0];
             setReadonlyOnFormElement(button, isReadonly);
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-trigger-appearance-minimal")) {
+            // Also update class xforms-trigger-readonly to style the a inside the span (in span layout, for IE6)
+            if (isReadonly) ORBEON.util.Dom.addClass(control, "xforms-trigger-readonly");
+            else            ORBEON.util.Dom.removeClass(control, "xforms-trigger-readonly");
         }
     },
 
@@ -6553,7 +6557,16 @@ ORBEON.xforms.Server = {
                                                         if (isInput) {
                                                             // Additional attributes for xforms:input
                                                             ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, inputSize, inputLength, inputAutocomplete);
-                                                        } else if (isTextarea && ! ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                                        } else if (isTextarea && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
+                                                            // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
+                                                            // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
+                                                            // if we need to send the value again to the server and (b) to figure out if the FCK editor has been edited
+                                                            // since the last time we sent the value to the serer. The bottom line is that we are going to compare
+                                                            // the server value to the content of the field. So storing the value as seen by the field vs. as seen by
+                                                            // server accounts for the slight difference there might be in those 2 representations.
+                                                            ORBEON.xforms.Globals.serverValue[documentElement.id] = ORBEON.xforms.Controls.getCurrentValue(documentElement);
+                                                        } else if (isTextarea) {
                                                             // Additional attributes for xforms:textarea
                                                             ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, textareaMaxlength, textareaCols, textareaRows);
                                                         } else {

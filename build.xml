@@ -134,6 +134,8 @@
             stable-3.8.0    => released stable version
          -->
         <property name="version.number" value="dev-post-3.7.1"/>
+        <!-- Can be overridden on command-line to provide different suffix -->
+        <property name="artifact.suffix" value=""/>
         <tstamp>
             <format property="time" pattern="yyyyMMddHHmm" timezone="GMT"/>
         </tstamp>

@@ -1,10 +1,9 @@
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:f="http://orbeon.org/oxf/xml/formatting"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-        xmlns:widget="http://orbeon.org/oxf/xml/widget"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xhtml:head>
         <xhtml:title>Repeat Unit Tests</xhtml:title>
@@ -34,10 +33,23 @@
             <xforms:bind nodeset="/companies/@show" type="xs:boolean"/>
             <xforms:bind nodeset="/companies/company/incorporated" type="xs:date"/>
         </xforms:model>
+
+        <xbl:xbl script-type="application/xhtml+xml">
+            <xbl:binding id="identity" element="fr|identity">
+                <xbl:template>
+                    <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+                        <xbl:content includes="xforms|repeat"/>
+                    </xforms:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-repeat.js"/>
+
+
 
     </xhtml:head>
     <xhtml:body>
@@ -57,9 +69,33 @@
                 </xhtml:tr>
             </xforms:repeat>
         </xhtml:table>
-        <xforms:trigger appearance="minimal">
-            <xforms:label>Add company</xforms:label>
-            <xforms:insert ev:event="DOMActivate" context="instance('companies')" nodeset="company" origin="instance('company-template')"/>
-        </xforms:trigger>
+        
+        <hr/>
+        <xhtml:table id="table-observer">
+            <xforms:repeat nodeset=".[@show = 'true']/company" >
+                <xxforms:script ev:target="#observer" ev:event="xxforms-nodeset-changed">window.observerElement =
+                    this;</xxforms:script>
+                <xhtml:tr>
+                    <xhtml:td>
+                        <xforms:input ref="name" id="name-observer"/>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xforms:repeat>
+        </xhtml:table>
+        
+        <hr/>
+        <xhtml:table id="table-xbl">
+            <fr:identity id="xbl-component">
+                <xforms:repeat nodeset=".[@show = 'true']/company">
+                    <xxforms:script ev:event="DOMFocusIn">window.observerElement =
+                        this;</xxforms:script>
+                    <xhtml:tr>
+                        <xhtml:td>
+                            <xforms:input ref="name" id="name-xbl"/>
+                        </xhtml:td>
+                    </xhtml:tr>
+                </xforms:repeat>
+            </fr:identity>
+        </xhtml:table>
     </xhtml:body>
 </xhtml:html>

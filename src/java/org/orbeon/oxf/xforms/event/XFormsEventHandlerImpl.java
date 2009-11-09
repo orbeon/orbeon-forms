@@ -21,13 +21,15 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents an XForms (or just plain XML Events) event handler implementation.
  */
 public class XFormsEventHandlerImpl implements XFormsEventHandler {
+
+    // Special target id indicating that the target is the observer
+    public static final String TARGET_IS_OBSERVER = "#observer";
 
     private final Element eventHandlerElement;
     private final String ancestorObserverStaticId;
@@ -35,7 +37,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     private final Map<String, String> eventNames;
     private final boolean isAllEvents;
     private final String[] observerStaticIds;
-    private final Map<String, String> targetStaticIds;
+    private final Set<String> targetStaticIds;
     //private final String handler;
     private final boolean isBubblingPhase;        // "true" means "default" (bubbling), "false" means "capture"
     private final boolean isPropagate;            // "true" means "continue", "false" means "stop"
@@ -47,10 +49,11 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * Initialize an action handler based on an action element.
      *
      * @param eventHandlerElement       action element e.g. xforms:action
+     * @param parentStaticId            static id of the parent element, or null
      * @param ancestorObserverStaticId  static id of the closest ancestor observer, or null
      */
-    public XFormsEventHandlerImpl(Element eventHandlerElement, String ancestorObserverStaticId) {
-        this(eventHandlerElement, ancestorObserverStaticId, false,
+    public XFormsEventHandlerImpl(Element eventHandlerElement, String parentStaticId, String ancestorObserverStaticId) {
+        this(eventHandlerElement, parentStaticId, ancestorObserverStaticId, false,
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME),
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME),
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME),
@@ -63,6 +66,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * Initialize an action handler based on a handler element and individual parameters.
      *
      * @param eventHandlerElement       event handler element (e.g. xbl:handler or xforms:action)
+     * @param parentStaticId            static id of the parent element, or null
      * @param ancestorObserverStaticId  static id of the closest ancestor observer, or null
      * @param isXBLHandler              whether the handler is an XBL handler (i.e. xbl:handler)
      * @param observersStaticIds        space-separated list of observers static ids, or null if parent element
@@ -72,9 +76,9 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * @param propagate                 whether event must propagate ("stop" | "continue")
      * @param defaultAction             whether default action must run ("cancel" | "perform")
      */
-    public XFormsEventHandlerImpl(Element eventHandlerElement, String ancestorObserverStaticId, boolean isXBLHandler,
-                                  String observersStaticIds, String eventNamesAttribute, String targets, String phase,
-                                  String propagate, String defaultAction) {
+    public XFormsEventHandlerImpl(Element eventHandlerElement, String parentStaticId, String ancestorObserverStaticId,
+                                  boolean isXBLHandler, String observersStaticIds, String eventNamesAttribute, String targets,
+                                  String phase, String propagate, String defaultAction) {
 
         this.eventHandlerElement = eventHandlerElement;
         this.ancestorObserverStaticId = ancestorObserverStaticId;
@@ -82,13 +86,12 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
 
         // Gather observers
         // NOTE: Supporting space-separated handlers is an extension, which may make it into XML Events 2
-        final Element parentElement = eventHandlerElement.getParent();
         if (observersStaticIds != null) {
             // ev:observer attribute specifies observers
             observerStaticIds = StringUtils.split(observersStaticIds);
-        } else if (parentElement != null && parentElement.attributeValue("id") != null) {
+        } else if (parentStaticId != null) {
             // Observer is parent
-            observerStaticIds = new String[] { parentElement.attributeValue("id")};
+            observerStaticIds = new String[] { parentStaticId };
         } else {
             // No observer
             observerStaticIds = new String[0];
@@ -115,10 +118,16 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         if (targets == null) {
             targetStaticIds = null;
         } else {
-            targetStaticIds = new HashMap<String, String>();
-            final String[] targetIdsArray = StringUtils.split(targets);
-            for (String aTargetIdsArray: targetIdsArray) {
-                targetStaticIds.put(aTargetIdsArray, "");
+            targetStaticIds = new HashSet<String>();
+            final String[] targetIds = StringUtils.split(targets);
+            for (String targetId: targetIds) {
+                if (TARGET_IS_OBSERVER.equals(targetId)) {
+                    // Add all observer ids as targets
+                    targetStaticIds.addAll(Arrays.asList(observerStaticIds));
+                } else {
+                    // Add id as target
+                    targetStaticIds.add(targetId);
+                }
             }
         }
 
@@ -139,20 +148,17 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
                             XFormsEventObserver eventObserver, XFormsEvent event) {
         // Create a new top-level action interpreter to handle this event
 
+        final XBLContainer contextContainer;
         if (isXBLHandler) {
             // Run within context of nested container
-
-            // Find nested container
-            final XBLContainer nestedContainer = ((XFormsComponentControl) eventObserver).getNestedContainer();
-
-            // Run action
-            new XFormsActionInterpreter(propertyContext, nestedContainer, eventObserver, eventObserver.getEffectiveId() + XFormsConstants.COMPONENT_SEPARATOR, eventHandlerElement, ancestorObserverStaticId)
-                    .runAction(propertyContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
+            contextContainer = ((XFormsComponentControl) eventObserver).getNestedContainer();
         } else {
             // Run normally
-            new XFormsActionInterpreter(propertyContext, container, eventObserver, eventObserver.getEffectiveId(), eventHandlerElement, ancestorObserverStaticId)
-                    .runAction(propertyContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
+            contextContainer = container;
         }
+
+        new XFormsActionInterpreter(propertyContext, contextContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId, isXBLHandler)
+                    .runAction(propertyContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
     }
 
     public String[] getObserversStaticIds() {
@@ -176,8 +182,8 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     }
 
     public boolean isMatchTarget(String targetStaticId) {
-        // Match if no target id is specified, or if any specifed target matches
-        return targetStaticIds == null || targetStaticIds.get(targetStaticId) != null;
+        // Match if no target id is specified, or if any specified target matches
+        return targetStaticIds == null || targetStaticIds.contains(targetStaticId);
     }
 
     public boolean isAllEvents() {

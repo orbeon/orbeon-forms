@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -113,30 +114,25 @@ public class XFormsItemUtils {
 
             private ItemContainer currentContainer = result;
 
+            private String getElementEffectiveId(Element element) {
+                return XFormsUtils.getRelatedEffectiveId(select1Control.getEffectiveId(), element.attributeValue("id"));
+            }
+
             public void startElement(Element element) {
                 final String localname = element.getName();
                 if ("item".equals(localname)) {
                     // xforms:item
 
 //                    mayReuse[0] = false;
-
-                    final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
-                    if (labelElement == null)
-                        throw new ValidationException("xforms:item must contain an xforms:label element.", select1Control.getLocationData());
-                    final String label = XFormsUtils.getChildElementValue(propertyContext, container, labelElement, false, null);
-
-                    final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
-                    if (valueElement == null)
-                        throw new ValidationException("xforms:item must contain an xforms:value element.", select1Control.getLocationData());
-                    final String value = XFormsUtils.getChildElementValue(propertyContext, container, valueElement, false, null);
+                    final String label = getLabelValue(element.element(XFormsConstants.XFORMS_LABEL_QNAME));
+                    final String value = getValueValue(element.element(XFormsConstants.XFORMS_VALUE_QNAME));
 
                     // TODO: must filter attributes on element.attributes()
                     currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, element.attributes(), label != null ? label : "", value != null ? value : ""));
 
                 } else if ("itemset".equals(localname)) {
                     // xforms:itemset
-
-                    contextStack.pushBinding(propertyContext, element);
+                    contextStack.pushBinding(propertyContext, element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
                     {
                         final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
 
@@ -165,15 +161,8 @@ public class XFormsItemUtils {
                                     // the nodeset.
                                     final boolean isRelevant = InstanceData.getInheritedRelevant(currentNodeInfo);
                                     if (isRelevant) {
-                                        final String label;
+                                        final String label = getLabelValue(element.element(XFormsConstants.XFORMS_LABEL_QNAME));
                                         final Element valueCopyElement;
-                                        {
-                                            final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
-                                            if (labelElement == null)
-                                                throw new ValidationException("xforms:itemset element must contain one xforms:label element.", select1Control.getLocationData());
-
-                                            label = XFormsUtils.getChildElementValue(propertyContext, container, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
-                                        }
                                         {
                                             final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
                                             valueCopyElement = (valueElement != null)
@@ -209,7 +198,7 @@ public class XFormsItemUtils {
                                         if (valueCopyElement.getName().equals("value")) {
                                             // Handle xforms:value
                                             // TODO: This could be optimized for xforms:value/@ref|@value as we could get the expression from the cache only once
-                                            final String value = XFormsUtils.getChildElementValue(propertyContext, container, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false, null);
+                                            final String value = getValueValue(valueCopyElement);
 
                                             // NOTE: At this point, if the value is null, we should consider the item
                                             // non-relevant if it is a leaf item. But we don't yet know if this item is
@@ -238,7 +227,7 @@ public class XFormsItemUtils {
 
                     final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
                     if (labelElement != null) {
-                        final String label = XFormsUtils.getChildElementValue(propertyContext, container, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
+                        final String label = getLabelValue(element.element(XFormsConstants.XFORMS_LABEL_QNAME));
 
                         // TODO: must filter attributes on element.attributes()
                         final Item newContainer = new Item(isMultiple, isEncryptItemValues, element.attributes(), label, null);
@@ -246,6 +235,22 @@ public class XFormsItemUtils {
                         currentContainer = newContainer;
                     }
                 }
+            }
+
+            private String getValueValue(Element valueElement) {
+                if (valueElement == null)
+                    throw new ValidationException("xforms:item or xforms:itemset must contain an xforms:value element.", select1Control.getLocationData());
+                final XBLBindings.Scope elementScope = select1Control.getChildElementScope(valueElement);
+                final String elementEffectiveId = getElementEffectiveId(valueElement);
+                return XFormsUtils.getChildElementValue(propertyContext, container, elementEffectiveId, elementScope, valueElement, false, null);
+            }
+
+            private String getLabelValue(Element labelElement) {
+                if (labelElement == null)
+                    throw new ValidationException("xforms:item or xforms:itemset must contain an xforms:label element.", select1Control.getLocationData());
+                final XBLBindings.Scope elementScope = select1Control.getChildElementScope(labelElement);
+                final String elementEffectiveId = getElementEffectiveId(labelElement);
+                return XFormsUtils.getChildElementValue(propertyContext, container, elementEffectiveId, elementScope, labelElement, false, null);
             }
 
             public void endElement(Element element) {
@@ -318,7 +323,7 @@ public class XFormsItemUtils {
         
         final Itemset result = new Itemset();
 
-        final Element controlElement = containingDocument.getStaticState().getControlInfoMap().get(prefixedId).getElement();
+        final Element controlElement = containingDocument.getStaticState().getControlInfoMap().get(prefixedId).element;
         final boolean isEncryptItemValues = XFormsSelect1Control.isEncryptItemValues(containingDocument, controlElement);
 
         Dom4jUtils.visitSubtree(controlElement, new Dom4jUtils.VisitorListener() {

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -60,12 +60,15 @@
         <!--</xbl:resources>-->
         <!-- NOTE: use XSLT so we can fetch attributes from under the itemset -->
         <xbl:template xxbl:transform="oxf:xslt">
-            <xforms:group xbl:attr="model context ref bind" xsl:version="2.0">
+            <!-- Outer group -->
+            <xforms:group xbl:attr="model context ref bind" xsl:version="2.0" xxbl:scope="outer">
                 <xbl:content includes="fr|link-select1 > xforms|label, fr|link-select1 > xforms|help, fr|link-select1 > xforms|hint, fr|link-select1 > xforms|alert"/>
-                
-                <xxforms:variable name="result" select="." as="node()"/>
 
                 <xforms:group  class="fr-component-group">
+
+                    <!-- Variable pointing to external single-node binding -->
+                    <xxforms:variable name="result" as="node()?" select="."/>
+
                     <xforms:repeat nodeset="{/*/xforms:itemset/@nodeset}">
                         <xxforms:variable name="position" select="position()" as="xs:integer"/>
                         <xxforms:variable name="label" select="{/*/xforms:itemset/xforms:label/(@ref | @value)}" as="xs:string"/>

@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.externalcontext;
 
@@ -48,19 +48,23 @@ public class RequestAdapter implements ExternalContext.Request {
         return null;
     }
 
-    public Map getAttributesMap() {
+    public String getClientContextPath(String urlString) {
         return null;
     }
 
-    public Map getHeaderMap() {
+    public Map<String, Object> getAttributesMap() {
         return null;
     }
 
-    public Map getHeaderValuesMap() {
+    public Map<String, String[]> getHeaderValuesMap() {
         return null;
     }
 
-    public Map getParameterMap() {
+    public Map<String, Object[]> getParameterMap() {
+        return null;
+    }
+
+    public Map<String, String> getHeaderMap() {
         return null;
     }
 

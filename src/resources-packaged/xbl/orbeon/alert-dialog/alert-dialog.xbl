@@ -1,0 +1,103 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <xbl:binding id="fr-alert-dialog" element="fr|alert-dialog">
+        <xbl:resources>
+            <xbl:style src="/ops/yui/alert-dialog/assets/skins/sam/alert-dialog.css"/>
+            <xbl:style src="/xbl/orbeon/alert-dialog/alert-dialog.css"/>
+        </xbl:resources>
+        <xbl:handlers>
+            <xbl:handler event="fr-show" phase="target">
+                <xxforms:show dialog="dialog" xxbl:scope="inner"/>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xsl:transform version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
+
+                <xsl:template match="/*">
+                    <xsl:variable name="has-multiple-choices" select="count(fr:positive-choice | fr:negative-choice | fr:neutral-choice) > 1"/>
+                    <xxforms:dialog xxbl:scope="inner" id="dialog" level="modal" appearance="full"
+                            class="xbl-fr-alert-dialog xbl-fr-alert-dialog-{if ($has-multiple-choices) then 'question' else 'info'}">
+                        <xforms:label xxbl:scope="outer"><xsl:copy-of select="fr:label/(@* | node())"/></xforms:label>
+                        <xforms:group appearance="xxforms:internal">
+                            <xxforms:hide ev:event="DOMActivate" dialog="dialog"/>
+                            <xhtml:div class="xbl-fr-alert-dialog-message">
+                                <xforms:output value="''" xxbl:scope="outer">
+                                    <xforms:label><xsl:copy-of select="fr:message/(@* | node())"/></xforms:label>
+                                </xforms:output>
+                            </xhtml:div>
+                            <xhtml:div class="xbl-fr-alert-dialog-buttons">
+                                <xsl:apply-templates/>
+                            </xhtml:div>
+                        </xforms:group>
+                    </xxforms:dialog>
+                </xsl:template>
+
+                <xsl:template match="fr:positive-choice">
+                    <xhtml:span class="xbl-fr-alert-dialog-positive">
+                        <xsl:copy-of select="fr:button(*, 'Yes')"/>
+                    </xhtml:span>
+                </xsl:template>
+
+                <xsl:template match="fr:negative-choice">
+                    <xhtml:span class="xbl-fr-alert-dialog-negative">
+                        <xsl:copy-of select="fr:button(*, 'No')"/>
+                    </xhtml:span>
+                </xsl:template>
+
+                <xsl:template match="fr:neutral-choice">
+                    <xhtml:span class="xbl-fr-alert-dialog-neutral">
+                        <xsl:copy-of select="fr:button(*, 'OK')"/>
+                    </xhtml:span>
+                </xsl:template>
+
+                <xsl:function name="fr:button">
+                    <xsl:param name="content" as="element()*"/>
+                    <xsl:param name="default" as="xs:string"/>
+                    <xsl:variable name="fr-label" as="element(fr:label)?" select="$content/self::fr:label"/>
+                    <fr:button ref="." xxbl:scope="outer">
+                        <xforms:label>
+                            <xsl:choose>
+                                <xsl:when test="exists($fr-label)">
+                                    <xsl:copy-of select="$fr-label/(@* | node())"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="$default"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xforms:label>
+                        <xsl:copy-of select="$content except $fr-label"/>
+                    </fr:button>
+                </xsl:function>
+
+                <xsl:template match="@*|node()" priority="-100"/>
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

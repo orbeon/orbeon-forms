@@ -1,0 +1,58 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:exf="http://www.exforms.org/exf/1-0"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+    <head>
+        <xf:model>
+            <xf:instance xmlns="">
+                <vehicles>
+                    <vehicle>
+                        <plate-number>1CCD412</plate-number>
+                        <vin>53585987654321031</vin>
+                        <leased/>
+                    </vehicle>
+                    <vehicle>
+                        <plate-number>3TRE787</plate-number>
+                        <vin>14393483498123400</vin>
+                        <leased/>
+                    </vehicle>
+                    <vehicle>
+                        <plate-number>6QWA76</plate-number>
+                        <vin>34756976067146047</vin>
+                        <leased/>
+                    </vehicle>
+                </vehicles>
+            </xf:instance>
+        </xf:model>
+    </head>
+    <body>
+        <table>
+            <xf:repeat nodeset="(exf:sort(vehicle, 'plate-number', 'text', 'descending'))">
+                <tr>
+                    <td>
+                        <xf:input ref="plate-number">
+                            <xf:label>California Plate...</xf:label>
+                        </xf:input>
+                    </td>
+                    <td>
+                        <xf:input ref="vin">
+                            <xf:label>Vehicle Id...</xf:label>
+                        </xf:input>
+                    </td>
+                    <td align="center">
+                        <xf:select ref="leased" appearance="full">
+                            <xf:label>Check...</xf:label>
+                            <xf:item>
+                                <xf:label/>
+                                <xf:value>''</xf:value>
+                            </xf:item>
+                        </xf:select>
+                    </td>
+                </tr>
+            </xf:repeat>
+        </table>
+    </body>
+</html>

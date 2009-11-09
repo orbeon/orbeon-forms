@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xbl:xbl script-type="application/xhtml+xml"
             xmlns:xforms="http://www.w3.org/2002/xforms"
             xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -24,7 +24,7 @@
         <xbl:template>
             <!-- Local model -->
             <xforms:model id="orbeon-xforms-instance-inspector-model">
-                <xforms:action ev:event="xforms-ready">
+                <xforms:action ev:event="xforms-enabled" ev:observer="orbeon-xforms-instance-inspector-group" ev:target="orbeon-xforms-instance-inspector-group">
                     <!-- Initialize itemset -->
                     <xforms:action xxforms:iterate="xxforms:list-models()">
                         <xxforms:variable name="current-model-id" select="." as="xs:string"/>
@@ -69,7 +69,7 @@
             </xforms:model>
 
             <!-- View -->
-            <xforms:group model="orbeon-xforms-instance-inspector-model" class="widgets-xforms-instance-inspector">
+            <xforms:group id="orbeon-xforms-instance-inspector-group" model="orbeon-xforms-instance-inspector-model" class="widgets-xforms-instance-inspector">
                 <xhtml:h2>Orbeon Forms XForms Instance Inspector (XBL)</xhtml:h2>
                 <xforms:group>
                     <xhtml:table>

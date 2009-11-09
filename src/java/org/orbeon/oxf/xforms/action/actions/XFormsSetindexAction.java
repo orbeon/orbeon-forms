@@ -16,17 +16,14 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -36,7 +33,7 @@ import org.orbeon.saxon.om.NodeInfo;
 public class XFormsSetindexAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
@@ -48,26 +45,27 @@ public class XFormsSetindexAction extends XFormsAction {
         if (currentSingleNode == null)
             return;
 
-        final String indexString = XPathCache.evaluateAsString(propertyContext,
-                actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
-                "number(" + indexXPath + ")", actionInterpreter.getNamespaceMappings(actionElement),
-                contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                contextStack.getFunctionContext(), null,
-                (LocationData) actionElement.getData());
+        // Determine index
+        final String indexString = actionInterpreter.evaluateStringExpression(propertyContext, actionElement,
+                contextStack.getCurrentNodeset(), contextStack.getCurrentPosition(), "number(" + indexXPath + ")");
 
         actionInterpreter.getIndentedLogger().logDebug("xforms:setindex", "setting index", "index", indexString);
 
-        executeSetindexAction(containingDocument, actionInterpreter.getXBLContainer(), actionInterpreter.getIndentedLogger(), repeatId, indexString);
+        // Execute
+        executeSetindexAction(actionInterpreter, propertyContext, eventObserver, actionElement, repeatId, indexString);
     }
 
-    protected static void executeSetindexAction(XFormsContainingDocument containingDocument, XBLContainer container, IndentedLogger indentedLogger, String repeatStaticId, String indexString) {
+    private static void executeSetindexAction(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventObserver eventObserver,
+                                                Element actionElement, String repeatStaticId, String indexString) {
         if ("NaN".equals(indexString)) {
             // "If the index evaluates to NaN the action has no effect."
             return;
         }
 
+        final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
+
         // Find repeat control
-        final Object control = container.resolveObjectById(null, repeatStaticId);// TODO: pass sourceId
+        final Object control = actionInterpreter.resolveEffectiveControl(propertyContext, actionElement, repeatStaticId);
         if (control instanceof XFormsRepeatControl) {
             // Set its new index
             final int newRepeatIndex = Integer.parseInt(indexString);
@@ -75,15 +73,12 @@ public class XFormsSetindexAction extends XFormsAction {
             if (repeatControl.getIndex() != newRepeatIndex) {
 
                 if (indentedLogger.isDebugEnabled()) {
-                    indentedLogger.logDebug("xforms:setindex", "setting index upon xforms:setfocus",
-                            "new index", Integer.toString(newRepeatIndex));
+                    indentedLogger.logDebug("xforms:setindex", "setting index upon xforms:setindex",
+                            "old index", Integer.toString(repeatControl.getIndex()), "new index", Integer.toString(newRepeatIndex));
                 }
 
+                // Set index on control
                 repeatControl.setIndex(newRepeatIndex);
-
-                final XFormsControls controls = containingDocument.getControls();
-                controls.markDirtySinceLastRequest(true);
-                container.setDeferredFlagsForSetindex();
             }
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as

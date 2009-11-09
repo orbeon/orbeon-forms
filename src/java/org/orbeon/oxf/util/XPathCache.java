@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004-2008 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.util;
 
@@ -64,12 +64,12 @@ public class XPathCache {
     private static final Logger logger = LoggerFactory.createLogger(XPathCache.class);
 
     public static class XPathContext {
-        public Map<String, String> prefixToURIMap;
-        public Map<String, ValueRepresentation> variableToValueMap;
-        public FunctionLibrary functionLibrary;
-        public FunctionContext functionContext;
-        public String baseURI;
-        public LocationData locationData;
+        public final Map<String, String> prefixToURIMap;
+        public final Map<String, ValueRepresentation> variableToValueMap;
+        public final FunctionLibrary functionLibrary;
+        public final FunctionContext functionContext;
+        public final String baseURI;
+        public final LocationData locationData;
 
         public XPathContext(Map<String, String> prefixToURIMap, Map<String, ValueRepresentation> variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
             this.prefixToURIMap = prefixToURIMap;
@@ -666,7 +666,7 @@ public class XPathCache {
             }
         } else {
             logger.info("TEST XPATH PATHS - expression not a ComputedExpression: " + xpathString);
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 

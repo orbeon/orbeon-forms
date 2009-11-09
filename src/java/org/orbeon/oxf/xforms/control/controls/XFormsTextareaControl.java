@@ -54,11 +54,6 @@ public class XFormsTextareaControl extends XFormsValueControl {
         return "text/html".equals(getMediatype()) || AUTOSIZE_APPEARANCE.equals(getAppearance());
     }
 
-    @Override
-    protected void evaluate(PropertyContext propertyContext) {
-        super.evaluate(propertyContext);
-    }
-
     // NOTE: textarea doesn't support maxlength natively (this is added in HTML 5), but this can be implemented in JavaScript
     public String getMaxlength() {
         return getExtensionAttributeValue(XFormsConstants.XXFORMS_MAXLENGTH_QNAME);

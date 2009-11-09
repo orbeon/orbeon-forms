@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
@@ -23,8 +22,8 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsRebuildEvent;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 
 /**
@@ -33,16 +32,13 @@ import org.orbeon.saxon.om.Item;
 public class XFormsRebuildAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XBLContainer container = actionInterpreter.getXBLContainer();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
-        final XFormsModel model = (modelId != null) ? container.findModelByStaticId(modelId) : actionInterpreter.getContextStack().getCurrentModel();
-
-        if (model == null)
-            throw new ValidationException("Invalid model id: " + modelId, (LocationData) actionElement.getData());
+        final XFormsModel model = actionInterpreter.resolveModel(propertyContext, actionElement, modelId);
 
         // Because of inter-model dependencies, we consider for now that the action must force the operation
         model.getDeferredActionContext().rebuild = true;

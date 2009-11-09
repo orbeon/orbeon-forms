@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <resources xml:lang="en">
+        <label>English</label>
+        <registration>
+            <title>Registration</title>
+            <first-name>First name</first-name>
+            <last-name>Last name</last-name>
+            <register>Register</register>
+            <thank-you>You have been registered. Thank you.</thank-you>
+        </registration>
+        <language>
+            <change>Change language:</change>
+        </language>
+    </resources>
+    <resources xml:lang="fr">
+        <label>Français</label>
+        <registration>
+            <title>Enregistrement</title>
+            <first-name>Prénom</first-name>
+            <last-name>Nom de famille</last-name>
+            <register>Enregistrer</register>
+            <thank-you>Vous vous être enregistré. Merci.</thank-you>
+        </registration>
+        <language>
+            <change>Choisissez votre language:</change>
+        </language>
+    </resources>
+    <resources xml:lang="zh-Hans">
+        <label>中文 (简化字)</label>
+        <registration>
+            <title>注册表格</title>
+            <first-name>名</first-name>
+            <last-name>姓</last-name>
+            <register>注册</register>
+            <thank-you>谢谢你的注册</thank-you>
+        </registration>
+        <language>
+            <change>选择语言:</change>
+        </language>
+    </resources>
+</resources>

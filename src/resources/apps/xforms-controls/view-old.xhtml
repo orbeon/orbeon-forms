@@ -1,0 +1,474 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xdt="http://www.w3.org/2005/xpath-datatypes"
+	xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    lang="en">
+
+    <xhtml:head>
+        <xhtml:title>XForms Controls</xhtml:title>
+        <xhtml:style type="text/css">
+            .xforms-range { margin-top: 1em; margin-bottom: 2em; }
+            legend { font-weight: bold }
+            .xbl-fr-box-select ul { background-color: white }
+            .input input, .inplace-input input { width: 20em; }
+            .password { width: 20em; }
+            .textarea { height: 6em; width: 20em; }
+            .xbl-fr-inplace-input .fr-inplace-buttons { display: inline-box; display: -moz-inline-box; *zoom: 1 }
+            .flag-container { height: 54px; width: 108px; background-color: white; border: 1px solid #9999CC; text-align:center; }
+        </xhtml:style>
+        <xforms:model id="main-model" xxforms:expose-xpath-types="true">
+            <xforms:action ev:event="xforms-ready">
+                <xforms:send submission="countries-submission"/>
+                <xforms:setfocus control="age"/>
+            </xforms:action>
+            <xforms:instance id="instance" xxforms:exclude-result-prefixes="#all">
+                <instance>
+                    <age>35</age>
+                    <preference>false</preference>
+                    <name/>
+                    <secret>42</secret>
+                    <amount/>
+                    <textarea>The world is but a canvas for the imagination.</textarea>
+                    <label>Hello, World!</label>
+                    <us-phone/>
+                    <date/>
+                    <time/>
+                    <date-time/>
+                    <flavor>v c</flavor>
+                    <carrier>fedex</carrier>
+                    <country-name/>
+                    <new-carrier>
+                        <label>USPS</label>
+                        <value>usps</value>
+                    </new-carrier>
+                    <new-flavor>
+                        <label>Key lime</label>
+                        <value>lime</value>
+                    </new-flavor>
+                    <range>
+                        <value>1</value>
+                        <letter>A</letter>
+                    </range>
+                    <country/>
+                </instance>
+            </xforms:instance>
+            <xforms:instance id="resources-instance" src="oxf:/apps/xforms-controls/resources.xml"/>
+            <xforms:instance id="flavors-instance">
+                <flavors>
+                    <flavor value="v">
+                        <label>Vanilla</label>
+                    </flavor>
+                    <flavor value="s">
+                        <label>Strawberry</label>
+                    </flavor>
+                    <flavor value="c">
+                        <label>Chocolate</label>
+                    </flavor>
+                </flavors>
+            </xforms:instance>
+            <xforms:instance id="carriers-instance">
+                <carriers>
+                    <carrier value="ups">
+                        <label>UPS</label>
+                    </carrier>
+                    <carrier value="fedex">
+                        <label>FedEx</label>
+                    </carrier>
+                    <carrier value="dhl">
+                        <label>DHL</label>
+                    </carrier>
+                </carriers>
+            </xforms:instance>
+            <!-- List of countries for name select1 -->
+            <xforms:instance id="countries-names-instance" src="services/countries"/>
+            <xforms:instance id="countries-instance">
+                <countries letter=""/>
+            </xforms:instance>
+            <xforms:instance id="country-details-instance">
+                <country us-code="">
+                    No country selected
+                </country>
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('instance')">
+                <!-- Age must be a positive integer and at most 150 -->
+                <xforms:bind nodeset="age" type="xs:positiveInteger" constraint=". le 150"/>
+                <!-- Boolean value -->
+                <xforms:bind nodeset="preference" type="xs:boolean"/>
+                <!-- Secret password is 42 -->
+                <xforms:bind nodeset="secret" constraint=". = '42'"/>
+                <!-- Text must be longer than 10 characters -->
+                <xforms:bind nodeset="textarea" constraint="string-length(.) > 10"/>
+                <!-- Phone type is just a string of digits -->
+                <xforms:bind nodeset="us-phone" type="xforms:nonNegativeInteger"/>
+                <!-- Value must be a date and at most 2 days in the future. It is initialized to 2 days in the future. -->
+                <xforms:bind nodeset="date"
+                             type="xs:date" constraint=". le (current-date() + xdt:dayTimeDuration('P2D'))"
+                             xxforms:default="adjust-date-to-timezone(current-date() + xs:dayTimeDuration('P2D'), ())"/>
+                <!-- Time is initialized with the current time -->
+                <xforms:bind nodeset="time" type="xs:time" xxforms:default="current-time()"/>
+                <!-- Date/time is initialized with the current date/time -->
+                <xforms:bind nodeset="date-time" type="xs:dateTime" xxforms:default="current-dateTime()"/>
+                <!-- Range is an integer -->
+                <xforms:bind nodeset="range/value" type="xs:integer"/>
+                <!-- The letter is calculated based on ../value -->
+                <xforms:bind nodeset="range/letter" calculate="
+                    for $value in xs:integer(../value) return
+                        ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+                        'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z')[$value]"/>
+            </xforms:bind>
+            <xforms:bind nodeset="instance('countries-instance')/@letter"
+                calculate="instance('instance')/range/letter"/>
+            <xforms:bind nodeset="instance('country-details-instance')/@us-code"
+                calculate="instance('instance')/country"/>
+
+            <xforms:submission ref="instance('countries-instance')" id="countries-submission"
+                method="post" action="services/update-countries" replace="instance"/>
+
+            <!-- Submission when country name changed -->
+            <xforms:submission ref="instance('instance')" id="country-name-updated" validate="false"
+                method="post" action="services/countries" replace="instance" instance="countries-names-instance"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <fr:tabview id="my-tabview">
+            <fr:tab id="text-controls" selected="true">
+                <fr:label>Text Controls</fr:label>
+                <xhtml:p>
+                    <xforms:input id="age" ref="age" incremental="true" class="input" xxforms:maxlength="3">
+                        <xforms:label class="fixed-width">Age:</xforms:label>
+                        <xforms:hint>Positive number</xforms:hint>
+                        <xforms:alert>Invalid age</xforms:alert>
+                        <xforms:help ref="instance('resources-instance')/help/age"/>
+                    </xforms:input>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:input id="preference" ref="preference">
+                        <xforms:label class="fixed-width">I like XForms:</xforms:label>
+                        <xforms:hint>Select this checkbox if you like XForms</xforms:hint>
+                    </xforms:input>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:secret ref="secret" incremental="true" class="password" id="secret">
+                        <xforms:label class="fixed-width">Password:</xforms:label>
+                        <xforms:hint>The password is 42 ;)</xforms:hint>
+                        <xforms:alert>Invalid password</xforms:alert>
+                        <xforms:help><xforms:output value="instance('resources-instance')/help/secret"/></xforms:help>
+                    </xforms:secret>
+                </xhtml:p>
+                <xhtml:p>
+                    <fr:currency ref="amount" id="currency">
+                        <xforms:label class="fixed-width">Amount:</xforms:label>
+                        <xforms:hint>Please enter an amount</xforms:hint>
+                        <xforms:alert>Invalid amount</xforms:alert>
+                        <xforms:help>This control allows you to enter a currency amount</xforms:help>
+                    </fr:currency>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:textarea ref="textarea" class="textarea" id="textarea">
+                        <xforms:label class="fixed-width">Wisdom:</xforms:label>
+                        <xforms:hint>Enter at least 11 characters</xforms:hint>
+                        <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
+                        <xforms:help><xforms:output mediatype="text/html" value="instance('resources-instance')/help/textarea"/></xforms:help>
+                    </xforms:textarea>
+                </xhtml:p>
+                <xhtml:p>
+                    <fr:inplace-input id="inplace-input" class="inplace-input" ref="name">
+                        <xforms:label class="fixed-width">Name:</xforms:label>
+                        <xforms:hint>Click here to enter your name</xforms:hint>
+                        <xforms:alert>Invalid name</xforms:alert>
+                        <xforms:help>This control is an in-place input: when you click on the text, it morphs into an input field which allows you to edit the value.</xforms:help>
+                    </fr:inplace-input>
+                </xhtml:p>
+                <xhtml:p>
+                    <fr:us-phone id="us-phone" ref="us-phone">
+                        <xforms:label class="fixed-width">Phone:</xforms:label>
+                        <xforms:hint>US phone hint</xforms:hint>
+                        <xforms:alert>Invalid phone number</xforms:alert>
+                        <xforms:help>Phone help</xforms:help>
+                    </fr:us-phone>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:input ref="date" class="datafield" id="regular-date">
+                        <xforms:label class="fixed-width">Date field:</xforms:label>
+                        <xforms:alert>Invalid date</xforms:alert>
+                        <xforms:help>
+                            <div>
+                                <p>
+                                    This field must contain:
+                                </p>
+                                <ul>
+                                    <li>a valid date</li>
+                                    <li>which is at most one day in the future</li>
+                                </ul>
+                            </div>
+                        </xforms:help>
+                    </xforms:input>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:input ref="date" class="datafield" appearance="minimal" id="minimal-date">
+                        <xforms:label class="fixed-width">Date minimal:</xforms:label>
+                        <xforms:alert>Invalid date</xforms:alert>
+                        <xforms:help>
+                            <div>
+                                <p>
+                                    This field must contain:
+                                </p>
+                                <ul>
+                                    <li>a valid date</li>
+                                    <li>which is at most one day in the future</li>
+                                </ul>
+                            </div>
+                        </xforms:help>
+                    </xforms:input>
+                </xhtml:p>
+                <xhtml:p>
+                    <fr:date-picker ref="date" id="data-picker">
+                        <xforms:label class="fixed-width">Date picker (XBL):</xforms:label>
+                        <xforms:alert>Invalid date</xforms:alert>
+                        <xforms:help>
+                            <div>
+                                <p>
+                                    This field must contain:
+                                </p>
+                                <ul>
+                                    <li>a valid date</li>
+                                    <li>which is at most one day in the future</li>
+                                </ul>
+                            </div>
+                        </xforms:help>
+                    </fr:date-picker>
+                </xhtml:p>
+                <xhtml:p>
+                    <fr:dropdown-date ref="date" id="dropdown-date">
+                        <xforms:label class="fixed-width">Date dropdowns (XBL):</xforms:label>
+                        <xforms:alert>Invalid date</xforms:alert>
+                        <xforms:hint>Date hint</xforms:hint>
+                        <xforms:help>Date help</xforms:help>
+                    </fr:dropdown-date>
+                </xhtml:p>
+                <xhtml:p>
+                    <fr:fields-date ref="date" id="fields-date">
+                        <xforms:label class="fixed-width">Date fields (XBL):</xforms:label>
+                        <xforms:alert>Invalid date</xforms:alert>
+                        <xforms:hint>Date hint</xforms:hint>
+                        <xforms:help>Date help</xforms:help>
+                    </fr:fields-date>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:output ref="date" xxforms:format="." id="date-output-native">
+                        <xforms:label class="fixed-width">Date (native XML):</xforms:label>
+                        <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/date/output/xml/*, 'html')"/></xforms:help>
+                    </xforms:output>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:output ref="date" xxforms:format="if (. castable as xs:date) then format-date(., '[FNn], le [D] [MNn] [Y]', 'fr', (), ()) else ()" id="date-output-french">
+                        <xforms:label class="fixed-width">Date (in French):</xforms:label>
+                        <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/date/output/french/*, 'html')"/></xforms:help>
+                    </xforms:output>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:input ref="time" id="time">
+                        <xforms:label class="fixed-width">Time:</xforms:label>
+                    </xforms:input>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:input ref="date-time" id="date-time">
+                        <xforms:label class="fixed-width">Date-time:</xforms:label>
+                    </xforms:input>
+                </xhtml:p>
+            </fr:tab>
+            <fr:tab id="typed-controls">
+                <fr:label>Typed Controls</fr:label>
+                [TODO]
+            </fr:tab>
+            <fr:tab id="selection-controls">
+                <fr:label>Selection Controls</fr:label>
+                <xforms:group appearance="xxforms:fieldset">
+                    <xforms:label>Single Value Selection</xforms:label>
+                    <xhtml:p>
+                        <xforms:select1 ref="carrier" appearance="full" xxforms:encrypt-item-values="false">
+                            <xforms:label class="fixed-width">Carrier:</xforms:label>
+                            <xforms:itemset nodeset="instance('carriers-instance')/carrier">
+                                <xforms:label ref="label"/>
+                                <xforms:value ref="@value"/>
+                            </xforms:itemset>
+                            <xforms:help>Click on a checkbox</xforms:help>
+                        </xforms:select1>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:select1 ref="carrier" appearance="compact">
+                            <xforms:label class="fixed-width"/>
+                            <xforms:itemset nodeset="instance('carriers-instance')/carrier">
+                                <xforms:label ref="label"/>
+                                <xforms:value ref="@value"/>
+                            </xforms:itemset>
+                            <xforms:help>Select one item from the list</xforms:help>
+                        </xforms:select1>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:select1 ref="carrier" appearance="minimal">
+                            <xforms:label class="fixed-width"/>
+                            <xforms:itemset nodeset="instance('carriers-instance')/carrier">
+                                <xforms:label ref="label"/>
+                                <xforms:value ref="@value"/>
+                            </xforms:itemset>
+                            <xforms:help>Select one item in the drop-down</xforms:help>
+                        </xforms:select1>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:group>
+                            <xforms:label class="fixed-width">Label/value:</xforms:label>
+
+                            <xforms:input ref="new-carrier/label"/>
+                            <xforms:input ref="new-carrier/value"/>
+                            <xforms:trigger>
+                                <xforms:label>Add carrier</xforms:label>
+                                <xforms:hint>Add a carrier to the list of carriers</xforms:hint>
+                                <xforms:action  ev:event="DOMActivate">
+                                    <xforms:insert nodeset="instance('carriers-instance')/carrier"
+                                        at="last()" position="after"/>
+                                    <xforms:setvalue ref="instance('carriers-instance')/carrier[last()]/@value"
+                                        value="instance('instance')/new-carrier/value"/>
+                                    <xforms:setvalue ref="instance('carriers-instance')/carrier[last()]/label"
+                                        value="instance('instance')/new-carrier/label"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xforms:group>
+                    </xhtml:p>
+                </xforms:group>
+                <xforms:group appearance="xxforms:fieldset">
+                    <xforms:label>Multiple Value Selection</xforms:label>
+                    <xhtml:p>
+                        <xforms:select ref="flavor" appearance="full">
+                            <xforms:label class="fixed-width">Flavor:</xforms:label>
+                            
+                            <xforms:itemset nodeset="instance('flavors-instance')/flavor">
+                                <xforms:label ref="label"/>
+                                <xforms:value ref="@value"/>
+                            </xforms:itemset>
+                            <xforms:help>Check as many checkboxes as you want</xforms:help>
+                        </xforms:select>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:select ref="flavor" appearance="compact">
+                            <xforms:label class="fixed-width"/>
+                            <xforms:itemset nodeset="instance('flavors-instance')/flavor">
+                                <xforms:label ref="label"/>
+                                <xforms:value ref="@value"/>
+                            </xforms:itemset>
+                            <xforms:help>Select as many items form the list as you want</xforms:help>
+                        </xforms:select>
+                    </xhtml:p>
+                    <fr:box-select ref="flavor">
+                        <xforms:label class="fixed-width"/>
+                        <xforms:itemset nodeset="instance('flavors-instance')/flavor">
+                            <xforms:label ref="label"/>
+                            <xforms:value ref="@value"/>
+                        </xforms:itemset>
+                        <xforms:help>Check as many checkboxes as you want</xforms:help>
+                    </fr:box-select>
+                    <xhtml:p>
+                        <xforms:group>
+                            <xforms:label class="fixed-width">Label/value:</xforms:label>
+
+                            <xforms:input ref="new-flavor/label"/>
+                            <xforms:input ref="new-flavor/value"/>
+                            <xforms:trigger>
+                                <xforms:label>Add flavor</xforms:label>
+                                <xforms:hint>Add a flavor to the list of flavors</xforms:hint>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:insert nodeset="instance('flavors-instance')/flavor"
+                                        at="last()" position="after"/>
+                                    <xforms:setvalue ref="instance('flavors-instance')/flavor[last()]/@value"
+                                        value="instance('instance')/new-flavor/value"/>
+                                    <xforms:setvalue ref="instance('flavors-instance')/flavor[last()]/label"
+                                        value="instance('instance')/new-flavor/label"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xforms:group>
+                    </xhtml:p>
+                </xforms:group>
+            </fr:tab>
+            <fr:tab>
+                <fr:label>Autocompletion</fr:label>
+                <xforms:group appearance="xxforms:fieldset">
+                    <xforms:label>Auto-Complete</xforms:label>
+                    <xhtml:p>
+                        <!-- Auto-complete for country name -->
+                        <!--
+                        <fr:autocomplete ref="instance('instance')/country-name" id="country-name" dynamic-itemset="true" style="width: 15em">
+                            <xforms:label class="label">Enter a country name: </xforms:label>
+                            <xforms:itemset nodeset="instance('countries-names-instance')/country">
+                                <xforms:label ref="name"/>
+                                <xforms:value ref="name"/>
+                            </xforms:itemset>
+                            <xforms:send submission="country-name-updated" ev:event="fr-search-changed"/>
+                        </fr:autocomplete>
+                        -->
+                    </xhtml:p>
+                    <xhtml:p class="flag-container">
+                        <!-- Display flag of selected country -->
+                        <!-- NOTE: Here we could use xforms:output with a text/html mediatype, but this solution with AVTs is much more elegant -->
+                        <xxforms:variable name="country-name" select="instance('countries-names-instance')/country[name = instance('instance')/country-name]" as="xs:string"/>
+                        <xforms:group ref=".[$country-name != '']">
+                            <xhtml:img src="/apps/xforms-controls/images/flags/{$country-name/us-code}-flag.gif" alt=""/>
+                        </xforms:group>
+                    </xhtml:p>
+                </xforms:group>
+
+            </fr:tab>
+            <fr:tab id="slider">
+                <fr:label>Range</fr:label>
+                <xforms:range ref="range/value" start="1" end="26">
+                    <xforms:action ev:event="xforms-value-changed">
+                        <xforms:recalculate/>
+                        <xforms:send submission="countries-submission"/>
+                    </xforms:action>
+                </xforms:range>
+                <xhtml:p>
+                    Countries starting with letter
+                    <xhtml:b><xforms:output ref="range/letter"/></xhtml:b>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:select1 ref="country" appearance="compact" style="height: 8em">
+                        <xforms:itemset nodeset="instance('countries-instance')/country">
+                            <xforms:label ref="name"/>
+                            <xforms:value ref="us-code"/>
+                        </xforms:itemset>
+                    </xforms:select1>
+                </xhtml:p>
+                <!-- Display the flag when a country is selected -->
+                <xhtml:p class="flag-container">
+                    <xforms:group ref=".[country != '']">
+                        <xforms:output mediatype="text/html" value="concat('&lt;img src=&quot;/apps/xforms-controls/images/flags/', country, '-flag.gif&quot;/>')"/>
+                    </xforms:group>
+                </xhtml:p>
+            </fr:tab>
+        </fr:tabview>
+
+        <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+
+    </xhtml:body>
+</xhtml:html>

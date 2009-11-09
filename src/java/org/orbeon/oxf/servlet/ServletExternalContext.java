@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.servlet;
 
@@ -22,8 +22,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.util.StringUtils;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.servlet.ServletContext;
@@ -67,6 +67,9 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         private boolean getInputStreamCalled;
         private String inputStreamCharset;
 
+        private String platformClientContextPath;
+        private String applicationClientContextPath;
+
         public String getContainerType() {
             return "servlet";
         }
@@ -77,18 +80,17 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         public String getContextPath() {
             if (contextPath == null) {
-                final String overriddenServletContext = (String) nativeRequest.getAttribute(OrbeonXFormsFilter.OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME);
-                if (overriddenServletContext != null) {
-                    // This attribute allows overriding the context path, for example when Orbeon Forms is deployed as a separate WAR
-                    contextPath = overriddenServletContext; // use overridden context
+                // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
+                // included servlet via the getAttribute method on the request object and their values must be equal to
+                // the request URI, context path, servlet path, path info, and query string of the included servlet,
+                // respectively."
+                // NOTE: This is very different from the similarly-named forward attributes!
+                final String dispatcherContext = (String) nativeRequest.getAttribute("javax.servlet.include.context_path");
+                if (dispatcherContext != null) {
+                    // This ensures we return the included / forwarded servlet's value
+                    contextPath = dispatcherContext;
                 } else {
-                    final String dispatcherContext = (String) nativeRequest.getAttribute("javax.servlet.include.context_path");
-                    if (dispatcherContext != null) {
-                        // This ensures we return the included / forwarded servlet's value
-                        contextPath = dispatcherContext;
-                    } else {
-                        contextPath = nativeRequest.getContextPath(); // use regular context
-                    }
+                    contextPath = nativeRequest.getContextPath(); // use regular context
                 }
             }
             return contextPath;
@@ -241,6 +243,11 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         public String getQueryString() {
             // Use included / forwarded servlet's value
+            // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
+            // included servlet via the getAttribute method on the request object and their values must be equal to the
+            // request URI, context path, servlet path, path info, and query string of the included servlet,
+            // respectively."
+            // NOTE: This is very different from the similarly-named forward attributes!
             final String dispatcherQueryString = (String) nativeRequest.getAttribute("javax.servlet.include.query_string");
             return (dispatcherQueryString != null) ? dispatcherQueryString : nativeRequest.getQueryString();
         }
@@ -255,6 +262,11 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         public String getRequestURI() {
             // Use included / forwarded servlet's value
+            // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the
+            // included servlet via the getAttribute method on the request object and their values must be equal to the
+            // request URI, context path, servlet path, path info, and query string of the included servlet,
+            // respectively."
+            // NOTE: This is very different from the similarly-named forward attributes!
             final String dispatcherRequestURI = (String) nativeRequest.getAttribute("javax.servlet.include.request_uri");
             return (dispatcherRequestURI != null) ? dispatcherRequestURI : nativeRequest.getRequestURI();
         }
@@ -268,6 +280,25 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         public String getServletPath() {
             return nativeRequest.getServletPath();
+        }
+
+        public String getClientContextPath(String urlString) {
+            // Return depending on whether passed URL is a platform URL or not
+            return URLRewriterUtils.isPlatformPath(urlString) ? getPlatformClientContextPath() : getApplicationClientContextPath();
+        }
+
+        private String getPlatformClientContextPath() {
+            if (platformClientContextPath == null) {
+                platformClientContextPath = URLRewriterUtils.getClientContextPath(this, true);
+            }
+            return platformClientContextPath;
+        }
+
+        private String getApplicationClientContextPath() {
+            if (applicationClientContextPath == null) {
+                applicationClientContextPath = URLRewriterUtils.getClientContextPath(this, false);
+            }
+            return applicationClientContextPath;
         }
 
         public Reader getReader() throws IOException {
@@ -395,8 +426,8 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             } else {
                 // Client-side redirect: send the redirect to the client
                 final String redirectURLString = NetUtils.pathInfoParametersToPathInfoQueryString(pathInfo, parameters);
-                if (!isNoRewrite && redirectURLString.startsWith("/") && !(nativeResponse instanceof ExternalContextToHttpServletResponseWrapper))
-                    nativeResponse.sendRedirect(request.getContextPath() + redirectURLString);
+                if (!isNoRewrite && !(nativeResponse instanceof ExternalContextToHttpServletResponseWrapper))
+                    nativeResponse.sendRedirect(rewriteRenderURL(redirectURLString, null, null));
                 else
                     nativeResponse.sendRedirect(redirectURLString);
             }
@@ -429,7 +460,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                     if (request.getRemoteUser() == null) {
                         // If the user is not logged in, just used the specified properties
                         lastModified = forceLastModified.getTime();
-                        revalidate = Properties.instance().getPropertySet().getBoolean(ProcessorService.HTTP_FORCE_MUST_REVALIDATE_PROPERTY, false).booleanValue();
+                        revalidate = Properties.instance().getPropertySet().getBoolean(ProcessorService.HTTP_FORCE_MUST_REVALIDATE_PROPERTY, false);
                     } else {
                         // If the user is logged in, make sure the correct lastModified is used
                         lastModified = 0;
@@ -658,7 +689,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         public Iterator<ExternalContext.Session.SessionListener> iterator() {
-            return (listeners != null) ? listeners.iterator() : Collections.EMPTY_LIST.iterator();
+            return (listeners != null) ? listeners.iterator() : Collections.<ExternalContext.Session.SessionListener>emptyList().iterator();
         }
     }
 
@@ -677,7 +708,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         public Iterator<ExternalContext.Application.ApplicationListener> iterator() {
-            return (listeners != null) ? listeners.iterator() : Collections.EMPTY_LIST.iterator();
+            return (listeners != null) ? listeners.iterator() : Collections.<ExternalContext.Application.ApplicationListener>emptyList().iterator();
         }
     }
 
@@ -720,7 +751,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         if (response == null) {
             response = new Response();
             final boolean isPortlet2 = "portlet2".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT));
-            response.setURLRewriter(isPortlet2 ? new Portlet2URLRewriter(getRequest()) : (URLRewriter) new ServletURLRewriter(pipelineContext, getRequest()));
+            response.setURLRewriter(isPortlet2 ? new Portlet2URLRewriter(getRequest()) : new ServletURLRewriter(pipelineContext, getRequest()));
         }
         return response;
     }
@@ -730,7 +761,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             // Force creation if whoever forwarded to us did have a session
             // This is to work around a Tomcat issue whereby a session is newly created in the original servlet, but
             // somehow we can't know about it when the request is forwarded to us.
-            if (!create && "true".equals(getRequest().getAttributesMap().get(OrbeonXFormsFilter.OPS_XFORMS_RENDERER_HAS_SESSION_ATTRIBUTE_NAME)))
+            if (!create && "true".equals(getRequest().getAttributesMap().get(OrbeonXFormsFilter.RENDERER_HAS_SESSION_ATTRIBUTE_NAME)))
                 create = true;
 
             final HttpSession nativeSession = nativeRequest.getSession(create);

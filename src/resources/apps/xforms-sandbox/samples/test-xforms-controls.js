@@ -155,7 +155,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "xforms:select and xforms:select1 appearance=full",
+    name: "xforms:select and xforms:select1",
 
     /**
      * Test if setting values of one list updates the other lists, after making the lists non-relevant and relevant
@@ -174,14 +174,6 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             var select = YAHOO.util.Dom.get(selectIds[index]);
             if (select.tagName.toLowerCase() != "select") select = select.getElementsByTagName("select")[0];
             select.value = value;
-
-            // For IE6, setting the value of the select does not update option.selected
-            var options = select.options;
-            for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
-                var option = options[optionIndex];
-                option.selected = option.value == value;
-            }
-
             xformsDispatchEvent(select, "change");
         }
 
@@ -209,6 +201,21 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                         });
                     });
                 });
+            });
+        });
+    },
+
+    testOutOfRange: function() {
+        function valueOfRadio() { return ORBEON.xforms.Document.getValue("flavor-select1-full" + XFORMS_SEPARATOR_1 + "1") };
+
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+           YAHOO.util.UserAction.click("set-out-of-range" + XFORMS_SEPARATOR_1 + "1");
+        }, function() {
+            YAHOO.util.Assert.areEqual("", valueOfRadio(), "value is empty string after setting value to out of range");
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+               YAHOO.util.UserAction.click("set-to-apple" + XFORMS_SEPARATOR_1 + "1");
+            }, function() {
+                YAHOO.util.Assert.areEqual("a", valueOfRadio(), "apple radio is selected after putting an 'a' in the node");
             });
         });
     }
@@ -344,24 +351,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 YAHOO.util.Assert.areEqual("Label", link.innerHTML);
             });
         });
-    },
-
-    // Special testing for the minimal trigger
-    testReadonly: function() {
-        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-            ORBEON.xforms.Document.setValue("readonly", "true");
-        }, function() {
-            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(this.triggerId, "xforms-trigger-readonly"),
-                "has class xforms-trigger-readonly when readonly");
-            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                ORBEON.xforms.Document.setValue("readonly", "false");
-            }, function() {
-                YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(this.triggerId, "xforms-trigger-readonly"),
-                    "does not have class xforms-trigger-readonly when not readonly");
-            });
-        });
     }
-
 }));
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({

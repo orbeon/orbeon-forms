@@ -26,7 +26,7 @@
 
         * Document: document model submission submission-details control event action
         * Global:   analysis server html resources state resolver utils
-        * Data:     analysis-xbl-tree submission-body model-serialized-instance
+        * Data:     analysis-xbl-tree submission-body model-serialized-instance server-body
      -->
     <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug"                          value="document model submission control event action analysis server html"/>
     <!--
@@ -99,10 +99,10 @@
     <!--<property as="xs:boolean" name="oxf.xforms.noscript.select-full-fieldsets"       value="false"/>-->
     <property as="xs:integer" name="oxf.xforms.offline-repeat-count"                    value="4"/>
     <property as="xs:integer" name="oxf.xforms.request-retries"                             value="1"/>
-    <property as="xs:string"  name="oxf.xforms.datepicker"                                  value="yui"/>  <!-- jscalendar or yui -->
+    <property as="xs:string"  name="oxf.xforms.datepicker"                                  value="yui"/>       <!-- jscalendar | yui -->
     <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                        value="true"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.two-months"                       value="false"/>
-    <property as="xs:string"  name="oxf.xforms.htmleditor"                                  value="yui"/>  <!-- fck or yui -->
+    <property as="xs:string"  name="oxf.xforms.htmleditor"                                  value="yui"/>       <!-- fck | yui -->
     <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                           value="true"/>
 
     <property as="xs:integer" name="oxf.xforms.internal-short-delay"                        value="100"/>
@@ -110,12 +110,11 @@
     <property as="xs:integer" name="oxf.xforms.delay-before-force-incremental-request"      value="2000"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-display-loading"                value="500"/>
 
-    <property as="xs:boolean" name="oxf.xforms.server.events.plain-value-change"            value="false"/>
     <property as="xs:boolean" name="oxf.xforms.server.events.initial-refresh-events"        value="true"/>
 
-    <property as="xs:string"  name="oxf.xforms.client.events.mode"                          value="default"/>  <!-- default or deferred -->
+    <property as="xs:string"  name="oxf.xforms.client.events.mode"                          value="default"/>   <!-- default | deferred -->
     <property as="xs:string"  name="oxf.xforms.client.events.filter"                        value=""/>
-    <property as="xs:boolean" name="oxf.xforms.new-xhtml-layout"                            value="false"/>
+    <property as="xs:string"  name="oxf.xforms.xhtml-layout"                                value="nospan"/>    <!-- nospan | span -->
 
     <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                              value=""/>
@@ -135,7 +134,8 @@
     <property as="xs:string"  name="oxf.epilogue.xforms.widgets.fr-elements-to-skip"        value="fr:back-button fr:body fr:buttons fr:component fr:dateTime fr:foobar fr:grid fr:metadata
                                                                                                fr:repeat fr:save-button fr:section fr:super-control fr:td fr:tr fr:view fr:dialogs
                                                                                                fr:max-results-displayed fr:mindate fr:prefix fr:digits-after-decimal fr:case fr:label
-                                                                                               fr:mindate fr:maxdate fr:pagedate fr:tab"/>
+                                                                                               fr:mindate fr:maxdate fr:pagedate fr:tab fr:dependency
+                                                                                               fr:title fr:message fr:positive-choice fr:negative-choice fr:neutral-choice"/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                          value="false"/>
 
 </properties>

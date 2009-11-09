@@ -26,6 +26,9 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.IdGenerator;
+import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
+import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
 import org.orbeon.oxf.xforms.processor.handlers.*;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
@@ -143,13 +146,14 @@ public class XFormsToXHTML extends ProcessorImpl {
                         annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity));
 
                         // Read the input through the annotator and gather namespace mappings
+                        final IdGenerator idGenerator = new IdGenerator();
                         final Map<String, Map<String, String>> namespaceMappings = new HashMap<String, Map<String, String>>();
-                        readInputAsSAX(pipelineContext, processorInput, new XFormsDocumentAnnotatorContentHandler(annotatedSAXStore, externalContext, namespaceMappings));
+                        readInputAsSAX(pipelineContext, processorInput, new XFormsAnnotatorContentHandler(annotatedSAXStore, externalContext, idGenerator, namespaceMappings));
 
                         // Get static state document and create static state object
                         final Document staticStateDocument = documentResult.getDocument();
 //                        XFormsContainingDocument.logDebugStatic("XForms to XHTML", "static state", new String[] { "document", Dom4jUtils.domToString(staticStateDocument) });
-                        xformsStaticState = new XFormsStaticState(pipelineContext, staticStateDocument, namespaceMappings, annotatedSAXStore);
+                        xformsStaticState = new XFormsStaticState(pipelineContext, staticStateDocument, idGenerator, namespaceMappings, annotatedSAXStore);
                     }
 
                     // Create document here so we can do appropriate analysis of caching dependencies
@@ -254,8 +258,8 @@ public class XFormsToXHTML extends ProcessorImpl {
     // What can be cached: URI dependencies + the annotated XForms document
     private static class InputDependencies extends URIProcessorOutputImpl.URIReferences {
 
-        private SAXStore annotatedSAXStore;
-        private XFormsStaticState xformsStaticState;
+        private final SAXStore annotatedSAXStore;
+        private final XFormsStaticState xformsStaticState;
 
         public InputDependencies(SAXStore annotatedSAXStore, XFormsStaticState xformsStaticState) {
             this.annotatedSAXStore = annotatedSAXStore;
@@ -348,11 +352,6 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         final ElementHandlerController controller = new ElementHandlerController();
 
-        // Make sure we have up to date controls
-        final XFormsControls xformsControls = containingDocument.getControls();
-        xformsControls.updateControlBindingsIfNeeded(pipelineContext);
-        xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
-
         final List<XFormsContainingDocument.Load> loads = containingDocument.getLoadsToRun();
         if (containingDocument.isGotSubmissionReplaceAll()) {
             // 1. Got a submission with replace="all"
@@ -414,12 +413,6 @@ public class XFormsToXHTML extends ProcessorImpl {
     private void testOutputResponseState(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,
                                          final IndentedLogger indentedLogger, final ContentHandler contentHandler,
                                          final XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState) throws SAXException {
-
-        // Make sure we have up to date controls
-        final XFormsControls xformsControls = containingDocument.getControls();
-        xformsControls.updateControlBindingsIfNeeded(pipelineContext);
-        xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
-
         // Output XML response
         XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, pipelineContext, contentHandler, xformsDecodedClientState, null, false, false, false, true);
     }

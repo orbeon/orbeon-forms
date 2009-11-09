@@ -1,21 +1,21 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.FastHttpDateFormat;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringUtils;
 
 import javax.servlet.ServletInputStream;
@@ -25,8 +25,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.security.Principal;
-import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Wrap an ExternalContext.Request into an HttpServletRequest.
@@ -149,7 +149,7 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
 
     public String[] getParameterValues(String name) {
         // Convert as parameters MAY contain FileItem values
-        return StringUtils.objectArrayToStringArray((Object[]) request.getParameterMap().get(name));
+        return StringUtils.objectArrayToStringArray(request.getParameterMap().get(name));
     }
 
     /* SUPPORTED: request body */
@@ -230,7 +230,7 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
     }
 
     public String getHeader(String name) {
-        final String[] values = ((String[]) request.getHeaderValuesMap().get(name));
+        final String[] values = request.getHeaderValuesMap().get(name);
         return values == null ? null : values[0];
     }
 
@@ -239,7 +239,7 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
     }
 
     public Enumeration getHeaders(String name) {
-        final String[] values = ((String[]) request.getHeaderValuesMap().get(name));
+        final String[] values = request.getHeaderValuesMap().get(name);
         return Collections.enumeration(Arrays.asList(values));
     }
 

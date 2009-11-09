@@ -1,0 +1,15 @@
+.xbl-fr-alert-dialog { width: 400px }
+.xbl-fr-alert-dialog ol { padding-left: 3em }
+.xbl-fr-alert-dialog li { list-style-type: decimal }/* overrides YUI reset so numbers in enumeration do show */
+.xbl-fr-alert-dialog .bd p { margin: .5em 0 .5em 0 }
+.xbl-fr-alert-dialog .hd { background-color: #666699 }
+.xbl-fr-alert-dialog .bd { margin: 0 .5em .5em .5em }
+.xbl-fr-alert-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em }
+.xbl-fr-alert-dialog-question .xbl-fr-alert-dialog-message { background-image: url(../../../apps/fr/style/images/pixelmixer/bubble_64.png); }
+.xbl-fr-alert-dialog-info .xbl-fr-alert-dialog-message { background-image: url(../../../apps/fr/style/images/pixelmixer/info_64.png); }
+.xbl-fr-alert-dialog-message { background-repeat: no-repeat; background-position: 5px; padding: 0 10px 0 90px; min-height: 80px; *height: 80px; }
+.xbl-fr-alert-dialog-message label { position: relative; top: 1em; }
+.xbl-fr-alert-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
+.xbl-fr-alert-dialog-buttons button img { margin-right: .5em; }
+.xbl-fr-alert-dialog-positive .xbl-fr-button .yui-button button { background: url(../../../apps/fr/style/images/silk/tick.png) no-repeat 5px; padding: 0 10px 0 25px;}
+.xbl-fr-alert-dialog-negative .xbl-fr-button .yui-button button { background: url(../../../apps/fr/style/images/silk/cross.png) no-repeat 5px; padding: 0 10px 0 25px;}

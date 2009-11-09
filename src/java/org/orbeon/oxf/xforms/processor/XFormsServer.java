@@ -32,17 +32,20 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventFactory;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -110,6 +113,14 @@ public class XFormsServer extends ProcessorImpl {
         // Use request input provided by client
         final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
 
+        // Logger used for heartbeat and request/response
+        final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), XFormsServer.getLogger(), LOGGING_CATEGORY);
+
+        final boolean logRequestResponse = XFormsProperties.getDebugLogging().contains("server-body");
+        if (logRequestResponse) {
+            indentedLogger.logDebug("", "ajax request", "body", Dom4jUtils.domToPrettyString(requestDocument));
+        }
+
         // Get action
         actionElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_ACTION_QNAME);
 
@@ -138,9 +149,6 @@ public class XFormsServer extends ProcessorImpl {
         if (actionElement != null) {
             eventElements.addAll(Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_EVENT_QNAME));
         }
-
-        // Logger used for heartbeat and response
-        final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), XFormsServer.getLogger(), LOGGING_CATEGORY);
 
         // Check for message where there is only the heartbeat event
         if (eventElements.size() == 1) {
@@ -235,21 +243,15 @@ public class XFormsServer extends ProcessorImpl {
             final IndentedLogger eventsIndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
             try {
                 // Run events if any
-                final Map<String, String> valueChangeControlIds = new HashMap<String, String>();
-                boolean allEvents = false;
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
 
                 // Set URL rewriter resource path information based on information in static state
                 pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, containingDocument.getStaticState().getVersionedPathMatchers());
 
+                final boolean allEvents;
+                final Set<String> valueChangeControlIds = new HashSet<String>();
                 if (eventElements.size() > 0) {
-                    // NOTE: We store here the last xxforms-value-change-with-focus-change event so
-                    // we can coalesce values in case several such events are sent for the same
-                    // control. The client should not send us such series of events, but currently
-                    // it may happen.
-                    String lastSourceControlId = null;
-                    String lastValueChangeEventValue = null;
 
                     // Find an output stream for xforms:submission[@replace = 'all']
                     final ExternalContext.Response response;
@@ -301,165 +303,15 @@ public class XFormsServer extends ProcessorImpl {
                     // Iterate through events to:
                     // 1. Reorder events if needed for noscript mode
                     // 2. Detect whether we got xxforms-online
-                    boolean hasXXFormsOnline = false;
-                    {
-                        final XFormsStaticState staticState = containingDocument.getStaticState();
-
-                        List<Element> noscriptActivateEvents = null;
-                        Map<String, String> noscriptValueIds = null;
-
-                        for (Iterator i = eventElements.iterator(); i.hasNext();) {
-                            final Element eventElement = (Element) i.next();
-                            final String eventName = eventElement.attributeValue("name");
-
-                            if (XFormsEvents.XXFORMS_ONLINE.equals(eventName)) {
-                                // We got an xxforms-online event
-                                hasXXFormsOnline = true;
-                            }
-
-                            if (isNoscript && XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE.equals(eventName)) {
-                                // Special event for noscript mode
-                                final String sourceControlId = eventElement.attributeValue("source-control-id");
-                                if (!staticState.isValueControl(sourceControlId)) {
-                                    // This is most likely a trigger or submit which will translate into a DOMActivate,
-                                    // so we move it to the end so that value change events are committed to the
-                                    // instance before that.
-                                    i.remove();
-                                    if (noscriptActivateEvents == null)
-                                        noscriptActivateEvents = new ArrayList<Element>();
-                                    noscriptActivateEvents.add(eventElement);
-                                } else {
-                                    // This is a value event, just remember the id
-                                    if (noscriptValueIds == null)
-                                        noscriptValueIds = new HashMap<String, String>();
-                                    noscriptValueIds.put(sourceControlId, "");
-                                }
-                            }
-                        }
-
-                        // Special handling of checkboxes blanking in noscript mode
-                        if (isNoscript) {
-                            final Map<String, XFormsControl> selectFullControls = containingDocument.getControls().getCurrentControlTree().getSelectFullControls();
-
-                            if (selectFullControls != null) {
-
-                                for (Map.Entry<String, XFormsControl> currentEntry: selectFullControls.entrySet()) {
-                                    final String currentEffectiveId = currentEntry.getKey();
-                                    final XFormsSelectControl currentControl = (XFormsSelectControl) currentEntry.getValue();
-
-                                    if (currentControl != null
-                                            && (noscriptValueIds == null || noscriptValueIds.get(currentEffectiveId) == null) // control did not have a value set by other events
-                                            && currentControl.isRelevant() && !currentControl.isReadonly()) {                 // control is relevant and not readonly
-
-                                        // <xxforms:event name="xxforms-value-or-activate" source-control-id="my-effective-id"/>
-                                        final Element newEventElement = Dom4jUtils.createElement(XFormsConstants.XXFORMS_EVENT_QNAME.getQualifiedName(), XFormsConstants.XXFORMS_EVENT_QNAME.getNamespaceURI());
-                                        newEventElement.addAttribute("name", XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);
-                                        newEventElement.addAttribute("source-control-id", currentEffectiveId);
-
-                                        // Append the blanking event
-                                        eventElements.add(newEventElement);
-                                    }
-                                }
-                            }
-
-                            // Append all noscript activation events
-                            if (noscriptActivateEvents != null) {
-                                eventElements.addAll(noscriptActivateEvents);
-                            }
-                        }
-
-                        if (hasXXFormsOnline)
-                            eventsIndentedLogger.logDebug("offline", "got xxforms-online event, enabling optimized handling of event sequence");
-                    }
+                    boolean hasXXFormsOnline = processEventsForNoscript(eventElements, containingDocument, eventsIndentedLogger, isNoscript);
 
                     // Start external events
                     containingDocument.startExternalEventsSequence(pipelineContext, response, hasXXFormsOnline);
                     eventsIndentedLogger.startHandleOperation("", "handling external events");
-                    
-                    // Iterate through all events to dispatch them
-                    int eventElementIndex = 0;
-                    for (Iterator i = eventElements.iterator(); i.hasNext(); eventElementIndex++) {
-                        final Element eventElement = (Element) i.next();
 
-                        // Whether this event is trusted, that is whether this event was a server event. Server events
-                        // are processed first, so are at the beginning of eventElements.
-                        boolean isTrustedEvent = eventElementIndex < serverEventsCount;
-
-                        final String eventName = eventElement.attributeValue("name");
-                        final String sourceTargetId = eventElement.attributeValue("source-control-id");
-                        final boolean bubbles = !"false".equals(eventElement.attributeValue("bubbles"));// default is true
-                        final boolean cancelable = !"false".equals(eventElement.attributeValue("cancelable"));// default is true
-
-                        final String otherControlId = eventElement.attributeValue("other-control-id");
-                        final String dndStart = eventElement.attributeValue("dnd-start");
-                        final String dndEnd = eventElement.attributeValue("dnd-end");
-
-                        final String value = eventElement.getText();
-
-                        if (XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED.equals(eventName)) {
-                            // Special event telling us to resend the client all the events since initialization
-                            if (xformsDecodedInitialClientState == null)
-                                throw new OXFException("Got xxforms-all-events-required event without initial dynamic state.");
-
-                            // Remember that we got this event
-                            allEvents = true;
-
-                        } else if (sourceTargetId != null && eventName != null) {
-                            // A normal event is passed
-                            if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE) && otherControlId == null) {
-                                // xxforms-value-change-with-focus-change event
-
-                                // The goal of the code below is to coalesce multiple sequential value changes for the
-                                // same control. Not sure if this is still needed.
-                                if (lastSourceControlId == null) {
-                                    // Remember event
-                                    lastSourceControlId = sourceTargetId;
-                                    lastValueChangeEventValue = value;
-                                } else if (lastSourceControlId.equals(sourceTargetId)) {
-                                    // Update event
-                                    lastValueChangeEventValue = value;
-                                } else {
-                                    // Send old event
-                                    containingDocument.executeExternalEvent(pipelineContext, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId,
-                                            true, true, null, lastValueChangeEventValue, filesElement, null, null, hasXXFormsOnline);
-                                    // Remember new event
-                                    lastSourceControlId = sourceTargetId;
-                                    lastValueChangeEventValue = value;
-                                }
-                            } else {
-                                // Other normal events
-
-                                // xxforms-offline requires initial dynamic state
-                                if (eventName.equals(XFormsEvents.XXFORMS_OFFLINE) && xformsDecodedInitialClientState == null)
-                                    throw new OXFException("Got xxforms-offline event without initial dynamic state.");
-
-                                if (lastSourceControlId != null) {
-                                    // Send old event
-                                    containingDocument.executeExternalEvent(pipelineContext, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId,
-                                            true, true, null, lastValueChangeEventValue, filesElement, null, null, hasXXFormsOnline);
-                                    lastSourceControlId = null;
-                                    lastValueChangeEventValue = null;
-                                }
-                                // Send new event
-                                containingDocument.executeExternalEvent(pipelineContext, isTrustedEvent, eventName, sourceTargetId,
-                                        bubbles, cancelable, otherControlId, value, filesElement, dndStart, dndEnd, hasXXFormsOnline);
-                            }
-
-                            if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
-                                // Remember id of controls for which value changed
-                                valueChangeControlIds.put(sourceTargetId, "");
-                            }
-                        } else if (!(sourceTargetId == null && eventName == null)) {
-                            // Error case
-                            throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
-                        }
-                    }
-                    // Flush stored event if needed
-                    if (lastSourceControlId != null) {
-                        // Send old event
-                        containingDocument.executeExternalEvent(pipelineContext, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId,
-                                true, true, null, lastValueChangeEventValue, filesElement, null, null, hasXXFormsOnline);
-                    }
+                    // Dispatch everything
+                    allEvents = createAndDispatchEvents(pipelineContext, containingDocument, xformsDecodedInitialClientState,
+                            filesElement, eventElements, serverEventsCount, valueChangeControlIds, hasXXFormsOnline);
 
                     // End external events
                     containingDocument.endExternalEventsSequence(pipelineContext, hasXXFormsOnline);
@@ -471,6 +323,8 @@ public class XFormsServer extends ProcessorImpl {
                         containingDocument.processBackgroundAsynchronousSubmissions(pipelineContext);
                         containingDocument.endOutermostActionHandler(pipelineContext);
                     }
+                } else {
+                    allEvents = false;
                 }
 
                 if (contentHandler != null) {
@@ -482,8 +336,22 @@ public class XFormsServer extends ProcessorImpl {
                     } else if (!isNoscript) {
                         // This is an Ajax response
                         indentedLogger.startHandleOperation("response", "handling regular Ajax response");
-                        outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds, pipelineContext, contentHandler, xformsDecodedClientState, xformsDecodedInitialClientState, allEvents, false, false, false);
-                        indentedLogger.endHandleOperation();
+
+                        // Hook-up debug content handler if we must log the response document
+                        final ContentHandler responseContentHandler;
+                        final LocationSAXContentHandler debugContentHandler;
+                        if (logRequestResponse) {
+                            debugContentHandler = new LocationSAXContentHandler();
+                            responseContentHandler = new TeeContentHandler(contentHandler, debugContentHandler);
+                        } else {
+                            debugContentHandler = null;
+                            responseContentHandler = contentHandler;
+                        }
+
+                        outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds, pipelineContext, responseContentHandler,
+                                xformsDecodedClientState, xformsDecodedInitialClientState, allEvents, false, false, false);
+
+                        indentedLogger.endHandleOperation("ajax response", (debugContentHandler != null) ? Dom4jUtils.domToPrettyString(debugContentHandler.getDocument()) : null);
                     } else {
                         // Noscript mode
                         indentedLogger.startHandleOperation("response", "handling noscript response");
@@ -518,6 +386,274 @@ public class XFormsServer extends ProcessorImpl {
                 throw new OXFException(e);
             }
         }
+    }
+
+    private boolean createAndDispatchEvents(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
+                           XFormsStateManager.XFormsDecodedClientState xformsDecodedInitialClientState, Element filesElement,
+                           List<Element> eventElements, int serverEventsCount, Set<String> valueChangeControlIds, boolean hasXXFormsOnline) {
+
+        // NOTE: We store here the last xxforms-value-change-with-focus-change event so
+        // we can coalesce values in case several such events are sent for the same
+        // control. The client should not send us such series of events, but currently
+        // it may happen.
+        String lastSourceControlId = null;
+        String lastValueChangeEventValue = null;
+
+        boolean hasAllEvents = false;
+
+        final List<XFormsEvent> events = new ArrayList<XFormsEvent>();
+
+        // Iterate through all events to dispatch them
+        int eventElementIndex = 0;
+        for (Iterator i = eventElements.iterator(); i.hasNext(); eventElementIndex++) {
+            final Element eventElement = (Element) i.next();
+
+            // Whether this event is trusted, that is whether this event was a server event. Server events
+            // are processed first, so are at the beginning of eventElements.
+            boolean isTrustedEvent = eventElementIndex < serverEventsCount;
+
+            final String eventName = eventElement.attributeValue("name");
+            final String sourceTargetId = eventElement.attributeValue("source-control-id");
+            final boolean bubbles = !"false".equals(eventElement.attributeValue("bubbles"));// default is true
+            final boolean cancelable = !"false".equals(eventElement.attributeValue("cancelable"));// default is true
+
+            final String otherControlId = eventElement.attributeValue("other-control-id");
+            final String dndStart = eventElement.attributeValue("dnd-start");
+            final String dndEnd = eventElement.attributeValue("dnd-end");
+
+            final String value = eventElement.getText();
+
+            if (XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED.equals(eventName)) {
+                // Special event telling us to resend the client all the events since initialization
+                if (xformsDecodedInitialClientState == null)
+                    throw new OXFException("Got xxforms-all-events-required event without initial dynamic state.");
+
+                // Remember that we got this event
+                hasAllEvents = true;
+
+            } else if (sourceTargetId != null && eventName != null) {
+                // A normal event is passed
+                if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE) && otherControlId == null) {
+                    // xxforms-value-change-with-focus-change event
+
+                    // The goal of the code below is to coalesce multiple sequential value changes for the
+                    // same control. Not sure if this is still needed.
+                    if (lastSourceControlId == null) {
+                        // Remember event
+                        lastSourceControlId = sourceTargetId;
+                        lastValueChangeEventValue = value;
+                    } else if (lastSourceControlId.equals(sourceTargetId)) {
+                        // Update event
+                        lastValueChangeEventValue = value;
+                    } else {
+                        // Send old event
+                        createCheckEvent(containingDocument, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE,
+                                lastSourceControlId, true, true, null, lastValueChangeEventValue, filesElement, null, null, events);
+                        // Remember new event
+                        lastSourceControlId = sourceTargetId;
+                        lastValueChangeEventValue = value;
+                    }
+                } else {
+                    // Other normal events
+
+                    // xxforms-offline requires initial dynamic state
+                    if (eventName.equals(XFormsEvents.XXFORMS_OFFLINE) && xformsDecodedInitialClientState == null)
+                        throw new OXFException("Got xxforms-offline event without initial dynamic state.");
+
+                    if (lastSourceControlId != null) {
+                        // Send old event
+                        createCheckEvent(containingDocument, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE,
+                                lastSourceControlId, true, true, null, lastValueChangeEventValue, filesElement, null, null, events);
+                        lastSourceControlId = null;
+                        lastValueChangeEventValue = null;
+                    }
+                    // Send new event
+                    createCheckEvent(containingDocument, isTrustedEvent, eventName, sourceTargetId, bubbles, cancelable,
+                            otherControlId, value, filesElement, dndStart, dndEnd, events);
+                }
+
+                if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
+                    // Remember id of controls for which value changed
+                    valueChangeControlIds.add(sourceTargetId);
+                }
+            } else if (!(sourceTargetId == null && eventName == null)) {
+                // Error case
+                throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
+            }
+        }
+        // Flush stored event if needed
+        if (lastSourceControlId != null) {
+            // Send old event
+            createCheckEvent(containingDocument, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE,
+                    lastSourceControlId, true, true, null, lastValueChangeEventValue, filesElement, null, null, events);
+        }
+
+        // Iterate and dispatch the events
+        for (XFormsEvent event: events) {
+            containingDocument.handleExternalEvent(pipelineContext, event, hasXXFormsOnline);
+        }
+
+        return hasAllEvents;
+    }
+
+    private void createCheckEvent(XFormsContainingDocument containingDocument, boolean isTrustedEvent,
+                                  String eventName, String targetEffectiveId, boolean bubbles, boolean cancelable,
+                                  String otherControlEffectiveId, String valueString, Element filesElement,
+                                  String dndStart, String dndEnd, List<XFormsEvent> events) {
+
+        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
+
+        // Get event target
+        final XFormsEventTarget eventTarget;
+        {
+            final Object eventTargetObject = containingDocument.getObjectByEffectiveId(targetEffectiveId);
+            if (!(eventTargetObject instanceof XFormsEventTarget)) {
+                if (indentedLogger.isDebugEnabled()) {
+                    indentedLogger.logDebug(XFormsContainingDocument.EVENT_LOG_TYPE, "ignoring client event with invalid target id", "target id", targetEffectiveId, "event name", eventName);
+                }
+                return;
+            }
+            eventTarget = (XFormsEventTarget) eventTargetObject;
+        }
+
+        // Rewrite event type. This is special handling of xxforms-value-or-activate for noscript mode.
+        // NOTE: We do this here, because we need to know the actual type of the target. Could do this statically if
+        // the static state kept type information for each control.
+        if (XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE.equals(eventName)) {
+            // In this case, we translate the event depending on the control type
+            if (eventTarget instanceof XFormsTriggerControl) {
+                // Triggers get a DOM activation
+                if ("".equals(valueString)) {
+                    // Handler produces:
+                    //   <button type="submit" name="foobar" value="activate">...
+                    //   <input type="submit" name="foobar" value="Hi There">...
+                    //   <input type="image" name="foobar" value="Hi There" src="...">...
+
+                    // IE 6/7 are terminally broken: they don't send the value back, but the contents of the label. So
+                    // we must test for any empty content here instead of "!activate".equals(valueString). (Note that
+                    // this means that empty labels won't work.) Further, with IE 6, all buttons are present when
+                    // using <button>, so we use <input> instead, either with type="submit" or type="image". Bleh.
+
+                    return;
+                }
+                eventName = XFormsEvents.XFORMS_DOM_ACTIVATE;
+            } else {
+                // Other controls get a value change
+                eventName = XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE;
+            }
+        }
+
+        // For testing only
+        if (XFormsProperties.isAjaxTest()) {
+            if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
+                valueString = "value" + System.currentTimeMillis();
+            }
+        }
+
+        // Check the event is allowed on target
+        if (isTrustedEvent) {
+            // Event is trusted, don't check if it is allowed
+            if (indentedLogger.isDebugEnabled()) {
+                indentedLogger.logDebug(XFormsContainingDocument.EVENT_LOG_TYPE, "processing trusted event", "target id", eventTarget.getEffectiveId(), "event name", eventName);
+            }
+        } else if (!containingDocument.checkForAllowedEvents(indentedLogger, eventName, eventTarget)) {
+            // Event is not trusted and is not allowed
+            return;
+        }
+        
+        // Get other event target
+        final XFormsEventTarget otherEventTarget;
+        {
+            final Object otherEventTargetObject = (otherControlEffectiveId == null) ? null : containingDocument.getObjectByEffectiveId(otherControlEffectiveId);
+            if (otherEventTargetObject == null) {
+                otherEventTarget = null;
+            } else if (!(otherEventTargetObject instanceof XFormsEventTarget)) {
+                if (indentedLogger.isDebugEnabled()) {
+                    indentedLogger.logDebug(XFormsContainingDocument.EVENT_LOG_TYPE, "ignoring invalid client event with invalid second control id", "target id", targetEffectiveId, "event name", eventName, "second control id", otherControlEffectiveId);
+                }
+                return;
+            } else {
+                otherEventTarget = (XFormsEventTarget) otherEventTargetObject;
+            }
+        }
+
+        // Create event
+        events.add(XFormsEventFactory.createEvent(containingDocument, eventName, eventTarget, otherEventTarget, true,
+                bubbles, cancelable, valueString, filesElement, new String[] { dndStart, dndEnd} ));
+    }
+
+    private boolean processEventsForNoscript(List<Element> eventElements, XFormsContainingDocument containingDocument, IndentedLogger eventsIndentedLogger, boolean noscript) {
+
+        boolean hasXXFormsOnline = false;
+
+        final XFormsStaticState staticState = containingDocument.getStaticState();
+
+        List<Element> noscriptActivateEvents = null;
+        Map<String, String> noscriptValueIds = null;
+
+        for (Iterator i = eventElements.iterator(); i.hasNext();) {
+            final Element eventElement = (Element) i.next();
+            final String eventName = eventElement.attributeValue("name");
+
+            if (XFormsEvents.XXFORMS_ONLINE.equals(eventName)) {
+                // We got an xxforms-online event
+                hasXXFormsOnline = true;
+            }
+
+            if (noscript && XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE.equals(eventName)) {
+                // Special event for noscript mode
+                final String sourceControlId = eventElement.attributeValue("source-control-id");
+                if (!staticState.isValueControl(sourceControlId)) {
+                    // This is most likely a trigger or submit which will translate into a DOMActivate,
+                    // so we move it to the end so that value change events are committed to the
+                    // instance before that.
+                    i.remove();
+                    if (noscriptActivateEvents == null)
+                        noscriptActivateEvents = new ArrayList<Element>();
+                    noscriptActivateEvents.add(eventElement);
+                } else {
+                    // This is a value event, just remember the id
+                    if (noscriptValueIds == null)
+                        noscriptValueIds = new HashMap<String, String>();
+                    noscriptValueIds.put(sourceControlId, "");
+                }
+            }
+        }
+
+        // Special handling of checkboxes blanking in noscript mode
+        if (noscript) {
+            final Map<String, XFormsControl> selectFullControls = containingDocument.getControls().getCurrentControlTree().getSelectFullControls();
+
+            if (selectFullControls != null) {
+
+                for (Map.Entry<String, XFormsControl> currentEntry: selectFullControls.entrySet()) {
+                    final String currentEffectiveId = currentEntry.getKey();
+                    final XFormsSelectControl currentControl = (XFormsSelectControl) currentEntry.getValue();
+
+                    if (currentControl != null
+                            && (noscriptValueIds == null || noscriptValueIds.get(currentEffectiveId) == null) // control did not have a value set by other events
+                            && currentControl.isRelevant() && !currentControl.isReadonly()) {                 // control is relevant and not readonly
+
+                        // <xxforms:event name="xxforms-value-or-activate" source-control-id="my-effective-id"/>
+                        final Element newEventElement = Dom4jUtils.createElement(XFormsConstants.XXFORMS_EVENT_QNAME.getQualifiedName(), XFormsConstants.XXFORMS_EVENT_QNAME.getNamespaceURI());
+                        newEventElement.addAttribute("name", XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);
+                        newEventElement.addAttribute("source-control-id", currentEffectiveId);
+
+                        // Append the blanking event
+                        eventElements.add(newEventElement);
+                    }
+                }
+            }
+
+            // Append all noscript activation events
+            if (noscriptActivateEvents != null) {
+                eventElements.addAll(noscriptActivateEvents);
+            }
+        }
+
+        if (hasXXFormsOnline)
+            eventsIndentedLogger.logDebug("offline", "got xxforms-online event, enabling optimized handling of event sequence");
+        return hasXXFormsOnline;
     }
 
     /**
@@ -581,7 +717,7 @@ public class XFormsServer extends ProcessorImpl {
      * @param testOutputStaticState             for testing purposes
      * @param testOutputAllActions              for testing purposes
      */
-    public static void outputAjaxResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,Map valueChangeControlIds,
+    public static void outputAjaxResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, Set<String> valueChangeControlIds,
                                 PipelineContext pipelineContext, ContentHandler contentHandler, XFormsStateManager.XFormsDecodedClientState xformsDecodedClientState,
                                 XFormsStateManager.XFormsDecodedClientState xformsDecodedInitialClientState,
                                 boolean allEvents, boolean isOfflineEvents, boolean testOutputStaticState, boolean testOutputAllActions) {
@@ -636,13 +772,6 @@ public class XFormsServer extends ProcessorImpl {
                     if (requireClientSubmission)
                         submissionServerEvents = XFormsUtils.encodeXML(pipelineContext, eventsDocument, false);
                 }
-            }
-
-            // Rebuild and evaluate controls if needed, before we compute the dynamic state
-            // NOTE: This is in case rebuilding controls modifies repeat indexes. We want the indexes to be included in the state further down.that
-            if (allEvents || containingDocument.isDirtySinceLastRequest() || testOutputAllActions) {// TODO: Why do we rebuild anyway in case of allEvents?
-                xformsControls.updateControlBindingsIfNeeded(pipelineContext);
-                xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
             }
 
             // Get encoded state to send to the client (unless computing the list of offline events)
@@ -923,7 +1052,7 @@ public class XFormsServer extends ProcessorImpl {
                                     IndentedLogger indentedLogger,
                                     List<XFormsControl> state1, List<XFormsControl> state2,
                                     Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2,
-                                    Map valueChangeControlIds) {
+                                    Set<String> valueChangeControlIds) {
         indentedLogger.startHandleOperation("", "computing differences");
         if (XFormsProperties.isOptimizeRelevance(containingDocument)) {
             new NewControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds).diff(state1, state2);

@@ -94,7 +94,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-
+        
         /**
          * Test that when we type the full value "Switzerland", the value of the node becomes "sz",
          * because "Switzerland" shows in the list of possible values, so the value should be selected
@@ -110,7 +110,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-
+        
         /**
          * Test that entering a partial match "Sw", we get the expected list of countries in the suggestion list.
          */
@@ -137,7 +137,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 }, function() {
                     // Check the alert is active
                     var control = YAHOO.util.Dom.get(staticDynamic + "-autocomplete");
-                    var container = YAHOO.util.Dom.get(staticDynamic + "-autocomplete$autocomplete-container");
+                    var container = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-container", null, control)[0];
                     YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(container, "xforms-invalid"));
                     var alert = YAHOO.util.Dom.getElementsByClassName("xforms-alert", null, control)[0];
                     YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(alert, "xforms-alert-active"),
@@ -184,7 +184,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-
+        
         /**
          * The max-results-displayed is set to 4 in the markup with an attribute for the static case and an element
          * for the dynamic case.
@@ -203,7 +203,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-
+        
         /**
          * Test that the left border of the suggestion box is aligned with the left border of the text field.
          */
@@ -224,7 +224,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-
+        
         testSetLabel: function() {
             this.runForStaticDynamic(function(staticDynamic, continuation) {
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {

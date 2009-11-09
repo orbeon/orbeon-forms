@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 (function() {
     var Dom = YAHOO.util.Dom,
@@ -105,22 +105,22 @@
         /**
          * Called when the group containing the map becomes enabled.
          */
-        mapContainerXFormsEnabled: function() {
-            var mapContainer = this;
-            var mapID = mapContainer.parentNode.id;
+        mapContainerXFormsEnabled: function(target) {
+            var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-map");
+            var mapID =  container.id;
             if (!Lang.isObject(maps[mapID])) {
-                maps[mapID] = new Map(mapContainer.parentNode);
+                maps[mapID] = new Map(container);
             }
         },
 
         /**
          * Called when the address provided to the component changes.
          */
-        addressXFormsValueChanged: function() {
-            var mapID = this.parentNode.parentNode.id;
+        addressXFormsValueChanged: function(target) {
+            var container = YAHOO.util.Dom.getAncestorByClassName(target, "xbl-fr-map");
+            var mapID =  container.id;
             maps[mapID].updateMarkerFromAddress();
         }
     };
 
 })();
-

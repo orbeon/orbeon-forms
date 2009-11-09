@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogCloseEvent;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 
 /**
@@ -33,20 +34,19 @@ public class XXFormsHideAction extends XFormsAction {
 
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Resolve attribute as AVTs
-        final String dialogStaticId = resolveAVT(actionInterpreter, propertyContext, actionElement, "dialog", true);
+        final String dialogStaticId = actionInterpreter.resolveAVT(propertyContext, actionElement, "dialog", true);
         if (dialogStaticId == null) {
             // TODO: Should we try to find the dialog containing the action, of the dialog containing the observer or the target causing this event?
         }
 
         if (dialogStaticId != null) {
             // Dispatch xxforms-dialog-close event to dialog
-            // TODO: use container.getObjectByEffectiveId() once XBLContainer is able to have local controls
-            final Object controlObject = resolveEffectiveControl(actionInterpreter, propertyContext, actionInterpreter.getObserverPseudoEffectiveId(), dialogStaticId, actionElement);
+            final Object controlObject = actionInterpreter.resolveEffectiveControl(propertyContext, actionElement, dialogStaticId);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XFormsEventTarget eventTarget = (XFormsEventTarget) controlObject;
                 final XFormsEvent newEvent = new XXFormsDialogCloseEvent(containingDocument, eventTarget);

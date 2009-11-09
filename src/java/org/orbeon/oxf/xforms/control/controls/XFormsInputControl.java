@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.control.controls;
 
@@ -18,13 +18,14 @@ import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.MatchProcessor;
 import org.orbeon.oxf.processor.Perl5MatchProcessor;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.value.CalendarValue;
@@ -58,11 +59,6 @@ public class XFormsInputControl extends XFormsValueControl {
         return EXTENSION_ATTRIBUTES;
     }
 
-    @Override
-    protected void evaluate(PropertyContext propertyContext) {
-        super.evaluate(propertyContext);
-    }
-
     public String getSize() {
         return getExtensionAttributeValue(XFormsConstants.XXFORMS_SIZE_QNAME);
     }
@@ -73,6 +69,16 @@ public class XFormsInputControl extends XFormsValueControl {
 
     public String getAutocomplete() {
         return getExtensionAttributeValue(XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME);
+    }
+
+    @Override
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext) {
+        super.setBindingContext(propertyContext, bindingContext);
+    }
+
+    @Override
+    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
+        super.evaluate(propertyContext, isRefresh);
     }
 
     @Override
@@ -394,18 +400,22 @@ public class XFormsInputControl extends XFormsValueControl {
     public String getFirstValueUseFormat(PipelineContext pipelineContext) {
         final String result;
 
-        final String typeName = getBuiltinTypeName();
-        if ("date".equals(typeName) || "time".equals(typeName)) {
-            // Format value specially
-            result = formatSubValue(pipelineContext, getFirstValueType(), getValue(pipelineContext));
-        } else if ("dateTime".equals(typeName)) {
-            // Format value specially
-            // Extract date part
-            final String datePart = getDateTimeDatePart(getValue(pipelineContext), 'T');
-            result = formatSubValue(pipelineContext, getFirstValueType(), datePart);
+        if (isRelevant()) {
+            final String typeName = getBuiltinTypeName();
+            if ("date".equals(typeName) || "time".equals(typeName)) {
+                // Format value specially
+                result = formatSubValue(pipelineContext, getFirstValueType(), getValue(pipelineContext));
+            } else if ("dateTime".equals(typeName)) {
+                // Format value specially
+                // Extract date part
+                final String datePart = getDateTimeDatePart(getValue(pipelineContext), 'T');
+                result = formatSubValue(pipelineContext, getFirstValueType(), datePart);
+            } else {
+                // Regular case, use external value
+                result = getExternalValue(pipelineContext);
+            }
         } else {
-            // Regular case, use external value
-            result = getExternalValue(pipelineContext);
+            result = null;
         }
 
         return (result != null) ? result : "";
@@ -420,14 +430,18 @@ public class XFormsInputControl extends XFormsValueControl {
     public String getSecondValueUseFormat(PipelineContext pipelineContext) {
         final String result;
 
-        final String typeName = getBuiltinTypeName();
-        if ("dateTime".equals(typeName)) {
-            // Format value specially
-            // Extract time part
-            final String timePart = getDateTimeTimePart(getValue(pipelineContext), 'T');
-            result = formatSubValue(pipelineContext, getSecondValueType(), timePart);
+        if (isRelevant()) {
+            final String typeName = getBuiltinTypeName();
+            if ("dateTime".equals(typeName)) {
+                // Format value specially
+                // Extract time part
+                final String timePart = getDateTimeTimePart(getValue(pipelineContext), 'T');
+                result = formatSubValue(pipelineContext, getSecondValueType(), timePart);
+            } else {
+                // N/A
+                result = null;
+            }
         } else {
-            // N/A
             result = null;
         }
 

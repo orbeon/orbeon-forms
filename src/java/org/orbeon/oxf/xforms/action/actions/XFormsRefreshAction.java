@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsRefreshEvent;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -33,19 +34,19 @@ import org.orbeon.saxon.om.Item;
 public class XFormsRefreshAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XBLContainer container = actionInterpreter.getXBLContainer();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
-        final XFormsModel model = (modelId != null) ? container.findModelByStaticId(modelId) : actionInterpreter.getContextStack().getCurrentModel();
+        final XFormsModel model = actionInterpreter.resolveModel(propertyContext, actionElement, modelId);
 
         if (model == null)
             throw new ValidationException("Invalid model id: " + modelId, (LocationData) actionElement.getData());
 
         // Because of inter-model dependencies, we consider for now that the action must force the operation
-        model.getDeferredActionContext().refresh = true;
+        container.requireRefresh();
         container.dispatchEvent(propertyContext, new XFormsRefreshEvent(containingDocument, model));
     }
 }

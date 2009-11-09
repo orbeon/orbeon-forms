@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 
 /**
@@ -33,7 +34,7 @@ import org.orbeon.saxon.om.Item;
 public class XFormsDispatchAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
@@ -52,14 +53,14 @@ public class XFormsDispatchAction extends XFormsAction {
         final String resolvedNewEventName;
         {
             // Resolve AVT
-            resolvedNewEventName = resolveAVTProvideValue(actionInterpreter, propertyContext, actionElement, newEventNameAttributeValue, false);
+            resolvedNewEventName = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, newEventNameAttributeValue, false);
             if (resolvedNewEventName == null)
                 return;
         }
         final String resolvedNewEventTargetStaticId;
         {
             // Resolve AVT
-            resolvedNewEventTargetStaticId = resolveAVTProvideValue(actionInterpreter, propertyContext, actionElement, newEventTargetIdValue, true);
+            resolvedNewEventTargetStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, newEventTargetIdValue, true);
             if (resolvedNewEventTargetStaticId == null)
                 return;
         }
@@ -69,20 +70,20 @@ public class XFormsDispatchAction extends XFormsAction {
         {
             // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
             // The event factory makes sure that those values are ignored for predefined events
-            final String newEventBubblesString = resolveAVT(actionInterpreter, propertyContext, actionElement, "bubbles", false);
+            final String newEventBubblesString = actionInterpreter.resolveAVT(propertyContext, actionElement, "bubbles", false);
             newEventBubbles = Boolean.valueOf((newEventBubblesString == null) ? "true" : newEventBubblesString);
         }
         final boolean newEventCancelable;
         {
             // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
             // The event factory makes sure that those values are ignored for predefined events
-            final String newEventCancelableString = resolveAVT(actionInterpreter, propertyContext, actionElement, "cancelable", false);
+            final String newEventCancelableString = actionInterpreter.resolveAVT(propertyContext, actionElement, "cancelable", false);
             newEventCancelable = Boolean.valueOf((newEventCancelableString == null) ? "true" : newEventCancelableString);
         }
         final int resolvedDelay;
         {
             // Resolve AVT
-            final String delayString = resolveAVT(actionInterpreter, propertyContext, actionElement, "delay", false);
+            final String delayString = actionInterpreter.resolveAVT(propertyContext, actionElement, "delay", false);
             resolvedDelay = (delayString == null || delayString.equals("")) ? 0 : Integer.parseInt(delayString);
         }
 
@@ -94,7 +95,7 @@ public class XFormsDispatchAction extends XFormsAction {
             // action."
 
             // Find actual target
-            final Object xformsEventTarget = resolveEffectiveObject(actionInterpreter, propertyContext, resolvedNewEventTargetStaticId, actionElement);
+            final Object xformsEventTarget = actionInterpreter.resolveEffectiveObject(propertyContext, actionElement, resolvedNewEventTargetStaticId);
             if (xformsEventTarget instanceof XFormsEventTarget) {
                 // Create and dispatch the event
                 final XFormsEvent newEvent = XFormsEventFactory.createEvent(containingDocument, resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable);
@@ -122,12 +123,12 @@ public class XFormsDispatchAction extends XFormsAction {
             // Whether to tell the client to show a progress indicator when sending this event
             final boolean showProgress;
             {
-                final String showProgressString = resolveAVT(actionInterpreter, propertyContext, actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME, false);
+                final String showProgressString = actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME, false);
                 showProgress = !"false".equals(showProgressString);
             }
             final String progressMessage;
             if (showProgress) {
-                progressMessage = resolveAVT(actionInterpreter, propertyContext, actionElement, XFormsConstants.XXFORMS_PROGRESS_MESSAGE_QNAME, false);
+                progressMessage = actionInterpreter.resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_PROGRESS_MESSAGE_QNAME, false);
             } else {
                 progressMessage = null;
             }

@@ -1,0 +1,60 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Navigation - Main</xhtml:title>
+        <xforms:model>
+            
+            <!-- Main instance where collect data from users -->
+            <xforms:instance id="registration">
+                <registration>
+                    <first-name/>
+                    <last-name/>
+                    <country/>
+                </registration>
+            </xforms:instance>
+            
+            
+            <!-- Submission taking us to the search page -->
+            <xforms:submission id="go-to-search" ref="instance('registration')"  method="post" replace="all" resource="navigation-search"/>
+                
+            <!-- List of all possible countries -->
+            <xforms:instance id="all-countries" src="oxf:/apps/xforms-controls/services/countries.xml"/>
+
+            <!-- Instance with data returned by the search -->
+            <xforms:instance id="input" src="input:instance"/>
+
+            <!-- If we get an initial instance and country from the search page, use that -->
+            <xforms:action ev:event="xforms-model-construct-done" if="exists(instance('input')/registration)">
+                <xforms:insert nodeset="instance('registration')" origin="instance('input')/registration"/>
+                <xforms:setvalue ref="instance('registration')/country" value="instance('input')/country"/>
+            </xforms:action>
+                
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-label { font-weight: bold; display: block; margin-top: .5em; }
+            .select-country { font-style: italic; }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:input ref="first-name">
+            <xforms:label>First name</xforms:label>
+        </xforms:input>
+        <xforms:input ref="last-name">
+            <xforms:label>Last name</xforms:label>
+        </xforms:input>
+        <xforms:output value="instance('all-countries')/country[us-code = instance('registration')/country]/name">
+            <xforms:label>Country</xforms:label>
+        </xforms:output>
+        <xforms:trigger appearance="minimal" class="select-country">
+            <xforms:label value="if (country = '') then 'Choose country' else '(change)'"/>
+            <xforms:send ev:event="DOMActivate" submission="go-to-search"/>
+        </xforms:trigger>
+    </xhtml:body>
+</xhtml:html>

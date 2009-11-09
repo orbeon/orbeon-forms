@@ -25,7 +25,6 @@ import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -96,6 +95,15 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
      * @param index  new repeat index
      */
     public void setIndex(int index) {
+        // Set index
+        setIndexInternal(index);
+
+        // Handle rebuild flags for container affected by changes to this repeat
+        final XBLContainer resolutionScopeContainer = getXBLContainer().findResolutionScope(getPrefixedId());
+        resolutionScopeContainer.setDeferredFlagsForSetindex();
+    }
+
+    private void setIndexInternal(int index) {
         final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getLocalForUpdate();
         local.index = ensureIndexBounds(index);
     }
@@ -114,18 +122,43 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    protected void evaluate(PropertyContext propertyContext) {
+    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
         
-        // For now, repeat does not support label, help, etc. so don't call super.evaluate()
+        // This will evaluate relevance
+        super.evaluate(propertyContext, isRefresh);
 
         // Evaluate iterations
         final List<XFormsControl> children = getChildren();
         if (children != null) {
             for (XFormsControl child: children) {
                 final XFormsRepeatIterationControl currentRepeatIteration = (XFormsRepeatIterationControl) child;
-                currentRepeatIteration.evaluate(propertyContext);
+                currentRepeatIteration.evaluate(propertyContext, isRefresh);
             }
         }
+    }
+    
+    @Override
+    public String getLabel(PropertyContext propertyContext) {
+        // Don't bother letting superclass handle this
+        return null;
+    }
+
+    @Override
+    public String getHelp(PropertyContext propertyContext) {
+        // Don't bother letting superclass handle this
+        return null;
+    }
+
+    @Override
+    public String getHint(PropertyContext propertyContext) {
+        // Don't bother letting superclass handle this
+        return null;
+    }
+
+    @Override
+    public String getAlert(PropertyContext propertyContext) {
+        // Don't bother letting superclass handle this
+        return null;
     }
 
     @Override
@@ -253,7 +286,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 contextStack.setBinding(this);
                 contextStack.popBinding();
             }
-            contextStack.pushBinding(propertyContext, getControlElement());
+            contextStack.pushBinding(propertyContext, getControlElement(), getEffectiveId(), getResolutionScope());
             setBindingContext(propertyContext, contextStack.getCurrentBindingContext());
 
             newRepeatNodeset = getBindingContext().getNodeset();
@@ -261,7 +294,13 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
         // Move things around and create new iterations if needed
         if (!compareNodesets(oldRepeatNodeset, newRepeatNodeset)) {
-            updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, insertedNodeInfos);
+            // Update iterations
+            final List<XFormsRepeatIterationControl> newIterations = updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, insertedNodeInfos);
+            // Initialize all new iterations
+            final ControlTree currentControlTree = containingDocument.getControls().getCurrentControlTree();
+            for (XFormsRepeatIterationControl newIteration: newIterations) {
+                currentControlTree.initializeRepeatIterationTree(propertyContext, newIteration);
+            }
         }
     }
 
@@ -287,9 +326,10 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
         final boolean isInsert = insertedNodeInfos != null;
 
+        final ControlTree currentControlTree = controls.getCurrentControlTree();
+
         final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
         final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
-        final ControlTree currentControlTree = controls.getCurrentControlTree();
 
         boolean updated = false;
         final List<XFormsRepeatIterationControl> newIterations;
@@ -312,17 +352,26 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     // Node has moved or is removed
 
                     final boolean isRemoved = currentNewIndex == -1;
-                    final XFormsRepeatIterationControl removedIteration = (XFormsRepeatIterationControl) oldChildren.get(i);
+                    final XFormsRepeatIterationControl movedOrRemovedIteration = (XFormsRepeatIterationControl) oldChildren.get(i);
+
                     if (isRemoved) {
-                        if (isDebugEnabled)
-                            indentedLogger.logDebug("xforms:repeat", "removing iteration", "id", getEffectiveId(), "index", Integer.toString(i + 1));
+                        if (isDebugEnabled) {
+                            indentedLogger.startHandleOperation("xforms:repeat", "removing iteration", "id", getEffectiveId(), "index", Integer.toString(i + 1));
+                        }
+
+                        // Dispatch destruction events
+                        currentControlTree.dispatchDestructionEvents(propertyContext, movedOrRemovedIteration);
 
                         // Indicate to iteration that it is being removed
-                        removedIteration.iterationRemoved(propertyContext);
+                        movedOrRemovedIteration.iterationRemoved(propertyContext);
+
+                        if (isDebugEnabled) {
+                            indentedLogger.endHandleOperation();
+                        }
                     }
 
                     // Deindex old iteration
-                    currentControlTree.deindexSubtree(removedIteration, true, isRemoved);
+                    currentControlTree.deindexSubtree(movedOrRemovedIteration, true);
                     updated = true;
                 }
             }
@@ -339,7 +388,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     // This new node was not in the old nodeset so create a new one
 
                     if (isDebugEnabled) {
-                        indentedLogger.logDebug("xforms:repeat", "creating new iteration", "id", getEffectiveId(), "index", Integer.toString(repeatIndex));
+                        indentedLogger.startHandleOperation("xforms:repeat", "creating new iteration", "id", getEffectiveId(), "index", Integer.toString(repeatIndex));
                     }
 
                     final XFormsContextStack contextStack = getXBLContainer().getContextStack();
@@ -350,6 +399,10 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     updated = true;
 
                     newIterations.add(newIteration);
+
+                    if (isDebugEnabled) {
+                        indentedLogger.endHandleOperation();
+                    }
                 } else {
                     // This new node was in the old nodeset so keep it
                     newIteration = (XFormsRepeatIterationControl) oldChildren.get(currentOldIndex);
@@ -367,8 +420,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                         // Set new index
                         newIteration.setIterationIndex(repeatIndex);
 
-                        // Index new iteration but do not cause events to be sent
-                        currentControlTree.indexSubtree(newIteration, true, false);
+                        // Index new iteration
+                        currentControlTree.indexSubtree(newIteration, true);
                         updated = true;
                     }
                 }
@@ -400,7 +453,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                                     "id", getEffectiveId(), "new index", Integer.toString(newRepeatIndex));
                         }
 
-                        setIndex(newRepeatIndex);
+                        setIndexInternal(newRepeatIndex);
                         didSetIndex = true;
                         break;
                     }
@@ -423,7 +476,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                                    "new index", Integer.toString(newRepeatIndex));
                         }
 
-                        setIndex(newRepeatIndex);
+                        setIndexInternal(newRepeatIndex);
                     }
                 } else if (oldRepeatIndex > 0 && oldRepeatIndex <= newIndexes.length) {
                     // The index was pointing to a node which has been removed
@@ -438,7 +491,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                                     "id", getEffectiveId(), "new index", Integer.toString(newRepeatNodeset.size()));
                         }
 
-                        setIndex(newRepeatNodeset.size());
+                        setIndexInternal(newRepeatNodeset.size());
                     } else {
                         // "if the new size of the collection is equal to or greater than the index, the index is not
                         // changed"
@@ -447,7 +500,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 } else {
                     // Old index was out of bounds?
 
-                    setIndex(getStartIndex());
+                    setIndexInternal(getStartIndex());
 
                     if (isDebugEnabled) {
                         indentedLogger.logDebug("xforms:repeat", "resetting index",
@@ -464,11 +517,19 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 for (int i = 0; i < oldChildren.size(); i++) {
 
                     if (isDebugEnabled) {
-                        indentedLogger.logDebug("xforms:repeat", "removing iteration", "id", getEffectiveId(), "index", Integer.toString(i + 1));
+                        indentedLogger.startHandleOperation("xforms:repeat", "removing iteration", "id", getEffectiveId(), "index", Integer.toString(i + 1));
                     }
 
+                    final XFormsRepeatIterationControl removedIteration = (XFormsRepeatIterationControl) oldChildren.get(i);
+
+                    // Dispatch destruction events
+                    currentControlTree.dispatchDestructionEvents(propertyContext, removedIteration);
+
                     // Deindex old iteration
-                    currentControlTree.deindexSubtree((XFormsContainerControl) oldChildren.get(i), true, true);
+                    currentControlTree.deindexSubtree(removedIteration, true);
+                    if (isDebugEnabled) {
+                        indentedLogger.endHandleOperation();
+                    }
                     updated = true;
                 }
             }
@@ -479,7 +540,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             }
 
             setChildren(null);
-            setIndex(0);
+            setIndexInternal(0);
 
             newIterations = Collections.emptyList();
         }

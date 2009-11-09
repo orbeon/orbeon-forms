@@ -26,6 +26,7 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 
 import java.io.IOException;
@@ -88,13 +89,15 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                 }
 
                 // Get last modification date and compute last modified if possible
+                // NOTE: It is not clear if this is right! We had a discussion top "remove serializer last modified,
+                // and use oxf:request-generator default validity".
                 final long lastModified = findInputLastModified(pipelineContext, dataInput, true);
 
                 // Set caching headers and force revalidation
                 response.setCaching(lastModified, true, true);
 
                 // Check if we are processing a forward. If so, we cannot tell the client that the content has not been modified. 
-                final boolean isForward = externalContext.getRequest().getAttributesMap().get("javax.servlet.forward.request_uri") != null;
+                final boolean isForward = URLRewriterUtils.isForwarded(externalContext.getRequest());
                 if (!isForward) {
                     // Check If-Modified-Since (conditional GET) and don't return content if condition is met
                     if (!response.checkIfModifiedSince(lastModified, true)) {

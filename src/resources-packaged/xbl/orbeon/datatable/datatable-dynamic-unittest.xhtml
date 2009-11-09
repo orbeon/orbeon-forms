@@ -46,14 +46,52 @@
 
         <xhtml:fieldset>
             <xhtml:legend>Datatable test controls</xhtml:legend>
-            <xhtml:p>
-                <xforms:group ref="instance('controls')">
+            <xforms:group ref="instance('controls')">
+                <xhtml:p>
                     <xforms:input ref="maxLength" id="maxLength">
                         <xforms:label>Maximum length: </xforms:label>
                         <xforms:help>Used by tests that check instance updates.</xforms:help>
                     </xforms:input>
-                </xforms:group>
-            </xhtml:p>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:input ref="page" id="page">
+                        <xforms:label>Current page: </xforms:label>
+                        <xforms:help>Used by tests that check external pagination.</xforms:help>
+                    </xforms:input>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:input ref="rowsPerPage" id="rowsPerPage">
+                        <xforms:label>Number of rows per page: </xforms:label>
+                        <xforms:help>Used by tests that check external pagination.</xforms:help>
+                    </xforms:input>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:input ref="sortOrder" id="sortOrder">
+                        <xforms:label>Sort order: </xforms:label>
+                        <xforms:help>Used by tests that check external sort.</xforms:help>
+                    </xforms:input>
+                </xhtml:p>
+                <xhtml:p>
+                    <xforms:input ref="sortedColumn" id="sortedColumn">
+                        <xforms:label>Sorted column: </xforms:label>
+                        <xforms:help>Used by tests that check external sort.</xforms:help>
+                    </xforms:input>
+                </xhtml:p>
+                <xforms:input ref="loading" id="loading" appearance="full">
+                    <!--TODO: replace by a select1 when #314362 will be fixed -->
+                    <!--<xforms:item>
+                        <xforms:label>true</xforms:label>
+                        <xforms:value>true</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                        <xforms:label>false</xforms:label>
+                        <xforms:value>false</xforms:value>
+                        </xforms:item>-->
+                    <xforms:label>Loading in progress: </xforms:label>
+                    <xforms:help>Used by tests that check the loading indicator
+                        feature</xforms:help>
+                </xforms:input>
+            </xforms:group>
             <xhtml:ol>
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="open-all">
@@ -305,6 +343,105 @@
                 </xhtml:div>
             </fr:case>
 
+            <fr:case selected="true" id="sorted">
+                <fr:label>Testing sortable columns on a mixed datatable with a sorted
+                    column</fr:label>
+                <xhtml:div>
+                    <xhtml:p/>
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <fr:datatable id="sorted-table" debug="true">
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xforms:repeat nodeset="line[1]/*[not(self::position)]">
+                                        <xhtml:th fr:sortable="true">
+                                            <xforms:output value="name()"/>
+                                        </xhtml:th>
+                                    </xforms:repeat>
+                                    <xhtml:th fr:sortable="true" fr:sorted="ascending"
+                                        >position</xhtml:th>
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="line[length &lt; 20]">
+                                    <xhtml:tr>
+                                        <xforms:repeat nodeset="*[not(self::position)]">
+                                            <xhtml:td>
+                                                <xforms:output value="."/>
+                                            </xhtml:td>
+                                        </xforms:repeat>
+                                        <xhtml:td>
+                                            <xforms:output value="position"/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
+
+            <fr:case selected="true" id="sortableExternal">
+                <fr:label>Testing sortable columns on a mixed datatable processed by the
+                    application</fr:label>
+                <xhtml:div>
+                    <xhtml:p/>
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <xxforms:variable name="sortOrder" select="instance('controls')/sortOrder"/>
+                        <xxforms:variable name="nodeset" select="line[length &lt; 20]"/>
+                        <xxforms:variable name="class"
+                            select="if ($sortOrder='ascending') then 'yui-dt-asc' else if ($sortOrder='descending') then 'yui-dt-desc' else ''"/>
+                        <xxforms:variable name="sortedNodeset"
+                            select="
+                                    if ($sortOrder='none') 
+                                        then $nodeset
+                                        else exf:sort($nodeset,  'length div nb-words' , 'number', $sortOrder)"
+                            xmlns:exf="http://www.exforms.org/exf/1-0"/>
+
+
+                        <fr:datatable id="sortableExternal-table" debug="true"
+                            sortAndPaginationMode="external">
+                            <xforms:action ev:event="fr-update-sort">
+                                <xforms:setvalue ref="instance('controls')/sortedColumn"
+                                    value="event('fr-column')"/>
+                                <xforms:setvalue ref="$sortOrder"
+                                    value="if ($sortOrder='ascending') then 'descending' else if ($sortOrder='descending') then 'none' else 'ascending'"
+                                />
+                            </xforms:action>
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xhtml:th>Position</xhtml:th>
+                                    <xforms:repeat nodeset="line[1]/*">
+                                        <xhtml:th>
+                                            <xforms:output value="name()"/>
+                                        </xhtml:th>
+                                    </xforms:repeat>
+                                    <xhtml:th fr:sortable="true" class="{$class}"
+                                        fr:sortMessage="if ($sortOrder='ascending') then 'Hey you, click to sort descending' else if ($sortOrder='descending') then 'Hey you, click to cancel sort' else 'Hey you, click to sort ascending'"
+                                        >Characters per word</xhtml:th>
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="$sortedNodeset">
+                                    <xhtml:tr>
+                                        <xhtml:td>
+                                            <xforms:output value="position()"/>
+                                        </xhtml:td>
+                                        <xforms:repeat nodeset="*">
+                                            <xhtml:td>
+                                                <xforms:output value="."/>
+                                            </xhtml:td>
+                                        </xforms:repeat>
+                                        <xhtml:td class="{$class}">
+                                            <xforms:output value="round(length div nb-words)"/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
+
             <fr:case selected="true" id="scrollH">
                 <fr:label>Testing a mixed datatable that is horizontally scrollable</fr:label>
                 <xhtml:div>
@@ -363,7 +500,8 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat nodeset="line[length &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
+                                <xforms:repeat
+                                    nodeset="line[length &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="position()"/>
@@ -383,13 +521,14 @@
                     </xforms:group>
                 </xhtml:div>
             </fr:case>
-            
+
             <fr:case selected="true" id="paginate">
                 <fr:label>Testing paginated tables</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
                     <xforms:group ref="instance('detailed-lorem')">
-                        <fr:datatable id="paginate-table" debug="false" paginated="true" rowsPerPage="5">
+                        <fr:datatable id="paginate-table" debug="false" paginated="true"
+                            rowsPerPage="5">
                             <xhtml:thead>
                                 <xhtml:tr>
                                     <xhtml:th>Position</xhtml:th>
@@ -422,13 +561,15 @@
                     </xforms:group>
                 </xhtml:div>
             </fr:case>
-            
+
             <fr:case selected="true" id="paginateMaxPage">
-                <fr:label>Testing paginated tables with a maximum number of pages to display</fr:label>
+                <fr:label>Testing paginated tables with a maximum number of pages to
+                    display</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
                     <xforms:group ref="instance('detailed-lorem')">
-                        <fr:datatable id="paginateMaxPage-table" debug="false" paginated="true" maxNbPagesToDisplay="7" rowsPerPage="4">
+                        <fr:datatable id="paginateMaxPage-table" debug="false" paginated="true"
+                            maxNbPagesToDisplay="7" rowsPerPage="4">
                             <xhtml:thead>
                                 <xhtml:tr>
                                     <xhtml:th>Position</xhtml:th>
@@ -461,7 +602,98 @@
                     </xforms:group>
                 </xhtml:div>
             </fr:case>
-            
+
+            <fr:case selected="true" id="paginateExternal">
+                <fr:label>Testing paginated tables supported by the application</fr:label>
+                <xhtml:div>
+                    <xhtml:p/>
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <xxforms:variable name="nbRows" select="count(line)"/>
+                        <xxforms:variable name="rowsPerPage"
+                            select="instance('controls')/rowsPerPage"/>
+                        <xxforms:variable name="nbPages" select="ceiling($nbRows div $rowsPerPage)"/>
+                        <xxforms:variable name="page" select="instance('controls')/page"/>
+
+                        <fr:datatable id="paginateExternal-table" debug="false" paginated="true"
+                            maxNbPagesToDisplay="7" sortAndPaginationMode="external" page="$page"
+                            nbPages="$nbPages">
+                            <xforms:action ev:event="fr-goto-page">
+                                <xforms:setvalue ref="$page" value="event('fr-new-page')"/>
+                            </xforms:action>
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xhtml:th>Position</xhtml:th>
+                                    <xforms:repeat nodeset="line[1]/*">
+                                        <xhtml:th>
+                                            <xforms:output value="name()"/>
+                                        </xhtml:th>
+                                    </xforms:repeat>
+                                    <xhtml:th>Characters per word</xhtml:th>
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat
+                                    nodeset="line[position() >= ($page - 1) * $rowsPerPage + 1 and position() &lt;= $page * $rowsPerPage]">
+                                    <xhtml:tr>
+                                        <xhtml:td>
+                                            <xforms:output value="position()"/>
+                                        </xhtml:td>
+                                        <xforms:repeat nodeset="*">
+                                            <xhtml:td>
+                                                <xforms:output value="."/>
+                                            </xhtml:td>
+                                        </xforms:repeat>
+                                        <xhtml:td>
+                                            <xforms:output value="round(length div nb-words)"/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
+
+
+            <fr:case selected="true" id="_314379">
+                <fr:label>Bug #314379</fr:label>
+                <xhtml:div>
+                    <xhtml:p>Bug <xhtml:a
+                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314379&amp;group_id=168&amp;atid=350207"
+                            >#314379</xhtml:a>: Scrollable datatables with dynamic columns get
+                        desynchronized after de hide/show cycle</xhtml:p>
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <fr:datatable id="table-314379" scrollable="both" height="200px"
+                            width="600px" loading="xxforms:instance('controls')/loading = 'true'">
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xforms:repeat nodeset="line[1]/*">
+                                        <xhtml:th fr:resizeable="true">
+                                            <xforms:output value="name()"/>
+                                        </xhtml:th>
+                                    </xforms:repeat>
+                                    <xhtml:th>Characters per word</xhtml:th>
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="line[length > 60]">
+                                    <xhtml:tr>
+                                        <xforms:repeat nodeset="*">
+                                            <xhtml:td>
+                                                <xforms:output value="."/>
+                                            </xhtml:td>
+                                        </xforms:repeat>
+                                        <xhtml:td>
+                                            <xforms:output value="round(length div nb-words)"/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
+
         </fr:accordion>
 
         <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->

@@ -56,9 +56,7 @@ public class XFormsProperties {
 //    private static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "optimize-local-instance-loads";
     private static final String OPTIMIZE_RELEVANCE_PROPERTY = "optimize-relevance";
     private static final String EXPOSE_XPATH_TYPES_PROPERTY = "expose-xpath-types";
-    private static final String PLAIN_VALUE_CHANGE_PROPERTY = "server.events.plain-value-change";
     private static final String INITIAL_REFRESH_EVENTS_PROPERTY = "server.events.initial-refresh-events";
-    private static final String EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY = "exception-invalid-client-control";
     private static final String AJAX_SHOW_LOADING_ICON_PROPERTY = "ajax.show-loading-icon";
     private static final String AJAX_SHOW_ERRORS_PROPERTY = "ajax.show-errors";
 
@@ -119,9 +117,10 @@ public class XFormsProperties {
     private static final String COMPUTED_BINDS_PROPERTY = "computed-binds";
     public static final String COMPUTED_BINDS_RECALCULATE_VALUE = "recalculate";
     public static final String COMPUTED_BINDS_REVALIDATE_VALUE = "revalidate";
-    public static final String DISPATCH_INITIAL_EVENTS = "dispatch-initial-events";
 
-    public static final String NEW_XHTML_LAYOUT = "new-xhtml-layout";
+    public static final String NEW_XHTML_LAYOUT = "new-xhtml-layout";   // deprecated
+    public static final String XHTML_LAYOUT = "xhtml-layout";
+    public enum XHTMLLayout { NOSPAN, SPAN }
 
     private static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
 
@@ -191,17 +190,13 @@ public class XFormsProperties {
             new PropertyDefinition(OPTIMIZE_LOCAL_INSTANCE_INCLUDE_PROPERTY, false, false),
             new PropertyDefinition(OPTIMIZE_RELEVANCE_PROPERTY, false, false),
             new PropertyDefinition(EXPOSE_XPATH_TYPES_PROPERTY, false, false),
-            new PropertyDefinition(PLAIN_VALUE_CHANGE_PROPERTY, false, false),
             new PropertyDefinition(INITIAL_REFRESH_EVENTS_PROPERTY, true, false),
-            new PropertyDefinition(EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY, false, false),
             new PropertyDefinition(AJAX_SHOW_LOADING_ICON_PROPERTY, true, false),
             new PropertyDefinition(AJAX_SHOW_ERRORS_PROPERTY, true, false),
             new PropertyDefinition(MINIMAL_RESOURCES_PROPERTY, true, false),
             new PropertyDefinition(COMBINE_RESOURCES_PROPERTY, true, false),
             new PropertyDefinition(SKIP_SCHEMA_VALIDATION_PROPERTY, false, false),
             new PropertyDefinition(COMPUTED_BINDS_PROPERTY, COMPUTED_BINDS_RECALCULATE_VALUE, false),
-            new PropertyDefinition(DISPATCH_INITIAL_EVENTS, true, false),
-            new PropertyDefinition(NEW_XHTML_LAYOUT, false, true),
             new PropertyDefinition(DATE_FORMAT_PROPERTY, "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(DATETIME_FORMAT_PROPERTY, "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(TIME_FORMAT_PROPERTY, "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
@@ -214,6 +209,8 @@ public class XFormsProperties {
             new PropertyDefinition(FORWARD_SUBMISSION_HEADERS, DEFAULT_FORWARD_SUBMISSION_HEADERS, false),
 
             // Properties to propagate to the client
+            new PropertyDefinition(NEW_XHTML_LAYOUT, false, true),
+            new PropertyDefinition(XHTML_LAYOUT, XHTMLLayout.NOSPAN.toString().toLowerCase(), true),
             new PropertyDefinition(SESSION_HEARTBEAT_PROPERTY, true, true),
             new PropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY, 12 * 60 * 60 * 800, true), // dynamic; 80 % of 12 hours in ms
             new PropertyDefinition(FCK_EDITOR_BASE_PATH_PROPERTY, "/ops/fckeditor/", true),// dynamic
@@ -311,8 +308,10 @@ public class XFormsProperties {
     }
 
     public  static Object parseProperty(String propertyName, String propertyValue) {
+        assert propertyName != null && propertyValue != null;
+        
         final PropertyDefinition propertyDefinition = getPropertyDefinition(propertyName);
-        return propertyDefinition.parseProperty(propertyValue);
+        return (propertyDefinition == null) ? null : propertyDefinition.parseProperty(propertyValue);
     }
 
     public static String getXFormsPassword() {
@@ -430,10 +429,6 @@ public class XFormsProperties {
         return getBooleanProperty(containingDocument, OPTIMIZE_LOCAL_INSTANCE_INCLUDE_PROPERTY);
     }
 
-    public static boolean isExceptionOnInvalidClientControlId(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, EXCEPTION_ON_INVALID_CLIENT_CONTROL_PROPERTY);
-    }
-
     public static boolean isAjaxShowLoadingIcon(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, AJAX_SHOW_LOADING_ICON_PROPERTY);
     }
@@ -454,10 +449,6 @@ public class XFormsProperties {
         return getBooleanProperty(containingDocument, OPTIMIZE_RELEVANCE_PROPERTY);
     }
 
-    public static boolean isPlainValueChange(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, PLAIN_VALUE_CHANGE_PROPERTY);
-    }
-
     public static boolean isInitialRefreshEvents(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, INITIAL_REFRESH_EVENTS_PROPERTY);
     }
@@ -470,12 +461,10 @@ public class XFormsProperties {
         return getStringProperty(containingDocument, COMPUTED_BINDS_PROPERTY);
     }
 
-    public static boolean isDispatchInitialEvents(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, DISPATCH_INITIAL_EVENTS);
-    }
-
     public static boolean isNewXHTMLLayout(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, NEW_XHTML_LAYOUT);
+        // Check both properties for backward compatibility
+        final String value = getStringProperty(containingDocument, XHTML_LAYOUT);
+        return XHTMLLayout.SPAN.toString().toLowerCase().equals(value) || getBooleanProperty(containingDocument, NEW_XHTML_LAYOUT);
     }
 
     public static boolean isReadonly(XFormsContainingDocument containingDocument) {

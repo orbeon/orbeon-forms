@@ -35,9 +35,10 @@
 
 /* Nicely position the help image */
 .xforms-help-image {
-    vertical-align: -0.2em;
+    vertical-align: middle;
     display: inline;
     margin: 0 .5em 0 -1px;/* move icon to the left a bit to align it better */
+    *margin-top: .25em;   /* help IE 6 position icon relatively to the label */
     padding: 0;
     float: left; /* HACK: Without the "float: left" on FF2/3 the mouseover event arrive on the label, not the help
                     image at the left of the label. */
@@ -353,13 +354,13 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 
 /* Cell content */
 .fr-grid-content {
-    padding: 0 0.5em 0 0.5em;      /* Add some space arround control */
+    padding: 0 0.5em 0 0.5em;      /* Add some space around control */
     *padding-right: 6px; /* To help IE move back controls within .fr-grid-content */
 }
 
 .fr-grid-content .xforms-label {
-    margin-top: 1em;        /* Space between control and the one on top of this one */
-    margin-bottom: .8em;    /* Space between label control and control "field" */
+    margin-top: .25em;      /* Space between control and the one on top of this one */
+    margin-bottom: 0;       /* Space between label control and control "field" */
     display: block;         /* So the margin has an effect */
 }
 
@@ -379,11 +380,11 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 /* NOTE: This doesn't work well with IE 6/7, see below hand-tuned widths for IE */
 .fr-grid .xforms-input input,
     .fr-grid .xforms-upload input,
-    .fr-grid .xforms-textarea,
-    .fr-grid .xforms-secret,
-    .fr-grid .xforms-select1-appearance-minimal,
-    .fr-grid .xforms-select1-appearance-compact,
-    .fr-grid .xforms-select-appearance-compact {
+    .xforms-layout-nospan .fr-grid .xforms-textarea, .xforms-layout-span .fr-grid .xforms-textarea textarea,
+    .xforms-layout-nospan .fr-grid .xforms-secret, .xforms-layout-span .fr-grid xforms-secret input,
+    .xforms-layout-nospan .fr-grid .xforms-select1-appearance-minimal, .xforms-layout-span .fr-grid .xforms-select1-appearance-minimal select,
+    .xforms-layout-nospan .fr-grid .xforms-select1-appearance-compact, .xforms-layout-span .fr-grid .xforms-select1-appearance-compact select,
+    .xforms-layout-nospan .fr-grid .xforms-select-appearance-compact, .xforms-layout-span .fr-grid .xforms-select-appearance-compact select {
     width: 100%;
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
@@ -395,7 +396,7 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 /* NOTE: This doesn't work well with IE 6/7, see below hand-tuned widths for IE */
 .fr-grid .xforms-input input.xforms-type-date,
     .fr-grid .xforms-input input.xforms-type-time {
-    width: 8em;
+    width: 7.5em;
 }
 
 /* Radio buttons */

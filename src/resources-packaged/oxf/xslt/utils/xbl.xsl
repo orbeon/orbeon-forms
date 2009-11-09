@@ -27,9 +27,13 @@
         <xsl:variable name="namespace" select="namespace-uri($context)"/>
         <xsl:variable name="component" select="local-name($context)"/>
 
+        <xsl:variable name="prefix" select="prefix-from-QName(node-name($context))"/>
+        <xsl:variable name="namespace" select="namespace-uri($context)"/>
+        <xsl:variable name="component" select="local-name($context)"/>
+
         <xsl:choose>
             <xsl:when test="exists($context/*[local-name() = $property and namespace-uri() = $namespace])">
-                <xforms:input class="xbl-{$prefix}-{$component}-{$property} xforms-initially-hidden" xxbl:attr="{$prefix}:{$property}/@*">
+                <xforms:input class="xbl-{$prefix}-{$component}-{$property} xforms-initially-hidden" xxbl:attr="{$prefix}:{$property}/@*" xxbl:scope="outer">
                     <xxforms:script ev:event="xforms-value-changed">
                         <xsl:text>YAHOO.xbl.</xsl:text>
                         <xsl:value-of select="$prefix"/>

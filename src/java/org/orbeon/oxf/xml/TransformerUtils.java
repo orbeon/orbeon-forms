@@ -37,10 +37,10 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TemplatesHandler;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -330,33 +330,58 @@ public class TransformerUtils {
      * Transform an InputStream to a dom4j Document.
      */
     public static Document readDom4j(InputStream inputStream, String systemId, boolean handleXInclude) {
-        return readDom4j(new StreamSource(inputStream, systemId), handleXInclude);
+        final LocationSAXContentHandler dom4jResult = new LocationSAXContentHandler();
+        {
+            final ContentHandler ch;
+            if (handleXInclude) {
+                // Insert XIncludeContentHandler
+                ch = new XIncludeProcessor.XIncludeContentHandler(null, dom4jResult, null, new TransformerURIResolver(false));
+            } else {
+                ch = dom4jResult;
+            }
+            XMLUtils.inputStreamToSAX(inputStream, systemId, ch, false, false);
+        }
+        return dom4jResult.getDocument();
+
     }
 
     /**
      * Transform a SAX Source to a dom4j Document.
      */
-    private static Document readDom4j(Source source, boolean handleXInclude) {
-        final LocationSAXContentHandler dom4jResult = new LocationSAXContentHandler();
-        try {
-            final Transformer identity = getIdentityTransformer();
-            if (handleXInclude) {
-                // Insert XIncludeContentHandler
-                identity.transform(source, new SAXResult(new XIncludeProcessor.XIncludeContentHandler(null, dom4jResult, null, new TransformerURIResolver(false))));
-            } else {
-                identity.transform(source, new SAXResult(dom4jResult));
-            }
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
-        return dom4jResult.getDocument();
-    }
+//    private static Document readDom4j(Source source, boolean handleXInclude) {
+//        final LocationSAXContentHandler dom4jResult = new LocationSAXContentHandler();
+//        try {
+//            final Transformer identity = getIdentityTransformer();
+//            if (handleXInclude) {
+//                // Insert XIncludeContentHandler
+//                identity.transform(source, new SAXResult(new XIncludeProcessor.XIncludeContentHandler(null, dom4jResult, null, new TransformerURIResolver(false))));
+//            } else {
+//                identity.transform(source, new SAXResult(dom4jResult));
+//            }
+//        } catch (TransformerException e) {
+//            throw new OXFException(e);
+//        }
+//        return dom4jResult.getDocument();
+//    }
 
     /**
      * Transform an InputStream to a TinyTree.
      */
     public static DocumentInfo readTinyTree(InputStream inputStream, String systemId, boolean handleXInclude) {
-        return readTinyTree(new StreamSource(inputStream, systemId), handleXInclude);
+        final TinyBuilder treeBuilder = new TinyBuilder();
+        {
+            final TransformerHandler identityHandler = getIdentityTransformerHandler();
+            identityHandler.setResult(treeBuilder);
+            final ContentHandler ch;
+            if (handleXInclude) {
+                // Insert XIncludeContentHandler
+                ch = new XIncludeProcessor.XIncludeContentHandler(null, identityHandler, null, new TransformerURIResolver(false));
+            } else {
+                ch = identityHandler;
+            }
+            XMLUtils.inputStreamToSAX(inputStream, systemId, ch, false, false);
+        }
+        return (DocumentInfo) treeBuilder.getCurrentRoot();
     }
 
     /**
@@ -424,8 +449,12 @@ public class TransformerUtils {
     /**
      * Transform a String to a TinyTree.
      */
-    public static DocumentInfo stringToTinyTree(String string) {
-        return readTinyTree(new StreamSource(new StringReader(string)), false);
+    public static DocumentInfo stringToTinyTree(String string, boolean handleXInclude) {
+        try {
+            return readTinyTree(new ByteArrayInputStream(string.getBytes("utf-8")), null, handleXInclude);
+        } catch (UnsupportedEncodingException e) {
+            throw new OXFException(e);// should not happen
+        }
     }
 
     /**

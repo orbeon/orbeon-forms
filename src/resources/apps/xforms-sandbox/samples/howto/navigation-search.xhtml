@@ -1,0 +1,64 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Navigation - Search</xhtml:title>
+        <xforms:model>
+            
+            <!-- Instance holding the selected country and instance we got in input -->
+            <xforms:instance id="country">
+                <response>
+                    <country/>
+                    <!-- We'll insert here the instance we got in input-->
+                </response>
+            </xforms:instance>
+            
+            <!-- "UI" instance to disable the select button until a country has been selected -->
+            <xforms:instance id="ui">
+                <ui>
+                    <select-trigger/>
+                </ui>
+            </xforms:instance>
+            <xforms:bind nodeset="instance('ui')/select-trigger" readonly="instance('country')/country = ''"/>
+            
+            <!-- List of all possible countries -->
+            <xforms:instance id="all-countries" src="oxf:/apps/xforms-controls/services/countries.xml"/>
+
+            <!-- Input instance, which we copy to the 'country' instance when the form loads -->
+            <xforms:instance id="input" src="input:instance"/>
+            <xforms:insert ev:event="xforms-model-construct-done" nodeset="instance('country')/*" origin="instance('input')"/>
+            
+            <!-- Submission to go back to the main form -->
+            <xforms:submission id="go-to-main" ref="instance('country')"  method="post" replace="all" resource="navigation-main"/>
+            
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-label { font-weight: bold; display: block; margin-top: .5em; }
+            .country-selection { width: 15em; }
+            .select-button { margin: .5em 0 0 0; }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        
+        <!-- Field for country name -->
+        <fr:autocomplete ref="country" dynamic-itemset="false" class="country-selection">
+            <xforms:label>Search country</xforms:label>
+            <xforms:itemset nodeset="instance('all-countries')/country">
+                <xforms:value ref="us-code"/>
+                <xforms:label ref="name"/>
+            </xforms:itemset>
+        </fr:autocomplete>
+        
+        <!-- Button to back to main form after selection has been made -->
+        <xforms:trigger ref="instance('ui')/select-trigger" class="select-button">
+            <xforms:label>Select</xforms:label>
+            <xforms:send ev:event="DOMActivate" submission="go-to-main"/>
+        </xforms:trigger>
+    </xhtml:body>
+</xhtml:html>

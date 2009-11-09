@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -28,7 +28,8 @@
                                                                                             oxf:/xbl/orbeon/us-phone/us-phone.xbl
                                                                                             oxf:/xbl/orbeon/us-currency-thousands/us-currency-thousands.xbl"/>
     <property as="xs:string"  name="oxf.fb.toolbox.group.selection.uri.*.*"          value="oxf:/forms/orbeon/builder/xbl/selection-controls.xbl
-                                                                                            oxf:/xbl/orbeon/link-select1/link-select1.xbl"/>
+                                                                                            oxf:/xbl/orbeon/link-select1/link-select1.xbl
+                                                                                            oxf:/xbl/orbeon/box-select/box-select.xbl"/>
     <property as="xs:string"  name="oxf.fb.toolbox.group.other.uri.*.*"              value="oxf:/forms/orbeon/builder/xbl/other-controls.xbl"/>
 
     <!-- Deprecated components configuration property -->

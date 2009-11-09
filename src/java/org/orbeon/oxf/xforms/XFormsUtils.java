@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -40,6 +41,7 @@ import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
 import org.w3c.tidy.Tidy;
@@ -71,6 +73,22 @@ public class XFormsUtils {
     private static final String LOGGING_CATEGORY = "utils";
     private static final Logger logger = LoggerFactory.createLogger(XFormsUtils.class);
     private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
+
+    public static final NodeInfo DUMMY_CONTEXT;
+    static {
+        try {
+            final TinyBuilder treeBuilder = new TinyBuilder();
+            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+            identity.setResult(treeBuilder);
+
+            identity.startDocument();
+            identity.endDocument();
+
+            DUMMY_CONTEXT = treeBuilder.getCurrentRoot();
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+    }
 
     private static final int SRC_CONTENT_BUFFER_SIZE = 1024;
 
@@ -391,11 +409,11 @@ public class XFormsUtils {
 
         // Try to get inline value
         {
-            final FastStringBuffer sb = new FastStringBuffer(20);
+            final StringBuilder sb = new StringBuilder(20);
 
             // Visit the subtree and serialize
 
-            // NOTE: It is a litte funny to do our own serialization here, but the alternative is to build a DOM and
+            // NOTE: It is a little funny to do our own serialization here, but the alternative is to build a DOM and
             // serialize it, which is not trivial because of the possible interleaved xforms:output's. Furthermore, we
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
@@ -418,13 +436,15 @@ public class XFormsUtils {
      *
      * @param propertyContext       current context
      * @param container             current XFormsContainingDocument
+     * @param sourceEffectiveId     source effective id for id resolution
+     * @param scope                 XBL scope
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getChildElementValue(final PropertyContext propertyContext, final XBLContainer container,
-                                              final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
+    public static String getChildElementValue(final PropertyContext propertyContext, final XBLContainer container, final String sourceEffectiveId,
+                                              final XBLBindings.Scope scope, final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
 
         // Check that there is a current child element
         if (childElement == null)
@@ -432,8 +452,8 @@ public class XFormsUtils {
 
         // Child element becomes the new binding
         final XFormsContextStack contextStack = container.getContextStack();
-        contextStack.pushBinding(propertyContext, childElement);
-        final String result = getElementValue(propertyContext, container, contextStack, childElement, acceptHTML, containsHTML);
+        contextStack.pushBinding(propertyContext, childElement, sourceEffectiveId, scope);
+        final String result = getElementValue(propertyContext, container, contextStack, sourceEffectiveId, childElement, acceptHTML, containsHTML);
         contextStack.popBinding();
         return result;
     }
@@ -447,13 +467,14 @@ public class XFormsUtils {
      * @param propertyContext       current PipelineContext
      * @param container             current XBLContainer
      * @param contextStack          context stack for XPath evaluation
+     * @param sourceEffectiveId     source effective id for id resolution
      * @param childElement          element to evaluate (xforms:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
     public static String getElementValue(final PropertyContext propertyContext, final XBLContainer container,
-                                         final XFormsContextStack contextStack,
+                                         final XFormsContextStack contextStack, final String sourceEffectiveId,
                                          final Element childElement, final boolean acceptHTML, final boolean[] containsHTML) {
 
         // No HTML found by default
@@ -489,8 +510,10 @@ public class XFormsUtils {
                             currentNodeset, currentBindingContext.getPosition(),
                             valueAttribute, container.getNamespaceMappings(childElement),
                             contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                            contextStack.getFunctionContext(), null,
+                            contextStack.getFunctionContext(sourceEffectiveId), null,
                             (LocationData) childElement.getData());
+
+                    contextStack.returnFunctionContext();
 
                     return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } else {
@@ -513,7 +536,7 @@ public class XFormsUtils {
                     return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } catch (IOException e) {
                     // Dispatch xforms-link-error to model
-                    final XFormsModel currentModel = currentBindingContext.getModel();
+                    final XFormsModel currentModel = currentBindingContext.model;
                     // NOTE: xforms-link-error is no longer in XForms 1.1 starting 2009-03-10
                     currentModel.getXBLContainer(null).dispatchEvent(propertyContext, new XFormsLinkErrorEvent(container.getContainingDocument(), currentModel, srcAttributeValue, childElement, e));
                     return null;
@@ -523,7 +546,7 @@ public class XFormsUtils {
 
         // Try to get inline value
         {
-            final FastStringBuffer sb = new FastStringBuffer(20);
+            final StringBuilder sb = new StringBuilder(20);
 
             // Visit the subtree and serialize
 
@@ -531,7 +554,8 @@ public class XFormsUtils {
             // serialize it, which is not trivial because of the possible interleaved xforms:output's. Furthermore, we
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
-            Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(propertyContext, container, contextStack, acceptHTML, containsHTML, sb, childElement));
+            Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(propertyContext, container, contextStack,
+                    sourceEffectiveId, acceptHTML, containsHTML, sb, childElement));
             if (acceptHTML && containsHTML != null && !containsHTML[0]) {
                 // We went through the subtree and did not find any HTML
                 // If the caller supports the information, return a non-escaped string so we can optimize output later
@@ -778,11 +802,12 @@ public class XFormsUtils {
         final URL url = URLFactory.createURL(src);
 
         // Load file into buffer
+        // TODO: this is wrong, must use regular URL resolution methods
         final InputStreamReader reader = new InputStreamReader(url.openStream());
         try {
             final StringBuffer value = new StringBuffer();
             final char[] buff = new char[SRC_CONTENT_BUFFER_SIZE];
-            int c = 0;
+            int c;
             while ((c = reader.read(buff, 0, SRC_CONTENT_BUFFER_SIZE - 1)) != -1) value.append(buff, 0, c);
             return value.toString();
         } finally {
@@ -823,16 +848,15 @@ public class XFormsUtils {
     }
 
     /**
-     * Resolve a render or action URL including xml:base resolution.
+     * Resolve a render URL including xml:base resolution.
      *
      * @param isPortletLoad         whether this is called within a portlet
      * @param propertyContext       current context
      * @param currentElement        element used for xml:base resolution
      * @param url                   URL to resolve
-     * @param generateAbsoluteURL   whether the result must be an absolute URL (if isPortletLoad == false)
      * @return                      resolved URL
      */
-    public static String resolveRenderOrActionURL(boolean isPortletLoad, PropertyContext propertyContext, Element currentElement, String url, boolean generateAbsoluteURL) {
+    public static String resolveRenderURL(boolean isPortletLoad, PropertyContext propertyContext, Element currentElement, String url) {
         final URI resolvedURI = resolveXMLBase(currentElement, url);
         final String resolvedURIString = resolvedURI.toString();
         final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
@@ -840,12 +864,10 @@ public class XFormsUtils {
         final String externalURL;
         // NOTE: Keep in mind that this is going to run from within a servlet, as the XForms server
         // runs in a servlet when processing these events!
+        // TODO: is this the case with JSR-268? Don't/can't we run xforms-server in the portlet?
         if (!isPortletLoad) {
             // XForms page was loaded from a servlet
-            // TODO: check this: must probably use response rewriting methods
-//            externalURL = externalContext.getResponse().rewriteRenderURL(resolvedURIString);
-            externalURL = URLRewriterUtils.rewriteURL(externalContext.getRequest(), resolvedURIString,
-                generateAbsoluteURL ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+            externalURL = externalContext.getResponse().rewriteRenderURL(resolvedURIString, null, null);
         } else {
             // XForms page was loaded from a portlet
             if (resolvedURI.getFragment() != null) {
@@ -916,7 +938,7 @@ public class XFormsUtils {
             // TODO: href may be an action URL or a render URL. Should pass element name and reuse code from AbstractRewrite.
 
             final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
-            rewrittenValue = resolveRenderOrActionURL(isPortletLoad, pipelineContext, element, attributeValue, false);
+            rewrittenValue = resolveRenderURL(isPortletLoad, pipelineContext, element, attributeValue);
         } else {
             rewrittenValue = attributeValue;
         }
@@ -930,7 +952,7 @@ public class XFormsUtils {
      * @param contextItems       context items
      * @param contextPosition    context position
      * @param variableToValueMap variables
-     * @param functionLibrary    XPath function libary to use
+     * @param functionLibrary    XPath function library to use
      * @param functionContext    context object to pass to the XForms function
      * @param prefixToURIMap     namespace mappings
      * @param locationData       LocationData for error reporting
@@ -1049,7 +1071,7 @@ public class XFormsUtils {
             }
             return result;
         } catch (URISyntaxException e) {
-            throw new ValidationException("Error while resolving URI: " + uri, e, (LocationData) element.getData());
+            throw new ValidationException("Error while resolving URI: " + uri, e, (element != null) ? (LocationData) element.getData() : null);
         }
     }
 
@@ -1105,7 +1127,6 @@ public class XFormsUtils {
      * @param document      the Document to display
      */
     public static void logDebugDocument(String debugMessage, Document document) {
-//        XFormsServer.logger.debug(debugMessage + ":\n" + Dom4jUtils.domToString(document));
         DebugProcessor.logger.info(debugMessage + ":\n" + Dom4jUtils.domToString(document));
     }
 
@@ -1346,17 +1367,19 @@ public class XFormsUtils {
         private final PropertyContext pipelineContext;
         private final XBLContainer container;
         private final XFormsContextStack contextStack;
+        private final String sourceEffectiveId;
         private final boolean acceptHTML;
         private final boolean[] containsHTML;
-        private final FastStringBuffer sb;
+        private final StringBuilder sb;
         private final Element childElement;
         private final boolean hostLanguageAVTs;
 
         // Constructor for "static" case, i.e. when we know the child element cannot have dynamic content
-        public LHHAElementVisitorListener(boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
+        public LHHAElementVisitorListener(boolean acceptHTML, boolean[] containsHTML, StringBuilder sb, Element childElement) {
             this.pipelineContext = null;
             this.container = null;
             this.contextStack = null;
+            this.sourceEffectiveId = null;
             this.acceptHTML = acceptHTML;
             this.containsHTML = containsHTML;
             this.sb = sb;
@@ -1365,10 +1388,12 @@ public class XFormsUtils {
         }
 
         // Constructor for "dynamic" case, i.e. when we know the child element can have dynamic content
-        public LHHAElementVisitorListener(PropertyContext pipelineContext, XBLContainer container, XFormsContextStack contextStack, boolean acceptHTML, boolean[] containsHTML, FastStringBuffer sb, Element childElement) {
+        public LHHAElementVisitorListener(PropertyContext pipelineContext, XBLContainer container, XFormsContextStack contextStack,
+                                          String sourceEffectiveId, boolean acceptHTML, boolean[] containsHTML, StringBuilder sb, Element childElement) {
             this.pipelineContext = pipelineContext;
             this.container = container;
             this.contextStack = contextStack;
+            this.sourceEffectiveId = sourceEffectiveId;
             this.acceptHTML = acceptHTML;
             this.containsHTML = containsHTML;
             this.sb = sb;
@@ -1391,30 +1416,38 @@ public class XFormsUtils {
                     protected XFormsContextStack getContextStack() {
                         return LHHAElementVisitorListener.this.contextStack;
                     }
+
+                    @Override
+                    public String getEffectiveId() {
+                        // Return given source effective id, so we have a source effective id for resolution of index(), etc.
+                        return sourceEffectiveId;
+                    }
                 };
-                contextStack.pushBinding(pipelineContext, element);
+                contextStack.pushBinding(pipelineContext, element, sourceEffectiveId, outputControl.getChildElementScope(element));
                 {
                     outputControl.setBindingContext(pipelineContext, contextStack.getCurrentBindingContext());
-                    outputControl.evaluateIfNeeded(pipelineContext);
+                    outputControl.evaluateIfNeeded(pipelineContext, false);
                 }
                 contextStack.popBinding();
 
-                if (acceptHTML) {
-                    if ("text/html".equals(outputControl.getMediatype())) {
-                        if (containsHTML != null)
-                            containsHTML[0] = true; // this indicates for sure that there is some nested HTML
-                        sb.append(outputControl.getExternalValue(pipelineContext));
+                if (outputControl.isRelevant()) {
+                    if (acceptHTML) {
+                        if ("text/html".equals(outputControl.getMediatype())) {
+                            if (containsHTML != null)
+                                containsHTML[0] = true; // this indicates for sure that there is some nested HTML
+                            sb.append(outputControl.getExternalValue(pipelineContext));
+                        } else {
+                            // Mediatype is not HTML so we don't escape
+                            sb.append(XMLUtils.escapeXMLMinimal(outputControl.getExternalValue(pipelineContext)));
+                        }
                     } else {
-                        // Mediatype is not HTML so we don't escape
-                        sb.append(XMLUtils.escapeXMLMinimal(outputControl.getExternalValue(pipelineContext)));
-                    }
-                } else {
-                    if ("text/html".equals(outputControl.getMediatype())) {
-                        // HTML is not allowed here, better tell the user
-                        throw new OXFException("HTML not allowed within element: " + childElement.getName());
-                    } else {
-                        // Mediatype is not HTML so we don't escape
-                        sb.append(outputControl.getExternalValue(pipelineContext));
+                        if ("text/html".equals(outputControl.getMediatype())) {
+                            // HTML is not allowed here, better tell the user
+                            throw new OXFException("HTML not allowed within element: " + childElement.getName());
+                        } else {
+                            // Mediatype is not HTML so we don't escape
+                            sb.append(outputControl.getExternalValue(pipelineContext));
+                        }
                     }
                 }
             } else {
@@ -1443,10 +1476,10 @@ public class XFormsUtils {
                             final XXFormsAttributeControl attributeControl
                                     = new XXFormsAttributeControl(container, element, currentAttributeName, currentAttributeValue);
 
-                            contextStack.pushBinding(pipelineContext, element);
+                            contextStack.pushBinding(pipelineContext, element, sourceEffectiveId, attributeControl.getChildElementScope(element));
                             {
                                 attributeControl.setBindingContext(pipelineContext, contextStack.getCurrentBindingContext());
-                                attributeControl.evaluateIfNeeded(pipelineContext);
+                                attributeControl.evaluateIfNeeded(pipelineContext, false);
                             }
                             contextStack.popBinding();
 
@@ -1562,14 +1595,14 @@ public class XFormsUtils {
     }
 
     /**
-     * Return an effective id without its suffix, e.g.:
+     * Return an effective id's prefixed id, i.e. the effective id without its suffix, e.g.:
      *
      * o foo$bar$my-input.1-2 => foo$bar$my-input
      *
      * @param effectiveId   effective id to check
      * @return              effective id without its suffix, null if effectiveId was null
      */
-    public static String getEffectiveIdNoSuffix(String effectiveId) {
+    public static String getPrefixedId(String effectiveId) {
         if (effectiveId == null)
             return null;
 
@@ -1689,7 +1722,7 @@ public class XFormsUtils {
      * @return      static id, or null if anyId was null
      */
     public static String getStaticIdFromId(String anyId) {
-        return getEffectiveIdNoSuffix(getEffectiveIdNoPrefix(anyId));
+        return getPrefixedId(getEffectiveIdNoPrefix(anyId));
     }
 
     /**
@@ -1702,7 +1735,17 @@ public class XFormsUtils {
      * @return              effective id
      */
     public static String appendToEffectiveId(String effectiveId, String ending) {
-        final String prefixedId = getEffectiveIdNoSuffix(effectiveId);
+        final String prefixedId = getPrefixedId(effectiveId);
         return prefixedId + ending + getEffectiveIdSuffixWithSeparator(effectiveId);
+    }
+
+    /**
+     * Check if an id is a static id, i.e. if it does not contain component/hierarchy separators.
+     *
+     * @param staticId  static id to check
+     * @return          true if the id is a static id
+     */
+    public static boolean isStaticId(String staticId) {
+        return staticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) == -1 && staticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) == -1;
     }
 }

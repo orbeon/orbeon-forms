@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
@@ -23,32 +23,31 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsResetEvent;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 
 /**
  * 10.1.11 The reset Element
+ *
+ * TODO: Processing xforms-reset is not actually implemented yet in the model.
  */
 public class XFormsResetAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XBLContainer container = actionInterpreter.getXBLContainer();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
+        final XFormsModel model = actionInterpreter.resolveModel(propertyContext, actionElement, modelId);
 
-        final Object modelObject = container.findModelByStaticId(modelId);// TODO: FIXME do like other model-related actions
-        if (modelObject instanceof XFormsModel) {
-            final XFormsModel model = (XFormsModel) modelObject;
-            container.dispatchEvent(propertyContext, new XFormsResetEvent(containingDocument, model));
+        if (model == null)
+            throw new ValidationException("Invalid model id for xforms:reset: " + modelId, (LocationData) actionElement.getData());
 
-            // "the reset action takes effect immediately and clears all of the flags."
-            model.setAllDeferredFlags(false);
-            containingDocument.getControls().markDirtySinceLastRequest(true);
-        } else {
-            throw new OXFException("xforms:reset model attribute must point to an xforms:model element.");
-        }
+        // "This action initiates reset processing by dispatching an xforms-reset event to the specified model."
+        container.dispatchEvent(propertyContext, new XFormsResetEvent(containingDocument, model));
     }
 }

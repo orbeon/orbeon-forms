@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.control.controls;
 
@@ -57,9 +57,39 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
     }
 
     @Override
-    protected void evaluate(PropertyContext propertyContext) {
-        // Just get the MIPs, don't call super.evaluate(), since that would also try to get label, etc.
-        getMIPsIfNeeded();
+    public boolean supportsRefreshEvents() {
+        // Des not support refresh events
+        return false;
+    }
+
+    // Make public for XFormsRepeatControl
+    @Override
+    public void evaluate(PropertyContext propertyContext, boolean isRefresh) {
+        super.evaluate(propertyContext, isRefresh);
+    }
+
+    @Override
+    public String getLabel(PropertyContext propertyContext) {
+        // Don't bother letting superclass handle this
+        return null;
+    }
+
+    @Override
+    public String getHelp(PropertyContext propertyContext) {
+        // Don't bother letting superclass handle this
+        return null;
+    }
+
+    @Override
+    public String getHint(PropertyContext propertyContext) {
+        // Don't bother letting superclass handle this
+        return null;
+    }
+
+    @Override
+    public String getAlert(PropertyContext propertyContext) {
+        // Don't bother letting superclass handle this
+        return null;
     }
 
     @Override

@@ -199,7 +199,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="id1">gigi1</xxf:control>
-                        <xxf:control id="id2" relevant="false">gigi2</xxf:control>
+                        <xxf:control id="id2" relevant="false"/>
                         <xxf:control id="id3" readonly="true">gigi3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
@@ -587,7 +587,7 @@
                                     <xforms:instance id="form-instance">
                                         <first-name xmlns=""/>
                                     </xforms:instance>
-                                    <!-- Value is always invaoid -->
+                                    <!-- Value is always invalid -->
                                     <xforms:bind nodeset="." constraint="false()"/>
                                 </xforms:model>
 
@@ -890,8 +890,8 @@
             </xxf:event-response>
         </output>
     </test>
-
-    <test description="Simple use of xxforms:bind-property function" name="oxf:pipeline">
+    
+    <test description="Simple use of xxforms:evaluate-bind-property function" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -913,13 +913,13 @@
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:output id="output-relevant" value="xxforms:bind-property('foo-bind', 'relevant')"/>
-                    <xforms:output id="output-readonly" value="xxforms:bind-property('foo-bind', 'readonly')"/>
-                    <xforms:output id="output-required" value="xxforms:bind-property('foo-bind', 'required')"/>
-                    <xforms:output id="output-type" value="xxforms:bind-property('foo-bind', 'type')"/>
-                    <xforms:output id="output-constraint" value="xxforms:bind-property('foo-bind', 'constraint')"/>
-                    <xforms:output id="output-calculate" value="xxforms:bind-property('foo-bind', 'calculate')"/>
-                    <xforms:output id="output-default" value="xxforms:bind-property('foo-bind', 'xxforms:default')"/>
+                    <xforms:output id="output-relevant" value="xxforms:evaluate-bind-property('foo-bind', 'relevant')"/>
+                    <xforms:output id="output-readonly" value="xxforms:evaluate-bind-property('foo-bind', 'readonly')"/>
+                    <xforms:output id="output-required" value="xxforms:evaluate-bind-property('foo-bind', 'required')"/>
+                    <xforms:output id="output-type" value="xxforms:evaluate-bind-property('foo-bind', 'type')"/>
+                    <xforms:output id="output-constraint" value="xxforms:evaluate-bind-property('foo-bind', 'constraint')"/>
+                    <xforms:output id="output-calculate" value="xxforms:evaluate-bind-property('foo-bind', 'calculate')"/>
+                    <xforms:output id="output-default" value="xxforms:evaluate-bind-property('foo-bind', 'xxforms:default')"/>
                 </xhtml:body>
             </xhtml:html>
         </input>
@@ -951,7 +951,7 @@
         </output>
     </test>
 
-    <test description="xxforms:bind-property function within nested nested binds with repeat" name="oxf:pipeline">
+    <test description="xxforms:evaluate-bind-property function within nested nested binds with repeat" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -983,15 +983,15 @@
                 </xhtml:head>
                 <xhtml:body>
                     <xforms:repeat bind="foo-bind" id="repeat">
-                        <xforms:output id="output-relevant" value="xxforms:bind-property('value-bind', 'relevant')"/>
-                        <xforms:output id="output-readonly" value="xxforms:bind-property('value-bind', 'readonly')"/>
-                        <xforms:output id="output-required" value="xxforms:bind-property('value-bind', 'required')"/>
-                        <xforms:output id="output-type" value="xxforms:bind-property('value-bind', 'type')"/>
-                        <xforms:output id="output-constraint" value="xxforms:bind-property('value-bind', 'constraint')"/>
-                        <xforms:output id="output-default" value="xxforms:bind-property('value-bind', 'xxforms:default')"/>
-                        <xforms:output id="output-custom" value="xxforms:bind-property('value-bind', 'foo:bar')"/>
+                        <xforms:output id="output-relevant" value="xxforms:evaluate-bind-property('value-bind', 'relevant')"/>
+                        <xforms:output id="output-readonly" value="xxforms:evaluate-bind-property('value-bind', 'readonly')"/>
+                        <xforms:output id="output-required" value="xxforms:evaluate-bind-property('value-bind', 'required')"/>
+                        <xforms:output id="output-type" value="xxforms:evaluate-bind-property('value-bind', 'type')"/>
+                        <xforms:output id="output-constraint" value="xxforms:evaluate-bind-property('value-bind', 'constraint')"/>
+                        <xforms:output id="output-default" value="xxforms:evaluate-bind-property('value-bind', 'xxforms:default')"/>
+                        <xforms:output id="output-custom" value="xxforms:evaluate-bind-property('value-bind', 'foo:bar')"/>
 
-                        <xforms:output id="output-calculate" value="xxforms:bind-property('bar-bind', 'calculate')"/>
+                        <xforms:output id="output-calculate" value="xxforms:evaluate-bind-property('bar-bind', 'calculate')"/>
                     </xforms:repeat>
                 </xhtml:body>
             </xhtml:html>
@@ -1027,14 +1027,14 @@
                         <xxf:control id="output-custom·1">42, 43</xxf:control>
                         <xxf:control id="output-calculate·1">43</xxf:control>
                         <xxf:repeat-iteration id="repeat" relevant="false" iteration="2"/>
-                        <xxf:control id="output-relevant·2" relevant="false">false</xxf:control>
-                        <xxf:control id="output-readonly·2" relevant="false">false</xxf:control>
-                        <xxf:control id="output-required·2" relevant="false">false</xxf:control>
-                        <xxf:control id="output-type·2" relevant="false">xs:integer</xxf:control>
-                        <xxf:control id="output-constraint·2" relevant="false">true</xxf:control>
-                        <xxf:control id="output-default·2" relevant="false">43</xxf:control>
-                        <xxf:control id="output-custom·2" relevant="false">43, 44</xxf:control>
-                        <xxf:control id="output-calculate·2" relevant="false">44</xxf:control>
+                        <xxf:control id="output-relevant·2" relevant="false"/>
+                        <xxf:control id="output-readonly·2" relevant="false"/>
+                        <xxf:control id="output-required·2" relevant="false"/>
+                        <xxf:control id="output-type·2" relevant="false"/>
+                        <xxf:control id="output-constraint·2" relevant="false"/>
+                        <xxf:control id="output-default·2" relevant="false"/>
+                        <xxf:control id="output-custom·2" relevant="false"/>
+                        <xxf:control id="output-calculate·2" relevant="false"/>
                         <xxf:control id="output-relevant·3">true</xxf:control>
                         <xxf:control id="output-readonly·3">false</xxf:control>
                         <xxf:control id="output-required·3">false</xxf:control>
@@ -1044,18 +1044,114 @@
                         <xxf:control id="output-custom·3">44, 45</xxf:control>
                         <xxf:control id="output-calculate·3">45</xxf:control>
                         <xxf:repeat-iteration id="repeat" relevant="false" iteration="4"/>
-                        <xxf:control id="output-relevant·4" relevant="false">false</xxf:control>
-                        <xxf:control id="output-readonly·4" relevant="false">true</xxf:control>
-                        <xxf:control id="output-required·4" relevant="false">false</xxf:control>
-                        <xxf:control id="output-type·4" relevant="false">xs:integer</xxf:control>
-                        <xxf:control id="output-constraint·4" relevant="false">false</xxf:control>
-                        <xxf:control id="output-default·4" relevant="false">45</xxf:control>
-                        <xxf:control id="output-custom·4" relevant="false">45, 46</xxf:control>
-                        <xxf:control id="output-calculate·4" relevant="false">46</xxf:control>
+                        <xxf:control id="output-relevant·4" relevant="false"/>
+                        <xxf:control id="output-readonly·4" relevant="false"/>
+                        <xxf:control id="output-required·4" relevant="false"/>
+                        <xxf:control id="output-type·4" relevant="false"/>
+                        <xxf:control id="output-constraint·4" relevant="false"/>
+                        <xxf:control id="output-default·4" relevant="false"/>
+                        <xxf:control id="output-custom·4" relevant="false"/>
+                        <xxf:control id="output-calculate·4" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
     </test>
+    
+    <test description="Initial build of controls may use out of date binds" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="fr-persistence-model">
+                        <xforms:instance id="fr-persistence-instance">
+                            <save xmlns="">
+                                <data-status>clean</data-status>
+                            </save>
+                        </xforms:instance>
+                        <xforms:instance id="fr-triggers-instance">
+                            <triggers xmlns="">
+                                <save/>
+                            </triggers>
+                        </xforms:instance>
+                        <xforms:bind nodeset="instance('fr-triggers-instance')">
+                            <xforms:bind nodeset="save" readonly="instance('fr-persistence-instance')/data-status = 'clean'"/>
+                        </xforms:bind>
 
+                        <xforms:submission id="fr-get-document-submission" serialization="none"
+                                           method="get" resource="oxf:/apps/xforms-sandbox/samples/bug-events-data.xml"
+                                           replace="instance" xxforms:instance="fr-form-instance"/>
+
+                        <xforms:action ev:event="xforms-model-construct-done">
+                            <xforms:send submission="fr-get-document-submission"/>
+                        </xforms:action>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:rebuild/>
+                            <xforms:recalculate/>
+                            <xforms:revalidate/>
+                            <xforms:refresh/>
+
+                            <xforms:setvalue ref="instance('fr-persistence-instance')/data-status" value="'clean'"/>
+                        </xforms:action>
+                    </xforms:model>
+                    <xforms:model id="fr-form-model">
+                        <xforms:instance id="fr-form-instance">
+                            <book>
+                                <title/>
+                            </book>
+                        </xforms:instance>
+                        <xforms:bind id="title-bind" nodeset="title"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xhtml:p>
+                        See <a
+                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=312406&amp;group_id=168&amp;atid=350207">fixed</a>.
+                        Proper behavior is that the Save button is disabled upon page load.
+                    </xhtml:p>
+                    <xforms:group model="fr-form-model">
+                        <xforms:input id="title-input" bind="title-bind">
+                            <xforms:label>Note</xforms:label>
+                        </xforms:input>
+                        <xforms:setvalue ev:event="xforms-value-changed xforms-enabled" model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-status" value="'dirty'"/>
+                    </xforms:group>
+                    <xforms:trigger id="save-trigger" ref="instance('fr-triggers-instance')/save">
+                        <xforms:label>Save</xforms:label>
+                    </xforms:trigger>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="fr-persistence-instance" model-id="fr-persistence-model">
+                                <save>
+                                    <data-status>clean</data-status>
+                                </save>
+                            </instance>
+                            <instance id="fr-triggers-instance" model-id="fr-persistence-model">
+                                <triggers>
+                                    <save/>
+                                </triggers>
+                            </instance>
+                            <instance id="fr-form-instance" model-id="fr-form-model">
+                                <book>
+                                    <title/>
+                                </book>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="title-input" label="Note"/>
+                        <xxf:control id="save-trigger" readonly="true" label="Save"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 </group>

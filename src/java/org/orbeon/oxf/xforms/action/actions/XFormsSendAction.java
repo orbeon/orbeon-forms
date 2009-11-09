@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 
@@ -33,7 +34,7 @@ import org.orbeon.saxon.om.Item;
 public class XFormsSendAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XBLContainer container = actionInterpreter.getXBLContainer();
 
@@ -45,13 +46,13 @@ public class XFormsSendAction extends XFormsAction {
         final String resolvedSubmissionStaticId;
         {
             // Resolve AVT
-            resolvedSubmissionStaticId = resolveAVTProvideValue(actionInterpreter, propertyContext, actionElement, submissionId, true);
+            resolvedSubmissionStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, submissionId, true);
             if (resolvedSubmissionStaticId == null)
                 return;
         }
 
         // Find actual target
-        final Object submission = resolveEffectiveObject(actionInterpreter, propertyContext, resolvedSubmissionStaticId, actionElement);
+        final Object submission = actionInterpreter.resolveEffectiveObject(propertyContext, actionElement, resolvedSubmissionStaticId);
         if (submission instanceof XFormsModelSubmission) {
             // Dispatch event to submission object
             final XFormsEvent newEvent = new XFormsSubmitEvent(container.getContainingDocument(), (XFormsEventTarget) submission);

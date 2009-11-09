@@ -17,7 +17,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
-import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
 import org.orbeon.oxf.xml.DeferredContentHandler;
 import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
 import org.orbeon.oxf.xml.XMLUtils;

@@ -1,0 +1,50 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xforms:model id="model">
+            <xforms:instance id="instance">
+                <values>
+                    <value/><value/>
+                </values>
+            </xforms:instance>
+        </xforms:model>
+        <xbl:xbl>
+            <xbl:binding id="foobar-component" element="fr|foobar">
+                <xbl:template>
+                    <xforms:repeat nodeset="value" id="clash">
+                        <xhtml:div>
+                            <xforms:output value="xxforms:index()"/>
+                        </xhtml:div>
+                    </xforms:repeat>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:trigger id="clash">
+            <xforms:label>NOP</xforms:label>
+        </xforms:trigger>
+        <fr:foobar id="my-foobar" ref="."/>
+    </xhtml:body>
+</xhtml:html>

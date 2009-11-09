@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xsl:stylesheet version="2.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -24,6 +24,7 @@
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
@@ -113,9 +114,8 @@
                 </template>
             </metadata>
 
-            <!-- XBL template -->
-            <xbl:template>
-
+            <!-- XBL implementation -->
+            <xbl:implementation>
                 <xforms:model id="{$component-id}-model">
                     <!-- Section data model -->
                     <xforms:instance id="fr-form-instance">
@@ -149,44 +149,60 @@
                     <!-- TODO -->
 
                 </xforms:model>
+            </xbl:implementation>
 
-                <!-- Current node -->
-                <xxforms:variable name="result" select="." as="node()?"/>
+            <!-- XBL template -->
+            <xbl:template>
+                
+                <xforms:group appearance="xxforms:internal" xxbl:scope="outer">
 
-                <xforms:group ref="$result">
-                    <xforms:action ev:event="xforms-enabled">
-                        <!-- Section becomes visible -->
-                        <xforms:action model="{$component-id}-model">
-                            <xxforms:variable name="local-instance" select="." as="element()"/>
-                            <xforms:action if="$result/*">
-                                <!-- There are already some nodes, copy them in -->
-                                <xforms:delete nodeset="$local-instance/*"/>
-                                <xforms:insert context="$local-instance" origin="$result/*"/>
+                    <!-- Inner group -->
+                    <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
+                        <!-- Variable pointing to external node -->
+                        <xxforms:variable name="result" as="node()?">
+                            <xxforms:sequence select="." xxbl:scope="outer"/>
+                        </xxforms:variable>
+
+                        <!-- Expose internally a variable pointing to Form Runner ressources -->
+                        <xxforms:variable name="fr-resources" as="element()?">
+                            <xxforms:sequence select="$fr-resources" xxbl:scope="outer"/>
+                        </xxforms:variable>
+
+                        <xforms:group appearance="xxforms:internal" ref="$result">
+                            <xforms:action ev:event="xforms-enabled">
+                                <!-- Section becomes visible -->
+                                <xforms:action model="{$component-id}-model">
+                                    <xxforms:variable name="local-instance" select="." as="element()"/>
+                                    <xforms:action if="$result/*">
+                                        <!-- There are already some nodes, copy them in -->
+                                        <xforms:delete nodeset="$local-instance/*"/>
+                                        <xforms:insert context="$local-instance" origin="$result/*"/>
+                                    </xforms:action>
+                                    <xforms:action if="not($result/*)">
+                                        <!-- No nodes, copy template out -->
+                                        <xforms:insert context="$result" origin="$local-instance/*"/>
+                                    </xforms:action>
+                                </xforms:action>
                             </xforms:action>
-                            <xforms:action if="not($result/*)">
-                                <!-- No nodes, copy template out -->
-                                <xforms:insert context="$result" origin="$local-instance/*"/>
+                        </xforms:group>
+
+                        <xforms:group appearance="xxforms:internal">
+                            <!-- Synchronize data with external world upon local value change -->
+                            <!-- This assumes the element QName match, or the value is not copied -->
+                            <xforms:action ev:event="xforms-value-changed">
+                                <xxforms:variable name="binding" select="event('xxforms:binding')" as="element()"/>
+                                <xforms:setvalue ref="$result/*[resolve-QName(name(), .) = resolve-QName(name($binding), $binding)]" value="$binding"/>
                             </xforms:action>
-                        </xforms:action>
-                    </xforms:action>
+
+                            <!-- TODO: must change language dynamically -->
+                            <xxforms:variable name="form-resources" select="instance('fr-form-resources')/*[1]" as="element(resource)"/>
+
+                            <!-- Copy grids within section-->
+                            <xsl:copy-of select="$fr-section/fr:grid"/>
+
+                        </xforms:group>
+                    </xforms:group>
                 </xforms:group>
-
-                <xforms:group model="{$component-id}-model">
-                    <!-- Synchronize data with external world upon local value change -->
-                    <!-- This assumes the element QName match, or the value is not copied -->
-                    <xforms:action ev:event="xforms-value-changed">
-                        <xxforms:variable name="binding" select="event('xxforms:binding')" as="element()"/>
-                        <xforms:setvalue ref="$result/*[resolve-QName(name(), .) = resolve-QName(name($binding), $binding)]" value="$binding"/>
-                    </xforms:action>
-
-                    <!-- TODO: must change language dynamically -->
-                    <xxforms:variable name="form-resources" select="instance('fr-form-resources')/*[1]" as="element(resource)"/>
-
-                    <!-- Copy grids within section-->
-                    <xsl:copy-of select="$fr-section/fr:grid"/>
-
-                </xforms:group>
-
             </xbl:template>
         </xbl:binding>
 

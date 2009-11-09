@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 
@@ -55,7 +56,7 @@ public class XFormsMessageAction extends XFormsAction {
 
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
@@ -77,7 +78,7 @@ public class XFormsMessageAction extends XFormsAction {
             // Get message value
             // TODO: In the future, we should support HTML
             final String messageValue = XFormsUtils.getElementValue(propertyContext, containingDocument,
-                    actionInterpreter.getContextStack(), actionElement, false, null);
+                    actionInterpreter.getContextStack(), actionInterpreter.getSourceEffectiveId(), actionElement, false, null);
 
             if (LOG_APPEARANCES.get(levelQName) != null) {
                 // Special log appearance

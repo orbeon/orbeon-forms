@@ -35,6 +35,14 @@
 .fr-summary-table, .fr-summary-table td, .fr-summary-table th { border: 1px solid #6E6E6E }
 .fr-summary-table th { background-color: #f8f8f8 }
 .fr-summary-table td, .fr-summary-table th { padding: 4px }
+.fr-summary-table td a {
+    width: 100%;
+    display: -moz-inline-box;
+    display: inline-block;
+    *zoom: 1;
+    *display: inline;
+    vertical-align: middle;
+}
 
 .fr-summary-table-div {
     overflow-x: auto;
@@ -57,7 +65,7 @@
 .fr-summary-welcome-message { display: block; margin-top: .5em; margin-bottom: .5em; clear: both }
 .fr-summary-search-count {  display: block; margin-top: 1em; margin-bottom: 1em }
 
-.fr-summary-search { display: block; margin: 2em 0 2em 0; }
+.fr-summary-search { display: block; margin: 1em 0 }
 .fr-summary-search-item { float: left; margin-right: .5em }
 .fr-summary-search-item select {
     width: 100%;

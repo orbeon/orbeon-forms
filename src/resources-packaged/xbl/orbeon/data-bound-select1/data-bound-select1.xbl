@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -21,80 +21,80 @@
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
-         xmlns:xbl="http://www.w3.org/ns/xbl">
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:exforms="http://www.exforms.org/exf/1-0"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         script-type="application/xhtml+xml">
+
     <xbl:binding id="fr-data-bound-select1" element="fr|data-bound-select1">
         <xbl:resources>
             <xbl:style>
                 div.xbl-fr-data-bound-select1 { display: inline; }
             </xbl:style>
         </xbl:resources>
-        <xbl:template>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer" appearance="xxforms:internal" xsl:version="2.0">
 
-            <!-- Variable pointing to attributes user put on the component -->
-            <xxforms:variable name="ref" xbl:attr="xbl:text=ref"/>
-            <xxforms:variable name="nodeset" xbl:attr="xbl:text=nodeset"/>
-            <xxforms:variable name="label" xbl:attr="xbl:text=label"/>
-            <xxforms:variable name="value" xbl:attr="xbl:text=value"/>
-            <xxforms:variable name="resource-dependency" xbl:attr="xbl:text=resource-dependency"/>
+                <xxforms:variable name="result" as="node()?" select="."/>
 
-            <xforms:model id="xbl-model">
-                <!-- Contains the data from which the itemset is populated -->
-                <xforms:instance id="itemset"><dummy/></xforms:instance>
-                <!-- What do when doing a refresh -->
-                <xxforms:variable name="resource" xbl:attr="xbl:text=resource"/>
-                <xforms:submission id="get-itemset" method="get" resource="{xxforms:component-context()/saxon:evaluate($resource)}" replace="instance" serialization="none">
-                    <xforms:action ev:event="xforms-submit-error">
-                        <xforms:insert nodeset="instance('itemset')" origin="xxforms:element('dummy')"/>
-                    </xforms:action>
-                </xforms:submission>
-                <!-- Refresh itemset when initialized -->
-                <xforms:send ev:event="xforms-model-construct-done" submission="get-itemset"/>
-            </xforms:model>
-
-            <!-- Points to the instance with data for the itemset, for convenience -->
-            <xxforms:variable name="itemset" select="instance('itemset')" model="xbl-model"/>
-            <xxforms:variable name="ref-node" select="saxon:evaluate($ref)"/>
-
-            <!-- Dummy control used to detect changes to another node -->
-            <xforms:group ref=".[$resource-dependency != '']">
-                <xforms:output id="dependency" ref="saxon:evaluate($resource-dependency)" style="display: none">
-                    <xforms:action ev:event="xforms-value-changed">
-                        <xforms:send model="xbl-model" submission="get-itemset"/>
-                        <xxforms:variable name="new-itemset" select="instance('itemset')" model="xbl-model"/>
-                        <xxforms:variable name="new-values" select="$new-itemset/saxon:evaluate($nodeset)/saxon:evaluate($value)"/>
-                        <!-- If the current value is not in the new itemset, set it to blank -->
-                        <xforms:action if="$ref-node != ''">
-                            <xxforms:variable name="current-value-not-in-itemset" select="not($new-values = $ref-node)"/>
-                            <!-- If the current value is not in the new itemset, set it to blank -->
-                            <xforms:action if="$current-value-not-in-itemset">
-                                <xforms:setvalue  ref="$ref-node"/>
-                            </xforms:action>
-                            <!-- If the current value is in the itemset, leave it as-is, but simulate an xforms-value-changed
-                                 as another drop-down that depends on this might have to refresh itself. (E.g. state change
-                                 to another state that has the same city, by the list of zips for the new city is different.) -->
-                            <xforms:action if="not($current-value-not-in-itemset)">
-                                <xxforms:variable name="current-value" select="string($ref-node)"/>
-                                <xforms:setvalue if="not($current-value-not-in-itemset)" ref="$ref-node"/>
-                                <xforms:setvalue if="not($current-value-not-in-itemset)" ref="$ref-node" value="$current-value"/>
-                            </xforms:action>
+                <!-- Local model -->
+                <xforms:model id="xbl-model" xxbl:scope="inner">
+                    <!-- Contains the data from which the itemset is populated -->
+                    <xforms:instance id="itemset"><dummy/></xforms:instance>
+                    <!-- What do when doing a refresh -->
+                    <xxforms:variable name="resource" xbl:attr="xbl:text=resource"/>
+                    <xforms:submission id="get-itemset" method="get" resource="{{xxforms:component-context()/xxforms:evaluate-avt($resource)}}" replace="instance" serialization="none">
+                        <xforms:action ev:event="xforms-submit-error">
+                            <xforms:insert nodeset="instance('itemset')" origin="xxforms:element('dummy')"/>
                         </xforms:action>
-                    </xforms:action>
-                </xforms:output>
-            </xforms:group>
+                    </xforms:submission>
+                    <!-- Refresh itemset when initialized -->
+                    <xforms:send ev:event="xforms-model-construct-done" submission="get-itemset"/>
+                </xforms:model>
 
-            <!-- The concrete select1 -->
-            <xforms:select1 xbl:attr="ref bind appearance" id="drop-down">
-                <xforms:message ev:event="xforms-out-of-range" level="modal">Getting xforms-out-of-range</xforms:message>
-                <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
-                <xforms:item>
-                    <xforms:label/>
-                    <xforms:value/>
-                </xforms:item>
-                <xforms:itemset nodeset="$itemset/saxon:evaluate($nodeset)">
-                    <xforms:label value="saxon:evaluate($label)"/>
-                    <xforms:value value="saxon:evaluate($value)"/>
-                </xforms:itemset>
-            </xforms:select1>
+                <xforms:group appearance="xxforms:internal">
+                    <!--  Create one xforms:output per dependency so we can detect the changes -->
+                    <xsl:for-each select="/*/fr:dependency">
+                        <xforms:output style="display: none">
+                            <xsl:copy-of select="@model | @context | @ref | @bind"/>
+                        </xforms:output>
+                    </xsl:for-each>
+
+                    <xforms:action ev:event="xforms-value-changed">
+                        <!-- Send submission -->
+                        <xforms:send model="xbl-model" submission="get-itemset" xxbl:scope="inner"/>
+
+                        <xxforms:variable name="nodeset" xxbl:scope="inner"><xsl:value-of select="/*/xforms:itemset/@nodeset"/></xxforms:variable>
+                        <xxforms:variable name="value" xxbl:scope="inner"><xsl:value-of select="/*/xforms:itemset/xforms:value/(@value | @ref)"/></xxforms:variable>
+                        <xxforms:variable name="new-values">
+                            <xxforms:sequence select="instance('itemset')/saxon:evaluate($nodeset)/saxon:evaluate($value)" xxbl:scope="inner"/>
+                        </xxforms:variable>
+                        <!-- If the current value is not in the new itemset and not already blank, set it to blank -->
+                        <xforms:setvalue if="not($result = ($new-values, ''))" ref="$result"/>
+
+                    </xforms:action>
+
+                    <!-- Stop propagation of all UI events -->
+                    <xforms:action ev:event="#all" ev:propagate="stop"/>
+                </xforms:group>
+
+                <!-- The concrete select1 -->
+                <xforms:select1 ref=".">
+                    <xforms:message ev:event="xforms-out-of-range" level="modal">Getting xforms-out-of-range</xforms:message>
+                    <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
+                    <!-- Blank item -->
+                    <xforms:item>
+                        <xforms:label/>
+                        <xforms:value/>
+                    </xforms:item>
+                    <!-- Itemset unconventionally evaluates wrt inner scope -->
+                    <xbl:content includes="xforms|itemset" xxbl:scope="inner"/>
+                    <!-- Stop propagation of all UI events -->
+                    <xforms:action ev:event="#all" ev:propagate="stop"/>
+                </xforms:select1>
+            </xforms:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

@@ -1,0 +1,120 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xbl="http://www.w3.org/ns/xbl"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <head>
+        <xforms:model id="model">
+            <xforms:instance id="instance">
+                <instance xmlns="">
+                    <record/>
+                </instance>
+            </xforms:instance>
+
+            <xforms:insert ev:event="xforms-ready" nodeset="instance('instance')/record" at="1"/>
+
+        </xforms:model>
+
+        <xbl:xbl script-type="application/xhtml+xml">
+            <xbl:binding id="fr-foo" element="fr|foo">
+                <xbl:template>
+                    <table>
+                        <xbl:content/>
+                    </table>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+
+        <xbl:xbl script-type="application/xhtml+xml">
+            <xbl:binding id="fr-bar" element="fr|bar">
+                <xbl:template>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <record/>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:insert ev:event="xforms-ready" nodeset="instance('instance')/record" at="1"/>
+                    </xforms:model>
+                    <xforms:group id="bar-group" model="model" appearance="xxforms:internal">
+                        <xforms:trigger id="bar-trigger">
+                            <xforms:label>Insert</xforms:label>
+                            <xforms:insert ev:event="DOMActivate" nodeset="instance('instance')/record" at="1"/>
+                        </xforms:trigger>
+                        <table>
+                            <xbl:content/>
+                        </table>
+                    </xforms:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+    </head>
+    <body>
+
+        <p>
+            This tests for
+            <a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=313769&amp;group_id=168&amp;atid=350207">
+                [ #313769 ] Insert of new node affecting repeat within XBL yields wrong repeat id
+            </a>. See also corresponding unit test in tests-xforms-server.xhtml.
+        </p>
+
+        <xforms:trigger>
+            <xforms:label>Insert</xforms:label>
+            <xforms:insert ev:event="DOMActivate" nodeset="instance('instance')/record" at="1"/>
+        </xforms:trigger>
+
+        <h2>Without XBL (update to global instance)</h2>
+        <table>
+            <tbody>
+                <xforms:repeat nodeset="record" id="repeat-no-xbl">
+                    <tr>
+                        <td>
+                            <xforms:output id="my-output" value="index('repeat-no-xbl')"/>
+                        </td>
+                    </tr>
+                </xforms:repeat>
+            </tbody>
+        </table>
+
+        <h2>With XBL (update to global instance)</h2>
+        <fr:foo id="my-foo">
+            <tbody>
+                <xforms:repeat nodeset="record" id="repeat-xbl">
+                    <tr>
+                        <td>
+                            <xforms:output id="my-output" value="index('repeat-xbl')"/>
+                        </td>
+                    </tr>
+                </xforms:repeat>
+            </tbody>
+        </fr:foo>
+
+        <h2>With XBL (update to local instance)</h2>
+        <fr:bar id="my-bar">
+            <tbody>
+                <xforms:repeat nodeset="record" id="repeat-xbl">
+                    <tr>
+                        <td>
+                            <xforms:output id="my-output" value="index('repeat-xbl')"/>
+                        </td>
+                    </tr>
+                </xforms:repeat>
+            </tbody>
+        </fr:bar>
+
+
+    </body>
+</html>

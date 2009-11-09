@@ -34,6 +34,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -150,7 +151,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
             }
 
             // XBL resources
-            final List<Element> xblStyles = containingDocument.getStaticState().getXblBindings().getXBLStyles();
+            final List<Element> xblStyles = containingDocument.getStaticState().getXBLBindings().getXBLStyles();
             if (xblStyles != null) {
                 for (final Element styleElement: xblStyles) {
                     attributesImpl.clear();
@@ -203,7 +204,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
             }
 
             // XBL scripts
-            final List<Element> xblScripts = containingDocument.getStaticState().getXblBindings().getXBLScripts();
+            final List<Element> xblScripts = containingDocument.getStaticState().getXBLBindings().getXBLScripts();
             if (xblScripts != null) {
                 for (final Element scriptElement: xblScripts) {
                     attributesImpl.clear();
@@ -228,7 +229,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                 final Map clientPropertiesMap;
                 {
                     // Dynamic properties
-                    final Map<String, Object> dynamicProperties = new HashMap<String, Object>();
+                    final Map<String, Serializable> dynamicProperties = new HashMap<String, Serializable>();
                     {
                         // Heartbeat delay
                         {
@@ -251,7 +252,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                         // Help events
                         {
-                            final boolean hasHandlerForXFormsHelp = containingDocument.getControls().hasHandlerForEvent(XFormsEvents.XFORMS_HELP);
+                            final boolean hasHandlerForXFormsHelp = containingDocument.getStaticState().hasHandlerForEvent(XFormsEvents.XFORMS_HELP);
                             if (hasHandlerForXFormsHelp) {
                                 dynamicProperties.put(XFormsProperties.HELP_HANDLER_PROPERTY, Boolean.TRUE);
                             }

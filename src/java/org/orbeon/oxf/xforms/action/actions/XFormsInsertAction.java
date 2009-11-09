@@ -17,15 +17,14 @@ import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -46,7 +45,7 @@ public class XFormsInsertAction extends XFormsAction {
 
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
                         XFormsEventObserver eventObserver, Element actionElement,
-                        boolean hasOverriddenContext, Item overriddenContext) {
+                        XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
@@ -108,11 +107,8 @@ public class XFormsInsertAction extends XFormsAction {
                 // "If the origin attribute is given, the origin node-set is the result of the evaluation of the
                 // origin attribute in the insert context."
 
-                originObjects = XPathCache.evaluate(propertyContext, insertContextNodeInfo,
-                        originAttribute, actionInterpreter.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
-                        XFormsContainingDocument.getFunctionLibrary(),
-                        contextStack.getFunctionContext(),
-                        null, (LocationData) actionElement.getData());
+                originObjects = actionInterpreter.evaluateExpression(propertyContext, actionElement,
+                        Collections.singletonList((Item) insertContextNodeInfo), 1, originAttribute);
                 //XFormsUtils.resolveXMLBase(actionElement, ".").toString()
 
                 // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
@@ -139,11 +135,8 @@ public class XFormsInsertAction extends XFormsAction {
                 // position is 1."
 
                 // "b. The return value is processed according to the rules of the XPath function round()"
-                final String insertionIndexString = XPathCache.evaluateAsString(propertyContext,
-                        collectionToBeUpdated, 1,
-                        "round(" + atAttribute + ")", actionInterpreter.getNamespaceMappings(actionElement), contextStack.getCurrentVariables(),
-                        XFormsContainingDocument.getFunctionLibrary(), contextStack.getFunctionContext(), null,
-                        (LocationData) actionElement.getData());
+                final String insertionIndexString = actionInterpreter.evaluateStringExpression(propertyContext,
+                        actionElement, collectionToBeUpdated, 1, "round(" + atAttribute + ")");
 
                 // "c. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
                 // location is equal to the result. If the result is non-positive, then the insert location is
@@ -384,7 +377,7 @@ public class XFormsInsertAction extends XFormsAction {
                                 if (indentedLogger.isDebugEnabled())
                                     indentedLogger.logDebug("xforms:insert", "skipping insertion of node as sibling in element content",
                                                     "type", clonedNode.getNodeTypeName(),
-                                                    "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToString((Attribute) clonedNode) : clonedNode.toString()
+                                                    "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToDebugString((Attribute) clonedNode) : clonedNode.toString()
                                             );
                             }
                         }
@@ -415,7 +408,6 @@ public class XFormsInsertAction extends XFormsAction {
         if (didInsertNodes && modifiedInstance  != null) {
             // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
             modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);
-            containingDocument.getControls().markDirtySinceLastRequest(true);
         }
 
         // "4. If the insert is successful, the event xforms-insert is dispatched."

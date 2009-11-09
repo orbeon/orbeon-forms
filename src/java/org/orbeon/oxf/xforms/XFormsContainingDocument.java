@@ -71,6 +71,8 @@ public class XFormsContainingDocument extends XBLContainer {
     private static final String LOGGING_CATEGORY = "document";
     private static final Logger logger = LoggerFactory.createLogger(XFormsContainingDocument.class);
 
+    public static final String EVENT_LOG_TYPE = "executeExternalEvent";
+
     private final Map<String, IndentedLogger> loggersMap = new HashMap<String, IndentedLogger>();
     {
         final Logger globalLogger = XFormsServer.getLogger();
@@ -129,9 +131,6 @@ public class XFormsContainingDocument extends XBLContainer {
 
     private boolean goingOffline;
 //    private boolean goingOnline;  // never used at the moment
-
-    // Global flag used during initialization only
-    private boolean mustPerformInitializationFirstRefresh;
 
     // Event information
     private static final Set<String> ignoredXFormsOutputExternalEvents = new HashSet<String>();
@@ -257,7 +256,6 @@ public class XFormsContainingDocument extends XBLContainer {
             if (encodedDynamicState == null || encodedDynamicState.equals("")) {
                 // Just for tests, we allow the dynamic state to be empty
                 initialize(pipelineContext);
-                xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
             } else {
                 // Regular case
                 restoreDynamicState(pipelineContext, encodedDynamicState);
@@ -280,9 +278,6 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     public XFormsState getXFormsState(PipelineContext pipelineContext) {
-
-        // Make sure we have up to date controls before creating state below
-        xformsControls.updateControlBindingsIfNeeded(pipelineContext);
 
         // Encode state
         return new XFormsState(xformsStaticState.getEncodedStaticState(pipelineContext), createEncodedDynamicState(pipelineContext, false));
@@ -457,8 +452,7 @@ public class XFormsContainingDocument extends XBLContainer {
         if (messagesToRun != null)
             throw new ValidationException("Unable to run a two-pass submission and xforms:message within a same action sequence.", activeSubmission.getLocationData());
 
-        if (scriptsToRun != null)
-            throw new ValidationException("Unable to run a two-pass submission and xxforms:script within a same action sequence.", activeSubmission.getLocationData());
+        // scriptsToRun: it seems reasonable to run scripts up to the point where the submission takes place
 
         if (focusEffectiveControlId != null)
             throw new ValidationException("Unable to run a two-pass submission and xforms:setfocus within a same action sequence.", activeSubmission.getLocationData());
@@ -775,8 +769,11 @@ public class XFormsContainingDocument extends XBLContainer {
 
     public void addScriptToRun(String scriptId, String eventTargetId, String eventObserverId) {
 
-        if (activeSubmission != null)
-            throw new ValidationException("Unable to run a two-pass submission and xxforms:script within a same action sequence.", activeSubmission.getLocationData());
+        if (activeSubmission != null) {
+            // Scripts occurring after the submission takes place should not run
+            indentedLogger.logWarning("", "xxforms:script will be ignored because two-pass submission started", "script id", scriptId);
+            return;
+        }
 
         // Warn that scripts won't run in noscript mode (duh)
         if (XFormsProperties.isNoscript(this))
@@ -952,106 +949,32 @@ public class XFormsContainingDocument extends XBLContainer {
     /**
      * Execute an external event and ensure deferred event handling.
      *
-     * @param pipelineContext           current PipelineContext
-     * @param isTrustedEvent            whether this event is trusted
-     * @param eventName                 name of the event
-     * @param targetEffectiveId         effective id of the target to dispatch to
-     * @param bubbles                   whether the event bubbles (for custom events)
-     * @param cancelable                whether the event is cancelable (for custom events)
-     * @param otherControlEffectiveId   other effective control id if any
-     * @param valueString               optional context string
-     * @param filesElement              optional files elements for upload
-     * @param dndStart                  optional DnD start information
-     * @param dndEnd                    optional DnD end information
+     * @param pipelineContext   current context
+     * @param event             event to dispatch
      * @param handleGoingOnline whether we are going online and therefore using optimized event handling
      */
-    public void executeExternalEvent(PipelineContext pipelineContext, boolean isTrustedEvent, String eventName, String targetEffectiveId,
-                                     boolean bubbles, boolean cancelable,
-                                     String otherControlEffectiveId, String valueString, Element filesElement,
-                                     String dndStart, String dndEnd, boolean handleGoingOnline) {
+    public void handleExternalEvent(PipelineContext pipelineContext, XFormsEvent event, boolean handleGoingOnline) {
 
         final IndentedLogger indentedLogger = getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
-        final String LOG_TYPE = "executeExternalEvent";
+
+        final XFormsEventTarget eventTarget = event.getTargetObject();
+        final String eventTargetEffectiveId = eventTarget.getEffectiveId();
+        final String eventName = event.getEventName();
+
         try {
-            indentedLogger.startHandleOperation(LOG_TYPE, "handling external event", "target id", targetEffectiveId, "event name", eventName);
 
-            // Get event target object
-            XFormsEventTarget eventTarget;
-            {
-                final Object eventTargetObject = getObjectByEffectiveId(targetEffectiveId);
-                if (!(eventTargetObject instanceof XFormsEventTarget)) {
-                    if (XFormsProperties.isExceptionOnInvalidClientControlId(this)) {
-                        throw new ValidationException("Event target id '" + targetEffectiveId + "' is not an XFormsEventTarget.", getLocationData());
-                    } else {
-                        if (indentedLogger.isDebugEnabled()) {
-                            indentedLogger.logDebug(LOG_TYPE, "ignoring client event with invalid target id", "target id", targetEffectiveId, "event name", eventName);
-                        }
-                        return;
-                    }
-                }
-                eventTarget = (XFormsEventTarget) eventTargetObject;
-            }
+            indentedLogger.startHandleOperation(EVENT_LOG_TYPE, "handling external event", "target id", eventTargetEffectiveId, "event name", eventName);
 
-            if (isTrustedEvent) {
-                // Event is trusted, don't check if it is allowed
-                if (indentedLogger.isDebugEnabled()) {
-                    indentedLogger.logDebug(LOG_TYPE, "processing trusted event", "target id", targetEffectiveId, "event name", eventName);
-                }
-            } else if (!checkForAllowedEvents(pipelineContext, indentedLogger, eventName, eventTarget, handleGoingOnline)) {
-                // Event is not trusted and is not allowed
-                return;
-            }
+            // TODO: Is this check still needed?
+            if (handleGoingOnline && eventTarget instanceof XFormsSingleNodeControl) {
+                final XFormsSingleNodeControl xformsControl = (XFormsSingleNodeControl) eventTarget;
+                // When going online, ensure rebuild/revalidate before each event
+                rebuildRecalculateIfNeeded(pipelineContext);
 
-            // Get other event target
-            final XFormsEventTarget otherEventTarget;
-            {
-                final Object otherEventTargetObject = (otherControlEffectiveId == null) ? null : getObjectByEffectiveId(otherControlEffectiveId);
-                if (otherEventTargetObject == null) {
-                    otherEventTarget = null;
-                } else if (!(otherEventTargetObject instanceof XFormsEventTarget)) {
-                    if (XFormsProperties.isExceptionOnInvalidClientControlId(this)) {
-                        throw new ValidationException("Other event target id '" + otherControlEffectiveId + "' is not an XFormsEventTarget.", getLocationData());
-                    } else {
-                        if (indentedLogger.isDebugEnabled()) {
-                            indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event with invalid second control id", "target id", targetEffectiveId, "event name", eventName, "second control id", otherControlEffectiveId);
-                        }
-                        return;
-                    }
-                } else {
-                    otherEventTarget = (XFormsEventTarget) otherEventTargetObject;
-                }
-            }
-
-            // Rewrite event type. This is special handling of xxforms-value-or-activate for noscript mode.
-            if (XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE.equals(eventName)) {
-                // In this case, we translate the event depending on the control type
-                if (eventTarget instanceof XFormsTriggerControl) {
-                    // Triggers get a DOM activation
-                    if ("".equals(valueString)) {
-                        // Handler produces:
-                        //   <button type="submit" name="foobar" value="activate">...
-                        //   <input type="submit" name="foobar" value="Hi There">...
-                        //   <input type="image" name="foobar" value="Hi There" src="...">...
-
-                        // IE 6/7 are terminally broken: they don't send the value back, but the contents of the label. So
-                        // we must test for any empty content here instead of "!activate".equals(valueString). (Note that
-                        // this means that empty labels won't work.) Further, with IE 6, all buttons are present when
-                        // using <button>, so we use <input> instead, either with type="submit" or type="image". Bleh.
-
-                        return;
-                    }
-                    eventName = XFormsEvents.XFORMS_DOM_ACTIVATE;
-                } else {
-                    // Other controls get a value change
-                    eventName = XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE;
-                }
-            }
-
-            // For testing only
-            if (XFormsProperties.isAjaxTest()) {
-                if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
-                    valueString = "value" + System.currentTimeMillis();
-                }
+                // Mark the control as dirty, because we may have done a rebuild/recalculate earlier, and this means
+                // the MIPs need to be re-evaluated before being checked below
+                getControls().cloneInitialStateIfNeeded();
+                xformsControl.markDirty();
             }
 
             if (!handleGoingOnline) {
@@ -1059,80 +982,72 @@ public class XFormsContainingDocument extends XBLContainer {
                 startOutermostActionHandler();
             }
             {
-                // Create event
-                final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(this, eventName, eventTarget, otherEventTarget,
-                        true, bubbles, cancelable, valueString, filesElement, new String[] { dndStart, dndEnd} );
+                // Check if the value to set will be different from the current value
+                if (eventTarget instanceof XFormsValueControl && event instanceof XXFormsValueChangeWithFocusChangeEvent) {
+                    final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) event;
+                    if (valueChangeWithFocusChangeEvent.getOtherTargetObject() == null) {
+                        // We only get a value change with this event
+                        final String currentExternalValue = ((XFormsValueControl) eventTarget).getExternalValue(pipelineContext);
+                        if (currentExternalValue != null) {
+                            // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
+                            final boolean isIgnoreValueChangeEvent = currentExternalValue.equals(valueChangeWithFocusChangeEvent.getNewValue());
+                            if (isIgnoreValueChangeEvent) {
+                                indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring value change event as value is the same",
+                                        "control id", eventTargetEffectiveId, "event name", eventName, "value", currentExternalValue);
 
-                // Handle repeat focus. Don't dispatch event on DOMFocusOut however.
-                if (targetEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1
-                        && !XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)) {
-
-                    // Check if the value to set will be different from the current value
-                    if (eventTarget instanceof XFormsValueControl && xformsEvent instanceof XXFormsValueChangeWithFocusChangeEvent) {
-                        final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) xformsEvent;
-                        if (valueChangeWithFocusChangeEvent.getOtherTargetObject() == null) {
-                            // We only get a value change with this event
-                            final String currentExternalValue = ((XFormsValueControl) eventTarget).getExternalValue(pipelineContext);
-                            if (currentExternalValue != null) {
-                                // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
-                                final boolean isIgnoreValueChangeEvent = currentExternalValue.equals(valueChangeWithFocusChangeEvent.getNewValue());
-                                if (isIgnoreValueChangeEvent) {
-                                    indentedLogger.logDebug(LOG_TYPE, "ignoring value change event as value is the same",
-                                            "control id", eventTarget.getEffectiveId(), "event name", eventName, "value", currentExternalValue);
-
-                                    // Ensure deferred event handling
-                                    // NOTE: Here this will do nothing, but out of consistency we better have matching startOutermostActionHandler/endOutermostActionHandler
-                                    endOutermostActionHandler(pipelineContext);
-                                    return;
-                                }
-                            } else {
-                                // shouldn't happen really, but just in case let's log this
-                                indentedLogger.logDebug(LOG_TYPE, "got null currentExternalValue", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                                // Ensure deferred event handling
+                                // NOTE: Here this will do nothing, but out of consistency we better have matching startOutermostActionHandler/endOutermostActionHandler
+                                endOutermostActionHandler(pipelineContext);
+                                return;
                             }
                         } else {
-                            // There will be a focus event too, so don't ignore
+                            // shouldn't happen really, but just in case let's log this
+                            indentedLogger.logDebug(EVENT_LOG_TYPE, "got null currentExternalValue", "control id", eventTargetEffectiveId, "event name", eventName);
                         }
+                    } else {
+                        // There will be a focus event too, so don't ignore the event!
                     }
+                }
 
-                    // Dispatch repeat focus event
-                    {
-                        // The event target is in a repeated structure, so make sure it gets repeat focus
-                        dispatchEvent(pipelineContext, new XXFormsRepeatFocusEvent(this, eventTarget));
-                        // Get a fresh reference
-                        eventTarget = (XFormsControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
-                    }
+                // Handle repeat focus. Don't dispatch event on DOMFocusOut however.
+                if (eventTargetEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1
+                        && !(event instanceof XFormsDOMFocusOutEvent)) {
+
+                    // The event target is in a repeated structure, so make sure it gets repeat focus
+                    dispatchEventCheckTarget(pipelineContext, new XXFormsRepeatFocusEvent(this, eventTarget));
                 }
 
                 // Interpret event
                 if (eventTarget instanceof XFormsOutputControl) {
                     // Special xforms:output case
 
-                    if (XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(eventName)) {
+                    if (event instanceof XFormsDOMFocusInEvent) {
 
                         // First, dispatch DOMFocusIn
-                        dispatchEvent(pipelineContext, xformsEvent);
+                        dispatchEventCheckTarget(pipelineContext, event);
 
                         // Then, dispatch DOMActivate unless the control is read-only
-                        final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
+                        final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) eventTarget;
                         if (!xformsOutputControl.isReadonly()) {
-                            dispatchEvent(pipelineContext, new XFormsDOMActivateEvent(this, xformsOutputControl));
+                            dispatchEventCheckTarget(pipelineContext, new XFormsDOMActivateEvent(this, xformsOutputControl));
                         }
                     } else if (!ignoredXFormsOutputExternalEvents.contains(eventName)) {
                         // Dispatch other event
-                        dispatchEvent(pipelineContext, xformsEvent);
+                        dispatchEventCheckTarget(pipelineContext, event);
                     }
-                } else if (xformsEvent instanceof XXFormsValueChangeWithFocusChangeEvent) {
+                } else if (event instanceof XXFormsValueChangeWithFocusChangeEvent) {
                     // 4.6.7 Sequence: Value Change
 
+                    // TODO: Not sure if this comment makes sense anymore.
                     // What we want to do here is set the value on the initial controls tree, as the value has already been
                     // changed on the client. This means that this event(s) must be the first to come!
 
-                    final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) xformsEvent;
-                    {
+                    final XXFormsValueChangeWithFocusChangeEvent valueChangeWithFocusChangeEvent = (XXFormsValueChangeWithFocusChangeEvent) event;
+                    if (checkEventTarget(event)) {
                         // Store value into instance data through the control
                         final XFormsValueControl valueXFormsControl = (XFormsValueControl) eventTarget;
                         // NOTE: filesElement is only used by the upload control at the moment
-                        valueXFormsControl.storeExternalValue(pipelineContext, valueChangeWithFocusChangeEvent.getNewValue(), null, filesElement);
+                        valueXFormsControl.storeExternalValue(pipelineContext, valueChangeWithFocusChangeEvent.getNewValue(), null, valueChangeWithFocusChangeEvent.getFilesElement());
                     }
 
                     {
@@ -1146,17 +1061,10 @@ public class XFormsContainingDocument extends XBLContainer {
                             // Dispatch DOMFocusOut
                             // NOTE: setExternalValue() above may cause e.g. xforms-select / xforms-deselect events to be
                             // dispatched, so we get the control again to have a fresh reference
-                            final XFormsControl sourceXFormsControl = (XFormsControl) getObjectByEffectiveId(eventTarget.getEffectiveId());
-                            if (sourceXFormsControl != null) {
-                                dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(this, sourceXFormsControl));
-                            }
+                            dispatchEventCheckTarget(pipelineContext, new XFormsDOMFocusOutEvent(this, eventTarget));
 
                             // Dispatch DOMFocusIn
-                            final XFormsControl otherTargetXFormsControl
-                                = (XFormsControl) getObjectByEffectiveId(((XFormsControl) valueChangeWithFocusChangeEvent.getOtherTargetObject()).getEffectiveId());
-                            if (otherTargetXFormsControl != null) {
-                                dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(this, otherTargetXFormsControl));
-                            }
+                            dispatchEventCheckTarget(pipelineContext, new XFormsDOMFocusInEvent(this, valueChangeWithFocusChangeEvent.getOtherTargetObject()));
                         }
 
                         // NOTE: Refresh is done with the automatic deferred updates
@@ -1164,7 +1072,7 @@ public class XFormsContainingDocument extends XBLContainer {
 
                 } else {
                     // Dispatch any other allowed event
-                    dispatchEvent(pipelineContext, xformsEvent);
+                    dispatchEventCheckTarget(pipelineContext, event);
                 }
             }
             // When not going online, each event is within its own start/end outermost action handler
@@ -1176,32 +1084,110 @@ public class XFormsContainingDocument extends XBLContainer {
         }
     }
 
-    public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event) {
+    /**
+     * Dispatch the event and check its target first.
+     *
+     * @param pipelineContext   current context
+     * @param event             event to dispatch
+     */
+    private void dispatchEventCheckTarget(PipelineContext pipelineContext, XFormsEvent event) {
+        if (checkEventTarget(event)) {
+            dispatchEvent(pipelineContext, event);
+        }
+    }
+
+    /**
+     * Check whether an event can be be dispatched to the given object. This only checks:
+     *
+     * o the the target is still live
+     * o that the target is not a non-relevant or readonly control
+     *
+     * @param event         event
+     * @return              true iif the event target is allowed
+     */
+    private boolean checkEventTarget(XFormsEvent event) {
+        final XFormsEventTarget eventTarget = event.getTargetObject();
+        final Object newReference = getObjectByEffectiveId(eventTarget.getEffectiveId());
+        if (eventTarget != newReference) {
+
+            // Here, we check that the event's target is still a valid object. For example, a couple of events from the
+            // UI could target controls. The first event is processed, which causes a change in the controls tree. The
+            // second event would then refer to a control which no longer exist. In this case, we don't dispatch it.
+
+            // We used to check simply by effective id, but this is not enough in some cases. We want to handle
+            // controls that just "move" in a repeat. Scenario:
+            //
+            // o repeat with 2 iterations has xforms:input and xforms:trigger
+            // o assume repeat is sorted on input value
+            // o use changes value in input and clicks trigger
+            // o client sends 2 events to server
+            // o client processes value change and sets new value
+            // o refresh takes place and causes reordering of rows
+            // o client processes DOMActivate on trigger, which now has moved position, e.g. row 2 to row 1
+            // o DOMActivate is dispatched to proper control (i.e. same as input was on)
+            //
+            // On the other hand, if the repeat iteration has disappeared, or was removed and recreated, the event is
+            // not dispatched.
+
+            if (indentedLogger.isDebugEnabled()) {
+                indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on ghost target",
+                        "control id", eventTarget.getEffectiveId(), "event name", event.getEventName());
+            }
+            return false;
+        }
+
+        if (eventTarget instanceof XFormsControl) {
+            final XFormsControl xformsControl = (XFormsControl) eventTarget;
+            if (!xformsControl.isRelevant()) {
+                // Controls accept event only if they are relevant
+                if (indentedLogger.isDebugEnabled()) {
+                    indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on non-relevant control",
+                            "control id", eventTarget.getEffectiveId(), "event name", event.getEventName());
+                }
+                return false;
+            }
+            if (eventTarget instanceof XFormsSingleNodeControl) {
+                final XFormsSingleNodeControl xformsSingleNodeControl = (XFormsSingleNodeControl) eventTarget;
+                if (xformsSingleNodeControl.isReadonly() && !(xformsSingleNodeControl instanceof XFormsOutputControl)) {
+                    // Controls accept event only if they are not readonly, except for xforms:output which may be readonly
+                    if (indentedLogger.isDebugEnabled()) {
+                        indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on read-only control",
+                                "control id", eventTarget.getEffectiveId(), "event name", event.getEventName());
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void dispatchEvent(PropertyContext propertyContext, XFormsEvent event) {
         // Ensure that the event uses the proper container to dispatch the event
         final XBLContainer targetContainer = event.getTargetObject().getXBLContainer(this);
         if (targetContainer == this) {
-            super.dispatchEvent(pipelineContext, event);
+            super.dispatchEvent(propertyContext, event);
         } else {
-            targetContainer.dispatchEvent(pipelineContext, event);
+            targetContainer.dispatchEvent(propertyContext, event);
         }
     }
 
     /**
      * Check whether the external event is allowed on the gtiven target/
      *
-     * @param pipelineContext   pipeline context
      * @param indentedLogger    logger
      * @param eventName         event name
      * @param eventTarget       event target
-     * @param handleGoingOnline whether we are going online and therefore using optimized event handling
      * @return                  true iif the event is allowed
      */
-    private boolean checkForAllowedEvents(PipelineContext pipelineContext, IndentedLogger indentedLogger, String eventName, XFormsEventTarget eventTarget, boolean handleGoingOnline) {
+    public boolean checkForAllowedEvents(IndentedLogger indentedLogger, String eventName, XFormsEventTarget eventTarget) {
         // Don't allow for events on non-relevant, readonly or xforms:output controls (we accept focus events on
         // xforms:output though).
         // This is also a security measure that also ensures that somebody is not able to change values in an instance
         // by hacking external events.
-        final String LOG_TYPE = "checkForAllowedEvents";
+
+        // TODO: should do this by asking each control what event it supports!
+        final String eventTargetEffectiveId = eventTarget.getEffectiveId();
         if (eventTarget instanceof XFormsControl) {
             // Target is a control
 
@@ -1210,7 +1196,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 // Check for implicitly allowed events
                 if (!allowedXXFormsDialogExternalEvents.contains(eventName)) {
                     if (indentedLogger.isDebugEnabled()) {
-                        indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on xxforms:dialog", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                        indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on xxforms:dialog", "control id", eventTargetEffectiveId, "event name", eventName);
                     }
                     return false;
                 }
@@ -1218,7 +1204,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 // Target is a repeat
                 if (!allowedXFormsRepeatExternalEvents.contains(eventName)) {
                     if (indentedLogger.isDebugEnabled()) {
-                        indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on xforms:repeat", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                        indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on xforms:repeat", "control id", eventTargetEffectiveId, "event name", eventName);
                     }
                     return false;
                 }
@@ -1229,51 +1215,32 @@ public class XFormsContainingDocument extends XBLContainer {
                 // Only single-node controls accept events from the client
                 if (!(eventTarget instanceof XFormsSingleNodeControl)) {// NOTE: This includes xforms:trigger/xforms:submit
                     if (indentedLogger.isDebugEnabled()) {
-                        indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on non-single-node control", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                        indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on non-single-node control", "control id", eventTargetEffectiveId, "event name", eventName);
                     }
                     return false;
                 }
 
                 final XFormsSingleNodeControl xformsControl = (XFormsSingleNodeControl) eventTarget;
-
-                if (handleGoingOnline) {
-                    // When going online, ensure rebuild/revalidate before each event
-                    rebuildRecalculateIfNeeded(pipelineContext);
-
-                    // Mark the control as dirty, because we may have done a rebuild/recalculate earlier, and this means
-                    // the MIPs need to be re-evaluated before being checked below
-                    getControls().cloneInitialStateIfNeeded();
-                    xformsControl.markDirty();
-                }
-
-                if (!xformsControl.isRelevant() || (xformsControl.isReadonly() && !(xformsControl instanceof XFormsOutputControl))) {
-                    // Controls accept event only if they are relevant and not readonly, except for xforms:output which may be readonly
-                    if (indentedLogger.isDebugEnabled()) {
-                        indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on non-relevant or read-only control", "control id", eventTarget.getEffectiveId(), "event name", eventName);
-                    }
-                    return false;
-                }
-
                 if (!isExplicitlyAllowedExternalEvent(eventName)) {
                     // The event is not explicitly allowed: check for implicitly allowed events
                     if (xformsControl instanceof XFormsOutputControl) {
                         if (!allowedXFormsOutputExternalEvents.contains(eventName)) {
                             if (indentedLogger.isDebugEnabled()) {
-                                indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on xforms:output", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                                indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on xforms:output", "control id", eventTargetEffectiveId, "event name", eventName);
                             }
                             return false;
                         }
                     } else if (xformsControl instanceof XFormsUploadControl) {
                         if (!allowedXFormsUploadExternalEvents.contains(eventName)) {
                             if (indentedLogger.isDebugEnabled()) {
-                                indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on xforms:upload", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                                indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on xforms:upload", "control id", eventTargetEffectiveId, "event name", eventName);
                             }
                             return false;
                         }
                     } else {
                         if (!allowedXFormsControlsExternalEvents.contains(eventName)) {
                             if (indentedLogger.isDebugEnabled()) {
-                                indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event", "control id", eventTarget.getEffectiveId(), "event name", eventName);
+                                indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event", "control id", eventTargetEffectiveId, "event name", eventName);
                             }
                             return false;
                         }
@@ -1286,7 +1253,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 // The event is not explicitly allowed: check for implicitly allowed events
                 if (!allowedXFormsSubmissionExternalEvents.contains(eventName)) {
                     if (indentedLogger.isDebugEnabled()) {
-                        indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on xforms:submission", "submission id", eventTarget.getEffectiveId(), "event name", eventName);
+                        indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on xforms:submission", "submission id", eventTargetEffectiveId, "event name", eventName);
                     }
                     return false;
                 }
@@ -1296,7 +1263,7 @@ public class XFormsContainingDocument extends XBLContainer {
             // Check for implicitly allowed events
             if (!allowedXFormsContainingDocumentExternalEvents.contains(eventName)) {
                 if (indentedLogger.isDebugEnabled()) {
-                    indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event on containing document", "target id", eventTarget.getEffectiveId(), "event name", eventName);
+                    indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on containing document", "target id", eventTargetEffectiveId, "event name", eventName);
                 }
                 return false;
             }
@@ -1305,7 +1272,7 @@ public class XFormsContainingDocument extends XBLContainer {
             if (!isExplicitlyAllowedExternalEvent(eventName)) {
                 // The event is not explicitly allowed
                 if (indentedLogger.isDebugEnabled()) {
-                    indentedLogger.logDebug(LOG_TYPE, "ignoring invalid client event", "target id", eventTarget.getEffectiveId(), "event name", eventName);
+                    indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event", "target id", eventTargetEffectiveId, "event name", eventName);
                 }
                 return false;
             }
@@ -1390,6 +1357,8 @@ public class XFormsContainingDocument extends XBLContainer {
         } else if (XFormsEvents.XXFORMS_OFFLINE.equals(eventName)) {
             // Internal event for going offline
             goOffline(propertyContext);
+        } else {
+            super.performDefaultAction(propertyContext, event);
         }
     }
 
@@ -1493,7 +1462,7 @@ public class XFormsContainingDocument extends XBLContainer {
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, instancesElement);
 
             // Create XForms controls and models
-            createControlsAndModels(pipelineContext);
+            createControlsAndModels(pipelineContext, false);
 
             // Restore top-level models state, including instances
             restoreModelsState(pipelineContext);
@@ -1506,7 +1475,6 @@ public class XFormsContainingDocument extends XBLContainer {
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, serializedControlStateMap);
 
             xformsControls.initializeState(pipelineContext, true);
-            xformsControls.evaluateControlValuesIfNeeded(pipelineContext);
 
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, null);
         }
@@ -1529,26 +1497,11 @@ public class XFormsContainingDocument extends XBLContainer {
         return (Map) propertyContext.getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
     }
 
-    /**
-     * Whether, during initialization, this is the first refresh. The flag is automatically cleared during this call so
-     * that only the first call returns true.
-     *
-     * @return  true if this is the first refresh, false otherwise
-     */
-    public boolean isInitializationFirstRefreshClear() {
-        boolean result = mustPerformInitializationFirstRefresh;
-        mustPerformInitializationFirstRefresh = false;
-        return result;
-    }
-
     private void initialize(PipelineContext pipelineContext) {
         // This is called upon the first creation of the XForms engine only
 
         // Create XForms controls and models
-        createControlsAndModels(pipelineContext);
-
-        // Before dispatching initialization events, remember that first refresh must be performed
-        this.mustPerformInitializationFirstRefresh = XFormsProperties.isDispatchInitialEvents(this);
+        createControlsAndModels(pipelineContext, true);
 
         // Group all xforms-model-construct-done and xforms-ready events within a single outermost action handler in
         // order to optimize events
@@ -1563,19 +1516,15 @@ public class XFormsContainingDocument extends XBLContainer {
 
         // End deferred behavior
         endOutermostActionHandler(pipelineContext);
-
-        // In case there is no model or no controls, make sure the flag is cleared as it is only relevant during
-        // initialization
-        this.mustPerformInitializationFirstRefresh = false;
     }
 
-    private void createControlsAndModels(PipelineContext pipelineContext) {
+    private void createControlsAndModels(PipelineContext pipelineContext, boolean isInitialization) {
 
         // Gather static analysis information
         xformsStaticState.analyzeIfNecessary(pipelineContext);
 
         // Create XForms controls
-        xformsControls = new XFormsControls(this);
+        xformsControls = new XFormsControls(this, isInitialization);
 
         // Add models
         addAllModels();
@@ -1609,7 +1558,7 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     public List getEventHandlers(XBLContainer container) {
-        return getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
+        return getStaticState().getEventHandlers(XFormsUtils.getPrefixedId(getEffectiveId()));
     }
 
     public static void logWarningStatic(String type, String message, String... parameters) {
@@ -1668,5 +1617,10 @@ public class XFormsContainingDocument extends XBLContainer {
 
     public IndentedLogger getIndentedLogger() {
         return indentedLogger;
+    }
+
+    @Override
+    protected List<XFormsControl> getChildrenControls(XFormsControls controls) {
+        return controls.getCurrentControlTree().getChildren();
     }
 }

@@ -113,9 +113,9 @@ public class Connection {
      *
      * @param externalContext   context
      * @param indentedLogger    logger
-     * @param username
+     * @param username          username
      * @param headerNameValues  LinkedHashMap<String headerName, String[] headerValues>
-     * @param headersToForward
+     * @param headersToForward  headers to forward
      * @return LinkedHashMap<String headerName, String[] headerValues>
      */
     private static Map<String, String[]> getHeadersMap(ExternalContext externalContext, IndentedLogger indentedLogger, String username,
@@ -140,7 +140,6 @@ public class Connection {
         }
 
         // Forward cookies for session handling
-        boolean sessionCookieSet = false;
         if (username == null) {
 
             // START NEW ALGORITHM
@@ -152,6 +151,7 @@ public class Connection {
 
             // TODO: ExternalContext must provide direct access to cookies
             final Object nativeRequest = externalContext.getNativeRequest();
+            boolean sessionCookieSet = false;
             if (nativeRequest instanceof HttpServletRequest) {
                 final HttpServletRequest httpServletRequest = (HttpServletRequest) nativeRequest;
                 final Cookie[] cookies = httpServletRequest.getCookies();
@@ -159,29 +159,46 @@ public class Connection {
                 final StringBuilder sb = new StringBuilder();
 
                 if (cookies != null) {
-                    for (final Cookie cookie: cookies) {
-                        // This is the standard JSESSIONID cookie
-                        final boolean isJsessionId = cookie.getName().equals("JSESSIONID");
-                        // Remember if we've seen JSESSIONID
-                        sessionCookieSet |= isJsessionId;
 
-                        // Forward JSESSIONID and JSESSIONIDSSO for JBoss
-                        if (isJsessionId || cookie.getName().equals("JSESSIONIDSSO")) {
-                            // Multiple cookies in the header, separated with ";"
-                            if (sb.length() > 0)
-                                sb.append("; ");
-
-                            sb.append(cookie.getName());
-                            sb.append('=');
-                            sb.append(cookie.getValue());
+                    // Figure out if we need to forward session cookies. We only forward if there is the requested
+                    // session id is the same as the current session. Otherwise, it means that the current session is no
+                    // longer valid, or that the incoming cookie is out of date.
+                    boolean forwardSessionCookies = false;
+                    final ExternalContext.Session session = externalContext.getSession(false);
+                    if (session != null) {
+                        final String requestedSessionId = httpServletRequest.getRequestedSessionId();
+                        if (session.getId().equals(requestedSessionId)) {
+                            forwardSessionCookies = true;
                         }
                     }
 
-                    if (sb.length() > 0) {
-                        // One or more cookies were set
-                        final String cookieString = sb.toString();
-                        indentedLogger.logDebug(LOG_TYPE, "forwarding cookies", "cookie", cookieString);
-                        StringUtils.addValueToStringArrayMap(headersMap, "Cookie", cookieString );
+                    if (forwardSessionCookies) {
+                        for (final Cookie cookie: cookies) {
+                            // This is the standard JSESSIONID cookie
+                            final boolean isJSessionId = cookie.getName().equals("JSESSIONID");
+                            // Remember if we've seen JSESSIONID
+                                sessionCookieSet |= isJSessionId;
+
+                            // Forward JSESSIONID and JSESSIONIDSSO for JBoss
+                            if (isJSessionId || cookie.getName().equals("JSESSIONIDSSO")) {
+                                // Multiple cookies in the header, separated with ";"
+                                if (sb.length() > 0)
+                                    sb.append("; ");
+
+                                sb.append(cookie.getName());
+                                sb.append('=');
+                                sb.append(cookie.getValue());
+                            }
+                        }
+
+                        if (sb.length() > 0) {
+                            // One or more cookies were set
+                            final String cookieString = sb.toString();
+                            indentedLogger.logDebug(LOG_TYPE, "forwarding cookies",
+                                    "cookie", cookieString,
+                                    "requested session id", externalContext.getRequest().getRequestedSessionId());
+                            StringUtils.addValueToStringArrayMap(headersMap, "Cookie", cookieString );
+                        }
                     }
                 }
             }

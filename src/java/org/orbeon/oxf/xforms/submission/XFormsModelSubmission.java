@@ -122,7 +122,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         this.submissions = new Submission[] {
             new EchoSubmission(this),
-            new OptimizedGetSubmission(this),
+            new ClientGetAllSubmission(this),
             new OptimizedSubmission(this),
             new CacheableSubmission(this),
             new RegularSubmission(this)
@@ -268,7 +268,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     }
 
     public List getEventHandlers(XBLContainer container) {
-        return containingDocument.getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
+        return containingDocument.getStaticState().getEventHandlers(XFormsUtils.getPrefixedId(getEffectiveId()));
     }
 
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
@@ -486,6 +486,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 if (indentedLogger.isDebugEnabled())
                     indentedLogger.startHandleOperation("", "handling result");
                 try {
+                    // Get fresh XPath context because function context might have changed
+                    // NOTE: It is not ideal that we have to do this!
+                    p.initializeXPathContext(propertyContext);
                     // Process the different types of response
                     if (submissionResult.getReplacer() != null) {
                         // Replacer provided, perform replacement
@@ -606,6 +609,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         }
     }
 
+    public XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+        model.getBindingContext(propertyContext, containingDocument);
+        final XFormsContextStack contextStack = model.getContextStack();
+        contextStack.pushBinding(propertyContext, getSubmissionElement(), getEffectiveId(), model.getResolutionScope());
+        return contextStack.getCurrentBindingContext();
+    }
+
     public class SubmissionParameters {
 
         // @replace attribute
@@ -614,16 +624,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean isReplaceText = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_TEXT);
         final boolean isReplaceNone = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE);
 
-        // Current node for xforms:submission and instance containing the node to submit
-        final NodeInfo refNodeInfo;
-        final XFormsInstance refInstance;
-
-        // Context stack
         final XFormsContextStack contextStack = model.getContextStack();
-        
-        final Item submissionElementContextItem;
-    
-        final XFormsFunction.Context functionContext;
+
+        // Current node for xforms:submission and instance containing the node to submit
+        NodeInfo refNodeInfo;
+        XFormsInstance refInstance;
+        Item submissionElementContextItem;
+
         final boolean hasBoundRelevantUploadControl;
         
         final String resolvedMethod;
@@ -633,14 +640,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean resolvedValidate;
         final boolean resolvedRelevant;
         
-        final boolean isHandlingOptimizedGet;
+        final boolean isHandlingClientGetAll;
 
         // XPath function library and namespace mappings
         final FunctionLibrary functionLibrary = XFormsContainingDocument.getFunctionLibrary();
         final Map<String, String> prefixToURIMap = container.getNamespaceMappings(submissionElement);
 
         // XPath context
-        final XPathCache.XPathContext xpathContext;
+        XPathCache.XPathContext xpathContext;
         
         final boolean isNoscript;
         final boolean isAllowDeferredSubmission;
@@ -651,28 +658,31 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean isDeferredSubmissionSecondPass;
         
         final boolean isDeferredSubmissionSecondPassReplaceAll;
+
+        public void initializeXPathContext(PropertyContext propertyContext) {
+            final XFormsContextStack.BindingContext bindingContext = getBindingContext(propertyContext, containingDocument);
+            final XFormsFunction.Context functionContext = contextStack.getFunctionContext(getEffectiveId());
+
+            refNodeInfo = bindingContext.getSingleNode();
+            submissionElementContextItem = bindingContext.getContextItem();
+            // NOTE: Current instance may be null if the document submitted is not part of an instance
+            refInstance = bindingContext.getInstance();
+            xpathContext = new XPathCache.XPathContext(prefixToURIMap, bindingContext.getInScopeVariables(), functionLibrary, functionContext, null, getLocationData());
+        }
         
         public SubmissionParameters(PropertyContext propertyContext, String eventName) {
-            contextStack.resetBindingContext(propertyContext);
-            
-            contextStack.setBinding(propertyContext, XFormsModelSubmission.this);
-    
-            refNodeInfo = contextStack.getCurrentSingleNode();
-            functionContext = contextStack.getFunctionContext();
-            submissionElementContextItem = contextStack.getContextItem();
-    
+
+            initializeXPathContext(propertyContext);
+
             // Check that we have a current node and that it is pointing to a document or an element
             if (refNodeInfo == null)
                 throw new XFormsSubmissionException(XFormsModelSubmission.this, "Empty single-node binding on xforms:submission for submission id: " + id, "getting submission single-node binding",
                         new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.NO_DATA, null));
-    
+
             if (!(refNodeInfo instanceof DocumentInfo || refNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
                 throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding",
                         new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.NO_DATA, null));
             }
-    
-            // Current instance may be null if the document submitted is not part of an instance
-            refInstance = contextStack.getCurrentInstance();
     
             // Determine if the instance to submit has one or more bound and relevant upload controls
             //
@@ -688,9 +698,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             hasBoundRelevantUploadControl = refInstance != null && !containingDocument.isInitializing()
                     && !containingDocument.isGotSubmissionSecondPass() && xxfFormsEnsureUploads && !isReplaceAll
                     && serialize && XFormsSubmissionUtils.hasBoundRelevantUploadControls(containingDocument, refInstance);
-        
-            // Evaluate early AVTs
-            xpathContext = new XPathCache.XPathContext(prefixToURIMap, contextStack.getCurrentVariables(), functionLibrary, functionContext, null, getLocationData());
             
             {
                 // Resolved method AVT
@@ -711,7 +718,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 resolvedRelevant = !"false".equals(resolvedRelevantString);
             }
         
-            isHandlingOptimizedGet = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && actualHttpMethod.equals("GET")
+            isHandlingClientGetAll = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && actualHttpMethod.equals("GET")
                     && isReplaceAll
                     && (resolvedMediatype == null || !resolvedMediatype.startsWith(NetUtils.APPLICATION_SOAP_XML)) // can't let SOAP requests be handled by the browser
                     && avtXXFormsUsername == null // can't optimize if there are authentication credentials
@@ -721,7 +728,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             isNoscript = XFormsProperties.isNoscript(containingDocument);
             isAllowDeferredSubmission = !isNoscript && !XFormsProperties.isAjaxPortlet(containingDocument);
         
-            isPossibleDeferredSubmission = (isReplaceAll && !isHandlingOptimizedGet) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);
+            isPossibleDeferredSubmission = (isReplaceAll && !isHandlingClientGetAll) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);
             isDeferredSubmission = isAllowDeferredSubmission && isPossibleDeferredSubmission;
             isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
             isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
@@ -1016,7 +1023,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             } else if (XFormsSubmissionUtils.isGet(submissionMethodAttribute) || XFormsSubmissionUtils.isDelete(submissionMethodAttribute)) {
                 actualSerialization = "application/x-www-form-urlencoded";
             } else {
-                throw new XFormsSubmissionException(this, "xforms:submission: invalid submission methodrequested: " + submissionMethodAttribute, "serializing instance");
+                throw new XFormsSubmissionException(this, "xforms:submission: invalid submission method requested: " + submissionMethodAttribute, "serializing instance");
             }
         } else {
             actualSerialization = submissionSerializationAttribute;

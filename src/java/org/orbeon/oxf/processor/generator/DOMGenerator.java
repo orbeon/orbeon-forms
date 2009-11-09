@@ -1,23 +1,17 @@
 /**
- *  Copyright (C) 2004 - 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.generator;
-
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXResult;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.cache.SimpleOutputCacheKey;
@@ -29,9 +23,15 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
-import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.ContentHandler;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
 
 /**
  * DOM Document to sax event processor.
@@ -77,8 +77,7 @@ public final class DOMGenerator extends ProcessorImpl {
         }
 
         Source makeDOMSource() {
-            final Source ret = Dom4jUtils.getDocumentSource(doc);
-            return ret;
+            return Dom4jUtils.getDocumentSource(doc);
         }
     }
 
@@ -92,8 +91,7 @@ public final class DOMGenerator extends ProcessorImpl {
         }
 
         Source makeDOMSource() {
-            final Source ret = new DOMSource(doc);
-            return ret;
+            return new DOMSource(doc);
         }
     }
 
@@ -126,11 +124,11 @@ public final class DOMGenerator extends ProcessorImpl {
         }
     }
 
-    public final static Long ZeroValidity = new Long(0);
+    public final static Long ZeroValidity = (long) 0;
     public final static String DefaultContext = "oxf:/";
 
     private static org.dom4j.Document makeCopyDoc(final org.dom4j.Element e) {
-        final org.dom4j.Element cpy = (org.dom4j.Element) e.createCopy();
+        final org.dom4j.Element cpy = e.createCopy();
         final NonLazyUserDataDocument ret = new NonLazyUserDataDocument();
         ret.setRootElement(cpy);
         return ret;
@@ -158,18 +156,17 @@ public final class DOMGenerator extends ProcessorImpl {
     /**
      * @param id  Is really just for debugging purposes.  Should give some clue as to who is
      *            instantiating this DOMGenerator.
-     * @param sid Base url used to resolve any relative urls that may be contained within the
+     * @param sid Base url used to resolve any relative URLs that may be contained within the
      *            document.
      */
-    public DOMGenerator
-            (final org.w3c.dom.Document d, final String id, Object v, final String sid) {
+    public DOMGenerator(final org.w3c.dom.Document d, final String id, Object v, final String sid) {
         this(id, v, new W3CSourceFactory(d, sid));
     }
 
     /**
      * @param id  Is really just for debugging purposes.  Should give some clue as to who is
      *            instantiating this DOMGenerator.
-     * @param sid Base url used to resolve any relative urls that may be contained within the
+     * @param sid Base url used to resolve any relative URLs that may be contained within the
      *            document.
      */
 
@@ -180,11 +177,10 @@ public final class DOMGenerator extends ProcessorImpl {
     /**
      * @param id  Is really just for debugging purposes.  Should give some clue as to who is
      *            instantiating this DOMGenerator.
-     * @param sid Base url used to resolve any relative urls that may be contained within the
+     * @param sid Base url used to resolve any relative URLs that may be contained within the
      *            document.
      */
-    public DOMGenerator
-            (final org.dom4j.Document d, final String id, Object v, final String sid) {
+    public DOMGenerator(final org.dom4j.Document d, final String id, Object v, final String sid) {
         this(id, v, new DOM4JSourceFactory(d, sid, true));
     }
 
@@ -194,27 +190,27 @@ public final class DOMGenerator extends ProcessorImpl {
 
     public ProcessorOutput createOutput(final String nm) {
 
-        final Class cls = getClass();
-        final ProcessorOutput ret = new ProcessorImpl.CacheableTransformerOutputImpl(cls, nm) {
-            public void readImpl(final PipelineContext ctxt, final ContentHandler cntntHndlr) {
+        final Class clazz = getClass();
+        final ProcessorOutput ret = new ProcessorImpl.CacheableTransformerOutputImpl(clazz, nm) {
+            public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
                 try {
-                    final Transformer idnt = TransformerUtils.getIdentityTransformer();
+                    final Transformer identityTransformer = TransformerUtils.getIdentityTransformer();
                     // NOTE: source cannot be an instance var.  Reason is that the XMLReader it
-                    // will create is stateful.  ( Meaning that if it used by multiple threads 
+                    // will create is stateful.  ( Meaning that if it used by multiple threads
                     // confusion will ensue.
                     final Source source = sourceFactory.makeSource();
-                    final SAXResult sr = new SAXResult(cntntHndlr);
-                    idnt.transform(source, sr);
+                    final SAXResult result = new SAXResult(contentHandler);
+                    identityTransformer.transform(source, result);
                 } catch (final TransformerException e) {
                     throw new OXFException(e);
                 }
             }
 
-            public OutputCacheKey getKeyImpl(final PipelineContext ctxt) {
+            public OutputCacheKey getKeyImpl(final PipelineContext pipelineContext) {
                 return key;
             }
 
-            public Object getValidityImpl(final PipelineContext ctxt) {
+            public Object getValidityImpl(final PipelineContext pipelineContext) {
                 return validity;
             }
         };

@@ -25,17 +25,15 @@ import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OldControlsComparator extends BaseControlsComparator {
 
     public OldControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
-                                 Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2, Map valueChangeControlIds) {
+                                 Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2, Set<String> valueChangeControlIds) {
         super(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
     }
 
@@ -72,7 +70,7 @@ public class OldControlsComparator extends BaseControlsComparator {
                 if (!(isStaticReadonly && xformsSingleNodeControl2.isReadonly() && xformsSingleNodeControl2 instanceof XFormsTriggerControl)
                         && !(xformsSingleNodeControl2 instanceof XFormsGroupControl && XFormsGroupControl.INTERNAL_APPEARANCE.equals(xformsSingleNodeControl2.getAppearance()))) {
                     // Output diffs between controlInfo1 and controlInfo2
-                    final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(xformsSingleNodeControl2.getEffectiveId()) != null;
+                    final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.contains(xformsSingleNodeControl2.getEffectiveId());
                     if ((!xformsSingleNodeControl2.equalsExternal(pipelineContext, xformsSingleNodeControl1) || isValueChangeControl)) {
                         // Don't send anything if nothing has changed
                         // But we force a change for controls whose values changed in the request
@@ -205,26 +203,9 @@ public class OldControlsComparator extends BaseControlsComparator {
 
                                 // TODO: Output value only when changed
 
+                                // Output element
                                 final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
-
-                                // Check if a "display-value" attribute must be added
-                                //                            final String displayValue = xformsValueControl.getDisplayValue(pipelineContext);
-                                //                            if (displayValue != null) {
-                                //                                doOutputElement |= addAttributeIfNeeded(attributesImpl, "display-value", displayValue, isNewRepeatIteration, displayValue.equals(""));
-                                //                            }
-
-                                // Create element with text value
-                                final String value;
-                                {
-                                    // Value may become null when controls are unbound
-                                    final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
-                                    value = (tempValue == null) ? "" : tempValue;
-                                }
-                                if (doOutputElement || !isNewlyVisibleSubtree || (isNewlyVisibleSubtree && !value.equals(""))) {
-                                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
-                                    ch.text(value);
-                                    ch.endElement();
-                                }
+                                outputElement(xformsValueControl, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "control");
                             } else {
                                 // No value, just output element with no content (but there may be attributes)
                                 if (doOutputElement)
@@ -256,20 +237,9 @@ public class OldControlsComparator extends BaseControlsComparator {
                                 doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "name", name2, isNewlyVisibleSubtree, false);
                             }
 
+                            // Output element
                             final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
-
-                            // Create element with text value
-                            final String value;
-                            {
-                                // Value may become null when controls are unbound
-                                final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
-                                value = (tempValue == null) ? "" : tempValue;
-                            }
-                            if (doOutputElement || !isNewlyVisibleSubtree || (isNewlyVisibleSubtree && !value.equals(""))) {
-                                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", attributesImpl);
-                                ch.text(value);
-                                ch.endElement();
-                            }
+                            outputElement(xformsValueControl, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "attribute");
                         } else if (isTextControl) {
                             // Text control
                             final XXFormsTextControl txtControlInfo2 = (XXFormsTextControl) xformsSingleNodeControl2;
@@ -285,20 +255,9 @@ public class OldControlsComparator extends BaseControlsComparator {
                                 doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewlyVisibleSubtree, false);
                             }
 
+                            // Output element
                             final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsSingleNodeControl2;
-
-                            // Create element with text value
-                            final String value;
-                            {
-                                // Value may become null when controls are unbound
-                                final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
-                                value = (tempValue == null) ? "" : tempValue;
-                            }
-                            if (doOutputElement || !isNewlyVisibleSubtree || (isNewlyVisibleSubtree && !value.equals(""))) {
-                                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "text", attributesImpl);
-                                ch.text(value);
-                                ch.endElement();
-                            }
+                            outputElement(xformsValueControl, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "text");
                         } else {
                             // Repeat iteration only handles relevance
 
@@ -417,6 +376,24 @@ public class OldControlsComparator extends BaseControlsComparator {
                     diff(children1, children2);
                 }
             }
+        }
+    }
+
+    private void outputElement(XFormsValueControl xformsValueControl, boolean doOutputElement, boolean isNewlyVisibleSubtree, Attributes attributesImpl, String elementName) {
+        // Create element with text value
+        final String value;
+        if (xformsValueControl.isRelevant()) {
+            // NOTE: Not sure if it is still possible to have a null value when the control is relevant
+            final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
+            value = (tempValue == null) ? "" : tempValue;
+        } else {
+            value = "";
+        }
+        if (doOutputElement || !isNewlyVisibleSubtree || !value.equals("")) {
+            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, elementName, attributesImpl);
+            if (value.length() > 0)
+                ch.text(value);
+            ch.endElement();
         }
     }
 }

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -524,9 +524,13 @@
                                                     <!-- Whether this is a component -->
                                                     <xxforms:variable name="is-component" select="$current-qname = $components-qnames" as="xs:boolean"/>
                                                     <!-- Component template if this is a component (take first one) -->
+                                                    <xxforms:variable name="component-binding" as="element(xbl:binding)?"
+                                                                      select="if ($is-component)
+                                                                              then ($component-bindings[$current-qname = (for $t in .//fb:template/*[1] return resolve-QName(name($t), $t))])[1]
+                                                                              else ()"/>
                                                     <xxforms:variable name="component-template" as="element(xbl:template)?"
                                                                       select="if ($is-component)
-                                                                              then ($component-bindings[$current-qname = (for $t in .//fb:template/*[1] return resolve-QName(name($t), $t))]/xbl:template)[1]
+                                                                              then ($component-binding/xbl:template)[1]
                                                                               else ()"/>
 
                                                     <xxforms:variable name="is-repeat" select="$current-qname = xs:QName('fr:repeat')" as="xs:boolean"/>
@@ -863,11 +867,11 @@
                                                                                     <xxforms:variable name="control-name" select="substring-before($control/@id, '-control')" as="xs:string"/>
                                                                                     <xxforms:variable name="instance-holder" as="element()"
                                                                                                       select="if ($is-component)
-                                                                                                              then $component-template//xforms:instance[@id = 'fr-form-instance']/*/*[name() = $control-name]
+                                                                                                              then $component-binding//xforms:instance[@id = 'fr-form-instance']/*/*[name() = $control-name]
                                                                                                               else $section-holder/*[name() = $control-name]" />
                                                                                     <xxforms:variable name="resource-holder" as="element()"
                                                                                                       select="if ($is-component)
-                                                                                                              then $component-template//xforms:instance[@id = 'fr-form-resources']/*/resource[1]/*[name() = $control-name]
+                                                                                                              then $component-binding//xforms:instance[@id = 'fr-form-resources']/*/resource[1]/*[name() = $control-name]
                                                                                                               else $current-resources/*[name() = $control-name]"/>
 
                                                                                     <!-- Editor for the current cell -->

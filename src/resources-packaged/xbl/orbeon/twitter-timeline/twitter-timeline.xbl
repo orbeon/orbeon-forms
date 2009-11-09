@@ -1,0 +1,160 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+
+         script-type="application/xhtml+xml">
+
+    <xbl:binding id="fr-twitter-timeline-binding" element="fr|twitter-timeline">
+        <xbl:resources>
+            <!-- CSS style -->
+            <xbl:style src="/xbl/orbeon/twitter-timeline/twitter-timeline.css"/>
+        </xbl:resources>
+        <xbl:template>
+            <!-- Local model -->
+            <xforms:model id="model">
+                <!-- Local instance -->
+                <xforms:instance id="instance">
+                    <!-- Copy configuration parameters -->
+                    <parameters>
+                        <id xbl:attr="xbl:text=username"/>
+                        <count xbl:attr="xbl:text=count">5</count>
+                    </parameters>
+                </xforms:instance>
+
+                <xforms:instance id="twitter-user-timeline-instance">
+                    <statuses>
+                        <!-- Example status:
+                        <status>
+                            <created_at>Fri Oct 24 22:25:01 +0000 2008</created_at>
+                            <id>974296158</id>
+                            <text>Bummer: &quot;New MacBook Pro Does Not Support 8GB RAM (for now)&quot; http://tinyurl.com/6egzsr</text>
+                            <source>&lt;a href=&quot;http://www.twhirl.org/&quot;&gt;twhirl&lt;/a&gt;</source>
+                            <truncated>false</truncated>
+                            <in_reply_to_status_id/>
+                            <in_reply_to_user_id/>
+                            <favorited>false</favorited>
+                            <user>
+                                <id>6087842</id>
+                                <name>Erik Bruchez</name>
+                                <screen_name>ebruchez</screen_name>
+                                <location>Hillsdale, California</location>
+                                <description/>
+                                <profile_image_url>
+                                    http://s3.amazonaws.com/twitter_production/profile_images/59072394/MangaErik_normal.jpg
+                                </profile_image_url>
+                                <url/>
+                                <protected>false</protected>
+                                <followers_count>69</followers_count>
+                            </user>
+                        </status>
+                        -->
+                    </statuses>
+                </xforms:instance>
+
+                <!-- Submission to call the twitter API -->
+                <xforms:submission id="user-timeline-submission"
+                       serialization="none"
+                       resource="http://twitter.com/statuses/user_timeline/{id}.xml?count={count}"
+                       method="get"
+                       replace="instance"
+                       targetref="instance('twitter-user-timeline-instance')"
+                       xxforms:username="orbeon_test"
+                       xxforms:password="orbeon">
+                </xforms:submission>
+
+                <!-- Load timeline upon initialization -->
+                <xforms:send submission="user-timeline-submission" ev:event="xforms-model-construct-done"/>
+
+            </xforms:model>
+            <!-- Local controls -->
+            <xforms:group>
+                <!-- DIV to help styling -->
+                <xhtml:div class="fr-top-shadow"/>
+                <xhtml:div class="fr-container">
+
+                    <!--<xforms:submit submission="user-timeline-submission">-->
+                        <!--<xforms:label>-->
+                            <!--Update Timeline for <xforms:output value="id"/>-->
+                        <!--</xforms:label>-->
+                    <!--</xforms:submit>-->
+                    <fr:button class="button">
+                        <xforms:label>
+                            Update Timeline for <xforms:output value="id"/>
+                        </xforms:label>
+                        <xforms:send ev:event="DOMActivate" submission="user-timeline-submission"/>
+                    </fr:button>
+
+                    <!-- Repeat over status -->
+                    <xhtml:div class="statuses">
+                        <xforms:repeat nodeset="instance('twitter-user-timeline-instance')/status">
+                            <!-- DIV around one status -->
+                            <xhtml:div class="status">
+                                <!-- User info -->
+                                <xhtml:div class="user">
+                                    <xhtml:a title="{user/name}" href="http://twitter.com/{user/screen_name}">
+                                        <xhtml:img src="{user/profile_image_url}" alt="{user/name}"/>
+                                        <xforms:output value="user/screen_name"/>
+                                    </xhtml:a>
+                                </xhtml:div>
+                                <!-- Entry -->
+                                <xhtml:div class="entry">
+                                    <xhtml:div>
+                                        <!-- Message -->
+                                        <xhtml:span class="message">
+                                            <!-- Bunch of regexps to escape, parse links, users, and hash tags with the message -->
+                                            <xxforms:variable name="markup-replaced" as="xs:string"
+                                                              select="replace(replace(text, '&lt;', '&amp;lt;'), '&quot;', '&amp;quot;')"/>
+                                            <xxforms:variable name="url-replaced" as="xs:string"
+                                                              select="replace($markup-replaced, '([A-Za-z]+://[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_:%&amp;\?/.=]+)',
+                                                                        '&lt;a href=''$1''>$1&lt;/a>')"/>
+                                            <xxforms:variable name="user-replaced" as="xs:string"
+                                                              select="replace($url-replaced, '[@]+([A-Za-z0-9\-_]+)',
+                                                                        '&lt;a href=''http://twitter.com/$1'' rel=''nofollow''>@$1&lt;/a>')"/>
+                                            <xxforms:variable name="hash-replaced" as="xs:string"
+                                                              select="replace($user-replaced, '[##]+([A-Za-z0-9\-_]+)',
+                                                                        '&lt;a href=''http://search.twitter.com/search?q=%23$1'' rel=''nofollow''>#$1&lt;/a>')"/>
+
+                                            <!-- Output the resulting HTML -->
+                                            <xforms:output mediatype="text/html" value="$hash-replaced"/>
+                                        </xhtml:span>
+                                        <!-- Link to tweet -->
+                                        <xhtml:a class="link" rel="bookmark" href="http://twitter.com/{user/screen_name}/status/{id}">
+                                            <xhtml:img src="/apps/fr/style/images/silk/link.png" alt="Link to this tweet"/>
+                                        </xhtml:a>
+                                        <!-- Source of the tweet -->
+                                        <xhtml:span class="meta">
+                                            <xhtml:span>posted  from <xforms:output mediatype="text/html" value="source"/></xhtml:span>
+                                        </xhtml:span>
+                                    </xhtml:div>
+                                </xhtml:div>
+                                <xhtml:div class="clear"/>
+                            </xhtml:div>
+                        </xforms:repeat>
+                    </xhtml:div>
+                </xhtml:div>
+                <xhtml:div class="fr-bottom-shadow"/>
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

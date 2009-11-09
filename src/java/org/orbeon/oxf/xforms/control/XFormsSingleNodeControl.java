@@ -14,11 +14,9 @@
 package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.Item;
@@ -43,15 +41,19 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     // Standard MIPs
     private boolean readonly;
     private boolean required;
-    private boolean relevant;
-    private boolean valid;
+    private boolean valid = true;
+
+    // Previous values for refresh
+    private boolean wasReadonly;
+    private boolean wasRequired;
+    private boolean wasValid;
+
+    // Type
+    private String type;
 
     // Custom MIPs
     private Map<String, String> customMIPs;
     private String customMIPsAsString;
-
-    // Type
-    private String type;
 
     public XFormsSingleNodeControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
@@ -60,7 +62,15 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     @Override
     public void markDirty() {
         super.markDirty();
+
+        // Keep previous values
+        wasReadonly = readonly;
+        wasRequired = required;
+        wasValid = valid;
+
+        // Clear everything
         mipsRead = false;
+        type = null;
         customMIPs = null;
         customMIPsAsString = null;
     }
@@ -91,11 +101,6 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         return readonly;
     }
 
-    public boolean isRelevant() {
-        getMIPsIfNeeded();
-        return relevant;
-    }
-
     /**
      * Convenience method to figure out when a control is relevant, assuming a "null" control is non-relevant.
      *
@@ -106,9 +111,31 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         return control != null && control.isRelevant();
     }
 
+    @Override
+    public boolean supportsRefreshEvents() {
+        // Single-node controls support refresh events
+        return true;
+    }
+
     public boolean isRequired() {
         getMIPsIfNeeded();
         return required;
+    }
+
+    public boolean wasReadonly() {
+        return wasReadonly;
+    }
+
+    public boolean wasRequired() {
+        return wasRequired;
+    }
+
+    public boolean wasValid() {
+        return wasValid;
+    }
+
+    public boolean isValueChanged() {
+        return false;
     }
 
     public String getType() {
@@ -185,14 +212,20 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    protected void evaluate(PropertyContext propertyContext) {
-        super.evaluate(propertyContext);
+    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
+        super.evaluate(propertyContext, isRefresh);
+
         getMIPsIfNeeded();
+
+        if (!isRefresh) {
+            // Sync values
+            wasReadonly = readonly;
+            wasRequired = required;
+            wasValid = valid;
+        }
     }
 
-    // Experiment with not evaluating labels, etc. if control is relevant.
-    // This is not the right way: must move basic concept of relevance to XFormsControl, as it is independent from
-    // notion of single-node binding.
+    // Experiment with not evaluating labels, etc. if control is not relevant.
 //    @Override
 //    protected void evaluate(PipelineContext pipelineContext) {
 //        getMIPsIfNeeded();
@@ -236,7 +269,6 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                     final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
                     this.readonly = InstanceData.getInheritedReadonly(currentNodeInfo);
                     this.required = InstanceData.getRequired(currentNodeInfo);
-                    this.relevant = InstanceData.getInheritedRelevant(currentNodeInfo);
                     this.valid = InstanceData.getValid(currentNodeInfo);
                     this.type = InstanceData.getType(currentNodeInfo);
 
@@ -253,7 +285,6 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                     // TODO: We could probably optimize and not even *create* the control object and its descendants
                     this.readonly = false;
                     this.required = false;
-                    this.relevant = false;
                     this.valid = true;// by default, a control is not invalid
                     this.type = null;
                     this.customMIPs = null;
@@ -265,29 +296,28 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                 this.valid = true;// by default, a control is not invalid
                 this.type = null;
                 this.customMIPs = null;
-
-                final XFormsControl parent = getParent();
-                if (parent instanceof XFormsSingleNodeControl) {
-                    // Inherit relevance based on outer control
-                    this.relevant = ((XFormsSingleNodeControl) parent).isRelevant();
-                } else if (parent instanceof XFormsRepeatControl) {
-                    // Must not happen because a repeat iteration is always bound to a node
-                    throw new OXFException("Unexpected parent control class: " + parent.getClass().getName());
-                } else if (parent instanceof XFormsNoSingleNodeContainerControl) {
-                    // Includes dialog, case, and component
-                    // TODO: those must have special relevance handling
-                    this.relevant = true;
-                } else if (parent == null) {
-                    // This means we are at the top-level, therefore we are relevant
-                    this.relevant = true;
-                } else {
-                    // Must not happen
-                    throw new OXFException("Unexpected parent control class: " + parent.getClass().getName());
-                }
-
-                //this.relevant = (currentItem instanceof NodeInfo) ? InstanceData.getInheritedRelevant((NodeInfo) currentItem) : false; // inherit relevance anyway
             }
             mipsRead = true;
+        }
+    }
+
+    @Override
+    protected boolean computeRelevant() {
+        final boolean parentRelevant = super.computeRelevant();
+
+        final Item currentItem = bindingContext.getSingleItem();
+        if (bindingContext.isNewBind()) {
+            if (currentItem instanceof NodeInfo) {
+                final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
+                // Control is bound to a node - get model item properties
+                return parentRelevant && InstanceData.getInheritedRelevant(currentNodeInfo);
+            } else {
+                // Control is not bound to a node - it becomes non-relevant
+                return false;
+            }
+        } else {
+            // Control is not bound to a node because it doesn't have a binding (group, trigger, dialog, etc. without @ref)
+            return parentRelevant;
         }
     }
 
@@ -310,8 +340,6 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         if (readonly != other.readonly)
             return false;
         if (required != other.required)
-            return false;
-        if (relevant != other.relevant)
             return false;
         if (valid != other.valid)
             return false;
@@ -338,13 +366,5 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         return isReadonly()
                 && (XFormsProperties.isStaticReadonlyAppearance(containingDocument)
                     || XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE.equals(getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)));
-    }
-
-    public static boolean isStaticReadonlyNoEvaluate(XFormsSingleNodeControl control) {
-        // Static read-only if we are read-only and static (global or local setting)
-        // NOTE: This method does not evaluate the control but checks the current bound node
-        return InstanceData.getInheritedReadonly(control.getBoundNode())
-                && (XFormsProperties.isStaticReadonlyAppearance(control.getXBLContainer().getContainingDocument())
-                    || XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE.equals(control.getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)));
     }
 }

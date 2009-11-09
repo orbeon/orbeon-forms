@@ -139,8 +139,8 @@ ORBEON.widgets.datatable.unittests_lib = {
     },
 
     resizeColumn: function(th, offset, step) {
-        var resizerliner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(th, 'div', 'yui-dt-resizerliner');
-        var resizer = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-resizer');
+        var resizerliner = YAHOO.util.Dom.getElementsByClassName('yui-dt-resizerliner', 'div', th)[0];
+        var resizer = YAHOO.util.Dom.getElementsByClassName('yui-dt-resizer', 'div', th)[0];
         var region = YAHOO.util.Region.getRegion(resizer);
         YAHOO.util.UserAction.mousedown(resizer, {clientX: region.right, clientY: region.top});
         var x;
@@ -338,7 +338,7 @@ ORBEON.widgets.datatable.unittests_lib = {
         for (var i = 0; i < headerCells.length; i++) {
             var cell = headerCells[i];
             if (this.isSignificant(cell)) {
-                var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
+                var liner = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell)[0];
                 colWidths.push(liner.style.width);
                 YAHOO.util.Assert.areNotEqual('', liner.style.width, 'Header cell for column ' + colWidths.length + ' should have a style width property in IE');
                 YAHOO.util.Assert.areNotEqual('auto', liner.style.width, 'Header cell for column ' + colWidths.length + ' should have a style width property in IE');
@@ -421,8 +421,23 @@ ORBEON.widgets.datatable.unittests_lib = {
 
     },
 
+    getPaginateLink: function(container, target) {
+        var paginator = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(container, 'div', 'yui-dt-paginator');
+        var links = this.getPaginationLinks(paginator);
+        for (var i = 0; i < links.length; i++) {
+            var link = links[i];
+            var linkText = this.trim(this.textContent(link));
+            if (target == linkText) {
+                return link;
+            }
+        }
+        return null;
+    },
+
     getLoadingIndicator: function(table) {
-        var tableGroup = YAHOO.util.Dom.getAncestorByTagName(table, 'span');
+        var container = YAHOO.util.Dom.getAncestorByClassName(table, 'xbl-fr-datatable');
+        var mainGroup = ORBEON.widgets.datatable.utils.getFirstChildByTagName(container, 'span');
+        var tableGroup = ORBEON.widgets.datatable.utils.getFirstChildByTagName(mainGroup, 'span');
         return YAHOO.util.Dom.getNextSibling(tableGroup);
     },
 
@@ -431,7 +446,41 @@ ORBEON.widgets.datatable.unittests_lib = {
         YAHOO.util.Assert.areEqual(value, visibility, 'Visibility is ' + visibility + ' instead of ' + value);
     },
 
-    clickAndCheckSortOrder: function(table, columnIndex, expectedOrder, callback) {
+    checkActualSortOrder: function(table, columnIndex, expectedOrder, sortType) {
+        //TODO: support scrollable tables
+        var rows = table.tBodies[0].rows;
+        var precedingValue = null;
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            if (this.isSignificant(row)) {
+                var cell = this.getSignificantElementByIndex(row.cells, columnIndex);
+                var currentValue = this.trim(this.textContent(cell));
+                if (sortType == 'number') {
+                    currentValue = parseFloat(currentValue);
+                }
+                if (precedingValue != null) {
+                    if (expectedOrder == 'ascending') {
+                        YAHOO.util.Assert.isTrue(currentValue >= precedingValue, 'Column ' + columnIndex + ' value "' + currentValue + '" should be bigger than "' + precedingValue + '"');
+                    } else {
+                        YAHOO.util.Assert.isTrue(currentValue <= precedingValue, 'Column ' + columnIndex + ' value "' + currentValue + '" should be smaller than "' + precedingValue + '"');
+                    }
+                }
+                precedingValue = currentValue;
+            }
+        }
+    },
+
+    checkHint: function(table, columnIndex, expectedHint, msgIntro) {
+        var headerCell = this.getSignificantElementByIndex(table.tHead.rows[0].cells, columnIndex);
+        if (msgIntro == undefined) {
+            msgIntro = '';
+        }
+        var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
+        var a = liner.getElementsByTagName('a')[0];
+        YAHOO.util.Assert.areEqual(expectedHint, a.title, msgIntro + 'Hint should be ' + expectedHint + ' not ' + a.title);
+    },
+
+    clickAndCheckSortOrder: function(table, columnIndex, expectedOrder, sortType, callback, expectedHintBefore, expectedHintAfter) {
         //TODO: support scrollable tables
         var className;
         if (expectedOrder == 'ascending') {
@@ -439,17 +488,33 @@ ORBEON.widgets.datatable.unittests_lib = {
         } else if (expectedOrder = 'descending') {
             className = 'yui-dt-desc';
         }
+        if (expectedHintBefore == undefined) {
+            expectedHintBefore = 'Click to sort ' + expectedOrder;
+        }
+        if (expectedHintAfter == undefined) {
+            if (expectedOrder == 'ascending') {
+                expectedHintAfter = 'Click to sort descending';
+            } else {
+                expectedHintAfter = 'Click to sort ascending';
+            }
+        }
+
+        this.checkHint(table, columnIndex, expectedHintBefore, 'Before click: ');
+
         var headerCell = this.getSignificantElementByIndex(table.tHead.rows[0].cells, columnIndex);
         var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             YAHOO.util.UserAction.click(liner, {clientX: 1});
         }, function() {
+            this.checkHint(table, columnIndex, expectedHintAfter, 'After click: ');
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(headerCell, className), 'Column ' + columnIndex + ' header cell should now have a class ' + className);
             var firstRow = this.getSignificantElementByIndex(table.tBodies[0].rows, 1);
             var bodyCell = this.getSignificantElementByIndex(firstRow.cells, columnIndex);
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(bodyCell, className), 'Column ' + columnIndex + ' body cellls should now have a class ' + className);
-            //TODO: test that the table is actually sorted
+            this.checkActualSortOrder(table, columnIndex, expectedOrder, sortType);
+
             callback();
+
         });
     },
 

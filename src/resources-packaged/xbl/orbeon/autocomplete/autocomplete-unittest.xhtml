@@ -73,7 +73,7 @@
                 <xforms:dispatch target="dynamic-autocomplete" name="fr-set-label">
                     <xxforms:context name="label" select="'Canada'"/>
                 </xforms:dispatch>
-			</xforms:action>
+            </xforms:action>
 
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
@@ -111,6 +111,7 @@
             </xforms:dispatch>
         </xforms:trigger>
 
+        <xforms:group ref=".">
         <xhtml:h2>Dynamic itemset</xhtml:h2>
 
         <xforms:output value="instance('selected-countries')/dynamic" id="dynamic-output">
@@ -158,6 +159,7 @@
                 <xxforms:context name="label" select="'Utopia'"/>
             </xforms:dispatch>
         </xforms:trigger>
+        </xforms:group>
 
     </xhtml:body>
 </xhtml:html>

@@ -1,0 +1,1 @@
+This directory contains XForms how-to samples. See also: http://wiki.orbeon.com/forms/how-to

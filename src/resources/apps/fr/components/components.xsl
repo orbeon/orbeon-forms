@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xsl:stylesheet version="2.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -76,9 +76,9 @@
             <xxforms:variable name="metadata-lang" select="xxforms:instance('fr-language-instance')"/>
             <xxforms:variable name="source-form-metadata" select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*"/>
             <!-- Scope variable with Form Runner resources -->
-            <xxforms:variable name="fr-resources" select="xxforms:instance('fr-fr-current-resources')"/>
+            <xxforms:variable name="fr-resources" model="fr-resources-model" select="$fr-fr-resources" as="element(resource)?"/>
             <!-- Scope form resources -->
-            <xxforms:variable name="form-resources" select="xxforms:instance('fr-current-form-resources')"/>
+            <xxforms:variable name="form-resources" model="fr-resources-model" select="$fr-form-resources" as="element(resource)?"/>
 
             <!-- Title in chosen language from metadata, view, or HTML title -->
             <!-- Title is used later  -->
@@ -171,8 +171,7 @@
                       xxforms:order="{if ($is-noscript) then 'label control alert hint help' else 'help label control alert hint'}"
                       xxforms:computed-binds="recalculate"
                       xxforms:offline="false"
-                      xxforms:noscript="{$is-noscript}"
-                      xxforms:server.events.plain-value-change="true">
+                      xxforms:noscript="{$is-noscript}">
 
             <!-- Parameters passed to this page -->
             <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->
@@ -225,7 +224,7 @@
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
 
-            <!-- If the first model does't have an id, add fr-form-model -->
+            <!-- If the first model doesn't have an id, add fr-form-model -->
             <xsl:if test="not(@id)">
                 <xsl:attribute name="id" select="'fr-form-model'"/>
             </xsl:if>

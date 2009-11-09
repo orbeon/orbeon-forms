@@ -1,32 +1,32 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Create an ExternalContext.Request useful for forwarding a request while simulating a
- * server-side redirect.
+ * Create an ExternalContext.Request useful for forwarding a request while simulating a server-side redirect.
  */
 public class ForwardExternalContextRequestWrapper extends RequestWrapper {
 
@@ -36,20 +36,22 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     private String mediaType;
     private byte[] messageBody;
 
-    private Map headerMap;
-    private Map headerValuesMap;
+    private Map<String, String> headerMap;
+    private Map<String, String[]> headerValuesMap;
 
     private InputStream inputStream;
     private String path;
     private String queryString;
-    private Map queryParameters;
+    private Map<String, Object[]> queryParameters;
 
     /**
      * This simulates a POST or a PUT.
      *
-     * @param customHeaderNameValues  LinkedHashMap<String headerName, String[] headerValues> or null
+     * @param customHeaderNameValues    can be null
      */
-    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String mediaType, byte[] messageBody, String[] namesOfHeadersToForward, Map customHeaderNameValues) {
+    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery,
+                                                String method, String mediaType, byte[] messageBody, String[] namesOfHeadersToForward,
+                                                Map<String, String[]> customHeaderNameValues) {
         super(request);
         this.contextPath = contextPath;
         this.pathQuery = pathQuery;
@@ -63,9 +65,10 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     /**
      * This simulates a GET.
      *
-     * @param customHeaderNameValues  LinkedHashMap<String headerName, String[] headerValues> or null
+     * @param customHeaderNameValues    can be null
      */
-    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery, String method, String[] namesOfHeadersToForward, Map customHeaderNameValues) {
+    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String contextPath, String pathQuery,
+                                                String method, String[] namesOfHeadersToForward, Map<String, String[]> customHeaderNameValues) {
         super(request);
         this.contextPath = contextPath;
         this.pathQuery = pathQuery;
@@ -74,7 +77,7 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         initializeHeaders(request, namesOfHeadersToForward, customHeaderNameValues);
     }
 
-    private void initializeHeaders(ExternalContext.Request request, String[] namesOfHeadersToForward, Map customHeaderNameValues) {
+    private void initializeHeaders(ExternalContext.Request request, String[] namesOfHeadersToForward, Map<String, String[]> customHeaderNameValues) {
         /**
          * We don't want to pass all the headers. For instance passing the Referer or Content-Length would be wrong. So
          * we only pass 2 headers:
@@ -86,29 +89,26 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
          * the JSESSIONID cookie is enough while in other cases this leads to a 401 is unclear.
          */
         {
-            this.headerMap = new LinkedHashMap();
-            this.headerValuesMap = new LinkedHashMap();
+            this.headerMap = new LinkedHashMap<String, String>();
+            this.headerValuesMap = new LinkedHashMap<String, String[]>();
 
-            final Map requestHeaderMap = request.getHeaderMap();
-            final Map requestHeaderValuesMap = request.getHeaderValuesMap();
+            final Map<String, String> requestHeaderMap = request.getHeaderMap();
+            final Map<String, String[]> requestHeaderValuesMap = request.getHeaderValuesMap();
 
             // Handle headers to forward
-            for (int i = 0; i < namesOfHeadersToForward.length; i++) {
-                final String currentHeaderName = namesOfHeadersToForward[i];
-
-                final Object v1 = requestHeaderMap.get(currentHeaderName);
+            for (final String currentHeaderName: namesOfHeadersToForward) {
+                final String v1 = requestHeaderMap.get(currentHeaderName);
                 if (v1 != null)
                     headerMap.put(currentHeaderName, v1);
 
-                final Object v2 = requestHeaderValuesMap.get(currentHeaderName);
+                final String[] v2 = requestHeaderValuesMap.get(currentHeaderName);
                 if (v2 != null)
                     headerValuesMap.put(currentHeaderName, v2);
             }
 
             // Handle custom headers. Those override existing headers if any.
             if (customHeaderNameValues != null) {
-                for (Iterator i = customHeaderNameValues.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                for (final Map.Entry currentEntry: customHeaderNameValues.entrySet()) {
                     final String currentHeaderName = (String) currentEntry.getKey();
                     final String[] currentHeaderValues = (String[]) currentEntry.getValue();
 
@@ -125,9 +125,13 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         return method.toUpperCase();
     }
 
-    public Map getParameterMap() {
+    public Map<String, Object[]> getParameterMap() {
         if (queryParameters == null) {
-            queryParameters = NetUtils.decodeQueryString(getQueryString(), false);
+            final Map<String, String[]> query = NetUtils.decodeQueryString(getQueryString(), false);
+            queryParameters = new HashMap<String, Object[]>(query.size());
+            for (Map.Entry<String, String[]> entry : query.entrySet()) {
+                queryParameters.put(entry.getKey(), StringUtils.stringArrayToObjectArray(entry.getValue()));
+            }
         }
 
         return queryParameters;
@@ -156,7 +160,7 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
 
     public InputStream getInputStream() throws IOException {
         if (inputStream == null) {
-            // NOTE: Provide an empty stream if there is no body because calle might assume InputStream is non-null
+            // NOTE: Provide an empty stream if there is no body because caller might assume InputStream is non-null
             inputStream = new ByteArrayInputStream((messageBody != null) ? messageBody : new byte[] {});
         }
 
@@ -167,26 +171,32 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         return null;//TODO?
     }
 
-    public Map getAttributesMap() {
+    public Map<String, Object> getAttributesMap() {
         // Just return super since we do not override attributes here
         return super.getAttributesMap();
     }
 
-    public Map getHeaderMap() {
+    public Map<String, String> getHeaderMap() {
         return headerMap;
     }
 
-    public Map getHeaderValuesMap() {
+    public Map<String, String[]> getHeaderValuesMap() {
         return headerValuesMap;
     }
 
+    @Override
+    public String getClientContextPath(String urlString) {
+        // NOTE: Assuming this is not going to be called
+        return super.getClientContextPath(urlString);
+    }
+
     /*
-     * NOTE: All the path methods are handled by the request dispatcher implementation in the servlet container upon
-     * forward, but upon include we must provide them.
-     *
-     * NOTE: Checked 2009-02-12 that none of the methods below are called when forwarding through
-     * spring/JSP/filter/Orbeon in Tomcat 5.5.27. HOWEVER they are called when including.
-     */
+    * NOTE: All the path methods are handled by the request dispatcher implementation in the servlet container upon
+    * forward, but upon include we must provide them.
+    *
+    * NOTE: Checked 2009-02-12 that none of the methods below are called when forwarding through
+    * spring/JSP/filter/Orbeon in Tomcat 5.5.27. HOWEVER they are called when including.
+    */
 
     public String getPathInfo() {
         if (path == null) {

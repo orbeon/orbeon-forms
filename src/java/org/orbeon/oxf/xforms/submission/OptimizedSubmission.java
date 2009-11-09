@@ -100,18 +100,18 @@ public class OptimizedSubmission extends BaseSubmission {
             if (submission.isURLNorewrite()) {
                 if (isDebugEnabled)
                     indentedLogger.logDebug("", "skipping optimized submission",
-                            "reason", "norewrite is specified");
+                            "reason", "norewrite is specified in portlet environment");
                 return false;
             }
 
             // NOTE: we could optimize for resource URLs:
-            // o JSR-268 local resource handling, can access porlet resources the same way as with render/action
+            // o JSR-268 local resource handling, can access portlet resources the same way as with render/action
             // o In include mode, Servlet resources can be accessed using request dispatcher to servlet
 
             if ("resource".equals(submission.getUrlType())) {
                 if (isDebugEnabled)
                     indentedLogger.logDebug("", "skipping optimized submission",
-                            "reason", "resource URL type is specified");
+                            "reason", "resource URL type is specified in portlet environment");
                 return false;
             }
         } else if (p.isReplaceAll) {

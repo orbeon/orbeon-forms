@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.util;
 
@@ -129,8 +129,16 @@ public class NetUtils {
      * invoked, NOT the path of the calling servlet.
      *
      * Request path = servlet path + path info.
+     *
+     * @param request   servlet HTTP request
+     * @return          path
      */
     public static String getRequestPathInfo(HttpServletRequest request) {
+
+        // NOTE: Servlet 2.4 spec says: "These attributes [javax.servlet.include.*] are accessible from the included
+        // servlet via the getAttribute method on the request object and their values must be equal to the request URI,
+        // context path, servlet path, path info, and query string of the included servlet, respectively."
+        // NOTE: This is very different from the similarly-named forward attributes!
 
         // Get servlet path
         String servletPath = (String) request.getAttribute("javax.servlet.include.servlet_path");
@@ -418,38 +426,6 @@ public class NetUtils {
     }
 
     /**
-     * Canonicalize a string of the form "a/b/../../c/./d/". The string may start and end with a
-     * "/". Occurrences of "..." or other similar patterns are ignored. Also, contiguous "/" are
-     * left as is.
-     */
-//    public static String canonicalizePathString(String path) {
-//
-//        StringTokenizer st = new StringTokenizer(path, "/", true);
-//        Stack elements = new Stack();
-//        while (st.hasMoreTokens()) {
-//            String s = st.nextToken();
-//            if (s.equals("..")) {
-//                elements.pop();
-//            } else if (s.equals(".")) {
-//                ;// Do nothing
-//            } else {
-//                elements.push(s);
-//            }
-//        }
-//        StringBuffer sb = new StringBuffer();
-//        int count = 0;
-//        for (Iterator i = elements.iterator(); i.hasNext(); count++) {
-//            String s = (String) i.next();
-//            if (count > 0 || path.startsWith("/"))
-//                sb.append("/");
-//            sb.append(s);
-//        }
-//        if (path.endsWith("/"))
-//            sb.append("/");
-//        return sb.toString();
-//    }
-
-    /**
      * Combine a path info and a parameters map to form a path info with a query string.
      */
     public static String pathInfoParametersToPathInfoQueryString(String pathInfo, Map parameters) throws IOException {
@@ -471,6 +447,24 @@ public class NetUtils {
             }
         }
         return redirectURL.toString();
+    }
+
+    /**
+     * Append a query string to an URL. This adds a '?' or a '&' or nothing, as needed.
+     *
+     * @param urlString     existing URL string
+     * @param queryString   query string, or null
+     * @return              resulting URL
+     */
+    public static String appendQueryString(String urlString, String queryString) {
+        if (org.apache.commons.lang.StringUtils.isBlank(queryString)) {
+            return urlString;
+        } else {
+            final StringBuilder updatedActionStringBuilder = new StringBuilder(urlString);
+            updatedActionStringBuilder.append((urlString.indexOf('?') == -1) ? '?' : '&');
+            updatedActionStringBuilder.append(queryString);
+            return updatedActionStringBuilder.toString();
+        }
     }
 
     /**
@@ -684,7 +678,7 @@ public class NetUtils {
      * application.
      */
     public static FileItem prepareFileItem(PipelineContext pipelineContext, int scope) {
-        // We use the commons fileupload utilities to save a file
+        // We use the commons file upload utilities to save a file
         if (fileItemFactory == null)
             fileItemFactory = new DiskFileItemFactory(0, SystemUtils.getTemporaryDirectory());
         final FileItem fileItem = fileItemFactory.createItem("dummy", "dummy", false, null);
@@ -855,46 +849,6 @@ public class NetUtils {
     }
 
     /**
-     * Create an absolute URL from an action string and a search string.
-     *
-     * @param action            absolute URL or absolute path
-     * @param queryString       optional query string to append to the action URL
-     * @param externalContext   current ExternalContext
-     * @return                  an absolute URL
-     */
-    public static URL createAbsoluteURL(String action, String queryString, ExternalContext externalContext) {
-        URL resultURL;
-        try {
-            final String actionString;
-            {
-                final StringBuffer updatedActionStringBuffer = new StringBuffer(action);
-                if (queryString != null && queryString.length() > 0) {
-                    if (action.indexOf('?') == -1)
-                        updatedActionStringBuffer.append('?');
-                    else
-                        updatedActionStringBuffer.append('&');
-                    updatedActionStringBuffer.append(queryString);
-                }
-                actionString = updatedActionStringBuffer.toString();
-            }
-
-            if (actionString.startsWith("/")) {
-                // Case of path absolute
-                final String requestURL = externalContext.getRequest().getRequestURL();
-                resultURL = URLFactory.createURL(requestURL, actionString);
-            } else if (urlHasProtocol(actionString)) {
-                // Case of absolute URL
-                resultURL = URLFactory.createURL(actionString);
-            } else {
-                throw new OXFException("Invalid URL: " + actionString);
-            }
-        } catch (MalformedURLException e) {
-            throw new OXFException("Invalid URL: " + action, e);
-        }
-        return resultURL;
-    }
-
-    /**
      * Remove the first path element of a path. Return null if there is only one path element
      *
      * E.g. /foo/bar => /bar?a=b
@@ -932,7 +886,7 @@ public class NetUtils {
      *
      * @param pipelineContext   PipelineContext to obtain session
      * @param uri               server URI to transform
-     * @param filename
+     * @param filename          file name
      * @param contentType       type of the content referred to by the URI, or null if unknown
      * @param lastModified      last modification timestamp
      * @return                  client URI
@@ -998,14 +952,12 @@ public class NetUtils {
             // Add a listener to destroy file items when the pipeline context is destroyed
             pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
                 public void contextDestroyed(boolean success) {
-                    if (uploadParameterMap != null) {
-                        for (final String name: uploadParameterMap.keySet()) {
-                            final Object values[] = uploadParameterMap.get(name);
-                            for (final Object currentValue: values) {
-                                if (currentValue instanceof FileItem) {
-                                    final FileItem fileItem = (FileItem) currentValue;
-                                    fileItem.delete();
-                                }
+                    for (final String name: uploadParameterMap.keySet()) {
+                        final Object values[] = uploadParameterMap.get(name);
+                        for (final Object currentValue: values) {
+                            if (currentValue instanceof FileItem) {
+                                final FileItem fileItem = (FileItem) currentValue;
+                                fileItem.delete();
                             }
                         }
                     }

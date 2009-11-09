@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -36,23 +36,38 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-accordion-toggle-all" phase="target">
-                <xforms:dispatch target="fr-accordion-group" name="fr-accordion-toggle-all">
-                    <xxforms:context name="selected" select="event('selected')"/>
-                </xforms:dispatch>
+                <xforms:setvalue ref="operation" value="if (event('selected')) then 'show' else 'hide'"/>
+                <xxforms:script id="xf-ta">YAHOO.xbl.fr.Accordion.instance(this).toggleAll();</xxforms:script>
             </xbl:handler>
-            <xbl:handler event="fr-accordion-toggle" phase="target">
-                <xforms:dispatch target="{event('case-id')}" name="fr-accordion-toggle">
-                    <xxforms:context name="selected" select="event('selected')"/>
-                </xforms:dispatch>
+            <xbl:handler event="fr-show-all" phase="target">
+                <xforms:setvalue ref="operation">show</xforms:setvalue>
+                <xxforms:script id="xf-sa">YAHOO.xbl.fr.Accordion.instance(this).toggleAll();</xxforms:script>
+            </xbl:handler>
+            <xbl:handler event="fr-hide-all" phase="target">
+                <xforms:setvalue ref="operation">hide</xforms:setvalue>
+                <xxforms:script id="xf-ha">YAHOO.xbl.fr.Accordion.instance(this).toggleAll();</xxforms:script>
+            </xbl:handler>
+            <!-- Handler for backward compatibility: prefer dispatching fr-toggle/fr-show/fr-hide directly to fr:case by id. -->
+            <xbl:handler event="fr-toggle fr-accordion-toggle" phase="target" xxbl:scope="outer">
+                <xforms:dispatch target="{event('case-id')}" name="{if (event('selected')) then 'fr-show' else 'fr-hide'}"/>
             </xbl:handler>
         </xbl:handlers>
+        <xbl:implementation>
+            <!-- Local model -->
+            <xforms:model id="accordion-model">
+                <xforms:instance id="accordion-instance">
+                    <instance>
+                        <operation/>
+                    </instance>
+                </xforms:instance>
+            </xforms:model>
+        </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
 
                 <xsl:template match="/*">
-                    <!-- Initialization event -->
                     <xforms:group ref="." id="fr-accordion-group">
 
                         <!-- TODO: This should not be necessary, but we need it until this bug is fixed:
@@ -63,27 +78,13 @@
                         <!-- Access to parameters -->
                         <xsl:copy-of select="xxbl:parameter(., 'open-closes-others')"/>
 
-                        <!-- Local model -->
-                        <xforms:model id="accordion-model">
-                            <xforms:instance id="accordion-instance">
-                                <instance>
-                                    <selected/>
-                                </instance>
-                            </xforms:instance>
-                        </xforms:model>
-
-                        <!-- Event handlers -->
-                        <xxforms:script ev:event="xforms-enabled" ev:target="fr-accordion-group">YAHOO.xbl.fr.Accordion.instance(this).init();</xxforms:script>
-                        <xforms:action ev:event="fr-accordion-toggle-all">
-                            <xforms:setvalue model="accordion-model" ref="selected" value="event('selected')"/>
-                            <xxforms:script>YAHOO.xbl.fr.Accordion.instance(this).toggleAll();</xxforms:script>
-                        </xforms:action>
-                        <xforms:action ev:event="fr-accordion-toggle">
-                            <xxforms:script>YAHOO.xbl.fr.Accordion.instance(this).toggle(arguments[0].target);</xxforms:script>
-                        </xforms:action>
+                        <!-- Constructor -->
+                        <xxforms:script id="xf-en" ev:event="xforms-enabled" ev:target="fr-accordion-group">YAHOO.xbl.fr.Accordion.instance(this).init();</xxforms:script>
+                        <!-- Toggle -->
+                        <xxforms:script id="xf-tg" ev:event="fr-accordion-toggle fr-toggle fr-show fr-hide">YAHOO.xbl.fr.Accordion.instance(this).toggle(event.target);</xxforms:script>
 
                         <!-- Dummy controls so JavaScript can access the local instance -->
-                        <xforms:output model="accordion-model" value="selected" class="xbl-fr-accordion-selected" style="display: none"/>
+                        <xforms:output model="accordion-model" value="operation" class="xbl-fr-accordion-operation" style="display: none"/>
 
                         <!-- Markup for the accordion -->
                         <xhtml:dl id="dl" class="xbl-fr-accordion-dl">
@@ -92,35 +93,54 @@
                     </xforms:group>
                 </xsl:template>
 
-                <xsl:template match="fr:case">
-                    <xsl:variable name="case-id" as="xs:string" select="if (@id) then @id else generate-id()"/>
+                <!-- Placed enclosing repeas and group in outer scope -->
+                <xsl:template match="/*/xforms:repeat | /*/xforms:group">
+                    <xsl:copy>
+                        <xsl:copy-of select="@*"/>
+                        <xsl:attribute name="xxbl:scope">outer</xsl:attribute>
+                        <xsl:apply-templates/>
+                    </xsl:copy>
+                </xsl:template>
+
+                <xsl:template match="/*/fr:case | /*/xforms:repeat/fr:case | /*/xforms:group/fr:case">
+                    <!--<xsl:variable name="case-id" as="xs:string" select="if (@id) then @id else generate-id()"/>-->
+                    <xsl:variable name="case-id" as="xs:string?" select="@id"/>
                     <xsl:variable name="label" as="element(fr:label)" select="fr:label[1]"/>
                     <!-- Section title -->
-                    <xhtml:dt id="t-{$case-id}" class="a-m-t{ if (@selected = 'true') then ' a-m-t-expand' else ''}">
-                        <xforms:group id="{$case-id}">
-                            <xforms:action ev:event="fr-accordion-toggle-all">
-                            </xforms:action>
-                            <xforms:action ev:event="fr-accordion-toggle">
-                                <xforms:setvalue model="accordion-model" ref="selected" value="event('selected')"/>
-                            </xforms:action>
-                        </xforms:group>
+                    <!--<xhtml:dt id="t-{$case-id}" class="a-m-t{ if (@selected = 'true') then ' a-m-t-expand' else ''}">-->
+                    <xhtml:dt class="a-m-t{ if (@selected = 'true') then ' a-m-t-expand' else ''}">
+                        <xsl:if test="$case-id"><xsl:attribute name="id" select="concat('t-', $case-id)"/></xsl:if>
                         <xsl:choose>
                             <!-- Static label, just copy content -->
-                            <xsl:when test="empty(($label/@ref, $label/@bind, $label/@value))">
+                            <xsl:when test="empty($label/(@ref | @bind | @value))">
                                 <xsl:copy-of select="$label/node()"/>
                             </xsl:when>
                             <!-- Dynamic label, generate xforms:output -->
                             <xsl:otherwise>
-                                <xforms:output>
-                                    <xsl:copy-of select="$label/@* | $label/node()"/>
+                                <!-- Put content in outer scope -->
+                                <xforms:output xxbl:scope="outer">
+                                    <xsl:copy-of select="$label/(@model | @context | @ref | @bind | @value | node())"/>
                                 </xforms:output>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xhtml:dt>
                     <!-- Section body -->
-                    <xhtml:dd id="d-{$case-id}" class="a-m-d{ if (@selected = 'true') then ' a-m-d-expand' else ''}">
+                    <!--<xhtml:dd id="d-{$case-id}" class="a-m-d{ if (@selected = 'true') then ' a-m-d-expand' else ''}">-->
+                    <xhtml:dd class="a-m-d{ if (@selected = 'true') then ' a-m-d-expand' else ''}">
+                        <xsl:if test="$case-id"><xsl:attribute name="id" select="concat('d-', $case-id)"/></xsl:if>
                         <xhtml:div class="bd">
-                            <xsl:copy-of select="node() except $label"/>
+                            <!-- Put content in outer scope -->
+                            <xforms:group xxbl:scope="outer">
+                                <xsl:if test="$case-id">
+                                    <xsl:attribute name="id" select="$case-id"/>
+                                    <!-- Custom events -->
+                                    <xforms:setvalue ev:event="fr-toggle" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">toggle</xforms:setvalue>
+                                    <xforms:setvalue ev:event="fr-show" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">show</xforms:setvalue>
+                                    <xforms:setvalue ev:event="fr-hide" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">hide</xforms:setvalue>
+                                </xsl:if>
+
+                                <xsl:copy-of select="node() except $label"/>
+                            </xforms:group>
                         </xhtml:div>
                     </xhtml:dd>
                 </xsl:template>

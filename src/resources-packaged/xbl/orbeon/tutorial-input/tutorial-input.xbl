@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <xbl:binding element="fr|tutorial-input">
+        <xbl:template>
+            <!-- Outer group implementing the single-node binding -->
+            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+                <!-- Copy LHHA elements if any -->
+                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
+                <!-- Inner group -->
+                <xforms:group xxbl:scope="inner">
+                    <!-- Variable pointing to external single-node binding -->
+                    <xxforms:variable name="binding" as="node()?">
+                        <xxforms:sequence select="." xxbl:scope="outer"/>
+                    </xxforms:variable>
+                    <!-- Input points to the external single-node binding -->
+                    <xforms:input ref="$binding"/>
+                </xforms:group>
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

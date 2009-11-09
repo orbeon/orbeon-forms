@@ -1,0 +1,142 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Editor in a dialog</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="planets">
+                <planets>
+                    <planet>
+                        <name>Mercury</name>
+                        <description>
+                            Mercury (0.4 AU) is the closest planet to the Sun and the smallest planet (0.055 Earth
+                            masses). Mercury has no natural satellites, and its only known geological features besides
+                            impact craters are lobed ridges or rupes, probably produced by a period of contraction early
+                            in its history.[35] Mercury's almost negligible atmosphere consists of atoms blasted off its
+                            surface by the solar wind.[36] Its relatively large iron core and thin mantle have not yet
+                            been adequately explained. Hypotheses include that its outer layers were stripped off by a
+                            giant impact, and that it was prevented from fully accreting by the young Sun's
+                            energy.[37][38]
+                        </description>
+                    </planet>
+                    <planet>
+                        <name>Venus</name>
+                        <description>
+                            Venus (0.7 AU) is close in size to Earth, (0.815 Earth masses) and like Earth, has a thick
+                            silicate mantle around an iron core, a substantial atmosphere and evidence of internal
+                            geological activity. However, it is much drier than Earth and its atmosphere is ninety times
+                            as dense. Venus has no natural satellites. It is the hottest planet, with surface
+                            temperatures over 400 Â°C, most likely due to the amount of greenhouse gases in the
+                            atmosphere.[39] No definitive evidence of current geological activity has been detected on
+                            Venus, but it has no magnetic field that would prevent depletion of its substantial
+                            atmosphere, which suggests that its atmosphere is regularly replenished by volcanic
+                            eruptions.[40]
+                        </description>
+                    </planet>
+                    <planet>
+                        <name>Earth</name>
+                        <description>
+                            Earth (1 AU) is the largest and densest of the inner planets, the only one known to have
+                            current geological activity, and is the only place in the universe where life is known to
+                            exist.[41] Its liquid hydrosphere is unique among the terrestrial planets, and it is also
+                            the only planet where plate tectonics has been observed. Earth's atmosphere is radically
+                            different from those of the other planets, having been altered by the presence of life to
+                            contain 21% free oxygen.[42] It has one natural satellite, the Moon, the only large
+                            satellite of a terrestrial planet in the Solar System.
+                        </description>
+                    </planet>
+                    <planet>
+                        <name>Mars</name>
+                        <description>
+                            Mars (1.5 AU) is smaller than Earth and Venus (0.107 Earth masses). It possesses an
+                            atmosphere of mostly carbon dioxide with a surface pressure of 6.1 millibars (roughly 0.6
+                            percent that of the Earth's).[43] Its surface, peppered with vast volcanoes such as Olympus
+                            Mons and rift valleys such as Valles Marineris, shows geological activity that may have
+                            persisted until as recently as 2 million years ago.[44] Its red colour comes from iron oxide
+                            (rust) in its soil.[45] Mars has two tiny natural satellites (Deimos and Phobos) thought to
+                            be captured asteroids.[46]
+                        </description>
+                    </planet>
+                </planets>
+            </xforms:instance>
+            <xforms:instance id="ui">
+                <ui>
+                    <edited-planet/>
+                </ui>
+            </xforms:instance>
+            <xforms:action ev:event="xforms-model-construct-done" xxforms:iterate="instance('planets')/planet/description">
+                <xforms:setvalue ref="." value="normalize-space(.)"/>
+            </xforms:action>
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-repeat-selected-item-1 { background-color: transparent; }
+            .xforms-label { font-weight: bold; display: block; margin-top: .5em; }
+            .edit-planet-textarea { width: 40em; height: 15em; }
+            .buttons { display: block; }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <xxforms:dialog id="edit-planet-dialog">
+            <xforms:label>Edit Planet</xforms:label>
+            <xforms:delete ev:event="xxforms-dialog-close" nodeset="instance('ui')/edited-planet/planet"/>
+            <xxforms:hide ev:event="DOMActivate" dialog="edit-planet-dialog"/>
+            <xforms:group ref="instance('ui')/edited-planet/planet">
+                <xforms:output value="name">
+                    <xforms:label>Planet</xforms:label>
+                </xforms:output>
+                <xforms:textarea ref="description" class="edit-planet-textarea">
+                    <xforms:label>Description</xforms:label>
+                </xforms:textarea>
+                <xhtml:div class="buttons">
+                    <xforms:trigger>
+                        <xforms:label>Cancel</xforms:label>
+                    </xforms:trigger>
+                    <xforms:trigger>
+                        <xforms:label>OK</xforms:label>
+                        <xforms:setvalue ev:event="DOMActivate"
+                            ref="instance('planets')/planet[name = context()/name]/description"
+                            value="context()/description"/>
+                    </xforms:trigger>
+                </xhtml:div>
+            </xforms:group>
+        </xxforms:dialog>
+        <xhtml:table class="gridtable">
+            <xhtml:thead>
+                <xhtml:tr>
+                    <xhtml:th>Name</xhtml:th>
+                    <xhtml:th>Description</xhtml:th>
+                    <xhtml:th/>
+                </xhtml:tr>
+            </xhtml:thead>
+            <xhtml:tbody>
+                <xforms:repeat nodeset="instance('planets')/planet">
+                    <xhtml:tr>
+                        <xhtml:td>
+                            <xforms:output value="name"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:output value="description"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:trigger appearance="minimal">
+                                <xforms:label>Edit</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xxforms:variable name="current-planet" select="."/>
+                                    <xforms:insert context="instance('ui')/edited-planet"
+                                        origin="instance('planets')/planet[name = $current-planet/name]"/>
+                                    <xxforms:show dialog="edit-planet-dialog"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xhtml:td>
+                    </xhtml:tr>
+                </xforms:repeat>
+            </xhtml:tbody>
+        </xhtml:table>
+    </xhtml:body>
+</xhtml:html>

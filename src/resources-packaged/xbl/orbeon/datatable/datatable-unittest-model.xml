@@ -74,6 +74,10 @@
         <controls>
             <maxLength>20</maxLength>
             <loading>true</loading>
+            <page>1</page>
+            <rowsPerPage>5</rowsPerPage>
+            <sortOrder>none</sortOrder>
+            <sortedColumn>-1</sortedColumn>
             <show>true</show>
         </controls>
     </xforms:instance>

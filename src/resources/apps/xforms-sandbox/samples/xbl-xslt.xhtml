@@ -48,6 +48,9 @@
                     <xsl:transform version="2.0">
                         <xsl:template match="@*|node()">
                             <xsl:copy>
+                                <xsl:if test="/*">
+                                    <xsl:attribute name="xxbl:scope">outer</xsl:attribute>
+                                </xsl:if>
                                 <xsl:apply-templates select="@*[not(name() = ('style1', 'style2'))]|node()"/>
                             </xsl:copy>
                         </xsl:template>

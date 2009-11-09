@@ -1,19 +1,16 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
-    subject to the following terms:
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    * Conversion to other formats is allowed, but the actual content may not be altered or edited
-      in any way.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    * You may create printed copies for your own personal use.
-
-    * For all other uses, such as selling printed copies or using (parts of) the manual in another
-      publication, prior written agreement from Orbeon, Inc. is required.
-
-    Please contact Orbeon at info@orbeon.com for more information.
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <header>
         <title>Request Generator</title>
@@ -28,9 +25,8 @@
                 from a Java object or other non-XML source.
             </p>
             <p>
-                The Request generator streams XML from the current HTTP request. It can serialize
-                request attributes including headers, parameters, query strings, user and server
-                information.
+                The Request generator streams XML from the current HTTP request. It can serialize request information
+                including headers, parameters, query strings, user and server information.
             </p>
         </section>
         <note>
@@ -45,15 +41,13 @@
         <section>
             <title>Configuration</title>
             <p>
-                The Request generator takes a mandatory configuration to select which request
-                attribute to display. This configuration consists of a series of
-                <code>include</code> and <code>exclude</code> elements containing XPath expressions
-                selecting a number of element from the request tree. Those expressions can be as
-                complex as any regular XPath 1.0 expression that returns a single node or a
-                node-set. However, it is recommended to keep those expressions as simple as
-                possible. One known limitation is that it is not possible to test on the
-                <code>value</code> element of uploaded files, as well as the content of the request
-                body.
+                The Request generator takes a mandatory configuration to select which request information to return.
+                This configuration consists of a series of <code>include</code> and <code>exclude</code> elements
+                containing XPath expressions selecting a number of element from the request tree. Those expressions can
+                be as complex as any regular XPath 1.0 expression that returns a single node or a node-set. However, it
+                is recommended to keep those expressions as simple as possible. One known limitation is that it is not
+                possible to test on the <code>value</code> element of uploaded files, as well as the content of the
+                request body.
             </p>
             <p>
                 Sample Configuration:
@@ -67,7 +61,7 @@
                 </config>
             </xml-source>
             <p>
-                The full attribute tree is:
+                The full tree is:
             </p>
             <xml-source>
                 <request>
@@ -134,6 +128,16 @@
                             <value>JSESSIONID=DA6E64FC1E6DFF0499B5D6F46A32186A</value>
                         </header>
                     </headers>
+                    <attributes>
+                        <attribute>
+                            <name>oxf.xforms.renderer.deployment</name>
+                            <value>separate</value>
+                        </attribute>
+                        <attribute>
+                            <name>javax.servlet.forward.context_path</name>
+                            <value>/myapp</value>
+                        </attribute>
+                    </attributes>
                     <method>GET</method>
                     <path-info>/doc/home-welcome</path-info>
                     <request-path>/doc/home-welcome</request-path>
@@ -147,17 +151,16 @@
             </xml-source>
             <note>
                 <p>
-                    Orbeon Forms adds a request attribute: the <code>request-path</code>. This attribute is defined as
-                    a concatenation of the <code>servlet-path</code> and the <code>path-info</code>. This is useful
-                    because both original attributes are frequently mixed up and often change depending on the
-                    application server or its configuration.
+                    Orbeon Forms adds a computed request information item: the <code>request-path</code>. This is
+                    defined as a concatenation of the <code>servlet-path</code> and the <code>path-info</code>. This is
+                    useful because both these are frequently mixed up and often change depending on the application
+                    server or its configuration.
                 </p>
             </note>
             <warning>
                 <p>
-                    This generator excludes all attributes by default. To obtain the whole
-                    attributes tree (as shown in the example above), you must explicitly include
-                    <code>/request</code>:
+                    This generator excludes all information items by default. To obtain the whole tree (as shown in the
+                    example above), you must explicitly include <code>/request</code>:
                 </p>
                 <xml-source border="false">
                     <p:processor name="oxf:request">
@@ -172,11 +175,19 @@
             </warning>
         </section>
         <section>
+            <title>Request Attributes</title>
+            <p>
+                When the request includes <code>/request/attributes</code>, the Request generator attempts to retrieve
+                request attributes. Since those can be any Java objects, as of October 2009 the generator only includes
+                string values.
+            </p>
+        </section>
+        <section>
             <title>Request Body</title>
             <p>
-                When the request includes <code>/request/body</code>, the Request generator
-                retrieves the body of the request sent to the application server. The content of
-                the body is made available as the following data types:
+                When the request includes <code>/request/body</code>, the Request generator retrieves the body of the
+                request sent to the application server. The content of the body is made available as the following data
+                types:
             </p>
             <ul>
                 <li>If the attribute <code>stream-type</code> on the <code>config</code> element

@@ -26,10 +26,11 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
+import org.orbeon.oxf.xforms.analysis.IdGenerator;
+import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandler;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
-import org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.SAXStore;
@@ -42,7 +43,6 @@ import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
 
 import javax.xml.transform.Transformer;
@@ -90,16 +90,29 @@ public class XFormsStaticState {
     // Static analysis
     private boolean isAnalyzed;                                             // whether this document has been analyzed already
 
-    private Map<String, Map<String, ControlInfo>> controlTypes;             // Map<String type, Map<String prefixedId, ControlInfo info>>
-    private Map<String, String> eventNamesMap;                              // Map<String eventName, String "">
-    private Map<String, List<XFormsEventHandler>> eventHandlersMap;         // Map<String controlPrefixedId, List<XFormsEventHandler> eventHandler>
-    private Map<String, ControlInfo> controlInfoMap;                        // Map<String controlPrefixedId, ControlInfo>
-    private Map<String, Map<String, ControlInfo>> attributeControls;        // Map<String forPrefixedId, Map<String name, ControlInfo info>>
+    // Namespace information
     private Map<String, Map<String, String>> namespacesMap;                 // Map<String prefixedId, Map<String prefix, String uri>> of namespace mappings
+
+    // Event handlers
+    private Map<String, String> eventNamesMap;                              // Map<String eventName, String "">
+    private Map<String, List<XFormsEventHandler>> eventHandlersMap;         // Map<String observerPrefixedId, List<XFormsEventHandler> eventHandler>: for all observers with handlers
+
+    // Controls
+    private Map<String, Map<String, ControlInfo>> controlTypes;             // Map<String type, Map<String prefixedId, ControlInfo info>>
+    // TODO: move itemsInfoMap and controlClasses to ControlInfo?
+    private Map<String, ControlInfo> controlInfoMap;                        // Map<String controlPrefixedId, ControlInfo>: for all controls
+    private Map<String, ItemsInfo> itemsInfoMap;                            // Map<String controlPrefixedId, ItemsInfo>: all select/select1
+    private Map<String, String> controlClasses;                             // Map<String controlPrefixedId, String classes>: all controls w/ special class info (currently only for offline)
+
+    // xforms:repeat
+    // TODO: move repeatChildrenMap to ControlInfo?
     private Map<String, List<String>> repeatChildrenMap;                    // Map<String, List> of repeat id to List of children ids
     private String repeatHierarchyString;                                   // contains comma-separated list of space-separated repeat prefixed id and ancestor if any
-    private Map<String, ItemsInfo> itemsInfoMap;                            // Map<String controlPrefixedId, ItemsInfo>
-    private Map<String, String> controlClasses;                             // Map<String controlPrefixedId, String classes>
+
+    // XXFormsAttributeControl
+    private Map<String, Map<String, ControlInfo>> attributeControls;        // Map<String forPrefixedId, Map<String name, ControlInfo info>>
+
+    // Offline support
     private boolean hasOfflineSupport;                                      // whether the document requires offline support
     private List<String> offlineInsertTriggerIds;                           // List<String triggerPrefixedId> of triggers can do inserts
 
@@ -125,19 +138,20 @@ public class XFormsStaticState {
      * producing an XForms page.
      *
      * @param propertyContext       current context
-     * @param staticStateDocument   Document containing the static state. The document may be modified by this constructor and must be discarded afterwards by the caller.
-     * @param namespacesMap         Map<String staticId, Map<String prefix, String uri>> of namespace mappings
-     * @param annotatedDocument     optional SAXStore containing XHTML for noscript mode
+     * @param staticStateDocument   document containing the static state, may be modified by this constructor and must be discarded afterwards by the caller
+     * @param idGenerator           generator for the top-level scope
+     * @param namespacesMap         map of namespace mappings, null if not available
+     * @param annotatedDocument     SAXStore containing the XHTML for noscript mode, null if not available
      */
-    public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, Map<String, Map<String, String>> namespacesMap, SAXStore annotatedDocument) {
-        initialize(propertyContext, staticStateDocument, namespacesMap, annotatedDocument, null);
+    public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, IdGenerator idGenerator, Map<String, Map<String, String>> namespacesMap, SAXStore annotatedDocument) {
+        initialize(propertyContext, staticStateDocument, idGenerator, namespacesMap, annotatedDocument, null);
     }
 
     /**
      * Create static state object from an encoded version. This constructor is used when restoring a static state from
      * a serialized form.
      *
-     * @param pipelineContext       current PropertyContext
+     * @param pipelineContext       current context
      * @param encodedStaticState    encoded static state
      */
     public XFormsStaticState(PropertyContext pipelineContext, String encodedStaticState) {
@@ -146,7 +160,7 @@ public class XFormsStaticState {
         final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedStaticState);
 
         // Initialize
-        initialize(pipelineContext, staticStateDocument, null, null, encodedStaticState);
+        initialize(pipelineContext, staticStateDocument, null, null, null, encodedStaticState);
     }
 
     public IndentedLogger getIndentedLogger() {
@@ -165,17 +179,18 @@ public class XFormsStaticState {
     /**
      * Initialize. Either there is:
      *
-     * o staticStateDocument, namespaceMap, and optional xhtmlDocument
+     * o staticStateDocument, topLevelStaticIds, namespaceMap, and optional xhtmlDocument
      * o staticStateDocument and encodedStaticState
      *
      * @param propertyContext       current context
-     * @param staticStateDocument
-     * @param encodedStaticState
-     * @param namespacesMap
-     * @param xhtmlDocument
+     * @param staticStateDocument   document containing the static state, may be modified by this constructor and must be discarded afterwards by the caller
+     * @param idGenerator           generator for the top-level scope
+     * @param namespacesMap         map of namespace mappings, null if not available
+     * @param xhtmlDocument         SAXStore containing the XHTML for noscript mode, null if not available
+     * @param encodedStaticState    existing serialization of static state, null if not available
      */
-    private void initialize(PropertyContext propertyContext, Document staticStateDocument, Map<String, Map<String, String>> namespacesMap,
-                            SAXStore xhtmlDocument, String encodedStaticState) {
+    private void initialize(PropertyContext propertyContext, Document staticStateDocument, IdGenerator idGenerator,
+                            Map<String, Map<String, String>> namespacesMap, SAXStore xhtmlDocument, String encodedStaticState) {
 
         indentedLogger.startHandleOperation("", "initializing static state");
 
@@ -205,7 +220,9 @@ public class XFormsStaticState {
         // Recompute namespace mappings if needed
         final Element htmlElement = staticStateElement.element(XMLConstants.XHTML_HTML_QNAME);
         if (namespacesMap == null) {
+            assert idGenerator == null : "idGenerator must be null if namespacesMap is null";
             this.namespacesMap = new HashMap<String, Map<String, String>>();
+            idGenerator = new IdGenerator();
             try {
 //                if (xhtmlDocument == null) {
                     // Recompute from staticStateDocument
@@ -216,14 +233,14 @@ public class XFormsStaticState {
                     if (htmlElement != null)
                         htmlElement.detach();
                     // Compute namespaces map
-                    identity.transform(new DocumentSource(staticStateDocument), new SAXResult(new XFormsDocumentAnnotatorContentHandler(this.namespacesMap)));
+                    identity.transform(new DocumentSource(staticStateDocument), new SAXResult(new XFormsAnnotatorContentHandler(this.namespacesMap, idGenerator)));
                     // Re-attach xhtml element
                     if (htmlElement != null)
                         staticStateElement.add(htmlElement);
 //                } else {
 //                    // Recompute from xhtmlDocument
 //                    final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-//                    identity.setResult(new SAXResult(new XFormsDocumentAnnotatorContentHandler(namespacesMap)));
+//                    identity.setResult(new SAXResult(new XFormsAnnotatorContentHandler(namespacesMap)));
 //                    xhtmlDocument.replay(identity);
 //                }
             } catch (Exception e) {
@@ -235,7 +252,7 @@ public class XFormsStaticState {
         }
 
         // Extract controls, models and components documents
-        extractControlsModelsComponents(propertyContext, staticStateElement);
+        extractControlsModelsComponents(propertyContext, staticStateElement, idGenerator);
 
         // Extract properties information
         extractProperties(staticStateElement);
@@ -290,8 +307,13 @@ public class XFormsStaticState {
                 if (propertiesElement != null) {
                     for (Iterator i = propertiesElement.attributeIterator(); i.hasNext();) {
                         final Attribute currentAttribute = (Attribute) i.next();
-                        final Object propertyValue = XFormsProperties.parseProperty(currentAttribute.getName(), currentAttribute.getValue());
-                        nonDefaultProperties.put(currentAttribute.getName(), propertyValue);
+                        final String propertyName = currentAttribute.getName();
+                        final Object propertyValue = XFormsProperties.parseProperty(propertyName, currentAttribute.getValue());
+                        if (propertyValue != null) {
+                            nonDefaultProperties.put(currentAttribute.getName(), propertyValue);
+                        } else {
+                            indentedLogger.logWarning("", "ignoring global property", "name", propertyName);
+                        }
                     }
                 }
             }
@@ -303,9 +325,13 @@ public class XFormsStaticState {
                     if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(currentAttribute.getNamespaceURI())) {
                         final String propertyName = currentAttribute.getName();
                         final Object propertyValue = XFormsProperties.parseProperty(propertyName, currentAttribute.getValue());
-                        // Only take the first occurrence into account, and make sure the property is supported
-                        if (nonDefaultProperties.get(propertyName) == null && XFormsProperties.getPropertyDefinition(propertyName) != null)
-                            nonDefaultProperties.put(propertyName, propertyValue);
+                        if (propertyValue != null) {
+                            // Only take the first occurrence into account, and make sure the property is supported
+                            if (nonDefaultProperties.get(propertyName) == null && XFormsProperties.getPropertyDefinition(propertyName) != null)
+                                nonDefaultProperties.put(propertyName, propertyValue);
+                        } else {
+                            indentedLogger.logWarning("", "ignoring property on xforms:model element", "name", propertyName);
+                        }
                     }
                 }
             }
@@ -367,7 +393,7 @@ public class XFormsStaticState {
         }
     }
 
-    private void extractControlsModelsComponents(PropertyContext pipelineContext, Element staticStateElement) {
+    private void extractControlsModelsComponents(PropertyContext pipelineContext, Element staticStateElement, IdGenerator idGenerator) {
 
         final Configuration xpathConfiguration = new Configuration();
 
@@ -427,7 +453,7 @@ public class XFormsStaticState {
         }
 
         // Extract components
-        xblBindings = new XBLBindings(indentedLogger, this, namespacesMap, staticStateElement);
+        xblBindings = new XBLBindings(indentedLogger, this, idGenerator, namespacesMap, staticStateElement);
     }
 
     /**
@@ -440,13 +466,13 @@ public class XFormsStaticState {
         modelDocuments.put(prefixedId, modelDocument);
     }
 
-    private void extractXFormsScripts(PropertyContext pipelineContext, DocumentWrapper documentInfo, String prefix) {
+    public void extractXFormsScripts(PropertyContext pipelineContext, DocumentWrapper documentInfo, String prefix) {
 
         // TODO: Not sure why we actually extract the scripts: we could just keep pointers on them, right? There is
         // probably not a notable performance if any at all, especially since this is needed at page generation time
         // only.
  
-        final String xpathExpression = "/descendant-or-self::xxforms:script[not(ancestor::xforms:instance)]";
+        final String xpathExpression = "/descendant-or-self::xxforms:script[not(ancestor::xforms:instance) and exists(@id)]";
 
         final List scripts = XPathCache.evaluate(pipelineContext, documentInfo, xpathExpression,
                 BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
@@ -624,8 +650,8 @@ public class XFormsStaticState {
         return eventNamesMap;
     }
 
-    public List<XFormsEventHandler> getEventHandlers(String id) {
-        return eventHandlersMap.get(id);
+    public List<XFormsEventHandler> getEventHandlers(String observerPrefixedId) {
+        return eventHandlersMap.get(observerPrefixedId);
     }
 
     public Map<String, ControlInfo> getControlInfoMap() {
@@ -636,24 +662,25 @@ public class XFormsStaticState {
         return controlTypes.get("repeat");
     }
 
-    public Element getControlElement(String prefixeId) {
-        return controlInfoMap.get(prefixeId).getElement();
+    public Element getControlElement(String prefixedId) {
+        final ControlInfo controlInfo = controlInfoMap.get(prefixedId);
+        return (controlInfo == null) ? null : controlInfo.element;
     }
 
-    public Element getLabelElement(String prefixeId) {
-        return labelsMap.get(prefixeId);
+    public Element getLabelElement(String prefixedId) {
+        return labelsMap.get(prefixedId);
     }
 
-    public Element getHelpElement(String prefixeId) {
-        return helpsMap.get(prefixeId);
+    public Element getHelpElement(String prefixedId) {
+        return helpsMap.get(prefixedId);
     }
 
-    public Element getHintElement(String prefixeId) {
-        return hintsMap.get(prefixeId);
+    public Element getHintElement(String prefixedId) {
+        return hintsMap.get(prefixedId);
     }
 
-    public Element getAlertElement(String prefixeId) {
-        return alertsMap.get(prefixeId);
+    public Element getAlertElement(String prefixedId) {
+        return alertsMap.get(prefixedId);
     }
 
     /**
@@ -663,8 +690,8 @@ public class XFormsStaticState {
      * @return                      true iif the control is a value control
      */
     public boolean isValueControl(String controlEffectiveId) {
-        final ControlInfo controlInfo = controlInfoMap.get(XFormsUtils.getEffectiveIdNoSuffix(controlEffectiveId));
-        return (controlInfo != null) && controlInfo.isValueControl();
+        final ControlInfo controlInfo = controlInfoMap.get(XFormsUtils.getPrefixedId(controlEffectiveId));
+        return (controlInfo != null) && controlInfo.isValueControl;
     }
 
     /**
@@ -686,13 +713,13 @@ public class XFormsStaticState {
                 return cachedMap;
             } else {
                 indentedLogger.logDebug("", "namespace mappings not cached",
-                        "prefix", prefix, "element", Dom4jUtils.elementToString(element));
+                        "prefix", prefix, "element", Dom4jUtils.elementToDebugString(element));
                 return Dom4jUtils.getNamespaceContextNoDefault(element);
             }
         } else {
             // No id attribute
             indentedLogger.logDebug("", "namespace mappings not available because element doesn't have an id attribute",
-                    "prefix", prefix, "element", Dom4jUtils.elementToString(element));
+                    "prefix", prefix, "element", Dom4jUtils.elementToDebugString(element));
             return Dom4jUtils.getNamespaceContextNoDefault(element);
         }
     }
@@ -726,8 +753,10 @@ public class XFormsStaticState {
 
     /**
      * Return XBL bindings information.
+     *
+     * @return XBL bindings information
      */
-    public XBLBindings getXblBindings() {
+    public XBLBindings getXBLBindings() {
         return xblBindings;
     }
 
@@ -749,7 +778,7 @@ public class XFormsStaticState {
 
             // Iterate over main static controls tree
             final Configuration xpathConfiguration = new Configuration();
-            final FastStringBuffer repeatHierarchyStringBuffer = new FastStringBuffer(1024);
+            final StringBuilder repeatHierarchyStringBuffer = new StringBuilder(1024);
             final Stack<String> repeatAncestorsStack = new Stack<String>();
             // NOTE: Say we DO want to exclude gathering event handlers within nested models, since those are gathered below
             analyzeComponentTree(propertyContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer, repeatAncestorsStack, true);
@@ -766,8 +795,7 @@ public class XFormsStaticState {
                 final Document modelDocument = currentEntry.getValue();
                 final DocumentWrapper modelDocumentInfo = new DocumentWrapper(modelDocument, null, xpathConfiguration);
                 // NOTE: Say we don't want to exclude gathering event handlers within nested models, since this is a model
-                extractEventHandlers(propertyContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
-
+                extractEventHandlers(propertyContext, xpathConfiguration, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
                 extractXFormsScripts(propertyContext, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId));
             }
 
@@ -778,6 +806,9 @@ public class XFormsStaticState {
 
             }
 
+            // Once analysis is done, some state can be freed
+            xblBindings.freeTransientState();
+
             isAnalyzed = true;
             return true;
         } else {
@@ -786,42 +817,94 @@ public class XFormsStaticState {
         }
     }
 
-    private void extractEventHandlers(PropertyContext pipelineContext, DocumentInfo documentInfo, String prefix, boolean excludeModels) {
+    private void extractEventHandlers(PropertyContext propertyContext, Configuration xpathConfiguration, DocumentInfo documentInfo, String prefix, boolean isControls) {
 
-        // Register event handlers on any element which has an id or an observer attribute.
-        // This also allows registering event handlers on XBL components. This follows the semantics of XML Events.
+        // Register event handlers on any element which has an id or an observer attribute. This also allows
+        // registering event handlers on XBL components. This follows the semantics of XML Events.
+
+        // NOTE: Special work is done to annotate handlers children of bound nodes, because that annotation is not done
+        // in XFormsAnnotatorContentHandler. Maybe it should be done there?
 
         // NOTE: Placing a listener on say a <div> element won't work at this point. Listeners have to be placed within
         // elements which have a representation in the compact component tree.
+        // UPDATE: This is right to a point: things should work for elements with @ev:observer, and element which have a
+        // compact tree ancestor element. Will not work for top-level handlers without @ev:observer though. Check more!
 
         // Two expressions depending on whether handlers within models are excluded or not
-        final String xpathExpression = excludeModels ?
+        final String xpathExpression = isControls ?
                 "//*[@ev:event and not(ancestor::xforms:instance) and not(ancestor::xforms:model) and (parent::*/@id or ev:observer)]" :
                 "//*[@ev:event and not(ancestor::xforms:instance) and (parent::*/@id or ev:observer)]";
 
         // Get all candidate elements
-        final List actionHandlers = XPathCache.evaluate(pipelineContext, documentInfo,
+        final List actionHandlers = XPathCache.evaluate(propertyContext, documentInfo,
                 xpathExpression, BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
 
-        // Check them all
+        // Check all candidate elements
         for (Object actionHandler: actionHandlers) {
             final NodeInfo currentNodeInfo = (NodeInfo) actionHandler;
 
             if (currentNodeInfo instanceof NodeWrapper) {
-                final Element currentElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+                final Element actionElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
-                if (XFormsActions.isActionName(currentElement.getNamespaceURI(), currentElement.getName())) {
+                if (XFormsActions.isActionName(actionElement.getNamespaceURI(), actionElement.getName())) {
                     // This is a known action name
 
-                    // If possible, find closest ancestor observer for XPath context evaluation
-                    final Element ancestorObserver = findAncestorObserver(currentElement);
-                    final String ancestorObserverStaticId = (ancestorObserver != null) ? ancestorObserver.attributeValue("id") : null;
+                    // Determine if the action is a child of a bound element. If so, we must annotate it here.
+                    final Element newActionElement;
+                    final String observerStaticId = actionElement.attributeValue(XFormsConstants.XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME);
 
+                    final String parentStaticId = actionElement.getParent().attributeValue("id");
+                    if (isControls) {
+                        // Analyzing controls
+                        if (observerStaticId == null) {
+                            // Observer is containing element
+                            if (parentStaticId != null) {
+                                final String parentPrefixedId = prefix + parentStaticId;
+                                if (xblBindings.hasBinding(parentPrefixedId)) {
+                                    // Parent is a bound node, so we found an action handler which is a child of a bound element
 
-                    final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(currentElement, ancestorObserverStaticId);
-                    registerActionHandler(eventHandler, prefix);
+                                    // Annotate handler
+                                    final XBLBindings.Scope innerScope = xblBindings.getResolutionScopeByPrefix(prefix); // if at top-level, prefix is ""
+                                    final XBLBindings.Scope outerScope = (prefix.length() == 0) ? xblBindings.getResolutionScopeByPrefix("") : xblBindings.getResolutionScopeByPrefixedId(innerScope.scopeId);
+                                    final XBLBindings.Scope bindingScope = xblBindings.getResolutionScopeByPrefixedId(parentPrefixedId);
+                                    final XFormsConstants.XXBLScope startScope = innerScope.equals(bindingScope) ? XFormsConstants.XXBLScope.inner : XFormsConstants.XXBLScope.outer;
+                                    newActionElement = xblBindings.annotateHandler(actionElement, prefix, innerScope, outerScope, startScope).getRootElement();
 
-                    // TODO: Ensure that there are ids for handlers within XBL bound nodes
+                                    // Extract scripts in the handler
+                                    final DocumentWrapper handlerWrapper = new DocumentWrapper(newActionElement.getDocument(), null, xpathConfiguration);
+                                    extractXFormsScripts(propertyContext, handlerWrapper, prefix);
+
+                                } else if (controlInfoMap.containsKey(parentPrefixedId)) {
+                                    // Parent is a control but not a bound node
+                                    newActionElement = actionElement;
+                                } else {
+                                    // Neither
+                                    newActionElement = null;
+                                }
+                            } else {
+                                // No parent id: we ignore the handler
+                                newActionElement = null;
+                            }
+
+                        } else {
+                            // Observer is specified with ev:observer
+                            // TODO: if the element is a descendant of a bound node, it must be ignored
+                            newActionElement = actionElement;
+                        }
+                    } else {
+                        // Analyzing models
+                        newActionElement = actionElement;
+                    }
+
+                    // Register action handler
+                    if (newActionElement != null) {
+                        // If possible, find closest ancestor observer for XPath context evaluation
+                        final Element ancestorObserver = findAncestorObserver(actionElement);
+                        final String ancestorObserverStaticId = (ancestorObserver != null) ? ancestorObserver.attributeValue("id") : null;
+
+                        final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(newActionElement, parentStaticId, ancestorObserverStaticId);
+                        registerActionHandler(eventHandler, prefix);
+                    }
                 }
             }
         }
@@ -862,13 +945,10 @@ public class XFormsStaticState {
     }
 
     public void analyzeComponentTree(final PropertyContext propertyContext, final Configuration xpathConfiguration,
-                                     final String prefix, Element startElement, final FastStringBuffer repeatHierarchyStringBuffer,
+                                     final String prefix, Element startElement, final StringBuilder repeatHierarchyStringBuffer,
                                      final Stack<String> repeatAncestorsStack, boolean excludeModelEventHandlers) {
 
         final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(startElement.getDocument(), null, xpathConfiguration);
-
-        // Extract event handlers for this tree of controls
-        extractEventHandlers(propertyContext, controlsDocumentInfo, prefix, excludeModelEventHandlers);
 
         // Extract scripts for this tree of controls
         extractXFormsScripts(propertyContext, controlsDocumentInfo, prefix);
@@ -924,7 +1004,15 @@ public class XFormsStaticState {
                 }
 
                 // Create and index static control information
-                final ControlInfo info = new ControlInfo(controlElement, hasBinding, XFormsControlFactory.isValueControl(controlURI, controlName));
+
+                final ControlInfo parentRepeatControlInfo;
+                if (repeatAncestorsStack.size() > 0) {
+                    parentRepeatControlInfo = controlInfoMap.get(repeatAncestorsStack.peek());
+                } else {
+                    parentRepeatControlInfo = null;
+                }
+
+                final ControlInfo info = new ControlInfo(controlPrefixedId, controlElement, hasBinding, XFormsControlFactory.isValueControl(controlURI, controlName), parentRepeatControlInfo);
                 controlInfoMap.put(controlPrefixedId, info);
                 {
                     Map<String, ControlInfo> controlsMap = controlTypes.get(controlName);
@@ -990,7 +1078,7 @@ public class XFormsStaticState {
                     // TODO: Check that xforms:case is within: switch
 //                    if (!(currentControlsContainer.getName().equals("switch")))
 //                        throw new ValidationException("xforms:case with id '" + effectiveControlId + "' is not directly within an xforms:switch container.", xformsControl.getLocationData());
-                } else  if ("attribute".equals(controlName)) {
+                } else if ("attribute".equals(controlName)) {
                     // Special indexing of xxforms:attribute controls
                     final String prefixedForAttribute = prefix + controlElement.attributeValue("for");
                     final String nameAttribute = controlElement.attributeValue("name");
@@ -1017,6 +1105,10 @@ public class XFormsStaticState {
                 }
             }
         });
+
+        // Extract event handlers for this tree of controls
+        // NOTE: Do this after analysing controls above so that XBL bindings are available for detection of nested event handlers.
+        extractEventHandlers(propertyContext, xpathConfiguration, controlsDocumentInfo, prefix, true);
 
         // Gather label, hint, help, alert information
         {
@@ -1191,6 +1283,17 @@ public class XFormsStaticState {
     }
 
     /**
+     * Returns whether there is any event handler registered anywhere in the controls for the given event name.
+     *
+     * @param eventName event name, like xforms-value-changed
+     * @return          true if there is a handler, false otherwise
+     */
+    public boolean hasHandlerForEvent(String eventName) {
+        // Check for #all as well as specific event
+        return eventNamesMap.get(XFormsConstants.XXFORMS_ALL_EVENTS) != null || eventNamesMap.get(eventName) != null;
+    }
+
+    /**
      * Statically create and register an event handler.
      *
      * @param newEventHandlerImpl           event handler implementation
@@ -1287,26 +1390,83 @@ public class XFormsStaticState {
     }
 
     public static class ControlInfo {
-        private Element element;
-        private boolean hasBinding;
-        private boolean isValueControl;
+        public final String prefixedId;
+        public final Element element;
+        public final boolean hasBinding;
+        public final boolean isValueControl;
+        public final ControlInfo ancestorRepeat;
 
-        public ControlInfo(Element element, boolean hasBinding, boolean isValueControl) {
+        public ControlInfo(String prefixedId, Element element, boolean hasBinding, boolean isValueControl, ControlInfo ancestorRepeat) {
+            this.prefixedId = prefixedId;
             this.element = element;
             this.hasBinding = hasBinding;
             this.isValueControl = isValueControl;
+            this.ancestorRepeat = ancestorRepeat;
         }
+    }
 
-        public Element getElement() {
-            return element;
-        }
+    /**
+     * Find the closest common ancestor repeat given two prefixed ids.
+     *
+     * @param prefixedId1   first prefixed id
+     * @param prefixedId2   second prefixed id
+     * @return              prefixed id of common ancestor repeat, or null if not found
+     */
+    public String findClosestCommonAncestorRepeat(String prefixedId1, String prefixedId2) {
+        final List<String> ancestors1 = getAncestorRepeats(prefixedId1, null);
+        final List<String> ancestors2 = getAncestorRepeats(prefixedId2, null);
 
-        public boolean hasBinding() {
-            return hasBinding;
-        }
+        // If one of them has no ancestors, there is no common ancestor
+        if (ancestors1.size() == 0 || ancestors2.size() == 0)
+            return null;
 
-        public boolean isValueControl() {
-            return isValueControl;
+        Collections.reverse(ancestors1);
+        Collections.reverse(ancestors2);
+
+        final Iterator<String> iterator1 = ancestors1.iterator();
+        final Iterator<String> iterator2 = ancestors2.iterator();
+
+        String result = null;
+        while (iterator1.hasNext() && iterator2.hasNext()) {
+            final String repeatId1 = iterator1.next();
+            final String repeatId2 = iterator2.next();
+
+            if (!repeatId1.equals(repeatId2))
+                break;
+
+            result = repeatId1;
         }
+        
+        return result;
+    }
+
+    /**
+     * Get prefixed ids of all of the start control's repeat ancestors, stopping at endPrefixedId if not null. If
+     * endPrefixedId is a repeat, it is excluded. If the source doesn't exist, return the empty list.
+     *
+     * @param startPrefixedId   prefixed id of start control
+     * @param endPrefixedId     prefixed id of end repeat, or null
+     * @return                  list of prefixed id from leaf to root, or the empty list
+     */
+    public List<String> getAncestorRepeats(String startPrefixedId, String endPrefixedId) {
+
+        // Simple case where source doesn't exist
+        final ControlInfo controlInfo = controlInfoMap.get(startPrefixedId);
+        if (controlInfo == null)
+            return Collections.emptyList();
+
+        // Simple case where there is no ancestor repeat
+        ControlInfo repeatControlInfo = controlInfo.ancestorRepeat;
+        if (repeatControlInfo == null)
+            return Collections.emptyList();
+
+        // At least one ancestor repeat
+        final List<String> result = new ArrayList<String>();
+        // Go until there are no more ancestors OR we find the boundary repeat
+        while (repeatControlInfo != null && (endPrefixedId == null || !endPrefixedId.equals(repeatControlInfo.prefixedId)) ) {
+            result.add(repeatControlInfo.prefixedId);
+            repeatControlInfo = repeatControlInfo.ancestorRepeat;
+        }
+        return result;
     }
 }

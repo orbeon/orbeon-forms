@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.test;
 
@@ -216,7 +216,7 @@ public class ProcessorTest extends TestCase {
     /**
      * Run test and compare to expected result
      */
-    public void test() throws Exception {
+    public void test() throws Throwable {
 
         // Create threads
         TestThread[] threads = new TestThread[THREAD_COUNT];
@@ -236,7 +236,7 @@ public class ProcessorTest extends TestCase {
             if (threads[i].getException() != null) {
                 System.err.println(description);
                 Throwable throwable = OXFException.getRootThrowable(threads[i].getException());
-                throw throwable instanceof Exception ? (Exception) throwable : threads[i].getException();
+                throw throwable;
             }
 
             // Check if got expected result
@@ -294,7 +294,7 @@ public class ProcessorTest extends TestCase {
 
     class TestThread extends Thread {
 
-        private Exception exception;
+        private Throwable exception;
         private boolean expectedEqualsActual = true;
         private String expectedDataString;
         private String actualDataString;
@@ -375,12 +375,12 @@ public class ProcessorTest extends TestCase {
                         StaticExternalContext.removeStaticContext();
                     }
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 exception = e;
             }
         }
 
-        public Exception getException() {
+        public Throwable getException() {
             return exception;
         }
 
@@ -396,24 +396,6 @@ public class ProcessorTest extends TestCase {
             return actualDataStringFormatted;
         }
     }
-
-    /*
-    private String domToString(Document document) {
-        try {
-            StringWriter outputWriter = new StringWriter();
-            TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-            TransformerUtils.applyOutputProperties(identity.getTransformer(), "xml", "1.0", null, null,
-                    TransformerUtils.DEFAULT_OUTPUT_ENCODING, true, Boolean.TRUE, true, 4);
-            identity.setResult(new StreamResult(outputWriter));
-            LocationSAXWriter saxWriter = new LocationSAXWriter();
-            saxWriter.setContentHandler(identity);
-            saxWriter.write(document);
-            return outputWriter.toString();
-        } catch (SAXException e) {
-            throw new OXFException(e);
-        }
-    }
-    */
 }
 
 class TestServletContext implements ServletContext {

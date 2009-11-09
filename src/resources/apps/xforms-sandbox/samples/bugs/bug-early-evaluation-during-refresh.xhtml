@@ -1,0 +1,60 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xbl="http://www.w3.org/ns/xbl"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <head>
+        <xforms:model id="model1">
+            <xforms:instance id="instance1">
+                <instance xmlns=""/>
+            </xforms:instance>
+
+            <xforms:action ev:event="xforms-ready">
+                <xforms:dispatch name="xxforms-repeat-focus" target="my-trigger" xxforms:repeat-indexes="2"/>
+            </xforms:action>
+
+        </xforms:model>
+        <xforms:model id="model2">
+            <xforms:instance id="instance2">
+                <instance xmlns="">
+                    <record/>
+                    <record/>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="record" readonly="(count(preceding-sibling::*) + 1) = index('my-repeat')"/>
+        </xforms:model>
+    </head>
+    <body>
+
+        <p>
+            This tests for
+            <a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=313777&amp;group_id=168&amp;atid=350207">
+                [ #313777 ] FB: Regression: After clicking on last grid cell, it is no longer possible to insert a new control
+            </a>.
+        </p>
+
+        <xforms:repeat model="model2" nodeset="record" id="my-repeat">
+            <div>
+                 <xforms:trigger id="my-trigger" ref=".">
+                    <xforms:label>Do Stuff</xforms:label>
+                     <!-- Add event handler so that refresh goes through event dispatching -->
+                     <xforms:action ev:event="#all"/>
+                </xforms:trigger>
+            </div>
+        </xforms:repeat>
+
+    </body>
+</html>

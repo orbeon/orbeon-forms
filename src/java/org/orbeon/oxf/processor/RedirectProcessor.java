@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
@@ -47,12 +47,12 @@ public class RedirectProcessor extends ProcessorImpl {
 
             // Build parameters
             String pathInfo = XPathUtils.selectStringValueNormalize(node, "normalize-space(redirect-url/path-info)");
-            Map parameters = new HashMap();
+            Map<String, String[]> parameters = new HashMap<String, String[]>();
 
             for (Iterator i = XPathUtils.selectIterator(node, "redirect-url/parameters/parameter"); i.hasNext();) {
                 Node parameter = (Node) i.next();
                 String name = XPathUtils.selectStringValue(parameter, "name");
-                int valueCount = XPathUtils.selectIntegerValue(parameter, "count(value)").intValue();
+                int valueCount = XPathUtils.selectIntegerValue(parameter, "count(value)");
                 String[] values = new String[valueCount];
                 int valueIndex = 0;
                 for (Iterator j = XPathUtils.selectIterator(parameter, "value"); j.hasNext(); valueIndex++) {

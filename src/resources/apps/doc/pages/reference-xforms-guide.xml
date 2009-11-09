@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <!--
-    Copyright (C) 2004-2008 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
-    subject to the following terms:
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    * Conversion to other formats is allowed, but the actual content may not be altered or edited
-      in any way.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    * You may create printed copies for your own personal use.
-
-    * For all other uses, such as selling printed copies or using (parts of) the manual in another
-      publication, prior written agreement from Orbeon, Inc. is required.
-
-    Please contact Orbeon at info@orbeon.com for more information.
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:xforms="http://www.w3.org/2002/xforms"
           xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
@@ -2090,6 +2087,14 @@
                     ways to initialize XForms instances.
                 </p>
             </section>
+            <a name="xforms-instance-initialization-recommended"/>
+            <section>
+                <title>Recommended methods</title>
+                <p>
+                    See <a href="http://wiki.orbeon.com/forms/how-to/load-initial-form-data">the Orbeon Forms wiki</a>
+                    for a guide to initializing instances.
+                </p>
+            </section>
             <a name="xforms-instance-initialization-pfc"/>
             <section>
                 <title>Initializing XForms Instances from the PFC</title>
@@ -2120,31 +2125,6 @@
                         output. These mechanisms are described in details in the <a
                         href="reference-page-flow#page-model-page-view">PFC documentation</a>.
                     </p>
-                </section>
-                <a name="xforms-instance-initialization-src"/>
-                <section>
-                    <title>Using the <code>src</code> Attribute</title>
-                    <p>
-                        The <code>&lt;xforms:instance></code> element supports an <code>src</code> attribute, able to
-                        access the current XML submission using the <code>input:instance</code> URI, as well as the page
-                        model data using the <code>input:data</code> URI.
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <html xmlns:xforms="http://www.w3.org/2002/xforms"
-                              xmlns:xi="http://www.w3.org/2001/XInclude-doc"
-                              xmlns="http://www.w3.org/1999/xhtml">
-                            <head>
-                                <title>Summary</title>
-                                <xforms:model>
-                                    <xforms:instance id="document-infos-instance" src="input:instance"/>
-                                    ...
-                                </xforms:model>
-                            </head>
-                            <body>
-                                ...
-                            </body>
-                        </html>
-                    </xml-source>
                 </section>
                 <a name="xforms-instance-initialization-xinclude"/>
                 <section>
@@ -2255,12 +2235,6 @@
                     </note>
                 </section>
             </section>
-            <section>
-                <title>Initializing XForms Instances with an XForms Submission</title>
-                <p>
-                    [TODO]
-                </p>
-            </section>
         </section>
         <!--
         <section>
@@ -2278,421 +2252,11 @@
         <a name="xforms-urls"/>
         <section>
             <title>URLs in XForms</title>
-            <section>
-                <title>Rationale</title>
-                <p>
-                    XForms documents can refer to external resources using URIs in the following
-                    circumstances:
-                </p>
-                <ul>
-                    <li>
-                        <p>
-                            <b>External Instances.</b> The <code>xforms:instance</code> element
-                            can have an <code>src</code> attribute linking to an external instance
-                            definition.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Submission.</b> The <code>xforms:submission</code> element must refer
-                            to an <code>action</code> URI.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Load Action.</b> The <code>xforms:load</code> action must refer to an
-                            URI that must be loaded upon execution.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Image Mediatype.</b> The <code>xforms:output</code> control may refer
-                            to an image URI.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>Message, Label, Help, Hint, and Alert.</b>
-                            <code>xforms:label</code>, <code>xforms:help</code>,
-                            <code>xforms:hint</code>, and <code>xforms:alert</code> may use an
-                            <code>src</code> attribute to refer to external content.
-                        </p>
-                        <note>
-                            The XForms 1.1 draft of November 15, 2004 removes linking attributes
-                            from actions and metadata elements and "the <code>src</code> attribute
-                            is not available to XForms 1.1 <code>message</code>, <code>label</code>,
-                            <code>help</code>, <code>hint</code>, <code>alert</code> elements."
-                        </note>
-                    </li>
-                </ul>
-                <p>
-                    URIs are resolved relatively to a <i>base URI</i>. The base URI is, by default,
-                    the external URL used to display the XForms page, with special handling of the
-                    servlet context, if necessary. It is also possible to override this behavior by
-                    adding <code>xml:base</code> attributes on <code>xforms:load</code> or any of
-                    its ancestor elements.
-                </p>
-                <!--<p>-->
-                    <!--As a general rule, for URLs relative to the :-->
-                <!--</p>-->
-                <!--<ul>-->
-                    <!--<li>-->
-                        <!--<p>-->
-                            <!--Absolute URLs (starting with a protocol or scheme) are used as is.-->
-                        <!--</p>-->
-                    <!--</li>-->
-                    <!--<li>-->
-                        <!--<p>-->
-                            <!--Absolute paths (starting with a "/") are relative-->
-                        <!--</p>-->
-                    <!--</li>-->
-                    <!--<li>-->
-                        <!--<p>-->
-<!-- -->
-                        <!--</p>-->
-                    <!--</li>-->
-                <!--</ul>-->
-            </section>
-            <a name="xforms-relative-paths-external-instances"/>
-            <section>
-                <title>External XForms Instances</title>
-                <p>
-                    Referring to external XForms instances is done with the <code>src</code>
-                    attribute on the <code>xforms:instance</code> element:
-                </p>
-                <xml-source show-namespaces="false">
-                    <xforms:instance src="instance.xml"/>
-                </xml-source>
-                <p>
-                    This feature allows for improved modularity by separating an XForms instance
-                    definition from an XHTML page. It also allows for producing XForms instances
-                    dynamically.
-                </p>
-                <p>
-                    The following assumes that Orbeon Forms runs in the <code>/ops</code> servlet context:
-                </p>
-                <table>
-                    <tr>
-                        <th>Base URI<br/>(External URL or <code>xml:base</code> attributes)</th>
-                        <th>Initial URI<br/>(<code>src</code> attribute)</th>
-                        <th>Resolved URI</th>
-                        <th>Comment</th>
-                    </tr>
-                    <tr>
-                        <td rowspan="3">
-                            <p>The following URI is loaded in a servlet:</p>
-                            <p>
-                                <code>http://a.org/ops/page</code>
-                            </p>
-                        </td>
-                        <td><code>http://b.com/instance</code></td>
-                        <td><code>http://b.com/instance</code></td>
-                        <td>
-                            Absolute URLs are left untouched.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>/new-instance</code></td>
-                        <td><code>http://a.org/ops/new-instance</code></td>
-                        <td>
-                            Absolute paths resolve against the current servlet context.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>admin/instance</code></td>
-                        <td><code>http://a.org/ops/admin/instance</code></td>
-                        <td>
-                            The relative path resolves against the original URL.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td rowspan="3">
-                            <p>The following path is loaded in a portlet:</p>
-                            <p>
-                                <code>/example/page</code>
-                            </p>
-                        </td>
-                        <td><code>http://b.com/instance</code></td>
-                        <td><code>http://b.com/instance</code></td>
-                        <td>
-                            Absolute URLs are left untouched.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>/new-instance</code></td>
-                        <td><code>/new-instance</code></td>
-                        <td>
-                            The absolute path is used as is. The XForms instance is loaded from the
-                            portlet. The developer must make sure that the path resolves to a PFC
-                            entry producing XML.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>admin/instance</code></td>
-                        <td><code>/example/admin/instance</code></td>
-                        <td>
-                            The relative path is resolved against the original path. The XForms
-                            instance is loaded from the portlet. The developer must make sure that
-                            the path resolves to a PFC entry producing XML.
-                        </td>
-                    </tr>
-                </table>
-            </section>
-            <a name="xforms-relative-paths-submission"/>
-            <section>
-                <title>XForms Submisssion</title>
-                <p>
-                    Specifying a submission URL is done with the <code>resource</code> attribute (or the deprecated, as
-                    of XForms 1.1, <code>action</code> attribute) on the <code>xforms:submission</code> element:
-                </p>
-                <xml-source show-namespaces="false">
-                    <xforms:submission resource="/submission" ref="..."/>
-                </xml-source>
-                <p>
-                    The following assumes that Orbeon Forms runs in the <code>/ops</code> servlet context:
-                </p>
-                <table>
-                    <tr>
-                        <th>Base URI<br/>(External URL or <code>xml:base</code> attributes)</th>
-                        <th>Initial URI<br/>(<code>action</code> attribute)</th>
-                        <th>XForms Init <sup>1</sup></th>
-                        <th>Resolved URI</th>
-                        <th>Comment</th>
-                    </tr>
-                    <tr>
-                        <td rowspan="3">
-                            <p>The following URI is loaded in a servlet:</p>
-                            <p>
-                                <code>http://a.org/ops/page</code>
-                            </p>
-                        </td>
-                        <td><code>http://b.com/submission</code></td>
-                        <td>N/A</td>
-                        <td><code>http://b.com/submission</code></td>
-                        <td>
-                            The absolute URL is left untouched. The XForms submission is performed
-                            on the absolute URL.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>/new-submission</code></td>
-                        <td>N/A</td>
-                        <td><code>http://a.org/ops/new-submission</code></td>
-                        <td>
-                            Absolute paths resolve against the current servlet context.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>admin/submission</code></td>
-                        <td>N/A</td>
-                        <td><code>http://a.org/ops/admin/submission</code></td>
-                        <td>
-                            The relative path resolves against the original URL.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td rowspan="5">
-                            <p>The following path is loaded in a portlet:</p>
-                            <p>
-                                <code>/example/page</code>
-                            </p>
-                        </td>
-                        <td><code>http://b.com/submission</code></td>
-                        <td>N/A</td>
-                        <td><code>http://b.com/submission</code></td>
-                        <td>
-                            The absolute URL is left untouched. The XForms submission is performed
-                            on the absolute URL.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2"><code>/new-submission</code></td>
-                        <td>Yes</td>
-                        <td><code>/new-submission</code></td>
-                        <td>
-                            The absolute path is used as is. The XForms submission is performed on
-                            the portlet.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>No</td>
-                        <td><code>http://a.org/ops/new-submission</code></td>
-                        <td>
-                            The absolute path resolves against the current servlet context. The
-                            submission is performed on the web application.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2"><code>admin/submission</code></td>
-                        <td>Yes</td>
-                        <td><code>/example/admin/submission</code></td>
-                        <td>
-                            The relative path is resolved against the original path. The XForms
-                            submission is performed on the portlet.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>No</td>
-                        <td><code>http://a.org/ops/ example/admin/submission</code></td>
-                        <td>
-                            The relative path resolves against the original path, then against the
-                            the current servlet context. The submission is performed on the web
-                            application.
-                        </td>
-                    </tr>
-                </table>
-                <p>
-                    <sup>1</sup> If "yes", this means the submission is performed during XForms
-                    initialization, for example upon an <code>xforms-ready</code> event. If "no",
-                    this means that the submission is performed after XForms initialization, for
-                    example upon the user activating a trigger.
-                </p>
-            </section>
-            <a name="xforms-relative-paths-load-action"/>
-            <section>
-                <title>XForms Load Action</title>
-                <p>
-                    The <code>xforms:load action</code> can refer to a resource to load either
-                    through the <code>resource</code> attribute or using a single-node binding
-                    retrieving the URI from an XForms instance. In both cases, the value of the URI
-                    is resolved relatively to the base URI.
-                </p>
-                <p>
-                    The following assumes that Orbeon Forms runs in the <code>/ops</code> servlet context:
-                </p>
-                <table>
-                    <tr>
-                        <th>Base URI<br/>(External URL or <code>xml:base</code> attributes)</th>
-                        <th>Initial URI<br/>(<code>resource</code> or Single-Node Binding)</th>
-                        <th><code>show</code><br/><code>f:url-type</code></th>
-                        <th>Resolved URI</th>
-                        <th>Comment</th>
-                    </tr>
-                    <tr>
-                        <td rowspan="6">
-                            <p>The following URI is loaded in a servlet:</p>
-                            <p>
-                                <code>http://a.org/c/d</code>
-                            </p>
-                        </td>
-                        <td rowspan="2"><code>http://b.com/e/</code></td>
-                        <td><code>replace</code></td>
-                        <td rowspan="2"><code>http://b.com/e/</code></td>
-                        <td>
-                            The absolute URL is left untouched. The new page replaces the existing
-                            page.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>new</code></td>
-                        <td>
-                            The absolute URL is left untouched. A new window or tab opens for the new
-                            page.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2"><code>/f</code></td>
-                        <td><code>replace</code></td>
-                        <td rowspan="2"><code>http://a.org/c/f</code></td>
-                        <td>
-                            Absolute paths resolve against the current servlet context. The new page
-                            replaces the existing page.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>new</code></td>
-                        <td>
-                            Absolute paths resolve against the current servlet context. A new window
-                            or tab opens for the new page.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2"><code>g</code></td>
-                        <td><code>replace</code></td>
-                        <td rowspan="2"><code>http://a.org/c/g</code></td>
-                        <td>
-                            The new page replaces the existing page.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>new</code></td>
-                        <td>
-                            A new window or tab opens for the new page.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td rowspan="8">
-                            <p>The following path is loaded in a portlet:</p>
-                            <p>
-                                <code>h/d</code>
-                            </p>
-                        </td>
-                        <td rowspan="2"><code>http://b.com/e/</code></td>
-                        <td><code>replace</code></td>
-                        <td rowspan="2"><code>http://b.com/e/</code></td>
-                        <td>
-                            This causes the application to load a page outside of the portlet,
-                            replacing the entire portal.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>new</code></td>
-                        <td>
-                            This causes the application to load a page in a new window outside of
-                            the portlet.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td rowspan="3"><code>/f</code></td>
-                        <td><code>replace</code></td>
-                        <td><code>/f</code></td>
-                        <td>
-                            The resulting path is loaded within the portlet.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>replace</code><br/><code>f:url-type= "resource"</code></td>
-                        <td><code>http://a.org/c/f</code></td>
-                        <td>
-                            The resulting path is loaded in the same window outside the portal.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>new</code></td>
-                        <td><code>http://a.org/c/f</code></td>
-                        <td>
-                            The resulting path is loaded in a new window.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td rowspan="3"><code>g</code></td>
-                        <td><code>replace</code></td>
-                        <td><code>h/g</code></td>
-                        <td>
-                            The resulting path is loaded within the portlet.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><code>replace</code><br/><code>f:url-type= "resource"</code></td>
-                        <td><i>undefined</i></td>
-                        <td><i>undefined</i></td>
-                    </tr>
-                    <tr>
-                        <td><code>new</code></td>
-                        <td><i>undefined</i></td>
-                        <td><i>undefined</i></td>
-                    </tr>
-                </table>
-            </section>
-            <a name="xforms-relative-paths-image-mediatype"/>
-            <section>
-                <title>Image Mediatype for <code>xforms:output</code></title>
-                <p>
-                    When an <code>xforms:output</code> control refers to an image URI, as documented
-                    <a href="#image-mediatype">below</a>, the resulting value is resolved
-                    relatively to the base URI.
-                </p>
-            </section>
+            <p>
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/url-rewriting">moved to the Orbeon
+                Forms wiki</a>.
+            </p>
         </section>
         <!--
         <section>

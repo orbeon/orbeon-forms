@@ -46,7 +46,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * OPS call-xpl() function.
+ * xxforms:call-xpl() function.
  */
 public class XXFormsCallXPL extends XFormsFunction {
 

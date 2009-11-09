@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -21,7 +21,11 @@
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
-         xmlns:xbl="http://www.w3.org/ns/xbl">
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:exforms="http://www.exforms.org/exf/1-0"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         script-type="application/xhtml+xml">
+
     <xbl:binding id="fr-color-binding-2" element="fr|rgb2">
 
         <!-- Orbeon Form Builder Component Metadata -->
@@ -43,9 +47,8 @@
             </template>
         </metadata>
 
-        <xbl:template>
-
-            <!-- Local model containing the date and time  -->
+        <xbl:implementation>
+            <!-- Local model -->
             <xforms:model id="rgb-model">
                 <xforms:instance id="rgb-instance">
                     <values>
@@ -56,13 +59,33 @@
                 </xforms:instance>
                 <xforms:bind nodeset="r | g | b" type="xs:integer"/>
             </xforms:model>
-
+        </xbl:implementation>
+        <xbl:template>
             <!-- Local controls -->
-            <xforms:group xbl:attr="model context ref bind">
-                <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
+            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
 
-                <xforms:group model="rgb-model">
-                    <xhtml:div>
+                <!-- Inner group -->
+                <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
+
+                    <!-- Variable pointing to external single-node binding -->
+                    <xxforms:variable name="result" as="node()?">
+                        <xxforms:sequence select="." xxbl:scope="outer"/>
+                    </xxforms:variable>
+
+                    <!-- React to update to bound node or control coming into existence -->
+                    <xforms:group ref="$result" appearance="xxforms:internal">
+                        <!-- Only set local values if the bound node is an xs:date -->
+                        <xforms:action ev:event="xforms-value-changed xforms-enabled">
+                            <!-- TODO: read and parse value -->
+                            <!--<xforms:action if="$result ...">-->
+                            <!--</xforms:action>-->
+                            <!--<xforms:action if="...">-->
+                            <!--</xforms:action>-->
+                        </xforms:action>
+                    </xforms:group>
+
+                    <xforms:group class="fr-component-group">
                         <xforms:range ref="r" start="0" end="255">
                             <xforms:label>R</xforms:label>
                         </xforms:range>
@@ -75,13 +98,18 @@
                             <xforms:label>B</xforms:label>
                         </xforms:range>
                         <!--<xhtml:div style="width: 100px; height: 2em; background-color: rgb(0,0,{b})"/>-->
-                    </xhtml:div>
 
-                    <xforms:action ev:event="xforms-value-changed">
-                        <!--<xforms:setvalue ref="$result" value="concat()"/>-->
-                    </xforms:action>
+                        <xforms:action ev:event="xforms-value-changed">
+                            <!-- TODO: write value in hex format -->
+                            <!--<xforms:setvalue ref="$result" value="concat()"/>-->
+                        </xforms:action>
+                    </xforms:group>
 
+                    <!-- Show color -->
                     <xhtml:div style="margin-top: .5em; border: 1px solid black; width: 218px; height: 2em; background-color: rgb({r},{g},{b})"/>
+
+                    <!-- Stop propagation of all UI events -->
+                    <xforms:action ev:event="#all" ev:propagate="stop"/>
                 </xforms:group>
             </xforms:group>
         </xbl:template>

@@ -1,0 +1,51 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events">
+    <head>
+        <title>Push initial form data to XForms from Java</title>
+        <xforms:model>
+
+            <!-- User in which user data is collected -->
+            <xforms:instance id="user-data">
+                <registration xmlns="">
+                    <first-name/>
+                    <last-name/>
+                </registration>
+            </xforms:instance>
+
+            <xforms:instance id="demo-user-data">
+                <registration xmlns="">
+                    <first-name>John</first-name>
+                    <last-name>Doe</last-name>
+                </registration>
+            </xforms:instance>
+
+            <!-- Just for the demo: store data into request first -->
+            <xforms:insert ev:event="xforms-model-construct-done"
+                           if="empty(xxforms:get-request-attribute('my-user-data'))"
+                           context="."
+                           origin="xxforms:set-request-attribute('my-user-data', instance('demo-user-data'))"/>
+
+            <!-- Load initial data from the request -->
+            <xforms:insert ev:event="xforms-model-construct-done"
+                           nodeset="instance('user-data')" origin="xxforms:get-request-attribute('my-user-data')"/>
+
+        </xforms:model>
+        <style type="text/css">
+            .xforms-label { display: block; }
+            fieldset { width: 15em; margin-top: 1em; }
+        </style>
+    </head>
+    <body>
+        <fieldset>
+            <legend>Registration</legend>
+            <xforms:input ref="first-name">
+                <xforms:label>First name</xforms:label>
+            </xforms:input>
+            <xforms:input ref="last-name">
+                <xforms:label>Last name</xforms:label>
+            </xforms:input>
+        </fieldset>
+    </body>
+</html>

@@ -145,7 +145,7 @@
                             The example below shows a call to the <code>xxforms:call-xpl</code> function:
                         </p>
                         <xml-source>
-                            xxforms:call-xpl ('oxf:/examples/sandbox/xpath/run-xpath.xpl', ('input', 'xpath'),
+                            xxforms:call-xpl('oxf:/examples/sandbox/xpath/run-xpath.xpl', ('input', 'xpath'),
                             (instance('instance')/input, instance('instance')/xpath), 'formatted-output')/*, 'html')
                         </xml-source>
                     </li>

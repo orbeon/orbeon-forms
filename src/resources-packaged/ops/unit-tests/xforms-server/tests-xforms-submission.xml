@@ -27,90 +27,68 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <test description="Instance replacement with index updates" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="main-model">
+                        <xforms:instance id="main-instance">
+                            <instance>
+                               <r1/>
+                               <r1>
+                                   <r2/>
+                                   <r2/>
+                               </r1>
+                               <r1/>
+                               <r3/>
+                               <r4/>
+                               <r4>
+                                   <r5/>
+                                   <r5/>
+                               </r4>
+                               <r4/>
+                           </instance>
+                        </xforms:instance>
+                        <xforms:instance id="new-instance">
+                           <instance>
+                               <r1/>
+                               <r1>
+                                   <r2/><!-- Force repeat2 from 2 to 1 -->
+                               </r1>
+                               <r1/>
+                               <!-- Force repeat3 from 1 to 0 -->
+                               <r4>
+                                   <r5/><!-- Force repeat5 from 0 to 1 -->
+                               </r4>
+                               <r4>
+                                   <r5/>
+                                   <r5/>
+                               </r4>
+                               <r4/>
+                           </instance>
+                        </xforms:instance>
+                        <xforms:submission id="test-submission" ref="instance('new-instance')" action="test:"
+                                           replace="instance" instance="main-instance" method="post"/>
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="action">
-                        <xxforms:action>
-                            <xxforms:event name="DOMActivate" source-control-id="test-trigger"/>
-                        </xxforms:action>
-                    </p:input>
-                    <p:input name="controls">
-                        <controls>
-                            <xforms:repeat nodeset="r1" id="repeat1" startindex="2">
-                                <xforms:repeat nodeset="r2" id="repeat2" startindex="4">
-                                </xforms:repeat>
-                            </xforms:repeat>
-                            <xforms:repeat nodeset="r3" id="repeat3">
-                            </xforms:repeat>
-                            <xforms:repeat nodeset="r4" id="repeat4">
-                                <xforms:repeat nodeset="r5" id="repeat5"/>
-                            </xforms:repeat>
-                            <xforms:trigger id="test-trigger">
-                                <xforms:label>Test</xforms:label>
-                                <xforms:send submission="test-submission" ev:event="DOMActivate"/>
-                            </xforms:trigger>
-                        </controls>
-                    </p:input>
-                    <p:input name="models">
-                        <models>
-                            <xforms:model id="main-model">
-                                <xforms:instance id="main-instance">
-                                   <instance/>
-                                </xforms:instance>
-                                <xforms:instance id="new-instance">
-                                   <instance/>
-                                </xforms:instance>
-                                <xforms:submission id="test-submission" ref="instance('new-instance')" action="test:"
-                                                   replace="instance" instance="main-instance" method="post"/>
-                            </xforms:model>
-                        </models>
-                    </p:input>
-                    <p:input name="instances">
-                        <instances>
-                            <instance id="main-instance" model-id="main-model">
-                                <instance>
-                                   <r1/>
-                                   <r1>
-                                       <r2/>
-                                       <r2/>
-                                   </r1>
-                                   <r1/>
-                                   <r3/>
-                                   <r4/>
-                                   <r4>
-                                       <r5/>
-                                       <r5/>
-                                   </r4>
-                                   <r4/>
-                               </instance>
-                            </instance>
-                            <instance id="new-instance" model-id="main-model">
-                               <instance>
-                                   <r1/>
-                                   <r1>
-                                       <r2/><!-- Force repeat2 from 2 to 1 -->
-                                   </r1>
-                                   <r1/>
-                                   <!-- Force repeat3 from 1 to 0 -->
-                                   <r4>
-                                       <r5/><!-- Force repeat5 from 0 to 1 -->
-                                   </r4>
-                                   <r4>
-                                       <r5/>
-                                       <r5/>
-                                   </r4>
-                                   <r4/>
-                               </instance>
-                            </instance>
-                        </instances>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-            </p:config>
+                        <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="test-trigger"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat nodeset="r1" id="repeat1" startindex="2">
+                        <xforms:repeat nodeset="r2" id="repeat2" startindex="4">
+                        </xforms:repeat>
+                    </xforms:repeat>
+                    <xforms:repeat nodeset="r3" id="repeat3">
+                    </xforms:repeat>
+                    <xforms:repeat nodeset="r4" id="repeat4">
+                        <xforms:repeat nodeset="r5" id="repeat5"/>
+                    </xforms:repeat>
+                    <xforms:trigger id="test-trigger">
+                        <xforms:label>Test</xforms:label>
+                        <xforms:send id="my-submission" submission="test-submission" ev:event="DOMActivate"/>
+                    </xforms:trigger>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -167,15 +145,15 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:delete-repeat-elements id="repeat2" parent-indexes="2" count="1"/>
+                        <xxf:copy-repeat-template id="repeat1" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:delete-repeat-elements id="repeat2" parent-indexes="1" count="1"/>
+                        <xxf:delete-repeat-elements id="repeat2" parent-indexes="3" count="1"/>
                         <xxf:delete-repeat-elements id="repeat3" parent-indexes="" count="1"/>
-                        <xxf:copy-repeat-template id="repeat5" parent-indexes="1" start-suffix="1" end-suffix="1"/>
+                        <xxf:copy-repeat-template id="repeat4" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:copy-repeat-template id="repeat5" parent-indexes="2" start-suffix="2" end-suffix="2"/>
+                        <xxf:delete-repeat-elements id="repeat5" parent-indexes="3" count="1"/>
+                        <xxf:control id="test-trigger" label="Test"/>
                     </xxf:control-values>
-                    <xxf:repeat-indexes>
-                        <xxf:repeat-index id="repeat2" old-index="2" new-index="1"/>
-                        <xxf:repeat-index id="repeat3" old-index="1" new-index="0"/>
-                        <xxf:repeat-index id="repeat5" old-index="0" new-index="1"/>
-                    </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -278,11 +256,9 @@
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body>
-
-                                <xforms:input ref="value">
+                                <xforms:input ref="value" id="my-input">
                                     <xforms:label>Value:</xforms:label>
                                 </xforms:input>
-
                             </xhtml:body>
                         </xhtml:html>
                     </p:input>
@@ -306,7 +282,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xf-6" readonly="true" label="Value:">2</xxf:control>
+                        <xxf:control id="my-input" readonly="true" label="Value:">2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1180,13 +1156,7 @@
                                     <event type="xforms-delete" target="source-instance" deleted-nodes="book"/>
                                     <event type="xforms-submit-done" target="replace-instance"/>
                                     <event type="xforms-enabled" target="title1"/>
-                                    <event type="xforms-optional" target="title1"/>
-                                    <event type="xforms-readwrite" target="title1"/>
-                                    <event type="xforms-valid" target="title1"/>
                                     <event type="xforms-enabled" target="lang1"/>
-                                    <event type="xforms-optional" target="lang1"/>
-                                    <event type="xforms-readwrite" target="lang1"/>
-                                    <event type="xforms-valid" target="lang1"/>
                                 </events>
                             </instance>
                         </instances>

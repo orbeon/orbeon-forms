@@ -37,18 +37,24 @@
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
-                    <xforms:group xbl:attr="model context ref bind" class="{{
-                            if (exf:required()) then (if (. = '') then 'xforms-required-empty' else 'xforms-required-filled') else ''}}">
+                    <!-- Outer group -->
+                    <xforms:group xbl:attr="model context ref bind" class="{{if (. != '' and exf:required()) then 'xforms-required-filled' else ''}}" xxbl:scope="outer">
                         <xbl:content includes="xforms|label"/>
-                        <!-- Init event -->
-                        <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Currency.instance(this).init();</xxforms:script>
-                        <xforms:group appearance="xxforms:internal">
 
-                            <!-- Stop propagation of all local UI events -->
-                            <xforms:action ev:event="#all" ev:propagate="stop"/>
+                        <!-- Init event -->
+                        <!-- TODO: use ev:target so that xforms-enabled is called only once -->
+                        <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.Currency.instance(this).init();</xxforms:script>
+
+                        <!-- Inner group -->
+                        <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
+
+                            <!-- Variable pointing to external single-node binding -->
+                            <xxforms:variable name="result" as="node()?">
+                                <xxforms:sequence select="." xxbl:scope="outer"/>
+                            </xxforms:variable>
 
                             <!-- Access to XForms value, and xforms-value-changed event -->
-                            <xforms:input ref="." class="xbl-fr-currency-xforms-input">
+                            <xforms:input ref="$result" id="currency-input" class="xbl-fr-currency-xforms-input">
                                 <xxforms:script id="xf-ch" ev:event="xforms-value-changed">YAHOO.xbl.fr.Currency.instance(this).valueChanged();</xxforms:script>
                                 <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Currency.instance(this).readonly();</xxforms:script>
                                 <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Currency.instance(this).readwrite();</xxforms:script>
@@ -57,7 +63,10 @@
                             <xsl:copy-of select="xxbl:parameter(., 'prefix')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'digits-after-decimal')"/>
                             <!-- The visible input -->
-                            <xhtml:input class="xbl-fr-currency-visible-input"/>
+                            <xhtml:input class="xbl-fr-currency-visible-input" xbl:attr="tabindex tabindex=navindex"/>
+
+                            <!-- Stop propagation of all local UI events -->
+                            <xforms:action ev:event="#all" ev:propagate="stop"/>
                         </xforms:group>
                         <xbl:content includes="xforms|help,xforms|hint,xforms|alert"/>
                     </xforms:group>

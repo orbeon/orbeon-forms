@@ -37,7 +37,7 @@
                 <xsl:variable name="state-abbreviation" as="xs:string?" select="$parameters[name = 'state-abbreviation']/value"/>
                 <xsl:variable name="city" as="xs:string?" select="$parameters[name = 'city']/value"/>
                 <xsl:variable name="max" as="xs:integer?" select="$parameters[name = 'max']/value"/>
-                <xsl:variable name="zips" as="element(zip)+" select="/zips/zip[state-abbreviation = $state-abbreviation and city = $city]"/>
+                <xsl:variable name="zips" as="element(zip)*" select="/zips/zip[state-abbreviation = $state-abbreviation and city = $city]"/>
                 <xsl:for-each select="$zips[empty($max) or position() lt $max]">
                     <xsl:sort select="code"/>
                     <zip code="{code}" latitute="{latitute}" longitude="{longitude}"/>

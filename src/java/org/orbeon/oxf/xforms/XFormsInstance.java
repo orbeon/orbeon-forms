@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -44,8 +45,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -129,7 +128,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                     }
                 } else {
                     // Just use TinyTree as is
-                    documentInfo = TransformerUtils.readTinyTree(new StreamSource(new StringReader(xmlString)), false);
+                    documentInfo = TransformerUtils.stringToTinyTree(xmlString, false);
                 }
             } else {
                 // Instance document is not available, defer to later initialization
@@ -261,6 +260,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         return instanceStaticId;
     }
 
+    public String getPrefixedId() {
+        return XFormsUtils.getPrefixedId(getEffectiveId());
+    }
+
     public String getEffectiveId() {
         return XFormsUtils.getRelatedEffectiveId(modelEffectiveId, getId());
     }
@@ -327,14 +330,6 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.replaced = replaced;
     }
 
-    public void synchronizeInstanceDataEventState() {
-        XFormsUtils.iterateInstanceData(this, new XFormsUtils.InstanceWalker() {
-            public void walk(NodeInfo nodeInfo) {
-                InstanceData.clearInstanceDataEventState(nodeInfo);
-            }
-        }, true);
-    }
-
     /**
      * Set a value on the instance using a NodeInfo and a value.
      *
@@ -387,31 +382,23 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         }
 
         // Set value
-        final String previousValue;
         if (node instanceof Element) {
             // NOTE: Previously, there was a "first text node rule" which ended up causing problems and was removed.
-            final Element elementnode = (Element) node;
-            previousValue = elementnode.getStringValue();
-            elementnode.setText(newValue);
+            final Element elementNode = (Element) node;
+            elementNode.setText(newValue);
         } else if (node instanceof Attribute) {
             // "Attribute nodes: The string-value of the attribute is replaced with a string corresponding to the new
             // value."
-            final Attribute attributenode = (Attribute) node;
-            previousValue = attributenode.getStringValue();
-            attributenode.setValue(newValue);
+            final Attribute attributeNode = (Attribute) node;
+            attributeNode.setValue(newValue);
         } else if (node instanceof Text) {
             // "Text nodes: The text node is replaced with a new one corresponding to the new value."
             final Text textNode = (Text) node;
-            previousValue = textNode.getStringValue();
             textNode.setText(newValue);
         } else {
             // "Namespace, processing instruction, comment, and the XPath root node: behavior is undefined."
             throw new OXFException("Setting value on node other than element, attribute or text is not supported for node type: " + node.getNodeTypeName());
         }
-
-        // Remember that the value has changed for this node if it has actually changed
-        if (!newValue.equals(previousValue))
-            InstanceData.markValueChanged(node);
     }
 
     public static String getValueForNodeInfo(NodeInfo nodeInfo) {
@@ -502,7 +489,6 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                 final String type = InstanceData.getType(node);
                 parentInfoElement.addAttribute("type", (type == null) ? "" : type);
 //                parentInfoElement.addAttribute("schema-error-messages", instanceData.getSchemaErrorsMsgs());
-                parentInfoElement.addAttribute("value-changed", Boolean.toString(InstanceData.isValueChanged(node)));
             }
         });
 
@@ -581,6 +567,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     private void updateRepeatNodesets(PropertyContext propertyContext, XFormsControls controls, List<Item> insertedNodeInfos) {
         final Map<String, XFormsControl> repeatControlsMap = controls.getCurrentControlTree().getRepeatControls();
         if (repeatControlsMap != null) {
+
+            final XBLBindings bindings = controls.getContainingDocument().getStaticState().getXBLBindings();
+            final XBLBindings.Scope instanceScope = bindings.getResolutionScopeByPrefixedId(getPrefixedId());
+
             // NOTE: Read in a list as the list of repeat controls may change within updateNodeset()
             final List<XFormsControl> repeatControls = new ArrayList<XFormsControl>(repeatControlsMap.values());
             for (XFormsControl repeatControl: repeatControls) {
@@ -589,13 +579,9 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                 final XFormsRepeatControl newRepeatControl = (XFormsRepeatControl) controls.getObjectByEffectiveId(repeatControl.getEffectiveId());
                 // Update node-set
                 if (newRepeatControl != null) {
-
-                    final String instancePrefix = XFormsUtils.getEffectiveIdPrefix(getEffectiveId());
-                    final String repeatControlPrefix = XFormsUtils.getEffectiveIdPrefix(newRepeatControl.getEffectiveId());
-
-                    // Only update controls within the same container as the instance OR in descendant containers
-                    if (repeatControlPrefix.startsWith(instancePrefix)) {
-                        // TODO: in the future, XBL shadow tree should hold its own subtree of components so this test is no longer needed
+                    // Only update controls within same scope as modified instance
+                    // NOTE: This can clearly break with e.g. xxforms:instance()
+                    if (newRepeatControl.getResolutionScope() == instanceScope) {
                         newRepeatControl.updateNodeset(propertyContext, insertedNodeInfos);
                     }
                 }
@@ -637,7 +623,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     }
 
     public List getEventHandlers(XBLContainer container) {
-        return container.getContainingDocument().getStaticState().getEventHandlers(XFormsUtils.getEffectiveIdNoSuffix(getEffectiveId()));
+        return container.getContainingDocument().getStaticState().getEventHandlers(XFormsUtils.getPrefixedId(getEffectiveId()));
     }
 
     public void logInstance(IndentedLogger indentedLogger, String message) {
@@ -647,5 +633,13 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                     "effective instance id", getEffectiveId(),
                     "instance", TransformerUtils.tinyTreeToString(getInstanceRootElementInfo()));
         }
+    }
+
+    public XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+        final XFormsModel model = getModel(containingDocument);
+        final XFormsContextStack.BindingContext modelBindingContext = model.getBindingContext(propertyContext, containingDocument);
+        // TODO: should push root element of this instance, right? But is this used anywhere?
+        //final XFormsContextStack contextStack = model.getContextStack();
+        return modelBindingContext;
     }
 }

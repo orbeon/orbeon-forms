@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
@@ -59,7 +58,7 @@
 //
 //                    name: "Map",
 //
-//                    testInitialLogitudeNotSet: function() {
+//                    testInitialLongitudeNotSet: function() {
 //                        YAHOO.util.Assert.areEqual("", ORBEON.xforms.Document.getValue("map-longitude"));
 //                        YAHOO.util.Assert.areEqual("", ORBEON.xforms.Document.getValue("map-latitude"));
 //                    }
@@ -88,10 +87,12 @@
             <xforms:input ref="city">
                 <xforms:label>City: </xforms:label>
             </xforms:input>
-            <fr:data-bound-select1 ref="state"
-                    appearance="minimal" resource="'/xforms-sandbox/service/zip-states'"
-                    nodeset="/states/state" label="@name" value="@abbreviation">
+            <fr:data-bound-select1 ref="state" appearance="minimal" resource="/xforms-sandbox/service/zip-states">
                 <xforms:label>State: </xforms:label>
+                <xforms:itemset nodeset="/states/state">
+                    <xforms:label ref="@name"/>
+                    <xforms:value ref="@abbreviation"/>
+                </xforms:itemset>
             </fr:data-bound-select1>
             <xforms:input ref="zip">
                 <xforms:label>Zip: </xforms:label>

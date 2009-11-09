@@ -17,7 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
+import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -30,10 +30,8 @@ import java.util.Map;
  * Represents an xforms:switch container control.
  *
  * NOTE: This keep the "currently selected flag" for all children xforms:case.
- *
- * TODO: Use inheritance to make this a single-node control that doesn't hold a value.
  */
-public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
+public class XFormsSwitchControl extends XFormsValueContainerControl {
 
     private transient String restoredCaseId;    // used by deserializeLocal() and childrenAdded()
 
@@ -83,13 +81,11 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
         }
     }
 
-    @Override
-    public String getType() {
-        return null;
-    }
-
     /**
      * Set the currently selected case.
+     *
+     * @param propertyContext   current context
+     * @param caseControl       case control to select
      */
     public void setSelectedCase(PropertyContext propertyContext, XFormsCaseControl caseControl) {
 
@@ -109,7 +105,7 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
             // "1. Dispatching an xforms-deselect event to the currently selected case."
             previouslySelectedCaseControl.getXBLContainer().dispatchEvent(propertyContext, new XFormsDeselectEvent(containingDocument, previouslySelectedCaseControl));
 
-            // "2. Dispatching an xform-select event to the case to be selected."
+            // "2. Dispatching an xforms-select event to the case to be selected."
             caseControl.getXBLContainer().dispatchEvent(propertyContext, new XFormsSelectEvent(containingDocument, caseControl));
         }
     }

@@ -28,13 +28,13 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.ValueRepresentation;
@@ -55,11 +55,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             XFormsConstants.CLASS_QNAME
     };
 
-    private XBLContainer container;
-    protected XFormsContainingDocument containingDocument;
+    private final XBLContainer container;
+    protected final XFormsContainingDocument containingDocument;
 
     // Static information (never changes for the lifetime of the containing document)
-    private Element controlElement;
+    private final Element controlElement;
     private String id;
     private String name;
     private String appearance;// could become more dynamic in the future
@@ -75,6 +75,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     protected XFormsContextStack.BindingContext bindingContext;
 
     private boolean isEvaluated;
+
+    // Relevance
+    private boolean relevant;
+    private boolean wasRelevant;
 
     // Optional extension attributes supported by the control
     private Map<QName, String> extensionAttributesValues;
@@ -123,6 +127,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         }
     }
 
+    public String getId() {
+        return id;
+    }
+
     public XBLContainer getXBLContainer() {
         return container;
     }
@@ -143,8 +151,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         // NOP, can be overridden
     }
 
-    public String getId() {
-        return id;
+    public XBLBindings.Scope getResolutionScope() {
+        return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getPrefixedId());
+    }
+
+    public XBLBindings.Scope getChildElementScope(Element element) {
+        return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getXBLContainer().getFullPrefix() + element.attributeValue("id"));
     }
 
     /**
@@ -156,7 +168,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         if (!parentSuffix.equals("")) {
             // Update effective id
-            effectiveId = XFormsUtils.getEffectiveIdNoSuffix(effectiveId) + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + parentSuffix;
+            effectiveId = XFormsUtils.getPrefixedId(effectiveId) + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + parentSuffix;
         } else {
             // Nothing to do as we are not in repeated content
         }
@@ -168,7 +180,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public String getPrefixedId() {
         if (prefixedId == null) {
-            prefixedId = XFormsUtils.getEffectiveIdNoSuffix(effectiveId);
+            prefixedId = XFormsUtils.getPrefixedId(effectiveId);
         }
         return prefixedId;
     }
@@ -179,6 +191,33 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public LocationData getLocationData() {
         return (controlElement != null) ? (LocationData) controlElement.getData() : null;
+    }
+
+    public boolean isRelevant() {
+        return relevant;
+    }
+
+    protected final void setRelevant(boolean relevant) {
+        this.relevant = relevant;
+    }
+
+    protected boolean computeRelevant() {
+        // If there is a parent, as it, otherwise we are top-level so say relevant by default
+        final XFormsControl parent = getParent();
+        return (parent == null) || parent.isRelevant();
+    }
+
+    public boolean wasRelevant() {
+        return wasRelevant;
+    }
+
+    public boolean supportsRefreshEvents() {
+        // TODO: should probably return true because most controls could then dispatch relevance events
+        return false;
+    }
+
+    public static boolean supportsRefreshEvents(XFormsControl control) {
+        return control != null && control.supportsRefreshEvents();
     }
 
     public String getAlert(PropertyContext propertyContext) {
@@ -277,7 +316,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @param propertyContext       current context
      * @param lhhaElement           element associated to the control (either as child or using @for)
      * @param acceptHTML            whether the result may contain HTML
-     * @param containsHTML          whether the result actually contains HTML (null allowed)    @return                      string containing the result of the evaluation, null if evaluation failed
+     * @param containsHTML          whether the result actually contains HTML (null allowed)
+     * @return                      string containing the result of the evaluation, null if evaluation failed
      */
     private String getLabelHelpHintAlertValue(PropertyContext propertyContext, Element lhhaElement, boolean acceptHTML, boolean[] containsHTML) {
 
@@ -289,37 +329,43 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         } else if (lhhaElement.getParent() == getControlElement()) {
             // LHHA is direct child of control, evaluate within context
             contextStack.setBinding(this);
-            contextStack.pushBinding(propertyContext, lhhaElement);
-            value = XFormsUtils.getElementValue(propertyContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
+            contextStack.pushBinding(propertyContext, lhhaElement, getEffectiveId(), getChildElementScope(lhhaElement));
+            value = XFormsUtils.getElementValue(propertyContext, container, contextStack, getEffectiveId(), lhhaElement, acceptHTML, containsHTML);
             contextStack.popBinding();
         } else {
             // LHHA is somewhere else, assumed as a child of xforms:* or xxforms:*
 
             // Find context object for XPath evaluation
-            final Element parentElement = lhhaElement.getParent();
-
-            final String parentStaticId = parentElement.attributeValue("id");
-            if (parentStaticId == null) {
+            final Element contextElement = lhhaElement.getParent();
+            final String contextStaticId = contextElement.attributeValue("id");
+            final String contextEffectiveId;
+            if (contextStaticId == null) {
                 // Assume we are at the top-level
                 contextStack.resetBindingContext(propertyContext);
+                contextEffectiveId = container.getFirstControlEffectiveId();
             } else {
                 // Not at top-level, find containing object
-
-                // TODO: this resolution doesn't look right!
-                final Object contextObject = container.resolveObjectById(getEffectiveId(), parentStaticId);
+                final Object contextObject = container.resolveObjectById(getEffectiveId(), contextStaticId, null);
                 if (contextObject instanceof XFormsControl) {
                     // Found context, evaluate relative to that
-                    contextStack.setBinding((XFormsControl) contextObject);
+                    final XFormsControl contextControl = (XFormsControl) contextObject;
+                    contextStack.setBinding(contextControl);
+                    contextEffectiveId = contextControl.getEffectiveId();
                 } else {
-                    // No context, don't evaluate (not sure why this should happen!)
-                    contextStack.resetBindingContext(propertyContext);
+                    // No context, don't evaluate (probably a misplaced LHHA element?)
+                    contextEffectiveId = null;
                 }
             }
 
-            // Push binding relative to context established above and evaluate
-            contextStack.pushBinding(propertyContext, lhhaElement);
-            value = XFormsUtils.getElementValue(propertyContext, container, contextStack, lhhaElement, acceptHTML, containsHTML);
-            contextStack.popBinding();
+            if (contextEffectiveId != null) {
+                // Push binding relative to context established above and evaluate
+                contextStack.pushBinding(propertyContext, lhhaElement, contextEffectiveId, getChildElementScope(lhhaElement));
+                value = XFormsUtils.getElementValue(propertyContext, container, contextStack, getEffectiveId(), lhhaElement, acceptHTML, containsHTML);
+                contextStack.popBinding();
+            } else {
+                // Do as if there was no LHHA
+                value = null;
+            }
         }
         return value;
     }
@@ -451,6 +497,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             return true;
 
         // Compare only what matters
+
+        if (relevant != other.relevant)
+            return false;
+
         if (!XFormsUtils.compareStrings(getLabel(pipelineContext), other.getLabel(pipelineContext)))
             return false;
         if (!XFormsUtils.compareStrings(getHelp(pipelineContext), other.getHelp(pipelineContext)))
@@ -488,10 +538,14 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return bindingContext;
     }
 
-    public final void evaluateIfNeeded(PropertyContext propertyContext) {
+    public XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
+        return getBindingContext();
+    }
+
+    public final void evaluateIfNeeded(PropertyContext propertyContext, boolean isRefresh) {
         if (!isEvaluated) {
             isEvaluated = true;// be careful with this flag, you can get into a recursion if you don't set it before calling evaluate()
-            evaluate(propertyContext);
+            evaluate(propertyContext, isRefresh);
 
             // Evaluate standard extension attributes
             evaluateExtensionAttributes(propertyContext, STANDARD_EXTENSION_ATTRIBUTES);
@@ -521,6 +575,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public void markDirty() {
+
+        // Keep previous values
+        wasRelevant = relevant;
+
+        // Clear everything
         isEvaluated = false;
         isLabelEvaluated = false;
         isHelpEvaluated = false;
@@ -530,11 +589,39 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             extensionAttributesValues.clear();
     }
 
-    protected void evaluate(PropertyContext propertyContext) {
-        getLabel(propertyContext);
-        getHint(propertyContext);
-        getHelp(propertyContext);
-        getAlert(propertyContext);
+    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
+
+        setRelevant(computeRelevant());
+
+        if (isRelevant()) {
+            // Control is relevant
+            getLabel(propertyContext);
+            getHint(propertyContext);
+            getHelp(propertyContext);
+            getAlert(propertyContext);
+        } else {
+            // Control is not relevant
+            label = null;
+            isLabelEvaluated = true;
+            isHTMLLabel = false;
+
+            help = null;
+            isHelpEvaluated= true;
+            isHTMLHelp = false;
+
+            hint = null;
+            isHintEvaluated= true;
+            isHTMLHint = false;
+
+            alert = null;
+            isAlertEvaluated= true;
+            isHTMLAlert = false;
+        }
+
+        if (!isRefresh) {
+            // Sync values
+            wasRelevant = relevant;
+        }
     }
 
     /**
@@ -596,12 +683,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                         }
 
                         repeatControl.setIndex(newRepeatIndex);
-
-                        // NOTE: Affected controls might be in different XBL containers. All XBL containers touched must be flagged.
-                        repeatControl.getXBLContainer().setDeferredFlagsForSetindex();
                     }
-                    
-                    controls.markDirtySinceLastRequest(true);
                 }
 
                 // Store new focus information for client
@@ -630,12 +712,16 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @return                  rewritten value
      */
     public String getEscapedHTMLValue(final PipelineContext pipelineContext, String rawValue) {
+
+        if (rawValue == null)
+            return null;
+
         // Quick check for the most common attributes, src and href. Ideally we should check more.
         final boolean needsRewrite = rawValue.indexOf("src=") != -1 || rawValue.indexOf("href=") != -1;
         final String result;
         if (needsRewrite) {
             // Rewrite URLs
-            final FastStringBuffer sb = new FastStringBuffer(rawValue.length() * 2);// just an approx of the size it may take
+            final StringBuilder sb = new StringBuilder(rawValue.length() * 2);// just an approx of the size it may take
             // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
             XFormsUtils.streamHTMLFragment(new ForwardingContentHandler() {
 
@@ -656,7 +742,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                         final String currentValue = attributes.getValue(i);
 
                         // Rewrite URI attribute if needed
-                        // NOTE: Sould probably use xml:base but we don't have an Element available to gather xml:base information
+                        // NOTE: Should probably use xml:base but we don't have an Element available to gather xml:base information
                         final String rewrittenValue = XFormsUtils.getEscapedURLAttributeIfNeeded(pipelineContext, containingDocument, null, currentName, currentValue);
 
                         sb.append(' ');
@@ -790,7 +876,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             return attributeValue;
         } else {
             // Possible AVT
-    
+
             // NOTE: the control may or may not be bound, so don't use getBoundNode()
             final List<Item> contextNodeset = bindingContext.getNodeset();
             if (contextNodeset == null || contextNodeset.size() == 0) {
@@ -811,7 +897,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                         bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData());
 
                 // Restore function context to prevent leaks caused by context pointing to removed controls
-                restoreFunctionContext(functionContext);
+                returnFunctionContext();
 
                 return result;
             }
@@ -847,7 +933,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                                 getFunctionContext(), null, getLocationData());
 
             // Restore function context to prevent leaks caused by context pointing to removed controls
-            restoreFunctionContext(functionContext);
+            returnFunctionContext();
 
             return result;
         }
@@ -885,7 +971,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                                 getFunctionContext(), null, getLocationData());
 
             // Restore function context to prevent leaks caused by context pointing to removed controls
-            restoreFunctionContext(functionContext);
+            returnFunctionContext();
 
             return result;
         }
@@ -897,13 +983,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @return XPath function context
      */
     private XFormsFunction.Context getFunctionContext() {
-        final XFormsFunction.Context context = getContextStack().getFunctionContext();
-        context.setSourceEffectiveId(getEffectiveId());
-        return context;
+        return getContextStack().getFunctionContext(getEffectiveId());
     }
 
-    private void restoreFunctionContext(XFormsFunction.Context functionContext) {
-        functionContext.setSourceEffectiveId(null);
+    private void returnFunctionContext() {
+        getContextStack().returnFunctionContext();
     }
 
     /**
@@ -1042,7 +1126,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      *
      * @param nodeset1  first nodeset
      * @param nodeset2  second nodeset
-     * @return  true iif the nodesets point to the same nodes
+     * @return          true iif the nodesets point to the same nodes
      */
     protected boolean compareNodesets(List<Item> nodeset1, List<Item> nodeset2) {
 
@@ -1050,9 +1134,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (nodeset1.size() != nodeset2.size())
             return false;
 
-        final Iterator j = nodeset2.iterator();
-        for (Object aNodeset1: nodeset1) {
-            final NodeInfo currentNodeInfo1 = (NodeInfo) aNodeset1;
+        final Iterator<Item> j = nodeset2.iterator();
+        for (Item item1: nodeset1) {
+            final NodeInfo currentNodeInfo1 = (NodeInfo) item1;
             final NodeInfo currentNodeInfo2 = (NodeInfo) j.next();
 
             // Found a difference

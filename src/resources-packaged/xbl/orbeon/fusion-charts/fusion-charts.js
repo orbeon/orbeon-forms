@@ -42,7 +42,7 @@ YAHOO.xbl.fr.FusionCharts.prototype = {
     },
 
     updateChart: function() {
-        var newXML = ORBEON.util.Dom.getStringValue(this.xmlSpan);
+        var newXML = ORBEON.xforms.Document.getValue(this.xmlSpan.id);
         if (newXML != this.xml) {
             this.xml = newXML;
             this.fusionChart.setDataXML(this.xml);

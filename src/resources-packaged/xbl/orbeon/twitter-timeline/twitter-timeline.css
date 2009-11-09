@@ -1,0 +1,59 @@
+/*
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+*/
+.xbl-fr-twitter-timeline {
+    text-align: left;
+    width: 57.69em; *width: 56.25em;
+    min-width: 750px;
+}
+
+.xbl-fr-twitter-timeline .fr-container {
+    background-color: #f0f0f0;
+    padding: 0.5em;
+}
+
+.xbl-fr-twitter-timeline .fr-top-shadow {
+    height: 10px; _height: 5px; font-size: 0;
+    background-image: url(../../../apps/fr/style/top-750.png); _background-image: none
+}
+
+.xbl-fr-twitter-timeline .fr-bottom-shadow {
+    height: 10px; _height: 5px; font-size: 0;
+    background-image: url(../../../apps/fr/style/bottom-750.png); _background-image: none
+}
+
+.xbl-fr-twitter-timeline .xforms-repeat-selected-item-1 { background: transparent }
+
+.xbl-fr-twitter-timeline .status {
+    border-top: 2px solid #146EB4;;
+    padding:0.5em 0;
+}
+.xbl-fr-twitter-timeline .status img { border: none; vertical-align: middle; }
+.xbl-fr-twitter-timeline .status .user { display: block; float: left; clear: both; margin-right: .5em; text-align: center }
+.xbl-fr-twitter-timeline .status .user .xforms-output { display: block }
+.xbl-fr-twitter-timeline .status .entry { display: inline }
+.xbl-fr-twitter-timeline .status .message a {
+    background-color: white;
+    border-top: 1px solid gray; border-bottom: 1px solid gray;
+    padding-top: 1px; padding-bottom: 1px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.xbl-fr-twitter-timeline .status .entry .meta {
+    display: block;
+    font-style: italic;
+    font-size: smaller;
+}
+.xbl-fr-twitter-timeline .status .clear { clear: both }
+
+.xbl-fr-twitter-timeline .xbl-fr-button { padding: .5em .5em 1em .5em}

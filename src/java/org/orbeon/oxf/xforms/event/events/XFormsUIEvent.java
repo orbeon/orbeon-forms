@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -26,9 +25,7 @@ import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.value.StringValue;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Base class for UI events.
@@ -40,8 +37,6 @@ public abstract class XFormsUIEvent extends XFormsEvent {
     private static final String XXFORMS_LABEL_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "label");
     private static final String XXFORMS_HINT_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "hint");
     private static final String XXFORMS_HELP_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "help");
-    private static final String XXFORMS_REPEAT_INDEXES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
-    private static final String XXFORMS_TARGET_PREFIXES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "target-prefixes");
 
     private XFormsControl targetXFormsControl;
 
@@ -112,38 +107,6 @@ public abstract class XFormsUIEvent extends XFormsEvent {
                 return new ListIterator(Collections.singletonList(new StringValue(help)));
             else
                 return EmptyIterator.getInstance();
-        } else if ("repeat-indexes".equals(name) || XXFORMS_REPEAT_INDEXES_ATTRIBUTE.equals(name)) {
-
-            if ("repeat-indexes".equals(name)) {
-                getIndentedLogger().logWarning("", "event('repeat-indexes') is deprecated. Use event('xxforms:repeat-indexes') instead.");
-            }
-
-            final String effectiveTargetId = targetXFormsControl.getEffectiveId();
-            final Integer[] parts = XFormsUtils.getEffectiveIdSuffixParts(effectiveTargetId);
-
-            if (parts.length > 0) {
-                final List<StringValue> tokens = new ArrayList<StringValue>(parts.length);
-                for (final Integer currentIndex: parts) {
-                    tokens.add(new StringValue(currentIndex.toString()));
-                }
-                return new ListIterator(tokens);
-            } else {
-                return EmptyIterator.getInstance();
-            }
-        } else if (XXFORMS_TARGET_PREFIXES_ATTRIBUTE.equals(name)) {
-
-            final String effectiveTargetId = targetXFormsControl.getEffectiveId();
-            final String[] parts = XFormsUtils.getEffectiveIdPrefixParts(effectiveTargetId);
-
-            if (parts.length > 0) {
-                final List<StringValue> tokens = new ArrayList<StringValue>(parts.length);
-                for (final String currentPart: parts) {
-                    tokens.add(new StringValue(currentPart));
-                }
-                return new ListIterator(tokens);
-            } else {
-                return EmptyIterator.getInstance();
-            }
         } else {
             return super.getAttribute(name);
         }

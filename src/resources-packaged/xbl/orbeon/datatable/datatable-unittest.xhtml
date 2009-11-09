@@ -21,7 +21,7 @@
         <xhtml:title>Datatable</xhtml:title>
 
         <xi:include href="datatable-unittest-model.xml"/>
-
+        
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
@@ -102,6 +102,34 @@
                     </fr:datatable>
                 </xhtml:div>
             </fr:case>-->
+            <fr:case selected="true" id="_314459">
+                <fr:label>#314459:Paginated datatables: the page number is not properly set when the
+                    datatable is hidden (by an empty context) and show again.</fr:label>
+                <xhtml:div>
+                    <xhtml:p>Bug <xhtml:a
+                            href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314459&amp;group_id=168&amp;atid=350207"
+                            >314459</xhtml:a>.</xhtml:p>
+                    <xforms:group ref="instance('lorem')[instance('controls')/show = 'true']">
+                        <fr:datatable id="_314459-table" paginated="true" rowsPerPage="5">
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xhtml:th>Text</xhtml:th>
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat
+                                    nodeset="line[string-length() &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
+                                    <xhtml:tr>
+                                        <xhtml:td>
+                                            <xforms:output value="."/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
             <fr:case selected="true" id="_314415">
                 <fr:label>#314415:Datatable within an xforms:repeat are not properly initialized
                     when iterations are deleted and added again</fr:label>
@@ -111,7 +139,8 @@
                             >314415</xhtml:a>.</xhtml:p>
                     <xforms:group ref="instance('lorem')[instance('controls')/show = 'true']">
                         <xforms:repeat nodeset="line[position() = (1, 2)]">
-                            <fr:datatable id="_314415-table" scrollable="both" width="500px" height="200px">
+                            <fr:datatable id="_314415-table" scrollable="both" width="500px"
+                                height="200px">
                                 <xhtml:thead>
                                     <xhtml:tr>
                                         <xhtml:th>Text</xhtml:th>

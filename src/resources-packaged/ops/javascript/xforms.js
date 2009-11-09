@@ -6553,21 +6553,23 @@ ORBEON.xforms.Server = {
                                                         if (isInput) {
                                                             // Additional attributes for xforms:input
                                                             ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, inputSize, inputLength, inputAutocomplete);
-                                                        } else if (isTextarea && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
-                                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
-                                                            // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
-                                                            // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
-                                                            // if we need to send the value again to the server and (b) to figure out if the FCK editor has been edited
-                                                            // since the last time we sent the value to the serer. The bottom line is that we are going to compare
-                                                            // the server value to the content of the field. So storing the value as seen by the field vs. as seen by
-                                                            // server accounts for the slight difference there might be in those 2 representations.
-                                                            ORBEON.xforms.Globals.serverValue[documentElement.id] = ORBEON.xforms.Controls.getCurrentValue(documentElement);
-                                                        } else if (isTextarea) {
+                                                        } else if (isTextarea && ! ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                             // Additional attributes for xforms:textarea
                                                             ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, textareaMaxlength, textareaCols, textareaRows);
                                                         } else {
                                                             // Other control just have a new value
                                                             ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
+
+                                                            // Store the server value as the client sees it, not as the server sees it. There can be a different in the following cases:
+                                                            //
+                                                            // 1) For HTML editors, the HTML might change once we put it in the DOM.
+                                                            // 2) For select/select1, if the server sends an out-of-range value, the actual value of the field won't be the out
+                                                            //    of range value but the empty string.
+                                                            //
+                                                            // It is important to store in the serverValue the actual value of the field, otherwise if the server later sends a new
+                                                            // value for the field, since the current value is different from the server value, we will incorrectly think that the
+                                                            // user modified the field, and won't update the field with the value provided by the server.
+                                                            ORBEON.xforms.Globals.serverValue[documentElement.id] = ORBEON.xforms.Controls.getCurrentValue(documentElement);
                                                         }
                                                     }
                                                 }

@@ -155,7 +155,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "xforms:select and xforms:select1 appearance=full",
+    name: "xforms:select and xforms:select1",
 
     /**
      * Test if setting values of one list updates the other lists, after making the lists non-relevant and relevant
@@ -201,6 +201,21 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                         });
                     });
                 });
+            });
+        });
+    },
+
+    testOutOfRange: function() {
+        function valueOfRadio() { return ORBEON.xforms.Document.getValue("flavor-select1-full" + XFORMS_SEPARATOR_1 + "1") };
+
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+           YAHOO.util.UserAction.click("set-out-of-range" + XFORMS_SEPARATOR_1 + "1");
+        }, function() {
+            YAHOO.util.Assert.areEqual("", valueOfRadio(), "value is empty string after setting value to out of range");
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+               YAHOO.util.UserAction.click("set-to-apple" + XFORMS_SEPARATOR_1 + "1");
+            }, function() {
+                YAHOO.util.Assert.areEqual("a", valueOfRadio(), "apple radio is selected after putting an 'a' in the node");
             });
         });
     }

@@ -1,3 +1,16 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xforms:group model="g-325a-model" ref="instance('document-instance')"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xforms="http://www.w3.org/2002/xforms"
@@ -193,7 +206,7 @@
                         <xforms:group ref="marriages/current/spouse">
                             <xforms:trigger appearance="minimal">
                                 <xforms:label>
-                                    <img src="../../../apps/forms/images/remove.gif" alt="Remove"/>
+                                    <img src="/apps/forms/images/remove.gif" alt="Remove"/>
                                     <!-- TODO: i18n -->
                                     <xforms:label>Remove Spouse</xforms:label>
                                 </xforms:label>
@@ -258,7 +271,7 @@
                         <xforms:group ref=".[not(marriages/current/spouse)]">
                             <xforms:trigger appearance="minimal">
                                 <xforms:label>
-                                    <img src="../../../apps/forms/images/add.gif" alt="Add"/>
+                                    <img src="/apps/forms/images/add.gif" alt="Add"/>
                                     <!-- TODO: i18n -->
                                     <xforms:label>Add Spouse</xforms:label>
                                 </xforms:label>
@@ -284,7 +297,7 @@
                             <xforms:group ref="instance('triggers-instance')/remove-residence-trigger">
                                 <xforms:trigger appearance="minimal">
                                     <xforms:label>
-                                        <img src="../../../apps/forms/images/remove.gif" alt="Remove"/>
+                                        <img src="/apps/forms/images/remove.gif" alt="Remove"/>
                                         <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/remove-residence"/>
                                     </xforms:label>
                                     <xforms:delete ev:event="DOMActivate" context="instance('document-instance')/residence-information/last-five-years"
@@ -296,7 +309,7 @@
                             <xforms:group ref="instance('triggers-instance')/add-residence-trigger">
                                 <xforms:trigger appearance="minimal">
                                     <xforms:label>
-                                        <img src="../../../apps/forms/images/add.gif" alt="Add"/>
+                                        <img src="/apps/forms/images/add.gif" alt="Add"/>
                                         <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/add-residence"/>
                                     </xforms:label>
                                     <xforms:insert ev:event="DOMActivate" context="instance('document-instance')/residence-information/last-five-years"
@@ -423,7 +436,7 @@
                             <xforms:group ref="instance('triggers-instance')/remove-employment-trigger">
                                 <xforms:trigger appearance="minimal">
                                     <xforms:label>
-                                        <img src="../../../apps/forms/images/remove.gif" alt="Remove"/>
+                                        <img src="/apps/forms/images/remove.gif" alt="Remove"/>
                                         <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/remove-employment"/>
                                     </xforms:label>
                                     <xforms:delete ev:event="DOMActivate" context="instance('document-instance')/employment-information/last-five-years"
@@ -435,7 +448,7 @@
                             <xforms:group ref="instance('triggers-instance')/add-employment-trigger">
                                 <xforms:trigger appearance="minimal">
                                     <xforms:label>
-                                        <img src="../../../apps/forms/images/add.gif" alt="Add"/>
+                                        <img src="/apps/forms/images/add.gif" alt="Add"/>
                                         <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/add-employment"/>
                                     </xforms:label>
                                     <xforms:insert ev:event="DOMActivate" context="instance('document-instance')/employment-information/last-five-years"

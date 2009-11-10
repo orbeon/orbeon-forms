@@ -1,33 +1,33 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
-    subject to the following terms:
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    * Conversion to other formats is allowed, but the actual content may not be altered or edited
-      in any way.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    * You may create printed copies for your own personal use.
-
-    * For all other uses, such as selling printed copies or using (parts of) the manual in another
-      publication, prior written agreement from Orbeon, Inc. is required.
-
-    Please contact Orbeon at info@orbeon.com for more information.
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <book software="Orbeon Forms" title="Orbeon Forms User Guide" copyright="Orbeon, Inc">
     <menu label="Getting Started">
         <menu-item label="Welcome" href="index"/>
         <menu label="Changes">
-            <!--<menu-item label="Version 3.7.2" href="home-changes-372"/>-->
-            <menu-item label="Version 3.7.1" href="home-changes-371"/>
+            <menu-item label="Version 3.7.2" href="home-changes-372"/>
+            <menu-item label="Version 3.7.1" href="home-changes-371" printed-book="false"/>
             <menu-item label="Version 3.6" href="home-changes-36" printed-book="false"/>
+
             <menu-item label="Version 3.5" href="home-changes-35" printed-book="false"/>
             <menu-item label="Version 3.0" href="home-changes-30" printed-book="false"/>
+            <!--
             <menu-item label="Version 2.8" href="home-changes-28" printed-book="false"/>
             <menu-item label="Version 2.7" href="home-changes-27" printed-book="false"/>
             <menu-item label="Version 2.6" href="home-changes-26" printed-book="false"/>
             <menu-item label="Version 2.5" href="home-changes-25" printed-book="false"/>
             <menu-item label="Version 2.2 and Earlier" href="home-changes-older" printed-book="false"/>
+            -->
         </menu>
         <menu-item label="Installing" href="intro-install"/>
         <menu-item label="Orbeon Forms Tutorial" href="intro-tutorial"/>

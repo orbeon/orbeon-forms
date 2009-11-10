@@ -18,28 +18,27 @@
     <section label="Form Builder (Preview)">
         <application id="fr/orbeon/builder/summary" label="Form Builder (Preview)"/>
         <application id="fr/orbeon/bookshelf/summary" label="Bookshelf Form"/>
-        <!--<application id="fr/orbeon/provinces/summary" label="Provinces Form"/>-->
+    </section>
+    <section label="Essential XForms">
+        <application id="xforms-controls" label="XForms Controls"/>
+        <application id="forms" label="Government Forms"/>
+        <application id="xforms-sandbox" label="XForms Sandbox"/>
     </section>
     <section label="XForms Tutorial Apps">
         <application id="xforms-hello" label="XForms Hello"/>
         <application id="xforms-bookcast" label="XForms Bookcast"/>
     </section>
-    <section label="XForms">
-        <application id="forms" label="Government Forms"/>
-        <application id="xforms-controls" label="XForms Controls"/>
+    <section label="More XForms">
         <application id="xforms-todo" label="To-Do Lists"/>
         <application id="xforms-translate" label="Instant Translation"/>
-        <application id="xforms-sandbox" label="XForms Sandbox"/>
-    </section>
-    <section label="More XForms">
         <application id="xforms-calculator" label="Calculator"/>
         <application id="xforms-flickr-resize" label="Flickr Resize"/>
         <application id="xforms-google-suggests" label="Google Suggests"/>
-        <application id="xforms-upload" label="Upload Control"/>
+        <!--<application id="xforms-upload" label="Upload Control"/>-->
         <application id="xforms-wizard-switch" label="Wizard w/ Switch"/>
-        <application id="xforms-cart" label="Shopping Cart"/>
-        <application id="xforms-sql-address-book" label="SQL Address Book"/>
-        <application id="xforms-tidy" label="HTML to XHTML"/>
+        <!--<application id="xforms-cart" label="Shopping Cart"/>-->
+        <!--<application id="xforms-sql-address-book" label="SQL Address Book"/>-->
+        <!--<application id="xforms-tidy" label="HTML to XHTML"/>-->
     </section>
     <section label="Sandboxes">
         <application id="xforms-sandbox" label="XForms Sandbox"/>

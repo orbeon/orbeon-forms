@@ -165,7 +165,7 @@
                                 <xforms:group ref="instance('control-instance')/non-empty-triggers">
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:recalculate/>
-                                        <xforms:load resource="/exist/rest/db/orbeon/forms/{{instance('parameters-instance')/form-id}}/{{instance('documents-instance')/documents/document[index('documents-repeat')]/id}}" f:url-type="resource"/>
+                                        <xforms:load resource="/exist/rest/db/orbeon/forms/{{instance('parameters-instance')/form-id}}/{{instance('documents-instance')/documents/document[index('documents-repeat')]/id}}"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
@@ -179,7 +179,7 @@
                                 <xforms:group ref="instance('control-instance')/non-empty-triggers">
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:recalculate/>
-                                        <xforms:load resource="/forms/pdf-detail/{{instance('parameters-instance')/form-id}}/{{instance('documents-instance')/documents/document[index('documents-repeat')]/id}}" f:url-type="resource" xxforms:show-progress="false"/>
+                                        <xforms:load resource="/forms/pdf-detail/{{instance('parameters-instance')/form-id}}/{{instance('documents-instance')/documents/document[index('documents-repeat')]/id}}" xxforms:show-progress="false"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>

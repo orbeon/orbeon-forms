@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2006 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <html xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -99,7 +99,7 @@
                                     <xforms:load ev:event="DOMActivate" resource="/forms/detail/{{instance('parameters-instance')/form-id}}/"/>
                                     <xforms:trigger appearance="minimal">
                                         <xforms:label>
-                                            <xhtml:img src="../apps/forms/images/add.gif" alt="New Form"/>
+                                            <xhtml:img src="/apps/forms/images/add.gif" alt="New Form"/>
                                             <xforms:output model="resources-model" ref="instance('resources-instance')/summary/labels/new-form"/>
                                         </xforms:label>
                                     </xforms:trigger>
@@ -113,7 +113,7 @@
                                     </xforms:action>
                                     <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
-                                            <xhtml:img src="../apps/forms/images/add-all.gif" alt="Import Forms"/>
+                                            <xhtml:img src="/apps/forms/images/add-all.gif" alt="Import Forms"/>
                                             <xforms:output model="resources-model" ref="instance('resources-instance')/summary/labels/import-forms"/>
                                         </xforms:label>
                                     </xforms:trigger>
@@ -127,7 +127,7 @@
                                     </xforms:action>
                                     <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
-                                            <xhtml:img src="../apps/forms/images/edit.gif" alt="Edit Form"/>
+                                            <xhtml:img src="/apps/forms/images/edit.gif" alt="Edit Form"/>
                                             <xforms:output model="resources-model" ref="instance('resources-instance')/summary/labels/edit-form"/>
                                         </xforms:label>
                                     </xforms:trigger>
@@ -141,7 +141,7 @@
                                     </xforms:action>
                                     <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
-                                            <xhtml:img src="../apps/forms/images/remove.gif" alt="Delete Form"/>
+                                            <xhtml:img src="/apps/forms/images/remove.gif" alt="Delete Form"/>
                                             <xforms:output model="resources-model" ref="instance('resources-instance')/summary/labels/delete-form"/>
                                         </xforms:label>
                                     </xforms:trigger>
@@ -155,7 +155,7 @@
                                     </xforms:action>
                                     <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
-                                            <xhtml:img src="../apps/forms/images/lockedstate.gif" alt="View Read=Only"/>
+                                            <xhtml:img src="/apps/forms/images/lockedstate.gif" alt="View Read=Only"/>
                                             <xforms:output model="resources-model" ref="instance('resources-instance')/summary/labels/view-readonly"/>
                                         </xforms:label>
                                     </xforms:trigger>
@@ -169,7 +169,7 @@
                                     </xforms:action>
                                     <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
-                                            <xhtml:img src="../apps/forms/images/view-xml.gif" alt="View XML"/>
+                                            <xhtml:img src="/apps/forms/images/view-xml.gif" alt="View XML"/>
                                             <xforms:output model="resources-model" ref="instance('resources-instance')/summary/labels/view-xml"/>
                                         </xforms:label>
                                     </xforms:trigger>
@@ -183,7 +183,7 @@
                                     </xforms:action>
                                     <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
-                                            <xhtml:img src="../apps/forms/images/pdf.png" alt="View PDF"/>
+                                            <xhtml:img src="/apps/forms/images/pdf.png" alt="View PDF"/>
                                             <xforms:output model="resources-model" ref="instance('resources-instance')/summary/labels/view-pdf"/>
                                         </xforms:label>
                                     </xforms:trigger>

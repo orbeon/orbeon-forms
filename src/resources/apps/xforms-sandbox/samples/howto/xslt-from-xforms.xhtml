@@ -1,0 +1,88 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>XSLT Transformation in XForms</xhtml:title>
+        <xforms:model>
+            
+            <!-- Instance to be transformed through XSLT -->
+            <xforms:instance id="input" xxforms:exclude-result-prefixes="#all">
+                <sites>
+                    <site>
+                        <name>Yahoo!</name>
+                        <tag>search</tag>
+                        <tag>portal</tag>
+                        <tag>mail</tag>
+                    </site>
+                    <site>
+                        <name>Google</name>
+                        <tag>search</tag>
+                        <tag>mail</tag>
+                    </site>
+                </sites>
+            </xforms:instance>
+            
+            <!-- Instance containing the output of the transformation -->
+            <xforms:instance id="output"><dummy/></xforms:instance>
+
+            <!-- The stylesheet doing the transformation; here is inline, but it will typically be an external file -->
+            <xforms:instance id="stylesheet">
+                <xsl:stylesheet version="2.0" exclude-result-prefixes="#all">
+                    <xsl:template match="site">
+                        <xsl:copy>
+                            <xsl:apply-templates select="node() except tag"/>
+                            <tags>
+                                <xsl:value-of select="string-join(tag, ' ')"/>
+                            </tags>
+                        </xsl:copy>
+                    </xsl:template>
+                    <xsl:template match="@*|node()" priority="-100">
+                        <xsl:copy>
+                            <xsl:apply-templates select="@*|node()"/>
+                        </xsl:copy>
+                    </xsl:template>
+                </xsl:stylesheet>
+            </xforms:instance>
+            
+            <xforms:instance id="ui">
+                <ui>
+                    <xsl:output method="xml" omit-xml-declaration="yes" indent="no" saxon:indent-spaces="4"/>
+                </ui>
+            </xforms:instance>
+            <xforms:delete ev:event="xforms-model-construct-done" nodeset="instance('input')//text()[normalize-space() = '']"/>
+            
+        </xforms:model>
+        <xhtml:style type="text/css">
+            pre { background-color: #eee; font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New; 
+                  float: left; padding: .5em 2em; }
+            .transform-trigger { float: left; margin: 5em 2em;  }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xhtml:pre><xforms:output value="saxon:serialize(instance('input'), instance('ui')/xsl:output)"/></xhtml:pre>
+        
+        <xforms:trigger appearance="minimal" class="transform-trigger">
+            <xforms:label>Run XSLT</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:insert nodeset="instance('output')" origin="saxon:transform(
+                    saxon:compile-stylesheet(instance('stylesheet')/root()), 
+                    saxon:parse(saxon:serialize(instance('input'), 'xml')))"/>
+                <xforms:toggle case="show-result"/>
+            </xforms:action>
+        </xforms:trigger>
+        
+        <xforms:switch>
+            <xforms:case/>
+            <xforms:case id="show-result">
+                <xhtml:pre><xforms:output value="saxon:serialize(instance('output'), instance('ui')/xsl:output)"/></xhtml:pre>
+            </xforms:case>
+        </xforms:switch>
+    </xhtml:body>
+</xhtml:html>

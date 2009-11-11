@@ -1,0 +1,39 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xforms:model id="resources-model"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:xforms="http://www.w3.org/2002/xforms"
+              xmlns:ev="http://www.w3.org/2001/xml-events"
+              xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+              xmlns:xi="http://www.w3.org/2001/XInclude"
+              xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+              xmlns:f="http://orbeon.org/oxf/xml/formatting"
+              xmlns:exist="http://exist.sourceforge.net/NS/exist">
+
+    <!-- XForms instance containing the current language -->
+    <xforms:instance id="language-instance">
+        <language xmlns="">en</language>
+    </xforms:instance>
+
+    <!-- XForms instance containing text resources -->
+    <xforms:instance id="resources-instance" src="/xforms-government/service/resources/{doc('input:instance')/*/form-id}/en"
+                     xxforms:readonly="false"/>
+
+    <!-- Update language submission -->
+    <xforms:submission id="update-language-submission" serialization="none"
+                       action="/xforms-government/service/resources/{{xxforms:instance('parameters-instance')/form-id}}/{{instance('language-instance')}}" validate="false"
+                       method="get" replace="instance" instance="resources-instance"
+                       xxforms:readonly="false"/>
+
+</xforms:model>

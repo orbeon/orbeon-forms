@@ -1,0 +1,87 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xforms:model id="persistence-model"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:xforms="http://www.w3.org/2002/xforms"
+              xmlns:ev="http://www.w3.org/2001/xml-events"
+              xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+              xmlns:xi="http://www.w3.org/2001/XInclude"
+              xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
+              xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+              xmlns:f="http://orbeon.org/oxf/xml/formatting"
+              xmlns:exist="http://exist.sourceforge.net/NS/exist">
+
+    <xforms:setvalue ev:event="xforms-submit-error" ref="xxforms:instance('control-instance')/error" value="event('response-body')"/>
+
+    <xforms:submission id="import-documents-submission" serialization="none"
+                       method="get" action="/xforms-government/service/import-documents" replace="none"/>
+
+    <xforms:instance id="list-documents-query">
+        <exist:query/>
+    </xforms:instance>
+
+    <xforms:instance id="search-instance">
+        <search xmlns=""/>
+    </xforms:instance>
+
+    <xforms:submission id="list-documents-submission" ref="instance('list-documents-query')"
+                       method="post" action="/exist/rest/db/orbeon/forms/?search={{instance('search-instance')}}"
+                       replace="instance" xxforms:instance="documents-instance" xxforms:readonly="true">
+        <xforms:message ev:event="xforms-submit-error" value="event('document-body')"/>
+    </xforms:submission>
+
+    <xforms:submission id="delete-document-submission" serialization="none" method="delete" replace="none"
+                       action="/exist/rest/db/orbeon/forms/{{xxforms:instance('parameters-instance')/form-id}}/{{xxforms:instance('documents-instance')/documents/document[index('documents-repeat')]/id}}"/>
+
+    <!-- Load submission -->
+    <xforms:submission id="load-submission" serialization="none"
+            action="/exist/rest/db/orbeon/forms/{{xxforms:instance('parameters-instance')/form-id}}/{{xxforms:instance('parameters-instance')/document-id}}" validate="false"
+            method="get" replace="instance" xxforms:instance="document-instance"/>
+
+    <xforms:instance id="persistence-instance">
+        <save>
+            <message/>
+            <save-status/>
+        </save>
+    </xforms:instance>
+
+    <!-- Save submission -->
+    <xforms:submission id="save-submission" ref="xxforms:instance('document-instance')"
+            action="/exist/rest/db/orbeon/forms/{{xxforms:instance('parameters-instance')/form-id}}/{{xxforms:instance('parameters-instance')/document-id}}"
+            method="put" replace="none">
+
+        <xforms:setvalue ev:event="xforms-submit-serialize" ref="instance('persistence-instance')/save-status">validated</xforms:setvalue>
+        <xforms:action ev:event="xforms-submit-done">
+            <xforms:setvalue ref="instance('persistence-instance')/message" value="xxforms:instance('resources-instance')/detail/messages/save-success"/>
+            <xforms:setvalue ref="xxforms:instance('control-instance')/data-status"/>
+            <xforms:setvalue ref="instance('persistence-instance')/save-status"/>
+            <xforms:toggle case="ok-message"/>
+        </xforms:action>
+        <xforms:action ev:event="xforms-submit-error">
+            <xforms:action if="not(instance('persistence-instance')/save-status = 'validated')">
+                <xforms:setvalue ref="instance('persistence-instance')/message"
+                                 value="xxforms:instance('resources-instance')/detail/messages/save-error-form"/>
+                <xforms:toggle case="validation-error-message"/>
+            </xforms:action>
+            <xforms:action if="instance('persistence-instance')/save-status = 'validated'">
+                <xforms:setvalue ref="instance('persistence-instance')/message"
+                                value="xxforms:instance('resources-instance')/detail/messages/save-error-submission"/>
+                <xforms:toggle case="fatal-error-message"/>
+            </xforms:action>
+
+            <xforms:setvalue ref="instance('persistence-instance')/save-status"/>
+        </xforms:action>
+    </xforms:submission>
+
+</xforms:model>

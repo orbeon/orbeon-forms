@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xsl:stylesheet version="2.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -132,7 +132,8 @@
         <xforms:group model="fr-persistence-model" ref="instance('fr-triggers-instance')/save">
             <fr:button id="fr-save-button" xxforms:modal="true">
                 <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/database_save.png" alt=""/>
+                    <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/database_save.png" alt=""/>-->
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/save_16.png" alt=""/>
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
                 </xforms:label>
             </fr:button>
@@ -165,8 +166,8 @@
         <xforms:group ref="xxforms:instance('fr-triggers-instance')/workflow-review">
             <fr:button xxforms:modal="true" id="fr-workflow-review-button">
                 <xforms:label>
-                    <!--<xhtml:img width="16" height="16" src="/apps/fr/style/next.gif" alt=""/>-->
-                    <xhtml:span>→ </xhtml:span>
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt=""/>
+                    <!--<xhtml:span>→ </xhtml:span>-->
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-review"/></xhtml:span>
                 </xforms:label>
             </fr:button>
@@ -177,8 +178,8 @@
         <xforms:group ref="xxforms:instance('fr-triggers-instance')/workflow-edit">
             <fr:button xxforms:modal="true" id="fr-workflow-edit-button">
                 <xforms:label>
-                    <!--<xhtml:img width="16" height="16" src="/apps/fr/style/previous.gif" alt=""/>-->
-                    <xhtml:span>← </xhtml:span>
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/left_16.png" alt=""/>
+                    <!--<xhtml:span>← </xhtml:span>-->
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-edit"/></xhtml:span>
                 </xforms:label>
             </fr:button>
@@ -189,8 +190,8 @@
         <xforms:group ref="xxforms:instance('fr-triggers-instance')/workflow-send">
             <fr:button xxforms:modal="true" id="fr-workflow-send-button">
                 <xforms:label>
-                    <!--<xhtml:img width="16" height="16" src="/apps/fr/style/next.gif" alt=""/>-->
-                    <xhtml:span>→ </xhtml:span>
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt=""/>
+                    <!--<xhtml:span>→ </xhtml:span>-->
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-send"/></xhtml:span>
                 </xforms:label>
             </fr:button>
@@ -222,7 +223,8 @@
         <xforms:group ref="xxforms:instance('fr-triggers-instance')/strict-submit" >
             <fr:button xxforms:modal="true" id="fr-email-button">
                 <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/email.png" alt=""/>
+                    <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/email.png" alt=""/>-->
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/letter_16.png" alt=""/>
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/email"/></xhtml:span>
                 </xforms:label>
                 <xforms:action ev:event="DOMActivate">

@@ -13,8 +13,7 @@
   -->
 <config xmlns="http://www.orbeon.com/oxf/controller">
 
-    <page path-info="/xforms-controls/" model="view.xhtml" view="view.xsl"/>
-    <page path-info="/xforms-controls/old" view="view-old.xhtml"/>
+    <page path-info="/xforms-controls/" model="/forms/orbeon/controls/form/form.xhtml" view="view.xsl"/>
 
     <page path-info="/xforms-controls/services/update-countries" view="services/update-countries.xpl"/>
     <page path-info="/xforms-controls/services/countries" view="services/countries.xpl"/>

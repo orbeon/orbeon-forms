@@ -729,7 +729,9 @@ ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
         if (ORBEON.widgets.datatable.datatables[id] == undefined || container.fr_dt_initialized == undefined) {
             var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
             var region = YAHOO.util.Region.getRegion(table);
-            if (region.left >= 0 && region.top >= 0) {
+            if ((region.left >= 0 && region.top >= 0)
+                && (region.left < region.right) 
+                && (region.top < region.bottom) ) {
                 ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id, innerTableWidth);
                 container.fr_dt_initialized = true;
             } else {

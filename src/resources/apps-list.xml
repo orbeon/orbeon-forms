@@ -18,10 +18,11 @@
     <section label="Form Builder (Preview)">
         <application id="fr/orbeon/builder/summary" label="Form Builder (Preview)"/>
         <application id="fr/orbeon/bookshelf/summary" label="Bookshelf Form"/>
+        <application id="fr/orbeon/controls/new" label="Controls Form"/>
     </section>
     <section label="Essential XForms">
         <application id="xforms-controls" label="XForms Controls"/>
-        <application id="forms" label="Government Forms"/>
+        <application id="xforms-government" label="Government Forms"/>
         <application id="xforms-sandbox" label="XForms Sandbox"/>
     </section>
     <section label="XForms Tutorial Apps">

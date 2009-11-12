@@ -448,7 +448,8 @@
                                             <!-- Search button -->
                                             <fr:button>
                                                 <xforms:label>
-                                                    <xhtml:img width="10" height="14" src="/apps/fr/style/search.gif" alt=""/>
+                                                    <!--<xhtml:img width="10" height="14" src="/apps/fr/style/search.gif" alt=""/>-->
+                                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/search_16.png" alt=""/>
                                                     <xforms:output value="$fr-resources/summary/search/search-forms"/>
                                                 </xforms:label>
                                             </fr:button>
@@ -586,7 +587,8 @@
                                         <!-- Search button -->
                                         <fr:button>
                                             <xforms:label>
-                                                <xhtml:img width="10" height="14" src="/apps/fr/style/search.gif" alt=""/>
+                                                <!--<xhtml:img width="10" height="14" src="/apps/fr/style/search.gif" alt=""/>-->
+                                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/search_16.png" alt=""/>
                                                 <xforms:output value="$fr-resources/summary/search/search-forms"/>
                                             </xforms:label>
                                         </fr:button>
@@ -878,7 +880,8 @@
                             <xforms:group ref="if (name() = 'new') then instance('fr-summary-triggers-instance')/new else ()">
                                 <fr:button>
                                     <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/add.gif" alt=""/>
+                                        <!--<xhtml:img src="/apps/fr/style/add.gif" alt=""/>-->
+                                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16.png" alt=""/>
                                         <xhtml:span><xforms:output ref="$fr-resources/summary/labels/new-form"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-summary-create"/>
@@ -932,7 +935,8 @@
                             <xforms:group ref="if (name() = 'delete') then instance('fr-summary-triggers-instance')/delete else ()">
                                 <fr:button>
                                     <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/delete.gif" alt=""/>
+                                        <!--<xhtml:img src="/apps/fr/style/delete.gif" alt=""/>-->
+                                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16.png" alt=""/>
                                         <xhtml:span><xforms:output ref="$fr-resources/summary/labels/delete-form"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:action ev:event="DOMActivate">

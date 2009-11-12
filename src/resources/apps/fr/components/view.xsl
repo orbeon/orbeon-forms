@@ -485,15 +485,18 @@
             <xhtml:div class="fr-status-icons">
                 <xforms:group model="fr-error-summary-model" ref=".[instance('fr-form-valid-instance') = 'false']">
                     <!-- Form is invalid -->
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/exclamation.png" alt="{{$fr-resources/errors/some}}" title="{{$fr-resources/errors/some}}"/>
+                    <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/exclamation.png" alt="{{$fr-resources/errors/some}}" title="{{$fr-resources/errors/some}}"/>-->
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/warning_16.png" alt="{{$fr-resources/errors/some}}" title="{{$fr-resources/errors/some}}"/>
                 </xforms:group>
                 <xforms:group model="fr-error-summary-model" ref=".[instance('fr-form-valid-instance') = 'true']">
                     <!-- Form is valid -->
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/tick.png" alt="{{$fr-resources/errors/none}}" title="{{$fr-resources/errors/none}}"/>
+                    <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/tick.png" alt="{{$fr-resources/errors/none}}" title="{{$fr-resources/errors/none}}"/>-->
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/tick_16.png" alt="{{$fr-resources/errors/none}}" title="{{$fr-resources/errors/none}}"/>
                 </xforms:group>
                 <xforms:group model="fr-persistence-model" ref="instance('fr-persistence-instance')[data-status = 'dirty']">
                     <!-- Data is dirty -->
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt="{{$fr-resources/errors/unsaved}}" title="{{$fr-resources/errors/unsaved}}"/>
+                    <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt="{{$fr-resources/errors/unsaved}}" title="{{$fr-resources/errors/unsaved}}"/>-->
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/save_16.png" alt="{{$fr-resources/errors/unsaved}}" title="{{$fr-resources/errors/unsaved}}"/>
                 </xforms:group>
             </xhtml:div>
         </xsl:if>

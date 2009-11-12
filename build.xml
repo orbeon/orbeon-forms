@@ -333,6 +333,7 @@
                 <exclude name="ops/**/*.js"/>
                 <exclude name="ops/**/*.gif"/>
                 <exclude name="ops/**/*.png"/>
+                <exclude name="ops/**/*.ico"/>
                 <exclude name="ops/**/*.jpg"/>
                 <exclude name="ops/**/*.html"/>
                 <exclude name="ops/**/*.htc"/>
@@ -372,6 +373,7 @@
                 <include name="ops/**/*.js"/>
                 <include name="ops/**/*.gif"/>
                 <include name="ops/**/*.png"/>
+                <include name="ops/**/*.ico"/>
                 <include name="ops/**/*.jpg"/>
                 <include name="ops/**/*.html"/>
                 <include name="ops/**/*.htc"/>

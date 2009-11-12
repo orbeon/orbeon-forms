@@ -195,6 +195,8 @@ Software License. The schema is available at the following location:
 This software makes use of the Silk Icons, released under a Creative Commons
 Attribution 2.5 License: http://www.famfamfam.com/lab/icons/silk/
 
+This software makes use of the PixelMixer icons at http://pixel-mixer.com/
+
 Please consult the third-party-licenses directory for more information
 about individual licenses.
 

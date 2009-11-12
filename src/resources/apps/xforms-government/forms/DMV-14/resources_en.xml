@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<resources xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xsl:version="2.0">
+    <xsl:copy-of select="doc('../../common/resources_en.xml')/*/*"/>
+    <summary>
+        <titles>
+            <name>Name</name>
+            <birth-date>Birth Date</birth-date>
+            <id-number>ID No.</id-number>
+            <vehicle>Vehicle</vehicle>
+        </titles>
+    </summary>
+    <detail>
+        <titles>
+            <detail-title>DMV 14, Notice of Change of Address</detail-title>
+            <plate-number>California Plate / CF / Placard No.</plate-number>
+            <vin>Vehicle Id or Vessel Hull Id Number</vin>
+            <leased>Check If Leased</leased>
+            <personal-information>Personal&lt;br/>Information</personal-information>
+            <voter-address-change>Voter Change&lt;br/>of Address</voter-address-change>
+            <new-residence-address>New or Correct&lt;br/>Residence&lt;br/>Address</new-residence-address>
+            <new-mailing-address>New or Correct&lt;br/>Mailing&lt;br/>Address</new-mailing-address>
+            <vehicles-owned>Vehicles,&lt;br/>Vessels, or&lt;br/>Placards&lt;br/>Owned By You</vehicles-owned>
+            <leased-vehicles>Leased Vehicles</leased-vehicles>
+            <coach-vessel-location>Location of&lt;br/>Trailer Coach&lt;br/>or Vessel</coach-vessel-location>
+            <old-address>Old Address</old-address>
+        </titles>
+        <labels>
+            <!-- Triggers labels -->
+            <remove-mailing-address>Remove Mailing Address</remove-mailing-address>
+            <clear-address>Clear Address</clear-address>
+            <add-mailing-address>Add Mailing Address</add-mailing-address>
+            <add-vehicle>Add Vehicle</add-vehicle>
+            <remove-vehicle>Remove Vehicle</remove-vehicle>
+            <remove-vehicle-address>Remove Vehicle Address</remove-vehicle-address>
+            <add-vehicle-address>Add Vehicle Address</add-vehicle-address>
+
+            <!-- Other controls labels -->
+            <first-name>First Name</first-name>
+            <initial>Initial</initial>
+            <last-name>Last Name</last-name>
+            <birth-date>Birth Date</birth-date>
+            <driver-license-number>Driver License / Id Card No.</driver-license-number>
+            <change-voting-address>Mark this box if you do not want to change your voting address</change-voting-address>
+            <street-number>Street Number</street-number>
+            <street-name-1>Street Name 1</street-name-1>
+            <street-name-2>Street Name 2</street-name-2>
+            <apt>Apt. No</apt>
+            <city>City</city>
+            <state>State</state>
+            <zip>Zip Code</zip>
+            <plate-number>California Plate / CF / Placard No.</plate-number>
+            <vin>Vehicle Id or Vessel Hull Id Number</vin>
+            <leased>Leased</leased>
+            <company-name>Leasing Company's Name</company-name>
+            <county>County</county>
+        </labels>
+        <alerts>
+            <first-name>Must contain letters and '-' only, start with a capital letter, and be 10 characters long at most.</first-name>
+            <initial>Must contain one optional capital letter.</initial>
+            <last-name>Must contain letters and '-' only, start with a capital letter, and be 20 characters long at most.</last-name>
+            <birth-date></birth-date>
+            <driver-license-number>Must contain letters and numbers only and be 8 characters long at most.</driver-license-number>
+            <street-number>Must contain 0 to 5 digits.</street-number>
+            <street-name-1>Must contain letters, '-', '.', '/', or space only, and be 21 characters long at most.</street-name-1>
+            <street-name-2>Must contain letters, '-', '.', '/', or space only, and be 22 characters long at most.</street-name-2>
+            <apt>Must contain letters and digits only and be 4 characters long at most.</apt>
+            <city>Must contain letters, '-' or space only, start with a letter, and be 22 characters long at most.</city>
+            <state>Must contain two capital letters that match a valid US state.</state>
+            <zip>Must contain 5 digits.</zip>
+            <plate-number>Must contain letters and numbers only and be 7 characters long at most.</plate-number>
+            <vin>Must contain letters and numbers only and be 17 characters long at most.</vin>
+            <leased></leased>
+            <company-name>Must contain letters, '-', '.', '/', or space only, and be 22 characters long at most.</company-name>
+            <county>Must contain letters, '-' or space only, start with a letter, and be 14 characters long at most.</county>
+        </alerts>
+        <formats>
+            <birth-date>[MNn] [D], [Y]</birth-date>
+        </formats>
+    </detail>
+</resources>

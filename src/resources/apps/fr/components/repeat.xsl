@@ -49,7 +49,8 @@
                         <xforms:group ref=".[not(exforms:readonly(.))]">
                             <xforms:trigger appearance="minimal" ref=".[{if ($max-occurs = 'unbounded') then 'true()' else concat('count(', if (@nodeset) then @nodeset else concat('xxforms:bind(''', @bind, ''')'), ') lt ', $max-occurs)}]">
                                 <!-- TODO: i18n of title -->
-                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/add.png" alt="Add" title="Add"/></xforms:label>
+                                <!--<xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/add.png" alt="Add" title="Add"/></xforms:label>-->
+                                <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16.png" alt="Add" title="Add"/></xforms:label>
                             </xforms:trigger>
                             <xforms:insert ev:event="DOMActivate"
                                            origin="{if (@origin) then @origin else concat('instance(''templates'')/', $tokenized-path[last()])}"
@@ -92,7 +93,8 @@
                                                 {if ($remove-constraint) then concat($remove-constraint, ' and ') else ''}
                                                     count(xxforms:repeat-nodeset('{$fr-repeat/@id}')) gt {$min-occurs}) then . else ()">
                                             <!-- TODO: i18n of title -->
-                                            <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="Remove" title="Remove"/></xforms:label>
+                                            <!--<xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="Remove" title="Remove"/></xforms:label>-->
+                                            <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16.png" alt="Remove" title="Remove"/></xforms:label>
                                         </xforms:trigger>
                                         <xforms:delete ev:event="DOMActivate" nodeset="."/>
                                     </xforms:group>
@@ -142,7 +144,7 @@
         </xforms:input>
         <xforms:trigger ref=".[not({@ref})]" appearance="minimal">
             <xforms:label>
-                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/add.png" alt=""/>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16.png" alt=""/>
                 <!-- TODO: i18n -->
                 Add <xsl:value-of select="lower-case(xforms:label)"/>
             </xforms:label>

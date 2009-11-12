@@ -229,16 +229,15 @@ p, fieldset, table { margin-bottom: 1em }
 .fr-toc { color: #004B92; padding: 0 1em 0 1em }
 
 /* Error summary */
-.fr-error-title {
+.xbl-fr-error-summary .fr-error-title {
     font-size: smaller;
     font-weight: bold;
     background-color: #DF731B;
     color: white;
     border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
 }
-.fr-error-label, .fr-error-row { font-weight: bold }
-
-.fr-error-alert { color: #DF731B }
+.xbl-fr-error-summary .fr-error-label, .xbl-fr-error-summary .fr-error-row { font-weight: bold }
+.xbl-fr-error-summary .fr-error-alert { color: #DF731B }
 
 .fr-section-title, .fr-section-title .xforms-label { font-weight: normal }
 

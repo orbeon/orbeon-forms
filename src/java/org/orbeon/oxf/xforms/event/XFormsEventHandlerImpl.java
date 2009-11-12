@@ -17,6 +17,8 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -31,6 +33,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     // Special target id indicating that the target is the observer
     public static final String TARGET_IS_OBSERVER = "#observer";
 
+    private final String prefix;
     private final Element eventHandlerElement;
     private final String ancestorObserverStaticId;
 
@@ -48,12 +51,13 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     /**
      * Initialize an action handler based on an action element.
      *
+     * @param prefix                    prefix of container in which the handler is located
      * @param eventHandlerElement       action element e.g. xforms:action
      * @param parentStaticId            static id of the parent element, or null
      * @param ancestorObserverStaticId  static id of the closest ancestor observer, or null
      */
-    public XFormsEventHandlerImpl(Element eventHandlerElement, String parentStaticId, String ancestorObserverStaticId) {
-        this(eventHandlerElement, parentStaticId, ancestorObserverStaticId, false,
+    public XFormsEventHandlerImpl(String prefix, Element eventHandlerElement, String parentStaticId, String ancestorObserverStaticId) {
+        this(prefix, eventHandlerElement, parentStaticId, ancestorObserverStaticId, false,
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME),
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME),
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME),
@@ -65,6 +69,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     /**
      * Initialize an action handler based on a handler element and individual parameters.
      *
+     * @param prefix                    prefix of container in which the handler is located
      * @param eventHandlerElement       event handler element (e.g. xbl:handler or xforms:action)
      * @param parentStaticId            static id of the parent element, or null
      * @param ancestorObserverStaticId  static id of the closest ancestor observer, or null
@@ -76,10 +81,11 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * @param propagate                 whether event must propagate ("stop" | "continue")
      * @param defaultAction             whether default action must run ("cancel" | "perform")
      */
-    public XFormsEventHandlerImpl(Element eventHandlerElement, String parentStaticId, String ancestorObserverStaticId,
+    public XFormsEventHandlerImpl(String prefix, Element eventHandlerElement, String parentStaticId, String ancestorObserverStaticId,
                                   boolean isXBLHandler, String observersStaticIds, String eventNamesAttribute, String targets,
                                   String phase, String propagate, String defaultAction) {
 
+        this.prefix = prefix;
         this.eventHandlerElement = eventHandlerElement;
         this.ancestorObserverStaticId = ancestorObserverStaticId;
         this.isXBLHandler = isXBLHandler;
@@ -140,23 +146,40 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * Execute the given event on this event handler.
      *
      * @param propertyContext       current context
-     * @param container             XBL container where observer is located
+     * @param containerForObserver  XBL container where observer is located
      * @param eventObserver         concrete event observer
      * @param event                 event
      */
-    public void handleEvent(PropertyContext propertyContext, XBLContainer container,
+    public void handleEvent(PropertyContext propertyContext, XBLContainer containerForObserver,
                             XFormsEventObserver eventObserver, XFormsEvent event) {
-        // Create a new top-level action interpreter to handle this event
 
         final XBLContainer contextContainer;
         if (isXBLHandler) {
             // Run within context of nested container
             contextContainer = ((XFormsComponentControl) eventObserver).getNestedContainer();
+        } else if (ancestorObserverStaticId == null || prefix.equals(XFormsUtils.getEffectiveIdPrefix(eventObserver.getEffectiveId()))) {
+            // Run within provided container if:
+            // * we don't know how to resolve otherwise because there is no ancestor observer
+            // * or the handler's prefix is the same as the observer's prefix
+            contextContainer = containerForObserver;
         } else {
-            // Run normally
-            contextContainer = container;
+            // The observer is in a different container from the handler
+            // We need to find the corresponding XBL container to use as context for interpreting the action
+            // To do so, we use the handler's ancestor static id and resolve it in the scope of the observer
+            final XFormsContainingDocument containingDocument = containerForObserver.getContainingDocument();
+            final Object result = eventObserver.getXBLContainer(containingDocument)
+                    .findResolutionScope(XFormsUtils.getPrefixedId(eventObserver.getEffectiveId()))
+                    .resolveObjectById(eventObserver.getEffectiveId(), ancestorObserverStaticId, null);
+            if (result != null) {
+                // Found the object corresponding to the ancestor object, just get its container
+                contextContainer = ((XFormsEventTarget) result).getXBLContainer(containingDocument);
+            } else {
+                // Not found (should this happen?)
+                contextContainer = containerForObserver;
+            }
         }
 
+        // Create a new top-level action interpreter to handle this event
         new XFormsActionInterpreter(propertyContext, contextContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId, isXBLHandler)
                     .runAction(propertyContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
     }

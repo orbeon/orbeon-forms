@@ -209,25 +209,14 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 .fr-toc { }
 
 /* Error summary */
-.fr-error-summary {
-    clear: both;
-    width: 100%;
-    padding: 0;
-    display: block;
-}
-
-.fr-error-summary-body { display: block; padding: 10px }
-
-.fr-explanation { padding: 10px }
-
-.fr-error-title {
+.xbl-fr-error-summary .fr-error-title {
     display: block;
     margin-left: 0;/* used to have margin here but with new colors no margin seems better */
     padding: .3em;
 }
-.fr-error-list li { margin-bottom: .5em }
-.fr-error-label, .fr-error-row, .fr-error-alert { }
-.fr-error-alert { color: red }
+
+/* Explanation message if present */
+.fr-explanation { padding: 10px }
 
 /* Buttons */
 

@@ -104,7 +104,7 @@
                                     <xsl:call-template name="fr-toc"/>
 
                                     <!-- Error summary (if at top) -->
-                                    <xsl:if test="normalize-space($error-summary) = ('top', 'both')">
+                                    <xsl:if test="$error-summary-top">
                                         <xsl:call-template name="fr-error-summary">
                                             <xsl:with-param name="position" select="'top'"/>
                                         </xsl:call-template>
@@ -122,7 +122,7 @@
                                     </xforms:group>
 
                                     <!-- Error summary (if at bottom) -->
-                                    <xsl:if test="normalize-space($error-summary) = ('', 'bottom', 'both')">
+                                    <xsl:if test="$error-summary-bottom">
                                         <xsl:call-template name="fr-error-summary">
                                             <xsl:with-param name="position" select="'bottom'"/>
                                         </xsl:call-template>
@@ -299,7 +299,7 @@
                 <!-- Group to scope variables -->
                 <xforms:group appearance="xxforms:internal" model="fr-error-summary-model">
                     <!-- Link to form content or to errors if any -->
-                    <xhtml:a href="#{{if (count($visible-errors) > 0) then 'fr-errors' else 'fr-form'}}">
+                    <xhtml:a href="#{{if (errors-count castable as xs:integer and xs:integer(errors-count) > 0) then 'fr-errors' else 'fr-form'}}">
                         <xforms:output value="$fr-resources/summary/labels/goto-content"/>
                     </xhtml:a>
                 </xforms:group>
@@ -415,60 +415,21 @@
     <xsl:template name="fr-error-summary">
         <xsl:param name="position" as="xs:string"/>
 
-        <!-- Errors to show: errors for visited controls -->
-
-        <!-- Only show this section if there are any visible errors -->
-        <xforms:group class="fr-error-summary fr-error-summary-{$position}" model="fr-error-summary-model"  ref=".[$visible-errors]">
+        <!-- Handle "control visited" events on #fr-form-group and #fb-metadata-group -->
+        <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this
+             doesn't work with "section templates" -->
+        <fr:error-summary id="error-summary-control-{$position}"
+                          observer="fr-form-group fb-metadata-group" model="fr-error-summary-model"
+                          errors-count-ref="errors-count" visible-errors-count-ref="visible-errors-count" valid-ref="valid">
+            <fr:title><xforms:output class="fr-error-title" value="$fr-resources/errors/summary-title"/></fr:title>
             <xsl:if test="$position = 'bottom'">
-                <xhtml:div class="fr-separator">&#160;</xhtml:div>
+                <fr:header><xhtml:div class="fr-separator">&#160;</xhtml:div></fr:header>
             </xsl:if>
-
-            <xforms:group class="fr-error-summary-body">
-                <xforms:output class="fr-error-title" value="$fr-resources/errors/summary-title"/>
-                <!-- Anchor for navigation -->
-                <xhtml:a name="fr-errors"/>
-                <xhtml:ol class="fr-error-list">
-                    <xforms:repeat nodeset="$visible-errors">
-                        <xhtml:li>
-                            <xxforms:variable name="has-label" select="normalize-space(@label)" as="xs:boolean"/>
-                            <xforms:group ref=".[$has-label]">
-                                <xsl:choose>
-                                    <xsl:when test="$is-noscript">
-                                        <!-- In noscript mode, use a plain link -->
-                                        <xhtml:a href="#{{@id}}">
-                                            <xforms:output value="@label" class="fr-error-label"/>
-                                        </xhtml:a>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <!-- Otherwise use trigger -->
-                                        <xforms:trigger appearance="minimal">
-                                            <xforms:label>
-                                                <xforms:output value="normalize-space(@label)" class="fr-error-label"/>
-                                            </xforms:label>
-                                            <xforms:setfocus ev:event="DOMActivate" control="{{@id}}"/>
-                                        </xforms:trigger>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xforms:group>
-
-                            <!--<xhtml:a href="#{{@id}}">-->
-                                <!--<xforms:output value="@label" class="fr-error-label"/>-->
-                            <!--</xhtml:a>-->
-                            <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row">
-                                <xforms:output value="concat(' (', @indexes, ')')"/>
-                            </xforms:group>
-                            <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert">
-                                <xforms:output value="string-join((' -'[$has-label], @alert), ' ')"/>
-                            </xforms:group>
-                        </xhtml:li>
-                    </xforms:repeat>
-                </xhtml:ol>
-            </xforms:group>
-
             <xsl:if test="$position = 'top'">
-                <xhtml:div class="fr-separator">&#160;</xhtml:div>
+                <fr:footer><xhtml:div class="fr-separator">&#160;</xhtml:div></fr:footer>
             </xsl:if>
-        </xforms:group>
+        </fr:error-summary>
+
     </xsl:template>
 
     <!-- Explanation message -->
@@ -483,12 +444,21 @@
         <!-- Status icons for detail page -->
         <xsl:if test="$is-detail">
             <xhtml:div class="fr-status-icons">
-                <xforms:group model="fr-error-summary-model" ref=".[instance('fr-form-valid-instance') = 'false']">
+                <xforms:group model="fr-error-summary-model" ref=".[valid = 'false']">
                     <!-- Form is invalid -->
+
+                    <!-- Display localized errors count -->
+                    <xxforms:variable name="message" as="xs:string"
+                            model="fr-error-summary-model"
+                            select="for $c in errors-count return
+                                      if ($c castable as xs:integer and xs:integer($c) > 0)
+                                      then concat($c, ' ', $fr-resources/summary/titles/(if (xs:integer($c) = 1) then error-count else errors-count))
+                                      else ''"/>
+
                     <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/exclamation.png" alt="{{$fr-resources/errors/some}}" title="{{$fr-resources/errors/some}}"/>-->
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/warning_16.png" alt="{{$fr-resources/errors/some}}" title="{{$fr-resources/errors/some}}"/>
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/warning_16.png" alt="{{$message}}" title="{{$message}}"/>
                 </xforms:group>
-                <xforms:group model="fr-error-summary-model" ref=".[instance('fr-form-valid-instance') = 'true']">
+                <xforms:group model="fr-error-summary-model" ref=".[valid = 'true']">
                     <!-- Form is valid -->
                     <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/tick.png" alt="{{$fr-resources/errors/none}}" title="{{$fr-resources/errors/none}}"/>-->
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/tick_16.png" alt="{{$fr-resources/errors/none}}" title="{{$fr-resources/errors/none}}"/>

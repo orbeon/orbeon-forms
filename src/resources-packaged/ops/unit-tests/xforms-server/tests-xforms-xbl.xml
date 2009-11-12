@@ -2814,4 +2814,124 @@
         </output>
     </test>
 
+    <test description="Event handler in component observes object in outer scope" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                        <xforms:instance id="instance1">
+                            <instance>
+                                <foo>42</foo>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:dispatch ev:event="xforms-ready" name="foobar" targetid="my-input"/>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <!-- NOTE: Put the entire group in outer scope, as we can't yet deal with different
+                                     scopes for control and nested action -->
+                                <xforms:group id="my-group" xxbl:scope="outer">
+                                    <!-- Observe object in outer scope -->
+                                    <xforms:setvalue ev:event="foobar" ev:observer="my-input" ref="foo">43</xforms:setvalue>
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+
+                    <!-- Just a control to dispatch events to -->
+                    <xforms:input id="my-input" ref="foo"/>
+                    <!-- Instantiate component -->
+                    <fr:foo/>
+
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance1" model-id="model1">
+                                <instance>
+                                    <foo>43</foo>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input">43</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <!-- THIS TEST DOESN'T WORK, BUT IT SHOULD! -->
+    <test description="Event handler outside component observes object within component" name="oxf:pipeline" exclude="true">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                        <xforms:instance id="instance1">
+                            <instance>
+                                <foo>42</foo>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:dispatch ev:event="xforms-ready" name="foobar" targetid="my-input"/>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xforms:group id="my-group">
+                                    <!-- Insert content in outer scope -->
+                                    <xbl:content/>
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="my-group">
+                        <!-- Observe object within component -->
+                        <xforms:setvalue ev:event="foobar" ev:observer="my-input" ref="foo">43</xforms:setvalue>
+
+                        <!-- Instantiate component -->
+                        <fr:foo id="my-foo">
+                            <xforms:input id="my-input" ref="foo"/>
+                        </fr:foo>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance1" model-id="model1">
+                                <instance>
+                                    <foo>43</foo>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-foo$my-input">43</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

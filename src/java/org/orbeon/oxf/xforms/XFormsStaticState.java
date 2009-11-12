@@ -851,12 +851,12 @@ public class XFormsStaticState {
 
                     // Determine if the action is a child of a bound element. If so, we must annotate it here.
                     final Element newActionElement;
-                    final String observerStaticId = actionElement.attributeValue(XFormsConstants.XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME);
+                    final String observersStaticIds = actionElement.attributeValue(XFormsConstants.XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME);
 
                     final String parentStaticId = actionElement.getParent().attributeValue("id");
                     if (isControls) {
                         // Analyzing controls
-                        if (observerStaticId == null) {
+                        if (observersStaticIds == null) {
                             // Observer is containing element
                             if (parentStaticId != null) {
                                 final String parentPrefixedId = prefix + parentStaticId;
@@ -902,8 +902,20 @@ public class XFormsStaticState {
                         final Element ancestorObserver = findAncestorObserver(actionElement);
                         final String ancestorObserverStaticId = (ancestorObserver != null) ? ancestorObserver.attributeValue("id") : null;
 
-                        final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(newActionElement, parentStaticId, ancestorObserverStaticId);
-                        registerActionHandler(eventHandler, prefix);
+                        // The observers to which this handler is attached might not be in the same scope. Try to find
+                        // that scope.
+                        final String observersPrefix;
+                        if (observersStaticIds != null) {
+                            // Explicit ev:observer, prefix might be different
+                            final XBLBindings.Scope actionScope = xblBindings.getResolutionScopeByPrefixedId(prefix + newActionElement.attributeValue("id"));
+                            observersPrefix = (actionScope != null) ? actionScope.getFullPrefix() : prefix;
+                        } else {
+                            // Parent is observer and has the same prefix
+                            observersPrefix = prefix;
+                        }
+
+                        final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(prefix, newActionElement, parentStaticId, ancestorObserverStaticId);
+                        registerActionHandler(eventHandler, observersPrefix);
                     }
                 }
             }
@@ -1297,9 +1309,9 @@ public class XFormsStaticState {
      * Statically create and register an event handler.
      *
      * @param newEventHandlerImpl           event handler implementation
-     * @param prefix                        depending on XBL context, e.g. "" or "foo$bar$"
+     * @param observersPrefix               prefix of observers, e.g. "" or "foo$bar$"
      */
-    public void registerActionHandler(XFormsEventHandlerImpl newEventHandlerImpl, String prefix) {
+    public void registerActionHandler(XFormsEventHandlerImpl newEventHandlerImpl, String observersPrefix) {
 
         // Register event handler
         final String[] observersStaticIds = newEventHandlerImpl.getObserversStaticIds();
@@ -1309,7 +1321,7 @@ public class XFormsStaticState {
                 // NOTE: Handle special case of global id on containing document
                 final String currentObserverPrefixedId
                         = XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID.equals(currentObserverStaticId)
-                        ? currentObserverStaticId : prefix + currentObserverStaticId;
+                        ? currentObserverStaticId : observersPrefix + currentObserverStaticId;
 
                 // Get handlers for observer
                 final List<XFormsEventHandler> eventHandlersForObserver;

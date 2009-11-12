@@ -97,7 +97,7 @@ public class XBLBindings {
         }
 
         public String getFullPrefix() {
-            return scopeId.length() == 0 ? scopeId : scopeId + '$';
+            return scopeId.length() == 0 ? "" : scopeId + '$';
         }
 
         /**
@@ -405,8 +405,8 @@ public class XBLBindings {
 
                                 // NOTE: <xbl:handler> has similar attributes as XForms actions, in particular @event, @phase, etc.
                                 final String controlStaticId = XFormsUtils.getStaticIdFromId(controlPrefixedId);
-                                final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(currentHandlerAnnotatedElement, null, controlStaticId, true,
-                                        controlStaticId,
+                                final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(prefix, currentHandlerAnnotatedElement,
+                                        null, controlStaticId, true, controlStaticId,
                                         currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME),
                                         null, // no target attribute allowed in XBL
                                         currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XML_EVENTS_PHASE_ATTRIBUTE_QNAME),

@@ -722,7 +722,8 @@ public class ControlTree implements Cloneable {
             }
 
             // Index this control
-            // NOTE: Must do after setting the context, so that relevance can be properly determined
+            // NOTE: Could do this even before context is set if needed. We used to have to put it here back when
+            // relevance was used in indexControl()
             controlIndex.indexControl(control);
 
             // Add to current container control
@@ -772,7 +773,8 @@ public class ControlTree implements Cloneable {
             repeatIterationControl.setBindingContext(propertyContext, currentBindingContext);
 
             // Index this control
-            // NOTE: Must do after setting the context, so that relevance can be properly determined
+            // NOTE: Could do this even before context is set if needed. We used to have to put it here back when
+            // relevance was used in indexControl()
             // NOTE: We don't dispatch events to repeat iterations
             controlIndex.indexControl(repeatIterationControl);
 

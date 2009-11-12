@@ -218,9 +218,7 @@
                                              scopes for control and nested action -->
                                         <xforms:group ref=".[property('xxforms:noscript')]" xxbl:scope="outer">
                                              <!--In noscript mode, use a plain link -->
-                                              <xhtml:a href="#{$error/@id}">
-                                                  <xforms:output value="$error/@label" class="fr-error-label"/>
-                                              </xhtml:a>
+                                              <xhtml:a href="#{$error/@id}"><xforms:output value="$error/@label" class="fr-error-label"/></xhtml:a>
                                         </xforms:group>
                                         <xforms:group ref=".[not(property('xxforms:noscript'))]" xxbl:scope="outer">
                                             <!-- Otherwise use trigger -->

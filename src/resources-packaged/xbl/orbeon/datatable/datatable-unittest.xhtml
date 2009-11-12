@@ -21,7 +21,7 @@
         <xhtml:title>Datatable</xhtml:title>
 
         <xi:include href="datatable-unittest-model.xml"/>
-        
+
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
@@ -112,9 +112,16 @@
                     <xhtml:p>The fact that the test suite starts is already an indication that the
                         bug has been fixed (otherwise, a JavaScript error is generated before the
                         suite even starts).</xhtml:p>
-                    <xxforms:dialog id="modeler-workload-dialog" level="modeless" close="false">
+                    <xforms:trigger id="show-314466">
+                        <xforms:label>show 314466</xforms:label>
+                        <xxforms:show ev:event="DOMActivate" dialog="_314466-dialog"/>
+                    </xforms:trigger>
+                    <xforms:trigger id="hide-314466">
+                        <xforms:label>hide 314466</xforms:label>
+                        <xxforms:hide ev:event="DOMActivate" dialog="_314466-dialog"/>
+                    </xforms:trigger>
+                    <xxforms:dialog id="_314466-dialog" level="modeless" close="false">
                         <xforms:label>Test #314466</xforms:label>
-
                         <fr:datatable id="_314466-table">
                             <xhtml:thead>
                                 <xhtml:tr>

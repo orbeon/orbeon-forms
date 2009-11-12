@@ -421,7 +421,7 @@
         <fr:error-summary id="error-summary-control-{$position}"
                           observer="fr-form-group fb-metadata-group" model="fr-error-summary-model"
                           errors-count-ref="errors-count" visible-errors-count-ref="visible-errors-count" valid-ref="valid">
-            <fr:title><xforms:output class="fr-error-title" value="$fr-resources/errors/summary-title"/></fr:title>
+            <fr:label><xforms:output value="$fr-resources/errors/summary-title"/></fr:label>
             <xsl:if test="$position = 'bottom'">
                 <fr:header><xhtml:div class="fr-separator">&#160;</xhtml:div></fr:header>
             </xsl:if>

@@ -31,9 +31,10 @@
         <xbl:resources>
             <xbl:style>
                 .xbl-fr-error-summary { clear: both; width: 100%; padding: 0 }
-                .xbl-fr-error-summary .fr-error-summary-body { display: block; padding: 10px }
+                .xbl-fr-error-summary .fr-error-summary-body { display: block; padding: 0 10px 10px }
                 .xbl-fr-error-summary .fr-error-list li { margin-bottom: .5em }
                 .xbl-fr-error-summary .fr-error-alert { color: red }
+                .xbl-fr-error-summary .fr-error-title { display: block; padding: .3em; margin: 10px 10px 0 }
             </xbl:style>
         </xbl:resources>
         <xbl:handlers>
@@ -202,13 +203,14 @@
                     <xbl:content includes="fr|error-summary > fr|header > *"/>
 
                     <xforms:group class="fr-error-summary-body">
-                        <!-- Include title -->
-                        <xbl:content includes="fr|error-summary > fr|title > *"/>
+                        <!-- Include optional title -->
+                        <xforms:label xxbl:scope="outer" class="fr-error-title"><xbl:content includes="fr|error-summary > fr|label > *"/></xforms:label>
                         <!-- Anchor for navigation -->
                         <xhtml:a name="fr-errors"/>
                         <xhtml:ol class="fr-error-list">
                             <xforms:repeat nodeset="$visible-errors">
                                 <xhtml:li>
+                                    <!-- Clickable / linkable label -->
                                     <xxforms:variable name="has-label" select="normalize-space(@label)" as="xs:boolean"/>
                                     <xforms:group ref=".[$has-label]">
                                         <xxforms:variable name="error" xxbl:scope="outer">
@@ -218,9 +220,7 @@
                                              scopes for control and nested action -->
                                         <xforms:group ref=".[property('xxforms:noscript')]" xxbl:scope="outer">
                                              <!--In noscript mode, use a plain link -->
-                                              <xhtml:a href="#{$error/@id}">
-                                                  <xforms:output value="$error/@label" class="fr-error-label"/>
-                                              </xhtml:a>
+                                              <xhtml:a href="#{$error/@id}"><xforms:output value="$error/@label" class="fr-error-label"/></xhtml:a>
                                         </xforms:group>
                                         <xforms:group ref=".[not(property('xxforms:noscript'))]" xxbl:scope="outer">
                                             <!-- Otherwise use trigger -->
@@ -230,10 +230,11 @@
                                             </xforms:trigger>
                                         </xforms:group>
                                     </xforms:group>
-
+                                    <!-- Repeat indexes -->
                                     <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row">
                                         <xforms:output value="concat(' (', @indexes, ')')"/>
                                     </xforms:group>
+                                    <!-- Alert message -->
                                     <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert">
                                         <xforms:output value="string-join((' -'[$has-label], @alert), ' ')"/>
                                     </xforms:group>

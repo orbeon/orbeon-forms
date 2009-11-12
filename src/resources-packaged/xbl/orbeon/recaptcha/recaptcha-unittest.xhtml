@@ -1,0 +1,92 @@
+<!--
+    Copyright (C) 2008 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XBL - reCAPTCHA</xhtml:title>
+        <xforms:model id="main-model">
+            <xforms:instance id="config">
+                <config>
+                    <public-key>6LesxAYAAAAAAEF9eTyysdkOF6O2OsPLO9zAiyzX</public-key>
+                    <private-key>6LesxAYAAAAAAJIXoxMvErqbisKkt7W-CPoE_Huo</private-key>
+                </config>
+            </xforms:instance>
+            <xforms:instance id="ui">
+                <ui>
+                    <error-code/>
+                </ui>
+            </xforms:instance>
+        </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <!-- <xhtml:script type="text/javascript" src="/xbl/orbeon/autocomplete/recaptcha-unittest.js"/> -->
+    </xhtml:head>
+    <xhtml:body>
+
+        
+        <xforms:switch>
+            <xforms:case id="recaptcha-case">
+                <!-- The reCAPTCHA component -->
+                <fr:recaptcha id="recaptcha">
+                    <fr:public-key ref="instance('config')/public-key"/>
+                    <fr:private-key ref="instance('config')/private-key"/>
+                    <xforms:toggle ev:event="fr-verify-done" case="success-case"/>
+                    <xforms:action ev:event="fr-verify-error">
+                        <xforms:setvalue ref="instance('ui')/error-code" value="event('fr-error-code')"/>
+                        <xforms:toggle case="failure-case"/>
+                    </xforms:action>
+                </fr:recaptcha>
+                <fr:button>
+                    <xforms:label>Verify</xforms:label>
+                    <xforms:dispatch ev:event="DOMActivate" target="recaptcha" name="fr-verify"/>
+                </fr:button>
+            </xforms:case>
+            <xforms:case id="success-case">
+                Yes, correct! Wasn't that fun? Yep?<xhtml:br/>
+                Then let's 
+                <xforms:trigger appearance="minimal">
+                    <xforms:label>try again</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:dispatch target="recaptcha" name="fr-reload"/>
+                        <xforms:toggle ev:event="DOMActivate" case="recaptcha-case"/>
+                    </xforms:action>
+                </xforms:trigger>.
+            </xforms:case>
+            <xforms:case id="failure-case">
+                Oops, something went wrong.<xhtml:br/>
+                The error code is: <xforms:output value="instance('ui')/error-code" id="error-code"/>.<xhtml:br/>
+                Let's try to give it
+                <xforms:trigger appearance="minimal">
+                    <xforms:label>another shot</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:dispatch target="recaptcha" name="fr-reload"/>
+                        <xforms:toggle ev:event="DOMActivate" case="recaptcha-case"/>
+                    </xforms:action>
+                </xforms:trigger>.
+            </xforms:case>
+        </xforms:switch>
+
+
+    </xhtml:body>
+</xhtml:html>

@@ -1,0 +1,105 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <xbl:script src="http://api.recaptcha.net/js/recaptcha_ajax.js"/>
+    <xbl:script src="/xbl/orbeon/recaptcha/recaptcha.js"/>
+
+    <xbl:binding id="fr-recaptcha" element="fr|recaptcha">
+        <xbl:resources>
+            <!-- <xbl:style src="/xbl/orbeon/recaptcha/recaptcha.css"/> -->
+        </xbl:resources>
+        <xbl:handlers>
+            <xbl:handler event="fr-verify" phase="target">
+                <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).getChallengeResponse();</xxforms:script>
+            </xbl:handler>
+            <xbl:handler event="fr-reload" phase="target">
+                <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).reload();</xxforms:script>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:implementation>
+            <!-- Local model -->
+            <xforms:model id="recaptcha-model">
+                <xforms:instance id="verify-request">
+                    <verify-request>
+                        <privatekey/>
+                        <remoteip>127.0.0.1</remoteip>
+                        <challenge/>
+                        <response/>
+                    </verify-request>
+                </xforms:instance>
+                <xforms:instance id="verify-response-text"><verify-response/></xforms:instance>
+                <xforms:submission id="verify-submission" resource="http://api-verify.recaptcha.net/verify"
+                    ref="instance('verify-request')" method="post" serialization="application/x-www-form-urlencoded"
+                    replace="text" target="instance('verify-response-text')"/>
+            </xforms:model>
+        </xbl:implementation>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xsl:transform version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
+                <xsl:template match="/*">
+                    <xforms:group>
+                        <!-- Init event -->
+                        <xforms:action id="xf-en" ev:event="xforms-enabled">
+                            <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).init();</xxforms:script>
+                            <!-- Copy value of private key to local model -->
+                            <xxforms:variable name="private-key">
+                                <xxforms:sequence select="{fr:private-key/@ref}" xxbl:scope="outer"/>
+                            </xxforms:variable>
+                            <xforms:setvalue ref="privatekey" value="$private-key" xxbl:scope="inner"/>
+                        </xforms:action>
+
+                        <!-- Configuration -->
+                        <xsl:copy-of select="xxbl:parameter(., 'public-key')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'theme')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'lang')"/>
+
+                        <xforms:input ref="challenge" class="xbl-fr-recaptcha-challenge" style="display: none"/>
+                        <xforms:input ref="response" class="xbl-fr-recaptcha-response" style="display: none">
+                            <xforms:action ev:event="xforms-value-changed">
+                                <!-- Call API doing the verificaton -->
+                                <xforms:send submission="verify-submission"/>
+                                <!-- Parse the response -->
+                                <xxforms:variable name="lines" select="tokenize(instance('verify-response-text'), '\n')"/>
+                                <xxforms:variable name="is-success" select="$lines[1] = 'true'"/>
+                                <!-- Dispatch success event -->
+                                <xforms:dispatch if="$is-success" targetid="fr-recaptcha" name="fr-verify-done"/>
+                                <!-- Dispatch failure event -->
+                                <xforms:dispatch if="not($is-success)" targetid="fr-recaptcha" name="fr-verify-error">
+                                    <xxforms:context name="fr-error-code" select="$lines[2]"/>
+                                </xforms:dispatch>
+                            </xforms:action>
+                        </xforms:input>
+
+                        <xhtml:div id="recaptcha-div" class="xbl-fr-recaptcha-div"/>
+                    </xforms:group>
+                </xsl:template>
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

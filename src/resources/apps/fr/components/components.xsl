@@ -66,6 +66,9 @@
 
     <xsl:variable name="is-section-collapse" select="(not($is-noscript) and $is-ajax-section-collapse) or $is-noscript-section-collapse" as="xs:boolean"/>
 
+    <xsl:variable name="error-summary-top" select="normalize-space($error-summary) = ('top', 'both')" as="xs:boolean"/>
+    <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')" as="xs:boolean"/>
+
     <xsl:template match="/xhtml:html">
         <!-- Handle document language -->
         <xhtml:html lang="{{xxforms:instance('fr-language-instance')}}"
@@ -152,12 +155,11 @@
             <xsl:apply-templates select="@*"/>
 
             <!-- Display localized errors count and form title -->
-            <!-- Only count errors for controls that have been visited -->
-            <xxforms:variable name="errors" select="count(
-                for $e in xxforms:instance('fr-errors-instance')/error
-                return if (exists(xxforms:instance('fr-visited-instance')/control[@id = $e/@id and @indexes = $e/@indexes])) then $e else () 
-            )" as="xs:integer"/>
-            <xforms:output model="fr-error-summary-model" value="for $c in count($visible-errors) return if ($c > 0) then concat($c, ' ', $fr-resources/summary/titles/(if ($c = 1) then error-count else errors-count), ' - ', $title) else $title"/>
+            <xforms:output model="fr-error-summary-model"
+                           value="for $c in visible-errors-count return
+                                    if ($c castable as xs:integer and xs:integer($c) > 0)
+                                    then concat($c, ' ', $fr-resources/summary/titles/(if (xs:integer($c) = 1) then error-count else errors-count), ' - ', $title)
+                                    else $title"/>
         </xsl:copy>
     </xsl:template>
 
@@ -205,8 +207,28 @@
         <!--<xi:include href="oxf:/apps/fr/offline/offline-model.xml" xxi:omit-xml-base="true"/>-->
         <!-- This model handles form sections -->
         <xi:include href="oxf:/apps/fr/includes/sections-model.xml" xxi:omit-xml-base="true"/>
-        <!-- This model handles error summary -->
-        <xi:include href="oxf:/apps/fr/includes/error-summary-model.xml" xxi:omit-xml-base="true"/>
+        <!-- This model handles global error summary information -->
+        <xforms:model id="fr-error-summary-model">
+            <xforms:instance id="fr-error-summary-instance">
+                <error-summary>
+                    <valid/>
+                    <errors-count/>
+                    <visible-errors-count/>
+                    <trigger/>
+                </error-summary>
+            </xforms:instance>
+            <xforms:bind nodeset="trigger" readonly="not(../valid = 'true')"/>
+            <!-- Mark all controls as visited when certain buttons are activated -->
+            <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-workflow-review-button fr-workflow-send-button fr-print-button fr-pdf-button fr-email-button fr-refresh-button">
+                <!-- Dispatch to the appropriate error summaries -->
+                <xsl:if test="$error-summary-top">
+                    <xforms:dispatch name="fr-visit-all" targetid="error-summary-control-top"/>
+                </xsl:if>
+                <xsl:if test="$error-summary-bottom">
+                    <xforms:dispatch name="fr-visit-all" targetid="error-summary-control-bottom"/>
+                </xsl:if>
+            </xforms:action>
+        </xforms:model>
         <!-- This model handles document persistence -->
         <xi:include href="oxf:/apps/fr/includes/persistence-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles navigation functionality -->

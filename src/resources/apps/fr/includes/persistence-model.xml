@@ -218,9 +218,9 @@
 
             <!-- Check validity of data before trying to save, because 1) we don't want to save attachments if the form
                  is invalid and 2) submission doesn't check validity anymore -->
-            <!-- NOTE: We use instance('fr-form-valid-instance') and not xxforms:valid() because the instance validity may
-                 not be reflected with the use of XBL components. -->
-            <xxforms:variable name="continue-with-save" select="not($check-data-valid) or xxforms:instance('fr-form-valid-instance') = 'true'" as="xs:boolean"/>
+            <!-- NOTE: We use instance('fr-error-summary-instance')/valid and not xxforms:valid() because the instance
+                 validity may not be reflected with the use of XBL components. -->
+            <xxforms:variable name="continue-with-save" select="not($check-data-valid) or xxforms:instance('fr-error-summary-instance')/valid = 'true'" as="xs:boolean"/>
 
             <xforms:action if="not($continue-with-save)">
                 <!-- Data not valid: display error -->
@@ -462,13 +462,13 @@
 
         <!-- Condition for disabling strict Save button -->
         <xforms:bind nodeset="strict-save" readonly="not(property('xxforms:noscript'))
-            and (instance('fr-persistence-instance')/data-status = 'clean' or xxforms:instance('fr-form-valid-instance') = 'false')"/>
+            and (instance('fr-persistence-instance')/data-status = 'clean' or xxforms:instance('fr-error-summary-instance')/valid = 'false')"/>
         <!-- Condition for disabling strict Submit button -->
-        <xforms:bind nodeset="strict-submit" readonly="not(property('xxforms:noscript')) and xxforms:instance('fr-form-valid-instance') = 'false'"/>
+        <xforms:bind nodeset="strict-submit" readonly="not(property('xxforms:noscript')) and xxforms:instance('fr-error-summary-instance')/valid = 'false'"/>
 
         <!-- Condition for disabling Publish button -->
         <xforms:bind nodeset="publish" readonly="not(property('xxforms:noscript'))
-            and not(instance('fr-persistence-instance')/data-status = 'clean') or xxforms:instance('fr-form-valid-instance') = 'false'"/>
+            and not(instance('fr-persistence-instance')/data-status = 'clean') or xxforms:instance('fr-error-summary-instance')/valid = 'false'"/>
 
         <!-- Conditions for disabling workflow buttons -->
         <xforms:bind nodeset="workflow-review" readonly="exforms:readonly(../submit)"/>

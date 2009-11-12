@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <!--
+        Component to represent a reusable error summary.
+     -->
+    <xbl:binding id="fr-error-summary-binding" element="fr|error-summary">
+        <xbl:resources>
+            <xbl:style>
+                .xbl-fr-error-summary { clear: both; width: 100%; padding: 0 }
+                .xbl-fr-error-summary .fr-error-summary-body { display: block; padding: 10px }
+                .xbl-fr-error-summary .fr-error-list li { margin-bottom: .5em }
+                .xbl-fr-error-summary .fr-error-alert { color: red }
+            </xbl:style>
+        </xbl:resources>
+        <xbl:handlers>
+            <xbl:handler event="fr-visit-all" phase="target">`
+                <!-- Mark all controls as visited -->
+                <xforms:setvalue ref="instance('fr-visited-instance')/@all">true</xforms:setvalue>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:implementation>
+            <xforms:model id="fr-error-summary-model">
+
+                <!-- Reset everything upon initialization -->
+                <xforms:action ev:event="xforms-model-construct-done">
+                    <xforms:delete nodeset="instance('fr-errors-instance')/*"/>
+                    <xforms:setvalue ref="instance('fr-visited-instance')"/>
+                    <xforms:setvalue ref="instance('fr-visited-instance')/@all">false</xforms:setvalue>
+                </xforms:action>
+
+                <!-- Instance containing the current errors -->
+                <xforms:instance id="fr-errors-instance">
+                    <errors xmlns=""/>
+                </xforms:instance>
+
+                <!-- Template for error information -->
+                <xforms:instance id="fr-error-template" xxforms:readonly="true">
+                    <error xmlns="" id="" indexes="" label="" alert="" binds="" position=""/>
+                </xforms:instance>
+
+                <!-- Instance containing visited controls -->
+                <!-- NOTE: represent as space-separated effective ids, as using nested elements takes more space and may cause UI bindings updates -->
+                <xforms:instance id="fr-visited-instance">
+                    <controls all="false" xmlns=""/>
+                </xforms:instance>
+
+                <!-- State instance -->
+                <xforms:instance id="fr-state-instance">
+                    <state xmlns="">
+                        <!-- Whether the form is valid or invalid -->
+                        <valid>true</valid>
+                        <!-- Number of errors -->
+                        <errors-count/>
+                        <!-- Number of visible errors -->
+                        <visible-errors-count/>
+                    </state>
+                </xforms:instance>
+
+                <!-- Errors for controls that have been visited -->
+                <xxforms:variable name="visible-errors" select="
+                    for $e in instance('fr-errors-instance')/error[normalize-space(@alert)]
+                    return if (instance('fr-visited-instance')/@all = 'true'
+                                or tokenize(instance('fr-visited-instance'), '\s+') = string-join(($e/@id, for $i in $e/@indexes return if (normalize-space($i)) then $i else ()), '·'))
+                           then $e else () " as="element(error)*"/>
+
+                <xforms:bind nodeset="instance('fr-state-instance')">
+                    <!-- Current number of errors -->
+                    <xforms:bind nodeset="errors-count" calculate="count(instance('fr-errors-instance')/error)"/>
+                    <!-- Current number of visible errors -->
+                    <xforms:bind nodeset="visible-errors-count" calculate="count($visible-errors)"/>
+                </xforms:bind>
+
+            </xforms:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xforms:group appearance="xxforms:internal" xxbl:scope="outer">
+
+                <!-- Handle events on observer(s) passed -->
+                <xforms:action xbl:attr="ev:observer=observer" ev:event="DOMFocusOut xforms-value-changed">
+                    <xforms:action xxbl:scope="inner">
+                        <xxforms:variable name="prefixed-id" select="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:target')), '$')" as="xs:string"/>
+                        <xxforms:variable name="indexes" select="string-join(xxforms:event('xxforms:repeat-indexes'), '-')" as="xs:string?"/>
+                        <xxforms:variable name="effective-id" select="string-join(($prefixed-id, if (normalize-space($indexes)) then $indexes else ()), '·')" as="xs:string"/>
+
+                        <xxforms:variable name="visited" select="tokenize(instance('fr-visited-instance'), '\s+')" as="xs:string*"/>
+
+                        <!-- Append only if we don't know already that this control has been visited -->
+                        <xforms:setvalue if="not($visited = $effective-id)" ref="instance('fr-visited-instance')" value="string-join((., $effective-id), ' ')"/>
+                    </xforms:action>
+                </xforms:action>
+
+                <!-- Handle xforms-invalid on observer(s) passed -->
+                <xforms:action xbl:attr="ev:observer=observer" ev:event="xforms-invalid" context="instance('fr-errors-instance')">
+
+                    <xforms:action xxbl:scope="inner">
+                        <xxforms:variable name="target" select="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:target')), '$')" as="xs:string"/>
+                        <xxforms:variable name="indexes" select="string-join(xxforms:event('xxforms:repeat-indexes'), '-')" as="xs:string"/>
+
+                        <!-- Insert if the value is invalid or if it is required but empty -->
+                        <xxforms:variable name="current-error" select="error[@id = $target and @indexes = $indexes]"/>
+                        <!-- Just update the label and alert if it already exists -->
+                        <xforms:action if="exists($current-error)" context="$current-error">
+                            <xforms:setvalue ref="$current-error/@alert" value="xxforms:event('xxforms:alert')"/>
+                            <xforms:setvalue ref="$current-error/@label" value="xxforms:event('xxforms:label')"/>
+                            <xforms:setvalue ref="$current-error/@binds" value="string-join(xxforms:invalid-binds(xxforms:event('xxforms:binding')), ' ')"/>
+                        </xforms:action>
+                        <!-- Otherwise insert new element and sets its values -->
+                        <xforms:action if="not(exists($current-error))">
+                            <!-- Remember that the instance is no longer valid -->
+                            <xforms:setvalue ref="instance('fr-state-instance')/valid">false</xforms:setvalue>
+                            <!-- Find insertion position based on instance node order -->
+                            <!-- NOTE: This could be different from UI order. In the future, this should somehow be based on UI order instead. -->
+                            <xxforms:variable name="node-position" select="count(xxforms:event('xxforms:binding')/preceding::*)" as="xs:integer"/>
+                            <xxforms:variable name="insert-position" select="count(error[xs:integer(@position) lt $node-position])" as="xs:integer"/>
+                            <xforms:insert context="." nodeset="error[$insert-position]" origin="instance('fr-error-template')"/>
+                            <xforms:action context="error[$insert-position + 1]">
+                                <xforms:setvalue ref="@id" value="$target"/>
+                                <xforms:setvalue ref="@indexes" value="string-join(xxforms:event('xxforms:repeat-indexes'), '-')"/>
+                                <xforms:setvalue ref="@alert" value="xxforms:event('xxforms:alert')"/>
+                                <xforms:setvalue ref="@label" value="xxforms:event('xxforms:label')"/>
+                                <xforms:setvalue ref="@binds" value="string-join(xxforms:invalid-binds(xxforms:event('xxforms:binding')), ' ')"/>
+                                <xforms:setvalue ref="@position" value="$node-position"/>
+                            </xforms:action>
+                        </xforms:action>
+                    </xforms:action>
+                </xforms:action>
+
+                <!-- Handle xforms-valid xforms-disabled on observer(s) passed -->
+                <xforms:action xbl:attr="ev:observer=observer" ev:event="xforms-valid xforms-disabled">
+
+                    <xforms:action xxbl:scope="inner">
+                        <xxforms:variable name="target" select="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:target')), '$')" as="xs:string"/>
+                        <xxforms:variable name="indexes" select="string-join(xxforms:event('xxforms:repeat-indexes'), '-')" as="xs:string"/>
+
+                        <xforms:action context="instance('fr-errors-instance')" if="error[@id = $target and @indexes = $indexes]">
+                            <xforms:action if="1 >= count(error)">
+                                <xforms:setvalue ref="instance('fr-state-instance')/valid">true</xforms:setvalue>
+                            </xforms:action>
+                            <xforms:delete nodeset="error[@id = $target and @indexes = $indexes]"/>
+                        </xforms:action>
+                    </xforms:action>
+                </xforms:action>
+
+                <!-- Write out the error count -->
+                <xforms:group ref="()" xbl:attr="model ref=errors-count-ref" appearance="xxforms:internal">
+                    <xforms:group ref="instance('fr-state-instance')/errors-count" xxbl:scope="inner" appearance="xxforms:internal">
+                        <xxforms:variable name="ref" as="item()?">
+                            <xxforms:sequence select="." xxbl:scope="outer"/>
+                        </xxforms:variable>
+                        <xforms:setvalue ev:event="xforms-value-changed" ref="$ref" value="context()"/>
+                    </xforms:group>
+                </xforms:group>
+
+                <!-- Write out the visible error count -->
+                <xforms:group ref="()" xbl:attr="model ref=visible-errors-count-ref" appearance="xxforms:internal">
+                    <xforms:group ref="instance('fr-state-instance')/visible-errors-count" xxbl:scope="inner" appearance="xxforms:internal">
+                        <xxforms:variable name="ref" as="item()?">
+                            <xxforms:sequence select="." xxbl:scope="outer"/>
+                        </xxforms:variable>
+                        <xforms:setvalue ev:event="xforms-value-changed" ref="$ref" value="context()"/>
+                    </xforms:group>
+                </xforms:group>
+
+                <!-- Write out the validity -->
+                <xforms:group ref="()" xbl:attr="model ref=valid-ref" appearance="xxforms:internal">
+                    <xforms:group ref="instance('fr-state-instance')/valid" xxbl:scope="inner" appearance="xxforms:internal">
+                        <xxforms:variable name="ref" as="item()?">
+                            <xxforms:sequence select="." xxbl:scope="outer"/>
+                        </xxforms:variable>
+                        <xforms:setvalue ev:event="xforms-value-changed" ref="$ref" value="context()"/>
+                    </xforms:group>
+                </xforms:group>
+
+                <!-- Only show this section if there are any visible errors -->
+                <xforms:group ref=".[$visible-errors]" xxbl:scope="inner">
+
+                    <!-- Include optional header -->
+                    <xbl:content includes="fr|error-summary > fr|header > *"/>
+
+                    <xforms:group class="fr-error-summary-body">
+                        <!-- Include title -->
+                        <xbl:content includes="fr|error-summary > fr|title > *"/>
+                        <!-- Anchor for navigation -->
+                        <xhtml:a name="fr-errors"/>
+                        <xhtml:ol class="fr-error-list">
+                            <xforms:repeat nodeset="$visible-errors">
+                                <xhtml:li>
+                                    <xxforms:variable name="has-label" select="normalize-space(@label)" as="xs:boolean"/>
+                                    <xforms:group ref=".[$has-label]">
+                                        <xxforms:variable name="error" xxbl:scope="outer">
+                                            <xxforms:sequence select="." xxbl:scope="inner"/>
+                                        </xxforms:variable>
+                                        <!-- NOTE: Put the entire groups in outer scope, as we can't yet deal with different
+                                             scopes for control and nested action -->
+                                        <xforms:group ref=".[property('xxforms:noscript')]" xxbl:scope="outer">
+                                             <!--In noscript mode, use a plain link -->
+                                              <xhtml:a href="#{$error/@id}">
+                                                  <xforms:output value="$error/@label" class="fr-error-label"/>
+                                              </xhtml:a>
+                                        </xforms:group>
+                                        <xforms:group ref=".[not(property('xxforms:noscript'))]" xxbl:scope="outer">
+                                            <!-- Otherwise use trigger -->
+                                            <xforms:trigger appearance="minimal">
+                                                <xforms:label><xforms:output value="normalize-space($error/@label)" class="fr-error-label"/></xforms:label>
+                                                <xforms:setfocus ev:event="DOMActivate" control="{$error/@id}"/>
+                                            </xforms:trigger>
+                                        </xforms:group>
+                                    </xforms:group>
+
+                                    <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row">
+                                        <xforms:output value="concat(' (', @indexes, ')')"/>
+                                    </xforms:group>
+                                    <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert">
+                                        <xforms:output value="string-join((' -'[$has-label], @alert), ' ')"/>
+                                    </xforms:group>
+                                </xhtml:li>
+                            </xforms:repeat>
+                        </xhtml:ol>
+                    </xforms:group>
+
+                    <!-- Include optional footer -->
+                    <xbl:content includes="fr|error-summary > fr|footer > *"/>
+
+                </xforms:group>
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

@@ -14,14 +14,9 @@
 th { padding: 1em; padding-top: 0; text-align: left; vertical-align: top }
 td { vertical-align: top }
 
-#main-action-table { width: 65em; margin-top: 1em; margin-bottom: 1em }
+#main-action-table { width: 64em; margin-top: 1em; margin-bottom: 1em }
 #main-action-table .forms-message-fatal { padding-left: 1em }
 #language-choice-td { width: 100%; text-align: right }
-
-.forms-errors-table { margin: 1em; padding: .5em; border: 1px dotted red; width: 60em; background: #fcc }
-.forms-errors-table .xforms-repeat-selected-item-1 { background: none }
-.forms-errors-table th { padding: 0; color: red; white-space: nowrap }
-.forms-error-actions { text-align: center; margin-bottom: .5em; }
 
 .forms-main-table { border: solid 2px #ffcc66; width: 64em }
 .forms-main-table th p { text-align: center; vertical-align: top }
@@ -44,7 +39,7 @@ td { vertical-align: top }
 
 .forms-hr { height: 2px; border: 0; background-color: #ffcc66; color: #ffcc66 }
 
-.xforms-label { margin-right: 1em; font-style: italic }
+.forms-action-table .xforms-label , .forms-main-table .xforms-label { margin-right: 1em; font-style: italic }
 .forms-hidden { display: none }
 .xforms-repeat-selected-item-1 td { cursor: default }
 .xforms-repeat-selected-item-2 td { cursor: default;  }
@@ -93,3 +88,18 @@ button.xforms-trigger img, .xforms-trigger button img { padding: .1em .5em .1em 
 
 .g-325a-personal-information-table .xforms-label { display: inline-block; display: -moz-inline-box; width: 7em }
 
+/* Error summary */
+.xbl-fr-error-summary { width: 64em }
+.xbl-fr-error-summary .xforms-repeat-selected-item-1 { background: none }
+
+.xbl-fr-error-summary .fr-error-title {
+    font-size: smaller;
+    font-weight: bold;
+    background-color: #FF9933;
+    color: white;
+    padding: 0 0 0 0.5em;
+    border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
+}
+.xbl-fr-error-summary .fr-error-summary-body { border-bottom: 2px solid #FFCC66 }
+.xbl-fr-error-summary .fr-error-label, .xbl-fr-error-summary .fr-error-row { font-weight: bold }
+.xbl-fr-error-summary .fr-error-alert { color: #FF9933 }

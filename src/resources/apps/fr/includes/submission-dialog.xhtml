@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xxforms:dialog xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -32,50 +32,57 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <xforms:repeat nodeset="instance('fr-submission-buttons-instance')/*">
-                <xhtml:span>
-                    <!-- Clear button -->
-                    <xforms:trigger ref=".[local-name() = 'clear']">
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
-                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-clear"/></xhtml:span>
-                        </xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:dispatch name="fr-clear" target="fr-persistence-model"/>
-                            <xxforms:hide dialog="fr-submission-result-dialog"/>
-                            <xforms:dispatch name="fr-new-document" target="fr-persistence-model"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                    <!-- Keep button -->
-                    <xforms:trigger ref=".[local-name() = 'keep']">
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-keep"/></xhtml:span>
-                        </xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xxforms:hide dialog="fr-submission-result-dialog"/>
-                            <xforms:dispatch name="fr-new-document" target="fr-persistence-model"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                    <!-- Go button -->
-                    <xforms:trigger ref=".[local-name() = 'go']">
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-go"/></xhtml:span>
-                        </xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xxforms:variable name="uri-xpath" select="xxforms:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', $app, $form), '.'))"/>
-                            <xforms:load context="xxforms:instance('fr-form-instance')" resource="{saxon:evaluate($uri-xpath)}"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                    <!-- Close window button -->
-                    <xforms:trigger ref=".[local-name() = 'close-window']">
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                            <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-close-window"/></xhtml:span>
-                        </xforms:label>
-                        <xxforms:script ev:event="DOMActivate">window.close();</xxforms:script>
-                    </xforms:trigger>
-                </xhtml:span>
+                <!-- Clear button -->
+                <fr:button ref=".[local-name() = 'clear']">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
+                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-clear"/></xhtml:span>
+                    </xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <!-- Restore instance -->
+                        <xforms:dispatch name="fr-clear" targetid="fr-persistence-model"/>
+                        <!-- Perform RRRR so that after that we can clear error summary -->
+                        <xforms:rebuild/>
+                        <xforms:recalculate/>
+                        <xforms:revalidate/>
+                        <xforms:refresh/>
+                        <!-- Clear error summary -->
+                        <xforms:dispatch name="fr-unvisit-all" targetid="fr-error-summary-model"/>
+
+                        <xxforms:hide dialog="fr-submission-result-dialog"/>
+                        <xforms:dispatch name="fr-new-document" target="fr-persistence-model"/>
+                    </xforms:action>
+                </fr:button>
+                <!-- Keep button -->
+                <fr:button ref=".[local-name() = 'keep']">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-keep"/></xhtml:span>
+                    </xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xxforms:hide dialog="fr-submission-result-dialog"/>
+                        <xforms:dispatch name="fr-new-document" target="fr-persistence-model"/>
+                    </xforms:action>
+                </fr:button>
+                <!-- Go button -->
+                <fr:button ref=".[local-name() = 'go']">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-go"/></xhtml:span>
+                    </xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xxforms:variable name="uri-xpath" select="xxforms:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', $app, $form), '.'))"/>
+                        <xforms:load context="xxforms:instance('fr-form-instance')" resource="{saxon:evaluate($uri-xpath)}"/>
+                    </xforms:action>
+                </fr:button>
+                <!-- Close window button -->
+                <fr:button ref=".[local-name() = 'close-window']">
+                    <xforms:label>
+                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
+                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-close-window"/></xhtml:span>
+                    </xforms:label>
+                    <xxforms:script ev:event="DOMActivate">window.close();</xxforms:script>
+                </fr:button>
             </xforms:repeat>
         </xforms:group>
     </xhtml:div>

@@ -32,7 +32,7 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <xxforms:hide ev:event="DOMActivate" dialog="fr-clear-confirm-dialog"/>
-            <xforms:trigger>
+            <fr:button>
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/clear"/></xhtml:span>
@@ -48,13 +48,13 @@
                     <!-- Clear error summary -->
                     <xforms:dispatch name="fr-unvisit-all" targetid="fr-error-summary-model"/>
                 </xforms:action>
-            </xforms:trigger>
-            <xforms:trigger>
+            </fr:button>
+            <fr:button>
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/cancel"/></xhtml:span>
                 </xforms:label>
-            </xforms:trigger>
+            </fr:button>
         </xforms:group>
     </xhtml:div>
 </xxforms:dialog>

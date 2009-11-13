@@ -42,9 +42,9 @@
             </xbl:style>
         </xbl:resources>
         <xbl:template>
-            <xhtml:span class="yui-button yui-push-button">
+            <xforms:group class="yui-button yui-push-button" xbl:attr="model context ref bind xxforms:modal" xxbl:scope="outer">
                 <xhtml:span class="first-child">
-                    <xforms:trigger ref="." xbl:attr="xxforms:modal" xxbl:scope="outer">
+                    <xforms:trigger>
                         <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
 
                         <xxforms:script ev:event="xforms-enabled">
@@ -64,7 +64,7 @@
                         </xxforms:script>
                     </xforms:trigger>
                 </xhtml:span>
-            </xhtml:span>
+            </xforms:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

@@ -219,7 +219,7 @@
             </xforms:instance>
             <xforms:bind nodeset="trigger" readonly="not(../valid = 'true')"/>
             <!-- Mark all controls as visited when certain buttons are activated -->
-            <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-workflow-review-button fr-workflow-send-button fr-print-button fr-pdf-button fr-email-button fr-refresh-button">
+            <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-workflow-review-button fr-workflow-send-button fr-print-button fr-pdf-button fr-email-button fr-refresh-button fr-submit-button">
                 <!-- Dispatch to the appropriate error summaries -->
                 <xsl:if test="$error-summary-top">
                     <xforms:dispatch name="fr-visit-all" targetid="error-summary-control-top"/>

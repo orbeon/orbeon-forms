@@ -31,16 +31,22 @@
         <xbl:resources>
             <xbl:style>
                 .xbl-fr-error-summary { clear: both; width: 100%; padding: 0 }
-                .xbl-fr-error-summary .fr-error-summary-body { display: block; padding: 0 10px 10px }
+                .xbl-fr-error-summary .fr-error-title { display: block; padding: .3em }
+                .xbl-fr-error-summary .fr-error-summary-body { display: block }
                 .xbl-fr-error-summary .fr-error-list li { margin-bottom: .5em }
                 .xbl-fr-error-summary .fr-error-alert { color: red }
-                .xbl-fr-error-summary .fr-error-title { display: block; padding: .3em; margin: 10px 10px 0 }
             </xbl:style>
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-visit-all" phase="target">`
                 <!-- Mark all controls as visited -->
+                <xforms:setvalue ref="instance('fr-visited-instance')"/>
                 <xforms:setvalue ref="instance('fr-visited-instance')/@all">true</xforms:setvalue>
+            </xbl:handler>
+            <xbl:handler event="fr-unvisit-all" phase="target">`
+                <!-- Mark all controls as visited -->
+                <xforms:setvalue ref="instance('fr-visited-instance')"/>
+                <xforms:setvalue ref="instance('fr-visited-instance')/@all">false</xforms:setvalue>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -115,9 +121,9 @@
                 </xforms:action>
 
                 <!-- Handle xforms-invalid on observer(s) passed -->
-                <xforms:action xbl:attr="ev:observer=observer" ev:event="xforms-invalid" context="instance('fr-errors-instance')">
+                <xforms:action xbl:attr="ev:observer=observer" ev:event="xforms-invalid">
 
-                    <xforms:action xxbl:scope="inner">
+                    <xforms:action xxbl:scope="inner" context="instance('fr-errors-instance')">
                         <xxforms:variable name="target" select="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:target')), '$')" as="xs:string"/>
                         <xxforms:variable name="indexes" select="string-join(xxforms:event('xxforms:repeat-indexes'), '-')" as="xs:string"/>
 

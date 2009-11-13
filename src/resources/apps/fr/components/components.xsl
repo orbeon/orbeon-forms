@@ -228,6 +228,16 @@
                     <xforms:dispatch name="fr-visit-all" targetid="error-summary-control-bottom"/>
                 </xsl:if>
             </xforms:action>
+            <!-- Mark all controls as un-visited when certain buttons are activated -->
+            <xforms:action ev:event="fr-unvisit-all">
+                <!-- Dispatch to the appropriate error summaries -->
+                <xsl:if test="$error-summary-top">
+                    <xforms:dispatch name="fr-unvisit-all" targetid="error-summary-control-top"/>
+                </xsl:if>
+                <xsl:if test="$error-summary-bottom">
+                    <xforms:dispatch name="fr-unvisit-all" targetid="error-summary-control-bottom"/>
+                </xsl:if>
+            </xforms:action>
         </xforms:model>
         <!-- This model handles document persistence -->
         <xi:include href="oxf:/apps/fr/includes/persistence-model.xml" xxi:omit-xml-base="true"/>

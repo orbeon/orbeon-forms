@@ -22,6 +22,7 @@
       xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns="http://www.w3.org/1999/xhtml">
 
     <xforms:group ref="dmv:personal-information">
@@ -302,7 +303,6 @@
                                         <xforms:setvalue ref="instance('document-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:plate-number"/>
                                         <xforms:setvalue ref="instance('document-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:vin"/>
                                         <xforms:setvalue ref="instance('document-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:leased"/>
-                                        <xforms:insert context="instance('plates-instance')" nodeset="plate" origin="instance('plate-template')"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
@@ -316,7 +316,6 @@
                                 <xforms:group ref="instance('triggers-instance')/remove-vehicle-trigger">
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:delete nodeset="instance('document-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>
-                                        <xforms:delete context="instance('plates-instance')" nodeset="plate" at="index('vehicles-repeat')"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
@@ -345,17 +344,8 @@
                                     </xforms:input>
                                 </td>
                                 <td>
-                                    <table class="dmv-plate-table">
-                                        <tr>
-                                            <td>
-                                                <span class="dmv-plate-span">
-                                                    <xforms:repeat nodeset="instance('plates-instance')/plate[count(context()/preceding-sibling::dmv:vehicle) + 1]/character[normalize-space(.) != '']">
-                                                        <xforms:output mediatype="image/gif" value="concat('/apps/xforms-government/images/_', if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_', '_small.gif')"/>
-                                                    </xforms:repeat>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                    <!-- Output nice licence plate -->
+                                    <fr:california-plate ref="*:plate-number"/>
                                 </td>
                                 <td>
                                     <xforms:input incremental="true" ref="dmv:vin" class="dmv-vin">
@@ -530,7 +520,7 @@
                                 <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/state"/>
                                 <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/state"/>
                                 <xforms:item>
-                                    <xforms:label></xforms:label>
+                                    <xforms:label/>
                                     <xforms:value/>
                                 </xforms:item>
                                 <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state']//xs:enumeration">

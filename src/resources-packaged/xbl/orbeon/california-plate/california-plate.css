@@ -1,0 +1,6 @@
+.xbl-fr-california-plate .fr-plate-table .xforms-repeat-selected-item-1,
+    .xbl-fr-california-plate .fr-plate-table .xforms-repeat-selected-item-2,
+    .xbl-fr-california-plate .fr-plate-table .xforms-repeat-selected-item-3,
+    .xbl-fr-california-plate .fr-plate-table .xforms-repeat-selected-item-4 { background: transparent }
+.xbl-fr-california-plate .fr-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; display: block; padding: 0; border: none; text-align: center; vertical-align: top }
+.xbl-fr-california-plate .fr-plate-span { position: relative; top: 19px; background: none }

@@ -69,10 +69,6 @@ button.xforms-trigger img, .xforms-trigger button img { padding: .1em .5em .1em 
 .dmv-address-col2-label { display: -moz-inline-box; display: inline-block; width: expression('7em'); min-width: 7em; }
 
 
-.dmv-plate-table .xforms-repeat-selected-item-2 { background: none }
-.dmv-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; display: block; padding: 0; border: none; text-align: center; vertical-align: top }
-.dmv-plate-span { position: relative; top: 19px; background: none }
-
 .g-325a-table input { width: 10em }
 .g-325a-table th { text-align: left }
 .g-325a-table { margin-left: 0; margin-right: 0; width: 100% }

@@ -393,7 +393,7 @@ public class XFormsControls implements XFormsObjectResolver {
         contextStack.pushIteration(iterationIndex);
 
         // Start visiting children of the xforms:repeat element
-        final Element repeatControlElement = containingDocument.getStaticState().getControlInfoMap().get(enclosingRepeatControl.getPrefixedId()).element;
+        final Element repeatControlElement = containingDocument.getStaticState().getControlElement(enclosingRepeatControl.getPrefixedId());
         XFormsControls.visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                 containingDocument.getStaticState(), enclosingRepeatControl.getXBLContainer(), repeatControlElement,
                 XFormsUtils.getEffectiveIdPrefix(enclosingRepeatControl.getEffectiveId()),

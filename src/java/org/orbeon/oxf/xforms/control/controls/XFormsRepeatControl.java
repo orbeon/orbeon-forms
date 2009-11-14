@@ -333,6 +333,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
         boolean updated = false;
         final List<XFormsRepeatIterationControl> newIterations;
+        final List<Integer> movedIterationsOldPositions;
+        final List<Integer> movedIterationsNewPositions;
 
         if (newRepeatNodeset != null && newRepeatNodeset.size() > 0) {
 
@@ -380,6 +382,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             final int newSize = newRepeatNodeset.size();
             final List<XFormsControl> newChildren = new ArrayList<XFormsControl>(newSize);
             newIterations = new ArrayList<XFormsRepeatIterationControl>();
+            movedIterationsOldPositions = new ArrayList<Integer>();
+            movedIterationsNewPositions = new ArrayList<Integer>();
             for (int repeatIndex = 1; repeatIndex <= newSize; repeatIndex++) {// 1-based index
 
                 final XFormsRepeatIterationControl newIteration;
@@ -406,14 +410,14 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 } else {
                     // This new node was in the old nodeset so keep it
                     newIteration = (XFormsRepeatIterationControl) oldChildren.get(currentOldIndex);
-
-                    if (newIteration.getIterationIndex() != repeatIndex) {
+                    final int newIterationOldIndex = newIteration.getIterationIndex();
+                    if (newIterationOldIndex != repeatIndex) {
                         // Iteration index changed
 
                         if (isDebugEnabled) {
                             indentedLogger.logDebug("xforms:repeat", "moving iteration",
                                    "id", getEffectiveId(),
-                                   "old index", Integer.toString(newIteration.getIterationIndex()),
+                                   "old index", Integer.toString(newIterationOldIndex),
                                    "new index", Integer.toString(repeatIndex));
                         }
 
@@ -423,6 +427,10 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                         // Index new iteration
                         currentControlTree.indexSubtree(newIteration, true);
                         updated = true;
+
+                        // Add context information
+                        movedIterationsOldPositions.add(newIterationOldIndex);
+                        movedIterationsNewPositions.add(repeatIndex);
                     }
                 }
 
@@ -543,11 +551,14 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             setIndexInternal(0);
 
             newIterations = Collections.emptyList();
+            movedIterationsOldPositions = Collections.emptyList();
+            movedIterationsNewPositions = Collections.emptyList();
         }
 
         if (updated) {
             // Dispatch custom event to notify that the nodeset has changed
-            getXBLContainer().dispatchEvent(propertyContext, new XXFormsNodesetChangedEvent(containingDocument, this));
+            getXBLContainer().dispatchEvent(propertyContext, new XXFormsNodesetChangedEvent(containingDocument, this,
+                    newIterations, movedIterationsOldPositions, movedIterationsNewPositions));
         }
 
         return newIterations;

@@ -23,6 +23,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.value.IntegerValue;
 import org.orbeon.saxon.value.StringValue;
 
 import java.util.Collections;
@@ -37,6 +38,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
     private static final String XXFORMS_LABEL_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "label");
     private static final String XXFORMS_HINT_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "hint");
     private static final String XXFORMS_HELP_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "help");
+    private static final String XXFORMS_POSITION_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "control-position");
 
     private XFormsControl targetXFormsControl;
 
@@ -105,6 +107,13 @@ public abstract class XFormsUIEvent extends XFormsEvent {
             final String help = targetXFormsControl.getHelp(getPipelineContext());
             if (help != null)
                 return new ListIterator(Collections.singletonList(new StringValue(help)));
+            else
+                return EmptyIterator.getInstance();
+        } else if (XXFORMS_POSITION_ATTRIBUTE.equals(name)) {
+            // Return the control's static position in the document
+            final int controlStaticPosition = getContainingDocument().getStaticState().getControlPosition(targetXFormsControl.getPrefixedId()); 
+            if (controlStaticPosition >= 0)
+                return new ListIterator(Collections.singletonList(new IntegerValue(controlStaticPosition)));
             else
                 return EmptyIterator.getInstance();
         } else {

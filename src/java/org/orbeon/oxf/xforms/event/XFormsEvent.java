@@ -126,7 +126,7 @@ public abstract class XFormsEvent implements Cloneable {
             // Return the target static id
 
             if ("target".equals(name)) {
-                getIndentedLogger().logWarning("", "event('target') is deprecated. Use event('xxforms:target') instead.");
+                getIndentedLogger().logWarning("", "event('target') is deprecated. Use event('xxforms:targetid') instead.");
             }
 
             return new ListIterator(Collections.singletonList(new StringValue(targetObject.getId())));

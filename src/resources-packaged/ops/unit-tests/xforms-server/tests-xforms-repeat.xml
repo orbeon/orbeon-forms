@@ -951,7 +951,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
                                     <xforms:input ref="." id="my-input"/>
                                 </xforms:repeat>
@@ -1544,7 +1544,7 @@
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
-                                                 xxforms:attribute('target', event('xxforms:target')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
                                                  xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                         <!-- Outer repeat -->
@@ -1689,7 +1689,7 @@
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
-                                                 xxforms:attribute('target', event('xxforms:target')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
                                                  xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                         <!-- Top-level -->

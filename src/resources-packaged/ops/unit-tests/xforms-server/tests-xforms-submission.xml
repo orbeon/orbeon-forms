@@ -383,7 +383,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
                                                              for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                              ))"/>
@@ -391,7 +391,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
                                                              ))"/>
 
@@ -463,7 +463,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
                                                              for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                              ))"/>
@@ -471,7 +471,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
                                                              ))"/>
 
@@ -547,7 +547,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
                                                              for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                              ))"/>
@@ -555,7 +555,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
                                                              ))"/>
 
@@ -636,7 +636,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
                                                              for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                              ))"/>
@@ -644,7 +644,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
                                                              ))"/>
 
@@ -723,7 +723,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
                                                              for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                              ))"/>
@@ -731,7 +731,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
                                                              ))"/>
 
@@ -810,7 +810,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
                                                              for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                              ))"/>
@@ -818,7 +818,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
                                                              ))"/>
 
@@ -901,7 +901,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
                                                              for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                              ))"/>
@@ -909,7 +909,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
                                                              ))"/>
 
@@ -1002,7 +1002,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
                                                              for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                              ))"/>
@@ -1010,7 +1010,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('error-type') return xxforms:attribute('error-type', $c)
                                                              ))"/>
 
@@ -1093,7 +1093,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
                                                              for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                              ))"/>
@@ -1101,7 +1101,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
                                                              ))"/>
 
@@ -1114,7 +1114,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
                                                              ))"/>
 
@@ -1203,7 +1203,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
                                                              for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                              ))"/>
@@ -1211,7 +1211,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
                                                              ))"/>
 
@@ -1294,7 +1294,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
                                                              for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                              ))"/>
@@ -1302,7 +1302,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              for $c in event('error-type') return xxforms:attribute('error-type', $c)
                                                              ))"/>
 

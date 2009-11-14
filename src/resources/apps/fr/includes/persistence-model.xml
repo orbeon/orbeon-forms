@@ -621,7 +621,7 @@
         <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">true</xforms:setvalue>
         <!-- Log error -->
-        <xforms:message level="xxforms:log-debug">Error with submission: <xforms:output value="event('xxforms:target')"/></xforms:message>
+        <xforms:message level="xxforms:log-debug">Error with submission: <xforms:output value="event('xxforms:targetid')"/></xforms:message>
         <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
         <!-- Set error message and show error section in UI -->
         <xforms:action if="event('error-type') = 'validation-error'">
@@ -645,7 +645,7 @@
         <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
         <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">true</xforms:setvalue>
         <!-- Log error -->
-        <xforms:message level="xxforms:log-debug">Error with submission: <xforms:output value="event('xxforms:target')"/></xforms:message>
+        <xforms:message level="xxforms:log-debug">Error with submission: <xforms:output value="event('xxforms:targetid')"/></xforms:message>
         <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
         <!-- Set error message and show error section in UI -->
         <xforms:action if="event('error-type') = 'validation-error'">

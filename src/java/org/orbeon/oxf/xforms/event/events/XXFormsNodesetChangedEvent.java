@@ -30,9 +30,9 @@ import java.util.List;
 
 public class XXFormsNodesetChangedEvent extends XFormsUIEvent {
 
-    private static final String OLD_POSITIONS_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "old-positions");
-    private static final String NEW_POSITIONS_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "new-positions");
-    private static final String NEW_ITERATIONS_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "new-iterations");
+    private static final String OLD_POSITIONS_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "from-positions");
+    private static final String NEW_POSITIONS_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "to-positions");
+    private static final String NEW_ITERATIONS_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "new-positions");
 
     private final List<XFormsRepeatIterationControl> newIterations;
     private final List<Integer> oldIterationPositions;

@@ -253,7 +253,7 @@ xxx Inserting error information into error list:
 
                 <!-- Node-set changed: handle xxforms-nodeset-changed on observer(s) passed -->
                 <xforms:action xbl:attr="ev:observer=observer" ev:event="xxforms-nodeset-changed"
-                               if="count(xxforms:event('xxforms:new-positions')) > 0">
+                               if="count(xxforms:event('xxforms:to-positions')) > 0">
                     <xforms:action xxbl:scope="inner">
                         <!-- One or more iterations have moved. This is a bit tricky: we must update the error summary properly. -->
 
@@ -263,16 +263,16 @@ xxx Inserting error information into error list:
                         <xxforms:variable name="repeat-indexes" select="xxforms:event('xxforms:repeat-indexes')" as="xs:string*"/>
                         <xxforms:variable name="repeat-ancestors" select="xxforms:event('xxforms:repeat-ancestors')" as="xs:string*"/>
                         <!-- These are the old positions of the iterations that moved on this current repeat target -->
-                        <xxforms:variable name="old-positions" select="xxforms:event('xxforms:old-positions')" as="xs:integer*"/>
+                        <xxforms:variable name="from-positions" select="xxforms:event('xxforms:from-positions')" as="xs:integer*"/>
                         <!-- These are the new positions of the iterations that moved on this current repeat target -->
-                        <xxforms:variable name="new-positions" select="xxforms:event('xxforms:new-positions')" as="xs:integer*"/>
+                        <xxforms:variable name="to-positions" select="xxforms:event('xxforms:to-positions')" as="xs:integer*"/>
 
                         <xxforms:variable name="prefix-size" select="count($repeat-ancestors) + 1" as="xs:integer"/>
                         <xxforms:variable name="repeats-prefix" select="($repeat-ancestors, xxforms:event('xxforms:targetid'))" as="xs:string*"/>
                         <xxforms:variable name="repeats-string" select="string-join($repeats-prefix, ' ')" as="xs:string*"/>
 
                         <xxforms:variable name="indexes-strings" as="xs:string*"
-                                          select="for $p in $old-positions
+                                          select="for $p in $from-positions
                                                   return string-join(($repeat-indexes, xs:string($p)), ' ')" />
 
                         <!-- Find affected errors, i.e. all controls that descend from any moved iteration -->
@@ -283,7 +283,7 @@ xxx Inserting error information into error list:
 
                         <!-- A full prefix looks like: "company-repeat·3/employee-repeat·2" -->
                         <xxforms:variable name="full-prefixes" as="xs:string*"
-                                          select="for $p in $old-positions
+                                          select="for $p in $from-positions
                                                     return string-join((for $r in $repeat-ancestors
                                                       return concat($r, '·', $repeat-indexes[index-of($repeat-ancestors, $r)]), concat($prefixed-id, '·', $p)), '/')"/>
 
@@ -296,7 +296,7 @@ xxx Inserting error information into error list:
                                                               (concat(
                                                                   string-join(tokenize($full-prefix, '·')[position() lt last()], '·'),
                                                                   '·',
-                                                                  $new-positions[index-of($old-positions, xs:integer(tokenize($full-prefix, '·')[last()]))[1]],
+                                                                  $to-positions[index-of($from-positions, xs:integer(tokenize($full-prefix, '·')[last()]))[1]],
                                                                   substring($v, string-length($full-prefix) + 1))), '/')
                                                         else $v
                                                     "/>
@@ -328,18 +328,18 @@ xxx Inserting error information into error list:
                         <xforms:action xxforms:iterate="$affected-errors">
                             <xxforms:variable name="error" select="." as="element(error)"/>
                             <xxforms:variable name="current-indexes" select="tokenize($error/@indexes, '\s+')" as="xs:string*"/>
-                            <xxforms:variable name="old-position" select="$current-indexes[$prefix-size]" as="xs:string"/>
-                            <xxforms:variable name="new-position" select="$new-positions[index-of($old-positions, xs:integer($old-position))[1]]" as="xs:integer"/>
+                            <xxforms:variable name="from-position" select="$current-indexes[$prefix-size]" as="xs:string"/>
+                            <xxforms:variable name="to-position" select="$to-positions[index-of($from-positions, xs:integer($from-position))[1]]" as="xs:integer"/>
 
                             <!--<xforms:message level="xxforms:log-debug" ev:event="DOMActivate">-->
                                 <!--xxxxxxx old-->
-                                <!--<xforms:output value="$old-position"/>-->
+                                <!--<xforms:output value="$from-position"/>-->
                                 <!--xxxxxxx new-->
-                                <!--<xforms:output value="$new-position"/>-->
-                                <!--xxxxxxx old-positions-->
-                                <!--<xforms:output value="string-join(for $v in $old-positions return xs:string($v), ' ')"/>-->
-                                <!--xxxxxxx new-positions-->
-                                <!--<xforms:output value="string-join(for $v in $new-positions return xs:string($v), ' ')"/>-->
+                                <!--<xforms:output value="$to-position"/>-->
+                                <!--xxxxxxx from-positions-->
+                                <!--<xforms:output value="string-join(for $v in $from-positions return xs:string($v), ' ')"/>-->
+                                <!--xxxxxxx to-positions-->
+                                <!--<xforms:output value="string-join(for $v in $to-positions return xs:string($v), ' ')"/>-->
                                 <!--xxxxxxx-->
                             <!--</xforms:message>-->
                             
@@ -349,7 +349,7 @@ xxx Inserting error information into error list:
                                 <xxforms:context name="control-position" select="$error/@position"/>
                                 <!-- Replace old iteration by new iteration and keep the rest the same -->
                                 <xxforms:context name="repeat-indexes"
-                                                 select="($repeat-indexes, xs:string($new-position), subsequence($current-indexes, $prefix-size + 1))"/>
+                                                 select="($repeat-indexes, xs:string($to-position), subsequence($current-indexes, $prefix-size + 1))"/>
                                 <!-- Unchanged -->
                                 <xxforms:context name="repeat-ancestors" select="$error/@repeats"/>
                                 <xxforms:context name="alert" select="$error/@alert"/>

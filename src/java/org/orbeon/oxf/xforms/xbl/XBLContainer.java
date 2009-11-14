@@ -428,7 +428,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             final XBLBindings.Scope scope = getXBLBindings().getResolutionScopeByPrefixedId(sourcePrefixedId);
             final String repeatPrefixedId = scope.getPrefixedIdForStaticId(repeatStaticId);
 
-            if (containingDocument.getStaticState().getControlInfoMap().get(repeatPrefixedId) != null) {
+            if (containingDocument.getStaticState().getControlPosition(repeatPrefixedId) >= 0) {
                 // 2. Found static control
 
                 // NOTE: above we make sure to use prefixed id, e.g. my-stuff$my-foo-bar$my-repeat

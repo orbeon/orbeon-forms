@@ -375,18 +375,18 @@
                         <!-- Form editor -->
 
                         <!-- In-place view deselected, remember id -->
-                        <xforms:action ev:event="xforms-deselect" if="for $target in event('xxforms:target') return starts-with($target, 'fr-inplace-') and ends-with($target, '-view')">
+                        <xforms:action ev:event="xforms-deselect" if="for $target in event('xxforms:targetid') return starts-with($target, 'fr-inplace-') and ends-with($target, '-view')">
 
                             <!-- Hide currently visible in-place edit if any -->
                             <xforms:toggle if="$variables/inplace-id != ''" case="{$variables/inplace-id}" xxforms:repeat-indexes="{$variables/inplace-repeat-indexes}"/>
 
                             <!-- Remember new id and indexes -->
-                            <xforms:setvalue ref="$variables/inplace-id" value="event('xxforms:target')"/>
+                            <xforms:setvalue ref="$variables/inplace-id" value="event('xxforms:targetid')"/>
                             <xforms:setvalue ref="$variables/inplace-repeat-indexes" value="string-join(event('xxforms:repeat-indexes'), ' ')"/>
                         </xforms:action>
 
                         <!-- In-place edit deselected, forget id -->
-                        <xforms:action ev:event="xforms-deselect" if="for $target in event('xxforms:target') return starts-with($target, 'fr-inplace-') and ends-with($target, '-edit')">
+                        <xforms:action ev:event="xforms-deselect" if="for $target in event('xxforms:targetid') return starts-with($target, 'fr-inplace-') and ends-with($target, '-edit')">
                             <xforms:setvalue ref="$variables/inplace-id"/>
                             <xforms:setvalue ref="$variables/inplace-repeat-indexes"/>
                         </xforms:action>

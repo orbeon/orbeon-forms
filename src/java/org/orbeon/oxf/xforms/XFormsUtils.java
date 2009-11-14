@@ -1559,6 +1559,16 @@ public class XFormsUtils {
     }
 
     /**
+     * Return whether the effective id has a suffix.
+     *
+     * @param effectiveId   effective id to check
+     * @return              true iif the effective id has a suffix
+     */
+    public static boolean hasEffectiveIdSuffix(String effectiveId) {
+        return (effectiveId != null) && effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1;
+    }
+
+    /**
      * Return the suffix of an effective id, e.g. "" or "2-5-1". The suffix returned does not start with a separator.
      *
      * @param effectiveId   effective id to check

@@ -64,6 +64,7 @@
         <xforms:bind nodeset="dmv:personal-information">
             <xforms:bind nodeset="dmv:name/dmv:first-name | dmv:name/dmv:last-name" required="true()"/>
             <xforms:bind nodeset="dmv:driver-license-number | dmv:birth-date" required="true()"/>
+            <xforms:bind nodeset="dmv:birth-date" type="xs:date"/>
         </xforms:bind>
         <xforms:bind nodeset="dmv:address-information">
             <xforms:bind nodeset="dmv:address">

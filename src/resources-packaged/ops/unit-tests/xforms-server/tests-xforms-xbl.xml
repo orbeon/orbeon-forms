@@ -265,7 +265,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                             xxforms:attribute('target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
 
                                     <xforms:repeat nodeset="date" id="date-repeat">
@@ -915,9 +915,9 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', 'bubbling'),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
                                                              xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
 
@@ -925,9 +925,9 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', 'capture'),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
                                                              xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
 
@@ -1528,9 +1528,9 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', 'bubbling'),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
                                                              xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
@@ -1754,9 +1754,9 @@
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', 'fr-level1-binding'),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', 'bubbling'),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
                                             <xbl:handler event="up-value1" phase="target" xxbl:scope="outer">
@@ -1783,9 +1783,9 @@
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', 'fr-level2-binding'),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', 'bubbling'),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
                                             <xbl:handler event="up-value2" phase="target" xxbl:scope="outer">
@@ -1812,9 +1812,9 @@
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', 'fr-level3-binding'),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', 'bubbling'),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
                                             <xbl:handler event="up-value3" phase="target" xxbl:scope="outer">
@@ -1843,9 +1843,9 @@
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', 'main-group'),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', 'bubbling'),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
 
                                     <!-- Top-level component -->
@@ -2284,7 +2284,7 @@
                         <xforms:insert ev:event="my-event-1 my-event-2" context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                 xxforms:attribute('target', xxforms:event('xxforms:target'))
+                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid'))
                                                  ))"/>
 
                     </xforms:model>
@@ -2303,7 +2303,7 @@
                             <xforms:insert context="instance('events')" nodeset="*"
                                            origin="xxforms:element('event',
                                                     (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                     xxforms:attribute('target', xxforms:event('xxforms:target'))
+                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))
                                                      ))"/>
                             <xforms:dispatch name="my-event-1" targetid="model"/>
                         </xforms:action>
@@ -2315,7 +2315,7 @@
                             <xforms:insert context="instance('events')" nodeset="*"
                                            origin="xxforms:element('event',
                                                     (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                     xxforms:attribute('target', xxforms:event('xxforms:target'))
+                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))
                                                      ))"/>
                             <xforms:dispatch name="my-event-2" targetid="model"/>
                         </xforms:action>

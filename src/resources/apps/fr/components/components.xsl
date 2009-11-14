@@ -219,13 +219,23 @@
             </xforms:instance>
             <xforms:bind nodeset="trigger" readonly="not(../valid = 'true')"/>
             <!-- Mark all controls as visited when certain buttons are activated -->
-            <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-workflow-review-button fr-workflow-send-button fr-print-button fr-pdf-button fr-email-button fr-refresh-button">
+            <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-workflow-review-button fr-workflow-send-button fr-print-button fr-pdf-button fr-email-button fr-refresh-button fr-submit-button">
                 <!-- Dispatch to the appropriate error summaries -->
                 <xsl:if test="$error-summary-top">
                     <xforms:dispatch name="fr-visit-all" targetid="error-summary-control-top"/>
                 </xsl:if>
                 <xsl:if test="$error-summary-bottom">
                     <xforms:dispatch name="fr-visit-all" targetid="error-summary-control-bottom"/>
+                </xsl:if>
+            </xforms:action>
+            <!-- Mark all controls as un-visited when certain buttons are activated -->
+            <xforms:action ev:event="fr-unvisit-all">
+                <!-- Dispatch to the appropriate error summaries -->
+                <xsl:if test="$error-summary-top">
+                    <xforms:dispatch name="fr-unvisit-all" targetid="error-summary-control-top"/>
+                </xsl:if>
+                <xsl:if test="$error-summary-bottom">
+                    <xforms:dispatch name="fr-unvisit-all" targetid="error-summary-control-bottom"/>
                 </xsl:if>
             </xforms:action>
         </xforms:model>

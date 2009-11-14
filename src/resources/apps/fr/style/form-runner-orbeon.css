@@ -239,6 +239,7 @@ p, fieldset, table { margin-bottom: 1em }
 .xbl-fr-error-summary .fr-error-label, .xbl-fr-error-summary .fr-error-row { font-weight: bold }
 .xbl-fr-error-summary .fr-error-alert { color: #DF731B }
 
+/* Section title */
 .fr-section-title, .fr-section-title .xforms-label { font-weight: normal }
 
 /* Add background to static read-only fields and special output fields */

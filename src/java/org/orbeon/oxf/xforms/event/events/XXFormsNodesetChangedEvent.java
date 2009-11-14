@@ -13,12 +13,73 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.value.IntegerValue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class XXFormsNodesetChangedEvent extends XFormsUIEvent {
-    public XXFormsNodesetChangedEvent(XFormsContainingDocument containingDocument, XFormsControl targetObject) {
+
+    private static final String OLD_POSITIONS_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "from-positions");
+    private static final String NEW_POSITIONS_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "to-positions");
+    private static final String NEW_ITERATIONS_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "new-positions");
+
+    private final List<XFormsRepeatIterationControl> newIterations;
+    private final List<Integer> oldIterationPositions;
+    private final List<Integer> newIterationPositions;
+
+    public XXFormsNodesetChangedEvent(XFormsContainingDocument containingDocument, XFormsControl targetObject,
+                                      List<XFormsRepeatIterationControl> newIterations,
+                                      List<Integer> oldIterationPositions, List<Integer> newIterationPositions) {
         super(containingDocument, XFormsEvents.XXFORMS_NODESET_CHANGED, targetObject);
+
+        this.newIterations = newIterations;
+        this.oldIterationPositions = oldIterationPositions;
+        this.newIterationPositions = newIterationPositions;
+    }
+
+    @Override
+    public SequenceIterator getAttribute(String name) {
+        if (NEW_ITERATIONS_ATTRIBUTE.equals(name)) {
+            return iterationsToSequenceIterator(newIterations);
+        } else if (OLD_POSITIONS_ATTRIBUTE.equals(name)) {
+            return integersToSequenceIterator(oldIterationPositions);
+        } else if (NEW_POSITIONS_ATTRIBUTE.equals(name)) {
+            return integersToSequenceIterator(newIterationPositions);
+        } else {
+            return super.getAttribute(name);
+        }
+    }
+
+    private static SequenceIterator iterationsToSequenceIterator(List<XFormsRepeatIterationControl> list) {
+        if (list.size() > 0) {
+            final List<Item> items = new ArrayList<Item>(list.size());
+            for (XFormsRepeatIterationControl i: list)
+                items.add(new IntegerValue(i.getIterationIndex()));
+            return new ListIterator(items);
+        } else {
+            return EmptyIterator.getInstance();
+        }
+    }
+
+    private static SequenceIterator integersToSequenceIterator(List<Integer> list) {
+        if (list.size() > 0) {
+            final List<Item> items = new ArrayList<Item>(list.size());
+            for (Integer i: list)
+                items.add(new IntegerValue(i));
+            return new ListIterator(items);
+        } else {
+            return EmptyIterator.getInstance();
+        }
     }
 }

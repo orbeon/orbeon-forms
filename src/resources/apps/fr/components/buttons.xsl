@@ -90,8 +90,15 @@
                         <xxforms:show dialog="fr-clear-confirm-dialog"/>
                     </xforms:action>
                     <xforms:action if="property('xxforms:noscript')">
-                        <!-- Clear directly -->
-                        <xforms:dispatch name="fr-clear" target="fr-persistence-model"/>
+                        <!-- Restore directly -->
+                        <xforms:dispatch name="fr-clear" targetid="fr-persistence-model"/>
+                        <!-- Perform RRRR so that after that we can clear error summary -->
+                        <xforms:rebuild/>
+                        <xforms:recalculate/>
+                        <xforms:revalidate/>
+                        <xforms:refresh/>
+                        <!-- Clear error summary -->
+                        <xforms:dispatch name="fr-unvisit-all" targetid="fr-error-summary-model"/>
                     </xforms:action>
                 </xforms:action>
             </fr:button>
@@ -132,8 +139,8 @@
         <xforms:group model="fr-persistence-model" ref="instance('fr-triggers-instance')/save">
             <fr:button id="fr-save-button" xxforms:modal="true">
                 <xforms:label>
-                    <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/database_save.png" alt=""/>-->
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/save_16.png" alt=""/>
+                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/database_save.png" alt=""/>
+                    <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/save_16.png" alt=""/>-->
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
                 </xforms:label>
             </fr:button>

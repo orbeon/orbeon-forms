@@ -43,10 +43,12 @@ public abstract class XFormsEvent implements Cloneable {
 
     private static final String XXFORMS_TYPE_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "type");
     private static final String XXFORMS_TARGET_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "target");
+    private static final String XXFORMS_TARGETID_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "targetid");
     private static final String XXFORMS_BUBBLES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "bubbles");
     private static final String XXFORMS_CANCELABLE_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "cancelable");
 
     private static final String XXFORMS_REPEAT_INDEXES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
+    private static final String XXFORMS_REPEAT_ANCESTORS_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-ancestors");
     private static final String XXFORMS_TARGET_PREFIXES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "target-prefixes");
 
     // Properties that change as the event propagates
@@ -120,11 +122,11 @@ public abstract class XFormsEvent implements Cloneable {
     }
 
     public SequenceIterator getAttribute(String name) {
-        if ("target".equals(name) || XXFORMS_TARGET_ATTRIBUTE.equals(name)) {// first is legacy name
+        if ("target".equals(name) || XXFORMS_TARGET_ATTRIBUTE.equals(name) || XXFORMS_TARGETID_ATTRIBUTE.equals(name)) {// first is legacy name
             // Return the target static id
 
             if ("target".equals(name)) {
-                getIndentedLogger().logWarning("", "event('target') is deprecated. Use event('xxforms:target') instead.");
+                getIndentedLogger().logWarning("", "event('target') is deprecated. Use event('xxforms:targetid') instead.");
             }
 
             return new ListIterator(Collections.singletonList(new StringValue(targetObject.getId())));
@@ -166,8 +168,31 @@ public abstract class XFormsEvent implements Cloneable {
             } else {
                 return EmptyIterator.getInstance();
             }
-        } else if (XXFORMS_TARGET_PREFIXES_ATTRIBUTE.equals(name)) {
+        } else if (XXFORMS_REPEAT_ANCESTORS_ATTRIBUTE.equals(name)) {
+            // Return the target's ancestor repeat static ids if any
+            final String effectiveTargetId = targetObject.getEffectiveId();
+            if (XFormsUtils.hasEffectiveIdSuffix( effectiveTargetId)) {
+                // There is a suffix so compute
+                final List<String> ancestorRepeats
+                        = getContainingDocument().getStaticState().getAncestorRepeats(XFormsUtils.getPrefixedId(targetObject.getEffectiveId()), null);
 
+                if (ancestorRepeats.size() > 0) {
+                    // At least one ancestor repeat
+                    final List<StringValue> tokens = new ArrayList<StringValue>(ancestorRepeats.size());
+                    for (final String currentRepeat: ancestorRepeats) {
+                        tokens.add(new StringValue(XFormsUtils.getStaticIdFromId(currentRepeat)));
+                    }
+                    return new ListIterator(tokens);
+                } else {
+                    // No ancestor repeats
+                    return EmptyIterator.getInstance();
+                }
+            } else {
+                // No suffix
+                return EmptyIterator.getInstance();
+            }
+        } else if (XXFORMS_TARGET_PREFIXES_ATTRIBUTE.equals(name)) {
+            // Return the target's id prefixes if any
             final String effectiveTargetId = targetObject.getEffectiveId();
             final String[] parts = XFormsUtils.getEffectiveIdPrefixParts(effectiveTargetId);
 
@@ -200,6 +225,10 @@ public abstract class XFormsEvent implements Cloneable {
             throw new OXFException(e);
         }
     }
+
+//    protected void setAttributeAsInteger(String name, int value) {
+//        setAttribute(name, new SequenceExtent(new Item[] { new IntegerValue(value) } ));
+//    }
 
     /**
      * Attempts to get the current pipeline context using the static context.

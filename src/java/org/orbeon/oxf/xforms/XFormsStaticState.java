@@ -654,10 +654,6 @@ public class XFormsStaticState {
         return eventHandlersMap.get(observerPrefixedId);
     }
 
-    public Map<String, ControlInfo> getControlInfoMap() {
-        return controlInfoMap;
-    }
-
     public Map<String, ControlInfo> getRepeatControlInfoMap() {
         return controlTypes.get("repeat");
     }
@@ -665,6 +661,16 @@ public class XFormsStaticState {
     public Element getControlElement(String prefixedId) {
         final ControlInfo controlInfo = controlInfoMap.get(prefixedId);
         return (controlInfo == null) ? null : controlInfo.element;
+    }
+
+    public int getControlPosition(String prefixedId) {
+        final ControlInfo controlInfo = controlInfoMap.get(prefixedId);
+        return (controlInfo == null) ? -1 : controlInfo.index;
+    }
+
+    public boolean hasNodeBinding(String prefixedId) {
+        final ControlInfo controlInfo = controlInfoMap.get(prefixedId);
+        return (controlInfo == null) ? false : controlInfo.hasNodeBinding;
     }
 
     public Element getLabelElement(String prefixedId) {
@@ -802,7 +808,7 @@ public class XFormsStaticState {
             if (indentedLogger.isDebugEnabled()) {
                 indentedLogger.logDebug("", "performed static analysis",
                             "time", Long.toString(System.currentTimeMillis() - startTime),
-                            "controls", Integer.toString(getControlInfoMap().size()));
+                            "controls", Integer.toString(controlInfoMap.size()));
 
             }
 
@@ -988,7 +994,7 @@ public class XFormsStaticState {
                         controlsDocumentInfo, xpathConfiguration, prefix, repeatHierarchyStringBuffer, repeatAncestorsStack);
 
                 // Check for mandatory and optional bindings
-                final boolean hasBinding;
+                final boolean hasNodeBinding;
                 {
                     final boolean hasBind = controlElement.attribute("bind") != null;
                     final boolean hasRef = controlElement.attribute("ref") != null;
@@ -1012,7 +1018,7 @@ public class XFormsStaticState {
                         }
                     }
 
-                    hasBinding = hasBind || hasRef || hasNodeset;
+                    hasNodeBinding = hasBind || hasRef || hasNodeset;
                 }
 
                 // Create and index static control information
@@ -1024,7 +1030,8 @@ public class XFormsStaticState {
                     parentRepeatControlInfo = null;
                 }
 
-                final ControlInfo info = new ControlInfo(controlPrefixedId, controlElement, hasBinding, XFormsControlFactory.isValueControl(controlURI, controlName), parentRepeatControlInfo);
+                final ControlInfo info = new ControlInfo(controlPrefixedId, controlElement, controlInfoMap.size() + 1, hasNodeBinding,
+                        XFormsControlFactory.isValueControl(controlURI, controlName), parentRepeatControlInfo);
                 controlInfoMap.put(controlPrefixedId, info);
                 {
                     Map<String, ControlInfo> controlsMap = controlTypes.get(controlName);
@@ -1135,29 +1142,29 @@ public class XFormsStaticState {
             int lhhaCount = 0;
             for (Iterator i = lhhaElements.iterator(); i.hasNext(); lhhaCount++) {
                 final NodeInfo currentNodeInfo = (NodeInfo) i.next();
-                final Element llhaElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+                final Element lhhaElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
-                final Element parentElement = llhaElement.getParent();
+                final Element parentElement = lhhaElement.getParent();
 
-                final String forAttribute = llhaElement.attributeValue("for");
+                final String forAttribute = lhhaElement.attributeValue("for");
                 final String controlPrefixedId;
                 if (forAttribute == null || XFormsControlFactory.isCoreControl(parentElement.getNamespaceURI(), parentElement.getName())) {
                     // Element is directly nested in XForms element OR it has a @for attribute but is within a core control so we ignore the @for attribute
-                    controlPrefixedId = prefix + llhaElement.getParent().attributeValue("id");
+                    controlPrefixedId = prefix + lhhaElement.getParent().attributeValue("id");
                 } else {
                     // Element has a @for attribute and is not within a core control
                     controlPrefixedId = prefix + forAttribute;
                 }
 
-                final String elementName = llhaElement.getName();
+                final String elementName = lhhaElement.getName();
                 if ("label".equals(elementName)) {
-                    labelsMap.put(controlPrefixedId, llhaElement);
+                    labelsMap.put(controlPrefixedId, lhhaElement);
                 } else if ("help".equals(elementName)) {
-                    helpsMap.put(controlPrefixedId, llhaElement);
+                    helpsMap.put(controlPrefixedId, lhhaElement);
                 } else if ("hint".equals(elementName)) {
-                    hintsMap.put(controlPrefixedId, llhaElement);
+                    hintsMap.put(controlPrefixedId, lhhaElement);
                 } else if ("alert".equals(elementName)) {
-                    alertsMap.put(controlPrefixedId, llhaElement);
+                    alertsMap.put(controlPrefixedId, lhhaElement);
                 }
             }
             indentedLogger.logDebug("", "extracted label, help, hint and alert elements", "count", Integer.toString(lhhaCount));
@@ -1404,14 +1411,16 @@ public class XFormsStaticState {
     public static class ControlInfo {
         public final String prefixedId;
         public final Element element;
-        public final boolean hasBinding;
+        public final int index;
+        public final boolean hasNodeBinding;
         public final boolean isValueControl;
         public final ControlInfo ancestorRepeat;
 
-        public ControlInfo(String prefixedId, Element element, boolean hasBinding, boolean isValueControl, ControlInfo ancestorRepeat) {
+        public ControlInfo(String prefixedId, Element element, int index, boolean hasNodeBinding, boolean isValueControl, ControlInfo ancestorRepeat) {
             this.prefixedId = prefixedId;
             this.element = element;
-            this.hasBinding = hasBinding;
+            this.index = index;
+            this.hasNodeBinding = hasNodeBinding;
             this.isValueControl = isValueControl;
             this.ancestorRepeat = ancestorRepeat;
         }

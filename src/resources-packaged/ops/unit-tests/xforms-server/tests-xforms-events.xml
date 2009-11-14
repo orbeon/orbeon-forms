@@ -117,7 +117,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                             xxforms:attribute('target', xxforms:event('xxforms:target')),
+                                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
 
                                     <xforms:input id="my-input-1" ref="."/>
@@ -401,7 +401,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target'))
+                                                             xxforms:attribute('target', event('xxforms:targetid'))
                                                              ))"/>
 
                                     <!-- Everything relevant -->
@@ -538,7 +538,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target'))
+                                                             xxforms:attribute('target', event('xxforms:targetid'))
                                                              ))"/>
 
                                     <!-- Must not get event -->
@@ -615,7 +615,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target'))
+                                                             xxforms:attribute('target', event('xxforms:targetid'))
                                                              ))"/>
 
                                     <!-- Must not get event -->
@@ -707,7 +707,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:target'))
+                                                             xxforms:attribute('target', event('xxforms:targetid'))
                                                              ))"/>
 
                                     <xforms:output id="output-1" value="value"/>
@@ -933,7 +933,7 @@
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('handler1-event',
                                                             (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                             xxforms:attribute('target', xxforms:event('xxforms:target'))))"/>
+                                                             xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
 
                                     <xforms:group id="group2">
                                         <!-- Record only if target is observer -->
@@ -941,14 +941,14 @@
                                                        context="instance('events')" nodeset="*"
                                                        origin="xxforms:element('handler2-event',
                                                                 (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                                 xxforms:attribute('target', xxforms:event('xxforms:target'))))"/>
+                                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
 
                                         <!-- Record if target is observer OR group3 -->
                                         <xforms:insert ev:event="foo bar" ev:target="#observer group3"
                                                        context="instance('events')" nodeset="*"
                                                        origin="xxforms:element('handler3-event',
                                                                 (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                                 xxforms:attribute('target', xxforms:event('xxforms:target'))))"/>
+                                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
 
                                         <xforms:group id="group3">
                                             <!-- Record only if target is observer -->
@@ -956,7 +956,7 @@
                                                            context="instance('events')" nodeset="*"
                                                            origin="xxforms:element('handler4-event',
                                                                     (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                                     xxforms:attribute('target', xxforms:event('xxforms:target'))))"/>
+                                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
                                         </xforms:group>
 
                                     </xforms:group>

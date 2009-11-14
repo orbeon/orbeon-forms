@@ -32,19 +32,29 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <xxforms:hide ev:event="DOMActivate" dialog="fr-clear-confirm-dialog"/>
-            <xforms:trigger>
+            <fr:button>
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/clear"/></xhtml:span>
                 </xforms:label>
-                <xforms:dispatch ev:event="DOMActivate" name="fr-clear" target="fr-persistence-model"/>
-            </xforms:trigger>
-            <xforms:trigger>
+                <xforms:action ev:event="DOMActivate">
+                    <!-- Restore instance -->
+                    <xforms:dispatch name="fr-clear" targetid="fr-persistence-model"/>
+                    <!-- Perform RRRR so that after that we can clear error summary -->
+                    <xforms:rebuild/>
+                    <xforms:recalculate/>
+                    <xforms:revalidate/>
+                    <xforms:refresh/>
+                    <!-- Clear error summary -->
+                    <xforms:dispatch name="fr-unvisit-all" targetid="fr-error-summary-model"/>
+                </xforms:action>
+            </fr:button>
+            <fr:button>
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/cancel"/></xhtml:span>
                 </xforms:label>
-            </xforms:trigger>
+            </fr:button>
         </xforms:group>
     </xhtml:div>
 </xxforms:dialog>

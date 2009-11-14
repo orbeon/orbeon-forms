@@ -18,7 +18,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -39,7 +38,7 @@ public class XFormsSetfocusAction extends XFormsAction {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
-        final String controlIdAttributeValue = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("control"));
+        final String controlIdAttributeValue = actionElement.attributeValue("control");
         if (controlIdAttributeValue == null)
             throw new OXFException("Missing mandatory 'control' attribute on xforms:control element.");
 

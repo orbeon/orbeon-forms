@@ -14,18 +14,16 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
 
 /**
  * 9.3.7 The setindex Element
@@ -35,24 +33,30 @@ public class XFormsSetindexAction extends XFormsAction {
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
-        final String repeatId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("repeat"));
-        final String indexXPath = actionElement.attributeValue("index");
+        // Check presence of attribute
+        final String repeatAttribute = actionElement.attributeValue("repeat");
+        if (repeatAttribute == null)
+            throw new OXFException("Missing mandatory 'repeat' attribute on xforms:setindex element.");
 
-        final NodeInfo currentSingleNode = actionInterpreter.getContextStack().getCurrentSingleNode();
+        // Can't evaluate index XPath if no context
+        final Item currentSingleNode = actionInterpreter.getContextStack().getCurrentSingleItem();
         if (currentSingleNode == null)
             return;
 
+        // Get repeat static id
+        final String repeatStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, repeatAttribute, true);
+
         // Determine index
+        final String indexXPath = actionElement.attributeValue("index");
         final String indexString = actionInterpreter.evaluateStringExpression(propertyContext, actionElement,
                 contextStack.getCurrentNodeset(), contextStack.getCurrentPosition(), "number(" + indexXPath + ")");
 
         actionInterpreter.getIndentedLogger().logDebug("xforms:setindex", "setting index", "index", indexString);
 
         // Execute
-        executeSetindexAction(actionInterpreter, propertyContext, eventObserver, actionElement, repeatId, indexString);
+        executeSetindexAction(actionInterpreter, propertyContext, eventObserver, actionElement, repeatStaticId, indexString);
     }
 
     private static void executeSetindexAction(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventObserver eventObserver,

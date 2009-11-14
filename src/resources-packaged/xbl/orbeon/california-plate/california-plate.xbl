@@ -1,0 +1,109 @@
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+
+    <!--
+        Component to represent a California license plate.
+     -->
+    <xbl:binding id="fr-california-plate-binding" element="fr|california-plate">
+
+        <!-- Orbeon Form Builder Component Metadata -->
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
+            <display-name lang="en">California Plate</display-name>
+            <display-name lang="fr">Plaque californienne</display-name>
+            <icon lang="en">
+                <small-icon>/ops/images/xforms/calendar.png</small-icon>
+                <large-icon>/ops/images/xforms/calendar.png</large-icon>
+            </icon>
+            <datatype>xforms:string</datatype>
+            <template>
+                 <fr:california-plate>
+                     <xforms:label ref=""/>
+                     <xforms:hint ref=""/>
+                     <xforms:help ref=""/>
+                     <xforms:alert ref=""/>
+                </fr:california-plate>
+            </template>
+        </metadata>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/california-plate/california-plate.css"/>
+        </xbl:resources>
+        <xbl:implementation>
+            <!-- Local model -->
+            <xforms:model id="model">
+                <!-- Local instance with space for 7 characters -->
+                <xforms:instance id="plate">
+                    <plate xmlns=""><c/><c/><c/><c/><c/><c/><c/></plate>
+                </xforms:instance>
+            </xforms:model>
+        </xbl:implementation>
+        <xbl:template>
+            <!-- Local controls -->
+            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+
+                <!-- Inner group -->
+                <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
+                    <!-- Variable pointing to external single-node binding -->
+                    <xxforms:variable name="result" as="node()?">
+                        <xxforms:sequence select="." xxbl:scope="outer"/>
+                    </xxforms:variable>
+
+                    <!-- React to update to bound node or control coming into existence -->
+                    <xforms:group ref="$result" appearance="xxforms:internal">
+                        <!-- Only set local values if the bound node is an xs:date -->
+                        <xforms:action ev:event="xforms-value-changed xforms-enabled">
+                            <!-- Convert to codepoints with a max length of 7 and pad with spaces -->
+                            <xxforms:variable name="codepoints" select="subsequence(string-to-codepoints(concat($result, '       ')), 1, 7)" as="xs:integer*"/>
+                            <!-- Set values for current elements -->
+                            <xforms:action xxforms:iterate="$codepoints">
+                                <xxforms:variable name="p" select="position()" as="xs:integer"/>
+                                <xxforms:variable name="c" select="." as="xs:integer"/>
+                                <xforms:setvalue ref="instance()/c[$p]" value="codepoints-to-string($c)"/>
+                            </xforms:action>
+                        </xforms:action>
+                    </xforms:group>
+
+                    <xforms:group class="fr-component-group">
+                        <xhtml:table class="fr-plate-table">
+                            <xhtml:tr>
+                                <xhtml:td>
+                                    <xhtml:span class="fr-plate-span">
+                                        <xforms:repeat nodeset="instance()/c[normalize-space(.) != '']">
+                                            <xhtml:img src="/xbl/orbeon/california-plate/images/_{if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_'}_small.gif"/>
+                                        </xforms:repeat>
+                                    </xhtml:span>
+                                </xhtml:td>
+                            </xhtml:tr>
+                        </xhtml:table>
+                    </xforms:group>
+
+                    <!-- Stop propagation of all UI events -->
+                    <xforms:action ev:event="#all" ev:propagate="stop"/>
+                </xforms:group>
+
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

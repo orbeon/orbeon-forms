@@ -24,18 +24,10 @@
       xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
       xmlns="http://www.w3.org/1999/xhtml">
 
-    <!-- This is called when the XForms engine is ready -->
-    <xforms:action ev:event="xforms-model-construct-done">
-        <!-- Build plates instance -->
-        <xforms:insert context="instance('plates-instance')"
-                       while="count(plate) lt count(instance('document-instance')//dmv:plate-number)"
-                       nodeset="plate" origin="instance('plate-template')"/>
-    </xforms:action>
-
     <xforms:action ev:event="xforms-ready">
         <!-- Set initial focus -->
         <xforms:setfocus control="dmv-last-name-control"/>
-        <!-- Make sure we look clean after initialization, as insertions can take place above -->
+        <!-- Make sure we look clean after initialization -->
         <xforms:refresh/>
         <xforms:setvalue ref="xxforms:instance('control-instance')/data-status"/>
     </xforms:action>
@@ -125,25 +117,4 @@
                 readonly="xxforms:instance('parameters-instance')/readonly = 'true'"/>/>
     </xforms:bind>
 
-    <!-- XForms instance for license plate information -->
-    <xforms:instance id="plates-instance">
-        <plates xmlns=""/>
-    </xforms:instance>
-
-    <xforms:instance id="plate-template" xxforms:readonly="true" >
-        <plate xmlns="">
-            <character/>
-            <character/>
-            <character/>
-            <character/>
-            <character/>
-            <character/>
-            <character/>
-        </plate>
-    </xforms:instance>
-
-    <xforms:bind nodeset="instance('plates-instance')">
-        <xforms:bind nodeset="plate/character"
-                     calculate="for $i in . return substring((instance('document-instance')//dmv:plate-number)[count($i/../preceding-sibling::plate) + 1], count($i/preceding-sibling::character) + 1, 1)"/>
-    </xforms:bind>
 </xforms:model>

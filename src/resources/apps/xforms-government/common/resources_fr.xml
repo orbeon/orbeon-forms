@@ -53,7 +53,7 @@
             <return>Retour aux formulaires</return>
             <discard>Ignorer changements</discard>
             <language-choice>Langue</language-choice>
-            <errors>Résumé des erreurs</errors>
+            <errors>Votre formulaire contient les erreurs suivantes</errors>
             <check-errors-in-form>Ce formulaire contient des erreurs</check-errors-in-form>
             <error-details>Détail des erreurs</error-details>
             <language-choice>Language</language-choice>

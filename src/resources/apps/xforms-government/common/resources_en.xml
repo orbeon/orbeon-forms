@@ -53,7 +53,7 @@
             <return>Return to Forms</return>
             <discard>Forget Changes</discard>
             <language-choice>Language</language-choice>
-            <errors>Summary of errors</errors>
+            <errors>Your form contains the following errors</errors>
             <check-errors-in-form>This form contains errors</check-errors-in-form>
             <error-details>View error details</error-details>
             <language-choice>Language</language-choice>

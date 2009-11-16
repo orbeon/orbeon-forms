@@ -41,7 +41,7 @@
             </xbl:style>
         </xbl:resources>
         <xbl:handlers>
-            <xbl:handler event="fr-visit-all" phase="target">`
+            <xbl:handler event="fr-visit-all" phase="target">
                 <!-- Mark all controls as visited -->
                 <xforms:setvalue ref="instance('fr-visited-instance')"/>
                 <xforms:setvalue ref="instance('fr-visited-instance')/@all">true</xforms:setvalue>
@@ -119,7 +119,7 @@
                     <!-- Debug -->
                     <!--
                     <xforms:message level="xxforms:log-debug">
-xxx Inserting error information into error list:
+Inserting error information into error list:
 
     prefixed-id: <xforms:output value="$prefixed-id"/>
     control-position:   <xforms:output value="$control-position"/>
@@ -165,9 +165,9 @@ xxx Inserting error information into error list:
 
             </xforms:model>
         </xbl:implementation>
-        <xbl:template>
+        <xbl:template xxbl:transform="oxf:xslt" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oxf="http://www.orbeon.com/oxf/processors">
             <!-- Outer group around outer event handlers -->
-            <xforms:group appearance="xxforms:internal" xxbl:scope="outer">
+            <xforms:group appearance="xxforms:internal" xxbl:scope="outer" xsl:version="2.0">
 
                 <!-- Control visited: handle events on observer(s) passed -->
                 <xforms:action xbl:attr="ev:observer=observer" ev:event="DOMFocusOut xforms-value-changed xforms-disabled">
@@ -305,25 +305,6 @@ xxx Inserting error information into error list:
                                                     "/>
                         <xforms:setvalue ref="instance('fr-visited-instance')" value="string-join($updated-visited, ' ')"/>
 
-                        <!--<xforms:message level="xxforms:log-debug" ev:event="DOMActivate">-->
-                            <!--xxxxxxx before-->
-                            <!--<xforms:output value="instance('fr-visited-instance')"/>-->
-                            <!--xxxxxxx after-->
-                            <!--<xforms:output value="string-join($updated-visited, ' ')"/>-->
-                            <!--xxxxxxx prefix-size-->
-                            <!--<xforms:output value="$prefix-size"/>-->
-                            <!--xxxxxxx full-prefixes-->
-                            <!--<xforms:output value="string-join($full-prefixes, ' ')"/>-->
-                            <!--xxxxxxx after 1-->
-                            <!--<xforms:output value="string-join(for $v in tokenize(instance('fr-visited-instance'), '\s+')-->
-                                                    <!--return for $full-prefix in string-join(subsequence(tokenize($v, '/'), 1, $prefix-size), '/')-->
-                                                      <!--return if ($full-prefixes = $full-prefix)-->
-                                                        <!--then concat('xxx', $v, 'xxx')-->
-                                                        <!--else $v, ' ')-->
-                                                    <!--"/>-->
-                            <!--xxxxxxx-->
-                        <!--</xforms:message>-->
-
                         <!-- Remove affected errors from instance -->
                         <xforms:delete nodeset="$affected-errors"/>
 
@@ -333,18 +314,6 @@ xxx Inserting error information into error list:
                             <xxforms:variable name="current-indexes" select="tokenize($error/@indexes, '\s+')" as="xs:string*"/>
                             <xxforms:variable name="from-position" select="$current-indexes[$prefix-size]" as="xs:string"/>
                             <xxforms:variable name="to-position" select="$to-positions[index-of($from-positions, xs:integer($from-position))[1]]" as="xs:integer"/>
-
-                            <!--<xforms:message level="xxforms:log-debug" ev:event="DOMActivate">-->
-                                <!--xxxxxxx old-->
-                                <!--<xforms:output value="$from-position"/>-->
-                                <!--xxxxxxx new-->
-                                <!--<xforms:output value="$to-position"/>-->
-                                <!--xxxxxxx from-positions-->
-                                <!--<xforms:output value="string-join(for $v in $from-positions return xs:string($v), ' ')"/>-->
-                                <!--xxxxxxx to-positions-->
-                                <!--<xforms:output value="string-join(for $v in $to-positions return xs:string($v), ' ')"/>-->
-                                <!--xxxxxxx-->
-                            <!--</xforms:message>-->
                             
                             <xforms:dispatch name="fr-insert-error" targetid="fr-error-summary-model">
                                 <!-- Unchanged -->
@@ -402,8 +371,12 @@ xxx Inserting error information into error list:
 
                     <!-- Body of the error summary -->
                     <xforms:group class="fr-error-summary-body">
-                        <!-- Include optional title -->
-                        <xforms:label xxbl:scope="outer" class="fr-error-title"><xbl:content includes="fr|error-summary > fr|label > *"/></xforms:label>
+                        <!-- Include optional fr:label into xforms:label -->
+                        <xsl:for-each select="/*/fr:label[1]">
+                            <xforms:label xxbl:scope="outer" class="fr-error-title">
+                                <xsl:copy-of select="@*|node()"/>
+                            </xforms:label>
+                        </xsl:for-each>
                         <!-- Anchor for navigation -->
                         <xhtml:a name="fr-errors"/>
                         <xhtml:ol class="fr-error-list">
@@ -420,7 +393,7 @@ xxx Inserting error information into error list:
                                         <xforms:group ref=".[property('xxforms:noscript')]" xxbl:scope="outer">
                                             <!-- In noscript mode, use a plain link -->
                                             <!-- TODO: compute effective id once xforms:function is implemented -->
-                                             <xhtml:a href="#{$error/@id}"><xforms:output value="$error/@label" class="fr-error-label"/></xhtml:a>
+                                             <xhtml:a href="#{{$error/@id}}"><xforms:output value="$error/@label" class="fr-error-label"/></xhtml:a>
                                         </xforms:group>
                                         <xforms:group ref=".[not(property('xxforms:noscript'))]" xxbl:scope="outer">
                                             <!-- Otherwise use trigger -->
@@ -432,10 +405,10 @@ xxx Inserting error information into error list:
                                                     <xxforms:variable name="indexes" select="tokenize($error/@indexes, '\s+')" as="xs:integer*"/>
                                                     <xforms:action xxforms:iterate="tokenize($error/@repeats, '\s+')">
                                                         <xxforms:variable name="position" select="position()" as="xs:integer"/>
-                                                        <xforms:setindex repeat="{.}" index="$indexes[$position]"/>
+                                                        <xforms:setindex repeat="{{.}}" index="$indexes[$position]"/>
                                                     </xforms:action>
                                                     <!-- NOTE: @id stores the prefixed id, so obtain static id -->
-                                                    <xforms:setfocus control="{tokenize($error/@id, '\$')[last()]}"/>
+                                                    <xforms:setfocus control="{{tokenize($error/@id, '\$')[last()]}}"/>
                                                 </xforms:action>
                                             </xforms:trigger>
                                         </xforms:group>

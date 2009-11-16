@@ -15,10 +15,7 @@ package org.orbeon.oxf.servlet;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -67,10 +64,11 @@ public class OrbeonXFormsFilter implements Filter {
             getOrbeonDispatcher(subRequestPath).forward(httpRequest, httpResponse);
         } else {
             // Forward the request to the Orbeon Forms renderer
-            final MyHttpServletResponseWrapper responseWrapper = new MyHttpServletResponseWrapper(httpResponse);
+            final FilterRequestWrapper requestWrapper = new FilterRequestWrapper(httpRequest);
+            final FilterResponseWrapper responseWrapper = new FilterResponseWrapper(httpResponse);
 
             // Execute filter
-            filterChain.doFilter(new FilterHeadersRequestWrapper(httpRequest), responseWrapper);
+            filterChain.doFilter(requestWrapper, responseWrapper);
 
             // Set document if not present AND output was intercepted
             if (httpRequest.getAttribute(RENDERER_DOCUMENT_ATTRIBUTE_NAME) == null) {
@@ -93,8 +91,15 @@ public class OrbeonXFormsFilter implements Filter {
             // Forward to Orbeon Forms for rendering only of there is content to be rendered, otherwise just return and
             // let the filterChain finish its life naturally, assuming that when sendRedirect is used, no content is
             // available in the response object
-            if (!isBlank(responseWrapper.getContent()))
-                getOrbeonDispatcher(RENDERER_PATH).forward(new EmptyBodyRequestWrapper(httpRequest), httpResponse);
+            if (!isBlank(responseWrapper.getContent())) {
+                // The request wrapper provides an empty request body if the filtered resource already attempted to
+                // read the body.
+                final HandleBodyOrbeonRequestWrapper orbeonRequestWrapper
+                        = new HandleBodyOrbeonRequestWrapper(httpRequest, requestWrapper.isRequestBodyRead());
+
+                // Forward
+                getOrbeonDispatcher(RENDERER_PATH).forward(orbeonRequestWrapper, httpResponse);
+            }
         }
     }
 
@@ -184,11 +189,12 @@ public class OrbeonXFormsFilter implements Filter {
         return contentType.substring(0, semicolonIndex).trim();
     }
 
-    private static class FilterHeadersRequestWrapper extends HttpServletRequestWrapper {
+    private static class FilterRequestWrapper extends HttpServletRequestWrapper {
 
         private Enumeration<String> headerNames;
+        private boolean requestBodyRead;
 
-        public FilterHeadersRequestWrapper(HttpServletRequest httpServletRequest) {
+        public FilterRequestWrapper(HttpServletRequest httpServletRequest) {
             super(httpServletRequest);
 
         }
@@ -235,39 +241,75 @@ public class OrbeonXFormsFilter implements Filter {
             else
                 return super.getDateHeader(s);
         }
-    }
-
-    // Return an empty stream for the body, because the body might be read by the JSP and we don't want Orbeon Forms to
-    // attempt to read a closed stream.
-    private static class EmptyBodyRequestWrapper extends FilterHeadersRequestWrapper {
-        private EmptyBodyRequestWrapper(HttpServletRequest httpServletRequest) {
-            super(httpServletRequest);
-        }
 
         @Override
-        public String getContentType() {
-            return null;
-        }
-
-        @Override
-        public int getContentLength() {
-            return 0;
+        public BufferedReader getReader() throws IOException {
+            // If the filtered resource attempts to read the request body, we will forward an empty body
+            this.requestBodyRead = true;
+            return super.getReader();
         }
 
         @Override
         public ServletInputStream getInputStream() throws IOException {
-            return new ServletInputStream() {
+            // If the filtered resource attempts to read the request body, we will forward an empty body
+            this.requestBodyRead = true;
+            return super.getInputStream();
+        }
+
+        public boolean isRequestBodyRead() {
+            return requestBodyRead;
+        }
+    }
+
+    private static class HandleBodyOrbeonRequestWrapper extends FilterRequestWrapper {
+
+        // If necessary, return an empty stream for the body, because the body might be read by the JSP and we don't want
+        // Orbeon Forms to attempt to read a closed stream.
+        private final boolean forceEmptyBody;
+
+        private HandleBodyOrbeonRequestWrapper(HttpServletRequest httpServletRequest, boolean forceEmptyBody) {
+            super(httpServletRequest);
+            this.forceEmptyBody = forceEmptyBody;
+        }
+
+        @Override
+        public String getContentType() {
+            return forceEmptyBody ? null : super.getContentType();
+        }
+
+        @Override
+        public int getContentLength() {
+            return forceEmptyBody ? 0 : super.getContentLength();
+        }
+
+        @Override
+        public ServletInputStream getInputStream() throws IOException {
+            return forceEmptyBody ? new ServletInputStream() {
                 @Override
                 public int read() throws IOException {
                     return -1;
                 }
-            };
+            } : super.getInputStream();
+        }
+
+        @Override
+        public BufferedReader getReader() throws IOException {
+            return forceEmptyBody ? new BufferedReader(new Reader() {
+                @Override
+                public int read(char[] cbuf, int off, int len) throws IOException {
+                    return 0;
+                }
+
+                @Override
+                public void close() throws IOException {
+                }
+            }) : super.getReader();
         }
     }
 
-    private static class MyHttpServletResponseWrapper extends HttpServletResponseWrapper {
+    private static class FilterResponseWrapper extends HttpServletResponseWrapper {
 
-        public MyHttpServletResponseWrapper(HttpServletResponse response) {
+        public FilterResponseWrapper(HttpServletResponse response) {
             super(response);
         }
 

@@ -66,12 +66,23 @@
                 <p:input name="config" href="#extracted-document"/>
                 <p:output name="data" id="xincluded-document"/>
             </p:processor>
+            <!-- Process XML submission if any -->
+            <!-- The idea is that if you submit XML to a servlet which forwards to Orbeon, it should be made available. -->
+            <p:processor name="oxf:pipeline">
+                <p:input name="config" href="/ops/pfc/xforms-xml-submission.xpl"/>
+                <!-- All those are empty (only the PFC uses them) -->
+                <p:input name="default-submission"><null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></p:input>
+                <p:input name="matcher-result"><null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></p:input>
+                <p:input name="setvalues"><null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></p:input>
+                <!-- Resulting submission if any -->
+                <p:output name="instance" id="submitted-xml"/>
+            </p:processor>
             <!-- Call up standard Orbeon Forms epilogue -->
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="/config/epilogue.xpl"/>
                 <p:input name="data" href="#xincluded-document"/>
-                <!-- There is no "current submission" -->
-                <p:input name="instance"><null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></p:input>
+                <!-- Pass submitted XML -->
+                <p:input name="instance" href="#submitted-xml"/>
             </p:processor>
         </p:otherwise>
     </p:choose>

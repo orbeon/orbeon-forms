@@ -30,13 +30,19 @@
                     <type>Mobile</type>
                 </phone>
             </xforms:instance>
+
+            <xforms:instance id="ui">
+                <ui>
+                    <show-errors>false</show-errors>
+                    <errors-count/>
+                </ui>>
+            </xforms:instance>
             
         </xforms:model>
         <xhtml:style type="text/css">
             .fields .xforms-alert-active, .fields .xforms-alert-inactive { display: none; }
             .fields .xforms-required 
                 { background: url('../../../apps/fr/style/images/silk/bullet_star.png') right top no-repeat; padding: 0 20px 1px 0; }
-            .fields .xforms-required-filled { background-image: none; }
             .fields .xforms-invalid-visited, .show-errors .xforms-invalid
                 { background: url('../../../apps/fr/style/images/silk/bullet_red.png') right top no-repeat; padding-right: 0 20px 1px 0; }
 
@@ -47,91 +53,86 @@
             .buttons .xbl-fr-button { line-height: 1em; }
             .buttons .xbl-fr-button img { margin-right: .3em; }
 
-            /*.error-summary { margin-top: 2em; }*/
-            /*.error-summary dl { background-color: #fed; border: 10px solid #fed; }*/
-            /*.error-summary dl, .error-summary dd { padding: 0; margin: 0; }*/
-            /*.error-summary dl { width: 30em; overflow: hidden; }*/
-            /*.error-summary dt { float: left; width: 10em; font-weight: bold; }*/
-            /*.error-summary dd { float: left; width: 20em; }*/
-            /*.error-summary .xforms-output-output { display: inline; }*/
-
-            /*.xforms-repeat-selected-item-1 { background-color: transparent; }*/
+            .xbl-fr-error-summary { margin-top: 2em; }
+            .fr-error-summary-body { background-color: #F2D6C6; padding: .5em 0 .5em 0; width: 40em; }
+            .xbl-fr-error-summary .fr-error-alert { color: black; }
+            .xforms-repeat-selected-item-1 { background-color: transparent; }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        <xforms:group id="form-group" class="fields {if (instance('errors-instance')/@show-errors = 'true') then 'show-errors' else ''}">
-            <xhtml:div>
-                <xforms:input ref="first-name">
-                    <xforms:label>First name</xforms:label>
-                    <xforms:alert>First name is mandatory</xforms:alert>
-                </xforms:input>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:input ref="middle-name">
-                    <xforms:label>Middle name</xforms:label>
-                </xforms:input>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:input ref="last-name">
-                    <xforms:label>Last name</xforms:label>
-                    <xforms:alert>Last name is mandatory</xforms:alert>
-                </xforms:input>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:input ref="age">
-                    <xforms:label>Age</xforms:label>
-                    <xforms:alert>Age must be a number between 0 and 150</xforms:alert>
-                </xforms:input>
-            </xhtml:div>
-            <xforms:repeat nodeset="phone" id="phone-repeat">
-                <xhtml:div>
-                    <xforms:input ref="number">
-                        <xforms:label>Number</xforms:label>
-                        <xforms:alert>Phone number is mandatory</xforms:alert>
-                    </xforms:input>
-                </xhtml:div>
-            </xforms:repeat>
-            
-            <!-- Handle invalid and valid events in order to update error summary -->
-            <xforms:action ev:event="xforms-invalid" if="normalize-space(event('xxforms:alert')) != ''">
-                <xforms:action if="not(instance('errors-instance')/error[@id = event('xxforms:targetid') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')])">
-                    <xforms:insert context="instance('errors-instance')" nodeset="error" origin="instance('error-template')"/>
-                    <xxforms:variable name="new-error" select="instance('errors-instance')/error[last()]"/>
-                    <xforms:setvalue ref="$new-error/@id" value="event('xxforms:targetid')"/>
-                    <xforms:setvalue ref="$new-error/@indexes" value="string-join(event('xxforms:repeat-indexes'), '-')"/>
-                    <xforms:setvalue ref="$new-error/@position" value="event('xxforms:position')"/>
-                    <xforms:setvalue ref="$new-error/@ancestors" value="event('xxforms:repeat-ancestors')"/>
-                </xforms:action>
-                <xforms:setvalue ref="instance('errors-instance')/error[@id = event('xxforms:targetid') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]/@alert" value="event('xxforms:alert')"/>
-                <xforms:setvalue ref="instance('errors-instance')/error[@id = event('xxforms:targetid') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]/@label" value="event('xxforms:label')"/>
-            </xforms:action>
-            <xforms:action ev:event="xforms-valid xforms-disabled" if="instance('errors-instance')/error[@id = event('xxforms:targetid') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]">
-                <xforms:delete nodeset="instance('errors-instance')/error[@id = event('xxforms:targetid') and @indexes = string-join(event('xxforms:repeat-indexes'), '-')]"/>
-            </xforms:action>
-
-        </xforms:group>
+        <xforms:switch>
+            <xforms:case>
+                <xforms:group id="form-group" class="fields {if (instance('ui')/show-errors = 'true') then 'show-errors' else ''}">
+                    <xhtml:div>
+                        <xforms:input ref="first-name">
+                            <xforms:label>First name</xforms:label>
+                            <xforms:alert>First name is mandatory</xforms:alert>
+                        </xforms:input>
+                    </xhtml:div>
+                    <xhtml:div>
+                        <xforms:input ref="middle-name">
+                            <xforms:label>Middle name</xforms:label>
+                        </xforms:input>
+                    </xhtml:div>
+                    <xhtml:div>
+                        <xforms:input ref="last-name">
+                            <xforms:label>Last name</xforms:label>
+                            <xforms:alert>Last name is mandatory</xforms:alert>
+                        </xforms:input>
+                    </xhtml:div>
+                    <xhtml:div>
+                        <xforms:input ref="age">
+                            <xforms:label>Age</xforms:label>
+                            <xforms:alert>Age must be a number between 0 and 150</xforms:alert>
+                        </xforms:input>
+                    </xhtml:div>
+                    <xforms:repeat nodeset="phone" id="phone-repeat">
+                        <xhtml:div>
+                            <xforms:input ref="number">
+                                <xforms:label>Number</xforms:label>
+                                <xforms:alert>Phone number is mandatory</xforms:alert>
+                            </xforms:input>
+                        </xhtml:div>
+                    </xforms:repeat>
+                </xforms:group>
         
-        <xhtml:div class="buttons">
-            <fr:button>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/add.png"/>
-                    <xhtml:span>Add phone</xhtml:span>
-                </xforms:label>
-                <xforms:insert context="." nodeset="phone" origin="instance('phone-template')" ev:event="DOMActivate"/>
-            </fr:button>
-            <fr:button>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/disk.png"/>
-                    <xhtml:span>Save</xhtml:span>
-                </xforms:label>
-                <xforms:dispatch ev:event="DOMActivate" name="fr-visit-all" targetid="error-summary"/>
-                <xforms:setvalue ev:event="DOMActivate" context="instance('errors-instance')" 
-                    ref="@show-errors" value="exists(context()/error)"/>
-            </fr:button>
-        </xhtml:div>
+                <xhtml:div class="buttons">
+                    <fr:button>
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/images/silk/add.png"/>
+                            <xhtml:span>Add phone</xhtml:span>
+                        </xforms:label>
+                        <xforms:insert context="." nodeset="phone" origin="instance('phone-template')" ev:event="DOMActivate"/>
+                    </fr:button>
+                    <fr:button>
+                        <xforms:label>
+                            <xhtml:img src="/apps/fr/style/images/silk/disk.png"/>
+                            <xhtml:span>Save</xhtml:span>
+                        </xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xxforms:variable name="save-succeeded" select="instance('ui')/errors-count = 0"/>
+                            <xforms:action if="$save-succeeded">
+                                <xforms:toggle case="save-success"/>
+                            </xforms:action>
+                            <xforms:action if="not($save-succeeded)">
+                                <xforms:dispatch name="fr-visit-all" targetid="error-summary"/>
+                                <xforms:setvalue ref="instance('ui')/show-errors">true</xforms:setvalue> 
+                                <xforms:toggle case="save-failure"/>
+                            </xforms:action>
+                        </xforms:action>
+                    </fr:button>
+                    <xforms:switch>
+                        <xforms:case/>
+                        <xforms:case id="save-failure">Your data could not saved; please check the form for errors.</xforms:case>
+                    </xforms:switch>
+                </xhtml:div>
 
-        <fr:error-summary id="error-summary" observer="form-group">
-        </fr:error-summary>
 
+                <fr:error-summary id="error-summary" observer="form-group" errors-count-ref="instance('ui')/errors-count">
+                    <fr:label>Error in this form</fr:label>
+                </fr:error-summary>
+            </xforms:case>
+            <xforms:case id="save-success">Your data was saved.</xforms:case>
+        </xforms:switch>
     </xhtml:body>
 </xhtml:html>

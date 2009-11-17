@@ -128,7 +128,7 @@
     </xforms:action>
 
     <xforms:action ev:event="xforms-ready">
-        <!-- In case there is an error, show it (error occured when the controls are not yet ready) -->
+        <!-- In case there is an error, show it (error occurred when the controls are not yet ready) -->
         <xforms:toggle if="instance('fr-persistence-instance')/is-error = 'true'" case="fr-message-fatal-error"/>
 
         <!-- Force all this so we can safely set the data status -->

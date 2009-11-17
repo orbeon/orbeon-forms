@@ -1014,7 +1014,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     private void doRefresh(PropertyContext propertyContext) {
-        getXBLContainer().refreshIfNeeded(propertyContext);
+        getXBLContainer().synchronizeAndRefresh(propertyContext);
     }
 
     /**

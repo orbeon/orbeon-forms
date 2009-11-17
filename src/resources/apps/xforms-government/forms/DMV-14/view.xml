@@ -299,10 +299,8 @@
                             <td>
                                 <xforms:group ref="instance('triggers-instance')/add-vehicle-trigger">
                                     <xforms:action ev:event="DOMActivate">
-                                        <xforms:insert nodeset="instance('document-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>
-                                        <xforms:setvalue ref="instance('document-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:plate-number"/>
-                                        <xforms:setvalue ref="instance('document-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:vin"/>
-                                        <xforms:setvalue ref="instance('document-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:leased"/>
+                                        <xforms:insert nodeset="instance('document-instance')//dmv:vehicles/dmv:vehicle"
+                                                       at="index('vehicles-repeat')" position="after" origin="instance('vehicle-template')"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>

@@ -53,7 +53,7 @@ h1, h2, h3, h4, h5, h6 {
 h1 { font-size: 197% }
 
 h2 {
-    font-size: 160%;
+    font-size: 130%;
     margin: 1em 0 .5em 0;/* try smaller margins */
 }
 
@@ -168,7 +168,9 @@ p, fieldset, table { margin-bottom: 1em }
     font-style: italic
 }
 
-.xforms-label { font-weight: bold }
+.xforms-label {
+    /* bold seems too much in general*/
+}
 
 .xforms-noscript .xforms-help-panel .xforms-help-group { list-style-type: square }
 

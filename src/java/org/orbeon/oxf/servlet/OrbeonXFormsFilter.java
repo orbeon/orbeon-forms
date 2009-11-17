@@ -191,55 +191,11 @@ public class OrbeonXFormsFilter implements Filter {
 
     private static class FilterRequestWrapper extends HttpServletRequestWrapper {
 
-        private Enumeration<String> headerNames;
         private boolean requestBodyRead;
 
         public FilterRequestWrapper(HttpServletRequest httpServletRequest) {
             super(httpServletRequest);
 
-        }
-
-        @Override
-        public String getHeader(String s) {
-            // Filter conditional get headers so that we always get content
-            if (s.toLowerCase().startsWith("if-") )
-                return null;
-            else
-                return super.getHeader(s);
-        }
-
-        @Override
-        public Enumeration getHeaders(String s) {
-            // Filter conditional get headers so that we always get content
-            if (s.toLowerCase().startsWith("if-"))
-                return null;
-            else
-                return super.getHeaders(s);
-        }
-
-        @Override
-        public Enumeration getHeaderNames() {
-            if (headerNames == null) {
-                // Filter conditional get headers so that we always get content
-                final List<String> newHeaderNames = new ArrayList<String>();
-                for (Enumeration e = super.getHeaderNames(); e.hasMoreElements();) {
-                    final String currentName = (String) e.nextElement();
-                    if (!currentName.toLowerCase().startsWith("if-"))
-                        newHeaderNames.add(currentName);
-                }
-                headerNames = Collections.enumeration(newHeaderNames);
-
-            }
-            return headerNames;
-        }
-
-        @Override
-        public long getDateHeader(String s) {
-            // Filter conditional get headers so that we always get content
-            if (s.toLowerCase().startsWith("if-"))
-                return -1;
-            else
-                return super.getDateHeader(s);
         }
 
         @Override
@@ -304,6 +260,53 @@ public class OrbeonXFormsFilter implements Filter {
                 public void close() throws IOException {
                 }
             }) : super.getReader();
+        }
+
+        // Filter all headers starting with "if-" so that Orbeon Forms doesn't attempt caching based on those.
+
+        private Enumeration<String> headerNames;
+
+        @Override
+        public String getHeader(String s) {
+            // Filter conditional get headers so that we always get content
+            if (s.toLowerCase().startsWith("if-") )
+                return null;
+            else
+                return super.getHeader(s);
+        }
+
+        @Override
+        public Enumeration getHeaders(String s) {
+            // Filter conditional get headers so that we always get content
+            if (s.toLowerCase().startsWith("if-"))
+                return null;
+            else
+                return super.getHeaders(s);
+        }
+
+        @Override
+        public Enumeration getHeaderNames() {
+            if (headerNames == null) {
+                // Filter conditional get headers so that we always get content
+                final List<String> newHeaderNames = new ArrayList<String>();
+                for (Enumeration e = super.getHeaderNames(); e.hasMoreElements();) {
+                    final String currentName = (String) e.nextElement();
+                    if (!currentName.toLowerCase().startsWith("if-"))
+                        newHeaderNames.add(currentName);
+                }
+                headerNames = Collections.enumeration(newHeaderNames);
+
+            }
+            return headerNames;
+        }
+
+        @Override
+        public long getDateHeader(String s) {
+            // Filter conditional get headers so that we always get content
+            if (s.toLowerCase().startsWith("if-"))
+                return -1;
+            else
+                return super.getDateHeader(s);
         }
     }
 

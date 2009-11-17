@@ -356,4 +356,130 @@
         </output>
     </test>
 
+    <test description="fr:error-summary" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <first-name/>
+                                <note/>
+                                <note/>
+                                <last-name/>
+                            </instance>
+                        </xforms:instance>
+
+                        <xforms:bind id="first-name-bind" nodeset="first-name" required="true()"/>
+                        <xforms:bind id="last-name-bind" nodeset="last-name" required="true()"/>
+                        <xforms:bind id="note-bind" nodeset="note" required="true()"/>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <!-- Visit last-name -->
+                            <xforms:dispatch name="DOMFocusOut" targetid="last-name-control"/>
+                            <!-- Visit note #2 -->
+                            <xforms:setindex repeat="repeat" index="2"/>
+                            <xforms:dispatch name="DOMFocusOut" targetid="note-control"/>
+                            <!-- Insert new note #2 -->
+                            <xforms:insert nodeset="note" at="1" position="after" origin="xxforms:element('note')"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                    <xi:include href="oxf:/xbl/orbeon/error-summary/error-summary.xbl" xxi:omit-xml-base="true"/>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:error-summary id="my-summary" observer="my-group"/>
+                    <xforms:group id="my-group">
+                        <xforms:input id="first-name-control" ref="first-name">
+                            <xforms:label>First name</xforms:label>
+                            <xforms:alert>Invalid first name</xforms:alert>
+                        </xforms:input>
+                        <xforms:repeat nodeset="note" id="repeat">
+                            <xforms:input id="note-control" ref=".">
+                                <xforms:label>Note</xforms:label>
+                                <xforms:alert>Invalid note</xforms:alert>
+                            </xforms:input>
+                        </xforms:repeat>
+                        <xforms:input id="last-name-control" ref="last-name">
+                            <xforms:label>Last name</xforms:label>
+                            <xforms:alert>Invalid last name</xforms:alert>
+                        </xforms:input>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <first-name/>
+                                    <note/>
+                                    <note/>
+                                    <note/>
+                                    <last-name/>
+                                </instance>
+                            </instance>
+                            <instance id="fr-errors-instance" model-id="my-summary$fr-error-summary-model">
+                                <errors>
+                                    <error id="first-name-control" full-id="first-name-control" position="23" repeats="" indexes="" label="First name" alert="Invalid first name" binds="first-name-bind"/>
+                                    <error id="note-control" full-id="repeat·1/note-control" position="25" repeats="repeat" indexes="1" label="Note" alert="Invalid note" binds="note-bind"/>
+                                    <error id="note-control" full-id="repeat·2/note-control" position="25" repeats="repeat" indexes="2" label="Note" alert="Invalid note" binds="note-bind"/>
+                                    <error id="note-control" full-id="repeat·3/note-control" position="25" repeats="repeat" indexes="3" label="Note" alert="Invalid note" binds=""/>
+                                    <error id="last-name-control" full-id="last-name-control" position="26" repeats="" indexes="" label="Last name" alert="Invalid last name" binds="last-name-bind"/>
+                                </errors>
+                            </instance>
+                            <instance id="fr-visited-instance" model-id="my-summary$fr-error-summary-model">
+                                <controls all="false">last-name-control repeat·3/note-control</controls>
+                            </instance>
+                            <instance id="fr-state-instance" model-id="my-summary$fr-error-summary-model">
+                                <state>
+                                    <valid>false</valid>
+                                    <errors-count>5</errors-count>
+                                    <visible-errors-count>2</visible-errors-count>
+                                </state>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-summary$er" index="1"/>
+                            <control effective-id="repeat" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-summary$body" class="fr-error-summary-body"/>
+                        <xxf:copy-repeat-template id="my-summary$er" parent-indexes="" start-suffix="2" end-suffix="2"/>
+                        <xxf:control id="my-summary$nsg·1" relevant="false"/>
+                        <xxf:attribute id="my-summary$xf-100·1" for="my-summary$nsa·1" name="href"/>
+                        <xxf:control id="my-summary$nso·1" relevant="false" class="fr-error-label"/>
+                        <xxf:control id="my-summary$lt·1" label="Note"/>
+                        <xxf:control id="my-summary$xg·1" class="fr-error-row"/>
+                        <xxf:control id="my-summary$io·1">[3]</xxf:control>
+                        <xxf:control id="my-summary$ag·1" class="fr-error-alert"/>
+                        <xxf:control id="my-summary$ao·1">- Invalid note</xxf:control>
+                        <xxf:control id="my-summary$nsg·2" relevant="false"/>
+                        <xxf:attribute id="my-summary$xf-100·2" for="my-summary$nsa·2" name="href"/>
+                        <xxf:control id="my-summary$nso·2" relevant="false" class="fr-error-label"/>
+                        <xxf:control id="my-summary$lt·2" label="Last name"/>
+                        <xxf:control id="my-summary$xg·2" relevant="false" class="fr-error-row"/>
+                        <xxf:control id="my-summary$io·2" relevant="false"/>
+                        <xxf:control id="my-summary$ag·2" class="fr-error-alert"/>
+                        <xxf:control id="my-summary$ao·2">- Invalid last name</xxf:control>
+                        <xxf:control id="first-name-control" required="true" valid="false" label="First name" alert="Invalid first name"/>
+                        <xxf:copy-repeat-template id="repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="note-control·1" required="true" valid="false" label="Note" alert="Invalid note"/>
+                        <xxf:control id="note-control·2" required="true" valid="false" label="Note" alert="Invalid note"/>
+                        <xxf:control id="note-control·3" required="true" valid="false" label="Note" alert="Invalid note"/>
+                        <xxf:control id="last-name-control" required="true" valid="false" label="Last name" alert="Invalid last name"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

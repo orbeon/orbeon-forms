@@ -352,21 +352,25 @@ public class XBLBindings {
                 final Document fullShadowTreeDocument = generateShadowTree(propertyContext, indentedLogger, controlsDocumentInfo, controlElement, bindingElement, newPrefix);
                 if (fullShadowTreeDocument != null) {
 
+                    // Generate compact shadow tree for this static id
+                    final Scope newScope = new Scope(newPrefix.substring(0, newPrefix.length() - 1));
+                    final Document compactShadowTreeDocument = filterShadowTree(indentedLogger, fullShadowTreeDocument, controlElement, newPrefix, newScope, controlPrefixedId);
+
+                    final Scope innerScope = getResolutionScopeById(controlPrefixedId);
+                    final Scope outerScope = prefixedIdToXBLScopeMap.get(controlPrefixedId);
+
                     // Register models placed under xbl:implementation
                     if (xblImplementations != null) {
                         final List<Document> implementationModelDocuments = xblImplementations.get(controlElement.getQName());
                         if (implementationModelDocuments != null && implementationModelDocuments.size() > 0) {
                             // Say we DO annotate because these models are outside the template
-                            addModelDocuments(controlPrefixedId, implementationModelDocuments, newPrefix, true);
+                            addModelDocuments(controlPrefixedId, implementationModelDocuments, newPrefix, true,
+                                    innerScope, outerScope, XFormsConstants.XXBLScope.inner);
                             if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", "registered XBL implementation model documents", "count", Integer.toString(implementationModelDocuments.size()));
                         }
 
-                    }
-
-                    // Generate compact shadow tree for this static id
-                    final Scope newScope = new Scope(newPrefix.substring(0, newPrefix.length() - 1));
-                    final Document compactShadowTreeDocument = filterShadowTree(indentedLogger, fullShadowTreeDocument, controlElement, newPrefix, newScope, controlPrefixedId);
+                    }   
 
                     // Extract and register models from within the template
                     {
@@ -374,7 +378,7 @@ public class XBLBindings {
                         final List<Document> templateModelDocuments = XFormsStaticState.extractNestedModels(propertyContext, compactShadowTreeWrapper, true, locationData);
                         if (templateModelDocuments.size() > 0) {
                             // Say we don't annotate documents because already annotated as part as template processing
-                            addModelDocuments(controlPrefixedId, templateModelDocuments, newPrefix, false);
+                            addModelDocuments(controlPrefixedId, templateModelDocuments, newPrefix, false, null, null, null);
                             if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", "created and registered XBL template model documents", "count", Integer.toString(templateModelDocuments.size()));
                         }
@@ -398,8 +402,6 @@ public class XBLBindings {
                                 // Register xbl:handler as an action handler
 
                                 // Annotate handler and gather scope information
-                                final Scope innerScope = getResolutionScopeById(controlPrefixedId);
-                                final Scope outerScope = prefixedIdToXBLScopeMap.get(controlPrefixedId);
                                 final Element currentHandlerAnnotatedElement
                                         = annotateHandler(currentHandlerElement, newPrefix, innerScope, outerScope, XFormsConstants.XXBLScope.inner).getRootElement();
 
@@ -436,12 +438,14 @@ public class XBLBindings {
         return annotatedDocument;
     }
 
-    private void addModelDocuments(String controlPrefixedId, List<Document> modelDocuments, String prefix, boolean annotate) {
+    private void addModelDocuments(String controlPrefixedId, List<Document> modelDocuments, String prefix, boolean annotate,
+                                   Scope innerScope, Scope outerScope, XFormsConstants.XXBLScope startScope) {
         for (Document currentModelDocument: modelDocuments) {
 
             // Annotate if needed, otherwise leave as is
             if (annotate) {
                 currentModelDocument = annotateShadowTree(currentModelDocument, prefix, idGenerator);
+                gatherScopeMappingsAndTransform(currentModelDocument, prefix, innerScope, outerScope, startScope, null, false, "/");
             }
 
             // Store models by "prefixed id"

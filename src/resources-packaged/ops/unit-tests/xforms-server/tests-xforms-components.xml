@@ -376,6 +376,14 @@
                         <xforms:bind id="last-name-bind" nodeset="last-name" required="true()"/>
                         <xforms:bind id="note-bind" nodeset="note" required="true()"/>
 
+                        <xforms:instance id="error-summary-instance">
+                            <error-summary>
+                                <valid/>
+                                <errors-count/>
+                                <visible-errors-count/>
+                            </error-summary>
+                        </xforms:instance>
+
                         <xforms:action ev:event="xforms-ready">
                             <!-- Visit last-name -->
                             <xforms:dispatch name="DOMFocusOut" targetid="last-name-control"/>
@@ -390,7 +398,12 @@
                     <xi:include href="oxf:/xbl/orbeon/error-summary/error-summary.xbl" xxi:omit-xml-base="true"/>
                 </xhtml:head>
                 <xhtml:body>
-                    <fr:error-summary id="my-summary" observer="my-group"/>
+                    <fr:error-summary id="my-summary" observer="my-group"
+                                      context="instance('error-summary-instance')"
+                                      errors-count-ref="errors-count"
+                                      visible-errors-count-ref="visible-errors-count"
+                                      valid-ref="valid"/>
+
                     <xforms:group id="my-group">
                         <xforms:input id="first-name-control" ref="first-name">
                             <xforms:label>First name</xforms:label>
@@ -423,6 +436,13 @@
                                     <note/>
                                     <last-name/>
                                 </instance>
+                            </instance>
+                            <instance id="error-summary-instance" model-id="model">
+                                <error-summary>
+                                    <valid>false</valid>
+                                    <errors-count>5</errors-count>
+                                    <visible-errors-count>2</visible-errors-count>
+                                </error-summary>
                             </instance>
                             <instance id="fr-errors-instance" model-id="my-summary$fr-error-summary-model">
                                 <errors>

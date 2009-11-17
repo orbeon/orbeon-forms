@@ -334,32 +334,32 @@ Inserting error information into error list:
                 </xforms:action>
 
                 <!-- Write out the error count -->
-                <xforms:group ref="()" xbl:attr="model ref=errors-count-ref" appearance="xxforms:internal">
+                <xforms:group ref="()" xbl:attr="model context ref=errors-count-ref" appearance="xxforms:internal">
                     <xforms:group ref="instance('fr-state-instance')/errors-count" xxbl:scope="inner" appearance="xxforms:internal">
                         <xxforms:variable name="ref" as="item()?">
                             <xxforms:sequence select="." xxbl:scope="outer"/>
                         </xxforms:variable>
-                        <xforms:setvalue ev:event="xforms-value-changed" ref="$ref" value="context()"/>
+                        <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="context()"/>
                     </xforms:group>
                 </xforms:group>
 
                 <!-- Write out the visible error count -->
-                <xforms:group ref="()" xbl:attr="model ref=visible-errors-count-ref" appearance="xxforms:internal">
+                <xforms:group ref="()" xbl:attr="model context ref=visible-errors-count-ref" appearance="xxforms:internal">
                     <xforms:group ref="instance('fr-state-instance')/visible-errors-count" xxbl:scope="inner" appearance="xxforms:internal">
                         <xxforms:variable name="ref" as="item()?">
                             <xxforms:sequence select="." xxbl:scope="outer"/>
                         </xxforms:variable>
-                        <xforms:setvalue ev:event="xforms-value-changed" ref="$ref" value="context()"/>
+                        <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="context()"/>
                     </xforms:group>
                 </xforms:group>
 
                 <!-- Write out the validity -->
-                <xforms:group ref="()" xbl:attr="model ref=valid-ref" appearance="xxforms:internal">
+                <xforms:group ref="()" xbl:attr="model context ref=valid-ref" appearance="xxforms:internal">
                     <xforms:group ref="instance('fr-state-instance')/valid" xxbl:scope="inner" appearance="xxforms:internal">
                         <xxforms:variable name="ref" as="item()?">
                             <xxforms:sequence select="." xxbl:scope="outer"/>
                         </xxforms:variable>
-                        <xforms:setvalue ev:event="xforms-value-changed" ref="$ref" value="context()"/>
+                        <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="context()"/>
                     </xforms:group>
                 </xforms:group>
 

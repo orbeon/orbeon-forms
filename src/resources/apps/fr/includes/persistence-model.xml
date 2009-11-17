@@ -224,7 +224,7 @@
 
             <xforms:action if="not($continue-with-save)">
                 <!-- Data not valid: display error -->
-                <xforms:setvalue ref="instance('fr-persistence-instance')/message"
+                <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/message"
                                  model="fr-resources-model" select="$fr-fr-resources/detail/messages/form-validation-error"/>
                 <xforms:toggle case="fr-message-validation-error"/>
                 <!-- Mark all active alerts as visited -->

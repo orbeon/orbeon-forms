@@ -120,15 +120,13 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                     final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
                     final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, inputControl, false);
 
-                    if (!handlerContext.isNewXHTMLLayout())
-                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);
 
                     final String outputValue = inputControl.getExternalValue(pipelineContext);
                     if (outputValue != null)
                         contentHandler.characters(outputValue.toCharArray(), 0, outputValue.length());
 
-                    if (!handlerContext.isNewXHTMLLayout())
-                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
                 }
             }
 

@@ -13,7 +13,7 @@
   -->
 <applications>
     <section label="Get Started">
-        <application id="home" label="Forms and Apps"/>
+        <application id="home" label="Demo Forms &amp; Apps"/>
     </section>
     <section label="Form Builder (Preview)">
         <application id="fr/orbeon/builder/summary" label="Form Builder (Preview)"/>

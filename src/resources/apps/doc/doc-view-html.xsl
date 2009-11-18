@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
-  
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
-  
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
-  
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -40,8 +40,8 @@
                         </xhtml:div>
                         <xhtml:span id="navigation" style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
                             <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0em" action="http://www.google.com/custom">
-                                <xhtml:a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</xhtml:a> |
-                                <xhtml:a href="../" f:url-norewrite="true">Example Apps</xhtml:a> |
+                                <xhtml:a href="http://www.orbeon.com/">Orbeon.com</xhtml:a> |
+                                <xhtml:a href="/">Demo Forms &amp; Apps</xhtml:a> |
                                 <xhtml:span style="white-space: nowrap">
                                     Search:
                                     <xhtml:input type="text" name="q" size="10" maxlength="255" value=""/>

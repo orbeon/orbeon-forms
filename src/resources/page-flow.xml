@@ -22,13 +22,13 @@
     <files path-info="(?!/([^/]+)/service/).+\.(java|xq)" matcher="oxf:perl5-matcher" mime-type="text/plain"/>
     <files path-info="(?!/([^/]+)/service/).+\.jar" matcher="oxf:perl5-matcher" mime-type="application/zip"/>
 
-    <!-- Home redirects to Welcome application -->
-    <page id="home" path-info="/">
-        <action><result page="welcome"/></action>
+    <!-- Redirect to the Home application -->
+    <page id="root" path-info="/(welcome/?)?" matcher="oxf:perl5-matcher">
+        <action><result page="home"/></action>
     </page>
 
     <!-- Welcome application -->
-    <page id="welcome" path-info="/welcome/" model="apps/welcome/page-flow.xml"/>
+    <page id="home" path-info="/home/" model="apps/home/page-flow.xml"/>
 
     <!-- Dispatch request to a specific application -->
     <page id="apps" path-info="/([^/]+)/.*" matcher="oxf:perl5-matcher" model="apps/${1}/page-flow.xml"/>

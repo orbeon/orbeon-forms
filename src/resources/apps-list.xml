@@ -12,17 +12,17 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <applications>
-    <section label="Welcome">
-        <application id="welcome" label="Welcome"/>
+    <section label="Get Started">
+        <application id="home" label="Forms and Apps"/>
     </section>
     <section label="Form Builder (Preview)">
         <application id="fr/orbeon/builder/summary" label="Form Builder (Preview)"/>
         <application id="fr/orbeon/bookshelf/summary" label="Bookshelf Form"/>
         <application id="fr/orbeon/controls/new" label="Controls Form"/>
+        <application id="xforms-government/detail/DMV-14/" label="DMV-14 Form"/>
     </section>
     <section label="Essential XForms">
         <application id="xforms-controls" label="XForms Controls"/>
-        <application id="xforms-government" label="Government Forms"/>
         <application id="xforms-sandbox" label="XForms Sandbox"/>
     </section>
     <section label="XForms Tutorial Apps">
@@ -35,11 +35,7 @@
         <application id="xforms-calculator" label="Calculator"/>
         <application id="xforms-flickr-resize" label="Flickr Resize"/>
         <application id="xforms-google-suggests" label="Google Suggests"/>
-        <!--<application id="xforms-upload" label="Upload Control"/>-->
         <application id="xforms-wizard-switch" label="Wizard w/ Switch"/>
-        <!--<application id="xforms-cart" label="Shopping Cart"/>-->
-        <!--<application id="xforms-sql-address-book" label="SQL Address Book"/>-->
-        <!--<application id="xforms-tidy" label="HTML to XHTML"/>-->
     </section>
     <section label="Sandboxes">
         <application id="xforms-sandbox" label="XForms Sandbox"/>

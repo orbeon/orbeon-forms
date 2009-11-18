@@ -28,6 +28,7 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.IdGenerator;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
+import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandler;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
@@ -222,7 +223,15 @@ public class XFormsStaticState {
         if (namespacesMap == null) {
             assert idGenerator == null : "idGenerator must be null if namespacesMap is null";
             this.namespacesMap = new HashMap<String, Map<String, String>>();
-            idGenerator = new IdGenerator();
+
+            {
+                // Use the last id used for id generation. During state restoration, XBL components must start with this id.
+                final Element currentIdElement = staticStateElement.element(XFormsExtractorContentHandler.LAST_ID_QNAME);
+                assert currentIdElement != null;
+                final String lastId = currentIdElement.attributeValue("id");
+                assert lastId != null;
+                idGenerator = new IdGenerator(Integer.parseInt(lastId));
+            }
             try {
 //                if (xhtmlDocument == null) {
                     // Recompute from staticStateDocument

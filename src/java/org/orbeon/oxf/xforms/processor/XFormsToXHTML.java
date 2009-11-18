@@ -143,10 +143,10 @@ public class XFormsToXHTML extends ProcessorImpl {
 
 //                        annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, new SAXLoggerProcessor.DebugContentHandler(identity)));
 
-                        annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity));
+                        final IdGenerator idGenerator = new IdGenerator();
+                        annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity, idGenerator));
 
                         // Read the input through the annotator and gather namespace mappings
-                        final IdGenerator idGenerator = new IdGenerator();
                         final Map<String, Map<String, String>> namespaceMappings = new HashMap<String, Map<String, String>>();
                         readInputAsSAX(pipelineContext, processorInput, new XFormsAnnotatorContentHandler(annotatedSAXStore, externalContext, idGenerator, namespaceMappings));
 

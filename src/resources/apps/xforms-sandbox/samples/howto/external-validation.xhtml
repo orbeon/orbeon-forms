@@ -1,0 +1,101 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:v="http://www.example.com/validation">
+
+    <xhtml:head>
+        <xhtml:title>External validation</xhtml:title>
+        <xforms:model xxforms:xhtml-layout="span">
+            
+            <xforms:instance id="user-info">
+                <user-info>
+                    <first-name>Tom</first-name>
+                    <last-name>Smith</last-name>
+                    <customer-number>1234-4567-7890</customer-number>
+                </user-info>
+            </xforms:instance>
+            <xforms:bind nodeset="//*" constraint="not(@v:valid = 'false')"/>
+            
+            <xforms:instance id="validation-result"><dummy/></xforms:instance>
+            <xforms:bind nodeset="instance('validation-result')/v:global-errors/v:global-error" constraint="false()"/>
+            
+            <xforms:submission id="validation-submission" ref="instance('user-info')" 
+                    resource="/apps/xforms-sandbox/samples/howto/external-validation-response.xml"
+                    method="post" replace="instance" instance="validation-result">
+                <xforms:delete ev:event="xforms-submit" nodeset="//@v:*"/>
+                <xforms:action ev:event="xforms-submit-done">
+                    <xforms:insert nodeset="." origin="instance('validation-result')/v:data/*"/>
+                    <xforms:dispatch name="fr-visit-all" targetid="error-summary"/>
+                </xforms:action>
+            </xforms:submission>
+            
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .fields .xforms-alert-active, .fields .xforms-alert-inactive { display: none; }
+            .fields .xforms-invalid
+                { background: url('../../../apps/fr/style/images/silk/bullet_red.png') right top no-repeat; padding: 0 20px 1px 0; }
+
+            .fields .xforms-control { line-height: 2.5em; }
+            .fields .xforms-label { display: inline-block; width: 10em; }
+            
+            .buttons { margin-top: 2em; }
+            .buttons .xbl-fr-button { line-height: 1em; }
+            .buttons .xbl-fr-button img { margin-right: .3em; }
+
+            .xbl-fr-error-summary { margin-top: 2em; }
+            .fr-error-summary-body { background-color: #F2D6C6; padding: .5em 0 .5em 0; width: 40em; }
+            .xbl-fr-error-summary .fr-error-alert { color: black; }
+            .xforms-repeat-selected-item-1 { background-color: transparent; }
+            .global-errors { display: none; }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:group id="form-group" class="fields">
+            <xhtml:div>
+                <xforms:input ref="first-name">
+                    <xforms:label>First name</xforms:label>
+                    <xforms:alert ref="@v:alert"/>
+                </xforms:input>
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:input ref="last-name">
+                    <xforms:label>Last name</xforms:label>
+                    <xforms:alert ref="@v:alert"/>
+                </xforms:input>
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:input ref="customer-number">
+                    <xforms:label>Customer number</xforms:label>
+                    <xforms:alert ref="@v:alert"/>
+                </xforms:input>
+            </xhtml:div>
+            <xhtml:div class="global-errors">
+                <xforms:repeat nodeset="instance('validation-result')/v:global-errors/v:global-error">
+                    <xforms:output ref=".">
+                        <xforms:label>Global error</xforms:label>
+                        <xforms:alert ref="@v:alert"/>
+                    </xforms:output>
+                </xforms:repeat>
+            </xhtml:div>
+        </xforms:group>
+
+        <xhtml:div class="buttons">
+            <fr:button>
+                <xforms:label>
+                    <xhtml:img src="/apps/fr/style/images/silk/disk.png"/>
+                    <xhtml:span>Save</xhtml:span>
+                </xforms:label>
+                <xforms:send ev:event="DOMActivate" submission="validation-submission"/>
+            </fr:button>
+        </xhtml:div>
+
+        <fr:error-summary id="error-summary" observer="form-group">
+            <fr:label>Errors in this form</fr:label>
+        </fr:error-summary>
+    </xhtml:body>
+</xhtml:html>

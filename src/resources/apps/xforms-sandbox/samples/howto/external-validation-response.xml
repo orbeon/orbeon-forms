@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<v:validation-result xmlns:v="http://www.example.com/validation">
+    <v:data>
+        <user-info>
+            <first-name>Tom</first-name>
+            <last-name>Smith</last-name>
+            <customer-number v:valid="false" v:alert="This customer number is unknown to the system">1234-4567-7890</customer-number>
+        </user-info>
+    </v:data>
+    <v:global-errors>
+        <v:global-error v:alert="The first and last name do not match an existing customer"/>
+    </v:global-errors>
+</v:validation-result>

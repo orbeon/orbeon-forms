@@ -81,34 +81,56 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
         if (isBoolean) {
             // Produce a boolean output
 
-            final boolean isMultiple = true;
-            final Itemset itemset = new Itemset();
-            // NOTE: We have decided that it did not make much sense to encrypt the value for boolean. This also poses
-            // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
-            // the encrypted value of "true". So we do not encrypt values.
-            // NOTE: Put null label so that it is not output at all
-            itemset.addChildItem(new Item(isMultiple, false, Collections.EMPTY_LIST, null, "true"));
+            if (!isStaticReadonly(inputControl)) {
+                // Output control
+                final boolean isMultiple = true;
+                final Itemset itemset = new Itemset();
+                // NOTE: We have decided that it did not make much sense to encrypt the value for boolean. This also poses
+                // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
+                // the encrypted value of "true". So we do not encrypt values.
+                // NOTE: Put null label so that it is not output at all
+                itemset.addChildItem(new Item(isMultiple, false, Collections.EMPTY_LIST, null, "true"));
 
-            // NOTE: In the future, we may want to use other appearances provided by xforms:select
-//            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));
+                // NOTE: In the future, we may want to use other appearances provided by xforms:select
+    //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));
 
-            // TODO: This delegation to xforms:select1 handler is error-prone, is there a better way?
-            final XFormsSelect1Handler select1Handler = new XFormsSelect1Handler() {
-                @Override
-                protected String getPrefixedId() {
-                    return XFormsInputHandler.this.getPrefixedId();
+                // TODO: This delegation to xforms:select1 handler is error-prone, is there a better way?
+                final XFormsSelect1Handler select1Handler = new XFormsSelect1Handler() {
+                    @Override
+                    protected String getPrefixedId() {
+                        return XFormsInputHandler.this.getPrefixedId();
+                    }
+                    @Override
+                    public String getEffectiveId() {
+                        return XFormsInputHandler.this.getEffectiveId();
+                    }
+                    @Override
+                    public XFormsSingleNodeControl getXFormsControl() {
+                        return XFormsInputHandler.this.getXFormsControl();
+                    }
+                };
+                select1Handler.setContext(getContext());
+                select1Handler.outputContent(uri, localname, attributes, effectiveId, inputControl, itemset, isMultiple, true, true);
+            } else {
+                // Output static read-only value
+
+                if (isConcreteControl) {
+                    final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+                    final String enclosingElementLocalname = "span";
+                    final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
+                    final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, inputControl, false);
+
+                    if (!handlerContext.isNewXHTMLLayout())
+                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);
+
+                    final String outputValue = inputControl.getExternalValue(pipelineContext);
+                    if (outputValue != null)
+                        contentHandler.characters(outputValue.toCharArray(), 0, outputValue.length());
+
+                    if (!handlerContext.isNewXHTMLLayout())
+                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
                 }
-                @Override
-                public String getEffectiveId() {
-                    return XFormsInputHandler.this.getEffectiveId();
-                }
-                @Override
-                public XFormsSingleNodeControl getXFormsControl() {
-                    return XFormsInputHandler.this.getXFormsControl();
-                }
-            };
-            select1Handler.setContext(getContext());
-            select1Handler.outputContent(uri, localname, attributes, effectiveId, inputControl, itemset, isMultiple, true, true);
+            }
 
         } else {
 

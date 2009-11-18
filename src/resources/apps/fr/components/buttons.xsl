@@ -92,10 +92,7 @@
                     <xforms:action if="property('xxforms:noscript')">
                         <!-- Restore directly -->
                         <xforms:dispatch name="fr-clear" targetid="fr-persistence-model"/>
-                        <!-- Perform RRRR so that after that we can clear error summary -->
-                        <xforms:rebuild/>
-                        <xforms:recalculate/>
-                        <xforms:revalidate/>
+                        <!-- Perform refresh (fr-clear sets RRR flags already) so that after that we can clear error summary -->
                         <xforms:refresh/>
                         <!-- Clear error summary -->
                         <xforms:dispatch name="fr-unvisit-all" targetid="fr-error-summary-model"/>

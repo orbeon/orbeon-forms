@@ -334,43 +334,43 @@ Inserting error information into error list:
                 </xforms:action>
 
                 <!-- Write out the error count -->
-                <xforms:group ref="()" xbl:attr="model ref=errors-count-ref" appearance="xxforms:internal">
+                <xforms:group ref="()" xbl:attr="model context ref=errors-count-ref" appearance="xxforms:internal">
                     <xforms:group ref="instance('fr-state-instance')/errors-count" xxbl:scope="inner" appearance="xxforms:internal">
                         <xxforms:variable name="ref" as="item()?">
                             <xxforms:sequence select="." xxbl:scope="outer"/>
                         </xxforms:variable>
-                        <xforms:setvalue ev:event="xforms-value-changed" ref="$ref" value="context()"/>
+                        <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="context()"/>
                     </xforms:group>
                 </xforms:group>
 
                 <!-- Write out the visible error count -->
-                <xforms:group ref="()" xbl:attr="model ref=visible-errors-count-ref" appearance="xxforms:internal">
+                <xforms:group ref="()" xbl:attr="model context ref=visible-errors-count-ref" appearance="xxforms:internal">
                     <xforms:group ref="instance('fr-state-instance')/visible-errors-count" xxbl:scope="inner" appearance="xxforms:internal">
                         <xxforms:variable name="ref" as="item()?">
                             <xxforms:sequence select="." xxbl:scope="outer"/>
                         </xxforms:variable>
-                        <xforms:setvalue ev:event="xforms-value-changed" ref="$ref" value="context()"/>
+                        <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="context()"/>
                     </xforms:group>
                 </xforms:group>
 
                 <!-- Write out the validity -->
-                <xforms:group ref="()" xbl:attr="model ref=valid-ref" appearance="xxforms:internal">
+                <xforms:group ref="()" xbl:attr="model context ref=valid-ref" appearance="xxforms:internal">
                     <xforms:group ref="instance('fr-state-instance')/valid" xxbl:scope="inner" appearance="xxforms:internal">
                         <xxforms:variable name="ref" as="item()?">
                             <xxforms:sequence select="." xxbl:scope="outer"/>
                         </xxforms:variable>
-                        <xforms:setvalue ev:event="xforms-value-changed" ref="$ref" value="context()"/>
+                        <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="context()"/>
                     </xforms:group>
                 </xforms:group>
 
                 <!-- Only show this section if there are any visible errors -->
-                <xforms:group ref=".[$visible-errors]" xxbl:scope="inner">
+                <xforms:group ref=".[$visible-errors]" xxbl:scope="inner" id="ig">
 
                     <!-- Include optional header -->
                     <xbl:content includes="fr|error-summary > fr|header > *"/>
 
                     <!-- Body of the error summary -->
-                    <xforms:group class="fr-error-summary-body">
+                    <xforms:group class="fr-error-summary-body" id="body">
                         <!-- Include optional fr:label into xforms:label -->
                         <xsl:for-each select="/*/fr:label[1]">
                             <xforms:label xxbl:scope="outer" class="fr-error-title">
@@ -380,25 +380,25 @@ Inserting error information into error list:
                         <!-- Anchor for navigation -->
                         <xhtml:a name="fr-errors"/>
                         <xhtml:ol class="fr-error-list">
-                            <xforms:repeat nodeset="$visible-errors">
+                            <xforms:repeat nodeset="$visible-errors" id="er">
                                 <xhtml:li>
                                     <!-- Clickable / linkable label -->
                                     <xxforms:variable name="has-label" select="normalize-space(@label)" as="xs:boolean"/>
-                                    <xforms:group ref=".[$has-label]">
+                                    <xforms:group ref=".[$has-label]" id="lg">
                                         <xxforms:variable name="error" xxbl:scope="outer">
                                             <xxforms:sequence select="." xxbl:scope="inner"/>
                                         </xxforms:variable>
                                         <!-- NOTE: Put the entire groups in outer scope, as we can't yet deal with different
                                              scopes for control and nested action -->
-                                        <xforms:group ref=".[property('xxforms:noscript')]" xxbl:scope="outer">
+                                        <xforms:group ref=".[property('xxforms:noscript')]" xxbl:scope="outer" id="nsg">
                                             <!-- In noscript mode, use a plain link -->
                                             <!-- TODO: compute effective id once xforms:function is implemented -->
-                                             <xhtml:a href="#{{$error/@id}}"><xforms:output value="$error/@label" class="fr-error-label"/></xhtml:a>
+                                             <xhtml:a id="nsa" href="#{{$error/@id}}"><xforms:output value="$error/@label" class="fr-error-label" id="nso"/></xhtml:a>
                                         </xforms:group>
                                         <xforms:group ref=".[not(property('xxforms:noscript'))]" xxbl:scope="outer">
                                             <!-- Otherwise use trigger -->
-                                            <xforms:trigger appearance="minimal">
-                                                <xforms:label><xforms:output value="normalize-space($error/@label)" class="fr-error-label"/></xforms:label>
+                                            <xforms:trigger appearance="minimal" id="lt">
+                                                <xforms:label value="normalize-space($error/@label)" class="fr-error-label"/>
                                                 <!-- Set focus to control using static id and repeat indexes -->
                                                 <xforms:action ev:event="DOMActivate">
                                                     <!-- Set correct index hierarchy -->
@@ -414,12 +414,12 @@ Inserting error information into error list:
                                         </xforms:group>
                                     </xforms:group>
                                     <!-- Repeat indexes -->
-                                    <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row">
-                                        <xforms:output value="concat(' [', @indexes, ']')"/>
+                                    <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row" id="xg">
+                                        <xforms:output value="concat(' [', @indexes, ']')" id="io"/>
                                     </xforms:group>
                                     <!-- Alert message -->
-                                    <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert">
-                                        <xforms:output value="string-join((' -'[$has-label], @alert), ' ')"/>
+                                    <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert" id="ag">
+                                        <xforms:output value="string-join((' -'[$has-label], @alert), ' ')" id="ao"/>
                                     </xforms:group>
                                 </xhtml:li>
                             </xforms:repeat>

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
+import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
@@ -70,9 +71,13 @@ import java.util.Stack;
  *   <foo:bar ...>
  *   <!-- Global properties -->
  *   <properties xxforms:noscript="true" .../>
+ *   <!-- Last id used (for id generation in XBL after deserialization) -->
+ *   <last-id id="123"/>
  * </static-state>
  */
 public class XFormsExtractorContentHandler extends ForwardingContentHandler {
+
+    public static final QName LAST_ID_QNAME = new QName("last-id");
 
     private Locator locator;
     private LocationData locationData;
@@ -86,6 +91,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private boolean mustOutputFirstElement = true;
 
     private final ExternalContext externalContext;
+    private final IdGenerator idGenerator;
     private final boolean ignoreRootElement;
 
     private Stack<URI> xmlBaseStack = new Stack<URI>();
@@ -103,9 +109,10 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
      * @param externalContext   external context to obtain request path, properties, etc.
      * @param contentHandler    resulting static state document
      */
-    public XFormsExtractorContentHandler(ExternalContext externalContext, ContentHandler contentHandler) {
+    public XFormsExtractorContentHandler(ExternalContext externalContext, ContentHandler contentHandler, IdGenerator idGenerator) {
         super(contentHandler);
         this.externalContext = externalContext;
+        this.idGenerator = idGenerator;
         this.ignoreRootElement = false;
 
         final ExternalContext.Request request = externalContext.getRequest();
@@ -143,6 +150,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     public XFormsExtractorContentHandler(ContentHandler contentHandler, boolean ignoreRootElement, String baseURI) {
         super(contentHandler, contentHandler != null);
         this.externalContext = null;
+        this.idGenerator = null;
         this.ignoreRootElement = ignoreRootElement;
 
         try {
@@ -202,6 +210,15 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             super.startElement("", "properties", "properties", newAttributes);
             super.endElement("", "properties", "properties");
             super.endPrefixMapping("xxforms");
+        }
+
+        if (idGenerator != null) {
+            // Remember the last id used for id generation. During state restoration, XBL components must start with this id.
+            final AttributesImpl newAttributes = new AttributesImpl();
+            newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, Integer.toString(idGenerator.getCurrentId()));
+            final String lastIdName = LAST_ID_QNAME.getName();
+            super.startElement("", lastIdName, lastIdName, newAttributes);
+            super.endElement("", lastIdName, lastIdName);
         }
 
         super.endElement("", "static-state", "static-state");

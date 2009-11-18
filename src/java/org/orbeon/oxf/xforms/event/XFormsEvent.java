@@ -180,6 +180,10 @@ public abstract class XFormsEvent implements Cloneable {
                     // At least one ancestor repeat
                     final List<StringValue> tokens = new ArrayList<StringValue>(ancestorRepeats.size());
                     for (final String currentRepeat: ancestorRepeats) {
+                        // Issue: it is more correct to provide a prefixed id, but it is wrong to surface prefixed ids
+                        // to form authors. The error summary, e.g., relies on unique ids, and in that case returning
+                        // a prefixed id would be better. How can we solve this better?
+//                        tokens.add(new StringValue(currentRepeat));
                         tokens.add(new StringValue(XFormsUtils.getStaticIdFromId(currentRepeat)));
                     }
                     return new ListIterator(tokens);

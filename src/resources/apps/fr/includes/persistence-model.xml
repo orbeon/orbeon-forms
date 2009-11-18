@@ -128,7 +128,7 @@
     </xforms:action>
 
     <xforms:action ev:event="xforms-ready">
-        <!-- In case there is an error, show it (error occured when the controls are not yet ready) -->
+        <!-- In case there is an error, show it (error occurred when the controls are not yet ready) -->
         <xforms:toggle if="instance('fr-persistence-instance')/is-error = 'true'" case="fr-message-fatal-error"/>
 
         <!-- Force all this so we can safely set the data status -->
@@ -224,7 +224,7 @@
 
             <xforms:action if="not($continue-with-save)">
                 <!-- Data not valid: display error -->
-                <xforms:setvalue ref="instance('fr-persistence-instance')/message"
+                <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/message"
                                  model="fr-resources-model" select="$fr-fr-resources/detail/messages/form-validation-error"/>
                 <xforms:toggle case="fr-message-validation-error"/>
                 <!-- Mark all active alerts as visited -->

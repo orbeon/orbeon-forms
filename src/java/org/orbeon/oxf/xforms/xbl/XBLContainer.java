@@ -639,6 +639,10 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     }
 
     public void endOutermostActionHandler(PropertyContext propertyContext) {
+        synchronizeAndRefresh(propertyContext);
+    }
+
+    public void synchronizeAndRefresh(PropertyContext propertyContext) {
         // Below we split RRR and Refresh in order to reduce the number of refreshes performed
 
         // This is fun. Say you have a single model requiring RRRR and you get here the first time:
@@ -657,7 +661,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         // * Then we run refresh if possible
         // * Then we check again, as refresh events might have changed things
         //
-        // TODO: We might want to implement some code to detect excessive loops/recursion 
+        // TODO: We might want to implement some code to detect excessive loops/recursion
 
         while (needRebuildRecalculateRevalidate() || containingDocument.getControls().isRequireRefresh()) {
             while (needRebuildRecalculateRevalidate())

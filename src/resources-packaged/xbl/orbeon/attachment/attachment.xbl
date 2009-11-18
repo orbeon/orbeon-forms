@@ -58,7 +58,7 @@
                 </xforms:upload>
                 <xforms:output appearance="xxforms:download" ref=".[normalize-space()]">
                     <xforms:label>
-                        <xhtml:img src="/apps/fr/style/down.gif" alt=""/>
+                        <xhtml:img src="/apps/fr/style/images/pixelmixer/down_16.png" alt=""/>
                         <xhtml:span>Download</xhtml:span>
                     </xforms:label>
                     <xbl:content includes="xforms|filename,xforms|mediatype"/>

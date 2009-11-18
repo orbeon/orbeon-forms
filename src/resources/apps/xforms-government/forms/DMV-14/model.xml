@@ -78,11 +78,42 @@
     <!-- XForms instance containing the XML schema (for enumerations) -->
     <xforms:instance id="schema-instance" src="oxf:/apps/xforms-government/forms/DMV-14/schema.xsd" xxforms:readonly="true" xxforms:cache="true"/>
 
-    <!-- XForms instance containing template for mailing address -->
-    <xforms:instance id="mailing-address-template" src="oxf:/apps/xforms-government/forms/DMV-14/template-mailing-address.xml" xxforms:readonly="true" />
+    <!-- Template for the mailing address -->
+    <xforms:instance id="mailing-address-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+        <address type="mailing" xmlns="http://orbeon.org/oxf/examples/dmv">
+            <street>
+                <number/>
+                <name-1/>
+                <name-2/>
+            </street>
+            <apt/>
+            <city/>
+            <state/>
+            <zip/>
+        </address>
+    </xforms:instance>
 
-    <!-- XForms instance containing template for vehicle address -->
-    <xforms:instance id="vehicle-address-template" src="oxf:/apps/xforms-government/forms/DMV-14/template-vehicle-address.xml" xxforms:readonly="true" />
+    <!-- Template for the vehicle address -->
+    <xforms:instance id="vehicle-address-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="#all">
+        <vehicle-address xmlns="http://orbeon.org/oxf/examples/dmv">
+            <street>
+                <number/>
+                <name-1/>
+                <name-2/>
+            </street>
+            <city/>
+            <county/>
+        </vehicle-address>
+    </xforms:instance>
+
+    <!-- Template for the vehicle details -->
+    <xforms:instance id="vehicle-template" xxforms:readonly="true">
+        <vehicle xmlns="http://orbeon.org/oxf/examples/dmv">
+            <plate-number/>
+            <vin/>
+            <leased/>
+        </vehicle>
+    </xforms:instance>
 
     <!-- XForms instance for widget control information -->
     <xforms:instance id="triggers-instance">

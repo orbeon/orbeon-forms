@@ -28,6 +28,11 @@ public class IdGenerator {
         this.ids = new HashSet<String>();
     }
 
+    public IdGenerator(int currentId) {
+        this();
+        this.currentId = currentId;
+    }
+
     public IdGenerator(Set<String> ids) {
         this.ids = ids;
     }
@@ -57,5 +62,9 @@ public class IdGenerator {
 
     public Iterator<String> iterator() {
         return ids.iterator();
+    }
+
+    public int getCurrentId() {
+        return currentId;
     }
 }

@@ -18,7 +18,7 @@
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xsl:variable name="has-widgets" as="xs:boolean" select="exists(//widget:*)"/>
-    <xsl:key name="xbl:bindings" match="xbl:binding" use="translate(@element, '|', ':')"/>
+    <xsl:key name="xbl:bindings" match="xbl:binding" use="for $m in tokenize(@element, '\s+') return translate($m, '|', ':')"/>
 
     <xsl:template match="@*|node()" priority="-100">
         <xsl:copy>
@@ -31,16 +31,18 @@
             <xsl:copy-of select="@*"/>
             <xsl:apply-templates select="node()"/>
 
-            <!-- Include XBL components -->
-            <xi:include href="oxf:/config/xforms-widgets.xbl" xxi:omit-xml-base="true"/>
-
             <xsl:if test="pipeline:property('oxf.epilogue.xforms.widgets.auto-include-fr-widgets')">
-                <!-- Include fr:* widgets -->
+                <!-- Include fr:* XBL definitions -->
                 <xsl:variable name="widgets-to-exclude"
                               select="tokenize(pipeline:property('oxf.epilogue.xforms.widgets.fr-elements-to-skip'), '\s+')"/>
-                <xsl:variable name="potential-elements" select="//fr:*|//widget:table"/>
+                <xsl:variable name="potential-elements" select="//fr:*|//widget:table|//widget:xforms-instance-inspector"/>
                 <xsl:for-each-group select="$potential-elements" group-by="name()">
-                    <xsl:if test="not( key('xbl:bindings', name())) and not( name() = $widgets-to-exclude )">
+                    <!-- Handle backward compatibility for widget:xforms-instance-inspector -->
+                    <xsl:variable name="name" as="xs:string"
+                                  select="if (name() = 'widget:xforms-instance-inspector') then 'fr:xforms-inspector' else name()"/>
+                    <xsl:variable name="existing-bindings" as="element()*" select="key('xbl:bindings', $name)"/>
+                    <xsl:if test="not(exists($existing-bindings)) and not($name = $widgets-to-exclude)">
+                        <xsl:variable name="local-name" as="xs:string" select="tokenize($name, ':')[last()]"/>
                         <!-- 
                         
                         Test if the widget isn't defined locally (either directly or as a result on an xi:include and if 
@@ -50,19 +52,17 @@
                     
                         -->
                         <!-- NOTE: use XInclude to allow caching. doc() would disable caching here. -->
-                        <xi:include href="oxf:/xbl/orbeon/{local-name()}/{local-name()}.xbl" xxi:omit-xml-base="true"/>
-
+                        <xi:include href="oxf:/xbl/orbeon/{$local-name}/{$local-name}.xbl" xxi:omit-xml-base="true"/>
                         <!-- We don't have a way to explicitly include an XBL file from another XBL file, so we handle
                              dependencies between XBL components in a case-by-case basis here. -->
-                        <xsl:if test="local-name() = 'alert-dialog' and empty($potential-elements/self::fr:button)">
+                        <xsl:if test="$local-name = 'alert-dialog' and empty($potential-elements/self::fr:button)">
                             <xi:include href="oxf:/xbl/orbeon/button/button.xbl" xxi:omit-xml-base="true"/>
                         </xsl:if>
                     </xsl:if>
                 </xsl:for-each-group>
             </xsl:if>
-
-            <xsl:if test="$has-widgets or pipeline:property('oxf.epilogue.xforms.inspector')">
-                <!-- NOTE: Would be nice to do this with the xbl:style element -->
+            <xsl:if test="$has-widgets">
+                <!-- For legacy widget:tabs. Use fr:tabview instead. -->
                 <xhtml:link rel="stylesheet" href="/config/theme/xforms-widgets.css" type="text/css" media="all"/>
             </xsl:if>
         </xsl:copy>
@@ -176,10 +176,18 @@
         </xsl:copy>
     </xsl:template>
 
+    <!-- Automatically translates widget:xforms-instance-inspector into fr:xforms-instance-inspector for backward compatibility -->
+    <xsl:template match="widget:xforms-instance-inspector">
+        <fr:xforms-inspector>
+            <xsl:apply-templates select="@*|node()"/>
+        </fr:xforms-inspector>
+    </xsl:template>
+
+    <!-- Automatically add the instance inspector if property is set -->
     <xsl:template match="xhtml:body[pipeline:property('oxf.epilogue.xforms.inspector')]">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
-            <widget:xforms-instance-inspector id="orbeon-xforms-inspector" xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+            <fr:xforms-inspector id="orbeon-xforms-inspector"/>
         </xsl:copy>
     </xsl:template>
 

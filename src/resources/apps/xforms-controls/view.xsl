@@ -215,7 +215,7 @@
             <xxforms:variable name="current-resources" select="instance('fr-form-resources')/resource[@xml:lang = instance('fr-language-instance')]"/>
             <xsl:apply-templates select="$itemset-dialog"/>
 
-            <!--<widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>-->
+            <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
         </xsl:copy>
     </xsl:template>
 

@@ -21,7 +21,7 @@
     <xsl:key name="xbl:bindings" match="xbl:binding" use="for $m in tokenize(@element, '\s+') return translate($m, '|', ':')"/>
 
     <!-- All elements that look like they can have XBL bindings -->
-    <xsl:variable name="potential-elements" as="element()*" select="//fr:*|//widget:table"/>
+    <xsl:variable name="potential-elements" as="element()*" select="//fr:*"/>
     <!-- All names thereof including XForms inspector if automatically added
          Also handle backward compatibility for widget:xforms-instance-inspector -->
     <xsl:variable name="potential-names" as="xs:string*"
@@ -68,7 +68,7 @@
                             <xi:include href="oxf:/xbl/orbeon/{$local-name}/{$local-name}.xbl" xxi:omit-xml-base="true"/>
                             <!-- We don't have a way to explicitly include an XBL file from another XBL file, so we handle
                                  dependencies between XBL components in a case-by-case basis here. -->
-                            <xsl:if test="$local-name = 'alert-dialog' and empty($potential-elements/self::fr:button)">
+                            <xsl:if test="$local-name = 'alert-dialog' and not('fr:button' = $potential-names) and not(exists(key('xbl:bindings', 'fr:button')))">
                                 <xi:include href="oxf:/xbl/orbeon/button/button.xbl" xxi:omit-xml-base="true"/>
                             </xsl:if>
                         </xsl:if>

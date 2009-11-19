@@ -55,7 +55,7 @@
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
-                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
                     <!-- Outer group -->
@@ -66,7 +66,7 @@
                         <xforms:group id="component-inner-group" xxbl:scope="inner">
 
                             <!-- Variable pointing to external single-node binding -->
-                            <xxforms:variable name="external-value" as="node()?"><xxforms:sequence select="." xxbl:scope="outer"/></xxforms:variable> 
+                            <xxforms:variable name="external-value" as="node()?"><xxforms:sequence select="." xxbl:scope="outer"/></xxforms:variable>
 
                             <!-- Init event -->
                             <xforms:action id="xf-en" ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="component-inner-group">
@@ -75,12 +75,14 @@
 
                             <!-- Configuration -->
                             <xxforms:variable name="dynamic-itemset" xbl:attr="xbl:text=dynamic-itemset"/>
-                            <xforms:output class="fr-autocomplete-dynamic-itemset" value="$dynamic-itemset" style="display: none"/>
+                            <xforms:output class="fr-autocomplete-select1e-dynamic-itemset" value="$dynamic-itemset" style="display: none"/>
                             <xsl:copy-of select="xxbl:parameter(., 'max-results-displayed')"/>
 
                             <!-- Dropdown with value shown by autocomplete -->
-                            <xforms:select1 id="select1" ref="$external-value" class="fr-autocomplete-select1" style="display: none" appearance="minimal" xxforms:encrypt-item-values="false">
-                                <xbl:content includes="xforms|itemset, xforms|item"/>
+                            <!-- style="display: none"  -->
+                            <xforms:select1 id="select1" ref="$external-value" class="fr-autocomplete-select1" appearance="minimal" xxforms:encrypt-item-values="false">
+                                <xsl:apply-templates select="xforms:itemset | xforms:item" mode="copy-label"/>
+                                <xsl:apply-templates select="xforms:itemset | xforms:item" mode="copy-value"/>
                             </xforms:select1>
                             <!-- Input with external value -->
                             <xforms:input id="external-value" ref="$external-value" class="fr-autocomplete-external-value" style="display: none"/>
@@ -111,6 +113,28 @@
                             <xforms:action ev:event="#all" ev:propagate="stop"/>
                         </xforms:group>
                     </xforms:group>
+                </xsl:template>
+
+                <!-- Add the xxbl:scope="outer" on the xforms:itemset and xforms:item -->
+                <xsl:template match="xforms:itemset | xforms:item" mode="#all">
+                    <xsl:copy>
+                        <xsl:attribute name="xxbl:scope">outer</xsl:attribute>
+                        <xsl:apply-templates select="@* | node()" mode="#current"/>
+                    </xsl:copy>
+                </xsl:template>
+
+                <!-- Don't do anything when the element does not correspond to the mode -->
+                <xsl:template match="xforms:label" mode="copy-value"/>
+                <xsl:template match="xforms:value" mode="copy-label"/>
+
+                <!-- When the element matches the mode, generate the other one -->
+                <xsl:template match="xforms:label" mode="copy-label">
+                    <xsl:copy-of select="."/>
+                    <xforms:value><xsl:copy-of select="@* | node()"/></xforms:value>
+                </xsl:template>
+                <xsl:template match="xforms:value" mode="copy-value">
+                    <xsl:copy-of select="."/>
+                    <xforms:label><xsl:copy-of select="@* | node()"/></xforms:label>
                 </xsl:template>
             </xsl:transform>
         </xbl:template>

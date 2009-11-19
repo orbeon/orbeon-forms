@@ -3219,6 +3219,10 @@ ORBEON.xforms.Events = {
     },
 
     click: function(event) {
+        // Stop processing if the mouse button that was clicked is not the left button
+        // See: http://www.quirksmode.org/js/events_properties.html#button
+        if (event.button != 0 && event.button != 1) return;
+
         ORBEON.xforms.Events.clickEvent.fire(event);
         var originalTarget = YAHOO.util.Event.getTarget(event);
         if (YAHOO.lang.isObject(originalTarget) && YAHOO.lang.isBoolean(originalTarget.disabled) && originalTarget.disabled) {

@@ -15,7 +15,7 @@
     <section label="Get Started">
         <application id="home" label="Demo Forms &amp; Apps"/>
     </section>
-    <section label="Form Builder (Preview)">
+    <section label="Form Builder / Runner">
         <application id="fr/orbeon/builder/summary" label="Form Builder (Preview)"/>
         <application id="fr/orbeon/bookshelf/summary" label="Bookshelf Form"/>
         <application id="fr/orbeon/controls/new" label="Controls Form"/>

@@ -631,30 +631,6 @@
                         <xxforms:variable name="show-created" select="xxforms:property(string-join(('oxf.fr.summary.show-created', $app, $form), '.'))"/>
                         <xxforms:variable name="show-last-modified" select="xxforms:property(string-join(('oxf.fr.summary.show-last-modified', $app, $form), '.'))"/>
 
-                        <!--
-                        <widget:table appearance="xxforms:data-table" sortedByKey="Type" sortedByDir="descending" paginated="true" rowsPerPage="20">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Name</th>
-                                    <th>Name</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr repeat-nodeset="document">
-                                    <td repeat-nodeset="instance('fr-configuration-instance')/*[tokenize(@class, '\s+') = 'fr-summary']">
-                                        <xxforms:variable name="control-info" select="." as="element()"/>
-                                        <xxforms:variable name="resourceId" select="substring-before($control-info/@id, '-control')" as="xs:string"/>
-                                        <xxforms:variable name="resource" select="$form-resources/*[local-name() = $resourceId]" as="element()?"/>
-                                        <xforms:input ref="@id" id="fr-document-document-detail-id" class="fr-expose-to-javascript"/>
-                                        <xforms:output value="if (exists($resource)) then $resource/label else if (normalize-space($control-info/xforms:label) != '') then $control-info/xforms:label else concat('[', $resourceId, ']')"/>
-
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </widget:table>
-                        -->
-
                         <div class="fr-summary-table-div">
                             <table class="fr-summary-table">
                             <!-- <fr:datatable-dyn scrollable="both" width="800px" height="500px"> -->

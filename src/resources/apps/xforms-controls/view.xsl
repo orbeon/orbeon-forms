@@ -56,8 +56,8 @@
                 #fb-itemset-editor-dialog .xbl-fr-link-select1 .xforms-label { display: none }
 
                 /* Edit Items trigger */
-                .edit-items-trigger { font-size: smaller }
-                .fr-grid-content .edit-items-trigger, .fr-grid-content .edit-items-trigger:hover { text-decoration: none; display: inline-block; clear: both }
+                .edit-items-trigger { font-size: smaller; display: block }
+                .fr-grid-content .edit-items-trigger, .fr-grid-content .edit-items-trigger:hover { text-decoration: none; clear: both }
 
                 .fr-grid-content .xforms-label,
                     .fr-grid-content .xbl-fr-button,
@@ -65,17 +65,17 @@
                 .fr-grid .fr-grid-content .xbl-fr-button button.xforms-trigger  { margin-top: 0 }
                 .fr-grid-content textarea.xforms-textarea, .xforms-textarea textarea { height: 9em }
 
-                /* fr:link-select1 displays to the right, except in the grid */
-                .xbl-fr-link-select1 { display: block; text-align: right }
-                .fr-grid .xbl-fr-link-select1 { text-align: left }
-                .xbl-fr-link-select1 .xforms-label { margin-right: .5em }
+                /* Selectors section */
+                .fr-selectors { text-align: right }
+                .fr-selectors .xbl-fr-link-select1 { display: -moz-inline-box; display: inline-block; text-align: right; margin-left: 1em; margin-bottom: .5em }
+                .fr-selectors .xbl-fr-link-select1 .xforms-label { margin-right: .5em }
 
                 /* ***** Styles from form-runner-orbeon.css ***********************************************************/
                 .xforms-input input, textarea.xforms-textarea, input.xforms-secret, .xforms-textarea textarea, .xforms-secret input {
                     border: 1px solid #ccc;
                 }
 
-                .xforms-label { font-weight: bold; }
+                .xforms-label { font-weight: bold }
 
                 /* Colored border for invalid fields */
                 /* NOTE: style required-empty as well to show user which are the required fields */
@@ -118,8 +118,11 @@
             <xsl:apply-templates/>
 
             <!-- Current language -->
-            <xforms:instance id="fr-language-instance">
-                <language>en</language>
+            <xforms:instance id="fr-settings-instance">
+                <settings>
+                    <lang>en</lang>
+                    <page-size>doc</page-size>
+                </settings>
             </xforms:instance>
 
             <!-- List of languages and associated names -->
@@ -137,18 +140,60 @@
                         <detail>
                             <labels>
                                 <language>Language:</language>
+                                <page-size>Page size:</page-size>
                                 <alert>Invalid value</alert>
                                 <edit-items>Edit Items</edit-items>
                             </labels>
+                            <items>
+                                <page-size>
+                                    <item>
+                                        <label>small</label>
+                                        <value>doc</value>
+                                    </item>
+                                    <item>
+                                        <label>large</label>
+                                        <value>doc2</value>
+                                    </item>
+                                    <item>
+                                        <label>larger</label>
+                                        <value>doc4</value>
+                                    </item>
+                                    <item>
+                                        <label>100%</label>
+                                        <value>doc3</value>
+                                    </item>
+                                </page-size>
+                            </items>
                         </detail>
                     </resource>
                     <resource xml:lang="fr">
                         <detail>
                             <labels>
                                 <language>Langue:</language>
+                                <page-size>Taille :</page-size>
                                 <alert>Valeur invalide</alert>
                                 <edit-items>Editer la liste</edit-items>
                             </labels>
+                            <items>
+                                <page-size>
+                                    <item>
+                                        <label>petite</label>
+                                        <value>doc</value>
+                                    </item>
+                                    <item>
+                                        <label>grande</label>
+                                        <value>doc2</value>
+                                    </item>
+                                    <item>
+                                        <label>plus grande</label>
+                                        <value>doc4</value>
+                                    </item>
+                                    <item>
+                                        <label>100%</label>
+                                        <value>doc3</value>
+                                    </item>
+                                </page-size>
+                            </items>
                         </detail>
                     </resource>
                 </resources>
@@ -185,19 +230,36 @@
             <xsl:attribute name="class" select="string-join((tokenize(@class, '\s+'), 'xforms-disable-hint-as-tooltip'), ' ')"/>
 
 
-            <xhtml:div id="doc4">
+            <xhtml:div id="doc" class="fr-doc">
                 <!-- Expose resources variables -->
-                <xxforms:variable name="fr-resources" select="instance('fr-fr-resources')/resource[@xml:lang = instance('fr-language-instance')]"/>
-                <xxforms:variable name="form-resources" select="instance('fr-form-resources')/resource[@xml:lang = instance('fr-language-instance')]"/>
+                <xxforms:variable name="fr-resources" select="instance('fr-fr-resources')/resource[@xml:lang = instance('fr-settings-instance')/lang]"/>
+                <xxforms:variable name="form-resources" select="instance('fr-form-resources')/resource[@xml:lang = instance('fr-settings-instance')/lang]"/>
 
-                <!-- Language selector -->
-                <fr:link-select1 ref="instance('fr-language-instance')">
-                    <xforms:label ref="$fr-resources/detail/labels/language"/>
-                    <xforms:itemset nodeset="instance('fr-form-resources')/resource">
-                        <xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/@native-name"/>
-                        <xforms:value ref="@xml:lang"/>
-                    </xforms:itemset>
-                </fr:link-select1>
+                <xhtml:div class="fr-selectors">
+                    <!-- Page size selector -->
+                    <fr:link-select1 ref="instance('fr-settings-instance')/page-size">
+                        <xforms:label ref="$fr-resources/detail/labels/page-size"/>
+                        <xforms:itemset nodeset="$fr-resources/detail/items/page-size/item">
+                            <xforms:label ref="label"/>
+                            <xforms:value ref="value"/>
+                        </xforms:itemset>
+                        <!-- NOTE: We can't use AVTs to implement this because we are changing an element id -->
+                        <xxforms:script ev:event="xforms-value-changed">
+                            var container = YAHOO.util.Dom.getAncestorByClassName(this, "fr-doc");
+                            container.id = ORBEON.xforms.Document.getValue('page-size');
+                        </xxforms:script>
+                    </fr:link-select1>
+                    <xforms:output id="page-size" ref="instance('fr-settings-instance')/page-size" style="display: none"/>
+
+                    <!-- Language selector -->
+                    <fr:link-select1 ref="instance('fr-settings-instance')/lang">
+                        <xforms:label ref="$fr-resources/detail/labels/language"/>
+                        <xforms:itemset nodeset="instance('fr-form-resources')/resource">
+                            <xforms:label value="xxforms:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/@native-name"/>
+                            <xforms:value ref="@xml:lang"/>
+                        </xforms:itemset>
+                    </fr:link-select1>
+                </xhtml:div>
                 
                 <!-- Form -->
                 <xforms:group id="fr-form-group" appearance="xxforms:internal">
@@ -209,10 +271,10 @@
             <xsl:variable name="itemset-dialog" as="element()">
                 <xsl:copy-of select="doc('oxf:/forms/orbeon/builder/form/dialog-itemsets.xml')/*"/>
             </xsl:variable>
-            <xxforms:variable name="form-resources" select="instance('fb-resources')//resource[@xml:lang = instance('fr-language-instance')]"/>
-            <xxforms:variable name="fb-lang" select="instance('fr-language-instance')"/>
+            <xxforms:variable name="form-resources" select="instance('fb-resources')//resource[@xml:lang = instance('fr-settings-instance')/lang]"/>
+            <xxforms:variable name="fb-lang" select="instance('fr-settings-instance')/lang"/>
             <xxforms:variable name="resources" select="instance('fr-form-resources')"/>
-            <xxforms:variable name="current-resources" select="instance('fr-form-resources')/resource[@xml:lang = instance('fr-language-instance')]"/>
+            <xxforms:variable name="current-resources" select="instance('fr-form-resources')/resource[@xml:lang = instance('fr-settings-instance')/lang]"/>
             <xsl:apply-templates select="$itemset-dialog"/>
 
             <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->

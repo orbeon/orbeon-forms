@@ -21,7 +21,8 @@
                 </user-info>
             </xforms:instance>
             <xforms:bind nodeset="first-name | last-name" required="true()"/>
-            <xforms:bind nodeset="age" required="true()" constraint=". castable as xs:integer and xs:integer(.) ge 0 and xs:integer(.) le 150"/>
+            <xforms:bind nodeset="age"
+                constraint=". = '' or (. castable as xs:integer and xs:integer(.) ge 0 and xs:integer(.) le 150)"/>
             <xforms:bind nodeset="phone/number" required="true()"/>
             
             <xforms:instance id="phone-template">
@@ -30,6 +31,9 @@
                     <type>Mobile</type>
                 </phone>
             </xforms:instance>
+            <xforms:action ev:event="xforms-model-construct-done" xxforms:iterate="for $i in (1 to 3) return .">
+                <xforms:insert context="instance('user-info')" nodeset="phone" origin="instance('phone-template')"/>
+            </xforms:action>
 
             <xforms:instance id="ui">
                 <ui>
@@ -41,10 +45,12 @@
         </xforms:model>
         <xhtml:style type="text/css">
             .fields .xforms-alert-active, .fields .xforms-alert-inactive { display: none; }
-            .fields .xforms-required 
-                { background: url('../../../apps/fr/style/images/silk/bullet_star.png') right top no-repeat; padding: 0 20px 1px 0; }
+            .fields .xforms-label
+                { padding: 0 0 0 18px; }
+            .fields .xforms-required .xforms-label
+                { background: url('../../../apps/fr/style/images/silk/bullet_star.png') left top no-repeat; }
             .fields .xforms-invalid-visited, .show-errors .xforms-invalid
-                { background: url('../../../apps/fr/style/images/silk/bullet_red.png') right top no-repeat; padding-right: 0 20px 1px 0; }
+                { background: url('../../../apps/fr/style/images/silk/bullet_red.png') right top no-repeat; padding: 0 20px 1px 0; }
 
             .fields .xforms-control { line-height: 2.5em; }
             .fields .xforms-label { display: inline-block; width: 10em; }
@@ -83,7 +89,7 @@
                     <xhtml:div>
                         <xforms:input ref="age">
                             <xforms:label>Age</xforms:label>
-                            <xforms:alert>Age must be a number between 0 and 150</xforms:alert>
+                            <xforms:alert>If provided, age must be a number between 0 and 150</xforms:alert>
                         </xforms:input>
                     </xhtml:div>
                     <xforms:repeat nodeset="phone" id="phone-repeat">

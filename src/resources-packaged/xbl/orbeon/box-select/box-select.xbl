@@ -59,6 +59,7 @@
                 .xbl-fr-box-select ul {
                     list-style-type: none;
                     padding: .1em;
+                    margin: 0;
                     border: 1px solid black;
                     height: 6.5em;
                     width: 15em;

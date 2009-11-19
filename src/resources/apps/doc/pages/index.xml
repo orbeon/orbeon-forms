@@ -1,19 +1,16 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
-    subject to the following terms:
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    * Conversion to other formats is allowed, but the actual content may not be altered or edited
-      in any way.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    * You may create printed copies for your own personal use.
-
-    * For all other uses, such as selling printed copies or using (parts of) the manual in another
-      publication, prior written agreement from Orbeon, Inc. is required.
-
-    Please contact Orbeon at info@orbeon.com for more information.
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
         <title>Welcome</title>
@@ -21,7 +18,6 @@
     <body>
         <section>
             <title>Orbeon Forms in a Nutshell</title>
-            <img src="../apps/doc/images/form-builder-400.png" class="ops-doc-image" alt="Screenshot of Orbeon Form Builder"/>
             <p>
                 Welcome to the reference documentation for the Orbeon Forms platform!
             </p>
@@ -35,9 +31,11 @@
                 <li>Includes Form Builder, the web-based form authoring tool</li>
                 <li>Is provided as open source under a business-friendly license</li>
             </ul>
-            <p>
-                Noteworthy features include:
-            </p>
+        </section>
+        <!--
+        <section>
+            <title>Noteworthy Features</title>
+            <img src="/apps/doc/images/form-builder-400.png" class="ops-doc-image" alt="Screenshot of Orbeon Form Builder"/>
             <ul>
                 <li>
                     <p>Fully interactive forms</p>
@@ -54,6 +52,7 @@
                     <ul>
                         <li>Create PDF documents</li>
                         <li>Full internationalization</li>
+                        <li>Accessible forms</li>
                     </ul>
                 </li>
             </ul>
@@ -62,10 +61,9 @@
                     <p>Advanced controls</p>
                     <ul>
                         <li>Auto-completion</li>
-                        <li>Tab views</li>
-                        <li>Dialogs</li>
-                        <li>Trees</li>
-                        <li>Menus</li>
+                        <li>Tabview and accordion</li>
+                        <li>Dialog</li>
+                        <li>Tree and menu</li>
                         <li>Programmable custom controls</li>
                     </ul>
                 </li>
@@ -87,6 +85,7 @@
                 </li>
             </ul>
         </section>
+        -->
         <section>
             <title>Getting Started with Orbeon Forms</title>
             <p>
@@ -95,12 +94,17 @@
             <ul>
                 <li>
                     <p>
-                        The <a href="intro-tutorial">Orbeon Forms Tutorial</a>.
+                        <a href="/">Demo forms &amp; apps</a>
                     </p>
                 </li>
                 <li>
                     <p>
-                        The <a href="/">Orbeon Forms example applications</a>.
+                        <a href="http://wiki.orbeon.com/forms">Orbeon Forms Wiki</a>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <a href="intro-tutorial">Orbeon Forms Tutorial</a>
                     </p>
                 </li>
             </ul>
@@ -110,22 +114,17 @@
             <ul>
                 <li>
                     <p>
-                        The <a href="/doc/home-faq">Frequently Asked Questions (FAQ)</a>.
+                        <a href="/doc/home-faq">Frequently Asked Questions (FAQ)</a>
                     </p>
                 </li>
                 <li>
                     <p>
-                        The <a href="reference-xforms-guide">XForms Guide</a>.
+                        <a href="reference-xforms-guide">XForms Guide</a>
                     </p>
                 </li>
                 <li>
                     <p>
-                        The <a href="home-changes-371">list of changes since the previous version</a>.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        The <a href="http://wiki.orbeon.com/forms">Orbeon Forms Wiki</a>.
+                        <a href="home-changes-372">List of changes since the previous version</a>
                     </p>
                 </li>
             </ul>

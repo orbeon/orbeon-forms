@@ -88,16 +88,18 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
         var select1Element = this.container.getElementsByTagName("select")[0];
         var options = select1Element.options;
         var matchingOptionIndex = -1;
-        for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
+        var itemsCount = options.length / 2;
+        for (var optionIndex = 0; optionIndex < itemsCount; optionIndex++) {
             var option = options[optionIndex];
-            if (option.text == searchFieldValue) {
+            if (option.value == searchFieldValue) {
                 // Give up if this is not the first match
                 if (matchingOptionIndex != -1) return;
                 matchingOptionIndex = optionIndex;
             }
         }
-        if (matchingOptionIndex != -1)
-            ORBEON.xforms.Document.setValue(this.externalValueInput.id, options[matchingOptionIndex].value);
+        if (matchingOptionIndex != -1) {
+            ORBEON.xforms.Document.setValue(this.externalValueInput.id, options[itemsCount + matchingOptionIndex].value);
+        }
     },
 
     /**
@@ -173,12 +175,13 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
         var foundExactMatch = false;
         if (query != "") {
             var queryLowerCase = query.toLowerCase();
-            for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
+            var itemsCount = options.length / 2;
+            for (var optionIndex = 0; optionIndex < itemsCount; optionIndex++) {
                 var option = options[optionIndex];
                 // We only do filtering for the static itemset mode
-                if (this.isDynamicItemset() || option.text.toLowerCase().indexOf(queryLowerCase) == 0)
-                    result[result.length] = [ option.text, option.value ];
-                if (option.text == query) foundExactMatch = true;
+                if (this.isDynamicItemset() || option.value.toLowerCase().indexOf(queryLowerCase) == 0)
+                    result[result.length] = [ option.value, options[itemsCount + optionIndex].value ];
+                if (option.value == query) foundExactMatch = true;
 
             }
         }

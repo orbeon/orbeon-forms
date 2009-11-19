@@ -5787,7 +5787,7 @@ ORBEON.xforms.Server = {
                 // Remove modal progress panel before handling DOM response, as e.g. xxf:script may dispatch events and
                 // we don't want them to be filtered. If there are server events, we don't remove the panel until they
                 // have been processed, i.e. the request sending the server events returns.
-            ORBEON.util.Utils.hideModalProgressPanel();
+                ORBEON.util.Utils.hideModalProgressPanel();
             }
             ORBEON.xforms.Server.handleResponseDom(responseXML, formID);
             // Reset changes, as changes are included in this bach of events

@@ -367,7 +367,9 @@ Inserting error information into error list:
                 <xsl:variable name="fr-errors" select="/*/fr:errors" as="element(fr:errors)*"/>
                 <xsl:if test="exists($fr-errors)">
                     <xxforms:variable name="global-errors" xxbl:scope="inner">
-                        <xxforms:sequence select="({string-join($fr-errors/@nodeset, ',')})" xxbl:scope="outer"/>
+                        <xxforms:sequence select="({string-join($fr-errors/@nodeset, ',')})" xxbl:scope="outer">
+                            <xsl:copy-of select="$fr-errors/ancestor-or-self::*/namespace::*"/>
+                        </xxforms:sequence>
                     </xxforms:variable>
                 </xsl:if>
                 
@@ -391,18 +393,18 @@ Inserting error information into error list:
 
                             <!-- Display global errors -->
                             <xsl:for-each select="$fr-errors">
-                                <xforms:repeat nodeset="{@nodeset}" xxbl:scope="outer">
+                                <xforms:repeat nodeset="{@nodeset}" xxbl:scope="outer" xmlns:v="http://www.example.com/validation">
+                                    <xsl:copy-of select="ancestor-or-self::*/namespace::*"/>
                                     <xhtml:li>
                                         <!-- Clickable / linkable label -->
-                                        <xsl:variable name="has-label" select="exists(fr:alert)" as="xs:boolean"/>
-                                        <xsl:if test="$has-label">
+                                        <xsl:if test="exists(fr:label)">
                                             <xforms:output class="fr-error-label">
                                                 <xsl:copy-of select="fr:label/(@*|node())"/>
                                             </xforms:output>
+                                            <xsl:text> - </xsl:text>
                                         </xsl:if>
-                                        <xsl:text> - </xsl:text>
                                         <!-- Alert message -->
-                                        <xsl:if test="fr:alert">
+                                        <xsl:if test="exists(fr:alert)">
                                             <xforms:output class="fr-error-alert">
                                                 <xsl:copy-of select="fr:alert/(@*|node())"/>
                                             </xforms:output>

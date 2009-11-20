@@ -184,11 +184,12 @@
             .books-table .add-td { width: 33em }
             .books-table .form-td { width: 33em; background: white; padding: .5em }
             .xforms-repeat-selected-item-1 .form-td { background: #ffc }
-            /*.xforms-repeat-selected-item-1 .form-td .xforms-select1-appearance-minimal { background: white;  }*/
             .books-action-table { margin-bottom: 1em }
             .books-action-table td { white-space: nowrap; vertical-align: middle; padding-right: 1em }
             .books-action-table .xforms-submit img { vertical-align: middle }
-            .books-action-table .xforms-trigger-appearance-minimal img { margin-right: 1em; vertical-align: middle }
+            .books-action-table .xforms-trigger img, .books-action-table .xforms-submit img { margin-right: 5px; vertical-align: middle }
+            .books-action-table .xforms-trigger span, .books-action-table .xforms-submit span { vertical-align: middle }
+            .books-action-table a:hover { text-decoration: none }
         </style>
     </head>
     <body>
@@ -200,17 +201,17 @@
             <tr>
                 <td>
                     <xforms:submit submission="save-submission" appearance="minimal">
-                        <xforms:label><img src="/apps/xforms-bookcast/images/save.gif" alt="Save"/> Save</xforms:label>
+                        <xforms:label><img src="/apps/xforms-bookcast/images/save.gif" alt="Save"/><span>Save</span></xforms:label>
                     </xforms:submit>
                 </td>
                 <td>
                     <xforms:submit submission="list-submission" appearance="minimal">
-                        <xforms:label><img src="/apps/xforms-bookcast/images/recycle-green.png" alt="Revert"/> Revert</xforms:label>
+                        <xforms:label><img src="/apps/xforms-bookcast/images/recycle-green.png" alt="Revert"/><span>Revert</span></xforms:label>
                     </xforms:submit>
                 </td>
                 <td>
                     <xforms:submit submission="sample-data-submission" appearance="minimal">
-                        <xforms:label><img src="/apps/xforms-bookcast/images/add-all.gif" alt="Load Sample Data"/> Load Sample Data</xforms:label>
+                        <xforms:label><img src="/apps/xforms-bookcast/images/add-all.gif" alt="Load Sample Data"/><span>Load Sample Data</span></xforms:label>
                     </xforms:submit>
                 </td>
             </tr>

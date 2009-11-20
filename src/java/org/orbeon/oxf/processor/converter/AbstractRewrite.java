@@ -23,9 +23,10 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.saxrewrite.RootFilter;
+import org.orbeon.oxf.xml.saxrewrite.DocumentRootState;
+import org.orbeon.oxf.xml.saxrewrite.FragmentRootState;
 import org.orbeon.oxf.xml.saxrewrite.State;
-import org.orbeon.oxf.xml.saxrewrite.StatefullHandler;
+import org.orbeon.oxf.xml.saxrewrite.StatefulHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -838,29 +839,39 @@ abstract class AbstractRewrite extends ProcessorImpl {
         final ProcessorOutput processorOutput = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
 
             /**
-             * Creates a StatefullHandler and uses that to translate the events from the input, rewrite-in, and then
+             * Creates a StatefulHandler and uses that to translate the events from the input, rewrite-in, and then
              * send them to the contentHandler (the output).
              */
             public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
-
-                // Get ExternalContext
-                final ExternalContext externalContext
-                        = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-
-                // Get PFC resource rewriting information if needed
-                final boolean isPortlet = externalContext instanceof PortletExternalContext;
-
-                // Do the conversion
-                final RootFilter initialState = new RootFilter(null, contentHandler);
-                final State aftRt = new RewriteState(initialState, contentHandler, externalContext.getRequest(), externalContext.getResponse(), isPortlet, 0, rewriteURI);
-                initialState.setNextState(aftRt);
-
-                final StatefullHandler statefullHandler = new StatefullHandler(initialState);
-
-                readInputAsSAX(pipelineContext, REWRITE_IN, statefullHandler);
+                readInputAsSAX(pipelineContext, REWRITE_IN, getRewriteContentHandler(pipelineContext, contentHandler, false));
             }
         };
         addOutput(name, processorOutput);
         return processorOutput;
+    }
+
+    public ContentHandler getRewriteContentHandler(final PipelineContext pipelineContext, final ContentHandler contentHandler, final boolean fragment) {
+        // Get ExternalContext
+        final ExternalContext externalContext
+                = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+
+        final boolean isPortlet = externalContext instanceof PortletExternalContext;
+
+        // Do the conversion
+        final State rootState;
+        if (fragment) {
+            // Start directly with rewrite state
+            final FragmentRootState fragmentRootState = new FragmentRootState(null, contentHandler);
+            final State afterRootState = new RewriteState(fragmentRootState, contentHandler, externalContext.getRequest(), externalContext.getResponse(), isPortlet, 0, rewriteURI);
+            fragmentRootState.setNextState(afterRootState);
+            rootState = fragmentRootState;
+        } else {
+            // Start with root filter
+            final DocumentRootState documentRootState = new DocumentRootState(null, contentHandler);
+            final State afterRootState = new RewriteState(documentRootState, contentHandler, externalContext.getRequest(), externalContext.getResponse(), isPortlet, 0, rewriteURI);
+            documentRootState.setNextState(afterRootState);
+            rootState = documentRootState;
+        }
+        return new StatefulHandler(rootState);
     }
 }

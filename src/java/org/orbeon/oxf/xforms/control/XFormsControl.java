@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.converter.XHTMLRewrite;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
@@ -723,7 +724,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             // Rewrite URLs
             final StringBuilder sb = new StringBuilder(rawValue.length() * 2);// just an approx of the size it may take
             // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
-            XFormsUtils.streamHTMLFragment(new ForwardingContentHandler() {
+            XFormsUtils.streamHTMLFragment(new XHTMLRewrite().getRewriteContentHandler(pipelineContext, new ForwardingContentHandler() {
 
                 private boolean isStartElement;
 
@@ -741,14 +742,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                         final String currentName = attributes.getLocalName(i);
                         final String currentValue = attributes.getValue(i);
 
-                        // Rewrite URI attribute if needed
-                        // NOTE: Should probably use xml:base but we don't have an Element available to gather xml:base information
-                        final String rewrittenValue = XFormsUtils.getEscapedURLAttributeIfNeeded(pipelineContext, containingDocument, null, currentName, currentValue);
-
                         sb.append(' ');
                         sb.append(currentName);
                         sb.append("=\"");
-                        sb.append(XMLUtils.escapeXMLMinimal(rewrittenValue));
+                        sb.append(currentValue);
                         sb.append('"');
                     }
                     sb.append('>');
@@ -764,7 +761,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                     }
                     isStartElement = false;
                 }
-            }, rawValue, getLocationData(), "xhtml");
+            }, true), rawValue, getLocationData(), "xhtml");
             result = sb.toString();
         } else {
             // No rewriting needed

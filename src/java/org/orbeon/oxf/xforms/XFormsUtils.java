@@ -338,7 +338,7 @@ public class XFormsUtils {
 //        }
 //    }
 
-    public static void streamHTMLFragment(final ContentHandler contentHandler, String value, LocationData locationData, final String xhtmlPrefix) {
+    public static void streamHTMLFragment(ContentHandler contentHandler, String value, LocationData locationData, String xhtmlPrefix) {
         
         if (value != null && value.trim().length() > 0) { // don't parse blank values
 
@@ -381,7 +381,8 @@ public class XFormsUtils {
                 try {
                     if (htmlDocument != null) {
                         final Transformer identity = TransformerUtils.getIdentityTransformer();
-                        identity.transform(new DOMSource(htmlDocument), new SAXResult(new HTMLBodyContentHandler(contentHandler, xhtmlPrefix)));
+                        identity.transform(new DOMSource(htmlDocument),
+                                new SAXResult(new HTMLBodyContentHandler(contentHandler, xhtmlPrefix)));
                     }
                 } catch (TransformerException e) {
                     throw new OXFException(e);

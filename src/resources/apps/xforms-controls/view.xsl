@@ -35,8 +35,9 @@
     <xsl:template match="xhtml:head">
         <xsl:copy>
             <xsl:apply-templates/>
+            <!-- Just put grids CSS otherwise overall style differs from that of other examples -->
+            <xhtml:link rel="stylesheet" href="/ops/yui/grids/grids-min.css" type="text/css" media="all"/>
             <!-- Reuse Form Runner base CSS -->
-            <xhtml:link rel="stylesheet" href="/ops/yui/reset-fonts-grids/reset-fonts-grids.css" type="text/css" media="all"/>
             <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-base.css" type="text/css" media="all"/>
             <!-- Add our own CSS tweaks -->
             <xhtml:style type="text/css">
@@ -283,7 +284,7 @@
 
     <!-- Place tabview -->
     <xsl:template match="fr:view/fr:body">
-        <fr:tabview>
+        <fr:tabview id="tabview">
             <xsl:apply-templates/>
         </fr:tabview>
     </xsl:template>

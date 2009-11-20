@@ -1168,7 +1168,7 @@
                     </li>
                     <li>
                         <p>
-                            <code>&lt;xxforms:input></code> attributes:
+                            <code>&lt;xxforms:input></code> and <code>&lt;xxforms:secret></code> attributes:
                         </p>
                         <ul>
                             <li>

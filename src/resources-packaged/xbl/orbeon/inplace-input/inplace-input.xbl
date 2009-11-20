@@ -57,6 +57,7 @@
                 .xbl-fr-inplace-input .xforms-input input { background-color: #FFFF88; background-image: none; border: none }
                 .xbl-fr-inplace-input .fr-inplace-buttons { display: block; margin-top:0.5em }
                 .xbl-fr-inplace-input .fr-inplace-buttons .xforms-control { display: inline }
+                .xbl-fr-inplace-input .fr-inplace-hint { font-style: italic }
 
                 .fr-grid-content .xbl-fr-inplace-input { width: 100% }
             </xbl:style>
@@ -89,6 +90,12 @@
                             <xhtml:span class="fr-inplace-content fr-inplace-view">
                                 <!-- NOTE: Output is in outer scope so it can evaluate hint in outer scope -->
                                 <xforms:output ref="." xbl:attr="navindex navindex=tabindex" xxbl:scope="outer">
+                                    <xsl:if test="xforms:hint">
+                                        <!-- Add class so we can distinguish between hint case and value case -->
+                                        <xsl:attribute name="class">{for $value in . return
+                                                                        if (normalize-space($value) = '' and not(exf:readonly($value)))
+                                                                          then 'fr-inplace-hint' else ''}</xsl:attribute>
+                                    </xsl:if>
                                     <!-- Handle inline hint-->
                                     <xsl:choose>
                                         <xsl:when test="xforms:hint">

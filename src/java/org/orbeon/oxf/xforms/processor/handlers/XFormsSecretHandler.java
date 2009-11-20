@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSecretControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -38,6 +39,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
 
         final XFormsSecretControl secretControl = (XFormsSecretControl) xformsControl;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final boolean isConcreteControl = secretControl != null;
 
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, secretControl, true);
 
@@ -51,9 +53,18 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
                 containerAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
                         handlerContext.isTemplate() || secretControl == null || secretControl.getExternalValue(pipelineContext) == null ? "" : secretControl.getExternalValue(pipelineContext));
 
-                // Handle accessibility attributes on <input>
+                // Handle accessibility attributes
                 handleAccessibilityAttributes(attributes, containerAttributes);
 
+                // Output all extension attributes
+                if (isConcreteControl) {
+                    // Output xxforms:* extension attributes
+                    secretControl.addExtensionAttributes(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
+                }
+
+                handleReadOnlyAttribute(reusableAttributes, containingDocument, secretControl);
+
+                // Output element
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, containerAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
             } else {

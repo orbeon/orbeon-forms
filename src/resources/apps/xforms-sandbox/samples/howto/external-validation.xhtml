@@ -22,7 +22,6 @@
             <xforms:bind nodeset="//*" constraint="not(@v:valid = 'false')"/>
             
             <xforms:instance id="validation-result"><dummy/></xforms:instance>
-            <xforms:bind nodeset="instance('validation-result')/v:global-errors/v:global-error" constraint="false()"/>
             
             <xforms:submission id="validation-submission" ref="instance('user-info')" 
                     resource="/apps/xforms-sandbox/samples/howto/external-validation-response.xml"
@@ -74,14 +73,6 @@
                     <xforms:alert ref="@v:alert"/>
                 </xforms:input>
             </xhtml:div>
-            <xhtml:div class="global-errors">
-                <xforms:repeat nodeset="instance('validation-result')/v:global-errors/v:global-error">
-                    <xforms:output ref=".">
-                        <xforms:label>Global error</xforms:label>
-                        <xforms:alert ref="@v:alert"/>
-                    </xforms:output>
-                </xforms:repeat>
-            </xhtml:div>
         </xforms:group>
 
         <xhtml:div class="buttons">
@@ -96,6 +87,9 @@
 
         <fr:error-summary id="error-summary" observer="form-group">
             <fr:label>Errors in this form</fr:label>
+            <fr:errors nodeset="instance('validation-result')/v:global-errors/v:global-error">
+                <fr:alert ref="@v:alert"/>
+            </fr:errors>
         </fr:error-summary>
     </xhtml:body>
 </xhtml:html>

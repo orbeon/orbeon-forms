@@ -65,12 +65,17 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
         final ITextUserAgent callback = new ITextUserAgent(renderer.getOutputDevice()) {
             public String resolveURI(String s) {
                 // Our own resolver
-                return externalContext.getResponse().rewriteResourceURL(s, true);
+
+                // Here there is a question: if the browser retrieves resources, they are obviously resource URLs. But
+                // when deploying with e.g. an Apache front-end, requests should not go through it. So we rewrite as a
+                // service URL instead.
+                return externalContext.rewriteServiceURL(s, true);
             }
 
             protected InputStream resolveAndOpenStream(String uri) {
                 try {
                     final String resolvedURI = resolveURI(uri);
+                    // TODO: Use xforms:submission code instead
                     final ConnectionResult connectionResult
                         = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
                             new URL(resolvedURI), null, null, null, null, null, Connection.getForwardHeaders());

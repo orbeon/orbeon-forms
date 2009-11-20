@@ -375,7 +375,7 @@ public class URLRewriterUtils {
          * Construct from parameters.
          *
          * @param pathInfo      path to match on
-         * @param matcher       type of matcher
+         * @param matcher       type of matcher, or null for basic matching rules
          * @param mimeType      mediatype
          * @param versioned     whether the resource is versioned
          */
@@ -393,7 +393,8 @@ public class URLRewriterUtils {
          */
         public PathMatcher(Element element) {
             this.pathInfo = element.attributeValue("path");
-            this.matcher = Dom4jUtils.explodedQNameToQName(element.attributeValue("matcher"));
+            final String matcherAttribute = element.attributeValue("matcher");
+            this.matcher = (matcherAttribute != null) ? Dom4jUtils.explodedQNameToQName(matcherAttribute) : null;
             this.mimeType = element.attributeValue("type");
             this.versioned = "true".equals(element.attributeValue("versioned"));
         }
@@ -407,7 +408,8 @@ public class URLRewriterUtils {
             final Element matcherElement = Dom4jUtils.createElement("matcher");
 
             matcherElement.addAttribute("path", pathInfo);
-            matcherElement.addAttribute("matcher", Dom4jUtils.qNameToExplodedQName(matcher));
+            if (matcher != null)
+                matcherElement.addAttribute("matcher", Dom4jUtils.qNameToExplodedQName(matcher));
             matcherElement.addAttribute("type", mimeType);
             if (versioned)
                 matcherElement.addAttribute("versioned", Boolean.toString(versioned));

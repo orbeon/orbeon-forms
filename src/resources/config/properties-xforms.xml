@@ -136,7 +136,7 @@
                                                                                                fr:max-results-displayed fr:mindate fr:prefix fr:digits-after-decimal fr:case fr:label
                                                                                                fr:mindate fr:maxdate fr:pagedate fr:tab fr:dependency
                                                                                                fr:title fr:message fr:positive-choice fr:negative-choice fr:neutral-choice
-                                                                                               fr:public-key fr:private-key fr:theme fr:lang fr:header fr:footer"/>
+                                                                                               fr:public-key fr:private-key fr:theme fr:lang fr:header fr:footer fr:errors fr:alert"/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                          value="false"/>
 
 </properties>

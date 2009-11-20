@@ -363,8 +363,16 @@ Inserting error information into error list:
                     </xforms:group>
                 </xforms:group>
 
+                <!-- Count global errors -->
+                <xsl:variable name="fr-errors" select="/*/fr:errors" as="element(fr:errors)*"/>
+                <xsl:if test="exists($fr-errors)">
+                    <xxforms:variable name="global-errors" xxbl:scope="inner">
+                        <xxforms:sequence select="({string-join($fr-errors/@nodeset, ',')})" xxbl:scope="outer"/>
+                    </xxforms:variable>
+                </xsl:if>
+                
                 <!-- Only show this section if there are any visible errors -->
-                <xforms:group ref=".[$visible-errors]" xxbl:scope="inner" id="ig">
+                <xforms:group ref=".[exists($visible-errors){if (exists($fr-errors)) then ' or exists($global-errors)' else ''}]" xxbl:scope="inner" id="ig">
 
                     <!-- Include optional header -->
                     <xbl:content includes="fr|error-summary > fr|header > *"/>
@@ -380,47 +388,70 @@ Inserting error information into error list:
                         <!-- Anchor for navigation -->
                         <xhtml:a name="fr-errors"/>
                         <xhtml:ol class="fr-error-list">
+
+                            <!-- Display global errors -->
+                            <xsl:for-each select="$fr-errors">
+                                <xforms:repeat nodeset="{@nodeset}" xxbl:scope="outer">
+                                    <xhtml:li>
+                                        <!-- Clickable / linkable label -->
+                                        <xsl:variable name="has-label" select="exists(fr:alert)" as="xs:boolean"/>
+                                        <xsl:if test="$has-label">
+                                            <xforms:output class="fr-error-label">
+                                                <xsl:copy-of select="fr:label/(@*|node())"/>
+                                            </xforms:output>
+                                        </xsl:if>
+                                        <xsl:text> - </xsl:text>
+                                        <!-- Alert message -->
+                                        <xsl:if test="fr:alert">
+                                            <xforms:output class="fr-error-alert">
+                                                <xsl:copy-of select="fr:alert/(@*|node())"/>
+                                            </xforms:output>
+                                        </xsl:if>
+                                    </xhtml:li>
+                                </xforms:repeat>
+                            </xsl:for-each>
+
+                            <!-- Display control errors -->
                             <xforms:repeat nodeset="$visible-errors" id="er">
                                 <xhtml:li>
                                     <!-- Clickable / linkable label -->
-                                    <xxforms:variable name="has-label" select="normalize-space(@label)" as="xs:boolean"/>
-                                    <xforms:group ref=".[$has-label]" id="lg">
-                                        <xxforms:variable name="error" xxbl:scope="outer">
-                                            <xxforms:sequence select="." xxbl:scope="inner"/>
-                                        </xxforms:variable>
-                                        <!-- NOTE: Put the entire groups in outer scope, as we can't yet deal with different
-                                             scopes for control and nested action -->
-                                        <xforms:group ref=".[property('xxforms:noscript')]" xxbl:scope="outer" id="nsg">
-                                            <!-- In noscript mode, use a plain link -->
-                                            <!-- TODO: compute effective id once xforms:function is implemented -->
-                                             <xhtml:a id="nsa" href="#{{$error/@id}}"><xforms:output value="$error/@label" class="fr-error-label" id="nso"/></xhtml:a>
-                                        </xforms:group>
-                                        <xforms:group ref=".[not(property('xxforms:noscript'))]" xxbl:scope="outer">
-                                            <!-- Otherwise use trigger -->
-                                            <xforms:trigger appearance="minimal" id="lt">
-                                                <xforms:label value="normalize-space($error/@label)" class="fr-error-label"/>
-                                                <!-- Set focus to control using static id and repeat indexes -->
-                                                <xforms:action ev:event="DOMActivate">
-                                                    <!-- Set correct index hierarchy -->
-                                                    <xxforms:variable name="indexes" select="tokenize($error/@indexes, '\s+')" as="xs:integer*"/>
-                                                    <xforms:action xxforms:iterate="tokenize($error/@repeats, '\s+')">
-                                                        <xxforms:variable name="position" select="position()" as="xs:integer"/>
-                                                        <xforms:setindex repeat="{{.}}" index="$indexes[$position]"/>
-                                                    </xforms:action>
-                                                    <!-- NOTE: @id stores the prefixed id, so obtain static id -->
-                                                    <xforms:setfocus control="{{tokenize($error/@id, '\$')[last()]}}"/>
-                                                </xforms:action>
-                                            </xforms:trigger>
-                                        </xforms:group>
+                                    <xxforms:variable name="has-label" as="xs:boolean" xxbl:scope="outer">
+                                        <xxforms:sequence select="normalize-space(@label)" xxbl:scope="inner"/>
+                                    </xxforms:variable>
+                                    <xxforms:variable name="error" as="element(error)" xxbl:scope="outer">
+                                        <xxforms:sequence select="." xxbl:scope="inner"/>
+                                    </xxforms:variable>
+                                    <!-- NOTE: Put the entire group or trigger in outer scope, as we can't yet deal with
+                                         different scopes for control and nested action -->
+                                    <xforms:group ref=".[$has-label and property('xxforms:noscript')]" xxbl:scope="outer">
+                                        <!-- In noscript mode, use a plain link -->
+                                        <!-- TODO: compute effective id once xforms:function is implemented -->
+                                         <xhtml:a id="nsa" href="#{{$error/@id}}"><xforms:output value="$error/@label" class="fr-error-label" id="nso"/></xhtml:a>
                                     </xforms:group>
+                                    <!-- Otherwise use trigger -->
+                                    <xforms:trigger ref=".[$has-label and not(property('xxforms:noscript'))]" xxbl:scope="outer"
+                                                    appearance="minimal" class="fr-error-label">
+                                        <xforms:label value="normalize-space($error/@label)"/>
+                                        <!-- Set focus to control using static id and repeat indexes -->
+                                        <xforms:action ev:event="DOMActivate">
+                                            <!-- Set correct index hierarchy -->
+                                            <xxforms:variable name="indexes" select="tokenize($error/@indexes, '\s+')" as="xs:integer*"/>
+                                            <xforms:action xxforms:iterate="tokenize($error/@repeats, '\s+')">
+                                                <xxforms:variable name="position" select="position()" as="xs:integer"/>
+                                                <xforms:setindex repeat="{{.}}" index="$indexes[$position]"/>
+                                            </xforms:action>
+                                            <!-- NOTE: @id stores the prefixed id, so obtain static id -->
+                                            <xforms:setfocus control="{{tokenize($error/@id, '\$')[last()]}}"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
                                     <!-- Repeat indexes -->
-                                    <xforms:group ref=".[string-length(@indexes) > 0]" class="fr-error-row" id="xg">
-                                        <xforms:output value="concat(' [', @indexes, ']')" id="io"/>
-                                    </xforms:group>
+                                    <xforms:output ref=".[string-length(@indexes) > 0]" class="fr-error-row"
+                                                   value="concat(' [', @indexes, ']')"  id="io"/>
+                                    <!-- Separator -->
+                                    <xforms:output ref=".[$has-label]" value="' - '" class="fr-error-dash" xxbl:scope="outer"/>
                                     <!-- Alert message -->
-                                    <xforms:group ref=".[normalize-space(@alert) != '']" class="fr-error-alert" id="ag">
-                                        <xforms:output value="string-join((' -'[$has-label], @alert), ' ')" id="ao"/>
-                                    </xforms:group>
+                                    <xforms:output ref=".[normalize-space(@alert) != '']" class="fr-error-alert"
+                                                   value="@alert" id="ao"/>
                                 </xhtml:li>
                             </xforms:repeat>
                         </xhtml:ol>

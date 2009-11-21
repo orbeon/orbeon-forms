@@ -24,10 +24,11 @@
     <xsl:variable name="potential-elements" as="element()*" select="//fr:*"/>
     <!-- All names thereof including XForms inspector if automatically added
          Also handle backward compatibility for widget:xforms-instance-inspector -->
-    <xsl:variable name="potential-names" as="xs:string*"
-                  select="(for $e in $potential-elements return
-                             for $n in name($e) return if ($n = 'widget:xforms-instance-inspector') then 'fr:xforms-inspector' else $n,
-                            'fr:xforms-inspector'[pipeline:property('oxf.epilogue.xforms.inspector')])"/>
+    <xsl:variable name="potential-names" as="xs:string*" select="$potential-elements/name()"/>
+    <xsl:variable name="potential-names-updated" as="xs:string*"
+                  select="(for $n in $potential-names return
+                             if ($n = 'widget:xforms-instance-inspector') then 'fr:xforms-inspector' else $n,
+                                'fr:xforms-inspector'[pipeline:property('oxf.epilogue.xforms.inspector')])"/>
 
     <!-- List of exclusions as not all fr:* elements actually have an XBL binding -->
     <xsl:variable name="widgets-to-exclude"
@@ -50,7 +51,7 @@
                 <!-- key() function wants a context -->
                 <xsl:variable name="context" select="." as="element(xhtml:head)"/>
                 <!-- Iterate over all distinct names -->
-                <xsl:for-each-group select="$potential-names" group-by=".">
+                <xsl:for-each-group select="$potential-names-updated" group-by=".">
                     <xsl:variable name="name" as="xs:string" select="."/>
                     <xsl:for-each select="$context">
                         <xsl:variable name="existing-bindings" as="element()*" select="key('xbl:bindings', $name)"/>
@@ -68,7 +69,7 @@
                             <xi:include href="oxf:/xbl/orbeon/{$local-name}/{$local-name}.xbl" xxi:omit-xml-base="true"/>
                             <!-- We don't have a way to explicitly include an XBL file from another XBL file, so we handle
                                  dependencies between XBL components in a case-by-case basis here. -->
-                            <xsl:if test="$local-name = 'alert-dialog' and not('fr:button' = $potential-names) and not(exists(key('xbl:bindings', 'fr:button')))">
+                            <xsl:if test="$local-name = 'alert-dialog' and not('fr:button' = $potential-names-updated) and not(exists(key('xbl:bindings', 'fr:button')))">
                                 <xi:include href="oxf:/xbl/orbeon/button/button.xbl" xxi:omit-xml-base="true"/>
                             </xsl:if>
                         </xsl:if>

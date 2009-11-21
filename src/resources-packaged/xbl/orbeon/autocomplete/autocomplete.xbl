@@ -75,12 +75,11 @@
 
                             <!-- Configuration -->
                             <xxforms:variable name="dynamic-itemset" xbl:attr="xbl:text=dynamic-itemset"/>
-                            <xforms:output class="fr-autocomplete-select1e-dynamic-itemset" value="$dynamic-itemset" style="display: none"/>
+                            <xforms:output class="fr-autocomplete-dynamic-itemset" value="$dynamic-itemset" style="display: none"/>
                             <xsl:copy-of select="xxbl:parameter(., 'max-results-displayed')"/>
 
                             <!-- Dropdown with value shown by autocomplete -->
-                            <!-- style="display: none"  -->
-                            <xforms:select1 id="select1" ref="$external-value" class="fr-autocomplete-select1" appearance="minimal" xxforms:encrypt-item-values="false">
+                            <xforms:select1 id="select1" ref="$external-value" class="fr-autocomplete-select1" appearance="minimal" xxforms:encrypt-item-values="false" style="display: none">
                                 <xsl:apply-templates select="xforms:itemset | xforms:item" mode="copy-label"/>
                                 <xsl:apply-templates select="xforms:itemset | xforms:item" mode="copy-value"/>
                             </xforms:select1>

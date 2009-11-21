@@ -77,6 +77,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
         <box-select/>
         <single-tree-selector/>
         <multiple-tree-selector/>
+        <autocomplete/>
     </selection-controls>
     <attachment-controls>
         <image-attachment filename="egg.jpg" mediatype="image/jpeg" size="11944">oxf:/apps/xforms-controls/images/egg.jpg</image-attachment>

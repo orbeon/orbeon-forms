@@ -64,6 +64,7 @@
                         <box-select/>
                         <single-tree-selector/>
                         <multiple-tree-selector/>
+                        <autocomplete/>
                     </selection-controls>
                     <attachment-controls>
                         <image-attachment filename="" mediatype="" size=""/>
@@ -129,6 +130,8 @@
                                  name="single-tree-selector"/>
                     <xforms:bind id="multiple-tree-selector-bind" nodeset="multiple-tree-selector"
                                  name="multiple-tree-selector"/>
+                    <xforms:bind id="autocomplete-bind" nodeset="autocomplete"
+                                 name="autocomplete"/>
                 </xforms:bind>
                 <xforms:bind id="other-controls-bind" nodeset="other-controls" name="other-controls">
 
@@ -666,6 +669,11 @@
                             <label>Rich Text Control</label>
                             <help/>
                         </rich-text-controls>
+                        <autocomplete>
+                            <label>Autocomplete</label>
+                            <hint>Enter the name of a country</hint>
+                            <code>Country code</code>
+                        </autocomplete>
                     </resource>
                     <resource xml:lang="fr">
                         <htmlarea>
@@ -1056,6 +1064,11 @@
                             <label>Contrôle texte riche</label>
                             <help/>
                         </rich-text-controls>
+                        <autocomplete>
+                            <label>Complétion automatique</label>
+                            <hint>Entrez le nom d'un pays</hint>
+                            <code>Code du pays</code>
+                        </autocomplete>
                     </resource>
                 </resources>
             </xforms:instance>
@@ -1068,6 +1081,16 @@
             <xforms:instance id="fr-service-response-instance" xxforms:exclude-result-prefixes="#all">
                 <response/>
             </xforms:instance>
+
+            <xforms:instance id="autocomplete-search-instance">
+                <instance><country-name/></instance>
+            </xforms:instance>
+            <xforms:instance id="autocomplete-itemset-instance">
+                <country/>
+            </xforms:instance>
+            <xforms:submission id="autocomplete-submission" ref="instance('autocomplete-search-instance')"
+                validate="false" method="post" resource="/xforms-controls/services/countries"
+                replace="instance" instance="autocomplete-itemset-instance"/>
 
         </xforms:model>
     </xhtml:head>
@@ -1526,6 +1549,32 @@
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
                                 </xforms:select>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xhtml:div class="autocomplete-container">
+                                    <fr:autocomplete bind="autocomplete-bind"
+                                                     id="autocomplete-control"
+                                                     dynamic-itemset="true" max-results-displayed="5">
+                                        <xforms:label ref="$form-resources/autocomplete/label"/>
+                                        <xforms:hint ref="$form-resources/autocomplete/hint"/>
+                                        <xforms:itemset nodeset="instance('autocomplete-itemset-instance')/country">
+                                            <xforms:label ref="name"/>
+                                            <xforms:value ref="us-code"/>
+                                        </xforms:itemset>
+                                        <xforms:action ev:event="fr-search-changed">
+                                            <xxforms:variable name="search-value" select="event('fr-search-value')"/>
+                                            <xforms:setvalue ref="instance('autocomplete-search-instance')/country-name" value="$search-value"/>
+                                            <xforms:send submission="autocomplete-submission"/>
+                                        </xforms:action>
+                                    </fr:autocomplete>
+                                    <xforms:group bind="autocomplete-bind" appearance="xxforms:internal">
+                                        <xforms:output ref=".[. != '']">
+                                            <xforms:label ref="$form-resources/autocomplete/code"/>
+                                        </xforms:output>
+                                    </xforms:group>
+                                </xhtml:div>
                             </xhtml:td>
                         </xhtml:tr>
                     </fr:grid>

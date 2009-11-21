@@ -24,7 +24,7 @@
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        
+
         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
         xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library">
 
@@ -84,7 +84,7 @@
                     .xforms-required-empty .xforms-input-input, textarea.xforms-required-empty,
                     input.xforms-required-empty, .xforms-required-empty input
                         { border-color: #DF731B }
-                
+
                 .xforms-alert-active {
                     font-weight: bold;
                     font-size: smaller;
@@ -103,6 +103,11 @@
                     color: #6E6E6E;
                     font-style: italic
                 }
+
+                /* ***** Autocomplete ***********************************************************/
+                .autocomplete-container { height: 12em; }
+                .autocomplete-container .yui-ac { width: 100%; }
+
             </xhtml:style>
         </xsl:copy>
     </xsl:template>
@@ -261,7 +266,7 @@
                         </xforms:itemset>
                     </fr:link-select1>
                 </xhtml:div>
-                
+
                 <!-- Form -->
                 <xforms:group id="fr-form-group" appearance="xxforms:internal">
                     <xsl:apply-templates/>
@@ -316,8 +321,8 @@
         </xhtml:table>
     </xsl:template>
 
-    <!-- Add "Edit Items" button to each control with an itemset -->
-    <xsl:template match="fr:grid//*[xforms:itemset]">
+    <!-- Add "Edit Items" button to each control with an itemset, except the autocomplete -->
+    <xsl:template match="fr:grid//*[not(self::fr:autocomplete) and xforms:itemset]">
         <xsl:next-match/>
         <xforms:trigger appearance="minimal" class="edit-items-trigger">
             <xforms:label>Edit Items</xforms:label>

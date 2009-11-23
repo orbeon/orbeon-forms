@@ -208,12 +208,6 @@
             <!-- Form Builder resources for itemset editor -->
             <xforms:instance id="fb-resources" resource="oxf:/forms/orbeon/builder/form/resources.xml" xxforms:readonly="true" xxforms:cache="true"/>
 
-            <!-- Initial instance -->
-            <xforms:send ev:event="xforms-model-construct-done" submission="load-submission"/>
-            <xforms:submission id="load-submission" serialization="none"
-                               method="get" resource="oxf:/apps/xforms-controls/initial-instance.xml"
-                               replace="instance" targetref="instance('fr-form-instance')"/>
-
             <!-- Perform background submission upon xforms-select for xforms:upload -->
             <xforms:action ev:observer="fr-form-group" ev:event="xforms-select"
                     if="for $b in xxforms:event('xxforms:binding') return $b/(@filename and @mediatype and @size)">

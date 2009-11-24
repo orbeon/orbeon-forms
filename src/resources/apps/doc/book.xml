@@ -17,22 +17,15 @@
         <menu label="Changes">
             <menu-item label="Version 3.7.2" href="home-changes-372"/>
             <menu-item label="Version 3.7.1" href="home-changes-371" printed-book="false"/>
+            
             <menu-item label="Version 3.6" href="home-changes-36" printed-book="false"/>
-
             <menu-item label="Version 3.5" href="home-changes-35" printed-book="false"/>
             <menu-item label="Version 3.0" href="home-changes-30" printed-book="false"/>
-            <!--
-            <menu-item label="Version 2.8" href="home-changes-28" printed-book="false"/>
-            <menu-item label="Version 2.7" href="home-changes-27" printed-book="false"/>
-            <menu-item label="Version 2.6" href="home-changes-26" printed-book="false"/>
-            <menu-item label="Version 2.5" href="home-changes-25" printed-book="false"/>
-            <menu-item label="Version 2.2 and Earlier" href="home-changes-older" printed-book="false"/>
-            -->
         </menu>
-        <menu-item label="Installing" href="intro-install"/>
+        <menu-item label="Installing" href="http://wiki.orbeon.com/forms/doc/developer-guide/admin-installing"/>
         <menu-item label="Orbeon Forms Tutorial" href="intro-tutorial"/>
-        <menu-item label="Frequently Asked Questions" href="home-faq"/>
         <menu-item label="Orbeon Forms Wiki" href="http://wiki.orbeon.com/forms"/>
+        <menu-item label="Frequently Asked Questions" href="home-faq"/>
     </menu>
     <menu label="Core Technologies Reference">
         <menu label="XForms">
@@ -40,8 +33,6 @@
             <menu-item label="XForms Extensions" href="reference-xforms-extensions"/>
             <menu-item label="XForms Engine Configuration" href="reference-xforms-configuration"/>
             <menu-item label="XPath Functions" href="reference-xforms-functions"/>
-            <menu-item label="XForms for Java Apps" href="reference-xforms-java"/>
-            <menu-item label="XForms 1.1 Compliance" href="http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-compliance-matrix"/>
         </menu>
         <menu label="Page Flow">
             <menu-item label="Page Flow Controller" href="reference-page-flow"/>
@@ -65,7 +56,6 @@
         <menu-item label="Non-XML Documents" href="reference-formats"/>
         <menu-item label="Error Page and Dialog" href="reference-error-pipeline"/>
         <menu-item label="Listeners" href="reference-listeners"/>
-        <menu-item label="URL Rewriting" href="reference-url-rewriting"/>
         <menu-item label="XML Namespaces" href="reference-xml-namespaces"/>
     </menu>
     <menu label="Processors Reference">
@@ -119,8 +109,6 @@
         <menu-item label="Command Line Applications" href="integration-command-line"/>
         <menu-item label="Web Services" href="integration-webservices"/>
         <menu-item label="Packaging and Deployment" href="integration-packaging"/>
-        <menu-item label="Performance and Tuning" href="integration-tuning"/>
-        <menu-item label="Portlets (JSR-168/268)" href="http://wiki.orbeon.com/forms/doc/developer-guide/deployment-portlet"/>
         <menu-item label="EJB Support" href="integration-ejb"/>
     </menu>
 </book>

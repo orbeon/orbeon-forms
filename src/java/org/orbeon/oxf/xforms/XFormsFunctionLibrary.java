@@ -215,11 +215,11 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:type
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}type", XXFormsType.class, 0, 1, 1, Type.QNAME_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}type", XXFormsType.class, 0, 0, 1, Type.QNAME_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 
         // xxforms:get-request-parameter()
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}invalid-binds", XXFormsInvalidBinds.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}invalid-binds", XXFormsInvalidBinds.class, 0, 0, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 
         // xxforms:if

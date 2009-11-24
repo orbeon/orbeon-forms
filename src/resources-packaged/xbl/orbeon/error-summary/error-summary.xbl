@@ -186,16 +186,16 @@ Inserting error information into error list:
                         <xxforms:variable name="visited" select="tokenize(instance('fr-visited-instance'), '\s+')" as="xs:string*"/>
 
                         <!-- Control visited: append only if we don't know already that this control has been visited -->
-                        <xforms:setvalue if="event('xxforms:type') != 'xforms-disabled' and not($visited = $full-id)"
+                        <xforms:setvalue if="xxforms:event('xxforms:type') != 'xforms-disabled' and not($visited = $full-id)"
                                          ref="instance('fr-visited-instance')" value="string-join((., $full-id), ' ')"/>
                         <!-- Control removed: remove full id from list if present -->
-                        <xforms:setvalue if="event('xxforms:type') = 'xforms-disabled' and $visited = $full-id"
+                        <xforms:setvalue if="xxforms:event('xxforms:type') = 'xforms-disabled' and $visited = $full-id"
                                          ref="instance('fr-visited-instance')" value="string-join($visited[. != $full-id], ' ')"/>
                     </xforms:action>
                 </xforms:action>
 
                 <!-- Control becomes invalid: handle xforms-invalid on observer(s) passed -->
-                <xforms:action xbl:attr="ev:observer=observer" ev:event="xforms-invalid">
+                <xforms:action xbl:attr="ev:observer=observer" ev:event="xforms-invalid xforms-value-changed">
 
                     <xforms:action xxbl:scope="inner">
 
@@ -204,16 +204,16 @@ Inserting error information into error list:
                         <xxforms:variable name="repeat-indexes" select="xxforms:event('xxforms:repeat-indexes')" as="xs:string*"/>
                         <xxforms:variable name="repeat-ancestors" select="xxforms:event('xxforms:repeat-ancestors')" as="xs:string*"/>
 
-                        <!-- Try to find existing error element (should probably not happen with new reliable UI events) -->
+                        <!-- Try to find existing error element -->
                         <xxforms:variable name="current-error" select="error[@id = $prefixed-id and @indexes = string-join($repeat-indexes, ' ')]" as="element(error)*"/>
-                        <!-- Just update the label and alert if it already exists -->
+                        <!-- Just update the label, alert and bind info if it already exists -->
                         <xforms:action if="exists($current-error)" context="$current-error">
                             <xforms:setvalue ref="$current-error/@alert" value="xxforms:event('xxforms:alert')"/>
                             <xforms:setvalue ref="$current-error/@label" value="xxforms:event('xxforms:label')"/>
                             <xforms:setvalue ref="$current-error/@binds" value="string-join(xxforms:invalid-binds(xxforms:event('xxforms:binding')), ' ')"/>
                         </xforms:action>
-                        <!-- Otherwise insert new element and sets its values -->
-                        <xforms:action if="not(exists($current-error))">
+                        <!-- Otherwise if the event is xforms-invalid, insert new element and sets its values -->
+                        <xforms:action if="xxforms:event('xxforms:type') = 'xforms-invalid' and not(exists($current-error))">
                             <!-- Remember that the instance is no longer valid -->
                             <xforms:setvalue ref="instance('fr-state-instance')/valid">false</xforms:setvalue>
 

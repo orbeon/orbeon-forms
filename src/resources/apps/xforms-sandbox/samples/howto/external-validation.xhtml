@@ -19,16 +19,28 @@
                     <customer-number>1234-4567-7890</customer-number>
                 </user-info>
             </xforms:instance>
-            <xforms:bind nodeset="//*" constraint="not(@v:valid = 'false')"/>
-            
+
+            <!-- Mark all fields as required -->
+            <xforms:bind nodeset="*" required="true()"/>
+
+            <!-- Mark all externally-invalid fields as invalid -->
+            <xforms:bind id="external-constraints-bind" nodeset="//*" constraint="not(@v:valid = 'false')"/>
+
+            <!-- Temporary validation result -->
             <xforms:instance id="validation-result"><dummy/></xforms:instance>
-            
-            <xforms:submission id="validation-submission" ref="instance('user-info')" 
+
+            <!-- External validation submission -->
+            <xforms:submission id="validation-submission" ref="instance('user-info')"
                     resource="/apps/xforms-sandbox/samples/howto/external-validation-response.xml"
                     method="post" replace="instance" instance="validation-result">
+                <!-- Clear external errors just before doing external validation -->
                 <xforms:delete ev:event="xforms-submit" nodeset="//@v:*"/>
                 <xforms:action ev:event="xforms-submit-done">
+                    <!-- Insert external validation results when done -->
                     <xforms:insert nodeset="." origin="instance('validation-result')/v:data/*"/>
+                    <!-- Add note that certain errors are revalidated until upon revalidation -->
+                    <xforms:setvalue xxforms:iterate="//@v:alert" ref="." value="concat(., ' (save again to revalidate)')"/>
+                    <!-- Show all errors on form -->
                     <xforms:dispatch name="fr-visit-all" targetid="error-summary"/>
                 </xforms:action>
             </xforms:submission>
@@ -47,7 +59,7 @@
             .buttons .xbl-fr-button img { margin-right: .3em; }
 
             .xbl-fr-error-summary { margin-top: 2em; }
-            .fr-error-summary-body { background-color: #F2D6C6; padding: .5em 0 .5em 0; width: 40em; }
+            .fr-error-summary-body { background-color: #F2D6C6; padding: .5em 0 .5em 0; width: 50em; }
             .xbl-fr-error-summary .fr-error-alert { color: black; }
             .xforms-repeat-selected-item-1 { background-color: transparent; }
             .global-errors { display: none; }
@@ -58,19 +70,19 @@
             <xhtml:div>
                 <xforms:input ref="first-name">
                     <xforms:label>First name</xforms:label>
-                    <xforms:alert ref="@v:alert"/>
+                    <xforms:alert value="if (xxforms:invalid-binds(.) = 'external-constraints-bind') then @v:alert else 'The first name is required'"/>
                 </xforms:input>
             </xhtml:div>
             <xhtml:div>
                 <xforms:input ref="last-name">
                     <xforms:label>Last name</xforms:label>
-                    <xforms:alert ref="@v:alert"/>
+                    <xforms:alert value="if (xxforms:invalid-binds(.) = 'external-constraints-bind') then @v:alert else 'The last name is required'"/>
                 </xforms:input>
             </xhtml:div>
             <xhtml:div>
                 <xforms:input ref="customer-number">
                     <xforms:label>Customer number</xforms:label>
-                    <xforms:alert ref="@v:alert"/>
+                    <xforms:alert value="if (xxforms:invalid-binds(.) = 'external-constraints-bind') then @v:alert else 'The customer number is required'"/>
                 </xforms:input>
             </xhtml:div>
         </xforms:group>
@@ -91,5 +103,7 @@
                 <fr:alert ref="@v:alert"/>
             </fr:errors>
         </fr:error-summary>
+        <!-- Uncomment this for the XForms inspector -->
+        <!--<fr:xforms-inspector/>-->
     </xhtml:body>
 </xhtml:html>

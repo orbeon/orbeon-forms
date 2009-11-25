@@ -54,7 +54,7 @@
                             </xxforms:variable>
 
                             <!-- Access to XForms value, and xforms-value-changed event -->
-                            <xforms:input ref="$result" id="currency-input" class="xbl-fr-currency-xforms-input">
+                            <xforms:input ref="$result" id="currency-input" class="xbl-fr-currency-xforms-input fr-hidden">
                                 <xxforms:script id="xf-ch" ev:event="xforms-value-changed">YAHOO.xbl.fr.Currency.instance(this).valueChanged();</xxforms:script>
                                 <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Currency.instance(this).readonly();</xxforms:script>
                                 <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Currency.instance(this).readwrite();</xxforms:script>

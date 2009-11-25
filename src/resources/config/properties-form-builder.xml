@@ -26,7 +26,7 @@
                                                                                             oxf:/xbl/orbeon/fields-date/fields-date.xbl
                                                                                             oxf:/xbl/orbeon/date-picker/date-picker.xbl
                                                                                             oxf:/xbl/orbeon/us-phone/us-phone.xbl
-                                                                                            oxf:/xbl/orbeon/us-currency-thousands/us-currency-thousands.xbl"/>
+                                                                                            oxf:/xbl/orbeon/currency/currency.xbl"/>
     <property as="xs:string"  name="oxf.fb.toolbox.group.selection.uri.*.*"          value="oxf:/forms/orbeon/builder/xbl/selection-controls.xbl
                                                                                             oxf:/xbl/orbeon/link-select1/link-select1.xbl
                                                                                             oxf:/xbl/orbeon/box-select/box-select.xbl"/>

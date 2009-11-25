@@ -32,6 +32,7 @@
 #fr-view .xforms-case-deselected { display: none }
 #fr-view .xforms-case-deselected .xforms-label { display: none }
 #fr-view .fr-hidden { display: none }
+.fr-grid .fr-grid-td .fr-grid-content .fr-hidden { display: none } /* for users of .fr-hidden without #fr-view */
 
 /* Nicely position the help image */
 .xforms-help-image {

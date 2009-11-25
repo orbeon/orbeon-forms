@@ -81,7 +81,7 @@ public class FilesystemResourceManagerImpl extends ResourceManagerBase {
     }
 
     /**
-     * Gets the last modified timestamp for the specofoed resource
+     * Gets the last modified timestamp for the specified resource
      * @param key A Resource Manager key
      * @param doNotThrowResourceNotFound
      * @return a timestamp

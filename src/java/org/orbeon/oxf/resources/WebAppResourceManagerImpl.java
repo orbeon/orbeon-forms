@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.resources;
 
@@ -76,7 +76,7 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
     }
 
     /**
-     * Gets the last modified timestamp for the specofoed resource
+     * Gets the last modified timestamp for the specified resource
      * @param key A Resource Manager key
      * @param doNotThrowResourceNotFound
      * @return a timestamp
@@ -111,7 +111,7 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
     }
 
     /**
-     * Indicates if the resource manager implementation suports write operations
+     * Indicates if the resource manager implementation supports write operations
      * @return true if write operations are allowed
      */
     public boolean canWrite(String key) {

@@ -186,8 +186,8 @@ p, fieldset, table { margin-bottom: 1em }
     color: #6E6E6E;
 }
 
-/* Set controls background */
-.xforms-input input, textarea.xforms-textarea, input.xforms-secret, .xforms-textarea textarea, .xforms-secret input {
+/* Set input/textarea controls background */
+.xforms-input input, textarea.xforms-textarea, input.xforms-secret, .xforms-textarea textarea, .xforms-secret input, .xbl-component .xbl-html-input {
     background-image: url(field.png);
     background-repeat: repeat-x;
     border: 1px solid #ccc;

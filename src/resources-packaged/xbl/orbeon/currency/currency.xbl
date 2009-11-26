@@ -63,7 +63,7 @@
                             <xsl:copy-of select="xxbl:parameter(., 'prefix')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'digits-after-decimal')"/>
                             <!-- The visible input -->
-                            <xhtml:input class="xbl-fr-currency-visible-input" xbl:attr="tabindex tabindex=navindex"/>
+                            <xhtml:input class="xbl-fr-currency-visible-input xbl-html-input" xbl:attr="tabindex tabindex=navindex"/>
 
                             <!-- Stop propagation of all local UI events -->
                             <xforms:action ev:event="#all" ev:propagate="stop"/>

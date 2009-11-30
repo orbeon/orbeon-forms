@@ -118,6 +118,8 @@
 
     <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                              value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.map.clientid"                         value=""/>
+    <property as="xs:boolean" name="oxf.xforms.xbl.fr.map.ssl"                              value="false"/>
     <property as="xs:integer" name="oxf.xforms.xbl.fr.autocomplete.max-results-displayed"   value="10"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.prefix"                      value="$"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.digits-after-decimal"        value="2"/>

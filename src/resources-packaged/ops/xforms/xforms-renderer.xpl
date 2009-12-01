@@ -41,6 +41,7 @@
 
     <p:choose href="#extracted-document">
         <p:when test="/p:config and /p:config/p:param[@type = 'output' and @name = 'data']">
+            <!-- XPL -->
             <!-- Pipeline with a data output -->
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="#extracted-document"/>
@@ -55,12 +56,14 @@
             </p:processor>
         </p:when>
         <p:when test="/p:config">
+            <!-- XPL -->
             <!-- Pipeline without a data output -->
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="#extracted-document"/>
             </p:processor>
         </p:when>
         <p:otherwise>
+            <!-- XForms -->
             <!-- Run XInclude as that may be desirable (e.g. to include components) -->
             <p:processor name="oxf:xinclude">
                 <p:input name="config" href="#extracted-document"/>

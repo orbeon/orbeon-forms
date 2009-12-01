@@ -71,11 +71,16 @@ public class OrbeonXFormsFilter implements Filter {
             filterChain.doFilter(requestWrapper, responseWrapper);
 
             // Set document if not present AND output was intercepted
+            final boolean isEmptyContent;
             if (httpRequest.getAttribute(RENDERER_DOCUMENT_ATTRIBUTE_NAME) == null) {
                 final String content = responseWrapper.getContent();
                 if (content != null) {
                     httpRequest.setAttribute(RENDERER_DOCUMENT_ATTRIBUTE_NAME, content);
                 }
+                isEmptyContent = isBlank(content);
+            } else {
+                // Assume content is not blank
+                isEmptyContent = false;
             }
 
             // Tell whether there is a session
@@ -91,7 +96,7 @@ public class OrbeonXFormsFilter implements Filter {
             // Forward to Orbeon Forms for rendering only of there is content to be rendered, otherwise just return and
             // let the filterChain finish its life naturally, assuming that when sendRedirect is used, no content is
             // available in the response object
-            if (!isBlank(responseWrapper.getContent())) {
+            if (!isEmptyContent) {
                 // The request wrapper provides an empty request body if the filtered resource already attempted to
                 // read the body.
                 final HandleBodyOrbeonRequestWrapper orbeonRequestWrapper

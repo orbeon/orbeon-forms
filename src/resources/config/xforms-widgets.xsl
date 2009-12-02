@@ -21,7 +21,7 @@
     <xsl:key name="xbl:bindings" match="xbl:binding" use="for $m in tokenize(@element, '\s+') return translate($m, '|', ':')"/>
 
     <!-- All elements that look like they can have XBL bindings -->
-    <xsl:variable name="potential-elements" as="element()*" select="//fr:*"/>
+    <xsl:variable name="potential-elements" as="element()*" select="//fr:* | //widget:xforms-instance-inspector"/>
     <!-- All names thereof including XForms inspector if automatically added
          Also handle backward compatibility for widget:xforms-instance-inspector -->
     <xsl:variable name="potential-names" as="xs:string*" select="$potential-elements/name()"/>
@@ -199,7 +199,7 @@
     </xsl:template>
 
     <!-- Automatically add the XForms inspector if property is set AND if there is not already an XForms inspector -->
-    <xsl:template match="xhtml:body[pipeline:property('oxf.epilogue.xforms.inspector') and not($potential-names = 'fr:xforms-inspector')]">
+    <xsl:template match="xhtml:body[pipeline:property('oxf.epilogue.xforms.inspector') and not($potential-names = ('fr:xforms-inspector', 'widget:xforms-instance-inspector'))]">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
             <fr:xforms-inspector id="orbeon-xforms-inspector"/>

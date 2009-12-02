@@ -40,8 +40,9 @@ YAHOO.xbl.fr.Recaptcha.prototype = {
         
         Recaptcha.create(publicKey, recaptchaDiv.id, {
            theme: theme,
-           lang: lang,
-           callback: Recaptcha.focus_response_field
+           lang: lang
+// NOTE: Setting the focus automatically is often not what is desired. Proper support for xf:setfocus would be ideal.
+//           ,callback: Recaptcha.focus_response_field
         });
     },
     

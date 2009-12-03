@@ -4663,15 +4663,7 @@ ORBEON.xforms.Init = {
                         // Create and store error panel
                         YAHOO.util.Dom.generateId(formChild);
                         ORBEON.util.Dom.removeClass(formChild, "xforms-initially-hidden");
-                        var errorPanel = new YAHOO.widget.Panel(formChild.id, {
-                            width: "700px",
-                            modal: true,
-                            fixedcenter: false,
-                            underlay: "shadow",
-                            visible: false,
-                            constraintoviewport: true,
-                            draggable: true
-                        });
+                        var errorPanel = new YAHOO.widget.Panel(formChild.id);
                         errorPanel.beforeHideEvent.subscribe(ORBEON.xforms.Events.errorPanelClosed, formID);
                         ORBEON.xforms.Globals.formErrorPanel[formID] = errorPanel;
 
@@ -4705,6 +4697,16 @@ ORBEON.xforms.Init = {
                             YAHOO.util.Dom.generateId(reloadA[0]);
                             YAHOO.util.Event.addListener(reloadA[0].id, "click", ORBEON.xforms.Events.errorReloadClicked, errorPanel);
                         }
+                        // For some unknown reason, passing a config in the contructor does not work anymore so we set
+                        // the error panel properties here.
+                        errorPanel.cfg.setProperty("width", "700px");
+                        errorPanel.cfg.setProperty("modal", true);
+                        errorPanel.cfg.setProperty("fixedcenter", false);
+                        errorPanel.cfg.setProperty("underlay", "shadow");
+                        errorPanel.cfg.setProperty("visible", false);
+                        errorPanel.cfg.setProperty("constraintoviewport", true);
+                        errorPanel.cfg.setProperty("draggable", true);
+                        errorPanel.cfg.setProperty("close", true);
 
                         xformsLoadingCount++;
                     } else if (formChild.className == "xforms-loading-none") {

@@ -242,17 +242,20 @@
                     <li>
                         <a name="xxforms-repeat-nodeset"/>
                         <p>
-                            <code>xxforms:repeat-nodeset($repeat-id as xs:string) as node()*</code>
+                            <code>xxforms:repeat-nodeset($repeat-id as xs:string?) as node()*</code>
                         </p>
                         <p>
                             The <code>xxforms:repeat-nodeset()</code> function returns the node-set of an enclosing
-                            <code>xforms:repeat</code>. It takes one mandatory string parameter containing the id of
-                            an enclosing repeat XForms control.
+                            <code>xforms:repeat</code>. It takes a string parameter containing the id of
+                            an enclosing repeat XForms control. When the argument
+                            is omitted, the function returns the index of the closest enclosing
+                            <code>&lt;xforms:repeat></code> element. This function must always be used within
+                            <code>&lt;xforms:repeat></code> otherwise an error is raised.
                         </p>
                         <xml-source show-namespaces="false">
                             <xforms:repeat id="employee-repeat" nodeset="employee">
                                 <xhtml:div>
-                                    <xforms:output value="count(xxforms:repeat-nodeset('book-repeat'))"/>
+                                    <xforms:output value="count(xxforms:repeat-nodeset('employee-repeat'))"/>
                                 </xhtml:div>
                             </xforms:repeat>
                         </xml-source>

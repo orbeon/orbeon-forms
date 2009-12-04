@@ -747,15 +747,15 @@ public class XFormsContextStack {
      * @return  repeat id, throw if not found
      */
     public String getEnclosingRepeatId() {
-        for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = contextStack.get(i);
-
+        BindingContext currentBindingContext = getCurrentBindingContext();
+        do {
             if (isRepeatIterationBindingContext(currentBindingContext)) {
                 // Found binding context for relevant repeat iteration
                 return currentBindingContext.parent.elementId;
             }
-        }
-        // It is required that there is a relevant enclosing xforms:repeat
+            currentBindingContext = currentBindingContext.parent;
+        } while (currentBindingContext != null);
+        // It is required that there is an enclosing xforms:repeat
         throw new ValidationException("Enclosing xforms:repeat not found.", getCurrentBindingContext().getLocationData());
     }
 
@@ -768,9 +768,8 @@ public class XFormsContextStack {
      * @return           the item
      */
     public Item getContextForId(String contextId) {
-        for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = contextStack.get(i);
-
+        BindingContext currentBindingContext = getCurrentBindingContext();
+        do {
             final Element bindingElement = currentBindingContext.getControlElement();
             if (bindingElement != null && XFormsControlFactory.isContainerControl(bindingElement.getNamespaceURI(), bindingElement.getName())) {
                 // We are a grouping control
@@ -786,7 +785,9 @@ public class XFormsContextStack {
                     return currentBindingContext.getSingleItem();
                 }
             }
-        }
+            currentBindingContext = currentBindingContext.parent;
+        } while (currentBindingContext != null);
+        // It is required that there is an enclosing container control
         throw new ValidationException("No enclosing container XForms control found for id: " + contextId, getCurrentBindingContext().getLocationData());
     }
 
@@ -797,16 +798,17 @@ public class XFormsContextStack {
      * @return          node-set
      */
     public List getRepeatNodeset(String repeatId) {
-        for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = contextStack.get(i);
-
+        BindingContext currentBindingContext = getCurrentBindingContext();
+        do {
             final Element bindingElement = currentBindingContext.getControlElement();
             final String elementId = currentBindingContext.elementId;
             if (repeatId.equals(elementId) && bindingElement != null && bindingElement.getName().equals("repeat")) {
                 // Found repeat, return associated node-set
                 return currentBindingContext.getNodeset();
             }
-        }
+            currentBindingContext = currentBindingContext.parent;
+        } while (currentBindingContext != null);
+        // It is required that there is an enclosing xforms:repeat
         throw new ValidationException("No enclosing xforms:repeat found for id: " + repeatId, getCurrentBindingContext().getLocationData());
     }
 

@@ -77,9 +77,18 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
     public void childrenAdded(PropertyContext propertyContext) {
         // This is called once all children have been added
 
+        // NOTE: We used to initialize the repeat index here, but this made the index() function non-functional during
+        // repeat construction. Instead, we now initialize the index in setBindingContext(), when that method is called
+        // during control creation.
+    }
+
+    @Override
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
+        super.setBindingContext(propertyContext, bindingContext, isCreate);
+
         // Ensure that the initial index is set, unless the state was already restored. In that case, the index was
         // reset from serialized data and the initial index must not be used.
-        if (!restoredState) {
+        if (isCreate && !restoredState) {
             final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
             local.index = ensureIndexBounds(getStartIndex());
         }
@@ -110,6 +119,22 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
     private int ensureIndexBounds(int index) {
         return Math.min(Math.max(index, (getSize() > 0) ? 1 : 0), getSize());
+    }
+
+    @Override
+    public int getSize() {
+
+        // Return the size based on the nodeset size, so we can call this before all iterations have been added.
+        // Scenario:
+        // o call index() or xxf:index() from within a variable within the iteration:
+        // o not all iterations have been added, but the size must be known
+        // NOTE: This raises an interesting question about the relevance of iterations. As of 2009-12-04, not sure
+        // how we handle that!
+        final XFormsContextStack.BindingContext bindingContext = getBindingContext();
+        if (bindingContext == null)
+            return 0;
+
+        return bindingContext.nodeset.size();
     }
 
     public int getIndex() {
@@ -287,7 +312,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 contextStack.popBinding();
             }
             contextStack.pushBinding(propertyContext, getControlElement(), getEffectiveId(), getResolutionScope());
-            setBindingContext(propertyContext, contextStack.getCurrentBindingContext());
+            setBindingContext(propertyContext, contextStack.getCurrentBindingContext(), false);
 
             newRepeatNodeset = getBindingContext().getNodeset();
         }

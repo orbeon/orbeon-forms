@@ -46,12 +46,12 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext) {
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
         final boolean isNewBinding = getBindingContext() == null;
         final boolean isNodesetChange = isNewBinding|| !compareNodesets(getBindingContext().getNodeset(), bindingContext.getNodeset());
 
         // Set/update binding context on control
-        super.setBindingContext(propertyContext, bindingContext);
+        super.setBindingContext(propertyContext, bindingContext, isCreate);
 
         nestedContainer.setBindingContext(bindingContext);
         nestedContainer.getContextStack().resetBindingContext(propertyContext);

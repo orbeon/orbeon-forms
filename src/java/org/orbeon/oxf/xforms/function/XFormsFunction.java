@@ -76,7 +76,10 @@ abstract public class XFormsFunction extends SystemFunction {
 
     protected String getSourceEffectiveId(XPathContext xpathContext) {
         final Context functionContext = (XFormsFunction.Context) PooledXPathExpression.getFunctionContext(xpathContext);
-        return functionContext.getSourceEffectiveId();
+        final String sourceEffectiveId = functionContext.getSourceEffectiveId();
+        if (sourceEffectiveId == null)
+            throw new OXFException("Source effective id not available for resolution.");
+        return sourceEffectiveId;
     }
 
     protected XFormsModel getModel(XPathContext xpathContext) {

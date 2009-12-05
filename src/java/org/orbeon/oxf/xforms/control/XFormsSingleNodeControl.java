@@ -76,10 +76,10 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext) {
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
 
         // Keep binding context
-        super.setBindingContext(propertyContext, bindingContext);
+        super.setBindingContext(propertyContext, bindingContext, isCreate);
 
         // Set bound node, only considering actual bindings with @bind, @ref or @nodeset
         if (bindingContext.isNewBind())

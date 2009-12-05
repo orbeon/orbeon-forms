@@ -342,7 +342,7 @@ public class ControlTree implements Cloneable {
 
         // Create iteration and set its binding context
         final XFormsRepeatIterationControl repeatIterationControl = new XFormsRepeatIterationControl(repeatControl.getXBLContainer(), repeatControl, iterationIndex);
-        repeatIterationControl.setBindingContext(propertyContext, bindingContext);
+        repeatIterationControl.setBindingContext(propertyContext, bindingContext, true);
 
         // Index this control
         iterationControlIndex.indexControl(repeatIterationControl);
@@ -710,7 +710,7 @@ public class ControlTree implements Cloneable {
 
             // Set current binding for control element
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
-            control.setBindingContext(propertyContext, currentBindingContext);
+            control.setBindingContext(propertyContext, currentBindingContext, true);
 
             // Control type-specific handling
             if (control instanceof XFormsSelectControl || control instanceof XFormsSelect1Control) {
@@ -770,7 +770,7 @@ public class ControlTree implements Cloneable {
 
             // Set current binding for iteration
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
-            repeatIterationControl.setBindingContext(propertyContext, currentBindingContext);
+            repeatIterationControl.setBindingContext(propertyContext, currentBindingContext, true);
 
             // Index this control
             // NOTE: Could do this even before context is set if needed. We used to have to put it here back when
@@ -837,7 +837,7 @@ public class ControlTree implements Cloneable {
                 final List<Item> newRepeatNodeset = newBindingContext.getNodeset();
 
                 // Set new current binding for control element
-                repeatControl.setBindingContext(propertyContext, newBindingContext);
+                repeatControl.setBindingContext(propertyContext, newBindingContext, false);
 
                 // Update iterations
                 final List<XFormsRepeatIterationControl> newIterations = repeatControl.updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, null);
@@ -852,7 +852,7 @@ public class ControlTree implements Cloneable {
                 // Handle dialog
                 // TODO: handle this through inheritance
 
-                control.setBindingContext(propertyContext, newBindingContext);
+                control.setBindingContext(propertyContext, newBindingContext, false);
 
                 final XXFormsDialogControl dialogControl = (XXFormsDialogControl) control;
                 final boolean isVisible = dialogControl.isVisible();
@@ -863,7 +863,7 @@ public class ControlTree implements Cloneable {
                 // TODO: handle other container controls
 
                 // Set new current binding for control element
-                control.setBindingContext(propertyContext, newBindingContext);
+                control.setBindingContext(propertyContext, newBindingContext, false);
             }
 
             // Mark the control as dirty so it gets reevaluated

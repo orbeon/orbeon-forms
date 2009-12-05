@@ -373,16 +373,18 @@ public class XFormsControls implements XFormsObjectResolver {
     /**
      * Visit all the controls elements by following repeats to allow creating the actual control.
      */
-    public static void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsContainingDocument containingDocument, XBLContainer rootContainer, ControlElementVisitorListener controlElementVisitorListener) {
-        rootContainer.getContextStack().resetBindingContext(propertyContext);
+    public static void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsContainingDocument containingDocument,
+                                                        XBLContainer rootXBLContainer, ControlElementVisitorListener controlElementVisitorListener) {
+        rootXBLContainer.getContextStack().resetBindingContext(propertyContext);
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
         final Element rootElement = containingDocument.getStaticState().getControlsDocument().getRootElement();
     
         visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                containingDocument.getStaticState(), rootContainer, rootElement, "", "");
+                containingDocument.getStaticState(), rootXBLContainer, null, rootElement, "", "");
     }
 
-    public static void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsRepeatControl enclosingRepeatControl, int iterationIndex, ControlElementVisitorListener controlElementVisitorListener) {
+    public static void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsRepeatControl enclosingRepeatControl,
+                                                        int iterationIndex, ControlElementVisitorListener controlElementVisitorListener) {
 
         final XFormsContainingDocument containingDocument = enclosingRepeatControl.getXBLContainer().getContainingDocument();
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
@@ -395,12 +397,13 @@ public class XFormsControls implements XFormsObjectResolver {
         // Start visiting children of the xforms:repeat element
         final Element repeatControlElement = containingDocument.getStaticState().getControlElement(enclosingRepeatControl.getPrefixedId());
         XFormsControls.visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                containingDocument.getStaticState(), enclosingRepeatControl.getXBLContainer(), repeatControlElement,
+                containingDocument.getStaticState(), enclosingRepeatControl.getXBLContainer(), enclosingRepeatControl, repeatControlElement,
                 XFormsUtils.getEffectiveIdPrefix(enclosingRepeatControl.getEffectiveId()),
                 XFormsUtils.getEffectiveIdSuffix(XFormsUtils.getIterationEffectiveId(enclosingRepeatControl.getEffectiveId(), iterationIndex)));
     }
 
-    public static void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsContainerControl containerControl, ControlElementVisitorListener controlElementVisitorListener) {
+    public static void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsContainerControl containerControl,
+                                                        ControlElementVisitorListener controlElementVisitorListener) {
 
         final XFormsControl control = (XFormsControl) containerControl;
         final XFormsContainingDocument containingDocument = control.getXBLContainer().getContainingDocument();
@@ -412,17 +415,17 @@ public class XFormsControls implements XFormsObjectResolver {
 
         // Start visiting children of the xforms:repeat element
         XFormsControls.visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                containingDocument.getStaticState(), control.getXBLContainer(), control.getControlElement(),
+                containingDocument.getStaticState(), control.getXBLContainer(), control, control.getControlElement(),
                 XFormsUtils.getEffectiveIdPrefix(control.getEffectiveId()),
                 XFormsUtils.getEffectiveIdSuffix(control.getEffectiveId()));
     }
 
     private static void visitControlElementsHandleRepeat(PropertyContext propertyContext, ControlElementVisitorListener controlElementVisitorListener,
-                                                    boolean isOptimizeRelevance, XFormsStaticState staticState, XBLContainer currentContainer,
-                                                    Element containerElement, String idPrefix, String idPostfix) {
+                                                    boolean isOptimizeRelevance, XFormsStaticState staticState, XBLContainer currentXBLContainer,
+                                                    XFormsControl currentControlsContainer, Element containerElement, String idPrefix, String idPostfix) {
 
         int variablesCount = 0;
-        final XFormsContextStack currentContextStack = currentContainer.getContextStack();
+        final XFormsContextStack currentContextStack = currentXBLContainer.getContextStack();
         for (Object o: containerElement.elements()) {
             final Element currentControlElement = (Element) o;
             final String currentControlURI = currentControlElement.getNamespaceURI();
@@ -439,7 +442,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 currentContextStack.pushBinding(propertyContext, currentControlElement, controlEffectiveId, newScope);
 
                 // Visit xforms:repeat element
-                controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, controlEffectiveId);
+                final XFormsControl newRepeatControl = controlElementVisitorListener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
 
                 // Iterate over current xforms:repeat nodeset
                 final List currentNodeSet = currentContextStack.getCurrentNodeset();
@@ -454,13 +457,13 @@ public class XFormsControls implements XFormsObjectResolver {
                             // Compute repeat iteration id
                             final String iterationEffectiveId = XFormsUtils.getIterationEffectiveId(controlEffectiveId, iterationIndex);
 
-                            final boolean recurse = controlElementVisitorListener.startRepeatIteration(currentContainer, iterationIndex, iterationEffectiveId);
+                            final boolean recurse = controlElementVisitorListener.startRepeatIteration(currentXBLContainer, iterationIndex, iterationEffectiveId);
                             if (recurse) {
                                 // When updating controls, the callee has the option of disabling recursion into an
                                 // iteration. This is used for handling new iterations.
                                 final String newIdPostfix = idPostfix.equals("") ? Integer.toString(iterationIndex) : (idPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iterationIndex);
                                 visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                                        staticState, currentContainer, currentControlElement, idPrefix, newIdPostfix);
+                                        staticState, currentXBLContainer, newRepeatControl, currentControlElement, idPrefix, newIdPostfix);
                             }
                             controlElementVisitorListener.endRepeatIteration(iterationIndex);
                         }
@@ -473,7 +476,7 @@ public class XFormsControls implements XFormsObjectResolver {
             } else if (XFormsControlFactory.isContainerControl(currentControlURI, currentControlName)) {
                 // Handle XForms grouping controls
                 currentContextStack.pushBinding(propertyContext, currentControlElement, controlEffectiveId, newScope);
-                final XFormsControl newControl = controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, controlEffectiveId);
+                final XFormsControl newContainerControl = controlElementVisitorListener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
                 final XFormsContextStack.BindingContext currentBindingContext = currentContextStack.getCurrentBindingContext();
                 {
                     // Recurse into grouping control and components if we don't optimize relevance, OR if we do
@@ -484,11 +487,11 @@ public class XFormsControls implements XFormsObjectResolver {
                     // this.
                     // && (!controlName.equals("case") || isCaseSelectedByControlElement(controlElement, effectiveControlId, idPostfix))
 
-                    if (ControlTree.TESTING_DIALOG_OPTIMIZATION && newControl instanceof XXFormsDialogControl) {// TODO: FOR TESTING DIALOG OPTIMIZATION
+                    if (ControlTree.TESTING_DIALOG_OPTIMIZATION && newContainerControl instanceof XXFormsDialogControl) {// TODO: FOR TESTING DIALOG OPTIMIZATION
                         // Visit dialog children only if dialog is visible
-                        if (((XXFormsDialogControl) newControl).isVisible()) {
+                        if (((XXFormsDialogControl) newContainerControl).isVisible()) {
                             visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                                    staticState, currentContainer, currentControlElement, idPrefix, idPostfix);
+                                    staticState, currentXBLContainer, newContainerControl, currentControlElement, idPrefix, idPostfix);
                         }
                     } else {
                         if (!isOptimizeRelevance
@@ -496,7 +499,7 @@ public class XFormsControls implements XFormsObjectResolver {
                                 || (currentBindingContext.getSingleNode() != null && InstanceData.getInheritedRelevant(currentBindingContext.getSingleNode())))) {
 
                             visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                                    staticState, currentContainer, currentControlElement, idPrefix, idPostfix);
+                                    staticState, currentXBLContainer, newContainerControl, currentControlElement, idPrefix, idPostfix);
                         }
                     }
                 }
@@ -505,30 +508,43 @@ public class XFormsControls implements XFormsObjectResolver {
             } else if (XFormsControlFactory.isCoreControl(currentControlURI, currentControlName)) {
                 // Handle leaf control
                 currentContextStack.pushBinding(propertyContext, currentControlElement, controlEffectiveId, newScope);
-                controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, controlEffectiveId);
+                controlElementVisitorListener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlEffectiveId);
                 currentContextStack.popBinding();
             } else if (currentControlName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
-                // Handle xxforms:variable specifically
+                // Handle xxforms:variable specially: as of 2009-12, variables are not considered controls!
 
                 // Create variable object
-                final Variable variable = new Variable(currentContainer, currentContextStack, currentControlElement);
+                final Variable variable = new Variable(currentXBLContainer, currentContextStack, currentControlElement);
 
                 // Push the variable on the context stack. Note that we do as if each variable was a "parent" of the following controls and variables.
                 // NOTE: The value is computed immediately. We should use Expression objects and do lazy evaluation in the future.
-                currentContextStack.pushVariable(currentControlElement, variable.getVariableName(), variable.getVariableValue(propertyContext, controlEffectiveId, true), newScope);
+
+                final String sourceEffectiveId;
+                if (currentControlsContainer == null) {
+                    // We can't figure out a source effective id
+                    // NOTE: This is partly due to the fact that variables are not full controls at this point. So resolution
+                    // by using the id of a variable won't work. This means that, at the top-level, resolution of e.g.
+                    // index(), xxf:index(), xxf:case(), xxf:binding(), will not work for a top-level variable.
+                    sourceEffectiveId = null;
+                } else {
+                    // There is a container control, so use its effective id
+                    sourceEffectiveId = currentControlsContainer.getEffectiveId();
+                }
+
+                currentContextStack.pushVariable(currentControlElement, variable.getVariableName(), variable.getVariableValue(propertyContext, sourceEffectiveId, true), newScope);
 
                 variablesCount++;
             } else if (staticState.getXBLBindings().isComponent(currentControlElement.getQName())) {
                 // Handle components
 
                 // NOTE: don't push the binding here, this is handled if necessary by the component implementation
-                final XFormsComponentControl newControl = (XFormsComponentControl) controlElementVisitorListener.startVisitControl(currentContainer, currentControlElement, controlEffectiveId);
+                final XFormsComponentControl newControl = (XFormsComponentControl) controlElementVisitorListener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
 
                 // Recurse into the shadow component tree
                 final Element shadowTreeDocumentElement = staticState.getXBLBindings().getCompactShadowTree(idPrefix + controlStaticId);
                 visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                        staticState, newControl.getNestedContainer(), shadowTreeDocumentElement, newControl.getNestedContainer().getFullPrefix(), idPostfix);
+                        staticState, newControl.getNestedContainer(), newControl, shadowTreeDocumentElement, newControl.getNestedContainer().getFullPrefix(), idPostfix);
 
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlEffectiveId);
 

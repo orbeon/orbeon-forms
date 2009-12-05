@@ -528,7 +528,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Set this control's binding context.
      */
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext) {
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
         this.bindingContext = bindingContext;
     }
 

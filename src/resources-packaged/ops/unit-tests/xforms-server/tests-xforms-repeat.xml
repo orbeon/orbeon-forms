@@ -1967,5 +1967,124 @@
             </xxf:event-response>
         </output>
     </test>
+    
+    <test description="xxforms:index() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <departments>
+                                <department>
+                                    <employee/>
+                                    <employee/>
+                                </department>
+                                <department>
+                                    <employee/>
+                                </department>
+                                <department>
+                                    <employee/>
+                                    <employee/>
+                                    <employee/>
+                                    <employee/>
+                                </department>
+                            </departments>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat id="department-repeat" nodeset="department" startindex="4">
+                        <xxforms:variable name="department-index-1" select="xxforms:index()" as="element*"/>
+                        <xxforms:variable name="department-index-2" select="xxforms:index('department-repeat')" as="element*"/>
+                        <xforms:output id="department-output-1" value="$department-index-1"/>
+                        <xforms:output id="department-output-2" value="$department-index-2"/>
+                        <xforms:repeat id="employee-repeat" nodeset="employee" startindex="3">
+                            <xxforms:variable name="employee-index-1" select="xxforms:index()" as="element*"/>
+                            <xxforms:variable name="employee-index-2" select="xxforms:index('employee-repeat')" as="element*"/>
+                            <xforms:output id="employee-output-1" value="$employee-index-1"/>
+                            <xforms:output id="employee-output-2" value="$employee-index-2"/>
+
+                            <xxforms:variable name="department-index-3" select="xxforms:index('department-repeat')" as="element*"/>
+                            <xforms:output id="department-output-3" value="$department-index-3"/>
+
+                            <!-- Make sure the function work from within an action as well -->
+                            <xforms:action ev:event="xforms-enabled">
+                                <xxforms:variable name="test-nodeset" select="xxforms:index()"/>
+                                <xforms:setvalue ref="." value="$test-nodeset"/>
+                            </xforms:action>
+                        </xforms:repeat>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <departments>
+                                    <department>
+                                        <employee>2</employee>
+                                        <employee>2</employee>
+                                    </department>
+                                    <department>
+                                        <employee>1</employee>
+                                    </department>
+                                    <department>
+                                        <employee>3</employee>
+                                        <employee>3</employee>
+                                        <employee>3</employee>
+                                        <employee>3</employee>
+                                    </department>
+                                </departments>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="department-repeat" index="3"/>
+                            <control effective-id="employee-repeat·1" index="2"/>
+                            <control effective-id="employee-repeat·2" index="1"/>
+                            <control effective-id="employee-repeat·3" index="3"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="department-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="department-output-1·1">3</xxf:control>
+                        <xxf:control id="department-output-2·1">3</xxf:control>
+                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="1" start-suffix="2" end-suffix="2"/>
+                        <xxf:control id="employee-output-1·1-1">2</xxf:control>
+                        <xxf:control id="employee-output-2·1-1">2</xxf:control>
+                        <xxf:control id="department-output-3·1-1">3</xxf:control>
+                        <xxf:control id="employee-output-1·1-2">2</xxf:control>
+                        <xxf:control id="employee-output-2·1-2">2</xxf:control>
+                        <xxf:control id="department-output-3·1-2">3</xxf:control>
+                        <xxf:control id="department-output-1·2">3</xxf:control>
+                        <xxf:control id="department-output-2·2">3</xxf:control>
+                        <xxf:control id="employee-output-1·2-1">1</xxf:control>
+                        <xxf:control id="employee-output-2·2-1">1</xxf:control>
+                        <xxf:control id="department-output-3·2-1">3</xxf:control>
+                        <xxf:control id="department-output-1·3">3</xxf:control>
+                        <xxf:control id="department-output-2·3">3</xxf:control>
+                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="3" start-suffix="2" end-suffix="4"/>
+                        <xxf:control id="employee-output-1·3-1">3</xxf:control>
+                        <xxf:control id="employee-output-2·3-1">3</xxf:control>
+                        <xxf:control id="department-output-3·3-1">3</xxf:control>
+                        <xxf:control id="employee-output-1·3-2">3</xxf:control>
+                        <xxf:control id="employee-output-2·3-2">3</xxf:control>
+                        <xxf:control id="department-output-3·3-2">3</xxf:control>
+                        <xxf:control id="employee-output-1·3-3">3</xxf:control>
+                        <xxf:control id="employee-output-2·3-3">3</xxf:control>
+                        <xxf:control id="department-output-3·3-3">3</xxf:control>
+                        <xxf:control id="employee-output-1·3-4">3</xxf:control>
+                        <xxf:control id="employee-output-2·3-4">3</xxf:control>
+                        <xxf:control id="department-output-3·3-4">3</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 
 </group>

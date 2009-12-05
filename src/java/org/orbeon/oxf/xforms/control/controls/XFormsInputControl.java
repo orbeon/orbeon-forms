@@ -72,8 +72,8 @@ public class XFormsInputControl extends XFormsValueControl {
     }
 
     @Override
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext) {
-        super.setBindingContext(propertyContext, bindingContext);
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
+        super.setBindingContext(propertyContext, bindingContext, isCreate);
     }
 
     @Override

@@ -18,6 +18,7 @@
     <section label="Form Builder / Runner">
         <application id="fr/orbeon/builder/summary" label="Form Builder (Preview)"/>
         <application id="fr/orbeon/bookshelf/summary" label="Bookshelf Form"/>
+        <application id="fr/orbeon/contact/summary" label="Contact Form"/>
         <application id="fr/orbeon/controls/new" label="Controls Form"/>
         <application id="xforms-government/detail/DMV-14/" label="DMV-14 Form"/>
     </section>

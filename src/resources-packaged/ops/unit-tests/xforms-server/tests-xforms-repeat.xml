@@ -1992,8 +1992,16 @@
                             </departments>
                         </xforms:instance>
                     </xforms:model>
+                    <xforms:model id="model2">
+                        <xforms:instance id="instance2">
+                            <form2/>
+                        </xforms:instance>
+                    </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
+                    <!-- Top-level variable with model change tests that source id for resolution doesn't break -->
+                    <xxforms:variable name="top-level-1" model="model2" select="." as="element()"/>
+                    
                     <xforms:repeat id="department-repeat" nodeset="department" startindex="4">
                         <xxforms:variable name="department-index-1" select="xxforms:index()" as="element*"/>
                         <xxforms:variable name="department-index-2" select="xxforms:index('department-repeat')" as="element*"/>
@@ -2039,6 +2047,9 @@
                                         <employee>3</employee>
                                     </department>
                                 </departments>
+                            </instance>
+                            <instance id="instance2" model-id="model2">
+                                <form2/>
                             </instance>
                         </instances>
                         <controls>

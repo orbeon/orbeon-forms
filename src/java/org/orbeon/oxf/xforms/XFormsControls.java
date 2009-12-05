@@ -522,11 +522,13 @@ public class XFormsControls implements XFormsObjectResolver {
 
                 final String sourceEffectiveId;
                 if (currentControlsContainer == null) {
-                    // We can't figure out a source effective id
+                    // We are a top-level variable and we can't figure out a source effective id
                     // NOTE: This is partly due to the fact that variables are not full controls at this point. So resolution
                     // by using the id of a variable won't work. This means that, at the top-level, resolution of e.g.
                     // index(), xxf:index(), xxf:case(), xxf:binding(), will not work for a top-level variable.
-                    sourceEffectiveId = null;
+
+                    // We need to return a valid effective id, so we return the top-level model in scope
+                    sourceEffectiveId = currentContextStack.getCurrentModel().getEffectiveId();
                 } else {
                     // There is a container control, so use its effective id
                     sourceEffectiveId = currentControlsContainer.getEffectiveId();

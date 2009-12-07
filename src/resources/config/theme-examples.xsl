@@ -72,13 +72,13 @@
                         <xhtml:td colspan="2" id="banner">
                             <xhtml:div style="float: left">
                                 <xhtml:a href="/" f:url-norewrite="true">
-                                    <xhtml:img f:url-norewrite="false" width="199" height="42"
+                                    <xhtml:img f:url-norewrite="false" width="212" height="42"
                                                style="border: 0 white; margin-left: 1em; margin-top: 0.2em; margin-bottom: 0.4em"
-                                               src="/config/theme/images/orbeon-small-blueorange.gif" alt='home'/>
+                                               src="/config/theme/images/orbeon-logo-trimmed-transparent-42.png" alt='home'/>
                                 </xhtml:a>
                             </xhtml:div>
                             <xhtml:span style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
-                                <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0em"
+                                <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0"
                                       action="http://www.google.com/custom">
                                     <xhtml:a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</xhtml:a>
                                     |

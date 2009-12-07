@@ -35,7 +35,7 @@
     <p:processor name="oxf:url-generator">
         <p:input name="config">
             <config>
-                <url>oxf:/config/theme/images/orbeon-small-blueorange.gif</url>
+                <url>oxf:/config/theme/images/orbeon-logo-trimmed-transparent-42.png</url>
                 <content-type>image/gif</content-type>
             </config>
         </p:input>

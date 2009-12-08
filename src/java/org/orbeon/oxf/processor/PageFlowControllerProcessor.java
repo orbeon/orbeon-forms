@@ -1160,27 +1160,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             (new NonLazyUserDataElement("exit-portal") {{ setText(Boolean.toString(doRedirectExitPortal)); }} )));
                     addOutput(new ASTOutput("data", isRedirectExitPortal));
                 }});
-                // Serialize the instance into the request if we are doing a server-side redirect
-                // TODO: do we still need this?
-//                if (doServerSideRedirect) {
-//                    when.addStatement(new ASTProcessorCall(XMLConstants.SCOPE_SERIALIZER_PROCESSOR_QNAME) {{
-//                        Document config = null;
-//                        try {
-//                            config = Dom4jUtils.parseText
-//                                    ("<config><key>" + XFormsInput.REQUEST_FORWARD_INSTANCE_DOCUMENT + "</key><scope>request</scope></config>");
-//                        } catch (DocumentException e) {
-//                            throw new OXFException(e);
-//                        } catch ( final SAXException e ) {
-//                            throw new OXFException( e );
-//                        }
-//                        addInput(new ASTInput("data", new ASTHrefId(internalXUpdatedInstance)));
-//                        addInput(new ASTInput("config", config));
-//                        final String[] locationParams =
-//                            new String[] { "result page id", resultPageId  };
-//                        setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(),
-//                                "serialization of XForms instance to request", resultElement, locationParams, true));
-//                    }});
-//                }
                 // Aggregate redirect-url config
                 final ASTHref redirectURLData;
                 if (setvaluesDocument != null && isTransformedInstance) {

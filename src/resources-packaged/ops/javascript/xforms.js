@@ -2468,11 +2468,10 @@ ORBEON.xforms.Controls = {
      */
     setFocus: function(controlId) {
         var control = ORBEON.util.Dom.getElementById(controlId);
-        // TODO: getting elements by position is not robust at all, fix it!
         ORBEON.xforms.Globals.maskFocusEvents = true;
-        if (ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean")) {
-            ORBEON.util.Dom.getChildElementByIndex(control, 0).focus();
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full") || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")) {
+        if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
+                || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
+                || (ORBEON.util.Dom.hasClass(control, "xforms-input") && ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))) {
             // Look for radio button or check box that is is checked
             var formInputs = ORBEON.util.Dom.getElementsByName(control, "input");
             if (formInputs.length > 0) {
@@ -2488,17 +2487,33 @@ ORBEON.xforms.Controls = {
                 // Set focus on either selected item if we found one or on first item otherwise
                 formInputs[foundSelected ? itemIndex : 0].focus();
             }
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-autocomplete")) {
-            ORBEON.util.Dom.getChildElementByIndex(control, 0).focus();
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            // Special case for RTE
             if (ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "yui") {
                 ORBEON.widgets.RTE.setFocus(control);
             } else {
-                // TODO: can we do anything meaningful for FCK?
+                // Not sure anything meaningful can be done for FCK
             }
-        } else if (typeof control.focus != "undefined") {
-            control.focus();
+        } else {
+            // Generic code to find focusable descendant-or-self HTML element and focus on it
+            var htmlControlNames = [ "input", "textarea", "select", "button", "a" ];
+            for (var i = 0; i < htmlControlNames.length; i++) {
+                var htmlControlName = htmlControlNames[i];
+                var htmlControl;
+                if (control.tagName.toLowerCase() == htmlControlName) {
+                    // Focus on control element itself
+                    htmlControl = control;
+                } else {
+                    // Find first input descendant
+                    var htmlControls = ORBEON.util.Dom.getElementsByName(control, htmlControlName);
+                    htmlControl = (htmlControls.length > 0) ? htmlControls[0] : null;
+                }
+                if (htmlControl != null && typeof htmlControl.focus != "undefined") {
+                    htmlControl.focus();
+                    break;
+                }
+            }
         }
 
         // Save current value as server value. We usually do this on focus, but for control where we set the focus

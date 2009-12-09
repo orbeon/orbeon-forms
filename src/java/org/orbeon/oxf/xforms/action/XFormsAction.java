@@ -49,9 +49,9 @@ public abstract class XFormsAction {
 
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
-        for (Object o: actionElement.elements(XFormsConstants.XXFORMS_CONTEXT_QNAME)) {
-            final Element currentContextInfo = (Element) o;
+        for (final Element currentContextInfo: Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_CONTEXT_QNAME)) {
 
+            // Get and check attributes
             final String name = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(currentContextInfo, "name"));
             if (name == null)
                 throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"name\" attribute.");
@@ -60,15 +60,22 @@ public abstract class XFormsAction {
             if (select == null)
                 throw new OXFException(XFormsConstants.XXFORMS_CONTEXT_QNAME + " element must have a \"select\" attribute.");
 
+            // Set context on context element
+            final XBLBindings.Scope currentActionScope = actionInterpreter.getActionScope(currentContextInfo);
+            contextStack.pushBinding(propertyContext, currentContextInfo, actionInterpreter.getSourceEffectiveId(currentContextInfo), currentActionScope);
+
             // Evaluate context parameter
             final SequenceExtent value = XPathCache.evaluateAsExtent(propertyContext,
                     actionInterpreter.getContextStack().getCurrentNodeset(), actionInterpreter.getContextStack().getCurrentPosition(),
-                    select, actionInterpreter.getNamespaceMappings(actionElement),
+                    select, actionInterpreter.getNamespaceMappings(currentContextInfo),
                     contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                    contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId()), null,
-                    (LocationData) actionElement.getData());
+                    contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(currentContextInfo)), null,
+                    (LocationData) currentContextInfo.getData());
 
             contextStack.returnFunctionContext();
+
+            // Restore context
+            contextStack.popBinding();
 
             event.setAttribute(name, value);
         }

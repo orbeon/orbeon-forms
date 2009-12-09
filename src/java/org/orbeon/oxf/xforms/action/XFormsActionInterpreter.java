@@ -49,7 +49,7 @@ public class XFormsActionInterpreter {
     private final XFormsControls xformsControls;
     private final XFormsContextStack actionBlockContextStack;
 
-    private final String sourceEffectiveId;
+    private final String outerActionElementEffectiveId;
 
     public XFormsActionInterpreter(PropertyContext propertyContext, XBLContainer container, XFormsEventObserver eventObserver,
                                    Element outerActionElement, String ancestorObserverStaticId, boolean isXBLHandler) {
@@ -63,7 +63,7 @@ public class XFormsActionInterpreter {
 
         if (isXBLHandler) {
             // Get the effective id of the <xbl:handler> element as source
-            sourceEffectiveId = container.getFullPrefix() + outerActionElement.attributeValue("id") + XFormsUtils.getEffectiveIdSuffixWithSeparator(container.getEffectiveId());
+            outerActionElementEffectiveId = container.getFullPrefix() + getActionStaticId(outerActionElement) + XFormsUtils.getEffectiveIdSuffixWithSeparator(container.getEffectiveId());
 
             // Initialize context stack based on container context (based on local models if any)
             container.getContextStack().resetBindingContext(propertyContext);
@@ -80,7 +80,7 @@ public class XFormsActionInterpreter {
             }
 
             // Effective id of the XPath observer, which must be a control or model object
-            sourceEffectiveId = xpathContextObserver.getEffectiveId();
+            outerActionElementEffectiveId = XFormsUtils.getRelatedEffectiveId(xpathContextObserver.getEffectiveId(), getActionStaticId(outerActionElement));
 
             actionBlockContextStack = new XFormsContextStack(container, xpathContextObserver.getBindingContext(propertyContext, containingDocument));
 
@@ -104,7 +104,7 @@ public class XFormsActionInterpreter {
         }
 
         // Push binding for outermost action
-        actionBlockContextStack.pushBinding(propertyContext, outerActionElement, getSourceEffectiveId(), getActionScope(outerActionElement));
+        actionBlockContextStack.pushBinding(propertyContext, outerActionElement, getSourceEffectiveId(outerActionElement), getActionScope(outerActionElement));
     }
 
     public XBLContainer getXBLContainer() {
@@ -198,7 +198,7 @@ public class XFormsActionInterpreter {
                     final String contextAttribute = actionElement.attributeValue("context");
                     final String modelAttribute = actionElement.attributeValue("model");
                     // TODO: function context
-                    actionBlockContextStack.pushBinding(propertyContext, null, contextAttribute, iterateIterationAttribute, modelAttribute, null, actionElement, namespaceContext, getSourceEffectiveId(), actionScope);
+                    actionBlockContextStack.pushBinding(propertyContext, null, contextAttribute, iterateIterationAttribute, modelAttribute, null, actionElement, namespaceContext, getSourceEffectiveId(actionElement), actionScope);
                 }
                 {
                     final String refAttribute = actionElement.attributeValue("ref");
@@ -213,7 +213,7 @@ public class XFormsActionInterpreter {
 
                         // Then we also need to push back binding attributes, excluding @context and @model
                         // TODO: function context
-                        actionBlockContextStack.pushBinding(propertyContext, refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceContext, getSourceEffectiveId(), actionScope);
+                        actionBlockContextStack.pushBinding(propertyContext, refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceContext, getSourceEffectiveId(actionElement), actionScope);
 
                         final Item overriddenContextNodeInfo = actionBlockContextStack.getCurrentSingleItem();
                         runSingleIteration(propertyContext, targetEffectiveId, eventObserver, actionElement, actionNamespaceURI,
@@ -289,7 +289,7 @@ public class XFormsActionInterpreter {
             // In that case, in the second iteration, xforms:repeat must find an up-to-date nodeset
             // NOTE: There is still the possibility that parent bindings will be out of date. What should be done there?
             actionBlockContextStack.popBinding();
-            actionBlockContextStack.pushBinding(propertyContext, actionElement, getSourceEffectiveId(), actionScope);
+            actionBlockContextStack.pushBinding(propertyContext, actionElement, getSourceEffectiveId(actionElement), actionScope);
 
             whileIteration++;
         }
@@ -339,19 +339,20 @@ public class XFormsActionInterpreter {
     }
 
     /**
-     * Return the source against which id resolutions are made.
+     * Return the source against which id resolutions are made for the given action element.
      *
+     * @param   actionElement           action element to resolve
      * @return  effective id of source
      */
-    public String getSourceEffectiveId() {
-        return sourceEffectiveId;
+    public String getSourceEffectiveId(Element actionElement) {
+        return XFormsUtils.getRelatedEffectiveId(outerActionElementEffectiveId, getActionStaticId(actionElement));
     }
 
     public String evaluateStringExpression(PropertyContext propertyContext, Element actionElement,
                                            List<Item> nodeset, int position, String xpathExpression) {
 
         // Setup function context
-        final XFormsFunction.Context functionContext = actionBlockContextStack.getFunctionContext(getSourceEffectiveId());
+        final XFormsFunction.Context functionContext = actionBlockContextStack.getFunctionContext(getSourceEffectiveId(actionElement));
 
         // @ref points to something
         final String result = XPathCache.evaluateAsString(propertyContext,
@@ -371,7 +372,7 @@ public class XFormsActionInterpreter {
 
 
         // Setup function context
-        final XFormsFunction.Context functionContext = actionBlockContextStack.getFunctionContext(getSourceEffectiveId());
+        final XFormsFunction.Context functionContext = actionBlockContextStack.getFunctionContext(getSourceEffectiveId(actionElement));
 
         // @ref points to something
         final List result = XPathCache.evaluate(propertyContext,
@@ -417,7 +418,7 @@ public class XFormsActionInterpreter {
             final LocationData locationData = (LocationData) actionElement.getData();
 
             // Setup function context
-            final XFormsFunction.Context functionContext = actionBlockContextStack.getFunctionContext(getSourceEffectiveId());
+            final XFormsFunction.Context functionContext = actionBlockContextStack.getFunctionContext(getSourceEffectiveId(actionElement));
 
             resolvedAVTValue = XFormsUtils.resolveAttributeValueTemplates(propertyContext, bindingContext.getNodeset(),
                         bindingContext.getPosition(), actionBlockContextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
@@ -485,7 +486,7 @@ public class XFormsActionInterpreter {
         final String repeatIndexes = resolveAVT(propertyContext, actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME, false);
         if (StringUtils.isBlank(repeatIndexes)) {
             // Most common case: resolve effective id based on source and target
-            return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(), targetStaticId, null);
+            return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(actionElement), targetStaticId, null);
         } else {
             // Extension: effective id is provided through repeat indexes, modify appropriately and directly reach control
             final Integer[] containerParts = XFormsUtils.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId());
@@ -502,9 +503,12 @@ public class XFormsActionInterpreter {
     }
 
     public String getActionPrefixedId(Element actionElement) {
-        final String actionStaticId = actionElement.attributeValue("id");
-        assert actionStaticId != null;
-        return container.getFullPrefix() + actionStaticId;
+        return container.getFullPrefix() + getActionStaticId(actionElement);
+    }
+
+    public String getActionStaticId(Element actionElement) {
+        assert actionElement.attributeValue("id") != null;
+        return actionElement.attributeValue("id");
     }
 
     public XBLBindings.Scope getActionScope(Element actionElement) {
@@ -532,7 +536,7 @@ public class XFormsActionInterpreter {
         } else {
             // Otherwise, try container
             final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement);
-            return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(), targetStaticId, null);
+            return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(actionElement), targetStaticId, null);
         }
     }
 

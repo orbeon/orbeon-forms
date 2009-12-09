@@ -2934,4 +2934,203 @@
         </output>
     </test>
 
+    <test description="Nested action with different resolution scope than outer action" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns=""/>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="foobar-component" element="fr|foobar">
+                            <xbl:template>
+                                <xforms:trigger id="my-trigger" xxbl:scope="outer">
+                                    <!-- Outer action in outer scope -->
+                                    <xforms:action id="my-action" ev:event="xforms-enabled">
+                                        <!-- Resolution/dispatch in inner scope -->
+                                        <xforms:dispatch id="my-dispatch" name="foobar" targetid="my-inner-group" xxbl:scope="inner"/>
+                                    </xforms:action>
+                                </xforms:trigger>
+                                <!-- Group in inner scope -->
+                                <xforms:group id="my-inner-group">
+                                    <!-- Set value in outer scope -->
+                                    <xforms:setvalue ev:event="foobar" ref="." xxbl:scope="outer">foobar</xforms:setvalue>
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <!-- Instantiate component -->
+                    <fr:foobar id="my-foobar" />
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>foobar</instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Use of context-sensitive XPath function in @if attribute within repeat with different scopes" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <fruit>Apple</fruit>
+                                <fruit>Orange</fruit>
+                            </instance>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="foobar-component" element="fr|foobar">
+                            <xbl:template>
+                                <!-- Repeat in outer scope -->
+                                <xforms:repeat id="my-repeat" nodeset="fruit" xxbl:scope="outer" startindex="2">
+                                    <xxforms:variable name="p" select="position()" as="xs:integer"/>
+                                    <!-- Group in inner scope -->
+                                    <xforms:group id="my-group" xxbl:scope="inner">
+                                        <!-- Action in outer scope -->
+                                        <xforms:action ev:event="xforms-enabled" if="xxforms:index() = $p" xxbl:scope="outer">
+                                            <xforms:setvalue ref=".">Banana</xforms:setvalue>
+                                        </xforms:action>
+                                    </xforms:group>
+                                </xforms:repeat>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <!-- Instantiate component -->
+                    <fr:foobar id="my-foobar" />
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <fruit>Apple</fruit>
+                                    <fruit>Banana</fruit>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-foobar$my-repeat" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="my-foobar$my-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Use of context-sensitive XPath function on xxforms:context within repeat with different scopes" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <fruit>Apple</fruit>
+                                <fruit>Orange</fruit>
+                            </instance>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="foobar-component" element="fr|foobar">
+                            <xbl:template>
+                                <!-- Repeat in outer scope -->
+                                <xforms:repeat id="my-repeat" nodeset="fruit" xxbl:scope="outer" startindex="2">
+                                    <xxforms:variable name="p" select="position()" as="xs:integer"/>
+                                    <!-- Group in inner scope -->
+                                    <xforms:group id="my-group" xxbl:scope="inner">
+                                        <!-- Action in outer scope -->
+                                        <xforms:action ev:event="xforms-enabled" if="xxforms:index() = $p" xxbl:scope="outer">
+                                            <xforms:dispatch name="foobar" targetid="my-group" xxbl:scope="inner">
+                                                <xxforms:context name="index" select="xxforms:index()" xxbl:scope="outer"/>
+                                            </xforms:dispatch>
+                                            <xforms:dispatch name="foobar" targetid="my-other-group" xxbl:scope="inner">
+                                                <xxforms:context name="index" select="xxforms:index()" xxbl:scope="outer"/>
+                                            </xforms:dispatch>
+                                        </xforms:action>
+
+                                        <!-- Event handler in inner scope -->
+                                        <xforms:action ev:event="foobar">
+                                            <xforms:setvalue ref="." xxbl:scope="outer" value="concat(., ' ', event('index'))"/>
+                                        </xforms:action>
+
+                                    </xforms:group>
+                                </xforms:repeat>
+                                <xforms:group id="my-other-group">
+                                    <!-- Event handler in inner scope -->
+                                    <xforms:action ev:event="foobar">
+                                        <xforms:setvalue ref="fruit[event('index')]" xxbl:scope="outer" value="concat(., ' ', event('index'))"/>
+                                    </xforms:action>
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <!-- Instantiate component -->
+                    <fr:foobar id="my-foobar" />
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <fruit>Apple</fruit>
+                                    <fruit>Orange 2 2</fruit>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-foobar$my-repeat" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="my-foobar$my-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

@@ -216,4 +216,20 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     public Map<String, String> getEventNames() {
         return eventNames;
     }
+
+    public Element getEventHandlerElement() {
+        return eventHandlerElement;
+    }
+
+    public String getStaticId() {
+        return eventHandlerElement.attributeValue("id");
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public String getAncestorObserverStaticId() {
+        return ancestorObserverStaticId;
+    }
 }

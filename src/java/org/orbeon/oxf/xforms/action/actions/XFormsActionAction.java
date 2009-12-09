@@ -53,13 +53,13 @@ public class XFormsActionAction extends XFormsAction {
 
                 // Push previous variables if any
                 if (currentVariableElements.size() > 0) {
-                    contextStack.addAndScopeVariables(propertyContext, actionInterpreter.getXBLContainer(), currentVariableElements, actionInterpreter.getSourceEffectiveId());
+                    contextStack.addAndScopeVariables(propertyContext, actionInterpreter.getXBLContainer(), currentVariableElements, actionInterpreter.getSourceEffectiveId(actionElement));
                     variablesCount += currentVariableElements.size();
                 }
 
                 // Set context on action element
                 final XBLBindings.Scope currentActionScope = actionInterpreter.getActionScope(currentActionElement);
-                contextStack.pushBinding(propertyContext, currentActionElement, actionInterpreter.getSourceEffectiveId(), currentActionScope);
+                contextStack.pushBinding(propertyContext, currentActionElement, actionInterpreter.getSourceEffectiveId(actionElement), currentActionScope);
 
                 // Run action
                 actionInterpreter.runAction(propertyContext, targetId, eventObserver, currentActionElement);

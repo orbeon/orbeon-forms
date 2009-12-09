@@ -14,10 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.QName;
+import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -97,6 +94,7 @@ public class XFormsStaticState {
     // Event handlers
     private Map<String, String> eventNamesMap;                              // Map<String eventName, String "">
     private Map<String, List<XFormsEventHandler>> eventHandlersMap;         // Map<String observerPrefixedId, List<XFormsEventHandler> eventHandler>: for all observers with handlers
+    private Map<String, String> eventHandlerAncestorsMap;                   // Map<String actionPrefixId, String ancestorPrefixedId>
 
     // Controls
     private Map<String, Map<String, ControlInfo>> controlTypes;             // Map<String type, Map<String prefixedId, ControlInfo info>>
@@ -788,6 +786,7 @@ public class XFormsStaticState {
             controlTypes = new HashMap<String, Map<String, ControlInfo>>();
             eventNamesMap = new HashMap<String, String>();
             eventHandlersMap = new HashMap<String, List<XFormsEventHandler>>();
+            eventHandlerAncestorsMap = new HashMap<String, String>();
             controlInfoMap = new HashMap<String, ControlInfo>();
             repeatChildrenMap = new HashMap<String, List<String>>();
 
@@ -1355,6 +1354,25 @@ public class XFormsStaticState {
                 eventHandlersForObserver.add(newEventHandlerImpl);
             }
 
+            // Remember closest ancestor observer for all nested actions
+            // This is used to find the closest ancestor control, which in turn is used to find the repeat hierarchy
+            {
+                final String prefix = newEventHandlerImpl.getPrefix();
+                final String ancestorObserverPrefixedId = prefix + newEventHandlerImpl.getAncestorObserverStaticId();
+                eventHandlerAncestorsMap.put(prefix + newEventHandlerImpl.getStaticId(), ancestorObserverPrefixedId);
+
+                Dom4jUtils.visitSubtree(newEventHandlerImpl.getEventHandlerElement(), new Dom4jUtils.VisitorListener() {
+                    public void startElement(Element element) {
+                        final String id = element.attributeValue("id");
+                        if (id != null)
+                            eventHandlerAncestorsMap.put(prefix + id, ancestorObserverPrefixedId);
+                    }
+
+                    public void endElement(Element element) {}
+                    public void text(Text text) {}
+                });
+            }
+
             // Remember all event names
             if (newEventHandlerImpl.isAllEvents()) {
                 eventNamesMap.put(XFormsConstants.XXFORMS_ALL_EVENTS, "");
@@ -1438,8 +1456,8 @@ public class XFormsStaticState {
     /**
      * Find the closest common ancestor repeat given two prefixed ids.
      *
-     * @param prefixedId1   first prefixed id
-     * @param prefixedId2   second prefixed id
+     * @param prefixedId1   first control prefixed id
+     * @param prefixedId2   second control prefixed id
      * @return              prefixed id of common ancestor repeat, or null if not found
      */
     public String findClosestCommonAncestorRepeat(String prefixedId1, String prefixedId2) {
@@ -1474,14 +1492,21 @@ public class XFormsStaticState {
      * Get prefixed ids of all of the start control's repeat ancestors, stopping at endPrefixedId if not null. If
      * endPrefixedId is a repeat, it is excluded. If the source doesn't exist, return the empty list.
      *
-     * @param startPrefixedId   prefixed id of start control
+     * @param startPrefixedId   prefixed id of start control or start action within control
      * @param endPrefixedId     prefixed id of end repeat, or null
      * @return                  list of prefixed id from leaf to root, or the empty list
      */
     public List<String> getAncestorRepeats(String startPrefixedId, String endPrefixedId) {
 
+        // Try control infos
+        ControlInfo controlInfo = controlInfoMap.get(startPrefixedId);
+        if (controlInfo == null) {
+            // Not found, so try actions
+            final String newStartPrefixedId = eventHandlerAncestorsMap.get(startPrefixedId);
+            controlInfo = controlInfoMap.get(newStartPrefixedId);
+        }
+
         // Simple case where source doesn't exist
-        final ControlInfo controlInfo = controlInfoMap.get(startPrefixedId);
         if (controlInfo == null)
             return Collections.emptyList();
 

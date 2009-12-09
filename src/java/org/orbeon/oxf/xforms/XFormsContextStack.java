@@ -240,7 +240,7 @@ public class XFormsContextStack {
      *
      * @param propertyContext   current PropertyContext
      * @param bindingElement    current element containing node binding attributes
-     * @param sourceEffectiveId effective id of source control for id resolution
+     * @param sourceEffectiveId effective id of source control for id resolution of models and binds
      * @param scope             XBL scope
      */
     public void pushBinding(PropertyContext propertyContext, Element bindingElement, String sourceEffectiveId, XBLBindings.Scope scope) {

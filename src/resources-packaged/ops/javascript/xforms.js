@@ -280,10 +280,10 @@ ORBEON.util.MozDom = {
      * Optimized version of getting Elements by Name on Mozilla
      * Firefox 2 assumes there are no other elements with the
      * same local name that are in a different namespace. This has
-     * been fixed in Firefox 3. See https://bugzilla.mozilla.org/show_bug.cgi?id=206053
+     * been fixed in Firefox 3 / Gecko 1.9. See https://bugzilla.mozilla.org/show_bug.cgi?id=206053
      */
     getElementsByName: function(element, localName, namespace) {
-        return element.getElementsByTagName((ORBEON.xforms.Globals.isFF3 && namespace != null ? namespace + ":" : "") + localName);
+        return element.getElementsByTagName((ORBEON.xforms.Globals.isFF3OrNewer && namespace != null ? namespace + ":" : "") + localName);
     }
 };
 
@@ -2573,7 +2573,7 @@ ORBEON.xforms.Controls = {
         // inside the text area (and not textarea height), we suppress textarea height to 0.
         // So that scrollHeight will always return the vertical space text is taking in a text area. After  that we
         // remove the height property, so that effect of setting of height (to 0) doesn't get proliferated elsewhere.
-        if (ORBEON.xforms.Globals.isFF3) {
+        if (ORBEON.xforms.Globals.isFF3OrNewer) {
 			textarea.style.height = 0;
 			scrollHeight = textarea.scrollHeight;
             textarea.style.height = null;
@@ -4506,15 +4506,13 @@ ORBEON.xforms.Init = {
 
         ORBEON.xforms.Globals = {
             // Booleans used for browser detection
-            // TODO: use Yahoo.env.ua for this
             isMac : navigator.userAgent.toLowerCase().indexOf("macintosh") != -1,                 // Running on Mac
-            isRenderingEngineGecko: navigator.userAgent.toLowerCase().indexOf("gecko") != -1,     // Firefox [TODO: Safari and Chrome also have "Gecko" in their user agent!]
-            isFF3: navigator.userAgent.toLowerCase().indexOf("firefox/3") != -1,                  // Firefox 3.0 (NOTE: will have to fix this for Firefox 4 and later)
-            isRenderingEnginePresto: navigator.userAgent.toLowerCase().indexOf("opera") != -1,    // Opera
-            isRenderingEngineWebCore: navigator.userAgent.toLowerCase().indexOf("safari") != -1,  // Safari
-            isRenderingEngineWebCore13: navigator.userAgent.indexOf("AppleWebKit/312") != -1,     // Safari 1.3
-            isRenderingEngineTrident: navigator.userAgent.toLowerCase().indexOf("msie") != -1     // Internet Explorer
-                    && navigator.userAgent.toLowerCase().indexOf("opera") == -1,
+            isRenderingEngineGecko: YAHOO.env.ua.gecko,                                           // Firefox or compatible (Gecko rendering engine)
+            isFF3OrNewer: YAHOO.env.ua.gecko >= 1.9,                                              // Firefox 3.0 or newer or compatible (Gecko >= 1.9)
+            isRenderingEnginePresto: YAHOO.env.ua.opera,                                          // Opera
+            isRenderingEngineWebCore: YAHOO.env.ua.webkit,                                        // Safari
+            isRenderingEngineWebCore13: YAHOO.env.ua.webkit <=312,                                // Safari 1.3
+            isRenderingEngineTrident: YAHOO.env.ua.ie,                                            // Internet Explorer
 
             /**
              * All the browsers support events in the capture phase, except IE and Safari 1.3. When browser don't support events
@@ -4527,7 +4525,7 @@ ORBEON.xforms.Init = {
             eventsFirstEventTime: 0,             // Time when the first event in the queue was added
             requestForm: null,                   // HTML for the request currently in progress
             requestIgnoreErrors: false,          // Should we ignore errors that result from running this request
-            requestInProgress: false,            // Indicates wether an Ajax request is currently in process
+            requestInProgress: false,            // Indicates whether an Ajax request is currently in process
             requestDocument: "",                 // The last Ajax request, so we can resend it if necessary
             requestRetries: 3,                   // How many retries we have left before we give up with this Ajax request
             executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
@@ -6760,7 +6758,7 @@ ORBEON.xforms.Server = {
                                         // After we display divs, we must re-enable the HTML editors.
                                         // This is a workaround for a Gecko (pre-Firefox 3) bug documented at:
                                         // http://wiki.fckeditor.net/Troubleshooting#gecko_hidden_div
-                                        if (children.length > 0 && ORBEON.xforms.Globals.isRenderingEngineGecko && !ORBEON.xforms.Globals.isFF3
+                                        if (children.length > 0 && ORBEON.xforms.Globals.isRenderingEngineGecko && !ORBEON.xforms.Globals.isFF3OrNewer
                                                 && ORBEON.xforms.Globals.htmlAreaNames.length > 0) {
 
                                             for (var childIndex = 0; childIndex < children.length; childIndex++) {

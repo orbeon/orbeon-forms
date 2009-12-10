@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2009 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 package org.orbeon.oxf.processor.zip;
 
 import org.apache.commons.fileupload.FileItem;
@@ -14,12 +27,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.zip.ZipEntry;
@@ -91,7 +99,7 @@ public class ZipProcessor extends ProcessorImpl {
                     // Generate an Orbeon binary document with the content of the zip file
                     FileInputStream zipInputStream = new FileInputStream(temporaryZipFile);
                     try {
-                        ProcessorUtils.readBinary(zipInputStream, contentHandler, "multipart/x-gzip", null);
+                        ProcessorUtils.readBinary(zipInputStream, contentHandler, "multipart/x-gzip", null, -1);
                     } finally {
                         zipInputStream.close();
                     }

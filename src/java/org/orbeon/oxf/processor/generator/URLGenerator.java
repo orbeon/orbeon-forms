@@ -626,21 +626,15 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     private interface ResourceHandler {
-        public Object getValidity() throws IOException;
-
-        public String getResourceMediaType() throws IOException;
-
-        public String getConnectionEncoding() throws IOException;
-
-        public void destroy() throws IOException;
-
-        public void readHTML(ContentHandler output) throws IOException;
-
-        public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException;
-
-        public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException;
-
-        public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException;
+        Object getValidity() throws IOException;
+        String getResourceMediaType() throws IOException;
+        String getConnectionEncoding() throws IOException;
+        int getConnectionStatusCode() throws IOException;
+        void destroy() throws IOException;
+        void readHTML(ContentHandler output) throws IOException;
+        void readText(ContentHandler output, String contentType, Long lastModified) throws IOException;
+        void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException;
+        void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException;
     }
 
     private static class OXFResourceHandler implements ResourceHandler {
@@ -663,6 +657,10 @@ public class URLGenerator extends ProcessorImpl {
             // want to abstract that anyway, so that the behavior is consistent whatever the sandbox
             // is.
             return null;
+        }
+
+        public int getConnectionStatusCode() throws IOException {
+            return -1;
         }
 
         public Object getValidity() throws IOException {
@@ -703,7 +701,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-            ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType, lastModified);
+            ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
         public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {
@@ -719,7 +717,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-            ProcessorUtils.readBinary(inputStream, output, contentType, lastModified);
+            ProcessorUtils.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode());
         }
 
         private String getKey() {
@@ -771,6 +769,15 @@ public class URLGenerator extends ProcessorImpl {
             // Otherwise, try URLConnection
             openConnection();
             return NetUtils.getContentTypeCharset(connectionResult.getResponseContentType());
+        }
+
+        public int getConnectionStatusCode() throws IOException {
+            // Return -1 for file protocol, as it returns nothing significant
+            if ("file".equals(config.getURL().getProtocol()))
+                return -1;
+            // Otherwise, try URLConnection
+            openConnection();
+            return connectionResult.statusCode;
         }
 
         public Object getValidity() throws IOException {
@@ -826,12 +833,12 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
-            ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType, lastModified);
+            ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
         public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
-            ProcessorUtils.readBinary(inputStream, output, contentType, lastModified);
+            ProcessorUtils.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode());
         }
 
         public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {

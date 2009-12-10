@@ -198,11 +198,11 @@ public class ProcessorUtils {
      * @param contentType           optional content type to set as attribute on the root element
      * @param lastModified          optional last modified timestamp
      */
-    public static void readText(InputStream is, String encoding, ContentHandler output, String contentType, Long lastModified) {
+    public static void readText(InputStream is, String encoding, ContentHandler output, String contentType, Long lastModified, int statusCode) {
         try {
             if (encoding == null)
                 encoding = DEFAULT_TEXT_READING_ENCODING;
-            outputStartDocument(output, contentType, lastModified, XMLConstants.XS_STRING_QNAME, DEFAULT_TEXT_DOCUMENT_ELEMENT);
+            outputStartDocument(output, contentType, lastModified, statusCode, XMLConstants.XS_STRING_QNAME, DEFAULT_TEXT_DOCUMENT_ELEMENT);
             XMLUtils.readerToCharacters(new InputStreamReader(is, encoding), output);
             outputEndDocument(output, DEFAULT_TEXT_DOCUMENT_ELEMENT);
         } catch (Exception e) {
@@ -220,7 +220,7 @@ public class ProcessorUtils {
      */
     public static void readText(String text, ContentHandler output, String contentType, Long lastModified) {
         try {
-            outputStartDocument(output, contentType, lastModified, XMLConstants.XS_STRING_QNAME, DEFAULT_TEXT_DOCUMENT_ELEMENT);
+            outputStartDocument(output, contentType, lastModified, -1, XMLConstants.XS_STRING_QNAME, DEFAULT_TEXT_DOCUMENT_ELEMENT);
             output.characters(text.toCharArray(), 0, text.length());
             outputEndDocument(output, DEFAULT_TEXT_DOCUMENT_ELEMENT);
         } catch (Exception e) {
@@ -235,10 +235,11 @@ public class ProcessorUtils {
      * @param output        output ContentHandler to write binary document to
      * @param contentType   optional content type to set as attribute on the root element
      * @param lastModified  optional last modified timestamp
+     * @param statusCode    optional status code, or -1 is to ignore
      */
-    public static void readBinary(InputStream is, ContentHandler output, String contentType, Long lastModified) {
+    public static void readBinary(InputStream is, ContentHandler output, String contentType, Long lastModified, int statusCode) {
         try {
-            outputStartDocument(output, contentType, lastModified, XMLConstants.XS_BASE64BINARY_QNAME, DEFAULT_BINARY_DOCUMENT_ELEMENT);
+            outputStartDocument(output, contentType, lastModified, statusCode, XMLConstants.XS_BASE64BINARY_QNAME, DEFAULT_BINARY_DOCUMENT_ELEMENT);
             XMLUtils.inputStreamToBase64Characters(new BufferedInputStream(is), output);
             outputEndDocument(output, DEFAULT_BINARY_DOCUMENT_ELEMENT);
         } catch (Exception e) {
@@ -246,7 +247,7 @@ public class ProcessorUtils {
         }
     }
 
-    private static void outputStartDocument(ContentHandler output, String contentType, Long lastModified, QName type, String documentElement) {
+    private static void outputStartDocument(ContentHandler output, String contentType, Long lastModified, int statusCode, QName type, String documentElement) {
         try {
             // Create attributes for root element: xsi:type, and optional content-type
             final AttributesImpl attributes = new AttributesImpl();
@@ -255,6 +256,8 @@ public class ProcessorUtils {
                 attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
             if (lastModified != null)
                 attributes.addAttribute("", "last-modified", "last-modified", "CDATA", ISODateUtils.getRFC1123Date(lastModified));
+            if (statusCode > 0)
+                attributes.addAttribute("", "status-code", "status-code", "CDATA", Integer.toString(statusCode));
 
             // Write document
             output.startDocument();

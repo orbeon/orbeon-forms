@@ -77,6 +77,44 @@
         </output>
     </test>
 
+    <!-- NOTE: This test requires a connection to www.orbeon.com -->
+    <test description="URL generator with HTTP and 404 status code" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>http://www.orbeon.com/i-dont-exist</url>
+                            <mode>text</mode>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="document"/>
+                </p:processor>
+
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#document"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0">
+                            <xsl:template match="/*">
+                                <!-- Just keep root element and attributes; remove @last-modified so we don't depend on a date -->
+                                <xsl:copy>
+                                    <xsl:copy-of select="@* except @last-modified"/>
+                                </xsl:copy>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="data">
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="text/html" status-code="404"/>
+        </output>
+    </test>
+
     <test description="Delegation Processor" name="oxf:delegation" ignore="true">
         <input name="interface">
             <config>

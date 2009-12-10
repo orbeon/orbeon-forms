@@ -828,6 +828,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readHTML(ContentHandler output) throws IOException {
             openConnection();
+            checkStatusCode();
             readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), output);
         }
 
@@ -843,6 +844,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {
             openConnection();
+            checkStatusCode();
             // Read the resource from the resource manager and parse it as XML
             try {
                 final XMLReader reader = XMLUtils.newXMLReader(config.isValidating(), config.isHandleXInclude());
@@ -860,6 +862,12 @@ public class URLGenerator extends ProcessorImpl {
             } catch (SAXException e) {
                 throw new OXFException(e);
             }
+        }
+
+        private void checkStatusCode() throws IOException {
+            final int statusCode = getConnectionStatusCode();
+            if (statusCode > 0 && (statusCode < 200 || statusCode >= 300))
+                throw new ValidationException("Got non-success status code: " + statusCode, new LocationData(config.getURL().toExternalForm(), -1, -1));
         }
 
         public static void readHTML(InputStream is, TidyConfig tidyConfig, String encoding, ContentHandler output) {

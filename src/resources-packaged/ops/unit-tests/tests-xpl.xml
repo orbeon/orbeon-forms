@@ -115,6 +115,29 @@
         </output>
     </test>
 
+    <!-- NOTE: This test requires a connection to www.orbeon.com -->
+    <test description="URL generator called through XSLT doc-available() with HTTP and 404 status code" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+
+                <p:processor name="oxf:xslt">
+                    <p:input name="data"><dummy/></p:input>
+                    <p:input name="config">
+                        <available xsl:version="2.0">
+                            <xsl:copy-of select="doc-available('http://www.orbeon.com/i-dont-exist')"/>
+                        </available>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="data">
+            <available>false</available>
+        </output>
+    </test>
+
     <test description="Delegation Processor" name="oxf:delegation" ignore="true">
         <input name="interface">
             <config>

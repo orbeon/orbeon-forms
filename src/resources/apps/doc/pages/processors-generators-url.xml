@@ -118,10 +118,12 @@
                     <p:output name="data" id="xml"/>
                 </p:processor>
             </xml-source>
+            <p>
+                If the URL is an HTTP or HTTPS URL and the server returns a non-success status code, an exception is raised.
+            </p>
             <note>
                 <p>
-                    The URL must point to a well-formed XML document. If it doesn't, an exception
-                    will be raised.
+                    The URL must point to a well-formed XML document. If it doesn't, an exception is raised.
                 </p>
             </note>
         </section>
@@ -190,6 +192,9 @@
             <p>
                 Even if HTML Tidy has some tolerance for malformed HTML, you should use well-formed HTML whenever
                 possible.
+            </p>
+            <p>
+                If the URL is an HTTP or HTTPS URL and the server returns a non-success status code, an exception is raised.
             </p>
         </section>
         <a name="text-mode"/>

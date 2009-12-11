@@ -72,7 +72,7 @@
             </xforms:instance>
             <!-- Test submission, which sends out all the name/value pairs -->
             <xforms:submission id="send" ref="." serialization="none" method="get"
-                               resource="http://example.org/?{string-join(for $s in instance('configuration')/search
+                               resource="http://example.org/?{string-join(for $s in instance(instance())/search
                                             return concat($s/parameter, '=', encode-for-uri($s/value)), '&amp;')}"/>
         </xforms:model>
         <style type="text/css">

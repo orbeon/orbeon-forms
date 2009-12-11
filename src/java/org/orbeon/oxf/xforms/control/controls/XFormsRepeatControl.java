@@ -403,69 +403,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 }
             }
 
-            // Iterate over new nodeset to move or add iterations
-            final int newSize = newRepeatNodeset.size();
-            final List<XFormsControl> newChildren = new ArrayList<XFormsControl>(newSize);
-            newIterations = new ArrayList<XFormsRepeatIterationControl>();
-            movedIterationsOldPositions = new ArrayList<Integer>();
-            movedIterationsNewPositions = new ArrayList<Integer>();
-            for (int repeatIndex = 1; repeatIndex <= newSize; repeatIndex++) {// 1-based index
-
-                final XFormsRepeatIterationControl newIteration;
-                final int currentOldIndex = oldIndexes[repeatIndex - 1];
-                if (currentOldIndex == -1) {
-                    // This new node was not in the old nodeset so create a new one
-
-                    if (isDebugEnabled) {
-                        indentedLogger.startHandleOperation("xforms:repeat", "creating new iteration", "id", getEffectiveId(), "index", Integer.toString(repeatIndex));
-                    }
-
-                    final XFormsContextStack contextStack = getXBLContainer().getContextStack();
-                    contextStack.pushIteration(repeatIndex);
-                    newIteration = controls.createRepeatIterationTree(propertyContext, contextStack.getCurrentBindingContext(), this, repeatIndex);
-                    contextStack.popBinding();
-
-                    updated = true;
-
-                    newIterations.add(newIteration);
-
-                    if (isDebugEnabled) {
-                        indentedLogger.endHandleOperation();
-                    }
-                } else {
-                    // This new node was in the old nodeset so keep it
-                    newIteration = (XFormsRepeatIterationControl) oldChildren.get(currentOldIndex);
-                    final int newIterationOldIndex = newIteration.getIterationIndex();
-                    if (newIterationOldIndex != repeatIndex) {
-                        // Iteration index changed
-
-                        if (isDebugEnabled) {
-                            indentedLogger.logDebug("xforms:repeat", "moving iteration",
-                                   "id", getEffectiveId(),
-                                   "old index", Integer.toString(newIterationOldIndex),
-                                   "new index", Integer.toString(repeatIndex));
-                        }
-
-                        // Set new index
-                        newIteration.setIterationIndex(repeatIndex);
-
-                        // Index new iteration
-                        currentControlTree.indexSubtree(newIteration, true);
-                        updated = true;
-
-                        // Add context information
-                        movedIterationsOldPositions.add(newIterationOldIndex);
-                        movedIterationsNewPositions.add(repeatIndex);
-                    }
-                }
-
-                // Add new iteration
-                newChildren.add(newIteration);
-            }
-            // Set the new children iterations
-            setChildren(newChildren);
-
-            // Set new repeat index
+            // Set new repeat index (do this before creating new iterations so that index is available then)
             final int oldRepeatIndex = getIndex();// 1-based
 
             boolean didSetIndex = false;
@@ -541,6 +479,70 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     }
                 }
             }
+
+            // Iterate over new nodeset to move or add iterations
+            final int newSize = newRepeatNodeset.size();
+            final List<XFormsControl> newChildren = new ArrayList<XFormsControl>(newSize);
+            newIterations = new ArrayList<XFormsRepeatIterationControl>();
+            movedIterationsOldPositions = new ArrayList<Integer>();
+            movedIterationsNewPositions = new ArrayList<Integer>();
+            for (int repeatIndex = 1; repeatIndex <= newSize; repeatIndex++) {// 1-based index
+
+                final XFormsRepeatIterationControl newIteration;
+                final int currentOldIndex = oldIndexes[repeatIndex - 1];
+                if (currentOldIndex == -1) {
+                    // This new node was not in the old nodeset so create a new one
+
+                    if (isDebugEnabled) {
+                        indentedLogger.startHandleOperation("xforms:repeat", "creating new iteration", "id", getEffectiveId(), "index", Integer.toString(repeatIndex));
+                    }
+
+                    final XFormsContextStack contextStack = getXBLContainer().getContextStack();
+                    contextStack.pushIteration(repeatIndex);
+                    newIteration = controls.createRepeatIterationTree(propertyContext, contextStack.getCurrentBindingContext(), this, repeatIndex);
+                    contextStack.popBinding();
+
+                    updated = true;
+
+                    newIterations.add(newIteration);
+
+                    if (isDebugEnabled) {
+                        indentedLogger.endHandleOperation();
+                    }
+                } else {
+                    // This new node was in the old nodeset so keep it
+                    newIteration = (XFormsRepeatIterationControl) oldChildren.get(currentOldIndex);
+                    final int newIterationOldIndex = newIteration.getIterationIndex();
+                    if (newIterationOldIndex != repeatIndex) {
+                        // Iteration index changed
+
+                        if (isDebugEnabled) {
+                            indentedLogger.logDebug("xforms:repeat", "moving iteration",
+                                   "id", getEffectiveId(),
+                                   "old index", Integer.toString(newIterationOldIndex),
+                                   "new index", Integer.toString(repeatIndex));
+                        }
+
+                        // Set new index
+                        newIteration.setIterationIndex(repeatIndex);
+
+                        // Index new iteration
+                        currentControlTree.indexSubtree(newIteration, true);
+                        updated = true;
+
+                        // Add context information
+                        movedIterationsOldPositions.add(newIterationOldIndex);
+                        movedIterationsNewPositions.add(repeatIndex);
+                    }
+                }
+
+                // Add new iteration
+                newChildren.add(newIteration);
+            }
+            // Set the new children iterations
+            setChildren(newChildren);
+
+
         } else {
             // New repeat nodeset is now empty
 

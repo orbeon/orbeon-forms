@@ -2098,4 +2098,77 @@
         </output>
     </test>
 
+    <test description="xxforms:index() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model>
+                        <xforms:instance id="item-instance">
+                            <item xmlns="">
+                                <name>New item</name>
+                            </item>
+                        </xforms:instance>
+                        <xforms:instance id="items-instance">
+                            <items xmlns=""/>
+                        </xforms:instance>
+                        <!-- Insert upon initialization -->
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:insert origin="instance( 'item-instance' )" context="instance( 'items-instance' )" nodeset="*" />
+                        </xforms:action>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="outer-group" ref=".[count(instance('items-instance')/item) gt 0]">
+                        <xforms:repeat nodeset="instance('items-instance')/item" id="items-item-repeat">
+                            <xforms:output id="position-output" value="count(preceding-sibling::item) + 1" />
+                            <xforms:output id="index-output-1" value="index('items-item-repeat')"/>
+                            <xforms:group id="input-group" ref=".[count(preceding-sibling::item) + 1 = index('items-item-repeat')]">
+                                <xforms:input id="input" ref="name"/>
+                            </xforms:group>
+                            <xforms:group id="output-group" ref=".[not(count(preceding-sibling::item) + 1 = index('items-item-repeat'))]">
+                                <xforms:output id="output" ref="name"/>
+                            </xforms:group>
+                       </xforms:repeat>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="item-instance" model-id="xf-1">
+                                <item>
+                                    <name>New item</name>
+                                </item>
+                            </instance>
+                            <instance id="items-instance" model-id="xf-1">
+                                <items>
+                                    <item>
+                                        <name>New item</name>
+                                    </item>
+                                </items>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="items-item-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="position-output·1">1</xxf:control>
+                        <xxf:control id="index-output-1·1">1</xxf:control>
+                        <xxf:control id="input·1">New item</xxf:control>
+                        <xxf:control id="output-group·1" relevant="false"/>
+                        <xxf:control id="output·1" relevant="false"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

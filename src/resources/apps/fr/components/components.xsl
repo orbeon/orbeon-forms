@@ -119,7 +119,8 @@
                 <!-- Dialogs -->
                 <xsl:call-template name="fr-dialogs"/>
             </xforms:group>
-            <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
+
+            <!--<fr:xforms-inspector/>-->
         </xsl:copy>
     </xsl:template>
 

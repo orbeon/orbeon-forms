@@ -1,16 +1,16 @@
-/*
-    Copyright (C) 2008 Orbeon, Inc.
-
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
-
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-*/
+/**
+ * Copyright (C) 2009 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 
 /*
     Alternate shades of blue:
@@ -177,8 +177,8 @@ p, fieldset, table { margin-bottom: 1em }
 /* Metadata */
 .fr-header { margin-top: .5em }
 .fr-logo { display: block; float: left }
-.fr-language-choice, .fr-noscript-choice, .fr-goto-content { color: gray; font-size: 85%; float: right; margin-top: .2em; text-align: right }
-.fr-language-choice a, .fr-noscript-choice a, .fr-goto-content a { color: #6E6E6E }
+.fr-language-choice, .fr-noscript-choice, .fr-goto-content, .fr-doc-links { color: gray; font-size: 85%; float: right; margin-top: .2em; text-align: right }
+.fr-language-choice a, .fr-noscript-choice a, .fr-goto-content a, .fr-doc-links a { color: #6E6E6E }
 .fr-goto-content { border: 2px solid #888888; padding: .5em; float: left; margin-left: 1em }
 
 /* Make button appear the same color as a link */

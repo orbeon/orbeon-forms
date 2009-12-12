@@ -58,6 +58,7 @@
                                         <fr:logo/>
                                         <fr:language-selector/>
                                         <fr:noscript-selector/>
+                                        <fr:form-builder-doc/>
                                         <fr:goto-content/>
                                     </xsl:variable>
 
@@ -230,6 +231,15 @@
 
         <xsl:if test="$default-logo-uri">
             <xforms:output class="fr-logo" value="$logo-uri" mediatype="image/*"/>
+        </xsl:if>
+    </xsl:template>
+
+        <xsl:template match="fr:form-builder-doc">
+        <xsl:if test="$is-form-builder">
+            <xhtml:div class="fr-doc-links">
+                <xhtml:a href="http://wiki.orbeon.com/forms/doc/user-guide/form-builder-user-guide" target="_blank">Form Builder User Guide</xhtml:a>
+                <xhtml:a href="http://www.orbeon.com/forms/screencast/form-builder" target="_blank">Form Builder Screencast</xhtml:a>
+            </xhtml:div>
         </xsl:if>
     </xsl:template>
 

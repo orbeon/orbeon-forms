@@ -944,6 +944,39 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     }
                     defaultMediatypeForSerialization = "application/octet-stream";
                     queryString = null;
+                } else if (requestedSerialization.equals("text/plain")) {
+                    // Text serialization
+                    try {
+                        final Transformer identity = TransformerUtils.getIdentityTransformer();
+                        TransformerUtils.applyOutputProperties(identity,
+                                "text", null, null, null, p2.encoding, true, false, false, 0);
+
+                        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+                        identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
+                        messageBody = os.toByteArray();
+                    } catch (Exception e) {
+                        throw new XFormsSubmissionException(XFormsModelSubmission.this, e, "xforms:submission: exception while serializing instance to text.", "serializing instance");
+                    }
+                    defaultMediatypeForSerialization = requestedSerialization;
+                    queryString = null;
+                } else if (requestedSerialization.equals("text/html") || requestedSerialization.equals("application/xhtml+xml")) {
+                    // HTML or XHTML serialization
+                    try {
+                        final Transformer identity = TransformerUtils.getIdentityTransformer();
+                        TransformerUtils.applyOutputProperties(identity,
+                                requestedSerialization.equals("text/html") ? "html" : "xhtml", p2.version, null, null,
+                                p2.encoding, p2.omitxmldeclaration, p2.standalone, p2.indent, 4);
+
+                        // TODO: use cdata-section-elements
+
+                        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+                        identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
+                        messageBody = os.toByteArray();
+                    } catch (Exception e) {
+                        throw new XFormsSubmissionException(XFormsModelSubmission.this, e, "xforms:submission: exception while serializing instance to HTML or XHTML.", "serializing instance");
+                    }
+                    defaultMediatypeForSerialization = requestedSerialization;
+                    queryString = null;
                 } else if (XMLUtils.isTextContentType(requestedSerialization)) {
                     // TODO: Text serialization
                     throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: text serialization is not yet implemented.", "serializing instance");

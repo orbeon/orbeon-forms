@@ -79,6 +79,9 @@
                 </items>
             </xforms:instance>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-select1-appearance-xxforms-tree, .xforms-select-appearance-xxforms-tree { padding: 0 0 2em 2em }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
         <xforms:select1 ref="data-set">
@@ -93,21 +96,24 @@
             </xforms:item>
         </xforms:select1>
 
-        <xhtml:table style="width: 100%">
+        <xhtml:table>
             <xhtml:tr>
                 <xhtml:th/>
                 <xhtml:th>Incremental</xhtml:th>
                 <xhtml:th>Non-Incremental</xhtml:th>
             </xhtml:tr>
             <xhtml:tr>
-                <xhtml:th rowspan="2">Single Selection </xhtml:th>
-                <xhtml:td colspan="2">
-                    <xforms:output ref="select1">
-                        <xforms:label>Selected values:</xforms:label>
-                    </xforms:output>
+                <xhtml:td>
+                    <xhtml:p>
+                        <xforms:output ref="select1">
+                            <xforms:label>Single selection:</xforms:label>
+                        </xforms:output>
+                    </xhtml:p>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>Remove selected</xforms:label>
+                        <xforms:delete ev:event="DOMActivate" nodeset="instance(instance('main-instance')/data-set)//item[@value = instance('main-instance')/select1]"/>
+                    </xforms:trigger>
                 </xhtml:td>
-            </xhtml:tr>
-            <xhtml:tr>
                 <xhtml:td>
                     <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree1" incremental="true">
                         <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item">
@@ -126,14 +132,17 @@
                 </xhtml:td>
             </xhtml:tr>
             <xhtml:tr>
-                <xhtml:th rowspan="2">Multiple Selection </xhtml:th>
-                <xhtml:td colspan="2">
-                    <xforms:output ref="select">
-                        <xforms:label>Selected values:</xforms:label>
-                    </xforms:output>
+                <xhtml:td>
+                    <xhtml:p>
+                        <xforms:output ref="select">
+                            <xforms:label>Multiple selection:</xforms:label>
+                        </xforms:output>
+                    </xhtml:p>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>Remove selected</xforms:label>
+                        <xforms:delete ev:event="DOMActivate" nodeset="instance(instance('main-instance')/data-set)//item[@value = tokenize(instance('main-instance')/select, '\s')]"/>
+                    </xforms:trigger>
                 </xhtml:td>
-            </xhtml:tr>
-            <xhtml:tr>
                 <xhtml:td>
                     <xforms:select ref="select" appearance="xxforms:tree" id="tree3" incremental="true">
                         <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item">
@@ -152,14 +161,11 @@
                 </xhtml:td>
             </xhtml:tr>
             <xhtml:tr>
-                <xhtml:th rowspan="2">Multiple Selection <xhtml:br/>(No Itemset)</xhtml:th>
-                <xhtml:td colspan="2">
+                <xhtml:td>
                     <xforms:output ref="select">
-                        <xforms:label>Selected values:</xforms:label>
+                        <xforms:label>Multiple selection (no itemset):</xforms:label>
                     </xforms:output>
                 </xhtml:td>
-            </xhtml:tr>
-            <xhtml:tr>
                 <xhtml:td>
                     <xforms:select ref="select" appearance="xxforms:tree" id="tree5" incremental="true">
                         <xforms:choices>

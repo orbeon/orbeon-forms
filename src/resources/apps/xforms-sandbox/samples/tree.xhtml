@@ -78,6 +78,9 @@
                     </item>
                 </items>
             </xforms:instance>
+            <xforms:instance id="template-instance">
+                <item label="New item" value="new-item"/>
+            </xforms:instance>
         </xforms:model>
         <xhtml:style type="text/css">
             .xforms-select1-appearance-xxforms-tree, .xforms-select-appearance-xxforms-tree { padding: 0 0 2em 2em }
@@ -104,15 +107,25 @@
             </xhtml:tr>
             <xhtml:tr>
                 <xhtml:td>
+                    <xxforms:variable name="current-item"
+                        select="instance(instance('main-instance')/data-set)//item[@value = instance('main-instance')/select1]"/>
                     <xhtml:p>
                         <xforms:output ref="select1">
                             <xforms:label>Single selection:</xforms:label>
                         </xforms:output>
                     </xhtml:p>
-                    <xforms:trigger appearance="minimal">
-                        <xforms:label>Remove selected</xforms:label>
-                        <xforms:delete ev:event="DOMActivate" nodeset="instance(instance('main-instance')/data-set)//item[@value = instance('main-instance')/select1]"/>
-                    </xforms:trigger>
+                    <xhtml:p>
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label>Remove selected</xforms:label>
+                            <xforms:delete ev:event="DOMActivate" nodeset="$current-item"/>
+                        </xforms:trigger>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label>Add new item</xforms:label>
+                            <xforms:insert ev:event="DOMActivate" nodeset="$current-item" origin="instance('template-instance')"/>
+                        </xforms:trigger>
+                    </xhtml:p>
                 </xhtml:td>
                 <xhtml:td>
                     <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree1" incremental="true">
@@ -133,15 +146,25 @@
             </xhtml:tr>
             <xhtml:tr>
                 <xhtml:td>
+                    <xxforms:variable name="current-items"
+                        select="instance(instance('main-instance')/data-set)//item[@value = tokenize(instance('main-instance')/select, '\s')]"/>
                     <xhtml:p>
                         <xforms:output ref="select">
                             <xforms:label>Multiple selection:</xforms:label>
                         </xforms:output>
                     </xhtml:p>
-                    <xforms:trigger appearance="minimal">
-                        <xforms:label>Remove selected</xforms:label>
-                        <xforms:delete ev:event="DOMActivate" nodeset="instance(instance('main-instance')/data-set)//item[@value = tokenize(instance('main-instance')/select, '\s')]"/>
-                    </xforms:trigger>
+                    <xhtml:p>
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label>Remove selected</xforms:label>
+                            <xforms:delete ev:event="DOMActivate" nodeset="$current-items"/>
+                        </xforms:trigger>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label>Add new item</xforms:label>
+                            <xforms:insert ev:event="DOMActivate" nodeset="$current-items[last()]" origin="instance('template-instance')"/>
+                        </xforms:trigger>
+                    </xhtml:p>
                 </xhtml:td>
                 <xhtml:td>
                     <xforms:select ref="select" appearance="xxforms:tree" id="tree3" incremental="true">

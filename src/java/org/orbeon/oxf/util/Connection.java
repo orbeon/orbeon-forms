@@ -652,7 +652,7 @@ public class Connection {
     }
 
     public static void logRequestBody(IndentedLogger indentedLogger, String mediatype, byte[] messageBody) throws UnsupportedEncodingException {
-        if (XMLUtils.isXMLMediatype(mediatype) || XMLUtils.isTextContentType(mediatype) || (mediatype != null && mediatype.equals("application/x-www-form-urlencoded"))) {
+        if (XMLUtils.isXMLMediatype(mediatype) || XMLUtils.isTextOrJSONContentType(mediatype) || (mediatype != null && mediatype.equals("application/x-www-form-urlencoded"))) {
             indentedLogger.logDebug("submission", "setting request body", "body", new String(messageBody, "UTF-8"));
         } else {
             indentedLogger.logDebug("submission", "setting binary request body");

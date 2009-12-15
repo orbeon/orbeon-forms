@@ -274,8 +274,28 @@ public class XMLUtils {
                 || mediatype.endsWith(XML_CONTENT_TYPE3_SUFFIX);
     }
 
+    /**
+     * Return whether the given content type is considered as text.
+     *
+     * @param contentType   content type or null
+     * @return              true if not null and a text content type, false otherwise.
+     */
     public static boolean isTextContentType(String contentType) {
         return contentType != null && contentType.startsWith(TEXT_CONTENT_TYPE_PREFIX);
+    }
+
+    /**
+     * Return whether the given content type is considered as text or JSON.
+     *
+     * NOTE: There was debate about whether JSON is text or not and whether it should have a text/* mediatype:
+     *
+     * http://www.alvestrand.no/pipermail/ietf-types/2006-February/001655.html
+     *
+     * @param contentType   content type or null
+     * @return              true if not null and a text or JSON content type, false otherwise
+     */
+    public static boolean isTextOrJSONContentType(String contentType) {
+        return contentType != null && (isTextContentType(contentType) || contentType.startsWith( "application/json"));
     }
 
     /**

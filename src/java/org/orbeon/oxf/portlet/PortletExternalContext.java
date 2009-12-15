@@ -584,7 +584,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         }
 
         public void write(RenderResponse response) throws IOException {
-            if (XMLUtils.isTextContentType(contentType) || XMLUtils.isXMLMediatype(contentType)) {
+            if (XMLUtils.isTextOrJSONContentType(contentType) || XMLUtils.isXMLMediatype(contentType)) {
                 // We are dealing with text content that may need rewriting
                 // CHECK: Is this check on the content-type going to cover the relevant cases?
                 if (stringWriter != null) {

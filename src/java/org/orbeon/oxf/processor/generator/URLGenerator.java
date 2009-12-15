@@ -438,7 +438,7 @@ public class URLGenerator extends ProcessorImpl {
                                     mode = "html";
                                 else if (XMLUtils.isXMLMediatype(contentType))
                                     mode = "xml";
-                                else if (XMLUtils.isTextContentType(contentType))
+                                else if (XMLUtils.isTextOrJSONContentType(contentType))
                                     mode = "text";
                                 else
                                     mode = "binary";

@@ -944,21 +944,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     }
                     defaultMediatypeForSerialization = "application/octet-stream";
                     queryString = null;
-                } else if (requestedSerialization.equals("text/plain")) {
-                    // Text serialization
-                    try {
-                        final Transformer identity = TransformerUtils.getIdentityTransformer();
-                        TransformerUtils.applyOutputProperties(identity,
-                                "text", null, null, null, p2.encoding, true, false, false, 0);
-
-                        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                        identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
-                        messageBody = os.toByteArray();
-                    } catch (Exception e) {
-                        throw new XFormsSubmissionException(XFormsModelSubmission.this, e, "xforms:submission: exception while serializing instance to text.", "serializing instance");
-                    }
-                    defaultMediatypeForSerialization = requestedSerialization;
-                    queryString = null;
                 } else if (requestedSerialization.equals("text/html") || requestedSerialization.equals("application/xhtml+xml")) {
                     // HTML or XHTML serialization
                     try {
@@ -977,9 +962,21 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     }
                     defaultMediatypeForSerialization = requestedSerialization;
                     queryString = null;
-                } else if (XMLUtils.isTextContentType(requestedSerialization)) {
-                    // TODO: Text serialization
-                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: text serialization is not yet implemented.", "serializing instance");
+                } else if (XMLUtils.isTextOrJSONContentType(requestedSerialization)) {
+                    // Text serialization
+                    try {
+                        final Transformer identity = TransformerUtils.getIdentityTransformer();
+                        TransformerUtils.applyOutputProperties(identity,
+                                "text", null, null, null, p2.encoding, true, false, false, 0);
+
+                        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+                        identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
+                        messageBody = os.toByteArray();
+                    } catch (Exception e) {
+                        throw new XFormsSubmissionException(XFormsModelSubmission.this, e, "xforms:submission: exception while serializing instance to text.", "serializing instance");
+                    }
+                    defaultMediatypeForSerialization = requestedSerialization;
+                    queryString = null;
                 } else {
                     throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: invalid submission serialization requested: " + requestedSerialization, "serializing instance");
                 }

@@ -580,6 +580,14 @@ ORBEON.util.Dom = {
             }
         }
         return result;
+    },
+
+    isAncestorOrSelfHidden: function(element) {
+        while (true) {
+            if (element == null) return false;
+            if (! YAHOO.lang.isUndefined(element.style) && YAHOO.util.Dom.getStyle(element, "display") == "none") return true;
+            element = element.parentNode;
+        }
     }
 };
 
@@ -2498,22 +2506,10 @@ ORBEON.xforms.Controls = {
         } else {
             // Generic code to find focusable descendant-or-self HTML element and focus on it
             var htmlControlNames = [ "input", "textarea", "select", "button", "a" ];
-            for (var i = 0; i < htmlControlNames.length; i++) {
-                var htmlControlName = htmlControlNames[i];
-                var htmlControl;
-                if (control.tagName.toLowerCase() == htmlControlName) {
-                    // Focus on control element itself
-                    htmlControl = control;
-                } else {
-                    // Find first input descendant
-                    var htmlControls = ORBEON.util.Dom.getElementsByName(control, htmlControlName);
-                    htmlControl = (htmlControls.length > 0) ? htmlControls[0] : null;
-                }
-                if (htmlControl != null && typeof htmlControl.focus != "undefined") {
+            var htmlControl = ORBEON.util.Dom.getElementByTagName(control, htmlControlNames);
+            // If we found a control, and the control is visible, set the focus on it
+            if (htmlControl != null && ! ORBEON.util.Dom.isAncestorOrSelfHidden(htmlControl))
                     htmlControl.focus();
-                    break;
-                }
-            }
         }
 
         // Save current value as server value. We usually do this on focus, but for control where we set the focus

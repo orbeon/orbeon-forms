@@ -306,7 +306,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             ORBEON.xforms.Document.setValue(this.dateValueId, "10/20/2030");
         }, function() {
             // Click on Next Year
-            ORBEON.xforms.Events.click({target: YAHOO.util.Dom.get(this.dateValueInputId) });
+            ORBEON.xforms.Events.click({target: YAHOO.util.Dom.get(this.dateValueInputId), button: 0 });
             var nextYear = YAHOO.util.Dom.getElementsByClassName("calyearright", null, "orbeon-calendar-div")[0];
             YAHOO.util.UserAction.click(nextYear);
             this.wait(function() {

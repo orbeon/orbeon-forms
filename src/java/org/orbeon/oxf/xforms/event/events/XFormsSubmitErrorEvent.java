@@ -114,7 +114,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                     }
                 }
 
-                if (isXMLParseFailed || XMLUtils.isTextContentType(connectionResult.getResponseMediaType())) {
+                if (isXMLParseFailed || XMLUtils.isTextOrJSONContentType(connectionResult.getResponseMediaType())) {
                     // XML parsing failed, or we got a text content-type
                     // Read stream into String
                     try {

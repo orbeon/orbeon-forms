@@ -314,7 +314,7 @@ public class EmailProcessor extends ProcessorImpl {
             content = handleInlinePartContent(partDocument, contentType);
         }
 
-        if (!XMLUtils.isTextContentType(contentType)) {
+        if (!XMLUtils.isTextOrJSONContentType(contentType)) {
             // This is binary content (including application/xml)
             if (content instanceof FileItem) {
                 final FileItem fileItem = (FileItem) content;

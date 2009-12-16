@@ -1685,6 +1685,76 @@
                                        replace="instance" xxforms:xinclude="true"/>
                 </xml-source>
             </section>
+            <a name="submission-text"/>
+            <section>
+                <title>Submitting Text Content</title>
+                <p>
+                    Orbeon Forms supports sending the text content of an XML document as per
+                    <a href="http://www.w3.org/TR/xslt-xquery-serialization/">XSLT 2.0 and XQuery 1.0 Serialization</a>.
+                    To perform a text submission:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The <code>post</code> or <code>put</code> method is required.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            You must use a the <code>text/plain</code> value for the <code>serialization</code> attribute.
+                        </p>
+                    </li>
+                </ul>
+                <xml-source>
+                    <xforms:instance id="instance">
+                        <text>This contains some text. The <b>string value</b> of the document will be sent </text>
+                    </xforms:instance>
+                    ...
+                    <xforms:submission id="save-submission"
+                        ref="instance()"
+                        method="post" serialization="text/plain"
+                        replace="none"
+                        resource="http://example.com/foo.text"/>
+                    ...
+                </xml-source>
+            </section>
+            <a name="submission-html"/>
+            <section>
+                <title>Submitting HTML or XHTML Content</title>
+                <p>
+                    Orbeon Forms supports sending an XML document as HTML or XHTML as per
+                    <a href="http://www.w3.org/TR/xslt-xquery-serialization/">XSLT 2.0 and XQuery 1.0 Serialization</a>.
+                    To perform a HTML or XHTML submission:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The <code>post</code> or <code>put</code> method is required.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            You must use a the <code>text/html</code> or the <code>application/xhtml+xml</code>
+                            value for the <code>serialization</code> attribute.
+                        </p>
+                    </li>
+                </ul>
+                <xml-source>
+                    <xforms:instance id="instance">
+                        <html>
+                            <head><title>My page</title></head>
+                            <body><p>Cool HTML!</p></body>
+                        </html>
+                    </xforms:instance>
+                    ...
+                    <xforms:submission id="save-submission"
+                        ref="instance()"
+                        method="post" serialization="text/html"
+                        replace="none"
+                        resource="http://example.com/foo.html"/>
+                    ...
+                </xml-source>
+            </section>
             <a name="submission-binary"/>
             <section>
                 <title>Submitting Binary Content</title>

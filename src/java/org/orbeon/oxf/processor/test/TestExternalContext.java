@@ -142,7 +142,7 @@ public class TestExternalContext implements ExternalContext  {
                     SAXSource saxSource = EmailProcessor.getSAXSource(null, pipelineContext, hrefAttribute, systemId, contentType);
                     final FileItem fileItem = EmailProcessor.handleStreamedPartContent(pipelineContext, saxSource);
 
-                    if (!(XMLUtils.isTextContentType(contentType) || XMLUtils.isXMLMediatype(contentType))) {
+                    if (!(XMLUtils.isTextOrJSONContentType(contentType) || XMLUtils.isXMLMediatype(contentType))) {
                         // This is binary content
                         if (fileItem != null) {
 

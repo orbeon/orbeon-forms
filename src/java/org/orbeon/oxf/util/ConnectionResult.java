@@ -160,7 +160,7 @@ public class ConnectionResult {
      * @throws IOException
      */
     public String getTextResponseBody() throws IOException {
-        if (XMLUtils.isTextContentType(getResponseMediaType())) {
+        if (XMLUtils.isTextOrJSONContentType(getResponseMediaType())) {
             // Text mediatype (including text/xml), read stream into String
             final String charset = NetUtils.getTextCharsetFromContentType(getResponseContentType());
             final Reader reader = new InputStreamReader(getResponseInputStream(), charset);

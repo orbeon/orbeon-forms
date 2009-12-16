@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.transformer.xslt;
 
@@ -34,8 +34,10 @@ import org.orbeon.oxf.xml.dom4j.ConstantLocator;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.Controller;
 import org.orbeon.saxon.FeatureKeys;
 import org.orbeon.saxon.event.ContentHandlerProxyLocator;
+import org.orbeon.saxon.event.Emitter;
 import org.orbeon.saxon.event.SaxonOutputKeys;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -113,12 +115,12 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     }
 
                     // Get transformer attributes if any
-                    Map attributes = null;
+                    Map<String, Boolean> attributes = null;
                     {
                         // Read attributes input only if connected
                         if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
                             // Read input as an attribute Map and cache it
-                            attributes = (Map) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
+                            attributes = (Map<String, Boolean>) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
                                 public Object read(PipelineContext context, ProcessorInput input) {
                                     final Document preferencesDocument = readInputAsDOM4J(context, input);
                                     final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
@@ -135,7 +137,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     final boolean isSmartOutputLocation = OUTPUT_LOCATION_SMART.equals(outputLocationMode);
                     if (isSmartOutputLocation) {
                         // Create new HashMap as we don't want to change the one in cache
-                        attributes = (attributes == null) ? new HashMap() : new HashMap(attributes);
+                        attributes = (attributes == null) ? new HashMap<String, Boolean>() : new HashMap<String, Boolean>(attributes);
                         // Set attributes for Saxon source location
                         attributes.put(FeatureKeys.LINE_NUMBERING, Boolean.TRUE);
                         attributes.put(FeatureKeys.COMPILE_WITH_TRACING, Boolean.TRUE);
@@ -167,20 +169,36 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     // NOTE: 2007-07-05 MK suggests that since we depend on Saxon anyway, we shouldn't use reflection
                     // here but directly the Saxon classes to avoid the cost of reflection.
 
-                    // Well, in fact if we really want to test on the two classes, we probably need to use reflection.
-                    // org.orbeon.saxon.Controller will be there for sure, but not net.sf.saxon.Controller.
-                    if (transformerClassName.equals("net.sf.saxon.Controller") || transformerClassName.equals("org.orbeon.saxon.Controller")) {
+                    if (transformerClassName.equals("org.orbeon.saxon.Controller")) {
+                        // Built-in Saxon transformer
                         saxonStringWriter = new StringWriter();
-                        final Object saxonTransformer = transformerHandler.getTransformer();
-                        final Method getMessageEmitter = saxonTransformer.getClass().getMethod("getMessageEmitter", new Class[]{});
-                        Object messageEmitter = getMessageEmitter.invoke(saxonTransformer, new Object[]{});
+                        final Controller saxonController = (Controller) transformerHandler.getTransformer();
+                        // NOTE: Saxon 9 returns a Receiver (MessageEmitter -> XMLEmitter -> Emitter -> Receiver)
+                        Emitter messageEmitter = saxonController.getMessageEmitter();
                         if (messageEmitter == null) {
-                            // TODO: this doesn't work w/ Saxon 9 because makeMessageEmitter() is private
-                            Method makeMessageEmitter = saxonTransformer.getClass().getMethod("makeMessageEmitter", new Class[]{});
-                            messageEmitter = makeMessageEmitter.invoke(saxonTransformer, new Object[]{});
+                            // NOTE: Saxon 9 makes this method private, use setMessageEmitter() instead
+                            messageEmitter = saxonController.makeMessageEmitter();
+                        }
+                        messageEmitter.setWriter(saxonStringWriter);
+                    } else if (transformerClassName.equals("net.sf.saxon.Controller")) {
+                        // A Saxon transformer, we don't know which version
+                        saxonStringWriter = new StringWriter();
+                        final Transformer saxonController = transformerHandler.getTransformer();
+                        final Method getMessageEmitter = saxonController.getClass().getMethod("getMessageEmitter");
+                        Object messageEmitter = getMessageEmitter.invoke(saxonController);
+                        if (messageEmitter == null) {
+                            // Try to set a Saxon MessageEmitter 
+
+                            final String messageEmitterClassName = "net.sf.saxon.event.MessageEmitter";
+                            final Class messageEmitterClass = Class.forName(messageEmitterClassName);
+                            messageEmitter = messageEmitterClass.newInstance();
+
+                            final Class receiverClass = Class.forName("net.sf.saxon.event.Receiver");
+                            final Method setMessageEmitter = saxonController.getClass().getMethod("setMessageEmitter", receiverClass);
+                            setMessageEmitter.invoke(saxonController, messageEmitter);
                         }
                         final Method setWriter = messageEmitter.getClass().getMethod("setWriter", new Class[]{Writer.class});
-                        setWriter.invoke(messageEmitter, new Object[]{saxonStringWriter});
+                        setWriter.invoke(messageEmitter, saxonStringWriter);
                     }
 
                     // Fallback location data
@@ -191,7 +209,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                         private Locator inputLocator;
                         private OutputLocator outputLocator;
-                        private Stack startElementLocationStack;
+                        private Stack<LocationData> startElementLocationStack;
 
                         class OutputLocator implements Locator {
 
@@ -237,7 +255,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             this.inputLocator = locator;
                             if (isSmartOutputLocation) {
                                 this.outputLocator = new OutputLocator();
-                                this.startElementLocationStack = new Stack();
+                                this.startElementLocationStack = new Stack<LocationData>();
                                 super.setDocumentLocator(this.outputLocator);
                             } else if (isDumbOutputLocation) {
                                 super.setDocumentLocator(this.inputLocator);
@@ -281,7 +299,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         public void endElement(String uri, String localname, String qName) throws SAXException {
                             if (outputLocator != null) {
                                 // Here we do a funny thing: since Saxon does not provide location data on endElement(), we use that of startElement()
-                                final LocationData locationData = (LocationData) startElementLocationStack.peek();
+                                final LocationData locationData = startElementLocationStack.peek();
                                 outputLocator.setLocationData(locationData);
                                 super.endElement(uri, localname, qName);
                                 outputLocator.setLocationData(null);
@@ -325,15 +343,16 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         private LocationData findSourceCharacterLocationData() {
                             if (inputLocator instanceof ContentHandlerProxyLocator) {
                                 final Stack stack = ((ContentHandlerProxyLocator) inputLocator).getContextItemStack();
-
-                                for (int i = stack.size() - 1; i >= 0; i--) {
-                                    final Item currentItem = (Item) stack.get(i);
-                                    if (currentItem instanceof NodeInfo) {
-                                        final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
-//                                        if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.TEXT_NODE) {
-                                            // Possible match
-                                            return new LocationData(currentNodeInfo.getSystemId(), currentNodeInfo.getLineNumber(), -1);
-//                                        }
+                                if (stack != null) {
+                                    for (int i = stack.size() - 1; i >= 0; i--) {
+                                        final Item currentItem = (Item) stack.get(i);
+                                        if (currentItem instanceof NodeInfo) {
+                                            final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
+    //                                        if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.TEXT_NODE) {
+                                                // Possible match
+                                                return new LocationData(currentNodeInfo.getSystemId(), currentNodeInfo.getLineNumber(), -1);
+    //                                        }
+                                        }
                                     }
                                 }
                             }
@@ -430,13 +449,13 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     URIReferences uriReferences = getURIReferences(context, configKeyValidity);
                     if (uriReferences == null || uriReferences.hasDynamicDocumentReferences)
                         return null;
-                    List keys = new ArrayList();
+                    List<CacheKey> keys = new ArrayList<CacheKey>();
                     keys.add(configKeyValidity.key);
-                    List allURIReferences = new ArrayList();
+                    List<URIReference> allURIReferences = new ArrayList<URIReference>();
                     allURIReferences.addAll(uriReferences.stylesheetReferences);
                     allURIReferences.addAll(uriReferences.documentReferences);
-                    for (Iterator i = allURIReferences.iterator(); i.hasNext();) {
-                        URIReference uriReference = (URIReference) i.next();
+                    for (Iterator<URIReference> i = allURIReferences.iterator(); i.hasNext();) {
+                        URIReference uriReference = i.next();
                         keys.add(new InternalCacheKey(XSLTTransformer.this, "xsltURLReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm()));
                     }
                     return new InternalCacheKey(XSLTTransformer.this, keys);
@@ -453,11 +472,11 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         return null;
                     List validities = new ArrayList();
                     validities.add(configKeyValidity.validity);
-                    List allURIReferences = new ArrayList();
+                    List<URIReference> allURIReferences = new ArrayList<URIReference>();
                     allURIReferences.addAll(uriReferences.stylesheetReferences);
                     allURIReferences.addAll(uriReferences.documentReferences);
-                    for (Iterator i = allURIReferences.iterator(); i.hasNext();) {
-                        URIReference uriReference = (URIReference) i.next();
+                    for (Iterator<URIReference> i = allURIReferences.iterator(); i.hasNext();) {
+                        URIReference uriReference = i.next();
                         Processor urlGenerator = new URLGenerator(URLFactory.createURL(uriReference.context, uriReference.spec));
                         validities.add(((ProcessorOutputImpl) urlGenerator.createOutput(OUTPUT_DATA)).getValidity(context));
                     }
@@ -478,12 +497,12 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     if (configKeyValidity == null)
                         return null;
 
-                    List keys = new ArrayList();
-                    List validities = new ArrayList();
+                    List<CacheKey> keys = new ArrayList<CacheKey>();
+                    List<Object> validities = new ArrayList<Object>();
                     keys.add(configKeyValidity.key);
                     validities.add(configKeyValidity.validity);
-                    for (Iterator i = uriReferences.stylesheetReferences.iterator(); i.hasNext();) {
-                        URIReference uriReference = (URIReference) i.next();
+                    for (Iterator<URIReference> i = uriReferences.stylesheetReferences.iterator(); i.hasNext();) {
+                        URIReference uriReference = i.next();
                         URL url = URLFactory.createURL(uriReference.context, uriReference.spec);
                         keys.add(new InternalCacheKey(XSLTTransformer.this, "xsltURLReference", url.toExternalForm()));
                         Processor urlGenerator = new URLGenerator(url);
@@ -504,13 +523,13 @@ public abstract class XSLTTransformer extends ProcessorImpl {
              * configKey        -> uriReferences
              * uriReferencesKey -> transformer
              */
-            private TemplatesInfo createTransformer(PipelineContext pipelineContext, String transformerClass, Map attributes) {
+            private TemplatesInfo createTransformer(PipelineContext pipelineContext, String transformerClass, Map<String, Boolean> attributes) {
                 StringErrorListener errorListener = new StringErrorListener(logger);
                 final StylesheetForwardingContentHandler topStylesheetContentHandler = new StylesheetForwardingContentHandler();
                 try {
                     // Create transformer
                     final TemplatesInfo templatesInfo = new TemplatesInfo();
-                    final List xsltContentHandlers = new ArrayList();
+                    final List<StylesheetForwardingContentHandler> xsltContentHandlers = new ArrayList<StylesheetForwardingContentHandler>();
                     {
                         // Create SAXSource adding our forwarding content handler
                         final SAXSource stylesheetSAXSource;
@@ -518,8 +537,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             xsltContentHandlers.add(topStylesheetContentHandler);
                             XMLReader xmlReader = new ProcessorOutputXMLReader(pipelineContext, getInputByName(INPUT_CONFIG).getOutput()) {
                                 public void setContentHandler(ContentHandler handler) {
-                                    super.setContentHandler(new TeeContentHandler(Arrays.asList(new Object[]{
-                                            topStylesheetContentHandler, handler})));
+                                    super.setContentHandler(new TeeContentHandler(Arrays.asList(topStylesheetContentHandler, handler)));
                                 }
                             };
                             stylesheetSAXSource = new SAXSource(xmlReader, new InputSource());
@@ -545,8 +563,8 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     {
                         // Create uriReferences
                         URIReferences uriReferences = new URIReferences();
-                        for (Iterator i = xsltContentHandlers.iterator(); i.hasNext();) {
-                            StylesheetForwardingContentHandler contentHandler = (StylesheetForwardingContentHandler) i.next();
+                        for (Iterator<StylesheetForwardingContentHandler> i = xsltContentHandlers.iterator(); i.hasNext();) {
+                            StylesheetForwardingContentHandler contentHandler = i.next();
                             uriReferences.hasDynamicDocumentReferences = uriReferences.hasDynamicDocumentReferences
                                     || contentHandler.getURIReferences().hasDynamicDocumentReferences;
                             uriReferences.stylesheetReferences.addAll
@@ -838,8 +856,8 @@ public abstract class XSLTTransformer extends ProcessorImpl {
     }
 
     private static class URIReferences {
-        public List stylesheetReferences = new ArrayList();
-        public List documentReferences = new ArrayList();
+        public List<URIReference> stylesheetReferences = new ArrayList<URIReference>();
+        public List<URIReference> documentReferences = new ArrayList<URIReference>();
 
         /**
          * Is true if and only if an XPath expression with a call to the

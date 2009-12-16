@@ -43,10 +43,10 @@
         </xbl:resources>
         <xbl:template>
             <!-- Group has complete single-node binding -->
-            <xforms:group class="yui-button yui-push-button" xbl:attr="model context ref bind xxforms:modal" xxbl:scope="outer">
+            <xforms:group class="yui-button yui-push-button" xbl:attr="model context ref bind" xxbl:scope="outer">
                 <xhtml:span class="first-child">
                     <!-- Bind trigger so it can handle read-only -->
-                    <xforms:trigger ref=".">
+                    <xforms:trigger ref="." xbl:attr="xxforms:modal">
                         <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
 
                         <xxforms:script ev:event="xforms-enabled">

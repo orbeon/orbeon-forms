@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+  Copyright (C) 2009 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <processors xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
@@ -20,7 +20,7 @@
     <!-- Include third-party definitions. The file must be present, even if almost empty -->
     <xi:include href="oxf:/config/third-party-processors.xml"/>
 
-    <!-- These are the main processor declarations. They are defined globaly for any pipeline
+    <!-- These are the main processor declarations. They are defined globally for any pipeline
     running in OXF. The uri attributes are present only for backward compatibility and is likely to
     be deprecated. The name attribute should be used for new processor definitions. -->
 
@@ -103,10 +103,10 @@
     </processor>
 
     <processor name="oxf:saxon">
-        <instantiation name="oxf:saxon8"/>
+        <instantiation name="oxf:builtin-saxon"/>
     </processor>
 
-    <processor name="oxf:saxon8">
+    <processor name="oxf:builtin-saxon">
         <instantiation name="oxf:generic-xslt-2.0">
             <input name="transformer">
                 <config>
@@ -132,7 +132,7 @@
         </instantiation>
     </processor>
 
-    <processor name="oxf:unsafe-saxon8">
+    <processor name="oxf:unsafe-builtin-saxon">
         <instantiation name="oxf:generic-xslt-2.0">
             <input name="transformer">
                 <config>
@@ -147,7 +147,7 @@
         </instantiation>
     </processor>
 
-    <processor name="oxf:saxon8sa">
+    <processor name="oxf:external-saxon-sa">
         <instantiation name="oxf:generic-xslt-2.0">
             <input name="transformer">
                 <config>
@@ -164,7 +164,7 @@
         </instantiation>
     </processor>
 
-    <processor name="oxf:unsafe-saxon8sa">
+    <processor name="oxf:external-unsafe-saxon-sa">
         <instantiation name="oxf:generic-xslt-2.0">
             <input name="transformer">
                 <config>
@@ -181,12 +181,43 @@
         </instantiation>
     </processor>
 
+    <processor name="oxf:external-saxon">
+        <instantiation name="oxf:generic-xslt-2.0">
+            <input name="transformer">
+                <config>
+                    <class>net.sf.saxon.TransformerFactoryImpl</class>
+                </config>
+            </input>
+            <input name="attributes">
+                <attributes xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                    <!-- By default, prevent usage of external functions for security purposes -->
+                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/allow-external-functions" value="false"/>
+                </attributes>
+            </input>
+        </instantiation>
+    </processor>
+
+    <processor name="oxf:unsafe-external-saxon">
+        <instantiation name="oxf:generic-xslt-2.0">
+            <input name="transformer">
+                <config>
+                    <class>net.sf.saxon.TransformerFactoryImpl</class>
+                </config>
+            </input>
+            <input name="attributes">
+                <attributes xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/allow-external-functions" value="true"/>
+                </attributes>
+            </input>
+        </instantiation>
+    </processor>
+
     <processor name="oxf:xslt">
-        <instantiation name="oxf:saxon8"/>
+        <instantiation name="oxf:builtin-saxon"/>
     </processor>
 
     <processor name="oxf:unsafe-xslt">
-        <instantiation name="oxf:unsafe-saxon8"/>
+        <instantiation name="oxf:unsafe-builtin-saxon"/>
     </processor>
 
     <processor name="oxf:xalan">
@@ -240,11 +271,11 @@
     </processor>
 
     <processor name="oxf:xslt-1.0">
-        <instantiation name="oxf:saxon8"/>
+        <instantiation name="oxf:xslt"/>
     </processor>
 
     <processor name="oxf:xslt-2.0">
-        <instantiation name="oxf:saxon8"/>
+        <instantiation name="oxf:xslt"/>
     </processor>
 
     <processor name="oxf:trax">
@@ -281,11 +312,11 @@
     </processor>
 
     <processor name="oxf:pfc-xslt-1.0">
-        <instantiation name="oxf:saxon8"/>
+        <instantiation name="oxf:xslt"/>
     </processor>
 
     <processor name="oxf:pfc-xslt-2.0">
-        <instantiation name="oxf:saxon8"/>
+        <instantiation name="oxf:xslt"/>
     </processor>
 
     <!-- XQuery Processors-->
@@ -673,7 +704,23 @@
     </processor>
 
     <processor name="oxf:saxon7">
-        <instantiation name="oxf:saxon8"/>
+        <instantiation name="oxf:builtin-saxon"/>
+    </processor>
+
+    <processor name="oxf:saxon8">
+        <instantiation name="oxf:builtin-saxon"/>
+    </processor>
+
+    <processor name="oxf:unsafe-saxon8">
+        <instantiation name="oxf:unsafe-builtin-saxon"/>
+    </processor>
+
+    <processor name="oxf:saxon8sa">
+        <instantiation name="oxf:external-saxon-sa"/>
+    </processor>
+
+    <processor name="oxf:unsafe-saxon8sa">
+        <instantiation name="oxf:external-unsafe-saxon-sa"/>
     </processor>
 
     <processor name="oxf:portlet-preferences">

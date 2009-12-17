@@ -5052,6 +5052,7 @@ ORBEON.xforms.Init = {
         }
         // Register event handler for click on label
         yuiTree.subscribe("labelClick", ORBEON.xforms.Events.treeLabelClick);
+        yuiTree.subscribe("enterKeyPressed", ORBEON.xforms.Events.treeLabelClick);
         ORBEON.util.Dom.removeClass(ORBEON.util.Utils.isNewXHTMLLayout() ? treeDiv.parentNode : treeDiv, "xforms-initially-hidden");
     },
 

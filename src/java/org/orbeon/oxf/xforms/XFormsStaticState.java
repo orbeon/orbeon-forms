@@ -1092,9 +1092,9 @@ public class XFormsStaticState {
 
                     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
                     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
-                    // don't check things like event handlers.
+                    // don't check things like event handlers. Also check for AVTs ion @class and @style.
                     final boolean hasNonStaticItem = (Boolean) XPathCache.evaluateSingle(propertyContext, controlNodeInfo,
-                            "exists(./(xforms:choices | xforms:item | xforms:itemset)//xforms:*[@ref or @nodeset or @bind or @value])", BASIC_NAMESPACE_MAPPINGS,
+                            "exists(./(xforms:choices | xforms:item | xforms:itemset)//xforms:*[@ref or @nodeset or @bind or @value or (@class, @style)[contains(., '{')]])", BASIC_NAMESPACE_MAPPINGS,
                             null, null, null, null, locationData);
 
                     // Remember information

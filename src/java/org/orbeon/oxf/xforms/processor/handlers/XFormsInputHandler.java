@@ -27,8 +27,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Collections;
-
 /**
  * Handle xforms:input.
  *
@@ -89,7 +87,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                 // a problem since the server does not send an itemset for new booleans, therefore the client cannot know
                 // the encrypted value of "true". So we do not encrypt values.
                 // NOTE: Put null label so that it is not output at all
-                itemset.addChildItem(new Item(isMultiple, false, Collections.EMPTY_LIST, null, "true"));
+                itemset.addChildItem(new Item(isMultiple, false, null, null, "true"));
 
                 // NOTE: In the future, we may want to use other appearances provided by xforms:select
     //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));

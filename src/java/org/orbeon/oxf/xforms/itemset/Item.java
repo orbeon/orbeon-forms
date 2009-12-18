@@ -22,6 +22,7 @@ import org.xml.sax.SAXException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents an item (xforms:item, xforms:choice, or item in itemset).
@@ -29,7 +30,7 @@ import java.util.List;
 public class Item implements ItemContainer {
 
     private final boolean isEncryptValue; // whether this item is part of an open selection control
-    private final List attributesList;
+    private final Map<String, String> attributes;
     private final String label;
     private final String value;
 
@@ -38,12 +39,12 @@ public class Item implements ItemContainer {
     private ItemContainer parent;
     private List<Item> children;
 
-    public Item(boolean isMultiple, boolean isEncryptValue, List attributesList, String label, String value) {
+    public Item(boolean isMultiple, boolean isEncryptValue, Map<String, String> attributes, String label, String value) {
 
         // Value is encrypted if requested, except with single selection if the value
         this.isEncryptValue = isEncryptValue && (isMultiple || StringUtils.isNotEmpty(value));
 
-        this.attributesList = attributesList;
+        this.attributes = attributes;
         this.label = label;
         this.value = value;
     }
@@ -91,8 +92,8 @@ public class Item implements ItemContainer {
         return children != null && children.size() > 0;
     }
 
-    public List getAttributesList() {
-        return attributesList;
+    public Map<String, String> getAttributes() {
+        return attributes;
     }
 
     public String getLabel() {
@@ -141,8 +142,8 @@ public class Item implements ItemContainer {
      */
     void visit(ContentHandler contentHandler, ItemsetListener listener) throws SAXException {
         if (hasChildren()) {
-            listener.startLevel(contentHandler, false);
-            for (Item item: children) {
+            listener.startLevel(contentHandler, this);
+            for (final Item item: children) {
                 listener.startItem(contentHandler, item, false);
                 item.visit(contentHandler, listener);
                 listener.endItem(contentHandler);
@@ -154,7 +155,7 @@ public class Item implements ItemContainer {
     void addToList(List<Item> result) {
         result.add(this);
         if (children != null) {
-            for (Item item: children) {
+            for (final Item item: children) {
                 item.addToList(result);
             }
         }
@@ -173,6 +174,10 @@ public class Item implements ItemContainer {
 
         // Compare label
         if (!XFormsUtils.compareStrings(label, other.label))
+            return false;
+
+        // Compare attributes
+        if (!XFormsUtils.compareMaps(attributes, other.attributes))
             return false;
 
         // Compare children

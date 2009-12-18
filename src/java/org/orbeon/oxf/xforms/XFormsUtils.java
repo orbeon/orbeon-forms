@@ -591,6 +591,17 @@ public class XFormsUtils {
         return (value1 == null && value2 == null) || (value1 != null && value2 != null && value1.size() == value2.size() && value1.equals(value2));
     }
 
+    /**
+     * Compare two maps, handling null values as well.
+     *
+     * @param value1    first value or null
+     * @param value2    second value or null
+     * @return          whether the values are identical or both null
+     */
+    public static boolean compareMaps(Map value1, Map value2) {
+        return (value1 == null && value2 == null) || (value1 != null && value2 != null && value1.equals(value2));
+    }
+
     public static ValueRepresentation convertJavaObjectToSaxonObject(Object object) {
         final ValueRepresentation valueRepresentation;
         if (object instanceof ValueRepresentation) {

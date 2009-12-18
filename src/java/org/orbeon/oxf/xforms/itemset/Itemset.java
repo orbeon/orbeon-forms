@@ -14,16 +14,16 @@
 package org.orbeon.oxf.xforms.itemset;
 
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
   * Represents an itemset.
@@ -71,9 +71,9 @@ public class Itemset implements ItemContainer {
      * @param listener              TreeListener to call back
      */
     public void visit(ContentHandler contentHandler, ItemsetListener listener) throws SAXException {
-        listener.startLevel(contentHandler, true);
+        listener.startLevel(contentHandler, null);
         boolean first = true;
-        for (Item item: children) {
+        for (final Item item: children) {
             listener.startItem(contentHandler, item, first);
             item.visit(contentHandler, listener);
             listener.endItem(contentHandler);
@@ -85,22 +85,20 @@ public class Itemset implements ItemContainer {
     /**
      * Return the list of items as a JSON tree.
      *
-     * @param controlValue  current value of the control (to determine selected item) or null
+     * @param controlValue  current value of the control (to determine selected item) or null (valued used only during initialization)
      * @param many          whether multiple selection is allowed (to determine selected item)
      * @return              String representing a JSON tree
      */
-    public String getJSONTreeInfo(final PipelineContext pipelineContext, final String controlValue, final boolean many, LocationData locationData) {
+    public String getJSONTreeInfo(final PropertyContext context, final String controlValue, final boolean many, LocationData locationData) {
         // Produce a JSON fragment with hierarchical information
         if (getChildren().size() > 0) {
-            final FastStringBuffer sb = new FastStringBuffer(100);
+            final StringBuilder sb = new StringBuilder(100);
             sb.append("[");
             try {
                 visit(null, new ItemsetListener() {
-                    public void startLevel(ContentHandler contentHandler, boolean topLevel) throws SAXException {
-                    }
 
-                    public void endLevel(ContentHandler contentHandler) throws SAXException {
-                    }
+                    public void startLevel(ContentHandler contentHandler, Item item) throws SAXException {}
+                    public void endLevel(ContentHandler contentHandler) throws SAXException {}
 
                     public void startItem(ContentHandler contentHandler, Item item, boolean first) throws SAXException {
                         final String value = item.getValue();
@@ -109,12 +107,30 @@ public class Itemset implements ItemContainer {
                             sb.append(',');
                         sb.append("[");
 
+                        // Label and value
                         sb.append('"');
                         sb.append(item.getExternalJSLabel());
                         sb.append("\",\"");
-                        sb.append(item.getExternalJSValue(pipelineContext));
+                        sb.append(item.getExternalJSValue(context));
                         sb.append('\"');
 
+                        // Attributes if any
+                        final Map<String, String> attributes = item.getAttributes();
+                        if (attributes != null && attributes.size() > 0) {
+                            final int size = attributes.size();
+                            int count = 0;
+                            sb.append(",{");// start map attribute name/value
+                            for (final Map.Entry<String, String> entry: attributes.entrySet()) {
+                                sb.append(XFormsUtils.escapeJavaScript(entry.getKey()));
+                                sb.append(':');
+                                sb.append(XFormsUtils.escapeJavaScript(entry.getValue()));
+                                if (++count != size)
+                                    sb.append(',');
+                            }
+                            sb.append('}');
+                        }
+
+                        // NOTE: This is used for tree/menu initialization only
                         if (controlValue != null) {
                             // We allow the value to be null when this method is used just to produce the structure of the tree without selection
                             sb.append(',');

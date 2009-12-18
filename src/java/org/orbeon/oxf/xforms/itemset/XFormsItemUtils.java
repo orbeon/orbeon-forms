@@ -18,6 +18,7 @@ import org.dom4j.Text;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
@@ -33,6 +34,8 @@ import java.util.*;
  * Utilities to deal with items and itemsets.
  */
 public class XFormsItemUtils {
+
+    private static final String[] ATTRIBUTES_TO_PROPAGATE = { "class", "style" };
 
     public static String encryptValue(PropertyContext propertyContext, String value) {
         return SecureUtils.encrypt(propertyContext, XFormsProperties.getXFormsPassword(), value);
@@ -127,8 +130,8 @@ public class XFormsItemUtils {
                     final String label = getLabelValue(element.element(XFormsConstants.XFORMS_LABEL_QNAME));
                     final String value = getValueValue(element.element(XFormsConstants.XFORMS_VALUE_QNAME));
 
-                    // TODO: must filter attributes on element.attributes()
-                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, element.attributes(), label != null ? label : "", value != null ? value : ""));
+                    final Map<String, String> attributes = getAttributes(element);
+                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label != null ? label : "", value != null ? value : ""));
 
                 } else if ("itemset".equals(localname)) {
                     // xforms:itemset
@@ -204,8 +207,8 @@ public class XFormsItemUtils {
                                             // non-relevant if it is a leaf item. But we don't yet know if this item is
                                             // a leaf item, so we prune such non-relevant items later.
 
-                                            // TODO: must filter attributes on element.attributes()
-                                            currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, element.attributes(), label != null ? label : "", value));
+                                            final Map<String, String> attributes = getAttributes(element);
+                                            currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label != null ? label : "", value));
                                         } else {
                                             // TODO: handle xforms:copy
                                             throw new ValidationException("xforms:copy is not yet supported.", select1Control.getLocationData());
@@ -229,8 +232,8 @@ public class XFormsItemUtils {
                     if (labelElement != null) {
                         final String label = getLabelValue(element.element(XFormsConstants.XFORMS_LABEL_QNAME));
 
-                        // TODO: must filter attributes on element.attributes()
-                        final Item newContainer = new Item(isMultiple, isEncryptItemValues, element.attributes(), label, null);
+                        final Map<String, String> attributes = getAttributes(element);
+                        final Item newContainer = new Item(isMultiple, isEncryptItemValues, attributes, label, null);
                         currentContainer.addChildItem(newContainer);
                         currentContainer = newContainer;
                     }
@@ -251,6 +254,41 @@ public class XFormsItemUtils {
                 final XBLBindings.Scope elementScope = select1Control.getChildElementScope(labelElement);
                 final String elementEffectiveId = getElementEffectiveId(labelElement);
                 return XFormsUtils.getChildElementValue(propertyContext, container, elementEffectiveId, elementScope, labelElement, false, null);
+            }
+
+            private Map<String, String> getAttributes(Element itemChoiceItemsetElement) {
+                final String elementEffectiveId = getElementEffectiveId(itemChoiceItemsetElement);
+
+                final Map<String, String> result = new LinkedHashMap<String, String>();
+                for (String attributeName: ATTRIBUTES_TO_PROPAGATE) {
+                    final String attributeValue = itemChoiceItemsetElement.attributeValue("class");
+                    if (attributeValue != null)
+                        addAttributeAVTValue(itemChoiceItemsetElement, attributeName, attributeValue, elementEffectiveId, result);
+                }
+                return result;
+            }
+
+            private void addAttributeAVTValue(Element itemChoiceItemsetElement, String attributeName, String attributeValue, String elementEffectiveId, Map<String, String> result) {
+                if (attributeValue.indexOf('{') == -1) {
+                    // Definitely not an AVT
+                    result.put(attributeName, attributeValue);
+                } else {
+                    // Possible AVT
+                    final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
+                    final List<org.orbeon.saxon.om.Item> currentNodeset = currentBindingContext.getNodeset();
+                    if (currentNodeset != null && currentNodeset.size() > 0) {
+                        final String tempResult = XPathCache.evaluateAsAvt(propertyContext,
+                                currentNodeset, currentBindingContext.getPosition(),
+                                attributeValue, container.getNamespaceMappings(itemChoiceItemsetElement),
+                                contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
+                                contextStack.getFunctionContext(elementEffectiveId), null,
+                                (LocationData) itemChoiceItemsetElement.getData());
+
+                        contextStack.returnFunctionContext();
+
+                        result.put(attributeName, tempResult);
+                    }
+                }
             }
 
             public void endElement(Element element) {
@@ -345,13 +383,13 @@ public class XFormsItemUtils {
                         throw new ValidationException("xforms:item must contain an xforms:value element.", (LocationData) controlElement.getData());
                     final String value = XFormsUtils.getStaticChildElementValue(valueElement, false, null);
 
-                    // TODO: must filter attributes on element.attributes()
-                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, element.attributes(), label != null ? label : "", value != null ? value : ""));
+                    final Map<String, String> attributes = getAttributes(element);
+                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label != null ? label : "", value != null ? value : ""));
 
                 } else if ("itemset".equals(localname)) {
                     // xforms:itemset
 
-                    throw new ValidationException("xforms:itemset should not appear in static itemset.", (LocationData) controlElement.getData());
+                    throw new ValidationException("xforms:itemset must not appear in static itemset.", (LocationData) controlElement.getData());
 
                 } else if ("choices".equals(localname)) {
                     // xforms:choices
@@ -360,8 +398,8 @@ public class XFormsItemUtils {
                     if (labelElement != null) {
                         final String label = XFormsUtils.getStaticChildElementValue(element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
 
-                        // TODO: must filter attributes on element.attributes()
-                        final Item newContainer = new Item(isMultiple, isEncryptItemValues, element.attributes(), label, null);
+                        final Map<String, String> attributes = getAttributes(element);
+                        final Item newContainer = new Item(isMultiple, isEncryptItemValues, attributes, label, null);
                         currentContainer.addChildItem(newContainer);
                         currentContainer = newContainer;
                     }
@@ -383,6 +421,17 @@ public class XFormsItemUtils {
             public void text(Text text) {
             }
         });
+        return result;
+    }
+
+    private static Map<String, String> getAttributes(Element itemChoiceItemsetElement) {
+
+        final Map<String, String> result = new LinkedHashMap<String, String>();
+        for (String attributeName: ATTRIBUTES_TO_PROPAGATE) {
+            final String attributeValue = itemChoiceItemsetElement.attributeValue("class");
+            if (attributeValue != null)
+                result.put(attributeName, attributeValue);
+        }
         return result;
     }
 }

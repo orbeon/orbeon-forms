@@ -6187,7 +6187,7 @@ ORBEON.xforms.Server = {
                                                 var label = itemElement[0];
                                                 var value = itemElement[1];
                                                 if (itemElement.length > 2) {
-                                                    // This is item that contains other elements
+                                                    // This is an item that contains other elements
                                                     sb[sb.length] = '<optgroup label="' + ORBEON.util.String.escapeAttribute(label) + '">';
                                                     // Go through options in this optgroup
                                                     for (var innerIndex = 2; innerIndex < itemElement.length; innerIndex++) {

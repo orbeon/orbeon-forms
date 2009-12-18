@@ -91,7 +91,7 @@
                                         <!-- Remove trigger -->
                                         <xforms:trigger appearance="minimal" ref="if (
                                                 {if ($remove-constraint) then concat($remove-constraint, ' and ') else ''}
-                                                    count(xxforms:repeat-nodeset('{$fr-repeat/@id}')) gt {$min-occurs}) then . else ()">
+                                                    count(xxforms:repeat-nodeset()) gt {$min-occurs}) then . else ()">
                                             <!-- TODO: i18n of title -->
                                             <!--<xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="Remove" title="Remove"/></xforms:label>-->
                                             <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16.png" alt="Remove" title="Remove"/></xforms:label>

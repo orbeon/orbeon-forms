@@ -1,28 +1,29 @@
 /**
- *  Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2009 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.itemset;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
   * Represents an itemset.
@@ -89,7 +90,7 @@ public class Itemset implements ItemContainer {
      * @return              String representing a JSON tree
      */
     public String getJSONTreeInfo(final PipelineContext pipelineContext, final String controlValue, final boolean many, LocationData locationData) {
-        // Produce a JSON fragment with hierachical information
+        // Produce a JSON fragment with hierarchical information
         if (getChildren().size() > 0) {
             final FastStringBuffer sb = new FastStringBuffer(100);
             sb.append("[");
@@ -158,15 +159,9 @@ public class Itemset implements ItemContainer {
 
         final Itemset other = (Itemset) obj;
 
-        if (children.size() != other.children.size())
+        // Compare children
+        if (!XFormsUtils.compareCollections(children, other.children))
             return false;
-
-        final Iterator<Item> otherIterator = other.children.iterator();
-        for (Item item: children) {
-            final Item otherItem = otherIterator.next();
-            if (!item.equals(otherItem))
-                return false;
-        }
 
         return true;
     }

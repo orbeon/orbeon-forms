@@ -3546,7 +3546,8 @@ ORBEON.xforms.Events = {
 
         // Depending who calls this listeners, we either get the node directly (for the enterKeyPressed 
         // and labelClick events) or we get an object which contains the node (for clickEvent).
-        var node = ! YAHOO.lang.isUndefined(object._type) && object._type == "TextNode" ? object : object.node;
+        var node = ! YAHOO.lang.isUndefined(object._type) && (object._type == "TextNode" || object._type == "TaskNode")
+            ? object : object.node;
 
         var yuiTree = this;
         var control = document.getElementById(yuiTree.id);

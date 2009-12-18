@@ -544,11 +544,28 @@ TV.prototype = {
 							}
 						}
 					}
-				},
-				this,
-				true
-			);
-			
+                },
+                this,
+                true
+            );
+
+            // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+            var anchors = this.getEl().getElementsByTagName("a");
+            for (var anchorIndex = 0; anchorIndex < anchors.length; anchorIndex++) {
+                var anchor = anchors[anchorIndex];
+    			Event.on(
+    				anchor,
+    				'focus',
+    				function (ev) {
+    				    var target = Event.getTarget(ev);
+    				    var node = this.getNodeByElement(target);
+    				    node.focus();
+                    },
+                    this,
+                    true
+                );
+            }
+
 			Event.on(
 				this.getEl(),
 				'dblclick',
@@ -2271,6 +2288,21 @@ YAHOO.widget.Node.prototype = {
 	*/
 	_focusHighlightedItems: [],
 	_focusedItem: null,
+    /**
+    * Removes the focus of previously selected Node
+    * @method _removeFocus
+    * @private
+    */
+    _removeFocus:function () {
+        if (this._focusedItem) {
+            Event.removeListener(this._focusedItem,'blur');
+            this._focusedItem = null;
+        }
+        var el;
+        while ((el = this._focusHighlightedItems.shift())) {  // yes, it is meant as an assignment, really
+            Dom.removeClass(el,YAHOO.widget.TreeView.FOCUS_CLASS_NAME );
+        }
+    },
 	/**
 	* Sets the focus on the node element.
 	* It will only be able to set the focus on nodes that have anchor elements in it.  
@@ -2282,18 +2314,9 @@ YAHOO.widget.Node.prototype = {
 	focus: function () {
 		var focused = false, self = this;
 
-		var removeListeners = function () {
-			var el;
-			if (self._focusedItem) {
-				Event.removeListener(self._focusedItem,'blur');
-				self._focusedItem = null;
-			}
-			
-			while ((el = self._focusHighlightedItems.shift())) {  // yes, it is meant as an assignment, really
-				Dom.removeClass(el,YAHOO.widget.TreeView.FOCUS_CLASS_NAME );
-			}
-		};
-		removeListeners();
+        if (this.tree.currentFocus) {
+            this.tree.currentFocus._removeFocus();
+        }
 
 		Dom.getElementsBy  ( 
 			function (el) {
@@ -2309,14 +2332,22 @@ YAHOO.widget.Node.prototype = {
 						aEl = aEl[0];
 						aEl.focus();
 						self._focusedItem = aEl;
-						Event.on(aEl,'blur',removeListeners);
+						Event.on(aEl,'blur',function() {
+                            self.tree.currentFocus = null;
+                            self._removeFocus();
+						});
 						focused = true;
 					}
 				}
 				self._focusHighlightedItems.push(el);
 			}
 		);
-		if (!focused) { removeListeners(); }
+        if (focused) {
+            this.tree.currentFocus = this;
+        } else {
+            this.tree.currentFocus = null;
+            this._removeFocus();
+        }
 		return focused;
 	},
 

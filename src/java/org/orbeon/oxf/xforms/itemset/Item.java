@@ -167,10 +167,16 @@ public class Item implements ItemContainer {
 
         final Item other = (Item) obj;
 
+        // Compare value
         if (!XFormsUtils.compareStrings(value, other.value))
             return false;
 
+        // Compare label
         if (!XFormsUtils.compareStrings(label, other.label))
+            return false;
+
+        // Compare children
+        if (!XFormsUtils.compareCollections(children, other.children))
             return false;
 
         return true;

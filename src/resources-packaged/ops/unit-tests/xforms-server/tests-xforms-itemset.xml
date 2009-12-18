@@ -405,7 +405,7 @@
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xhtml:html>
                             <xhtml:head>
                                 <xforms:model id="model" xxforms:encrypt-item-values="false">
                                     <xforms:instance id="selection">
@@ -474,6 +474,80 @@
                     <xxf:control-values/>
                     <xxf:itemsets>
                         <xxf:itemset id="select-1">[["1","1"],["2.1","2.1"],["2.2.1","2.2.1"],["2.2.2.1","2.2.2.1"]]</xxf:itemset>
+                    </xxf:itemsets>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Hierarchical itemset with item deletion" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model" xxforms:encrypt-item-values="false">
+                        <xforms:instance id="selection">
+                            <value/>
+                        </xforms:instance>
+
+                        <xforms:instance id="itemset-1">
+                            <items>
+                                <item id="1"/>
+                                <item id="2">
+                                    <item id="2.1"/>
+                                    <item id="2.2">
+                                        <item id="2.2.1"/>
+                                        <item id="2.2.2">
+                                            <item id="2.2.2.1"/>
+                                            <item id="2.2.2.2"/>
+                                        </item>
+                                    </item>
+                                </item>
+                            </items>
+                        </xforms:instance>
+
+                        <xforms:delete ev:event="xforms-ready" nodeset="instance('itemset-1')//item[@id = '2.2.2.1']"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:select id="select-1" ref=".">
+                        <xforms:itemset nodeset="instance('itemset-1')//item">
+                            <xforms:label ref="@id"/>
+                            <xforms:value ref="@id"/>
+                        </xforms:itemset>
+                    </xforms:select>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="selection" model-id="model">
+                                <value/>
+                            </instance>
+                            <instance id="itemset-1" model-id="model">
+                                <items>
+                                    <item id="1"/>
+                                    <item id="2">
+                                        <item id="2.1"/>
+                                        <item id="2.2">
+                                            <item id="2.2.1"/>
+                                            <item id="2.2.2">
+                                                <item id="2.2.2.2"/>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </items>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:itemsets>
+                        <xxf:itemset id="select-1">[["1","1"],["2","2",["2.1","2.1"],["2.2","2.2",["2.2.1","2.2.1"],["2.2.2","2.2.2",["2.2.2.2","2.2.2.2"]]]]]</xxf:itemset>
                     </xxf:itemsets>
                 </xxf:action>
             </xxf:event-response>

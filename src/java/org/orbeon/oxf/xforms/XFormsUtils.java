@@ -569,14 +569,26 @@ public class XFormsUtils {
     }
 
     /**
-     * Compare two strings, handling null values as well.
+     * Compare two objects, handling null values as well.
      *
      * @param value1    first value or null
      * @param value2    second value or null
      * @return          whether the values are identical or both null
      */
-    public static boolean compareStrings(String value1, String value2) {
+    public static boolean compareStrings(Object value1, Object value2) {
         return (value1 == null && value2 == null) || (value1 != null && value2 != null && value1.equals(value2));
+    }
+
+    /**
+     * Compare two collections, handling null values as well.
+     *
+     * @param value1    first value or null
+     * @param value2    second value or null
+     * @return          whether the values are identical or both null
+     */
+    public static boolean compareCollections(Collection value1, Collection value2) {
+        // Add quick check on size, which AbstractList e.g. doesn't do
+        return (value1 == null && value2 == null) || (value1 != null && value2 != null && value1.size() == value2.size() && value1.equals(value2));
     }
 
     public static ValueRepresentation convertJavaObjectToSaxonObject(Object object) {

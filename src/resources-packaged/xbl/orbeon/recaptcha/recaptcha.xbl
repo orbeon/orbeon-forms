@@ -81,7 +81,7 @@
                         <xforms:input ref="challenge" class="xbl-fr-recaptcha-challenge" style="display: none"/>
                         <xforms:input ref="response" class="xbl-fr-recaptcha-response" style="display: none">
                             <xforms:action ev:event="xforms-value-changed">
-                                <!-- Call API doing the verificaton -->
+                                <!-- Call API doing the verification -->
                                 <xforms:send submission="verify-submission"/>
                                 <!-- Parse the response -->
                                 <xxforms:variable name="lines" select="tokenize(instance('verify-response-text'), '\n')"/>

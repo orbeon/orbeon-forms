@@ -4980,10 +4980,28 @@ ORBEON.xforms.Init = {
             var childArray = nameValueArray[arrayIndex];
             var name = childArray[0];
             var value = childArray[1];
-            var selected = childArray[2];
-            var hasSelected = typeof selected == "boolean";
+            var nextPosition = 2;
+            var labelStyle = "ygtvlabel";
+            var selected = false;
+            for (var optionals = [childArray[2], childArray[3]], optionalIndex = 0; optionalIndex < 2; optionalIndex++) {
+                var optional = optionals[optionalIndex];
+                if (! YAHOO.lang.isUndefined(optional) && ! YAHOO.lang.isArray(optional)) {
+                    // We have an optional field
+                    nextPosition++;
+                    if (YAHOO.lang.isBoolean(optional)) {
+                        // Optional field is boolean telling if this node is selected
+                        selected = optional;
+                    } else if (! YAHOO.lang.isUndefined(optional["class"])) {
+                        // Optional field is an object; for now, we only handle the class property
+                        labelStyle += " " + optional["class"];
+                    }
+                } else {
+                    // No need to check further
+                    break;
+                }
+            }
             // Create node and add to tree
-            var nodeInformation = { label: name, value: value };
+            var nodeInformation = { label: name, value: value, labelStyle: labelStyle };
             var childNode;
             if (treeDiv.xformsAllowMultipleSelection) {
                 childNode = new YAHOO.widget.TaskNode(nodeInformation, treeNode, false);
@@ -4991,9 +5009,9 @@ ORBEON.xforms.Init = {
             } else {
                 childNode = new YAHOO.widget.TextNode(nodeInformation, treeNode, false);
             }
-            ORBEON.xforms.Init._addToTree(treeDiv, childArray, childNode, hasSelected ? 3 : 2);
+            ORBEON.xforms.Init._addToTree(treeDiv, childArray, childNode, nextPosition);
             // Add this value to the list if selected
-            if (hasSelected && selected) {
+            if (selected) {
                 if (treeDiv.value != "") treeDiv.value += " ";
                 treeDiv.value += value;
             }
@@ -5027,6 +5045,14 @@ ORBEON.xforms.Init = {
         ORBEON.xforms.Controls.treeOpenSelectedVisible(yuiTree, values);
         // Draw the tree the first time
         yuiTree.draw();
+        // Show the currently selected value
+        if (!treeDiv.xformsAllowMultipleSelection) {
+            var selectedNode = yuiTree.getNodeByProperty("value", treeDiv.value);
+            // Handle cases where the current value is not in the tree. In most cases this is because the value is
+            // empty string; no value has been selected yet.
+            if (selectedNode != null)
+                YAHOO.util.Dom.addClass(selectedNode.getLabelEl(), "xforms-tree-label-selected");
+        }
     },
 
     _tree: function(treeDiv) {
@@ -5048,14 +5074,6 @@ ORBEON.xforms.Init = {
         ORBEON.xforms.Init._initTreeDivFromArray(treeDiv, yuiTree, treeArray);
         // Save value in tree
         ORBEON.xforms.Globals.serverValue[controlId] = treeDiv.value
-        // Show the currently selected value
-        if (!treeDiv.xformsAllowMultipleSelection) {
-            var selectedNode = yuiTree.getNodeByProperty("value", treeDiv.value);
-            // Handle cases where the current value is not in the tree. In most cases this is because the value is
-            // empty string; no value has been selected yet.
-            if (selectedNode != null)
-                YAHOO.util.Dom.addClass(selectedNode.getLabelEl(), "xforms-tree-label-selected");
-        }
         // Register event handler for click on label
         yuiTree.subscribe("labelClick", ORBEON.xforms.Events.treeLabelClick);
         yuiTree.subscribe("enterKeyPressed", ORBEON.xforms.Events.treeLabelClick);

@@ -925,4 +925,105 @@
         </output>
     </test>
 
+    <test description="New layout for hierarchical xforms:select[@appearance = 'compact'] with classes" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model" xxforms:encrypt-item-values="false" xxforms:new-xhtml-layout="true">
+                        <xforms:instance id="selection">
+                            <value/>
+                        </xforms:instance>
+
+                        <xforms:instance id="itemset-1">
+                            <items>
+                                <item id="1"/>
+                                <item id="2">
+                                    <item id="2.1"/>
+                                    <item id="2.2">
+                                        <item id="2.2.1"/>
+                                        <item id="2.2.2">
+                                            <item id="2.2.2.1"/>
+                                            <item id="2.2.2.2"/>
+                                        </item>
+                                    </item>
+                                </item>
+                            </items>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:select id="select-1" ref="." appearance="compact">
+                        <xforms:itemset nodeset="instance('itemset-1')//item" class="my-{if (exists(*)) then 'folder' else 'leaf'}">
+                            <xforms:label ref="@id"/>
+                            <xforms:value ref="@id"/>
+                        </xforms:itemset>
+                    </xforms:select>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:span id="select-1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact">
+                    <xhtml:select id="select-1$$c" name="select-1" multiple="multiple">
+                        <xhtml:option class="my-leaf" value="1">1</xhtml:option>
+                        <xhtml:option class="my-folder" value="2">2</xhtml:option>
+                        <xhtml:option class="my-leaf" value="2.1">2.1</xhtml:option>
+                        <xhtml:option class="my-folder" value="2.2">2.2</xhtml:option>
+                        <xhtml:option class="my-leaf" value="2.2.1">2.2.1</xhtml:option>
+                        <xhtml:option class="my-folder" value="2.2.2">2.2.2</xhtml:option>
+                        <xhtml:option class="my-leaf" value="2.2.2.1">2.2.2.1</xhtml:option>
+                        <xhtml:option class="my-leaf" value="2.2.2.2">2.2.2.2</xhtml:option>
+                    </xhtml:select>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
+    <test description="New layout for hierarchical xforms:select[@appearance = 'xxforms:tree'] with classes" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model" xxforms:encrypt-item-values="false" xxforms:new-xhtml-layout="true">
+                        <xforms:instance id="selection">
+                            <value/>
+                        </xforms:instance>
+
+                        <xforms:instance id="itemset-1">
+                            <items>
+                                <item id="1"/>
+                                <item id="2">
+                                    <item id="2.1"/>
+                                    <item id="2.2">
+                                        <item id="2.2.1"/>
+                                        <item id="2.2.2">
+                                            <item id="2.2.2.1"/>
+                                            <item id="2.2.2.2"/>
+                                        </item>
+                                    </item>
+                                </item>
+                            </items>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:select id="select-1" ref="." appearance="xxforms:tree">
+                        <xforms:itemset nodeset="instance('itemset-1')//item" class="my-{if (exists(*)) then 'folder' else 'leaf'}">
+                            <xforms:label ref="@id"/>
+                            <xforms:value ref="@id"/>
+                        </xforms:itemset>
+                    </xforms:select>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:span id="select-1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-xxforms-tree xforms-initially-hidden">
+                    <xhtml:div id="select-1$$c">[["1","1",{"class":"my-leaf"},false],["2","2",{"class":"my-folder"},false,["2.1","2.1",{"class":"my-leaf"},false],["2.2","2.2",{"class":"my-folder"},false,["2.2.1","2.2.1",{"class":"my-leaf"},false],["2.2.2","2.2.2",{"class":"my-folder"},false,["2.2.2.1","2.2.2.1",{"class":"my-leaf"},false],["2.2.2.2","2.2.2.2",{"class":"my-leaf"},false]]]]]</xhtml:div>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
 </group>

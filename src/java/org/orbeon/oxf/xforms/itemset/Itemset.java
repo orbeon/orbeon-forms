@@ -121,9 +121,13 @@ public class Itemset implements ItemContainer {
                             int count = 0;
                             sb.append(",{");// start map attribute name/value
                             for (final Map.Entry<String, String> entry: attributes.entrySet()) {
+                                sb.append('"');
                                 sb.append(XFormsUtils.escapeJavaScript(entry.getKey()));
+                                sb.append('"');
                                 sb.append(':');
+                                sb.append('"');
                                 sb.append(XFormsUtils.escapeJavaScript(entry.getValue()));
+                                sb.append('"');
                                 if (++count != size)
                                     sb.append(',');
                             }

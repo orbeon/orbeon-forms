@@ -261,7 +261,7 @@ public class XFormsItemUtils {
 
                 final Map<String, String> result = new LinkedHashMap<String, String>();
                 for (String attributeName: ATTRIBUTES_TO_PROPAGATE) {
-                    final String attributeValue = itemChoiceItemsetElement.attributeValue("class");
+                    final String attributeValue = itemChoiceItemsetElement.attributeValue(attributeName);
                     if (attributeValue != null)
                         addAttributeAVTValue(itemChoiceItemsetElement, attributeName, attributeValue, elementEffectiveId, result);
                 }

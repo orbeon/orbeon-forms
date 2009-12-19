@@ -81,10 +81,19 @@
             <xforms:instance id="template-instance">
                 <item label="New item" value="new-item"/>
             </xforms:instance>
+            <xforms:action ev:event="xforms-model-construct-done">
+                <xforms:action xxforms:iterate="instance('encyclopedia-instance')//item">
+                    <!--  | instance('books-instance')//item -->
+                    <xforms:insert context="." origin="xxforms:attribute('color', if (starts-with(context()/@value, 's')) then 'red' else 'green')"/>
+                </xforms:action>
+            </xforms:action>
         </xforms:model>
         <xhtml:style type="text/css">
             .xforms-select1-appearance-xxforms-tree, .xforms-select-appearance-xxforms-tree { padding: 0 0 2em 2em }
             .tree-table .xforms-label { display: block; }
+            .tree-table .green { background-color: #dfd; }
+            .tree-table .red { background-color: #fdd; }
+            .tree-table .xforms-tree-label-selected { background-color: #ffa; }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
@@ -99,7 +108,17 @@
                 <xforms:value>books-instance</xforms:value>
             </xforms:item>
         </xforms:select1>
-
+        <xhtml:p>
+            <xforms:trigger appearance="minimal">
+                <xforms:label>Put in red starting with C</xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:action xxforms:iterate="instance('encyclopedia-instance')//item">
+                        <!--  | instance('books-instance')//item -->
+                        <xforms:insert context="." origin="xxforms:attribute('color', if (starts-with(context()/@value, 'c')) then 'red' else 'green')"/>
+                    </xforms:action>
+                </xforms:action>
+            </xforms:trigger>
+        </xhtml:p>
         <xhtml:table class="tree-table">
             <xhtml:tr>
                 <xhtml:th/>
@@ -130,7 +149,7 @@
                 </xhtml:td>
                 <xhtml:td>
                     <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree1" incremental="true">
-                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item">
+                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">
                             <xforms:label ref="@label"/>
                             <xforms:value ref="@value"/>
                         </xforms:itemset>
@@ -138,7 +157,7 @@
                 </xhtml:td>
                 <xhtml:td>
                     <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree2" incremental="false">
-                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item">
+                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">
                             <xforms:label ref="@label"/>
                             <xforms:value ref="@value"/>
                         </xforms:itemset>
@@ -169,7 +188,7 @@
                 </xhtml:td>
                 <xhtml:td>
                     <xforms:select ref="select" appearance="xxforms:tree" id="tree3" incremental="true">
-                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item">
+                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">
                             <xforms:label ref="@label"/>
                             <xforms:value ref="@value"/>
                         </xforms:itemset>
@@ -177,7 +196,7 @@
                 </xhtml:td>
                 <xhtml:td>
                     <xforms:select ref="select" appearance="xxforms:tree" id="tree4" incremental="false">
-                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item">
+                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">
                             <xforms:label ref="@label"/>
                             <xforms:value ref="@value"/>
                         </xforms:itemset>

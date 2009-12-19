@@ -606,7 +606,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         if (itemAttributes != null) {
             final String itemClassValue = itemAttributes.get("class");
             if (itemClassValue != null) {
-                sb.append(' ');
+                if (sb.length() > 0)
+                    sb.append(' ');
                 sb.append(itemClassValue);
             }
         }

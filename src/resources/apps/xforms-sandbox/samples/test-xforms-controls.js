@@ -161,10 +161,14 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     testClasses: function() {
         function checkColors(firstColor, secondColor) {
-            var radios = YAHOO.util.Dom.getChildren("flavor-select1-full" + XFORMS_SEPARATOR_1 + "1");
+            var radioContainer = YAHOO.util.Dom.get("flavor-select1-full" + XFORMS_SEPARATOR_1 + "1");
+            if (ORBEON.util.Utils.isNewXHTMLLayout()) radioContainer = YAHOO.util.Dom.getFirstChild(radioContainer);
+            var radios = YAHOO.util.Dom.getChildren(radioContainer);
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(radios[0], firstColor), "radio has " + firstColor + " class");
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(radios[1], secondColor), "radio has " + secondColor + " class");
-            var checkboxes = YAHOO.util.Dom.getChildren("flavor-select-full" + XFORMS_SEPARATOR_1 + "1");
+            var checkboxContainer = YAHOO.util.Dom.get("flavor-select-full" + XFORMS_SEPARATOR_1 + "1");
+            if (ORBEON.util.Utils.isNewXHTMLLayout()) checkboxContainer = YAHOO.util.Dom.getFirstChild(checkboxContainer);
+            var checkboxes = YAHOO.util.Dom.getChildren(checkboxContainer);
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(checkboxes[0], firstColor), "check box has " + firstColor + " class");
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(checkboxes[1], secondColor), "check box has " + secondColor + " class");
             var select1Options = YAHOO.util.Dom.get("flavor-select1-compact" + XFORMS_SEPARATOR_1 + "1").getElementsByTagName("option");

@@ -611,7 +611,7 @@ ORBEON.util.String = {
     },
 
     /**
-     * Escape text that apears in an HTML attribute which we use in an innerHTML.
+     * Escape text that appears in an HTML attribute which we use in an innerHTML.
      */
     escapeAttribute: function(text) {
         return ORBEON.util.String.replace(text, '"', '&quot;');
@@ -6193,30 +6193,44 @@ ORBEON.xforms.Server = {
                                             }
 
                                             // Utility function to generate an option
-                                            function generateOption(label, value, selectedValues) {
+                                            function generateOption(label, value, clazz, selectedValues) {
                                                 var selected = xformsArrayContains(selectedValues, value);
                                                 return '<option value="' + ORBEON.util.String.escapeAttribute(value) + '"'
-                                                        + (selected ? ' selected="selected"' : '') + '>' + label + '</option>';
+                                                        + (selected ? ' selected="selected"' : '')
+                                                        + (clazz != null ? ' class="' + ORBEON.util.String.escapeAttribute(clazz) + '"' : '')
+                                                        + '>' + label + '</option>';
                                             }
 
                                             // Build new content for the select element
                                             var sb = new Array();
                                             for (var topIndex = 0; topIndex < itemsetTree.length; topIndex++) {
                                                 var itemElement = itemsetTree[topIndex];
-                                                var label = itemElement[0];
-                                                var value = itemElement[1];
-                                                if (itemElement.length > 2) {
+                                                var itemElementIndex = 0;
+                                                var label = itemElement[itemElementIndex++];
+                                                var value = itemElement[itemElementIndex++];
+                                                var clazz = null;
+                                                if (! YAHOO.lang.isUndefined(itemElement[itemElementIndex]) && ! YAHOO.lang.isArray(itemElement[itemElementIndex])) {
+                                                    // We have a property object
+                                                    properties = itemElement[itemElementIndex++];
+                                                    if (! YAHOO.lang.isUndefined(properties["class"]))
+                                                        clazz = properties["class"];
+                                                }
+                                                if (itemElement.length > itemElementIndex) {
                                                     // This is an item that contains other elements
-                                                    sb[sb.length] = '<optgroup label="' + ORBEON.util.String.escapeAttribute(label) + '">';
+                                                    sb[sb.length] = '<optgroup label="' + ORBEON.util.String.escapeAttribute(label) + '"'
+                                                        + (clazz != null ? ' class="' + ORBEON.util.String.escapeAttribute(clazz) + '"' : '')
+                                                        + '">';
                                                     // Go through options in this optgroup
-                                                    for (var innerIndex = 2; innerIndex < itemElement.length; innerIndex++) {
-                                                        var itemElementOption = itemElement[innerIndex];
-                                                        sb[sb.length] = generateOption(itemElementOption[0], itemElementOption[1], selectedValues);
+                                                    while (itemElementIndex < itemElement.length) {
+                                                        var itemElementOption = itemElement[itemElementIndex++];
+                                                        var subItemClazz = ! YAHOO.lang.isUndefined(itemElementOption[2]) && ! YAHOO.lang.isUndefined(itemElementOption[2]["class"])
+                                                            ? itemElementOption[2]["class"] : null;
+                                                        sb[sb.length] = generateOption(itemElementOption[0], itemElementOption[1], subItemClazz, selectedValues);
                                                     }
                                                     sb[sb.length] = '</optgroup>';
                                                 } else {
                                                     // This item is directly an option
-                                                    sb[sb.length] = generateOption(label, value, selectedValues);
+                                                    sb[sb.length] = generateOption(label, value, clazz, selectedValues);
                                                 }
                                             }
 
@@ -6282,6 +6296,9 @@ ORBEON.xforms.Server = {
                                                 var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e" + itemIndex);
                                                 ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-effective-id$", itemEffectiveId);
                                                 ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
+                                                if (! YAHOO.lang.isUndefined(itemElement[2]) && ! YAHOO.lang.isUndefined(itemElement[2]["class"])) {
+                                                    templateClone.className += " " + itemElement[2]["class"];
+                                                }
 
                                                 // Restore checked state after copy
                                                 if (valueToChecked[itemElement[1]] == true) {

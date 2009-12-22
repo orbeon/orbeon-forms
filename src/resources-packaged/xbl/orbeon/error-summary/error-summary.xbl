@@ -474,7 +474,7 @@ Inserting error information into error list:
                                     <xforms:group ref=".[$has-label and property('xxforms:noscript')]" xxbl:scope="outer">
                                         <!-- In noscript mode, use a plain link -->
                                         <!-- TODO: compute effective id once xforms:function is implemented -->
-                                         <xhtml:a id="nsa" href="#{{$error/@id}}"><xforms:output value="$error/@label" class="fr-error-label" id="nso"/></xhtml:a>
+                                         <xhtml:a href="#{{$error/@id}}"><xforms:output value="$error/@label" class="fr-error-label"/></xhtml:a>
                                     </xforms:group>
                                     <!-- Otherwise use trigger -->
                                     <xforms:trigger ref=".[$has-label and not(property('xxforms:noscript'))]" xxbl:scope="outer"

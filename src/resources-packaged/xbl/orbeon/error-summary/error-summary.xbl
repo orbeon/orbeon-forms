@@ -45,11 +45,34 @@
                 <!-- Mark all controls as visited -->
                 <xforms:setvalue ref="instance('fr-visited-instance')"/>
                 <xforms:setvalue ref="instance('fr-visited-instance')/@all">true</xforms:setvalue>
+                <!-- Mark all active alerts as visited -->
+                <!-- TODO: must use configured observer -->
+                <!-- TODO: check which classes exactly to change -->
+                <!-- TODO: handle unvisit -->
+                <!--<xxforms:script ev:event="fr-visit-alerts">-->
+                    <!--<![CDATA[-->
+                    <!--var rootElement = ORBEON.util.Dom.getElementById("fr-form");-->
+                    <!--var elements = YAHOO.util.Dom.getElementsByClassName("xforms-alert-active", "label", rootElement);-->
+                    <!--for (var i = 0; i < elements.length; i++) {-->
+                        <!--var element = elements[i];-->
+                        <!--YAHOO.util.Dom.addClass(element, "xforms-alert-active-visited")-->
+                    <!--}-->
+                    <!--]]>-->
+                <!--</xxforms:script>-->
             </xbl:handler>
             <xbl:handler event="fr-unvisit-all" phase="target">`
                 <!-- Mark all controls as visited -->
                 <xforms:setvalue ref="instance('fr-visited-instance')"/>
                 <xforms:setvalue ref="instance('fr-visited-instance')/@all">false</xforms:setvalue>
+            </xbl:handler>
+            <xbl:handler event="fr-update" phase="target">`
+                <!-- Update errors in non-incremental mode -->
+                <xforms:delete nodeset="instance('fr-snapshot-instance')/*"/>
+                <xforms:insert context="instance('fr-snapshot-instance')" origin="instance('fr-errors-instance')/*"/>
+            </xbl:handler>
+            <xbl:handler event="fr-clear" phase="target">`
+                <!-- Clear all errors in non-incremental mode -->
+                <xforms:delete nodeset="instance('fr-snapshot-instance')/*"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -67,6 +90,11 @@
                     <errors xmlns=""/>
                 </xforms:instance>
 
+                <!-- Instance containing the visible errors (for non-incremental mode) -->
+                <xforms:instance id="fr-snapshot-instance">
+                    <errors xmlns=""/>
+                </xforms:instance>
+
                 <!-- Template for error information -->
                 <xforms:instance id="fr-error-template" xxforms:readonly="true">
                     <error xmlns="" id="" full-id="" position="" repeats="" indexes="" label="" alert="" binds=""/>
@@ -81,6 +109,10 @@
                 <!-- State instance -->
                 <xforms:instance id="fr-state-instance">
                     <state xmlns="">
+                        <!-- Whether errors are shown incrementally or not -->
+                        <incremental>true</incremental>
+                        <!-- Observer element -->
+                        <observer/>
                         <!-- Whether the form is valid or invalid -->
                         <valid>true</valid>
                         <!-- Number of errors -->
@@ -93,7 +125,7 @@
                 <!-- Errors for controls that have been visited -->
                 <!--<xxforms:variable name="visible-errors" select="instance('fr-errors-instance')/error"/>-->
                 <xxforms:variable name="visible-errors" as="element(error)*"
-                  select="for $e in instance('fr-errors-instance')/error[normalize-space(@alert)]
+                  select="for $e in instance(if (instance('fr-state-instance')/incremental != 'false') then 'fr-errors-instance' else 'fr-snapshot-instance')/error[normalize-space(@alert)]
                             return
                               if (instance('fr-visited-instance')/@all = 'true' or tokenize(instance('fr-visited-instance'), '\s+') = $e/@full-id)
                                 then $e else ()"/>
@@ -168,6 +200,20 @@ Inserting error information into error list:
         <xbl:template xxbl:transform="oxf:xslt" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:oxf="http://www.orbeon.com/oxf/processors">
             <!-- Outer group around outer event handlers -->
             <xforms:group appearance="xxforms:internal" xxbl:scope="outer" xsl:version="2.0">
+
+                <!-- When the group becomes relevant, remember incremental flag -->
+                <!-- NOTE:
+                    * upon initial refresh, xforms-enabled is dispatched here
+                    * iteration over $visible-errors in view has already taken place, but over empty list of errors
+                    * then correct incremental flag is set
+                    * initial errors might have been inserted already or not, depending on where error summary is on page
+                    * but in any case, this means a second refresh has to take place
+                    -->
+                <xforms:setvalue ev:event="xforms-enabled" ref="instance('fr-state-instance')/incremental"
+                                 xxbl:scope="inner" xbl:attr="xbl:text=incremental"/>
+                <!-- When the group becomes relevant, remember observer -->
+                <xforms:setvalue ev:event="xforms-enabled" ref="instance('fr-state-instance')/observer"
+                                 xxbl:scope="inner" xbl:attr="xbl:text=observer"/>
 
                 <!-- Control visited: handle events on observer(s) passed -->
                 <xforms:action xbl:attr="ev:observer=observer" ev:event="DOMFocusOut xforms-value-changed xforms-disabled">

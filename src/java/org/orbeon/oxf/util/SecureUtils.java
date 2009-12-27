@@ -20,11 +20,15 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.om.FastStringBuffer;
 
 import javax.crypto.Cipher;
+import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.MessageDigest;
 import java.security.spec.InvalidKeySpecException;
@@ -233,6 +237,41 @@ public class SecureUtils {
         return result;
     }
 
+    public static String hmacString(String key, String data, String algorithm, String encoding) {
+    	try {
+    		return hmacBytes(key.getBytes("utf-8"), data.getBytes("utf-8"), algorithm, encoding);
+    	} catch (UnsupportedEncodingException e) {
+    		throw new OXFException("Exception computing digest with algorithm: " + algorithm, e);
+    	}
+    }
+    
+    public static String hmacBytes(byte[] key, byte[] data, String algorithm, String encoding) {
+    	SecretKey secretKey;
+    	Mac mac;
+    	try {
+    		secretKey = new SecretKeySpec(key, algorithm);
+    		mac = Mac.getInstance("Hmac" + algorithm.toUpperCase().replace("-", ""));
+    		
+    		mac.init(secretKey);
+    	} catch (NoSuchAlgorithmException e) {
+    		throw new OXFException("Exception computing hmac with algorithm: " + algorithm, e);
+    	} catch (InvalidKeyException e) {
+    		throw new OXFException("Exception computing hmac with algorithm: " + algorithm, e);
+		}
+    	byte[] digestBytes = mac.doFinal(data);
+    	
+    	// Format result
+    	final String result;
+    	if ("base64".equals(encoding)) {
+    		result = Base64.encode(digestBytes);
+    	} else if ("hex".equals(encoding)) {
+    		result = byteArrayToHex(digestBytes);
+    	} else {
+    		throw new OXFException("Invalid digest encoding (must be one of 'base64' or 'hex'): " + encoding);
+    	}
+    	return result.replace("\n", "");
+    }
+    
     // As of 2009-03-11 XForms 1.1 says digits should be lowercase.
     private static final char[] HEXADECIMAL_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 

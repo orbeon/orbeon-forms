@@ -828,5 +828,58 @@
             </xxf:event-response>
         </output>
     </test>
+    
+    <test description="hmac() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                    </xforms:model>
+
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output1" value="hmac('key', 'abc', 'SHA-1', 'hex')"/>
+                    <xforms:output id="output2" value="hmac('key', 'abc', 'MD5', 'hex')"/>
+                    <xforms:output id="output3" value="hmac('key', 'abc', 'SHA-256', 'hex')"/>
+                    <xforms:output id="output4" value="hmac('key', 'abc', 'SHA-1', 'base64')"/>
+                    <xforms:output id="output5" value="hmac('key', 'abc', 'MD5', 'base64')"/>
+                    <xforms:output id="output6" value="hmac('key', 'abc', 'SHA-256', 'base64')"/>
+                    <xforms:output id="output7" value="hmac('key', 'abc', 'SHA-384', 'hex')"/>
+                    <xforms:output id="output8" value="hmac('key', 'abc', 'SHA-512', 'hex')"/>
+                    <xforms:output id="output9" value="hmac('key', 'abc', 'SHA-384', 'base64')"/>
+                    <xforms:output id="output10" value="hmac('key', 'abc', 'SHA-512', 'base64')"/>
+                    <xforms:output id="output11" value="hmac('key', 'abc', 'SHA-256')"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:dynamic-state>
+		        <dynamic-state>
+		            <instances/>
+		        </dynamic-state>
+		    </xxf:dynamic-state>
+            <xxf:action>
+                <xxf:control-values>
+                    <xxf:control id="output1">4fd0b215276ef12f2b3e4c8ecac2811498b656fc</xxf:control>
+                    <xxf:control id="output2">d2fe98063f876b03193afb49b4979591</xxf:control>
+                    <xxf:control id="output3">9c196e32dc0175f86f4b1cb89289d6619de6bee699e4c378e68309ed97a1a6ab</xxf:control>
+                    <xxf:control id="output4">T9CyFSdu8S8rPkyOysKBFJi2Vvw=</xxf:control>
+                    <xxf:control id="output5">0v6YBj+HawMZOvtJtJeVkQ==</xxf:control>
+                    <xxf:control id="output6">nBluMtwBdfhvSxy4konWYZ3mvuaZ5MN45oMJ7Zehpqs=</xxf:control>
+                    <xxf:control id="output7">30ddb9c8f347cffbfb44e519d814f074cf4047a55d6f563324f1c6a33920e5edfb2a34bac60bdc96cd33a95623d7d638</xxf:control>
+                    <xxf:control id="output8">3926a207c8c42b0c41792cbd3e1a1aaaf5f7a25704f62dfc939c4987dd7ce060009c5bb1c2447355b3216f10b537e9afa7b64a4e5391b0d631172d07939e087a</xxf:control>
+                    <xxf:control id="output9">MN25yPNHz/v7ROUZ2BTwdM9AR6Vdb1YzJPHGozkg5e37KjS6xgvcls0zqVYj19Y4</xxf:control>
+                    <xxf:control id="output10">OSaiB8jEKwxBeSy9PhoaqvX3olcE9i38k5xJh9184GAAnFuxwkRzVbMhbxC1N+mvp7ZKTlORsNYxFy0Hk54Ieg==</xxf:control>
+                    <xxf:control id="output11">nBluMtwBdfhvSxy4konWYZ3mvuaZ5MN45oMJ7Zehpqs=</xxf:control>
+                </xxf:control-values>
+            </xxf:action>
+        </xxf:event-response>
+        </output>
+    </test>
+
+    
 
 </group>

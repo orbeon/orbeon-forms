@@ -118,6 +118,13 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
+        // The hmac() function (XForms 1.1)
+        e = register("hmac", Hmac.class, 0, 3, 4, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 3, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        
         // The random() function (XForms 1.1)
         e = register("random", Random.class, 0, 0, 1, Type.NUMBER_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.BOOLEAN_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);

@@ -37,8 +37,8 @@ YAHOO.xbl.fr.Date.prototype = {
         yuiCalendar.selectEvent.subscribe(this.dateSelected, this, true);
         this.setLanguage();
         this.valueChanged();
-        this.propertyMindateChanged();
-        this.propertyMaxdateChanged();
+        this.parameterMindateChanged();
+        this.parameterMaxdateChanged();
         yuiCalendar.render();
     },
 

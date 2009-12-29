@@ -91,7 +91,7 @@
                             </xforms:trigger>
                             <!-- Markup with input for the YUI autocomplete -->
                             <xhtml:div xbl:attr="class style">
-                                <xforms:input model="autocomplete-model" ref="textfield-value" incremental="true" id="search" class="fr-autocomplete-search">
+                                <xforms:input model="autocomplete-model" ref="textfield-value" incremental="true" id="search" class="fr-autocomplete-search"  xbl:attr="tabindex accesskey">
                                     <xforms:action ev:event="xforms-value-changed">
                                         <!-- If the search value is empty, set the external value to empty as well -->
                                         <xforms:action if=". = ''">

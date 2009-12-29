@@ -81,6 +81,18 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         },
 
         /**
+         * Test that tabindex attribute is copied on the visible input field.
+         */
+        testHasTabIndex: function() {
+            // On the static autocomplete we have tabindex="1"
+            var staticVisibleInput = YAHOO.util.Dom.get("static-autocomplete").getElementsByTagName("input")[1];
+            YAHOO.util.Assert.areEqual("1", ORBEON.util.Dom.getAttribute(staticVisibleInput, "tabindex"));
+            // On the dynamic autocomplete we don't have a tabindex
+            var dynamicVisibleInput = YAHOO.util.Dom.get("dynamic-autocomplete").getElementsByTagName("input")[1];
+            YAHOO.util.Assert.areEqual(null, ORBEON.util.Dom.getAttribute(dynamicVisibleInput, "tabindex"));
+        },
+
+        /**
          * This test needs to be first, as we test that setting the label to Canada on xforms-ready by dispatching
          * the fr-set-label event, we indeed get the value 'ca' in the node bound to the control.
          */

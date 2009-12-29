@@ -46,7 +46,7 @@
             <xhtml:fieldset>
                 <xhtml:legend>Min/max dates</xhtml:legend>
                 <xhtml:div>
-                    <xforms:input ref="mindate">
+                    <xforms:input ref="mindate" tabindex="1">
                         <xforms:label>Min:</xforms:label>
                     </xforms:input>
                 </xhtml:div>
@@ -56,7 +56,7 @@
                     </xforms:input>
                 </xhtml:div>
                 <xhtml:div>
-                    <xforms:input ref="pagedate">
+                    <xforms:input ref="pagedate" tabindex="2">
                         <xforms:label>Page date:</xforms:label>
                     </xforms:input>
                 </xhtml:div>
@@ -71,7 +71,7 @@
                     </fr:date>
                 </xhtml:div>
                 <xhtml:div>
-                    <fr:date ref="date">
+                    <fr:date ref="date" tabindex="3" accesskey="F">
                         <xforms:label>Dynamic min:</xforms:label>
                         <fr:mindate ref="../mindate"/>
                     </fr:date>
@@ -83,7 +83,7 @@
                     </fr:date>
                 </xhtml:div>
                 <xhtml:div>
-                    <fr:date ref="date" mindate="2009-05-06" maxdate="2009-05-24">
+                    <fr:date ref="date" mindate="2009-05-06" maxdate="2009-05-24" tabindex="4">
                         <xforms:label>Static min/max:</xforms:label>
                     </fr:date>
                 </xhtml:div>

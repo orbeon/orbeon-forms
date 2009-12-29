@@ -64,6 +64,15 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         },
 
         /**
+         * Checks that the value in the search field is waht we expect it to be.
+         */
+        checkSearchValue: function(staticDynamic, expectedValue, message) {
+            var searchValue = ORBEON.xforms.Document.getValue(staticDynamic + "-autocomplete$search");
+            YAHOO.util.Assert.areEqual(expectedValue, searchValue, staticDynamic +
+                (YAHOO.lang.isUndefined(message) ? "" : " - " + message));
+        },
+
+        /**
          * Checks that the items we get in the suggestion list are the one we expect.
          */
         checkSuggestions: function(staticDynamic, expectedValues) {
@@ -89,7 +98,9 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             YAHOO.util.Assert.areEqual("1", ORBEON.util.Dom.getAttribute(staticVisibleInput, "tabindex"));
             // On the dynamic autocomplete we don't have a tabindex
             var dynamicVisibleInput = YAHOO.util.Dom.get("dynamic-autocomplete").getElementsByTagName("input")[1];
-            YAHOO.util.Assert.areEqual(null, ORBEON.util.Dom.getAttribute(dynamicVisibleInput, "tabindex"));
+            var noTabindex = ORBEON.util.Dom.getAttribute(dynamicVisibleInput, "tabindex");
+            // IE 6/7 returns 0, while other browsers returns null
+            YAHOO.util.Assert.isTrue(noTabindex == null || noTabindex == 0);
         },
 
         /**
@@ -197,6 +208,35 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             });
         },
         
+        testDoubleSpaceInLabel: function() {
+            this.runForStaticDynamic(function(staticDynamic, continuation) {
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    // By typing the full country name, we already check that the suggestion comes and that it is
+                    // not one of the 2 possibilities that is automatically selected
+                    this.simulateTypeInField(staticDynamic, "Virgin");
+                }, function() {
+                    ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                        // Click on the first Virgin Island
+                        this.simulateClickItem(staticDynamic, 0);
+                    }, function() {
+                        this.checkExternalValue(staticDynamic, "vq", "1st value (vq) selected when clicking on the 1st item in the list");
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            this.simulateTypeInField(staticDynamic, "Virgin");
+                        }, function() {
+                            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                                // Click on the second US
+                                this.simulateClickItem(staticDynamic, 1);
+                            }, function() {
+                                this.checkExternalValue(staticDynamic, "vq2", "2nd value (vq2) selected when clicking on the 2nd item in the list");
+                                this.checkSearchValue(staticDynamic, "Virgin  Islands");
+                                continuation.call(this);
+                            });
+                        });
+                    });
+                });
+            });
+        },
+
         /**
          * The max-results-displayed is set to 4 in the markup with an attribute for the static case and an element
          * for the dynamic case.

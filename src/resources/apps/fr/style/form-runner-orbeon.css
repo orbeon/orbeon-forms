@@ -86,7 +86,7 @@ p, fieldset, table { margin-bottom: 1em }
 /* ***** Other ****************************************************************************************************** */
 
 .fr-top, .fr-footer { background-repeat: no-repeat; clear: both }
-.fr-shadow { height: 10px; _height: 5px; font-size: 0 } /* help display background image */
+.fr-shadow { height: 10px; _height: 5px; font-size: 0; clear: both; } /* Clear is necessary because the previous block contains floated elements */
 .fr-footer { min-height: 10px } /* help display background image */
 /* IE 6 HACK in all the lines below: don't use the PNG background image as it doesn't show properly */
 #doc .fr-shadow { background-image: url(top-750.png); _background-image: none }

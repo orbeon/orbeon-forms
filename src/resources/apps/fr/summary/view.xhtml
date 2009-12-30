@@ -347,70 +347,7 @@
                 <xforms:insert context="instance('fr-buttons-instance')" origin="(for $b in $buttons return xxforms:element($b))"/>
             </xforms:action>
 
-            <xforms:action ev:event="fr-offline">
-                <xxforms:script ev:event="DOMActivate">
-                    frTakeOnlineOrOffline(false);
-                </xxforms:script>
-            </xforms:action>
-
-            <xforms:action ev:event="fr-online">
-                <xxforms:script ev:event="DOMActivate">
-                    frTakeOnlineOrOffline(true);
-                </xxforms:script>
-            </xforms:action>
         </xforms:model>
-        <xhtml:script type="text/javascript">
-            function frTakeOnlineOrOffline(isTakeOnline) {
-
-                // Figure out the URL of the form we want to take offline
-                var documentsRepeatIndex = ORBEON.xforms.Document.getRepeatIndex("documents-repeat");
-                var nameControlId = "fr-document-name" + XFORMS_SEPARATOR_1 + documentsRepeatIndex;
-                var name = ORBEON.xforms.Document.getValue(nameControlId);
-                var url = window.location.href + "/" + name + "/edit";
-
-                // Take if offline
-                if (isTakeOnline) {
-                    ORBEON.xforms.Document.takeOnlineFromSummary(url, function(formWindow) {
-                        formWindow.ORBEON.xforms.Document.dispatchEvent("fr-save-button", "DOMActivate");
-                    });
-                } else {
-                    ORBEON.xforms.Document.takeOfflineFromSummary(url);
-                }
-
-                // Update instance as this form is now offline
-                var offlineControlId = "fr-document-offline" + XFORMS_SEPARATOR_1 + documentsRepeatIndex;
-                ORBEON.xforms.Document.setValue(offlineControlId, isTakeOnline ? "false" : "true");
-
-                // Delete information we have in the database about form, if any
-                var database = google.gears.factory.create("beta.database");
-                database.open("orbeon.fr");
-                database.execute("create table if not exists Offline_Form_Info" +
-                    " (url text, name text, value text)");
-                database.execute("delete from Offline_Form_Info where url = ?", [url]);
-
-                // When taking form offline, also store latest information about the form in the database
-                if (!isTakeOnline) {
-                    var nameIndex = 1;
-                    // Iterate over columns in the summary table
-                    while (true) {
-
-                        // Get name for a given column
-                        var nameControlId = "input-fr-document-document-detail-id" + XFORMS_SEPARATOR_1 + nameIndex;
-                        if (ORBEON.util.Dom.getElementById(nameControlId) == null) break;
-                        var controlId = ORBEON.xforms.Document.getValue(nameControlId);
-                        var name = controlId.substring(0, controlId.indexOf("-control"));
-
-                        // Get value for a given column
-                        var valueControlId = "fr-document-document-detail-value" + XFORMS_SEPARATOR_1 + documentsRepeatIndex + XFORMS_SEPARATOR_2 + nameIndex;
-                        var value = ORBEON.xforms.Document.getValue(valueControlId);
-
-                        // Store this name/value pair in the database
-                        database.execute("insert into Offline_Form_Info (url, name, value) values (?, ?, ?)", [url, name, value]);
-                        nameIndex++;
-                    }
-                }
-            }
-        </xhtml:script>
     </head>
     <body>
         <!-- Whether this is the summary page for the form builder -->
@@ -613,13 +550,6 @@
                         <!-- Stop propagation of all the UI events here because we don't care about validity and visited properties -->
                         <xforms:action ev:event="#all" ev:propagate="stop"/>
 
-                        <xforms:group ref=".[document]">
-                            <!-- Display welcome message -->
-                            <xforms:output mediatype="text/html"
-                                           value="saxon:serialize($fr-resources/summary/messages/intro/node(), 'html')"
-                                           class="fr-summary-welcome-message"/>
-                        </xforms:group>
-
                         <xforms:group ref="instance('fr-paging-instance')[search-total != total]" class="fr-summary-search-count">
                             <xforms:output value="$fr-resources/summary/search/returned-1"/>
                             <xforms:output value="instance('fr-paging-instance')/search-total"/>
@@ -632,35 +562,43 @@
                         <xxforms:variable name="show-last-modified" select="xxforms:property(string-join(('oxf.fr.summary.show-last-modified', $app, $form), '.'))"/>
 
                         <div class="fr-summary-table-div">
-                            <table class="fr-summary-table">
-                            <!-- <fr:datatable-dyn scrollable="both" width="800px" height="500px"> -->
+                            <fr:datatable>
+                                <!-- scrollable="horizontal" width="940px" -->
                                 <thead>
                                     <tr>
-                                        <th class="fr-summary-repeat-selection-checkbox"/>
-                                        <th class="fr-summary-repeat-column-number" fr:sortable="true" fr:resizeable="true">
+                                        <th fr:sortable="false" class="fr-summary-repeat-selection-checkbox"/>
+                                        <th fr:sortable="false" class="fr-summary-repeat-column-number" fr:resizeable="true">
                                             <xforms:output value="$fr-resources/summary/titles/row-number"/>
                                         </th>
                                         <xforms:repeat nodeset="if ($show-created) then . else ()">
-                                            <th fr:sortable="true" fr:resizeable="true">
+                                            <th fr:sortable="false" fr:resizeable="true">
                                                 <xforms:output value="$fr-resources/summary/titles/created"/>
                                             </th>
                                         </xforms:repeat>
                                         <xforms:repeat nodeset="if ($show-last-modified) then . else ()">
-                                            <th fr:sortable="true" fr:resizeable="true">
+                                            <th fr:sortable="false" fr:resizeable="true">
                                                 <xforms:output value="$fr-resources/summary/titles/last-modified"/>
                                             </th>
                                         </xforms:repeat>
                                         <!-- Iterate through specially marked controls and derive resource id then resource -->
                                         <xforms:repeat nodeset="instance('fr-configuration-instance')/*[tokenize(@class, '\s+') = 'fr-summary']" id="fr-summary-repeat-column-number">
-                                            <th fr:sortable="true" fr:resizeable="true">
-                                                <xxforms:variable name="control-info" select="." as="element()"/>
-                                                <xxforms:variable name="resourceId" select="substring-before($control-info/@id, '-control')" as="xs:string"/>
-                                                <xxforms:variable name="resource" select="$form-resources/*[local-name() = $resourceId]" as="element()?"/>
-                                                <!-- control to make data accessible to JavaScript -->
-                                                <xforms:input ref="@id" id="fr-document-document-detail-id" class="fr-expose-to-javascript"/>
+                                            <th fr:sortable="false" fr:resizeable="true">
                                                 <!-- Output showing as the header of the column -->
-                                                <xforms:output value="if (exists($resource)) then $resource/label else if (normalize-space($control-info/xforms:label) != '') then $control-info/xforms:label else concat('[', $resourceId, ']')"/>
-
+                                                <xforms:output value="
+                                                    for 
+                                                        (: Current node is a control, such as xforms:input :)
+                                                        $control-info in .,
+                                                        (: Control has id='title-control', $resource-id = 'title' :)
+                                                        $resource-id in substring-before($control-info/@id, '-control'),
+                                                        (: Find resource for control id; will be empty string if node found :)
+                                                        $resource in ($form-resources/*[local-name() = $resource-id], '')[1]
+                                                    return
+                                                        (: If we found a resource, use its label :)
+                                                        if ($resource instance of element()) then $resource/label 
+                                                        (: If no resource is found, try to use the inline label :)
+                                                        else if (normalize-space($control-info/xforms:label) != '') then $control-info/xforms:label 
+                                                        (: If everything fails, display the name of the control between brakets :)
+                                                        else concat('[', $resource-id, ']')"/>
                                             </th>
                                         </xforms:repeat>
                                     </tr>
@@ -687,11 +625,6 @@
                                                 </xforms:select>
                                             </td>
                                             <td class="fr-summary-repeat-column-number">
-                                                <!-- Expose to JavaScript attribute that will be by JavaScript, telling us if the form if offline or online -->
-                                                <!-- This element must be present only when offline is supported -->
-                                                <!--<xforms:input ref="@offline" id="fr-document-offline" class="fr-expose-to-javascript"/>-->
-                                                <!-- Expose to JavaScript name of this form -->
-                                                <!--<xforms:input ref="@name" id="fr-document-name" class="fr-expose-to-javascript"/>-->
                                                 <xhtml:a href="{$document-href}" target="_blank">
                                                     <xforms:output value="$document-number"/>
                                                 </xhtml:a>
@@ -713,16 +646,6 @@
                                             <!-- One column for each detail -->
                                             <xforms:repeat nodeset="details/detail" id="document-details-repeat">
                                                 <td>
-                                                    <!-- control to make data accessible to JavaScript -->
-
-                                                    <!-- This element must be present only when offline is supported -->
-                                                    <!--<xforms:input ref="." id="fr-document-document-detail-value" class="fr-expose-to-javascript"/>-->
-
-                                                    <!--<xxforms:variable name="detail-position" select="position()" as="xs:integer"/>-->
-                                                    <!--<xxforms:variable name="query" select="instance('fr-search-instance')/query[$detail-position + 1]"/>-->
-                                                    <!--<xxforms:variable name="control" select="$query/@control" as="xs:string"/>-->
-                                                    <!--<xxforms:variable name="type" select="substring-after($query/@type, ':')" as="xs:string"/>-->
-
                                                     <xhtml:a href="{$document-href}" target="_blank">
                                                         <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
                                                         <xforms:output value="
@@ -770,16 +693,8 @@
                                         </tr>
                                     </xforms:group>
                                 </tbody>
-                            <!-- </fr:datatable-dyn> -->
-                            </table>
+                            </fr:datatable>
                         </div>
-
-                        <!--<p>-->
-                            <!--<xforms:output value="$fr-resources/summary/titles/selected"/>:-->
-                            <!--<xforms:output value="instance('fr-paging-instance')/from + index('documents-repeat') - 1"/>-->
-                            <!--<xforms:output value="$fr-resources/summary/titles/of"/>-->
-                            <!--<xforms:output value="instance('fr-paging-instance')/total"/>-->
-                        <!--</p>-->
 
                         <div class="fr-paging-buttons">
                             <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
@@ -944,20 +859,6 @@
                         <xforms:output ref="$fr-resources/summary/labels/view-xml"/>
                     </xforms:label>
                     <xforms:dispatch ev:event="DOMActivate" target="fr-persistence-model" name="fr-summary-xml"/>
-                </xforms:trigger>
-                <xforms:trigger ref="if (instance('fr-summary-instance')/document[index('documents-repeat')]/@offline = 'false') then . else ()">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/take-offline.gif" alt="Take offline"/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/offline"/></xhtml:span>
-                    </xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-offline"/>
-                </xforms:trigger>
-                <xforms:trigger ref="if (instance('fr-summary-instance')/document[index('documents-repeat')]/@offline = 'true') then . else ()">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/take-online.gif" alt="Take online"/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/online"/></xhtml:span>
-                    </xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" target="fr-form-model" name="fr-online"/>
                 </xforms:trigger>
                 -->
             </fr:bottom>

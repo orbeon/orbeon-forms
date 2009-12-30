@@ -65,7 +65,6 @@
                 <of>of</of>
             </paging>
             <messages>
-                <intro><i>Please select a document in order to perform an operation, or select "New" to create a new blank document.</i></intro>
                 <no-form-found><i>No form data was found.</i></no-form-found>
             </messages>
             <labels>
@@ -220,7 +219,6 @@
                 <of>sur</of>
             </paging>
             <messages>
-                <intro><i>Veuillez sélectionner un document avant d'effectuer une opération, ou sélectionnez "Nouveau" pour créer un nouveau document.</i></intro>
                 <no-form-found><i>Aucun formulaire trouvé.</i></no-form-found>
             </messages>
             <labels>
@@ -377,7 +375,6 @@
                 <of>de</of>
             </paging>
             <messages>
-                <intro><i>Por favor, seleccione un documento para llevar a cabo una operación, o seleccione "Nuevo" para crear un nuevo documento en blanco.</i></intro>
                 <no-form-found><i>No se encontró el formulario.</i></no-form-found>
             </messages>
             <labels>

@@ -26,16 +26,12 @@
     margin-bottom: .1em;
 }
 
-.fr-summary-table tbody tr.fr-summary-row-not-selected:hover { background-image: url(logo-bg.gif) }
-
-.fr-summary-row-selected { background-color: #e8e8ff }
-.fr-summary-row-selected .xforms-repeat-selected-item-2 { background-color: #e8e8ff }/* HACK for IE 7 only otherwise cell has different background color */
-
-.fr-summary-table .xforms-label { display: none }
-.fr-summary-table, .fr-summary-table td, .fr-summary-table th { border: 1px solid #6E6E6E }
-.fr-summary-table th { background-color: #f8f8f8 }
-.fr-summary-table td, .fr-summary-table th { padding: 4px }
-.fr-summary-table td a {
+.fr-summary-table-div tbody tr:hover td { background-color: #426FD9 }               /* Cursor over row: background is darker blue color from YUI */
+.fr-summary-table-div tbody tr:hover td a { color: #FFFFFF }                        /* Cursor over row: text color is white */
+.fr-summary-table-div tbody a { text-decoration: none; color: black; outline: 0 }   /* Links in table must appear as normal text */
+.fr-summary-table-div tr.yui-dt-selected td { background-color: transparent }       /* Override YUI class that highlights selected row */
+.fr-summary-table-div td { white-space: nowrap }                                    /* Mainly to prevent dates to wrap */
+.fr-summary-table-div td a {                                                        /* Link to take as much space as possible in the cell */
     width: 100%;
     display: -moz-inline-box;
     display: inline-block;
@@ -44,28 +40,9 @@
     vertical-align: middle;
 }
 
-.fr-summary-table-div {
-    overflow-x: auto;
-    overflow-y: hidden;
-    *padding-bottom: 17px;
-}
-
-/* Mainly to prevent dates to wrap */
-.fr-summary-table td { white-space: nowrap }
-
-/* Links in table must appear as normal text */
-.fr-summary-table tbody a { text-decoration: none; color: black; outline: 0 } /*inherit not supported by IE 6/7*/
-
-.fr-summary-table {
-    margin: 1px;/* shouldn't have to do this, but FF3 behaves funny otherwise */
-    border-collapse: collapse;
-    width: 99.5%;/* 100% causes FF 3 and IE 7 to still use a scrollbar; why? */
-}
-
-.fr-summary-welcome-message { display: block; margin-top: .5em; margin-bottom: .5em; clear: both }
 .fr-summary-search-count {  display: block; margin-top: 1em; margin-bottom: 1em }
 
-.fr-summary-search { display: block; margin: 1em 0 }
+.fr-summary-search { display: block; margin: 2em 0 }
 .fr-summary-search-item { float: left; margin-right: .5em }
 .fr-summary-search-item select, .fr-summary-search-item input { width: 12em }
 
@@ -81,7 +58,7 @@
 .fr-summary-search .fr-search-options-buttons a { vertical-align: middle; font-size: 77%; margin: 0 0 0 1em; }
 .fr-summary-search .xforms-label { font-weight: normal; }
 
-.fr-paging-buttons { padding-top: .5em }
+.fr-paging-buttons { padding: .5em 0 1em 0 }
 .fr-paging-buttons button { vertical-align: middle }
 .fr-paging-buttons button img { margin: 0 } /* as other buttons set an img margin */
 .fr-paging-numbers { vertical-align: middle; margin-left: .5em; margin-right: .5em }

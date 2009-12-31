@@ -947,6 +947,44 @@
         </output>
     </test>
 
+    <test description="power() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                    </xforms:model>
+
+                </xhtml:head>
+                <xhtml:body>
+                     <xforms:output id="output1" value="power(2,3)">
+                        <xforms:label>power(2,3) : </xforms:label>
+                     </xforms:output>
+                     <xforms:output id="output2" value="power(-1,0.5)">
+                        <xforms:label>power(-1,0.5) : </xforms:label>
+                     </xforms:output>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1" label="power(2,3) : ">8</xxf:control>
+                        <xxf:control id="output2" label="power(-1,0.5) : ">NaN</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     
 
 </group>

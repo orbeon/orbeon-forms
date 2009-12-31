@@ -78,6 +78,11 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // 7.8 Number Functions (avg(), min(), max() are implemented in XPath 2.0)
+        
+        e = register("power", Power.class, 0, 2, 2, Type.NUMBER_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.NUMBER_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 1, Type.NUMBER_TYPE, StaticProperty.EXACTLY_ONE);
+        
         e = register("count-non-empty", CountNonEmpty.class, 0, 1, 1, Type.INTEGER_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.ANY_ATOMIC_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 

@@ -1053,6 +1053,44 @@
         </output>
     </test>
 
+    <test description="days-to-date() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                    </xforms:model>
+
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output1" value="days-to-date(11688)">
+                        <xforms:label>Test 1 : </xforms:label>
+                    </xforms:output>
+                    <xforms:output id="output2" value="days-to-date(-1)">
+                        <xforms:label>Test 2 : </xforms:label>
+                    </xforms:output>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1" label="Test 1 : ">2002-01-01</xxf:control>
+                        <xxf:control id="output2" label="Test 2 : ">1969-12-31</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     
 
 </group>

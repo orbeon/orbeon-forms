@@ -107,6 +107,9 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("days-from-date", DaysFromDate.class, 0, 1, 1, Type.INTEGER_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
+        e = register("days-to-date", DaysToDate.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.INTEGER_TYPE, StaticProperty.EXACTLY_ONE);
+
         e = register("seconds-from-dateTime", SecondsFromDateTime.class, 0, 1, 1, Type.INTEGER_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 

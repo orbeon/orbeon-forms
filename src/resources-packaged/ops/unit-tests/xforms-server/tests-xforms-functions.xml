@@ -1091,6 +1091,84 @@
         </output>
     </test>
 
+    <test description="choose() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                        <xforms:instance xmlns="">
+                            <petlist>
+                                <dogs>
+                        
+                                    <dog name="Benji" />
+                                    <dog name="Cujo" />
+                                    <dog name="Lassie" />
+                                </dogs>
+                                <cats>
+                                    <cat name="Garfield" />
+                                    <cat name="Heathcliff" />
+                                    <cat name="Felix" />
+                                    <cat name="Tom" />
+                        
+                                </cats>
+                            </petlist>
+                        </xforms:instance>
+                                    
+                    </xforms:model>
+
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat nodeset="choose(count(dogs/dog) &gt; count(cats/cat), dogs/dog, cats/cat)">
+                        <xforms:output ref="@name">
+                            <xforms:label>Nodeset : </xforms:label>
+                        </xforms:output>
+                    </xforms:repeat>
+
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="xf-1" model-id="model1">
+                                <petlist>
+                                    <dogs>
+                                        <dog name="Benji"/>
+                                        <dog name="Cujo"/>
+                                        <dog name="Lassie"/>
+                                    </dogs>
+                                    <cats>
+                                        <cat name="Garfield"/>
+                                        <cat name="Heathcliff"/>
+                                        <cat name="Felix"/>
+                                        <cat name="Tom"/>
+                                    </cats>
+                                </petlist>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="xf-2" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="xf-2" parent-indexes="" start-suffix="2" end-suffix="4"/>
+                        <xxf:control id="xf-3·1" label="Nodeset : ">Garfield</xxf:control>
+                        <xxf:control id="xf-3·2" label="Nodeset : ">Heathcliff</xxf:control>
+                        <xxf:control id="xf-3·3" label="Nodeset : ">Felix</xxf:control>
+                        <xxf:control id="xf-3·4" label="Nodeset : ">Tom</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     
 
 </group>

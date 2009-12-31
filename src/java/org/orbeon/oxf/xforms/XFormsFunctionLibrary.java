@@ -66,6 +66,10 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         // 7.7 Boolean Functions
         e = register("boolean-from-string", BooleanFromString.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        
+        // 7.6.2 The is-card-number() Function
+        e = register("is-card-number", IsCardNumber.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // NOTE: Deprecated under this name. Use xxforms:if() instead
         e = register("xfif", If.class, 0, 3, 3, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);

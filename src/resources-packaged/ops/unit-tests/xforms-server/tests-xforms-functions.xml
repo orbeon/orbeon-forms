@@ -880,6 +880,73 @@
         </output>
     </test>
 
+    <test description="is-card-number() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                        <xforms:instance>
+                            <root>341111111111111</root>
+                        </xforms:instance>
+                    </xforms:model>
+
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output1" value="is-card-number('541234567890125')">
+                        <xforms:label>Test 1 : </xforms:label>
+                        <!-- must output true -->
+                    </xforms:output>
+                    <xforms:output id="output2" value="is-card-number('1002312234567990000')">
+                        <xforms:label>Test 2 : </xforms:label>
+                        <!-- must output true -->
+                    </xforms:output>
+                    <xforms:output id="output3" value="is-card-number(.)">
+                        <xforms:label>Test 3 : </xforms:label>
+                        <!-- must output true -->
+                    </xforms:output>
+                    <xforms:output id="output4" value="is-card-number('123456789012')">
+                        <xforms:label>Test 4 : </xforms:label>
+                        <!-- must output true -->
+                    </xforms:output>
+                    <xforms:output id="output5" value="is-card-number('123')">
+                        <xforms:label>Test 5 : </xforms:label>
+                        <!-- must output true -->
+                    </xforms:output>
+                    <xforms:output id="output6" value="is-card-number('12345a789012')">
+                        <xforms:label>Test 6 : </xforms:label>
+                        <!-- must output true -->
+                    </xforms:output>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="xf-1" model-id="model1">
+                                <root>341111111111111</root>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1" label="Test 1 : ">true</xxf:control>
+                        <xxf:control id="output2" label="Test 2 : ">true</xxf:control>
+                        <xxf:control id="output3" label="Test 3 : ">true</xxf:control>
+                        <xxf:control id="output4" label="Test 4 : ">false</xxf:control>
+                        <xxf:control id="output5" label="Test 5 : ">false</xxf:control>
+                        <xxf:control id="output6" label="Test 6 : ">false</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     
 
 </group>

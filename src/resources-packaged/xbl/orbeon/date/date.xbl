@@ -54,7 +54,7 @@
                             </xsl:when>
                             <!-- Standard case with text field-->
                             <xsl:otherwise>
-                                <xforms:input ref="."/>
+                                <xforms:input ref="." xbl:attr="tabindex accesskey"/>
                             </xsl:otherwise>
                         </xsl:choose>
                         <xbl:content includes="xforms|help,xforms|hint,xforms|alert"/>

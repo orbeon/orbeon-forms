@@ -228,9 +228,15 @@
                           select="(($source-form-metadata/logo,
                                     instance('fr-form-metadata')/logo,
                                     '{$default-logo-uri}')[normalize-space() != ''])[1]"/>
-
         <xsl:if test="$default-logo-uri">
-            <xforms:output class="fr-logo" value="$logo-uri" mediatype="image/*"/>
+            <!-- If image comes from resources, use an img tag so we can serve GIF for IE6 -->
+            <xxforms:variable name="is-logo-in-resources" select="starts-with($logo-uri, 'oxf:')"/>
+            <xforms:group ref=".[$is-logo-in-resources]">
+                <xhtml:img class="fr-logo" src="{{substring-after($logo-uri, 'oxf:')}}"/>
+            </xforms:group>
+            <xforms:group ref=".[not($is-logo-in-resources)]">
+                <xforms:output class="fr-logo" value="$logo-uri" mediatype="image/*"/>
+            </xforms:group>
         </xsl:if>
     </xsl:template>
 

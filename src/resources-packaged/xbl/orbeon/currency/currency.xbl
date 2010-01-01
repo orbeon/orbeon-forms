@@ -53,6 +53,12 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/currency/currency.css"/>
         </xbl:resources>
+        <!-- Commented out waiting for the XBL engine to "forward" focus events to components -->
+        <!-- <xbl:handlers>
+            <xbl:handler event="xforms-focus" phase="target">
+                <xforms:message level="xxforms:log-info">Got focus</xforms:message>
+            </xbl:handler>
+        </xbl:handlers> -->
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>

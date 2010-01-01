@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -1762,7 +1762,7 @@ public class XFormsUtils {
     /**
      * Append a new string to an effective id.
      *
-     *   foo$bar.1-2 and my-ending => foo$bar-my-ending.1-2
+     *   foo$bar.1-2 and -my-ending => foo$bar-my-ending.1-2
      *
      * @param effectiveId   base effective id
      * @param ending        new ending

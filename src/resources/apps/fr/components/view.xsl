@@ -586,37 +586,42 @@
         <!-- This is statically built in XSLT instead of using XForms -->
         <xsl:if test="$has-toc and $is-detail and not($is-form-builder) and count(/xhtml:html/xhtml:body//fr:section) ge $min-toc">
             <xhtml:div class="fr-toc">
-                <!-- Set context to fr-form-model for binds below -->
-                <xforms:group model="fr-form-model" appearance="xxforms:internal">
-                    <xhtml:h2>
-                        <xforms:output value="$fr-resources/summary/titles/toc"/>
-                    </xhtml:h2>
-                    <xhtml:ol>
-                        <xsl:for-each select="/xhtml:html/xhtml:body//fr:section">
-                            <!-- Reference bind so that entry for section disappears if the section is non-relevant -->
-                            <xsl:choose>
-                                <!-- TODO: must handle @ref/@bind/inline text -->
-                                <xsl:when test="@bind">
-                                    <xforms:group bind="{@bind}">
-                                        <xhtml:li>
-                                            <xhtml:a href="#{@id}"><xforms:output value="{xforms:label/@ref}"/></xhtml:a>
-                                            <!-- NOTE: Will have to add sub-sections when necessary -->
-                                        </xhtml:li>
-                                    </xforms:group>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xhtml:li>
-                                        <xhtml:a href="#{@id}"><xsl:value-of select="xforms:label"/></xhtml:a>
-                                        <!-- NOTE: Will have to add sub-sections when necessary -->
-                                    </xhtml:li>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </xsl:for-each>
-                    </xhtml:ol>
-                </xforms:group>
+                <xhtml:ol>
+                    <xsl:apply-templates mode="fr-toc-sections"/>
+                </xhtml:ol>
             </xhtml:div>
             <xhtml:div class="fr-separator">&#160;</xhtml:div>
         </xsl:if>
+    </xsl:template>
+
+    <xsl:template match="text()" mode="fr-toc-sections"/>
+    <xsl:template match="*" mode="fr-toc-sections"><xsl:apply-templates mode="fr-toc-sections"/></xsl:template>
+    <xsl:template match="fr:section" mode="fr-toc-sections">
+        <xsl:variable name="sub-sections">
+            <xsl:if test="exists(fr:section)">
+                <xhtml:ol>
+                    <xsl:apply-templates mode="fr-toc-sections"/>
+                </xhtml:ol>
+            </xsl:if>
+        </xsl:variable>
+        <!-- Reference bind so that entry for section disappears if the section is non-relevant -->
+        <xsl:choose>
+            <!-- TODO: must handle @ref/@bind/inline text -->
+            <xsl:when test="@bind">
+                <xforms:group bind="{@bind}">
+                    <xhtml:li>
+                        <xhtml:a href="#{@id}"><xforms:output value="{xforms:label/@ref}"/></xhtml:a>
+                        <xsl:copy-of select="$sub-sections"/>
+                    </xhtml:li>
+                </xforms:group>
+            </xsl:when>
+            <xsl:otherwise>
+                <xhtml:li>
+                    <xhtml:a href="#{@id}"><xsl:value-of select="xforms:label"/></xhtml:a>
+                    <xsl:copy-of select="$sub-sections"/>
+                </xhtml:li>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <!-- Add a default xforms:alert for those fields which don't have one. Only do this within grids and dialogs. -->

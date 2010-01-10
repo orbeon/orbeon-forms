@@ -1169,6 +1169,85 @@
         </output>
     </test>
 
-    
+    <test description="boolean-from-string() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+           <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ex="http://example.com">
+              <xhtml:head>
+                <xhtml:title>7.6.1.a boolean-from-string() function</xhtml:title>
+                <xhtml:link rel="stylesheet" href="/apps/xforms-test-suite/TestSuite11.css" type="text/css"/>
+                <xforms:model id="model1">
+                    <xforms:instance>
+                        <ex:driver>
+                            <ex:safe>true</ex:safe>
+                            <ex:experienced>TRUE</ex:experienced>
+                            <ex:insured>1</ex:insured>
+                            <ex:points>false</ex:points>
+                            <ex:accidents>FALSE</ex:accidents>
+                            <ex:mv_violation>0</ex:mv_violation>
+                            <ex:junk>3dod0</ex:junk>
+                        </ex:driver>
+                    </xforms:instance>
+                </xforms:model>
+              </xhtml:head>
+              <xhtml:body>
+                <xforms:output value="boolean-from-string(ex:safe)" id="xf-output-1">
+                    <xforms:label>Safe Driver : </xforms:label>
+                </xforms:output>
+                <xforms:output value="boolean-from-string(ex:experienced)" id="xf-output-2">
+                    <xforms:label>Experienced Driver : </xforms:label>
+                </xforms:output>
+                <xforms:output value="boolean-from-string(ex:insured)" id="xf-output-3">
+                    <xforms:label>Insured Driver : </xforms:label>
+                </xforms:output>
+                <xforms:output value="boolean-from-string(ex:points)" id="xf-output-4">
+                    <xforms:label>License Points : </xforms:label>
+                </xforms:output>
+                <xforms:output value="boolean-from-string(ex:accidents)" id="xf-output-5">
+                    <xforms:label>Accidents : </xforms:label>
+                </xforms:output>
+                <xforms:output value="boolean-from-string(ex:mv_violation)" id="xf-output-6">
+                    <xforms:label>Moving Violations : </xforms:label>
+                </xforms:output>
+                <xforms:output value="boolean-from-string(ex:junk)" id="xf-output-7">
+                    <xforms:label>Junk Instance Data : </xforms:label>
+                </xforms:output>
+                
+              </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="xf-2" model-id="model1">
+                                <ex:driver xmlns:ex="http://example.com">
+                                    <ex:safe>true</ex:safe>
+                                    <ex:experienced>TRUE</ex:experienced>
+                                    <ex:insured>1</ex:insured>
+                                    <ex:points>false</ex:points>
+                                    <ex:accidents>FALSE</ex:accidents>
+                                    <ex:mv_violation>0</ex:mv_violation>
+                                    <ex:junk>3dod0</ex:junk>
+                                </ex:driver>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="xf-output-1" label="Safe Driver : ">true</xxf:control>
+                        <xxf:control id="xf-output-2" label="Experienced Driver : ">true</xxf:control>
+                        <xxf:control id="xf-output-3" label="Insured Driver : ">true</xxf:control>
+                        <xxf:control id="xf-output-4" label="License Points : ">false</xxf:control>
+                        <xxf:control id="xf-output-5" label="Accidents : ">false</xxf:control>
+                        <xxf:control id="xf-output-6" label="Moving Violations : ">false</xxf:control>
+                        <xxf:control id="xf-output-7" label="Junk Instance Data : ">false</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>    
 
 </group>

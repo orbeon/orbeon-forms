@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -48,7 +48,7 @@
                                     </xforms:instance>
                                 </xforms:model>
                                 <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                                    <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms:alert"/>
+                                    <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
 
                                     <xforms:group id="component-inner-group" appearance="xxforms:internal" xxbl:scope="inner">
 
@@ -480,7 +480,7 @@
                                             </xforms:model>
 
                                             <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                                                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms:alert"/>
+                                                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
 
                                                 <xforms:group id="component-inner-group" appearance="xxforms:internal" xxbl:scope="inner">
 
@@ -3127,6 +3127,173 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="my-foobar$my-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Separate LHHA element in XBL content" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <foo1 label="My label">42</foo1>
+                            </instance>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xforms:group xbl:attr="ref" xxbl:scope="outer">
+                                    <!-- Here xforms:label and xforms:input are copied within an outer group -->
+                                    <xbl:content includes="xforms|label,xforms|input"/>
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:foo id="my-foo" ref="foo1">
+                        <xforms:label id="gaga-label" for="gaga" ref="@label"/>
+                        <xforms:input ref="." id="gaga"/>
+                    </fr:foo>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <foo1 label="My label">42</foo1>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-foo$gaga" label="My label">42</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Separate LHHA element in XBL content in inner-scoped group" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <foo1 label="My label">42</foo1>
+                            </instance>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xforms:group xbl:attr="ref" xxbl:scope="outer" id="outer-group">
+                                    <xxforms:variable name="result" xxbl:scope="inner">
+                                        <xxforms:sequence select="." xxbl:scope="outer"/>
+                                    </xxforms:variable>
+                                    <xforms:group xxbl:scope="inner" ref="$result" id="inner-group">
+                                        <!-- Here xforms:label and xforms:input are copied within an inner group -->
+                                        <xbl:content includes="xforms|label,xforms|input"/>
+                                    </xforms:group>
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:foo id="my-foo" ref="foo1">
+                        <xforms:label id="gaga-label" for="gaga" ref="@label"/>
+                        <xforms:input ref="." id="gaga"/>
+                    </fr:foo>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <foo1 label="My label">42</foo1>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-foo$gaga" label="My label">42</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Separate LHHA element with LHHA element outside copied XBL content" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <foo1 label="My label">42</foo1>
+                            </instance>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xforms:group xbl:attr="ref" xxbl:scope="outer">
+                                    <!-- xforms:input is copied within an outer group -->
+                                    <xbl:content includes="xforms|input"/>
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:label id="gaga-label" for="gaga" ref="foo1/@label"/>
+                    <fr:foo id="my-foo" ref="foo1">
+                        <xforms:input ref="." id="gaga"/>
+                    </fr:foo>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <foo1 label="My label">42</foo1>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-foo$gaga" label="My label">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

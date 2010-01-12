@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -346,21 +346,18 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 contextEffectiveId = container.getFirstControlEffectiveId();
             } else {
                 // Not at top-level, find containing object
-                final Object contextObject = container.resolveObjectById(getEffectiveId(), contextStaticId, null);
-                if (contextObject instanceof XFormsControl) {
-                    // Found context, evaluate relative to that
-                    final XFormsControl contextControl = (XFormsControl) contextObject;
-                    contextStack.setBinding(contextControl);
-                    contextEffectiveId = contextControl.getEffectiveId();
+                final XFormsControl ancestorContextControl = findAncestorContextControl(contextStaticId, lhhaElement.attributeValue("id"));
+                if (ancestorContextControl != null) {
+                    contextStack.setBinding(ancestorContextControl);
+                    contextEffectiveId = ancestorContextControl.getEffectiveId();
                 } else {
-                    // No context, don't evaluate (probably a misplaced LHHA element?)
                     contextEffectiveId = null;
                 }
             }
 
             if (contextEffectiveId != null) {
                 // Push binding relative to context established above and evaluate
-                contextStack.pushBinding(propertyContext, lhhaElement, contextEffectiveId, getChildElementScope(lhhaElement));
+                contextStack.pushBinding(propertyContext, lhhaElement, contextEffectiveId, getResolutionScope());
                 value = XFormsUtils.getElementValue(propertyContext, container, contextStack, getEffectiveId(), lhhaElement, acceptHTML, containsHTML);
                 contextStack.popBinding();
             } else {
@@ -369,6 +366,27 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             }
         }
         return value;
+    }
+
+    private XFormsControl findAncestorContextControl(String contextStaticId, String lhhaStaticId) {
+        // NOTE: LHHA element must be in the same resolution scope as the current control (since @for refers to @id)
+        final XBLBindings.Scope lhhaScope = getResolutionScope();
+        final String lhhaPrefixedId = lhhaScope.getPrefixedIdForStaticId(lhhaStaticId);
+
+        // Assume that LHHA element is within same repeat iteration as its related control
+        final String contextPrefixedId = XFormsUtils.getRelatedEffectiveId(lhhaPrefixedId, contextStaticId);
+        final String contextEffectiveId = contextPrefixedId + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
+        
+        Object ancestorObject = container.getContainingDocument().getObjectByEffectiveId(contextEffectiveId);
+        while (ancestorObject instanceof XFormsControl) {
+            final XFormsControl ancestorControl = (XFormsControl) ancestorObject;
+            if (ancestorControl.getResolutionScope() == lhhaScope) {
+                // Found ancestor in right scope
+                return ancestorControl;
+            }
+            ancestorObject = ancestorControl.getParent();
+        }
+        return null;
     }
 
     /**
@@ -642,7 +660,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
-        if (XFormsEvents.XXFORMS_REPEAT_FOCUS.equals(event.getEventName()) || XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
+        if (XFormsEvents.XXFORMS_REPEAT_FOCUS.equals(event.getEventName())
+                || XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
 
             // Try to update xforms:repeat indexes based on this
             {
@@ -688,6 +707,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 }
 
                 // Store new focus information for client
+                // TODO: remove this for improvements to grouping control focus
                 if (XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
                     containingDocument.setClientFocusEffectiveControlId(getEffectiveId());
                 }
@@ -922,8 +942,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             contextStack.setBinding(this);
 
             // Get function context
-            final XFormsFunction.Context functionContext = getFunctionContext();
-
             final String result = XPathCache.evaluateAsString(propertyContext, contextNodeset, bindingContext.getPosition(),
                                 xpathString, getNamespaceMappings(), bindingContext.getInScopeVariables(),
                                 XFormsContainingDocument.getFunctionLibrary(),
@@ -957,9 +975,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             // Reason is that XPath functions might use the context stack to get the current model, etc.
             final XFormsContextStack contextStack = getContextStack();
             contextStack.setBinding(this);
-
-            // Get function context
-            final XFormsFunction.Context functionContext = getFunctionContext();
 
             // Evaluate
             final String result = XPathCache.evaluateAsString(propertyContext, contextItem,

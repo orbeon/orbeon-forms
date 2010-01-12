@@ -11,11 +11,9 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
-    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xi="http://www.w3.org/2001/XInclude">
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget" xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <xhtml:head>
         <xhtml:title>Datatable</xhtml:title>
@@ -34,15 +32,14 @@
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript"
-            src="/xbl/orbeon/datatable/datatable-dynamic-unittest.js"/>
+        <xhtml:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-dynamic-unittest.js"/>
         <xhtml:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-unittest-lib.js"/>
 
     </xhtml:head>
     <xhtml:body>
 
-        <xhtml:p>Make sure you do a "shift reload" to restart the tests to get a fresh instance,
-            otherwise tests on sortable features will fail.</xhtml:p>
+        <xhtml:p>Make sure you do a "shift reload" to restart the tests to get a fresh instance, otherwise tests on sortable features will
+            fail.</xhtml:p>
 
         <xhtml:fieldset>
             <xhtml:legend>Datatable test controls</xhtml:legend>
@@ -88,16 +85,14 @@
                         <xforms:value>false</xforms:value>
                         </xforms:item>-->
                     <xforms:label>Loading in progress: </xforms:label>
-                    <xforms:help>Used by tests that check the loading indicator
-                        feature</xforms:help>
+                    <xforms:help>Used by tests that check the loading indicator feature</xforms:help>
                 </xforms:input>
             </xforms:group>
             <xhtml:ol>
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="open-all">
                         <xforms:label>Open all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion"
-                            name="fr-accordion-toggle-all">
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
                             <xxforms:context name="selected" select="true()"/>
                         </xforms:dispatch>
                     </xforms:trigger>
@@ -105,8 +100,7 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="close-all">
                         <xforms:label>Close all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion"
-                            name="fr-accordion-toggle-all">
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
                             <xxforms:context name="selected" select="false()"/>
                         </xforms:dispatch>
                     </xforms:trigger>
@@ -187,9 +181,52 @@
                 </xhtml:div>
             </fr:case>
 
+            <fr:case selected="true" id="mixed-variables">
+                <fr:label>An example of datatable mixing static and dynamic columns with variables</fr:label>
+                <xhtml:div>
+                    <xhtml:p/>
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <fr:datatable id="mixed-table-variables" debug="true">
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xhtml:th>Position</xhtml:th>
+                                    <xxforms:variable name="cpw">Characters per word</xxforms:variable>
+                                    <xforms:repeat nodeset="line[1]/*">
+                                        <xhtml:th>
+                                            <xforms:output value="name()"/>
+                                        </xhtml:th>
+                                    </xforms:repeat>
+                                    <xhtml:th>
+                                        <xforms:output value="$cpw"/>
+                                    </xhtml:th>
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="line[length &lt; 20]">
+                                    <xhtml:tr>
+                                        <xxforms:variable name="position" select="position()"/>
+                                        <xxforms:variable name="cpw" select="round(length div nb-words)"/>
+                                        <xhtml:td>
+                                            <xforms:output value="$position"/>
+                                        </xhtml:td>
+                                        <xforms:repeat nodeset="*">
+                                            <xhtml:td>
+                                                <xforms:output value="."/>
+                                            </xhtml:td>
+                                        </xforms:repeat>
+                                        <xhtml:td>
+                                            <xforms:output value="$cpw"/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
+
             <fr:case selected="true" id="mixed-two-columnsets">
-                <fr:label>An example of datatable mixing static and dynamic columns with 2 column
-                    sets</fr:label>
+                <fr:label>An example of datatable mixing static and dynamic columns with 2 column sets</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
                     <xforms:group ref="instance('detailed-lorem')">
@@ -234,8 +271,7 @@
             </fr:case>
 
             <fr:case selected="true" id="static">
-                <fr:label>An example of datatable with static columns using the dynamic
-                    code</fr:label>
+                <fr:label>An example of datatable with static columns using the dynamic code</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
                     <xforms:group ref="instance('detailed-lorem')">
@@ -317,8 +353,7 @@
                                         </xhtml:th>
                                     </xforms:repeat>
                                     <!-- TODO: see why we need fr:sortType="number" -->
-                                    <xhtml:th fr:sortable="true" fr:sortType="number">Characters per
-                                        word</xhtml:th>
+                                    <xhtml:th fr:sortable="true" fr:sortType="number">Characters per word</xhtml:th>
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
@@ -344,8 +379,7 @@
             </fr:case>
 
             <fr:case selected="true" id="sorted">
-                <fr:label>Testing sortable columns on a mixed datatable with a sorted
-                    column</fr:label>
+                <fr:label>Testing sortable columns on a mixed datatable with a sorted column</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
                     <xforms:group ref="instance('detailed-lorem')">
@@ -357,8 +391,7 @@
                                             <xforms:output value="name()"/>
                                         </xhtml:th>
                                     </xforms:repeat>
-                                    <xhtml:th fr:sortable="true" fr:sorted="ascending"
-                                        >position</xhtml:th>
+                                    <xhtml:th fr:sortable="true" fr:sorted="ascending">position</xhtml:th>
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
@@ -381,8 +414,7 @@
             </fr:case>
 
             <fr:case selected="true" id="sortableExternal">
-                <fr:label>Testing sortable columns on a mixed datatable processed by the
-                    application</fr:label>
+                <fr:label>Testing sortable columns on a mixed datatable processed by the application</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
                     <xforms:group ref="instance('detailed-lorem')">
@@ -398,11 +430,9 @@
                             xmlns:exf="http://www.exforms.org/exf/1-0"/>
 
 
-                        <fr:datatable id="sortableExternal-table" debug="true"
-                            sortAndPaginationMode="external">
+                        <fr:datatable id="sortableExternal-table" debug="true" sortAndPaginationMode="external">
                             <xforms:action ev:event="fr-update-sort">
-                                <xforms:setvalue ref="instance('controls')/sortedColumn"
-                                    value="event('fr-column')"/>
+                                <xforms:setvalue ref="instance('controls')/sortedColumn" value="event('fr-column')"/>
                                 <xforms:setvalue ref="$sortOrder"
                                     value="if ($sortOrder='ascending') then 'descending' else if ($sortOrder='descending') then 'none' else 'ascending'"
                                 />
@@ -447,8 +477,7 @@
                 <xhtml:div>
                     <xhtml:p/>
                     <xforms:group ref="instance('detailed-lorem')">
-                        <fr:datatable id="scrollH-table" debug="false" scrollable="horizontal"
-                            width="800px">
+                        <fr:datatable id="scrollH-table" debug="false" scrollable="horizontal" width="800px">
                             <xhtml:thead>
                                 <xhtml:tr>
                                     <xhtml:th>Position</xhtml:th>
@@ -500,8 +529,7 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat
-                                    nodeset="line[length &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
+                                <xforms:repeat nodeset="line[length &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="position()"/>
@@ -527,8 +555,7 @@
                 <xhtml:div>
                     <xhtml:p/>
                     <xforms:group ref="instance('detailed-lorem')">
-                        <fr:datatable id="paginate-table" debug="false" paginated="true"
-                            rowsPerPage="5">
+                        <fr:datatable id="paginate-table" debug="false" paginated="true" rowsPerPage="5">
                             <xhtml:thead>
                                 <xhtml:tr>
                                     <xhtml:th>Position</xhtml:th>
@@ -563,13 +590,11 @@
             </fr:case>
 
             <fr:case selected="true" id="paginateMaxPage">
-                <fr:label>Testing paginated tables with a maximum number of pages to
-                    display</fr:label>
+                <fr:label>Testing paginated tables with a maximum number of pages to display</fr:label>
                 <xhtml:div>
                     <xhtml:p/>
                     <xforms:group ref="instance('detailed-lorem')">
-                        <fr:datatable id="paginateMaxPage-table" debug="false" paginated="true"
-                            maxNbPagesToDisplay="7" rowsPerPage="4">
+                        <fr:datatable id="paginateMaxPage-table" debug="false" paginated="true" maxNbPagesToDisplay="7" rowsPerPage="4">
                             <xhtml:thead>
                                 <xhtml:tr>
                                     <xhtml:th>Position</xhtml:th>
@@ -609,14 +634,12 @@
                     <xhtml:p/>
                     <xforms:group ref="instance('detailed-lorem')">
                         <xxforms:variable name="nbRows" select="count(line)"/>
-                        <xxforms:variable name="rowsPerPage"
-                            select="instance('controls')/rowsPerPage"/>
+                        <xxforms:variable name="rowsPerPage" select="instance('controls')/rowsPerPage"/>
                         <xxforms:variable name="nbPages" select="ceiling($nbRows div $rowsPerPage)"/>
                         <xxforms:variable name="page" select="instance('controls')/page"/>
 
-                        <fr:datatable id="paginateExternal-table" debug="false" paginated="true"
-                            maxNbPagesToDisplay="7" sortAndPaginationMode="external" page="$page"
-                            nbPages="$nbPages">
+                        <fr:datatable id="paginateExternal-table" debug="false" paginated="true" maxNbPagesToDisplay="7"
+                            sortAndPaginationMode="external" page="$page" nbPages="$nbPages">
                             <xforms:action ev:event="fr-goto-page">
                                 <xforms:setvalue ref="$page" value="event('fr-new-page')"/>
                             </xforms:action>
@@ -632,8 +655,7 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat
-                                    nodeset="line[position() >= ($page - 1) * $rowsPerPage + 1 and position() &lt;= $page * $rowsPerPage]">
+                                <xforms:repeat nodeset="line[position() >= ($page - 1) * $rowsPerPage + 1 and position() &lt;= $page * $rowsPerPage]">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="position()"/>
@@ -658,13 +680,11 @@
             <fr:case selected="true" id="_314379">
                 <fr:label>Bug #314379</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
-                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314379&amp;group_id=168&amp;atid=350207"
-                            >#314379</xhtml:a>: Scrollable datatables with dynamic columns get
-                        desynchronized after de hide/show cycle</xhtml:p>
+                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314379&amp;group_id=168&amp;atid=350207"
+                            >#314379</xhtml:a>: Scrollable datatables with dynamic columns get desynchronized after de hide/show cycle</xhtml:p>
                     <xforms:group ref="instance('detailed-lorem')">
-                        <fr:datatable id="table-314379" scrollable="both" height="200px"
-                            width="600px" loading="xxforms:instance('controls')/loading = 'true'">
+                        <fr:datatable id="table-314379" scrollable="both" height="200px" width="600px"
+                            loading="xxforms:instance('controls')/loading = 'true'">
                             <xhtml:thead>
                                 <xhtml:tr>
                                     <xforms:repeat nodeset="line[1]/*">

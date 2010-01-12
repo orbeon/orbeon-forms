@@ -55,54 +55,102 @@ var testCase = {
     },
 
     testMixed: function() {
-        var thiss = this;
-        thiss.openAccordionCase(thiss, 'mixed', function() {
-            // Test significant values the first column
-            var div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·1');
-            thiss.checkColTypeValue(div, 'column');
-            thiss.checkColDebugValue(div, 'index', 1);
-            thiss.checkColDebugValue(div, 'position', undefined);
-            // Test significant values the column set
-            div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·2');
-            thiss.checkColTypeValue(div, 'columnSet');
-            thiss.checkColDebugValue(div, 'index', 2);
-            thiss.checkColDebugValue(div, 'nbColumns', 4);
-            thiss.checkColDebugValue(div, 'nodeset', '*');
-            // Test significant values from the second column
-            div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·3');
-            thiss.checkColTypeValue(div, 'column');
-            thiss.checkColDebugValue(div, 'index', 2);
-            thiss.checkColDebugValue(div, 'position', 1);
-            // Test significant values from the third column
-            div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·4');
-            thiss.checkColTypeValue(div, 'column');
-            thiss.checkColDebugValue(div, 'index', 3);
-            thiss.checkColDebugValue(div, 'position', 2);
-            // Test significant values from the fourth column
-            div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·5');
-            thiss.checkColTypeValue(div, 'column');
-            thiss.checkColDebugValue(div, 'index', 4);
-            thiss.checkColDebugValue(div, 'position', 3);
-            // Test significant values from the fifth column
-            div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·6');
-            thiss.checkColTypeValue(div, 'column');
-            thiss.checkColDebugValue(div, 'index', 5);
-            thiss.checkColDebugValue(div, 'position', 4);
-            // Test significant values from the sixth column
-            div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·7');
-            thiss.checkColTypeValue(div, 'column');
-            thiss.checkColDebugValue(div, 'index', 6);
-            thiss.checkColDebugValue(div, 'position', undefined);
+         var thiss = this;
+         thiss.openAccordionCase(thiss, 'mixed', function() {
+             // Test significant values the first column
+             var div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·1');
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 1);
+             thiss.checkColDebugValue(div, 'position', undefined);
+             // Test significant values the column set
+             div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·2');
+             thiss.checkColTypeValue(div, 'columnSet');
+             thiss.checkColDebugValue(div, 'index', 2);
+             thiss.checkColDebugValue(div, 'nbColumns', 4);
+             thiss.checkColDebugValue(div, 'nodeset', '*');
+             // Test significant values from the second column
+             div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·3');
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 2);
+             thiss.checkColDebugValue(div, 'position', 1);
+             // Test significant values from the third column
+             div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·4');
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 3);
+             thiss.checkColDebugValue(div, 'position', 2);
+             // Test significant values from the fourth column
+             div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·5');
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 4);
+             thiss.checkColDebugValue(div, 'position', 3);
+             // Test significant values from the fifth column
+             div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·6');
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 5);
+             thiss.checkColDebugValue(div, 'position', 4);
+             // Test significant values from the sixth column
+             div = YAHOO.util.Dom.get('my-accordion$mixed-table$debug-column·7');
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 6);
+             thiss.checkColDebugValue(div, 'position', undefined);
 
-            // Check the table structure
-            var table = YAHOO.util.Dom.get('my-accordion$mixed-table$mixed-table-table');
-            thiss.checkTableStructure(table, 6);
+             // Check the table structure
+             var table = YAHOO.util.Dom.get('my-accordion$mixed-table$mixed-table-table');
+             thiss.checkTableStructure(table, 6);
 
-            thiss.closeAccordionCase(thiss, 'mixed');
-        });
-    },
+             thiss.closeAccordionCase(thiss, 'mixed');
+         });
+     },
 
-    testMixedTwoColumsets: function() {
+    testMixedVariables: function() {
+         var thiss = this;
+         thiss.openAccordionCase(thiss, 'mixed-variables', function() {
+             // Test significant values the first column
+             var div = YAHOO.util.Dom.get('my-accordion$mixed-table-variables$debug-column·1');
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 1);
+             thiss.checkColDebugValue(div, 'position', undefined);
+             // Test significant values the column set
+             div = YAHOO.util.Dom.get('my-accordion$mixed-table-variables$debug-column·2');
+             thiss.checkColTypeValue(div, 'columnSet');
+             thiss.checkColDebugValue(div, 'index', 2);
+             thiss.checkColDebugValue(div, 'nbColumns', 4);
+             thiss.checkColDebugValue(div, 'nodeset', '*');
+             // Test significant values from the second column
+             div = YAHOO.util.Dom.get('my-accordion$mixed-table-variables$debug-column·3');
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 2);
+             thiss.checkColDebugValue(div, 'position', 1);
+             // Test significant values from the third column
+             div = YAHOO.util.Dom.get('my-accordion$mixed-table-variables$debug-column·4');
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 3);
+             thiss.checkColDebugValue(div, 'position', 2);
+             // Test significant values from the fourth column
+             div = YAHOO.util.Dom.get('my-accordion$mixed-table-variables$debug-column·5');
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 4);
+             thiss.checkColDebugValue(div, 'position', 3);
+             // Test significant values from the fifth column
+             div = YAHOO.util.Dom.get('my-accordion$mixed-table-variables$debug-column·6');
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 5);
+             thiss.checkColDebugValue(div, 'position', 4);
+             // Test significant values from the sixth column
+             div = YAHOO.util.Dom.get('my-accordion$mixed-table-variables$debug-column·7');
+             thiss.checkColTypeValue(div, 'column');
+             thiss.checkColDebugValue(div, 'index', 6);
+             thiss.checkColDebugValue(div, 'position', undefined);
+
+             // Check the table structure
+             var table = YAHOO.util.Dom.get('my-accordion$mixed-table$mixed-table-table');
+             thiss.checkTableStructure(table, 6);
+
+             thiss.closeAccordionCase(thiss, 'mixed-variables');
+         });
+     },
+
+     testMixedTwoColumsets: function() {
         var thiss = this;
         thiss.openAccordionCase(thiss, 'mixed-two-columnsets', function() {
             // Test significant values the first column set

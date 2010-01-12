@@ -53,6 +53,15 @@ var testCase = {
         });
     },
 
+    testVariables: function() {
+        var thiss = this;
+        thiss.openAccordionCase(this, 'variables', function(){
+            var table = YAHOO.util.Dom.get('my-accordion$table-variables$table-variables-table');
+            thiss.checkTableStructure(table, 2);
+            thiss.closeAccordionCase(thiss, 'variables');
+        });
+    },
+    
     EOS: ""
 };
 

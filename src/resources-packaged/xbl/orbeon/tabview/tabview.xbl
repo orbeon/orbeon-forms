@@ -28,6 +28,7 @@
          xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
  	<xbl:script type="text/javascript" src="/ops/yui/element/element-beta.js"/>
+    <xbl:script src="/xbl/orbeon/tabview/tabview.js"/>
     <xbl:script src="/ops/yui/tabview/tabview-min.js"/>
 
     <xbl:binding id="fr-tabview" element="fr|tabview">
@@ -49,7 +50,7 @@
                         <xsl:copy-of select="@class"/>
 
                         <!-- Initialization event -->
-                        <xxforms:script id="xf-en" ev:event="xforms-enabled" ev:target="fr-tabview-group">new YAHOO.widget.TabView(YAHOO.util.Dom.getElementsByClassName("yui-navset", null, this)[0]);</xxforms:script>
+                        <xxforms:script id="xf-en" ev:event="xforms-enabled" ev:target="fr-tabview-group">YAHOO.xbl.fr.TabView.instance(this).init();</xxforms:script>
 
                         <xhtml:div class="yui-navset">
                             <xhtml:ul class="yui-nav">
@@ -92,6 +93,17 @@
                                                 <!--<xforms:setvalue ev:event="fr-show" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">show</xforms:setvalue>-->
                                                 <!--<xforms:setvalue ev:event="fr-hide" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">hide</xforms:setvalue>-->
                                             </xsl:if>
+
+                                            <!-- Triggers by the JavaScript to notify the XForms code of events -->
+                                            <xforms:trigger id="fr-tabview-select-{position()}" class="fr-tabview-select-{position()}" style="display: none" xxbl:scope="inner">
+                                                <xforms:label/>
+                                                <xforms:dispatch ev:event="DOMActivate" name="fr-select" target="fr-tabview-select-{position()}"/>
+                                            </xforms:trigger>
+                                            <xforms:trigger id="fr-tabview-deselect-{position()}" class="fr-tabview-deselect-{position()}" style="display: none" xxbl:scope="inner">
+                                                <xforms:label/>
+                                                <xforms:dispatch ev:event="DOMActivate" name="fr-deselect" target="fr-tabview-deselect-{position()}"/>
+                                            </xforms:trigger>
+
                                             <xsl:apply-templates select="node() except fr:label"/>
                                         </xforms:group>
                                     </xhtml:div>

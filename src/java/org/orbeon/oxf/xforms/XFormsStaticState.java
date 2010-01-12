@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -947,6 +947,23 @@ public class XFormsStaticState {
         return currentAncestor;
     }
 
+    private boolean hasAncestorBinding(String prefix, Element element) {
+
+        if (xblBindings == null)
+            return false;
+
+        // Recurse until we find an element which is a binding
+        Element currentAncestor = element.getParent();
+        while (currentAncestor != null) {
+            if (xblBindings.hasBinding(prefix + currentAncestor.attributeValue("id"))) {
+                return true;
+            }
+            currentAncestor = currentAncestor.getParent();
+        }
+
+        return false;
+    }
+
     /**
      * Return true if the given element is an event observer. Must return true for controls, components, xforms:model,
      * xforms:instance, xforms:submission.
@@ -1148,7 +1165,7 @@ public class XFormsStaticState {
                 null, null, null, null, locationData);
 
             int lhhaCount = 0;
-            for (Iterator i = lhhaElements.iterator(); i.hasNext(); lhhaCount++) {
+            for (Iterator i = lhhaElements.iterator(); i.hasNext();) {
                 final NodeInfo currentNodeInfo = (NodeInfo) i.next();
                 final Element lhhaElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
@@ -1161,18 +1178,36 @@ public class XFormsStaticState {
                     controlPrefixedId = prefix + lhhaElement.getParent().attributeValue("id");
                 } else {
                     // Element has a @for attribute and is not within a core control
-                    controlPrefixedId = prefix + forAttribute;
+                    if (xblBindings != null) { // mmh, can bindings be null?
+
+                        if (hasAncestorBinding(prefix, lhhaElement)) {
+                            // Ignore content of bound elements
+                            controlPrefixedId = null;
+                        } else {
+                            // Find prefixed id of control with assumption that it is in the same scope as the LHHA element
+                            final XBLBindings.Scope lhhaScope = xblBindings.getResolutionScopeByPrefixedId(prefix + lhhaElement.attributeValue("id"));
+                            controlPrefixedId = lhhaScope.getPrefixedIdForStaticId(forAttribute);
+                        }
+                    } else {
+                        // Degenerate case where there are no XBL components
+                        controlPrefixedId = prefix + forAttribute;
+                    }
                 }
 
-                final String elementName = lhhaElement.getName();
-                if ("label".equals(elementName)) {
-                    labelsMap.put(controlPrefixedId, lhhaElement);
-                } else if ("help".equals(elementName)) {
-                    helpsMap.put(controlPrefixedId, lhhaElement);
-                } else if ("hint".equals(elementName)) {
-                    hintsMap.put(controlPrefixedId, lhhaElement);
-                } else if ("alert".equals(elementName)) {
-                    alertsMap.put(controlPrefixedId, lhhaElement);
+                if (controlPrefixedId != null) {
+
+                    lhhaCount++;
+
+                    final String elementName = lhhaElement.getName();
+                    if ("label".equals(elementName)) {
+                        labelsMap.put(controlPrefixedId, lhhaElement);
+                    } else if ("help".equals(elementName)) {
+                        helpsMap.put(controlPrefixedId, lhhaElement);
+                    } else if ("hint".equals(elementName)) {
+                        hintsMap.put(controlPrefixedId, lhhaElement);
+                    } else if ("alert".equals(elementName)) {
+                        alertsMap.put(controlPrefixedId, lhhaElement);
+                    }
                 }
             }
             indentedLogger.logDebug("", "extracted label, help, hint and alert elements", "count", Integer.toString(lhhaCount));

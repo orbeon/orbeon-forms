@@ -25,21 +25,36 @@
         <xforms:model id="my-model">
             <xforms:instance id="instance">
                 <instance>
+                    <tab relevant="false"/>
+                    <tab relevant="true"/>
+                    <tab relevant="true"/>
+                    <tab relevant="true"/>
                 </instance>
             </xforms:instance>
+            <xforms:bind nodeset="tab/@relevant" relevant=". = 'true'"/>
             <xforms:submission id="sleep-5-seconds" method="post"
                 action="/xforms-sandbox/service/sleep-5-seconds" serialization="none" replace="none"/>
-
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
+        <xforms:repeat nodeset="tab">
+            <fr:button>
+                <xforms:label>Toggle tab <xforms:output value="position()"/></xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="@relevant" value="if (. = 'true') then 'false' else 'true'"/>
+            </fr:button>
+        </xforms:repeat>
+
         <fr:tabview>
-            <fr:tab>
+            <fr:tab ref="tab[1]/@relevant">
                 <fr:label>First</fr:label>
                 Content of first tab.
             </fr:tab>
-            <fr:tab>
+            <fr:tab ref="tab[2]/@relevant">
                 <fr:label>Second</fr:label>
+                Content of second tab.
+            </fr:tab>
+            <fr:tab ref="tab[3]/@relevant">
+                <fr:label>Third</fr:label>
                 <xforms:action ev:event="fr-select">
                     <xforms:send submission="sleep-5-seconds"/>
                     <xforms:toggle case="data-loaded"/>
@@ -54,6 +69,10 @@
                         <xhtml:span>Data loaded.</xhtml:span>
                     </xforms:case>
                 </xforms:switch>
+            </fr:tab>
+            <fr:tab ref="tab[4]/@relevant">
+                <fr:label>Fourth</fr:label>
+                Content of fourth tab.
             </fr:tab>
         </fr:tabview>
     </xhtml:body>

@@ -27,21 +27,33 @@
                 <instance>
                 </instance>
             </xforms:instance>
+            <xforms:submission id="sleep-5-seconds" method="post"
+                action="/xforms-sandbox/service/sleep-5-seconds" serialization="none" replace="none"/>
+
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
         <fr:tabview>
             <fr:tab>
                 <fr:label>First</fr:label>
-                <xxforms:script ev:event="fr-select">console.log("First tab selected");</xxforms:script>
-                <xxforms:script ev:event="fr-deselect">console.log("First tab deselected");</xxforms:script>
-                First content.
+                Content of first tab.
             </fr:tab>
             <fr:tab>
                 <fr:label>Second</fr:label>
-                <xxforms:script ev:event="fr-select">console.log("Second tab selected");</xxforms:script>
-                <xxforms:script ev:event="fr-deselect">console.log("Second tab deselected");</xxforms:script>
-                Second content.
+                <xforms:action ev:event="fr-select">
+                    <xforms:send submission="sleep-5-seconds"/>
+                    <xforms:toggle case="data-loaded"/>
+                </xforms:action>
+                <xforms:switch>
+                    <xforms:case>
+                        <xhtml:img src="/ops/images/yui/loading.gif" style="vertical-align: middle"/>
+                        <xhtml:span>Loading data...</xhtml:span>
+                    </xforms:case>
+                    <xforms:case id="data-loaded">
+                        <xhtml:img src="/apps/fr/style/images/silk/tick.png" style="vertical-align: middle"/>
+                        <xhtml:span>Data loaded.</xhtml:span>
+                    </xforms:case>
+                </xforms:switch>
             </fr:tab>
         </fr:tabview>
     </xhtml:body>

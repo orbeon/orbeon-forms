@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -21,13 +21,8 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.ListIterator;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
-
-import java.util.Collections;
 
 public class XXFormsBinding extends XFormsFunction {
 
@@ -51,7 +46,7 @@ public class XXFormsBinding extends XFormsFunction {
             if (boundNode == null)
                 return EmptyIterator.getInstance();
 
-            return new ListIterator(Collections.singletonList(boundNode));
+            return SingletonIterator.makeIterator(boundNode);
         } else if (object instanceof XFormsContainerControl) {
             final XFormsControl control = (XFormsControl) object;
             final XFormsContextStack.BindingContext bindingContext = control.getBindingContext();

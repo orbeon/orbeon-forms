@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -20,7 +20,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.StringValue;
 
-import java.util.Collections;
 import java.util.List;
 
 
@@ -70,10 +69,10 @@ public class XFormsInsertEvent extends XFormsEvent {
             return (originItems == null) ? EmptyIterator.getInstance() : new ListIterator(originItems);
         } else if ("insert-location-node".equals(name)) {
             // "The insert location node as defined by the insert action."
-            return new ListIterator(Collections.singletonList(insertLocationNodeInfo));
+            return SingletonIterator.makeIterator(insertLocationNodeInfo);
         } else if ("position".equals(name)) {
             // "The insert position, before or after."
-            return new ListIterator(Collections.singletonList(new StringValue(position)));
+            return SingletonIterator.makeIterator(new StringValue(position));
         } else {
             return super.getAttribute(name);
         }

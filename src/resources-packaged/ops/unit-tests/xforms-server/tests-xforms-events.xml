@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -1179,6 +1179,117 @@
                         <xxf:control id="input1">42</xxf:control>
                         <xxf:control id="input2" relevant="false"/>
                         <xxf:control id="input3" readonly="true">Good value 3</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Test of capture, target, and bubbling phases" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <name>Ada</name>
+                            </instance>
+                        </xforms:instance>
+
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:dispatch name="my-event" targetid="my-input"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="my-group">
+                        <xforms:insert ev:event="my-event" ev:phase="capture"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('group1',
+                                                (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                 xxforms:attribute('phase', event('xxforms:phase')),
+                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                        <xforms:insert ev:event="my-event" ev:phase="target"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('group2',
+                                                (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                 xxforms:attribute('phase', event('xxforms:phase')),
+                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                        <xforms:insert ev:event="my-event" ev:phase="bubbling"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('group3',
+                                                (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                 xxforms:attribute('phase', event('xxforms:phase')),
+                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                        <xforms:insert ev:event="my-event" ev:phase="default"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('group4',
+                                                (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                 xxforms:attribute('phase', event('xxforms:phase')),
+                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+
+                        <xforms:input id="my-input" ref="name">
+                            <xforms:insert ev:event="my-event" ev:phase="capture"
+                                           context="instance('events')" nodeset="*"
+                                           origin="xxforms:element('input1',
+                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                     xxforms:attribute('phase', event('xxforms:phase')),
+                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                            <xforms:insert ev:event="my-event" ev:phase="target"
+                                           context="instance('events')" nodeset="*"
+                                           origin="xxforms:element('input2',
+                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                     xxforms:attribute('phase', event('xxforms:phase')),
+                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                            <xforms:insert ev:event="my-event" ev:phase="bubbling"
+                                           context="instance('events')" nodeset="*"
+                                           origin="xxforms:element('input3',
+                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                     xxforms:attribute('phase', event('xxforms:phase')),
+                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                            <xforms:insert ev:event="my-event" ev:phase="default"
+                                           context="instance('events')" nodeset="*"
+                                           origin="xxforms:element('input4',
+                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                     xxforms:attribute('phase', event('xxforms:phase')),
+                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                        </xforms:input>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <name>Ada</name>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <group1 type="my-event" phase="capture" target="my-input"/>
+                                    <input2 type="my-event" phase="target" target="my-input"/>
+                                    <input4 type="my-event" phase="target" target="my-input"/>
+                                    <group3 type="my-event" phase="bubbling" target="my-input"/>
+                                    <group4 type="my-event" phase="bubbling" target="my-input"/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input">Ada</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

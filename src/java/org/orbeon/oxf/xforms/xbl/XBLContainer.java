@@ -864,13 +864,14 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                         // Process event handlers
                         for (Object currentEventHandler: currentEventHandlers) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) currentEventHandler;
-                            if (eventHandler.isCapturePhase()
+                            if (eventHandler.isCapturePhaseOnly()
                                     && eventHandler.isMatchEventName(retargetedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
                                 // Capture phase match on event name and target is specified
                                 indentedLogger.startHandleOperation("dispatchEvent", "capture handler");
                                 containingDocument.startHandleEvent(retargetedEvent);
                                 try {
+                                    retargetedEvent.setCurrentPhase(XFormsEvent.Phase.capture);
                                     eventHandler.handleEvent(propertyContext, currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
                                 } finally {
                                     containingDocument.endHandleEvent();
@@ -957,13 +958,14 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     if (currentEventHandlers != null) {
                         for (Object currentEventHandler: currentEventHandlers) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) currentEventHandler;
-                            if ((eventHandler.isTargetPhase() && isAtTarget || !eventHandler.isCapturePhase() && !eventHandler.isTargetPhase() && originalEvent.isBubbles())
+                            if ((eventHandler.isTargetPhase() && isAtTarget || eventHandler.isBubblingPhase() && !isAtTarget && originalEvent.isBubbles())
                                     && eventHandler.isMatchEventName(retargetedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
                                 // Bubbling phase match on event name and target is specified
                                 indentedLogger.startHandleOperation("dispatchEvent", isAtTarget ? "target handler" : "bubble handler");
                                 containingDocument.startHandleEvent(retargetedEvent);
                                 try {
+                                    retargetedEvent.setCurrentPhase(isAtTarget ? XFormsEvent.Phase.target : XFormsEvent.Phase.bubbling);
                                     eventHandler.handleEvent(propertyContext, currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);
                                 } finally {
                                     containingDocument.endHandleEvent();

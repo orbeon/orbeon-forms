@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -20,9 +20,9 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.SingletonIterator;
 import org.orbeon.saxon.value.IntegerValue;
 
-import java.util.Collections;
 import java.util.List;
 
 
@@ -53,7 +53,7 @@ public class XFormsDeleteEvent extends XFormsEvent {
             return new ListIterator(deletedNodeInfos);
         } else if ("delete-location".equals(name)) {
             // "The delete location as defined by the delete action, or NaN if there is no delete location."
-            return (deleteIndex < 1) ? EmptyIterator.getInstance() : new ListIterator(Collections.singletonList(new IntegerValue(deleteIndex)));
+            return (deleteIndex < 1) ? EmptyIterator.getInstance() : SingletonIterator.makeIterator(new IntegerValue(deleteIndex));
         } else {
             return super.getAttribute(name);
         }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -23,11 +23,9 @@ import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.PathMap;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.SingletonIterator;
 import org.orbeon.saxon.trans.XPathException;
-
-import java.util.Collections;
 
 /**
  * xxforms:instance() function. This function operates like the standard instance() function, except that it looks for
@@ -58,7 +56,7 @@ public class XXFormsInstance extends XFormsFunction {
         // Return instance document if found
         if (instance != null) {
             // "this function returns a node-set containing just the root element node"
-            return new ListIterator(Collections.singletonList(instance.getInstanceRootElementInfo()));
+            return SingletonIterator.makeIterator(instance.getInstanceRootElementInfo());
         } else {
             // "an empty node-set is returned"
             getContainingDocument(xpathContext).getIndentedLogger(XFormsModel.LOGGING_CATEGORY).logWarning("xxforms:instance()", "instance not found", "instance id", instanceId);

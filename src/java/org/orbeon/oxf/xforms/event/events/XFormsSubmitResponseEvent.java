@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -66,12 +66,12 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
 
         if ("resource-uri".equals(name)) {
             // "The submission resource URI that succeeded/failed (xsd:anyURI)"
-            return new ListIterator(Collections.singletonList(new StringValue(resourceURI)));
+            return SingletonIterator.makeIterator(new StringValue(resourceURI));
         } else if ("response-status-code".equals(name)) {
             // "The protocol return code of the error response, or NaN if the failed submission did not receive an error
             // response."
             if (statusCode > 0)
-                return new ListIterator(Collections.singletonList(new IntegerValue(statusCode)));
+                return SingletonIterator.makeIterator(new IntegerValue(statusCode));
             else
                 return EmptyIterator.getInstance();// instead of returning NaN, we return an empty 
         } else if ("response-headers".equals(name)) {

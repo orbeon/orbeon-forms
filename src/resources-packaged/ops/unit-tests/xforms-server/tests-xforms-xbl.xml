@@ -916,7 +916,7 @@
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
-                                                             xxforms:attribute('phase', 'bubbling'),
+                                                             xxforms:attribute('phase', event('xxforms:phase')),
                                                              xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
                                                              xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
@@ -926,7 +926,7 @@
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
-                                                             xxforms:attribute('phase', 'capture'),
+                                                             xxforms:attribute('phase', event('xxforms:phase')),
                                                              xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
                                                              xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
@@ -950,7 +950,7 @@
                         <instances>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <event type="xforms-enabled" target="external-group" phase="bubbling" original-target="external-group" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="external-group" phase="target" original-target="external-group" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-foobar" phase="capture" original-target="internal-group" indexes="" original-indexes=""/>
                                     <event type="DOMActivate" target="my-foobar" phase="capture" original-target="internal-trigger-1" indexes="" original-indexes=""/>
                                     <event type="fr:my-event" target="my-foobar" phase="capture" original-target="my-foobar" indexes="" original-indexes=""/>
@@ -1529,7 +1529,7 @@
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
-                                                             xxforms:attribute('phase', 'bubbling'),
+                                                             xxforms:attribute('phase', event('xxforms:phase')),
                                                              xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
                                                              xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
@@ -1593,7 +1593,7 @@
                                     <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="bar-group" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
-                                    <event type="my-event" target="my-bar-1" phase="bubbling" original-target="my-bar-1" indexes="" original-indexes=""/>
+                                    <event type="my-event" target="my-bar-1" phase="target" original-target="my-bar-1" indexes="" original-indexes=""/>
                                     <event type="xforms-value-changed" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
                                     <event type="xforms-value-changed" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
                                 </events>
@@ -1609,7 +1609,7 @@
                                     <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="bar-group" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
-                                    <event type="my-event" target="my-bar-2" phase="bubbling" original-target="my-bar-2" indexes="" original-indexes=""/>
+                                    <event type="my-event" target="my-bar-2" phase="target" original-target="my-bar-2" indexes="" original-indexes=""/>
                                     <event type="xforms-value-changed" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
                                     <event type="xforms-value-changed" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
                                 </events>
@@ -1755,7 +1755,7 @@
                                                             (xxforms:attribute('observer', 'fr-level1-binding'),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
-                                                             xxforms:attribute('phase', 'bubbling'),
+                                                             xxforms:attribute('phase', event('xxforms:phase')),
                                                              xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
@@ -1784,7 +1784,7 @@
                                                             (xxforms:attribute('observer', 'fr-level2-binding'),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
-                                                             xxforms:attribute('phase', 'bubbling'),
+                                                             xxforms:attribute('phase', event('xxforms:phase')),
                                                              xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
@@ -1813,7 +1813,7 @@
                                                             (xxforms:attribute('observer', 'fr-level3-binding'),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
-                                                             xxforms:attribute('phase', 'bubbling'),
+                                                             xxforms:attribute('phase', event('xxforms:phase')),
                                                              xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
@@ -1844,7 +1844,7 @@
                                                             (xxforms:attribute('observer', 'main-group'),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
-                                                             xxforms:attribute('phase', 'bubbling'),
+                                                             xxforms:attribute('phase', event('xxforms:phase')),
                                                              xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
 
@@ -1866,17 +1866,17 @@
                         <instances>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <event observer="main-group" type="xforms-enabled" target="main-group" phase="bubbling" original-target="main-group" indexes=""/>
+                                    <event observer="main-group" type="xforms-enabled" target="main-group" phase="target" original-target="main-group" indexes=""/>
                                     <event observer="fr-level3-binding" type="xforms-enabled" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="fr-level2-binding" type="xforms-enabled" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
-                                    <event observer="fr-level1-binding" type="up-value1" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
-                                    <event observer="fr-level2-binding" type="up-value2" target="level2-component" phase="bubbling" original-target="level2-component" indexes="1"/>
-                                    <event observer="fr-level3-binding" type="up-value3" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
-                                    <event observer="fr-level3-binding" type="down-3" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
-                                    <event observer="fr-level2-binding" type="down-2" target="level2-component" phase="bubbling" original-target="level2-component" indexes="1"/>
-                                    <event observer="fr-level1-binding" type="down-1" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
+                                    <event observer="fr-level1-binding" type="up-value1" target="level1-component" phase="target" original-target="level1-component" indexes=""/>
+                                    <event observer="fr-level2-binding" type="up-value2" target="level2-component" phase="target" original-target="level2-component" indexes="1"/>
+                                    <event observer="fr-level3-binding" type="up-value3" target="level3-component" phase="target" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="fr-level3-binding" type="down-3" target="level3-component" phase="target" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="fr-level2-binding" type="down-2" target="level2-component" phase="target" original-target="level2-component" indexes="1"/>
+                                    <event observer="fr-level1-binding" type="down-1" target="level1-component" phase="target" original-target="level1-component" indexes=""/>
                                     <event observer="main-group" type="down-1" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
                                     <event observer="fr-level3-binding" type="DOMFocusIn" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="fr-level2-binding" type="DOMFocusIn" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>

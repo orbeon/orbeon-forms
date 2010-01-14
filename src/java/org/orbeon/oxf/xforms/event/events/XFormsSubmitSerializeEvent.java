@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -25,8 +25,6 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.StringValue;
-
-import java.util.Collections;
 
 /**
  * 4.1.1 The xforms-submit-serialize Event
@@ -70,16 +68,16 @@ public class XFormsSubmitSerializeEvent extends XFormsEvent {
 
             // Return document element
             final Item item = XXFormsElement.DOCUMENT_WRAPPER.wrap(submissionBodyElement);
-            return new ListIterator(Collections.singletonList(item));
+            return SingletonIterator.makeIterator(item);
         } else if (XXFORMS_BINDING_ATTRIBUTE.equals(name)) {
             // Return the node to which the submission is bound if any
             if (boundNode != null)
-                return new ListIterator(Collections.singletonList(boundNode));
+                return SingletonIterator.makeIterator(boundNode);
             else
                 return EmptyIterator.getInstance();
         } else if (XXFORMS_SERIALIZATION_ATTRIBUTE.equals(name)) {
             // Return the requested serialization
-            return new ListIterator(Collections.singletonList(new StringValue(requestedSerialization)));
+            return SingletonIterator.makeIterator(new StringValue(requestedSerialization));
         } else {
             return super.getAttribute(name);
         }

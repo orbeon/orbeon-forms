@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -21,12 +21,10 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.SingletonIterator;
 import org.orbeon.saxon.value.IntegerValue;
 import org.orbeon.saxon.value.StringValue;
-
-import java.util.Collections;
 
 /**
  * Base class for UI events.
@@ -61,7 +59,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
 
             // Return the node to which the control is bound
             if (targetXFormsControl instanceof XFormsSingleNodeControl) {
-                return new ListIterator(Collections.singletonList(((XFormsSingleNodeControl) targetXFormsControl).getBoundNode()));
+                return SingletonIterator.makeIterator(((XFormsSingleNodeControl) targetXFormsControl).getBoundNode());
             } else {
                 return EmptyIterator.getInstance();
             }
@@ -73,7 +71,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
 
             final String alert = targetXFormsControl.getAlert(getPipelineContext());
             if (alert != null)
-                return new ListIterator(Collections.singletonList(new StringValue(alert)));
+                return SingletonIterator.makeIterator(new StringValue(alert));
             else
                 return EmptyIterator.getInstance();
         } else if ("label".equals(name) || XXFORMS_LABEL_ATTRIBUTE.equals(name)) {
@@ -84,7 +82,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
 
             final String label = targetXFormsControl.getLabel(getPipelineContext());
             if (label != null)
-                return new ListIterator(Collections.singletonList(new StringValue(label)));
+                return SingletonIterator.makeIterator(new StringValue(label));
             else
                 return EmptyIterator.getInstance();
         } else if ("hint".equals(name) || XXFORMS_HINT_ATTRIBUTE.equals(name)) {
@@ -95,7 +93,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
 
             final String hint = targetXFormsControl.getHint(getPipelineContext());
             if (hint != null)
-                return new ListIterator(Collections.singletonList(new StringValue(hint)));
+                return SingletonIterator.makeIterator(new StringValue(hint));
             else
                 return EmptyIterator.getInstance();
         } else if ("help".equals(name) || XXFORMS_HELP_ATTRIBUTE.equals(name)) {
@@ -106,14 +104,14 @@ public abstract class XFormsUIEvent extends XFormsEvent {
 
             final String help = targetXFormsControl.getHelp(getPipelineContext());
             if (help != null)
-                return new ListIterator(Collections.singletonList(new StringValue(help)));
+                return SingletonIterator.makeIterator(new StringValue(help));
             else
                 return EmptyIterator.getInstance();
         } else if (XXFORMS_POSITION_ATTRIBUTE.equals(name)) {
             // Return the control's static position in the document
             final int controlStaticPosition = getContainingDocument().getStaticState().getControlPosition(targetXFormsControl.getPrefixedId()); 
             if (controlStaticPosition >= 0)
-                return new ListIterator(Collections.singletonList(new IntegerValue(controlStaticPosition)));
+                return SingletonIterator.makeIterator(new IntegerValue(controlStaticPosition));
             else
                 return EmptyIterator.getInstance();
         } else {

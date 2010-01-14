@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -18,11 +18,9 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.SingletonIterator;
 import org.orbeon.saxon.value.StringValue;
-
-import java.util.Collections;
 
 
 /**
@@ -48,7 +46,7 @@ public class XFormsDeselectEvent extends XFormsUIEvent {
         if (XFormsSelectEvent.XXFORMS_ITEM_VALUE.equals(name)) {
             // Return the selected item value
             if (itemValue != null)
-                return new ListIterator(Collections.singletonList(new StringValue(itemValue)));
+                return SingletonIterator.makeIterator(new StringValue(itemValue));
             else
                 return EmptyIterator.getInstance();
         } else {

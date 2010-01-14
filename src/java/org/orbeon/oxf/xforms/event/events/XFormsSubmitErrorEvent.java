@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -27,13 +27,12 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.SingletonIterator;
 import org.orbeon.saxon.value.StringValue;
 
 import java.io.*;
 import java.net.URL;
-import java.util.Collections;
 
 
 /**
@@ -192,15 +191,15 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
             // as a string. Otherwise, an empty string is returned."
 
             if (getBodyDocument() != null)
-                return new ListIterator(Collections.singletonList(getBodyDocument()));
+                return SingletonIterator.makeIterator(getBodyDocument());
             else if (getBodyString() != null)
-                return new ListIterator(Collections.singletonList(new StringValue(getBodyString())));
+                return SingletonIterator.makeIterator(new StringValue(getBodyString()));
             else
-                return new ListIterator(Collections.singletonList(StringValue.EMPTY_STRING));
+                return SingletonIterator.makeIterator(StringValue.EMPTY_STRING);
         } else if ("error-type".equals(name)) {
             // "One of the following: submission-in-progress, no-data, validation-error, parse-error, resource-error,
             // target-error."
-            return new ListIterator(Collections.singletonList(new StringValue(String.valueOf(errorType))));
+            return SingletonIterator.makeIterator(new StringValue(String.valueOf(errorType)));
         } else {
             return super.getAttribute(name);
         }

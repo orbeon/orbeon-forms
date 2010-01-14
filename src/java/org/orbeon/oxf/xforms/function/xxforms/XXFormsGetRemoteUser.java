@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -18,12 +18,10 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.SingletonIterator;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
-
-import java.util.Collections;
 
 /**
  * xxforms:get-remote-user() as xs:string*
@@ -43,7 +41,7 @@ public class XXFormsGetRemoteUser extends XFormsFunction {
         if (remoteUser == null) {
             return EmptyIterator.getInstance();
         } else {
-            return new ListIterator(Collections.singletonList(new StringValue(remoteUser)));
+            return SingletonIterator.makeIterator(new StringValue(remoteUser));
         }
     }
 }

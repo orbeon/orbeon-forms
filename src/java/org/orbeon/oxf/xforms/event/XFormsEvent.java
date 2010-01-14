@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -24,16 +24,16 @@ import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.ListIterator;
-import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.BooleanValue;
 import org.orbeon.saxon.value.SequenceExtent;
 import org.orbeon.saxon.value.StringValue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -46,6 +46,7 @@ public abstract class XFormsEvent implements Cloneable {
     private static final String XXFORMS_TARGETID_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "targetid");
     private static final String XXFORMS_BUBBLES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "bubbles");
     private static final String XXFORMS_CANCELABLE_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "cancelable");
+    private static final String XXFORMS_PHASE_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "phase");
 
     private static final String XXFORMS_REPEAT_INDEXES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
     private static final String XXFORMS_REPEAT_ANCESTORS_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-ancestors");
@@ -53,14 +54,9 @@ public abstract class XFormsEvent implements Cloneable {
 
     // Properties that change as the event propagates
     // TODO
-//    private static final String XXFORMS_PHASE_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "phase");
 //    private static final String XXFORMS_DEFAULT_PREVENTED_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "default-prevented");
 //    private static final String XXFORMS_CURRENT_TARGET_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "current-target");// same as observer?
 //    private static final String XXFORMS_OBSERVER_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "observer");
-//    See DOM 3 events for phase:
-//    const unsigned short      CAPTURING_PHASE                = 1;
-//    const unsigned short      AT_TARGET                      = 2;
-//    const unsigned short      BUBBLING_PHASE                 = 3;
 
     private XFormsEvent originalEvent;  // original event (for retargeted event)
 
@@ -69,6 +65,10 @@ public abstract class XFormsEvent implements Cloneable {
     private XFormsEventTarget targetObject;
     private final boolean bubbles;
     private final boolean cancelable;
+
+    public enum Phase { capture, target, bubbling }
+
+    private Phase currentPhase = Phase.capture;
 
     private Map<String, SequenceExtent> customAttributes;
 
@@ -81,6 +81,14 @@ public abstract class XFormsEvent implements Cloneable {
         this.targetObject = targetObject;
         this.bubbles = bubbles;
         this.cancelable = cancelable;
+    }
+
+    public Phase getCurrentPhase() {
+        return currentPhase;
+    }
+
+    public void setCurrentPhase(Phase currentPhase) {
+        this.currentPhase = currentPhase;
     }
 
     public XBLContainer getTargetXBLContainer() {
@@ -129,7 +137,7 @@ public abstract class XFormsEvent implements Cloneable {
                 getIndentedLogger().logWarning("", "event('target') is deprecated. Use event('xxforms:targetid') instead.");
             }
 
-            return new ListIterator(Collections.singletonList(new StringValue(targetObject.getId())));
+            return SingletonIterator.makeIterator(StringValue.makeStringValue(targetObject.getId()));
         } else if ("event".equals(name) || XXFORMS_TYPE_ATTRIBUTE.equals(name)) {// first is legacy name
             // Return the event type
 
@@ -137,13 +145,16 @@ public abstract class XFormsEvent implements Cloneable {
                 getIndentedLogger().logWarning("", "event('event') is deprecated. Use event('xxforms:type') instead.");
             }
 
-            return new ListIterator(Collections.singletonList(new StringValue(eventName)));
+            return SingletonIterator.makeIterator(StringValue.makeStringValue(eventName));
         } else if (XXFORMS_BUBBLES_ATTRIBUTE.equals(name)) {
             // Return whether the event bubbles
-            return new ListIterator(Collections.singletonList(BooleanValue.get(bubbles)));
+            return SingletonIterator.makeIterator(BooleanValue.get(bubbles));
         } else if (XXFORMS_CANCELABLE_ATTRIBUTE.equals(name)) {
             // Return whether the event is cancelable
-            return new ListIterator(Collections.singletonList(BooleanValue.get(cancelable)));
+            return SingletonIterator.makeIterator(BooleanValue.get(cancelable));
+        } else if (XXFORMS_PHASE_ATTRIBUTE.equals(name)) {
+            // Return the current event phase
+            return SingletonIterator.makeIterator(StringValue.makeStringValue(getCurrentPhase().name()));
         } else if (customAttributes != null && customAttributes.get(name) != null) {
             // Return custom attribute if found
             return (customAttributes.get(name)).iterate(null); // NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
@@ -162,7 +173,7 @@ public abstract class XFormsEvent implements Cloneable {
             if (parts.length > 0) {
                 final List<StringValue> tokens = new ArrayList<StringValue>(parts.length);
                 for (final Integer currentIndex: parts) {
-                    tokens.add(new StringValue(currentIndex.toString()));
+                    tokens.add(StringValue.makeStringValue(currentIndex.toString()));
                 }
                 return new ListIterator(tokens);
             } else {
@@ -183,8 +194,8 @@ public abstract class XFormsEvent implements Cloneable {
                         // Issue: it is more correct to provide a prefixed id, but it is wrong to surface prefixed ids
                         // to form authors. The error summary, e.g., relies on unique ids, and in that case returning
                         // a prefixed id would be better. How can we solve this better?
-//                        tokens.add(new StringValue(currentRepeat));
-                        tokens.add(new StringValue(XFormsUtils.getStaticIdFromId(currentRepeat)));
+//                        tokens.add(StringValue.makeStringValue(currentRepeat));
+                        tokens.add(StringValue.makeStringValue(XFormsUtils.getStaticIdFromId(currentRepeat)));
                     }
                     return new ListIterator(tokens);
                 } else {
@@ -203,7 +214,7 @@ public abstract class XFormsEvent implements Cloneable {
             if (parts.length > 0) {
                 final List<StringValue> tokens = new ArrayList<StringValue>(parts.length);
                 for (final String currentPart: parts) {
-                    tokens.add(new StringValue(currentPart));
+                    tokens.add(StringValue.makeStringValue(currentPart));
                 }
                 return new ListIterator(tokens);
             } else {
@@ -218,7 +229,7 @@ public abstract class XFormsEvent implements Cloneable {
     }
 
     protected void setAttributeAsString(String name, String value) {
-        setAttribute(name, new SequenceExtent(new Item[] { new StringValue(value) } ));
+        setAttribute(name, new SequenceExtent(new Item[] { StringValue.makeStringValue(value) } ));
     }
 
     protected String getAttributeAsString(String name) {

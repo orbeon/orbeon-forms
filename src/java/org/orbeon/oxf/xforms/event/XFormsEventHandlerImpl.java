@@ -42,8 +42,12 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     private final String[] observerStaticIds;
     private final Set<String> targetStaticIds;
     //private final String handler;
-    private final boolean isCapturePhase;         // "true" means "capture"
-    private final boolean isTargetPhase;          // "true" means "target"
+
+    // Phase filters
+    private final boolean isCapturePhase;
+    private final boolean isTargetPhase;
+    private final boolean isBubblingPhase;
+
     private final boolean isPropagate;            // "true" means "continue", "false" means "stop"
     private final boolean isPerformDefaultAction; // "true" means "perform", "false" means "cancel"
 
@@ -139,7 +143,9 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         }
 
         this.isCapturePhase = "capture".equals(phase);
-        this.isTargetPhase = "target".equals(phase);
+        this.isTargetPhase = "target".equals(phase) || "default".equals(phase) || phase == null;
+        this.isBubblingPhase = "bubbling".equals(phase) || "default".equals(phase) || phase == null;
+
         this.isPropagate = !"stop".equals(propagate);
         this.isPerformDefaultAction = !"cancel".equals(defaultAction);
     }
@@ -190,12 +196,16 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         return observerStaticIds;
     }
 
-    public boolean isCapturePhase() {
+    public boolean isCapturePhaseOnly() {
         return isCapturePhase;
     }
 
     public boolean isTargetPhase() {
         return isTargetPhase;
+    }
+
+    public boolean isBubblingPhase() {
+        return isBubblingPhase;
     }
 
     public boolean isPropagate() {

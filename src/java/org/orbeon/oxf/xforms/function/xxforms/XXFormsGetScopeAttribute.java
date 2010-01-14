@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
@@ -21,14 +21,13 @@ import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.EmptyIterator;
-import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.SingletonIterator;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.AtomicValue;
 import org.xml.sax.InputSource;
 
 import java.io.StringReader;
-import java.util.Collections;
 
 /**
  * Base class for xxforms:get-*-attribute() functions.
@@ -38,7 +37,7 @@ public abstract class XXFormsGetScopeAttribute extends XFormsFunction {
     protected SequenceIterator convertAttributeValue(Object attributeObject) throws XPathException {
         if (attributeObject instanceof AtomicValue) {
             // Found atomic value
-            return new ListIterator(Collections.singletonList(attributeObject));
+            return SingletonIterator.makeIterator((AtomicValue) attributeObject);
         } else if (attributeObject != null) {
             // Found something else, hopefully convertible to SAXStore
             final SAXStore saxStore;
@@ -53,7 +52,7 @@ public abstract class XXFormsGetScopeAttribute extends XFormsFunction {
             }
             // Convert to DocumentInfo
             final DocumentInfo documentInfo = TransformerUtils.saxStoreToTinyTree(saxStore);
-            return new ListIterator(Collections.singletonList(documentInfo));
+            return SingletonIterator.makeIterator(documentInfo);
         } else {
             // Empty result
             return EmptyIterator.getInstance();

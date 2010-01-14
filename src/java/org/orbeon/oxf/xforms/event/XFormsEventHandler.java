@@ -21,8 +21,10 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
  */
 public interface XFormsEventHandler {
 
-    boolean isCapturePhase();
+    boolean isCapturePhaseOnly();
     boolean isTargetPhase();
+    boolean isBubblingPhase();
+
     boolean isPropagate();
     boolean isPerformDefaultAction();
 

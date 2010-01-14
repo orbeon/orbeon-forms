@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
 
     YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
@@ -289,6 +302,27 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                         this.checkExternalValue(staticDynamic, "", "external value is empty string because Utopia does not exist in the itemset");
                         continuation.call(this);
                     });
+                });
+            });
+        },
+        testSetfocus: function() {
+            var staticAutocompleteInput = YAHOO.util.Dom.getElementsByClassName("yui-ac-input", null, "static-autocomplete")[0];
+            var dynamicAutocompleteInput = YAHOO.util.Dom.getElementsByClassName("yui-ac-input", null, "dynamic-autocomplete")[0];
+            var staticGotFocus = false;
+            var dynamicGotFocus = false;
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                YAHOO.util.Event.addFocusListener(staticAutocompleteInput, function() { staticGotFocus = true; }, this, true);
+                YAHOO.util.Event.addFocusListener(dynamicAutocompleteInput, function() { dynamicGotFocus = true; }, this, true);
+                YAHOO.util.UserAction.click(YAHOO.util.Dom.get("static-setfocus"));
+            }, function() {
+                YAHOO.util.Assert.isTrue(staticGotFocus);
+                YAHOO.util.Assert.isFalse(dynamicGotFocus);
+
+                ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                    YAHOO.util.UserAction.click(YAHOO.util.Dom.get("dynamic-setfocus"));
+                }, function() {
+                    YAHOO.util.Assert.isTrue(staticGotFocus);
+                    YAHOO.util.Assert.isTrue(dynamicGotFocus);
                 });
             });
         }

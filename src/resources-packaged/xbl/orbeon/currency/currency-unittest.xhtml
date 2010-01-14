@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -37,6 +37,7 @@
                     <repeat show="true">42</repeat>
                     <required-empty/>
                     <required-filled>42</required-filled>
+                    <setfocus>3.1415</setfocus>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="double" readonly="false()" calculate="for $value in ../value return if ($value castable as xs:decimal) then ../value * 2 else ''"/>
@@ -162,6 +163,15 @@
                 <xforms:label>Required filled</xforms:label>
                 <xforms:alert>Value is required</xforms:alert>
             </fr:currency>
+        </xhtml:div>
+        <xhtml:div>
+            <fr:currency ref="setfocus" id="setfocus" prefix="">
+                <xforms:label>Setfocus</xforms:label>
+            </fr:currency>
+            <xforms:trigger id="setfocus-trigger" appearance="minimal">
+                <xforms:label>Setfocus</xforms:label>
+                <xforms:setfocus ev:event="DOMActivate" control="setfocus"/>
+            </xforms:trigger>
         </xhtml:div>
     </xhtml:body>
 </xhtml:html>

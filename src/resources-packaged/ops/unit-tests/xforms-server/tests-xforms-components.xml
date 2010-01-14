@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -564,6 +564,189 @@
                         <xxf:control id="note-control·3" required="true" valid="false" label="Note" alert="Invalid note"/>
                         <xxf:control id="last-name-control" required="true" valid="false" label="Last name" alert="Invalid last name"/>
                     </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xforms:setfocus on fr:date" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <date>2010-01-13</date>
+                            </instance>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:setfocus control="my-date"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                    <xi:include href="oxf:/xbl/orbeon/date/date.xbl" xxi:omit-xml-base="true"/>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:date id="my-date" ref="date"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <date>2010-01-13</date>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-date$xf-7" class="xbl-fr-date-mindate"/>
+                        <xxf:attribute id="my-date$xf-7" for="my-date$xf-7" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-date$xf-9" class="xbl-fr-date-maxdate"/>
+                        <xxf:attribute id="my-date$xf-9" for="my-date$xf-9" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-date$xf-11" class="xbl-fr-date-pagedate"/>
+                        <xxf:attribute id="my-date$xf-11" for="my-date$xf-11" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-date$xf-12">2010-01-13</xxf:control>
+                    </xxf:control-values>
+                    <xxf:setfocus control-id="my-date$xf-7"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xforms:setfocus on fr:currency" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <currency>12.34</currency>
+                            </instance>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:setfocus control="my-currency"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                    <xi:include href="oxf:/xbl/orbeon/currency/currency.xbl" xxi:omit-xml-base="true"/>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:currency id="my-currency" ref="currency"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <currency>12.34</currency>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-currency$currency-input" class="xbl-fr-currency-xforms-input fr-hidden">12.34</xxf:control>
+                        <xxf:control id="my-currency$xf-11" class="xbl-fr-currency-prefix"/>
+                        <xxf:attribute id="my-currency$xf-11" for="my-currency$xf-11" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency$xf-13" class="xbl-fr-currency-digits-after-decimal"/>
+                        <xxf:attribute id="my-currency$xf-13" for="my-currency$xf-13" name="style">display: none</xxf:attribute>
+                    </xxf:control-values>
+                    <xxf:script name="my_currency_xf_6_xforms_function" target-id="my-currency$xf-5" observer-id="my-currency$xf-5"/>
+                    <xxf:script name="my_currency_xf_sf_xforms_function" target-id="my-currency" observer-id="my-currency"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xforms:setfocus on fr:autocomplete" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <value>One</value>
+                                <item>One</item>
+                                <item>Two</item>
+                                <item>Three</item>
+                            </instance>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:setfocus control="my-autocomplete"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                    <xi:include href="oxf:/xbl/orbeon/autocomplete/autocomplete.xbl" xxi:omit-xml-base="true"/>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:autocomplete id="my-autocomplete" ref="value" incremental="true" dynamic-itemset="true" >
+                        <xforms:itemset nodeset="../item">
+                            <xforms:label ref="."/>
+                            <xforms:value ref="."/>
+                        </xforms:itemset>
+                    </fr:autocomplete>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value>One</value>
+                                    <item>One</item>
+                                    <item>Two</item>
+                                    <item>Three</item>
+                                </instance>
+                            </instance>
+                            <instance id="autocomplete-instance" model-id="my-autocomplete$autocomplete-model">
+                                <autocomplete>
+                                    <textfield-value/>
+                                </autocomplete>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-autocomplete$xf-5" class="fr-autocomplete-container"/>
+                        <xxf:control id="my-autocomplete$itemset" class="fr-autocomplete-dynamic-itemset">true</xxf:control>
+                        <xxf:attribute id="my-autocomplete$itemset" for="my-autocomplete$itemset" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-autocomplete$xf-10" class="xbl-fr-autocomplete-max-results-displayed"/>
+                        <xxf:attribute id="my-autocomplete$xf-10" for="my-autocomplete$xf-10" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-autocomplete$select1" class="fr-autocomplete-select1">One</xxf:control>
+                        <xxf:attribute id="my-autocomplete$select1" for="my-autocomplete$select1" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-autocomplete$external-value" class="fr-autocomplete-external-value">One</xxf:control>
+                        <xxf:attribute id="my-autocomplete$external-value" for="my-autocomplete$external-value" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-autocomplete$value-selected" class="fr-autocomplete-value-selected"/>
+                        <xxf:attribute id="my-autocomplete$value-selected" for="my-autocomplete$value-selected" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-autocomplete$search" class="fr-autocomplete-search"/>
+                    </xxf:control-values>
+                    <xxf:itemsets>
+                        <xxf:itemset id="my-autocomplete$select1">[["One","One"],["Two","Two"],["Three","Three"],["One","One"],["Two","Two"],["Three","Three"]]</xxf:itemset>
+                    </xxf:itemsets>
+                    <xxf:script name="my_autocomplete_init_xforms_function" target-id="my-autocomplete$component-inner-group" observer-id="my-autocomplete$component-inner-group"/>
+                    <xxf:setfocus control-id="my-autocomplete$search"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

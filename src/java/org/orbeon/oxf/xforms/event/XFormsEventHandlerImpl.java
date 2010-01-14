@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -42,7 +42,8 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     private final String[] observerStaticIds;
     private final Set<String> targetStaticIds;
     //private final String handler;
-    private final boolean isBubblingPhase;        // "true" means "default" (bubbling), "false" means "capture"
+    private final boolean isCapturePhase;         // "true" means "capture"
+    private final boolean isTargetPhase;          // "true" means "target"
     private final boolean isPropagate;            // "true" means "continue", "false" means "stop"
     private final boolean isPerformDefaultAction; // "true" means "perform", "false" means "cancel"
 
@@ -137,7 +138,8 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
             }
         }
 
-        this.isBubblingPhase = !"capture".equals(phase);
+        this.isCapturePhase = "capture".equals(phase);
+        this.isTargetPhase = "target".equals(phase);
         this.isPropagate = !"stop".equals(propagate);
         this.isPerformDefaultAction = !"cancel".equals(defaultAction);
     }
@@ -188,8 +190,12 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         return observerStaticIds;
     }
 
-    public boolean isBubblingPhase() {
-        return isBubblingPhase;
+    public boolean isCapturePhase() {
+        return isCapturePhase;
+    }
+
+    public boolean isTargetPhase() {
+        return isTargetPhase;
     }
 
     public boolean isPropagate() {

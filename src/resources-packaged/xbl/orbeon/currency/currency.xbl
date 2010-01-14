@@ -55,7 +55,6 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="xforms-focus" phase="target" defaultAction="cancel">
-                <xforms:message level="xxforms:log-info">Got focus</xforms:message>
                 <xxforms:script id="xf-sf">YAHOO.xbl.fr.Currency.instance(this).setfocus();</xxforms:script>
             </xbl:handler>
         </xbl:handlers>

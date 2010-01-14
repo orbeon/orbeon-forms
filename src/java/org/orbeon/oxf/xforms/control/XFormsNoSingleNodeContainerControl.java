@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -90,5 +90,19 @@ public abstract class XFormsNoSingleNodeContainerControl extends XFormsControl i
                 currentControl.iterationRemoved(propertyContext);
             }
         }
+    }
+
+    @Override
+    public boolean setFocus() {
+        // "4.3.7 The xforms-focus Event [...] Setting the focus to a group or switch container form control set the
+        // focus to the first form control in the container that is able to accept focus"
+        if (children != null && children.size() > 0) {
+            for (XFormsControl currentControl: children) {
+                final boolean didSetFocus = currentControl.setFocus();
+                if (didSetFocus)
+                    return true;
+            }
+        }
+        return false;
     }
 }

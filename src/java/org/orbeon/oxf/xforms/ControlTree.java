@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -190,16 +190,18 @@ public class ControlTree implements Cloneable {
         final List<String> controlsEffectiveIds = new ArrayList<String>();
         visitChildrenControls(removedIteration, true, new XFormsControls.XFormsControlVisitorAdapter() {
             @Override
-            public void startVisitControl(XFormsControl control) {
+            public boolean startVisitControl(XFormsControl control) {
                 // Don't handle container controls here
                 if (!(control instanceof XFormsContainerControl))
                     controlsEffectiveIds.add(control.getEffectiveId());
+                return true;
             }
             @Override
-            public void endVisitControl(XFormsControl control) {
+            public boolean endVisitControl(XFormsControl control) {
                 // Add container control after all its children have been added
                 if (control instanceof XFormsContainerControl)
                     controlsEffectiveIds.add(control.getEffectiveId());
+                return true;
             }
         });
 
@@ -363,8 +365,9 @@ public class ControlTree implements Cloneable {
         final Map<String, XFormsControl> effectiveIdsToControls = new LinkedHashMap<String, XFormsControl>();
         visitChildrenControls(repeatIteration, true, new XFormsControls.XFormsControlVisitorAdapter() {
             @Override
-            public void startVisitControl(XFormsControl control) {
+            public boolean startVisitControl(XFormsControl control) {
                 effectiveIdsToControls.put(control.getEffectiveId(), control);
+                return true;
             }
         });
 
@@ -392,9 +395,10 @@ public class ControlTree implements Cloneable {
      */
     public void indexSubtree(XFormsContainerControl containerControl, boolean includeCurrent) {
         visitChildrenControls(containerControl, includeCurrent, new XFormsControls.XFormsControlVisitorAdapter() {
-            public void startVisitControl(XFormsControl control) {
+            public boolean startVisitControl(XFormsControl control) {
                 // Index control
                 controlIndex.indexControl(control);
+                return true;
             }
         });
     }
@@ -407,9 +411,10 @@ public class ControlTree implements Cloneable {
      */
     public void deindexSubtree(XFormsContainerControl containerControl, boolean includeCurrent) {
         visitChildrenControls(containerControl, includeCurrent, new XFormsControls.XFormsControlVisitorAdapter() {
-            public void startVisitControl(XFormsControl control) {
+            public boolean startVisitControl(XFormsControl control) {
                 // Deindex control
                 controlIndex.deindexControl(control);
+                return true;
             }
         });
     }
@@ -441,12 +446,13 @@ public class ControlTree implements Cloneable {
         final Map<String, Integer> repeatIdToIndex = new LinkedHashMap<String, Integer>();
 
         visitControlsFollowRepeats(new XFormsControls.XFormsControlVisitorAdapter() {
-            public void startVisitControl(XFormsControl control) {
+            public boolean startVisitControl(XFormsControl control) {
                 if (control instanceof XFormsRepeatControl) {
                     // Found xforms:repeat
                     final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
                     repeatIdToIndex.put(repeatControl.getPrefixedId(), ((XFormsRepeatControl.XFormsRepeatControlLocal) repeatControl.getInitialLocal()).getIndex());
                 }
+                return true;
             }
         });
 
@@ -462,12 +468,13 @@ public class ControlTree implements Cloneable {
         final Map<String, Integer> repeatIdToIndex = new LinkedHashMap<String, Integer>();
 
         visitControlsFollowRepeats(new XFormsControls.XFormsControlVisitorAdapter() {
-            public void startVisitControl(XFormsControl control) {
+            public boolean startVisitControl(XFormsControl control) {
                 if (control instanceof XFormsRepeatControl) {
                     // Found xforms:repeat
                     final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
                     repeatIdToIndex.put(repeatControl.getPrefixedId(), repeatControl.getIndex());
                 }
+                return true;
             }
         });
 
@@ -494,25 +501,40 @@ public class ControlTree implements Cloneable {
         handleControl(xformsControlVisitorListener, getChildren());
     }
 
-    private static void visitChildrenControls(XFormsContainerControl containerControl, boolean includeCurrent, XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener) {
-        if (includeCurrent) {
-            xformsControlVisitorListener.startVisitControl((XFormsControl) containerControl);
-        }
+    /**
+     * Visit all the descendant controls of the given container control.
+     */
+    public static void visitDescendantControls(XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener, XFormsContainerControl containerControl) {
         handleControl(xformsControlVisitorListener, containerControl.getChildren());
+    }
+
+    private static void visitChildrenControls(XFormsContainerControl containerControl, boolean includeCurrent, XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener) {
+        boolean doContinue;
+        if (includeCurrent) {
+            doContinue = xformsControlVisitorListener.startVisitControl((XFormsControl) containerControl);
+            if (!doContinue) return;
+        }
+        doContinue = handleControl(xformsControlVisitorListener, containerControl.getChildren());
+        if (!doContinue) return;
         if (includeCurrent) {
             xformsControlVisitorListener.endVisitControl((XFormsControl) containerControl);
         }
     }
 
-    private static void handleControl(XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener, List<XFormsControl> children) {
+    private static boolean handleControl(XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener, List<XFormsControl> children) {
         if (children != null && children.size() > 0) {
             for (XFormsControl currentControl: children) {
-                xformsControlVisitorListener.startVisitControl(currentControl);
-                if (currentControl instanceof XFormsContainerControl)
-                    handleControl(xformsControlVisitorListener, ((XFormsContainerControl) currentControl).getChildren());
-                xformsControlVisitorListener.endVisitControl(currentControl);
+                boolean doContinue = xformsControlVisitorListener.startVisitControl(currentControl);
+                if (!doContinue) return false;
+                if (currentControl instanceof XFormsContainerControl) {
+                    doContinue = handleControl(xformsControlVisitorListener, ((XFormsContainerControl) currentControl).getChildren());
+                    if (!doContinue) return false;
+                }
+                doContinue = xformsControlVisitorListener.endVisitControl(currentControl);
+                if (!doContinue) return false;
             }
         }
+        return true;
     }
 
     public XFormsControl getControl(String effectiveId) {
@@ -888,6 +910,7 @@ public class ControlTree implements Cloneable {
             if (isExistingIteration) {
                 // Mark the control as dirty so it gets reevaluated
                 repeatIterationControl.markDirty();
+                // NOTE: We don't need to call repeatIterationControl.setBindingContext() because XFormsRepeatControl/updateIterations() does it already
             }
 
             // Allow recursing into this iteration only if it is not a newly created iteration

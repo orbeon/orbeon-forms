@@ -638,4 +638,15 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         // Indicate to childrenAdded() that default index must not be set
         restoredState = true;
     }
+
+    @Override
+    public boolean setFocus() {
+        // "4.3.7 The xforms-focus Event [...] Setting focus to a repeat container form control sets the focus to the
+        // repeat object  associated with the repeat index"
+        if (getIndex() > 0) {
+            return getChildren().get(getIndex() - 1).setFocus();
+        } else {
+            return false;
+        }
+    }
 }

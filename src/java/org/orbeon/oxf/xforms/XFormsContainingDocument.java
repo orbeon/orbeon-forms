@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -899,7 +899,7 @@ public class XFormsContainingDocument extends XBLContainer {
 
         final XFormsControl xformsControl = (XFormsControl) getObjectByEffectiveId(focusEffectiveControlId);
         // It doesn't make sense to tell the client to set the focus to an element that is non-relevant or readonly
-        if (xformsControl != null && xformsControl instanceof XFormsSingleNodeControl) {
+        if (xformsControl instanceof XFormsSingleNodeControl) {
             final XFormsSingleNodeControl xformsSingleNodeControl = (XFormsSingleNodeControl) xformsControl;
             if (xformsSingleNodeControl.isRelevant() && !xformsSingleNodeControl.isReadonly())
                 return focusEffectiveControlId;
@@ -913,7 +913,7 @@ public class XFormsContainingDocument extends XBLContainer {
     /**
      * Tell the client that help must be shown for the given effective control id.
      *
-     * This can be called several times, but only the last controld id is remembered.
+     * This can be called several times, but only the last control id is remembered.
      *
      * @param effectiveControlId
      */

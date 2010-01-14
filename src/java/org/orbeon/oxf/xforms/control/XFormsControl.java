@@ -706,10 +706,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                     }
                 }
 
-                // Store new focus information for client
-                // TODO: remove this for improvements to grouping control focus
                 if (XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
-                    containingDocument.setClientFocusEffectiveControlId(getEffectiveId());
+                    // Focus on current control if possible
+                    setFocus();
                 }
             }
         } else if (XFormsEvents.XFORMS_HELP.equals(event.getEventName())) {
@@ -1156,5 +1155,15 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 return false;
         }
         return true;
+    }
+
+    /**
+     * Set the focus on this control.
+     *
+     * @return  true iif control accepted focus
+     */
+    public boolean setFocus() {
+        // By default, a control doesn't accept focus
+        return false;
     }
 }

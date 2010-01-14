@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -145,8 +145,9 @@ public class XFormsControls implements XFormsObjectResolver {
 
                 // Need to make sure that current == initial within controls
                 visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
-                    public void startVisitControl(XFormsControl control) {
+                    public boolean startVisitControl(XFormsControl control) {
                         control.resetLocal();
+                        return true;
                     }
                 });
 
@@ -174,7 +175,7 @@ public class XFormsControls implements XFormsObjectResolver {
     public void serializeControls(Element dynamicStateElement) {
         final Element controlsElement = Dom4jUtils.createElement("controls");
         visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
-            public void startVisitControl(XFormsControl control) {
+            public boolean startVisitControl(XFormsControl control) {
                 final Map nameValues = control.serializeLocal();
                 if (nameValues != null) {
                     final Element controlElement = controlsElement.addElement("control");
@@ -184,6 +185,7 @@ public class XFormsControls implements XFormsObjectResolver {
                         controlElement.addAttribute((String) currentEntry.getKey(), (String) currentEntry.getValue());
                     }
                 }
+                return true;
             }
         });
         // Only add the element if necessary
@@ -575,20 +577,20 @@ public class XFormsControls implements XFormsObjectResolver {
     }
 
     public static interface XFormsControlVisitorListener {
-        public void startVisitControl(XFormsControl control);
-        public void endVisitControl(XFormsControl control);
+        public boolean startVisitControl(XFormsControl control);
+        public boolean endVisitControl(XFormsControl control);
     }
 
     public static class XFormsControlVisitorAdapter implements XFormsControlVisitorListener {
-        public void startVisitControl(XFormsControl control) {}
-        public void endVisitControl(XFormsControl control) {}
+        public boolean startVisitControl(XFormsControl control) { return true; }
+        public boolean endVisitControl(XFormsControl control) { return true; }
     }
 
     /**
      * Get the items for a given control id. This is not an effective id, but an original control id.
      *
      * @param controlId     original control id
-     * @return              List of Item
+     * @return              itemset
      */
     public Itemset getConstantItems(String controlId) {
         if (constantItems == null)
@@ -601,12 +603,12 @@ public class XFormsControls implements XFormsObjectResolver {
      * Set the items for a given control id. This is not an effective id, but an original control id.
      *
      * @param controlId     static control id
-     * @param items         List<Item>
+     * @param itemset       itemset
      */
-    public void setConstantItems(String controlId, Itemset items) {
+    public void setConstantItems(String controlId, Itemset itemset) {
         if (constantItems == null)
             constantItems = new HashMap<String, Itemset>();
-        constantItems.put(controlId, items);
+        constantItems.put(controlId, itemset);
     }
     
     public void doRefresh(final PropertyContext propertyContext, XBLContainer container) {
@@ -660,10 +662,11 @@ public class XFormsControls implements XFormsObjectResolver {
 
         // Iterate through controls and check the nodes they are bound to
         visitAllControls(new XFormsControlVisitorAdapter() {
-            public void startVisitControl(XFormsControl control) {
+            public boolean startVisitControl(XFormsControl control) {
                 if (XFormsControl.supportsRefreshEvents(control)) {// test here just to make smaller list
                     eventsToDispatch.add(control.getEffectiveId());
                 }
+                return true;
             }
         });
 

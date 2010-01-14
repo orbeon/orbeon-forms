@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -73,8 +73,8 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
         final Map<String, Map<String, List<String>>> javaScriptControlsAppearancesMap = new HashMap<String, Map<String, List<String>>>();
         {
             final XFormsControls xformsControls = containingDocument.getControls();
-            xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
-                public void startVisitControl(XFormsControl control) {
+            xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
+                public boolean startVisitControl(XFormsControl control) {
                     final String controlName = control.getName();
 
                     // Don't run JavaScript initialization if the control is static readonly (could change in the
@@ -99,9 +99,8 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         }
                         idsForAppearanceOrMediatypeList.add(control.getEffectiveId());
                     }
+                    return true;
                 }
-
-                public void endVisitControl(XFormsControl xformsControl) {}
             });
         }
 

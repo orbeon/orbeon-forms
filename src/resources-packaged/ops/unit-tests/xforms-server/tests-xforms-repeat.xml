@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -2165,6 +2165,80 @@
                         <xxf:control id="input·1">New item</xxf:control>
                         <xxf:control id="output-group·1" relevant="false"/>
                         <xxf:control id="output·1" relevant="false"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Repeat iteration update upon nodeset shuffle with exf:sort()" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <event>000000000000</event>
+                                <event>000000000001</event>
+                            </instance>
+                        </xforms:instance>
+
+                        <xforms:instance id="other">
+                            <instance xmlns="">
+                                <order>ascending</order>
+                                <selection/>
+                                <index/>
+                            </instance>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:refresh/>
+                            <xforms:setvalue ref="instance('other')/order">descending</xforms:setvalue>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat nodeset="exf:sort(event, '.', 'text', instance('other')/order)" id="my-repeat">
+                        <xforms:action ev:event="xxforms-nodeset-changed">
+                            <xforms:setvalue ref="instance('other')/selection" value="xxforms:repeat-nodeset('my-repeat')[index('my-repeat')]"/>
+                            <xforms:setvalue ref="instance('other')/index" value="index('my-repeat')"/>
+                        </xforms:action>
+                        <xforms:output ref="." id="my-output"/>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <event>000000000000</event>
+                                    <event>000000000001</event>
+                                </instance>
+                            </instance>
+                            <instance id="other" model-id="model">
+                                <instance>
+                                    <order>descending</order>
+                                    <selection>000000000000</selection>
+                                    <index>2</index>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
+                        <xxf:control id="my-output·1">000000000001</xxf:control>
+                        <xxf:control id="my-output·2">000000000000</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
 
     var emptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "empty")[0];
@@ -188,6 +201,16 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                     // Check it is now marked valid and filled
                     checkClasses(requiredEmptyGroup, false, true, false, true, "after filled empty");
                 });
+            });
+        },
+        testSetfocus: function() {
+            var setfocusInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, "setfocus")[0];
+            var gotFocus = false;
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                YAHOO.util.Event.addFocusListener(setfocusInput, function() { gotFocus = true; }, this, true);
+                YAHOO.util.UserAction.click(YAHOO.util.Dom.get("setfocus-trigger"));
+            }, function() {
+                YAHOO.util.Assert.isTrue(gotFocus);
             });
         }
     }));

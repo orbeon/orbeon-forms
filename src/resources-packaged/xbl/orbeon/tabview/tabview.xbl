@@ -25,6 +25,7 @@
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
  	<xbl:script type="text/javascript" src="/ops/yui/element/element-beta.js"/>
@@ -35,6 +36,16 @@
         <xbl:resources>
             <xbl:style src="/ops/yui/tabview/assets/skins/sam/tabview.css"/>
         </xbl:resources>
+        <xbl:implementation>
+            <!-- Local model -->
+            <xforms:model id="tabview-model">
+                <xforms:instance id="tabview-instance">
+                    <tabview-instance>
+                        <index-of-first-relevant-tab/>
+                    </tabview-instance>
+                </xforms:instance>
+            </xforms:model>
+        </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
@@ -52,14 +63,31 @@
                         <!-- Initialization event -->
                         <xxforms:script id="xf-en" ev:event="xforms-enabled" ev:target="fr-tabview-group">YAHOO.xbl.fr.TabView.instance(this).init();</xxforms:script>
 
+                        <!-- Builds relevance-related variables for each tab -->
+                        <xsl:for-each select="fr:tab">
+                            <!-- Point to whatever the fr:tab is bound to, if anything -->
+                            <xxforms:variable name="fr-tab-binding-{position()}">
+                                <xxforms:sequence xxbl:scope="outer" select=".">
+                                    <xsl:copy-of select="@model | @context | @ref | @bind"/>
+                                </xxforms:sequence>
+                            </xxforms:variable>
+                            <!--  Is this tab relevant -->
+                            <xxforms:variable name="fr-tab-relevance-{position()}"
+                                select="exists($fr-tab-binding-{position()}) and exf:relevant($fr-tab-binding-{position()})"/>
+                        </xsl:for-each>
+
+                        <!-- Contains the relevance for all the tabs as a sequence of boolean values -->
+                        <xxforms:variable name="fr-tab-relevances" select="({string-join(
+                                for $tab-index in 1 to count(fr:tab) return concat('$fr-tab-relevance-', $tab-index), ',')})"/>
+                        <!-- Store index of the first tab which is relevant -->
+                        <xforms:setvalue ev:event="xforms-enabled" ref="index-of-first-relevant-tab" value="index-of($fr-tab-relevances, true())[1]"/>
+
                         <xhtml:div class="yui-navset">
                             <xhtml:ul class="yui-nav">
                                 <xsl:for-each select="fr:tab">
                                     <xsl:variable name="label" as="element(fr:label)" select="fr:label[1]"/>
-                                    <xhtml:li>
-                                        <xsl:if test="position() = 1">
-                                            <xsl:attribute name="class">selected</xsl:attribute>
-                                        </xsl:if>
+                                    <xhtml:li style="{{if ($fr-tab-relevance-{position()}) then '' else 'display: none'}}"
+                                            class="{{if (index-of-first-relevant-tab = '{position()}') then 'selected' else ''}}">
                                         <!-- Transform xforms:label into xforms:output -->
                                         <xhtml:a href="#tab{position()}"><xhtml:em>
                                             <xsl:choose>

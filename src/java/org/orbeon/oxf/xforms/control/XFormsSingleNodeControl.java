@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -366,5 +366,19 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         return isReadonly()
                 && (XFormsProperties.isStaticReadonlyAppearance(containingDocument)
                     || XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE.equals(getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)));
+    }
+
+    @Override
+    public boolean setFocus() {
+        if (isRelevant() && !isReadonly()) {
+            // "4.3.7 The xforms-focus Event [...] Any form control is able to accept the focus if it is relevant"
+            // In addition, we don't allow focusing on read-only controls
+
+            // Store new focus information for client
+            containingDocument.setClientFocusEffectiveControlId(getEffectiveId());
+            return true;
+        } else {
+            return false;
+        }
     }
 }

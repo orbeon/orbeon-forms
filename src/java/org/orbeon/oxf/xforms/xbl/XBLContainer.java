@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -857,16 +857,14 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             // Capture phase
             for (XFormsEventObserver currentEventObserver: eventObservers) {
                 final List currentEventHandlers = currentEventObserver.getEventHandlers(this);
-
                 if (currentEventHandlers != null) {
                     if (currentEventObserver != targetObject) {
-                        // Event listeners on the target which are in capture mode are not called
+                        // Event listeners on the target are handled separately
 
                         // Process event handlers
                         for (Object currentEventHandler: currentEventHandlers) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) currentEventHandler;
-                            // TODO: handle isTargetPhase()
-                            if (!eventHandler.isBubblingPhase()
+                            if (eventHandler.isCapturePhase()
                                     && eventHandler.isMatchEventName(retargetedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
                                 // Capture phase match on event name and target is specified
@@ -913,8 +911,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                 }
             }
 
-            // Bubbling phase
-            if (propagate && originalEvent.isBubbles()) {
+            // Target and bubbling phases
+            if (propagate) {
 
                 // Go from leaf to root
                 Collections.reverse(eventObservers);
@@ -950,7 +948,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
                     // Process "action at target"
                     // NOTE: This is used XFormsInstance for xforms-insert/xforms-delete processing
-                    if (currentEventObserver == targetObject) {
+                    final boolean isAtTarget = currentEventObserver == targetObject;
+                    if (isAtTarget) {
                         currentEventObserver.performTargetAction(propertyContext, currentEventObserver.getXBLContainer(containingDocument), retargetedEvent);
                     }
 
@@ -958,12 +957,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     if (currentEventHandlers != null) {
                         for (Object currentEventHandler: currentEventHandlers) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) currentEventHandler;
-                            // TODO: handle isTargetPhase()
-                            if (eventHandler.isBubblingPhase()
+                            if ((eventHandler.isTargetPhase() && isAtTarget || !eventHandler.isCapturePhase() && !eventHandler.isTargetPhase() && originalEvent.isBubbles())
                                     && eventHandler.isMatchEventName(retargetedEvent.getEventName())
                                     && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
                                 // Bubbling phase match on event name and target is specified
-                                indentedLogger.startHandleOperation("dispatchEvent", "bubble handler");
+                                indentedLogger.startHandleOperation("dispatchEvent", isAtTarget ? "target handler" : "bubble handler");
                                 containingDocument.startHandleEvent(retargetedEvent);
                                 try {
                                     eventHandler.handleEvent(propertyContext, currentEventObserver.getXBLContainer(containingDocument), currentEventObserver, retargetedEvent);

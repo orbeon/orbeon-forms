@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -1079,7 +1079,7 @@
                         </xforms:bind>
 
                         <xforms:submission id="fr-get-document-submission" serialization="none"
-                                           method="get" resource="oxf:/apps/xforms-sandbox/samples/bug-events-data.xml"
+                                           method="get" resource="oxf:/apps/xforms-sandbox/samples/bugs/bug-events-data.xml"
                                            replace="instance" xxforms:instance="fr-form-instance"/>
 
                         <xforms:action ev:event="xforms-model-construct-done">
@@ -1137,9 +1137,9 @@
                                     <save/>
                                 </triggers>
                             </instance>
-                            <instance id="fr-form-instance" model-id="fr-form-model">
+                            <instance id="fr-form-instance" model-id="fr-form-model" source-uri="oxf:/apps/xforms-sandbox/samples/bugs/bug-events-data.xml" replaced="true">
                                 <book>
-                                    <title/>
+                                    <title>Cool title</title>
                                 </book>
                             </instance>
                         </instances>
@@ -1147,7 +1147,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="title-input" label="Note"/>
+                        <xxf:control id="title-input" label="Note">Cool title</xxf:control>
                         <xxf:control id="save-trigger" readonly="true" label="Save"/>
                     </xxf:control-values>
                 </xxf:action>

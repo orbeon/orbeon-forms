@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -53,12 +53,12 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/currency/currency.css"/>
         </xbl:resources>
-        <!-- Commented out waiting for the XBL engine to "forward" focus events to components -->
-        <!-- <xbl:handlers>
-            <xbl:handler event="xforms-focus" phase="target">
+        <xbl:handlers>
+            <xbl:handler event="xforms-focus" phase="target" defaultAction="cancel">
                 <xforms:message level="xxforms:log-info">Got focus</xforms:message>
+                <xxforms:script id="xf-sf">YAHOO.xbl.fr.Currency.instance(this).setfocus();</xxforms:script>
             </xbl:handler>
-        </xbl:handlers> -->
+        </xbl:handlers>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>

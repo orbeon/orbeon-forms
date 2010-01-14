@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -589,6 +589,191 @@
                         <xxf:control id="my-trigger·1" label="Do Stuff"/>
                         <xxf:control id="my-trigger·2" readonly="true" label="Do Stuff"/>
                     </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xforms:setfocus on xforms:group" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <first-name>Ada</first-name>
+                            </instance>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:setfocus control="my-group-1"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="my-group-1">
+                        <xforms:input ref="()" id="my-input-1"/>
+                        <xforms:group id="my-group-2">
+                            <xforms:input ref="first-name" id="my-input-2"/>
+                        </xforms:group>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <first-name>Ada</first-name>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input-1" relevant="false"/>
+                        <xxf:control id="my-input-2">Ada</xxf:control>
+                    </xxf:control-values>
+                    <xxf:setfocus control-id="my-input-2"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xforms:setfocus on xforms:switch" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <first-name>Ada</first-name>
+                            </instance>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:toggle case="my-case-12"/>
+                            <xforms:toggle case="my-case-21"/>
+                            <xforms:setfocus control="my-switch-1"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:switch id="my-switch-1">
+                        <xforms:case id="my-case-11">
+                            <xforms:input ref="first-name" id="my-input-11"/>
+                        </xforms:case>
+                        <xforms:case id="my-case-12">
+                            <xforms:switch id="my-switch-2">
+                                <xforms:case id="my-case-21">
+                                    <xforms:input ref="first-name" id="my-input-21"/>
+                                </xforms:case>
+                                <xforms:case id="my-case-22">
+                                    <xforms:input ref="first-name" id="my-input-22"/>
+                                </xforms:case>
+                            </xforms:switch>
+                            <xforms:input ref="first-name" id="my-input-23"/>
+                        </xforms:case>
+                    </xforms:switch>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <first-name>Ada</first-name>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-switch-1" case-id="my-case-12"/>
+                            <control effective-id="my-switch-2" case-id="my-case-21"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:div id="my-case-12" visibility="visible"/>
+                        <xxf:div id="my-case-11" visibility="hidden"/>
+                        <xxf:control id="my-input-11">Ada</xxf:control>
+                        <xxf:div id="my-case-21" visibility="visible"/>
+                        <xxf:div id="my-case-22" visibility="hidden"/>
+                        <xxf:control id="my-input-21">Ada</xxf:control>
+                        <xxf:control id="my-input-22">Ada</xxf:control>
+                        <xxf:control id="my-input-23">Ada</xxf:control>
+                    </xxf:control-values>
+                    <xxf:setfocus control-id="my-input-21"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xforms:setfocus on xforms:repeat" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <first-name>Ada</first-name>
+                                <first-name>Marie</first-name>
+                                <first-name>Clara</first-name>
+                            </instance>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:setindex repeat="my-repeat" index="2"/>
+                            <xforms:setfocus control="my-repeat"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat id="my-repeat" nodeset="first-name">
+                        <xforms:input ref="." id="my-input"/>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <first-name>Ada</first-name>
+                                    <first-name>Marie</first-name>
+                                    <first-name>Clara</first-name>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
+                        <xxf:control id="my-input·1">Ada</xxf:control>
+                        <xxf:control id="my-input·2">Marie</xxf:control>
+                        <xxf:control id="my-input·3">Clara</xxf:control>
+                    </xxf:control-values>
+                    <xxf:setfocus control-id="my-input·2"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

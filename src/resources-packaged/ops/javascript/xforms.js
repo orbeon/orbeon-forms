@@ -4722,7 +4722,7 @@ ORBEON.xforms.Init = {
                         errorPanel.cfg.setProperty("constraintoviewport", true);
                         errorPanel.cfg.setProperty("draggable", true);
                         errorPanel.cfg.setProperty("close", true);
-                        
+
                         xformsLoadingCount++;
                     } else if (formChild.className == "xforms-loading-none") {
                         ORBEON.xforms.Globals.formLoadingNone[formID] = formChild;
@@ -6969,42 +6969,8 @@ ORBEON.xforms.Server = {
                                 case "message": {
                                     var messageElement = actionElement.childNodes[actionIndex];
                                     var message = ORBEON.util.Dom.getStringValue(messageElement);
-                                    if (ORBEON.util.Dom.getAttribute(messageElement, "level") == "modal") {
-                                    	if (ORBEON.xforms.Globals.alertDialog == null) {
-                                    		// YUI alert dialog used by alert action
-                                            ORBEON.xforms.Globals.alertDialog = new YAHOO.widget.SimpleDialog("alert_dlg1", {
-                    							width : "200px",
-                    							effect : {
-                    								effect : YAHOO.widget.ContainerEffect.FADE,
-                    								duration : 0.15
-                    							},
-                    							fixedcenter : true,
-                    							modal : true,
-                    							visible : false,
-                    							close : true,
-                    							constraintoviewport : true,
-                    							buttons : [ {
-                    								text : "close",
-                    								handler : function() {
-                    									this.hide();
-                    								},
-                    								isDefault : true
-                    							} ],
-                    							draggable : false,
-                    							effect : [ {
-                    								effect : YAHOO.widget.ContainerEffect.FADE,
-                    								duration : 0.1
-                    							} ]
-                    						});
-
-//                                            ORBEON.xforms.Globals.alertDialog.form = ORBEON.xforms.Globals.requestForm; 
-                                            ORBEON.xforms.Globals.alertDialog.setHeader("Alert");
-                                            ORBEON.xforms.Globals.alertDialog.render(document.body); 
-                                    	}
-                                    	ORBEON.xforms.Globals.alertDialog.cfg.setProperty("text",message);  
-                                    	ORBEON.xforms.Globals.alertDialog.show();
-                                    	alert(message);
-                                    }
+                                    if (ORBEON.util.Dom.getAttribute(messageElement, "level") == "modal")
+                                        alert(message);
                                     break;
                                 }
 

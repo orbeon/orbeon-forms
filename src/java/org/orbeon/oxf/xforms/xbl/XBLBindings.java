@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -409,11 +409,11 @@ public class XBLBindings {
                                 final String controlStaticId = XFormsUtils.getStaticIdFromId(controlPrefixedId);
                                 final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(prefix, currentHandlerAnnotatedElement,
                                         null, controlStaticId, true, controlStaticId,
-                                        currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME),
+                                        currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XBL_HANDLER_EVENT_ATTRIBUTE_QNAME),
                                         null, // no target attribute allowed in XBL
-                                        currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XML_EVENTS_PHASE_ATTRIBUTE_QNAME),
-                                        currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME),
-                                        currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME));
+                                        currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XBL_HANDLER_PHASE_ATTRIBUTE_QNAME),
+                                        currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XBL_HANDLER_PROPAGATE_ATTRIBUTE_QNAME),
+                                        currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XBL_HANDLER_DEFAULT_ACTION_ATTRIBUTE_QNAME));
 
                                 staticState.registerActionHandler(eventHandler, prefix);
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -121,6 +121,12 @@ public class XFormsConstants {
     public static final QName XBL_HANDLER_QNAME = new QName("handler", XBL_NAMESPACE);
     public static final QName XBL_IMPLEMENTATION_QNAME = new QName("implementation", XBL_NAMESPACE);
 
+    public static final QName XBL_HANDLER_EVENT_ATTRIBUTE_QNAME = new QName("event");
+    public static final QName XBL_HANDLER_PHASE_ATTRIBUTE_QNAME = new QName("phase");
+    public static final QName XBL_HANDLER_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate");
+    // NOTE: XBL 2 working draft has "default-action" instead
+    public static final QName XBL_HANDLER_DEFAULT_ACTION_ATTRIBUTE_QNAME = new QName("defaultAction");
+
     // XBL extensions
     public static final String XXBL_PREFIX = "xxbl";
     public static final String XXBL_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xbl";
@@ -128,6 +134,7 @@ public class XFormsConstants {
     public static final QName XXBL_ATTR_QNAME = new QName("attr", XXBL_NAMESPACE);
     public static final QName XXBL_TRANSFORM_QNAME = new QName("transform", XXBL_NAMESPACE);
     public static final QName XXBL_SCOPE_QNAME = new QName("scope", XXBL_NAMESPACE);
+
     public enum XXBLScope { inner, outer }
     
     // Variables
@@ -147,14 +154,6 @@ public class XFormsConstants {
     public static final QName XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME = new QName("phase", XML_EVENTS_NAMESPACE);
     public static final QName XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate", XML_EVENTS_NAMESPACE);
     public static final QName XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME = new QName("defaultAction", XML_EVENTS_NAMESPACE);
-
-    public static final QName XML_EVENTS_EVENT_ATTRIBUTE_QNAME = new QName("event");
-    public static final QName XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME = new QName("observer");
-    public static final QName XML_EVENTS_TARGET_ATTRIBUTE_QNAME = new QName("target");
-    public static final QName XML_EVENTS_HANDLER_ATTRIBUTE_QNAME = new QName("handler");
-    public static final QName XML_EVENTS_PHASE_ATTRIBUTE_QNAME = new QName("phase");
-    public static final QName XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate");
-    public static final QName XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME = new QName("defaultAction");
 
     public static final String XXFORMS_ALL_EVENTS = "#all";
 

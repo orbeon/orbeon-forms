@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -508,339 +508,28 @@
         <section>
             <title>Enhanced <code>event()</code> Function Support</title>
             <p>
-                Orbeon Forms enhances the XML Events <code>event()</code> function to take a qualified name as
-                parameter:
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-events#TOC-Enhanced-event-function-support">migrated
+                to the wiki</a>.
             </p>
-            <xml-source>
-                event($attribute-name as QName) item()*
-            </xml-source>
-            <p>
-                This allows namespacing attribute names, therefore better allowing for extension attributes.
-            </p>
-            <p>
-                The following standard event attributes are implemented:
-            </p>
-            <p>
-                [TODO: describe standard Orbeon Forms support for event() function]
-            </p>
-            <a name="xforms-events-event-attributes"/>
-            <p>
-                On all events, the following extension attributes are supported:
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        <code>event('xxforms:type') as xs:string</code>
-                    </p>
-                    <p>
-                        Return the event type (also known as event name), for example <code>"DOMActivate"</code>.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>event('xxforms:targetid') as xs:string</code>
-                    </p>
-                    <p>
-                        Return the static id of the event target (<code>event('xxforms:target')</code> is supported for backward compatibility).
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>event('xxforms:bubbles') as xs:boolean</code>
-                    </p>
-                    <p>
-                        Return whether the event is allowed to bubble or not.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>event('xxforms:cancelable') as xs:boolean</code>
-                    </p>
-                    <p>
-                        Return whether the event is cancelable or not.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>event('xxforms:repeat-indexes') as xs:string*</code>
-                    </p>
-                    <p>
-                        Return the event target's current repeat indexes, if any, starting from the ancestor
-                        repeat.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>event('xxforms:repeat-indexes') as xs:string*</code>
-                    </p>
-                    <p>
-                        Return the event target's current repeat indexes, if any, starting from the ancestor
-                        repeat.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>event('xxforms:repeat-ancestors') as xs:string*</code>
-                    </p>
-                    <p>
-                        Return the event target's ancestor repeat ids, if any.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>event('xxforms:target-prefixes') as xs:string*</code>
-                    </p>
-                    <p>
-                        Return the event target's id prefixes, if any, starting from the ancestor components. This
-                        will be empty unless the target is within an XBL component.
-                    </p>
-                </li>
-            </ul>
-            <a name="xforms-ui-events-event-attributes"/>
-            <p>
-                On all UI events (<code>DOMActivate</code>, <code>DOMFocusIn</code>, <code>DOMFocusOut</code>,
-                <code>xforms-select</code>, <code>xforms-deselect</code>, <code>xforms-enabled</code>,
-                <code>xforms-disabled</code>, <code>xforms-help</code>, <code>xforms-hint</code>,
-                <code>xforms-valid</code>, <code>xforms-invalid</code>, <code>xforms-required</code>,
-                <code>xforms-optional</code>, <code>xforms-readonly</code>, <code>xforms-readwrite</code>,
-                <code>xforms-value-change</code>), the following extension attributes are supported:
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        <code>event('xxforms:control-position') as xs:integer</code>
-                    </p>
-                    <p>
-                        Return the event target's position in the user interface. This is the control's static position,
-                        i.e. this does not reflect possible repeat iterations.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>event('xxforms:binding') as node()?</code>
-                    </p>
-                    <p>
-                        Return the event target's single-node binding if any.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>event('xxforms:label') as xs:string?</code>
-                    </p>
-                    <p>
-                        Return the event target's label value if any.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>event('xxforms:hint') as xs:string?</code>
-                    </p>
-                    <p>
-                        Return the event target's hint value if any.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>event('xxforms:help') as xs:string?</code>
-                    </p>
-                    <p>
-                        Return the event target's help value if any.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>event('xxforms:alert') as xs:string?</code>
-                    </p>
-                    <p>
-                        Return the event target's alert value if any.
-                    </p>
-                </li>
-            </ul>
-            <p>
-                On <code>xforms-select</code>, the following extension attributes are supported:
-            </p>
-            <ul>
-                <li>
-                    <a name="xforms-select-event-attributes"/>
-                    <p>
-                        <code>event('xxforms:item-value')</code>
-                    </p>
-                    <p>
-                        When this event is dispatched to in response to a selection control item being selected,
-                        returns the value of the selected item.
-                    </p>
-                </li>
-            </ul>
-            <p>
-                On <code>xforms-submit-serialize</code>, the following extension attributes are supported:
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        <code>event('xxforms:binding') as node()?</code>
-                    </p>
-                    <p>
-                        Return the submission's single-node binding if any.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>event('xxforms:serialization') as xs:string</code>
-                    </p>
-                    <p>
-                        Return the submission's requested serialization, e.g. <code>application/xml</code>,
-                        <code>application/x-www-form-urlencoded</code>, etc..
-                    </p>
-                </li>
-            </ul>
         </section>
         <a name="dispatch-context"/>
         <section>
             <title>Enhanced <code>&lt;xforms:dispatch></code> Support</title>
             <p>
-                Orbeon Forms supports passing event context attributes with the <code>&lt;xxforms:context></code>
-                child element. The actions supported are actions which directly cause an event to be dispatched:
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        <code>&lt;xforms:dispatch></code>
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>&lt;xforms:send></code>
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>&lt;xxforms:show></code>
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>&lt;xxforms:hide></code>
-                    </p>
-                </li>
-            </ul>
-            <p>
-                Here is how you pass context attributes when executing an action:
-            </p>
-            <xml-source>
-                <xforms:dispatch name="rename-control" target="my-model">
-                    <xxforms:context name="control" select="my/control"/>
-                    <xxforms:context name="control-name" select="'beverage-selection'"/>
-                </xforms:dispatch>
-            </xml-source>
-            <p>
-                <code>&lt;xxforms:context></code> supports the following two attributes:
-            </p>
-            <table>
-                <tr>
-                    <th><code>name</code></th>
-                    <td>Mandatory</td>
-                    <td>
-                        <p>
-                            Name of the context attribute.
-                        </p>
-                        <p>
-                            Note that the context attribute name cannot be a qualified name (QName), because this would
-                            not be compatible with <a href="http://www.w3.org/TR/DOM-Level-2-Events/events.html">DOM 2
-                            Events</a>. However, a QName can be used as custom event name.
-                        </p>
-                        <p>
-                            In order to avoid confusion with standard XForms names, we recommend you use prefixed names
-                            if you use custom context information with standard event names (when supported). However,
-                            with custom event names, prefixing is not necessary.
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <th><code>select</code></th>
-                    <td>Mandatory</td>
-                    <td>
-                        XPath 2.0 expression determining the value of the context attribute.
-                    </td>
-                </tr>
-            </table>
-            <p>
-                Context attribute passed this way can be retrieved using the <code>event()</code> function:
-            </p>
-            <xml-source>
-                <xforms:action ev:event="rename-control">
-                    <xforms:setvalue ref="event('control')/@name" value="event('control-name')"/>
-                </xforms:action>
-            </xml-source>
-            <note>
-                <p>
-                    At the moment, with, <code>&lt;xforms:dispatch></code>, only custom events support passing
-                    context attributes this way. Built-in events, such as <code>xforms-value-changed</code>, or
-                    <code>DOMActivate</code>, ignore nested <code>&lt;xxforms:context></code> elements.
-                </p>
-            </note>
-        </section>
-        <a name="xforms-select-deselect"/>
-        <section>
-            <title>Enhanced Support for <code>xforms-select</code> and <code>xforms-deselect</code></title>
-            <p>
-                [TODO: describe support for these events on xforms:upload]
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-events#TOC-Enhanced-xforms:dispatch-support">migrated
+                to the wiki</a>.
             </p>
         </section>
         <a name="repeat-indexes"/>
         <section>
-            <title>Targetting effective controls within repeat iterations</title>
+            <title>Targeting effective controls within repeat iterations</title>
             <p>
-                The following actions all support attributes resolving to a particular control:
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-events#TOC-Targeting-effective-controls-within">migrated
+                to the wiki</a>.
             </p>
-            <ul>
-                <li>
-                    <p>
-                        <code>&lt;xforms:dispatch></code> (<code>target</code> attribute)
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>&lt;xforms:setfocus></code> (<code>control</code> attribute)
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>&lt;xforms:toggle></code> (<code>case</code> attribute)
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>&lt;xxforms:show></code> (<code>neighbor</code> attribute)
-                    </p>
-                </li>
-            </ul>
-            <p>
-                When that control is within a repeat iteration, the actual control targetted is chosen based on the
-                current set of repeat indexes. However, in some cases, it is useful to be able to target the control
-                within a particular iteration. This is achieved with the <code>xxforms:repeat-indexes</code>
-                extension attribute on these actions. This attribute takes a space-separated list of repeat
-                indexes, starting with the outermost repeat. Example:
-            </p>
-            <xml-source>
-                <comment> Repeat hierarchy </comment>
-                <xforms:repeat nodeset="todo-list">
-                    <xforms:repeat nodeset="todo-item">
-                        <xforms:switch>
-                            <xforms:case id="edit-case">
-                                ...
-                            </xforms:case>
-                            <xforms:case id="view-case">
-                                ...
-                            </xforms:case>
-                        </xforms:switch>
-                    </xforms:repeat>
-                </xforms:repeat>
-                <xforms:trigger>
-                    <xforms:label>Toggle Me!</xforms:label>
-                    <comment> Toggle the case within the 5th todo item of the 3rd todo list </comment>
-                    <xforms:toggle ev:event="DOMActivate" case="edit-case" xxforms:repeat-indexes="3 5"/>
-                </xforms:trigger>
-            </xml-source>
         </section>
         <a name="validation-extensions"/>
         <section>
@@ -2115,63 +1804,10 @@
             <section>
                 <title>Multiple Event Names, Observers and Targets on Event Handlers</title>
                 <p>
-                    The <code>ev:event</code>, <code>ev:observer</code> and <code>ev:target</code> attributes,
-                    defined by the <a href="http://www.w3.org/TR/xml-events/">XML Events specification</a>, only
-                    support one event name, observer, or target respectively. Orbeon Forms supports as an extension
-                    a list of space-separated values. The behavior is as follows:
+                    This section has <a
+                    href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-events#TOC-Multiple-event-names-observers-and-">migrated
+                    to the wiki</a>.
                 </p>
-                <ul>
-                    <li>
-                        <p>
-                            For <code>ev:event</code>: the handler is called if any of the specified events matches.
-                        </p>
-                        <xml-source>
-                            <xforms:action ev:event="DOMFocusIn DOMFocusOut">
-                                <comment> Reacting to either the "DOMFocusIn" and "DOMFocusOut" events </comment>
-                                ...
-                            </xforms:action>
-                        </xml-source>
-                    </li>
-                    <li>
-                        <p>
-                            For <code>ev:observer</code>: the event handler is attached to all the observers
-                            specified.
-                        </p>
-                        <xml-source>
-                            <xforms:action ev:event="DOMActivate" ev:observer="my-input my-trigger">
-                                <comment> Observing both the "my-input" and "my-trigger" controls </comment>
-                                ...
-                            </xforms:action>
-                        </xml-source>
-                    </li>
-                    <li>
-                        <p>
-                            For <code>ev:target</code>: the handler is called if any of the specified targets
-                            matches.
-                        </p>
-                        <xml-source>
-                            <xforms:action ev:event="xforms-submit-done" ev:target="create-submission update-submission">
-                                <comment> Checking that either the "create-submission" and "update-submission" controls is a target </comment>
-                                ...
-                            </xforms:action>
-                        </xml-source>
-                    </li>
-                </ul>
-                <p>
-                    The extensions above have been <a
-                    href="http://lists.w3.org/Archives/Public/www-html-editor/2008JanMar/0012.html">requested</a>
-                    for inclusion in XML Events 2.
-                </p>
-                <p>
-                    In addition, the special <code>#all</code> event name can be used to catch all events:
-                </p>
-                <xml-source>
-                    <xforms:group>
-                        <comment>Stop propagation of all events</comment>
-                        <xforms:action ev:event="#all" ev:propagate="stop"/>
-                        ...
-                    </xforms:group>
-                </xml-source>
             </section>
             <a name="xxforms-download-appearance"/>
             <section>

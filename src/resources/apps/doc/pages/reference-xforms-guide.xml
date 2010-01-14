@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -1782,75 +1782,16 @@
                 </p>
             </section>
             <a name="xforms-events"/>
+            <a name="events-intro"/>
+            <a name="events-observer"/>
+            <a name="events-observer-target"/>
             <section>
                 <title>Events</title>
-                <a name="events-intro"/>
-                <section>
-                    <title>Introduction</title>
-                    <p>
-                        [TODO: Introduction to events in XForms.]
-                    </p>
-                </section>
-                <a name="events-observer"/>
-                <a name="events-observer-target"/>
-                <section>
-                    <title>Using the <code>ev:observer</code> and <code>ev:target</code> Attributes</title>
-                    <p>
-                        The <code>ev:observer</code> attribute, defined by the <a
-                        href="http://www.w3.org/TR/xml-events/">XML Events specification</a>, allows you to register
-                        event handlers by specifying an element identifier, instead of embedding the event handler
-                        within that element. This is particularly useful to register event handlers on
-                        <code>&lt;xforms:instance></code> elements, which do not allow you to directly embed XML event
-                        handlers.
-                    </p>
-                    <xml-source>
-                        <xforms:model id="main-model">
-                            <comment> Child instance </comment>
-                            <xforms:instance id="child-instance" src="my-instance.xml"/>
-                            <comment> Register the event handler on the child instance </comment>
-                            <xforms:dispatch ev:observer="child-instance" ev:event="xforms-insert" targetid="main-model" name="update-after-insert"/>
-                        </xforms:model>
-                    </xml-source>
-                    <p>
-                        Note that you still need to use the <code>ev:event</code> attribute to specify to what event the
-                        handler responds. The following example shows how you can define event handlers for XForms
-                        elements anywhere in an XForms document:
-                    </p>
-                    <xml-source>
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="my-model">
-                                    <comment> A small instance </comment>
-                                    <xforms:instance id="my-instance">
-                                        <instance>initial</instance>
-                                    </xforms:instance>
-                                    <comment> Event handler located in the model but observing an element in the view </comment>
-                                    <xforms:action ev:observer="my-group" ev:target="my-input" ev:event="DOMFocusIn">
-                                        <xforms:setvalue ref=".">new</xforms:setvalue>
-                                    </xforms:action>
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-                                <xforms:group id="my-group">
-                                    <comment> A simple XForms input control </comment>
-                                    <xforms:input id="my-input" ref=".">
-                                        <xforms:label>My Data</xforms:label>
-                                    </xforms:input>
-                                    <comment> Event handler located in the view but observing an element in the model </comment>
-                                    <xforms:action ev:observer="my-model" ev:event="xforms-ready">
-                                        <xforms:dispatch name="DOMFocusIn" targetid="my-input"/>
-                                    </xforms:action>
-                                </xforms:group>
-                            </xhtml:body>
-                        </xhtml:html>
-                    </xml-source>
-                    <p>
-                        The above example also shows how you can constrain an event handler to respond to an event
-                        dispatched to a particular target element using the <code>ev:target</code> attribute. here, the
-                        event handler responds to <code>DOMFocusIn</code> events, but only those dispatched to the
-                        <code>my-input</code> control.
-                    </p>
-                </section>
+                <p>
+                    This section has <a
+                    href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-events#TOC-Orbeon-Forms-support">migrated
+                    to the wiki</a>.
+                </p>
             </section>
             <a name="xforms-actions"/>
             <section>

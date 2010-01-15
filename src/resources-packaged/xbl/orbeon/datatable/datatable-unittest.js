@@ -17,7 +17,29 @@ var testCase = {
 
     name: "datatable",
 
-    test314466: function() {
+    testOptionalScrollhV: function() {
+         var thiss = this;
+         thiss.openAccordionCase(thiss, 'optional-scrollh-v', function() {
+             var tbody = YAHOO.util.Dom.get('my-accordion$optional-scrollh-v-table$optional-scrollh-v-table-tbody');
+             var bodyContainer = tbody.parentNode.parentNode;
+             thiss.checkHorizontalScrollbar(bodyContainer, false);
+             thiss.closeAccordionCase(thiss, 'optional-scrollh-v');
+         });
+     }
+     ,
+
+    testOptionalScrollh: function() {
+         var thiss = this;
+         thiss.openAccordionCase(thiss, 'optional-scrollh', function() {
+             var tbody = YAHOO.util.Dom.get('my-accordion$optional-scrollh-table$optional-scrollh-table-tbody');
+             var bodyContainer = tbody.parentNode.parentNode;
+             thiss.checkHorizontalScrollbar(bodyContainer, false);
+             thiss.closeAccordionCase(thiss, 'optional-scrollh');
+         });
+     }
+     ,
+
+     test314466: function() {
         var thiss = this;
         thiss.openAccordionCase(thiss, '_314466', function() {
 

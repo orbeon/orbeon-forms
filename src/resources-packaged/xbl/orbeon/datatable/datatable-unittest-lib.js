@@ -156,8 +156,15 @@ ORBEON.widgets.datatable.unittests_lib = {
         return x - region.right;
     },
 
-    checkHorizontalScrollbar: function (elt) {
-        YAHOO.util.Assert.isTrue(elt.clientHeight + 15 < elt.offsetHeight, 'Element has no horizontal scroll bar (clientHeight: ' + elt.clientHeight + ', offsetHeight: ' + elt.offsetHeight + ')');
+    checkHorizontalScrollbar: function (elt, expected) {
+        if (expected == undefined) {
+            expected = true;
+        }
+        if (expected) {
+            YAHOO.util.Assert.isTrue(elt.clientHeight + 15 < elt.offsetHeight, 'Element has no horizontal scroll bar (clientHeight: ' + elt.clientHeight + ', offsetHeight: ' + elt.offsetHeight + ')');
+        } else {
+            YAHOO.util.Assert.isFalse(elt.clientHeight + 15 < elt.offsetHeight, 'Element has an horizontal scroll bar (clientHeight: ' + elt.clientHeight + ', offsetHeight: ' + elt.offsetHeight + ')');
+        }
     },
 
     checkEmbeddedWidthAndHeight: function (elt, parentWidth, parentHeight) {

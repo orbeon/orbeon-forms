@@ -2280,8 +2280,7 @@
                                                  xxforms:attribute('new', event('xxforms:new-index'))
                                                  ))"/>
 
-                        <xforms:repeat nodeset="value" id="my-repeat">
-                        </xforms:repeat>
+                        <xforms:repeat nodeset="value" id="my-repeat"/>
                     </xforms:group>
                 </xhtml:body>
             </xhtml:html>

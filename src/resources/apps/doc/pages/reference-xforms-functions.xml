@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -35,36 +35,10 @@
         <section>
             <title>Standard XForms Functions</title>
             <p>
-                Orbeon Forms supports the following standard XForms functions:
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-xpath-functions#TOC-Standard-XForms-1.1-functions">migrated
+                to the wiki</a>.
             </p>
-            <ul>
-                <li>
-                    [TODO: most other functions are supported, provide exact list]
-                </li>
-                <li>
-                    <a name="xforms-property"/>
-                    <p>
-                        <code><a href="http://www.w3.org/TR/xforms11/#fn-property">property($property-name as xs:string) as xs:anyAtomicType?</a></code>
-                    </p>
-                    <p>
-                        This function supports extension property names in the
-                        <code>http://orbeon.org/oxf/xml/xforms</code> namespace (usually mapped to the
-                        <code>xxforms</code> prefix). Any such property name will return the value of an XForms engine
-                        property. Example:
-                    </p>
-                   <xml-source>
-                        <xforms:output value="property('xxforms:noscript')"/>
-                    </xml-source>
-                    <note>
-                        <p>
-                            The standard XForms function returns an XPath 1.0 <code>string</code>. The Orbeon Forms
-                            implementation returns the following types: empty sequence (if the property is not found),
-                            <code>xs:string</code>, <code>xs:integer</code>, <code>xs:boolean</code> or
-                            <code>xs:anyURI</code> depending on the type of the property.
-                        </p>
-                    </note>
-                </li>
-            </ul>
         </section>
         <a name="xpath-extensions"/>
         <section>
@@ -76,14 +50,10 @@
             <section>
                 <title>XSLT 2.0 Functions</title>
                 <p>
-                    When using XPath 2.0, the following functions from XSLT 2.0 are also available:
+                    This section has <a
+                    href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-xpath-functions#TOC-XSLT-2.0-functions">migrated
+                    to the wiki</a>.
                 </p>
-                <ul>
-                    <li><p><code>format-date()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-date">external documentation</a>)</p></li>
-                    <li><p><code>format-dateTime()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-dateTime">external documentation</a>)</p></li>
-                    <li><p><code>format-time()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-time">external documentation</a>)</p></li>
-                    <li><p><code>format-number()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-number">external documentation</a>)</p></li>
-                </ul>
             </section>
             <a name="ops-extensions"/>
             <a name="orbeon-extensions"/>
@@ -801,43 +771,9 @@
             <section>
                 <title>eXForms Functions</title>
                 <p>
-                    <a href="http://www.exforms.org/">eXForms</a> is a suggested set of extensions to XForms 1.0,
-                    grouped into different modules. Orbeon Forms supports the <a
-                    href="http://www.exforms.org/mips.html"><code>exf:mip</code></a> module, which includes the
-                    following functions:
-                </p>
-                <ul>
-                    <li>
-                        <p><code>exf:relevant()</code></p>
-                    </li>
-                    <li>
-                        <p><code>exf:readonly()</code></p>
-                    </li>
-                    <li>
-                        <p><code>exf:required()</code></p>
-                    </li>
-                </ul>
-                <p>
-                    Orbeon Forms also supports the following from the <a
-                    href="http://exforms.org/sorting.html">sorting module</a>:
-                </p>
-                <ul>
-                    <li>
-                        <p><code>exf:sort($sequence as item()*, $sort-key as xs:string, $datatype as xs:string?, $order as xs:string?, $case-order as xs:string?) as item()*</code></p>
-                        <p>
-                           Note that the second argument is interpreted as a string, unlike with
-                           <code>xxforms:sort()</code>:
-                        </p>
-                        <xml-source>
-                            <xforms:itemset nodeset="exforms:sort(instance('samples-instance')/file, '@name', 'text', 'ascending')">
-                                ...
-                            </xforms:itemset>
-                        </xml-source>
-                    </li>
-                </ul>
-                <p>
-                    eXForms functions live in the <code>http://www.exforms.org/exf/1-0</code> namespace, usually
-                    bound to the prefix <code>exf</code> or <code>exforms</code>.
+                    This section has <a
+                    href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-xpath-functions#TOC-eXforms-functions">migrated
+                    to the wiki</a>.
                 </p>
             </section>
         </section>

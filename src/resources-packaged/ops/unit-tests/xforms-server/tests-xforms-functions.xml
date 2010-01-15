@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -1019,7 +1019,7 @@
         </output>
     </test>
 
-    <test description="local-date-time() function" name="oxf:pipeline">
+    <test description="local-dateTime() function" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
@@ -1031,8 +1031,8 @@
 
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:output id="output1" value="local-date-time('test')">
-                        <xforms:label>local-date-time() : </xforms:label>
+                    <xforms:output id="output1" value="local-dateTime('test')">
+                        <xforms:label>local-dateTime() : </xforms:label>
                     </xforms:output>
                 </xhtml:body>
             </xhtml:html>
@@ -1046,7 +1046,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output1" label="local-date-time() : ">2004-12-31T12:00:00-07:00</xxf:control>
+                        <xxf:control id="output1" label="local-dateTime() : ">2004-12-31T12:00:00-07:00</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

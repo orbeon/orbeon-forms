@@ -2245,4 +2245,77 @@
         </output>
     </test>
 
+    <test description="xxforms-index-changed event" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <values><value>1</value><value>2</value><value>3</value><value>4</value></values>
+                        </xforms:instance>
+
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:setindex repeat="my-repeat" index="2"/>
+                            <xforms:insert nodeset="value" origin="(xxforms:element('value', 5), xxforms:element('value', 6))"/>
+                            <xforms:delete nodeset="value" at="6"/>
+                            <xforms:delete nodeset="value"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="my-group">
+                        <xforms:insert ev:event="xxforms-index-changed"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 xxforms:attribute('old', event('xxforms:old-index')),
+                                                 xxforms:attribute('new', event('xxforms:new-index'))
+                                                 ))"/>
+
+                        <xforms:repeat nodeset="value" id="my-repeat">
+                        </xforms:repeat>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values/>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xxforms-index-changed" target="my-repeat" old="0" new="1"/>
+                                    <event type="xxforms-index-changed" target="my-repeat" old="1" new="2"/>
+                                    <event type="xxforms-index-changed" target="my-repeat" old="2" new="6"/>
+                                    <event type="xxforms-index-changed" target="my-repeat" old="6" new="5"/>
+                                    <event type="xxforms-index-changed" target="my-repeat" old="5" new="0"/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="0"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:delete-repeat-elements id="my-repeat" parent-indexes="" count="1"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

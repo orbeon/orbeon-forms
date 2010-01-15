@@ -1750,7 +1750,7 @@
                                         <xbl:handlers>
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
-                                                <xforms:insert context="xxforms:instance('events')" nodeset="*"
+                                                <xforms:insert if="not(xxforms:event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', 'fr-level1-binding'),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
@@ -1779,7 +1779,7 @@
                                         <xbl:handlers>
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
-                                                <xforms:insert context="xxforms:instance('events')" nodeset="*"
+                                                <xforms:insert if="not(xxforms:event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', 'fr-level2-binding'),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
@@ -1808,7 +1808,7 @@
                                         <xbl:handlers>
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
-                                                <xforms:insert context="xxforms:instance('events')" nodeset="*"
+                                                <xforms:insert if="not(xxforms:event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', 'fr-level3-binding'),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
@@ -1839,7 +1839,7 @@
 
                                 <xforms:group context="instance('main-instance')" id="main-group">
                                     <!-- TEST: Event listener -->
-                                    <xforms:insert ev:event="#all" context="instance('events')" nodeset="*"
+                                    <xforms:insert if="not(xxforms:event('xxforms:type') = 'xxforms-index-changed')" ev:event="#all" context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', 'main-group'),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),

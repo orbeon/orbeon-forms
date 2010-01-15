@@ -702,7 +702,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                                     "new index", Integer.toString(newRepeatIndex));
                         }
 
-                        repeatControl.setIndex(newRepeatIndex);
+                        repeatControl.setIndex(propertyContext, newRepeatIndex);
                     }
                 }
 

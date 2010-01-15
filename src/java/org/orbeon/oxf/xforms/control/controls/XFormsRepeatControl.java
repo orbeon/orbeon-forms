@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsIndexChangedEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
@@ -80,6 +81,12 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         // NOTE: We used to initialize the repeat index here, but this made the index() function non-functional during
         // repeat construction. Instead, we now initialize the index in setBindingContext(), when that method is called
         // during control creation.
+
+//        if (!restoredState && getIndex() > 0) {
+            // Dispatch custom event to notify that the repeat index has changed
+//            getXBLContainer().dispatchEvent(propertyContext, new XXFormsIndexChangedEvent(containingDocument, this,
+//                    0, getIndex()));
+//        }
     }
 
     @Override
@@ -101,11 +108,21 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
     /**
      * Set the repeat index. The index is automatically adjusted to fall within bounds.
      *
-     * @param index  new repeat index
+     * @param propertyContext   current context
+     * @param index             new repeat index
      */
-    public void setIndex(int index) {
+    public void setIndex(PropertyContext propertyContext, int index) {
+
+        final int oldRepeatIndex = getIndex();// 1-based
+
         // Set index
         setIndexInternal(index);
+
+        if (oldRepeatIndex != getIndex()) {
+            // Dispatch custom event to notify that the repeat index has changed
+            getXBLContainer().dispatchEvent(propertyContext, new XXFormsIndexChangedEvent(containingDocument, this,
+                    oldRepeatIndex, getIndex()));
+        }
 
         // Handle rebuild flags for container affected by changes to this repeat
         final XBLContainer resolutionScopeContainer = getXBLContainer().findResolutionScope(getPrefixedId());
@@ -356,6 +373,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
         final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
 
+        final int oldRepeatIndex = getIndex();// 1-based
         boolean updated = false;
         final List<XFormsRepeatIterationControl> newIterations;
         final List<Integer> movedIterationsOldPositions;
@@ -404,8 +422,6 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             }
 
             // Set new repeat index (do this before creating new iterations so that index is available then)
-            final int oldRepeatIndex = getIndex();// 1-based
-
             boolean didSetIndex = false;
             if (isInsert) {
                 // Insert logic
@@ -594,6 +610,12 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             // Dispatch custom event to notify that the nodeset has changed
             getXBLContainer().dispatchEvent(propertyContext, new XXFormsNodesetChangedEvent(containingDocument, this,
                     newIterations, movedIterationsOldPositions, movedIterationsNewPositions));
+        }
+
+        if (oldRepeatIndex != getIndex()) {
+            // Dispatch custom event to notify that the repeat index has changed
+            getXBLContainer().dispatchEvent(propertyContext, new XXFormsIndexChangedEvent(containingDocument, this,
+                    oldRepeatIndex, getIndex()));
         }
 
         return newIterations;

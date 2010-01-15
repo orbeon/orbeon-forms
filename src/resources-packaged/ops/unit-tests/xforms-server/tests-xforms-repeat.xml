@@ -2296,7 +2296,6 @@
                             </instance>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <event type="xxforms-index-changed" target="my-repeat" old="0" new="1"/>
                                     <event type="xxforms-index-changed" target="my-repeat" old="1" new="2"/>
                                     <event type="xxforms-index-changed" target="my-repeat" old="2" new="6"/>
                                     <event type="xxforms-index-changed" target="my-repeat" old="6" new="5"/>

@@ -422,7 +422,9 @@
                         else max((1, $nbPages - $maxNbPagesToDisplay + 1))
                         else 1) cast as xs:integer"
                         xxbl:scope="inner"/>
-                    <xxforms:variable name="pages" select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"
+                    <xxforms:variable name="pages" select="if ($nbPages castable as xs:integer) 
+                                then for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)
+                                else ()"
                         xxbl:scope="inner"/>
                 </xsl:when>
             </xsl:choose>

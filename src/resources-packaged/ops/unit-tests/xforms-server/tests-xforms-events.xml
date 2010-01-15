@@ -830,8 +830,8 @@
         </output>
     </test>
 
-    <!-- NOTE: This test is disabled  because as of 2009-10 we can't run the setvalue within an empty context. -->
-    <test description="Event listener on xforms:repeat" name="oxf:pipeline" exclude="true">
+    <!-- NOTE: This test is disabled because as of 2009-10 we can't run the setvalue within an empty context. -->
+    <test description="Event listener on xforms:repeat when node-set becomes empty" name="oxf:pipeline" exclude="true">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>

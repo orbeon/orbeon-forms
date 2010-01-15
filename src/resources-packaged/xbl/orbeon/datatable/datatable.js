@@ -115,7 +115,12 @@ ORBEON.widgets.datatable.prototype.finish = function () {
             if (this.scrollV) {
                 minWidth = this.tableWidth - 19;
             } else {
-                minWidth = this.tableWidth - 1;  
+                if (YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8)       {
+                    minWidth = this.tableWidth -1;
+                } else {
+                    minWidth = this.tableWidth; 
+                }
+
             }
             this.tableWidth = this.optimizeWidth(minWidth);
         }

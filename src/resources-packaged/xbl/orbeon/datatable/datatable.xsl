@@ -693,7 +693,7 @@
 
         <!-- <xforms:output value="$columnDesc/@index"/>-->
 
-        <xhtml:div class="yui-dt-liner">
+        <xhtml:div class="yui-dt-liner datatable-cell-content">
             <xhtml:span class="yui-dt-label">
                 <xsl:choose>
                     <xsl:when test="@fr:sortable = 'true'">
@@ -962,7 +962,7 @@
             ">
 
             <xsl:apply-templates select="@*[name() != 'class']" mode="dynamic"/>
-            <xhtml:div class="yui-dt-liner">
+            <xhtml:div class="yui-dt-liner datatable-cell-content">
                 <xsl:apply-templates select="node()" mode="dynamic"/>
             </xhtml:div>
         </xhtml:td>
@@ -987,7 +987,7 @@
             ">
 
             <xsl:apply-templates select="@*[name() != 'class']" mode="dynamic"/>
-            <xhtml:div class="yui-dt-liner">
+            <xhtml:div class="yui-dt-liner datatable-cell-content">
                 <xsl:apply-templates select="node()" mode="dynamic"/>
             </xhtml:div>
         </xhtml:td>

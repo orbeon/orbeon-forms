@@ -115,7 +115,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
             if (this.scrollV) {
                 minWidth = this.tableWidth - 19;
             } else {
-                minWidth = this.tableWidth + 1;   // Adding one to be sure there is a scrollbar
+                minWidth = this.tableWidth - 1;  
             }
             this.tableWidth = this.optimizeWidth(minWidth);
         }
@@ -192,11 +192,8 @@ ORBEON.widgets.datatable.prototype.finish = function () {
             }
             this.headerScrollWidth = this.tableWidth + 20;
             this.headerScrollContainer.style.width = this.headerScrollWidth + 'px';
-            if (this.scrollH) {
-                this.bodyContainer.style.overflow = "scroll";
-            } else {
-                this.bodyContainer.style.overflow = "auto";
-            }
+            this.bodyContainer.style.overflow = "auto";
+            this.bodyContainer.style.overflowY = "scroll";
         }
 
 
@@ -215,7 +212,9 @@ ORBEON.widgets.datatable.prototype.finish = function () {
     if (this.scrollH) {
         YAHOO.util.Event.addListener(this.bodyContainer, 'scroll', ORBEON.widgets.datatable.scrollHandler, this, true);
         this.width = this.container.clientWidth;
-        this.bodyContainer.style.overflowX = "scroll";
+        if (this.tableWidth > this.width) {
+            this.bodyContainer.style.overflowX = "scroll";
+        }   
     } else {
         this.width = this.tableWidth;
     }

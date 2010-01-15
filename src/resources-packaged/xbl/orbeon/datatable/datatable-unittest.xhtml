@@ -11,11 +11,9 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
-    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xi="http://www.w3.org/2001/XInclude">
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget" xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <xhtml:head>
         <xhtml:title>Datatable</xhtml:title>
@@ -53,8 +51,7 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="open-all">
                         <xforms:label>Open all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion"
-                            name="fr-accordion-toggle-all">
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
                             <xxforms:context name="selected" select="true()"/>
                         </xforms:dispatch>
                     </xforms:trigger>
@@ -62,8 +59,7 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="close-all">
                         <xforms:label>Close all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion"
-                            name="fr-accordion-toggle-all">
+                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
                             <xxforms:context name="selected" select="false()"/>
                         </xforms:dispatch>
                     </xforms:trigger>
@@ -102,16 +98,69 @@
                     </fr:datatable>
                 </xhtml:div>
                 </fr:case>-->
-            <fr:case selected="true" id="_314466">
-                <fr:label>#314466:Datatable generates an error in IE when used within an
-                    xxforms:dialog.</fr:label>
+            <fr:case selected="true" id="optional-scrollh-v">
+                <fr:label>Optional horizontal scrollbar with a vertical scrollbar</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
-                            href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314466&amp;group_id=168&amp;atid=350207"
+                    <xhtml:p/>
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <fr:datatable id="optional-scrollh-v-table" scrollable="both" width="500px" height="200px">
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xhtml:th fr:resizeable="true">Text</xhtml:th>
+                                    <xhtml:th fr:resizeable="true">Position</xhtml:th>
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="line[length &lt; 50]">
+                                    <xhtml:tr>
+                                        <xhtml:td>
+                                            <xforms:output value="text"/>
+                                        </xhtml:td>
+                                        <xhtml:td>
+                                            <xforms:output value="position"/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
+            <fr:case selected="true" id="optional-scrollh">
+                <fr:label>Optional horizontal scrollbar</fr:label>
+                <xhtml:div>
+                    <xhtml:p/>
+                    <xforms:group ref="instance('detailed-lorem')">
+                        <fr:datatable id="optional-scrollh-table" scrollable="horizontal" width="500px">
+                            <xhtml:thead>
+                                <xhtml:tr>
+                                    <xhtml:th fr:resizeable="true">Text</xhtml:th>
+                                    <xhtml:th fr:resizeable="true">Position</xhtml:th>
+                                </xhtml:tr>
+                            </xhtml:thead>
+                            <xhtml:tbody>
+                                <xforms:repeat nodeset="line[length > 40 and length &lt; 50]">
+                                    <xhtml:tr>
+                                        <xhtml:td>
+                                            <xforms:output value="text"/>
+                                        </xhtml:td>
+                                        <xhtml:td>
+                                            <xforms:output value="position"/>
+                                        </xhtml:td>
+                                    </xhtml:tr>
+                                </xforms:repeat>
+                            </xhtml:tbody>
+                        </fr:datatable>
+                    </xforms:group>
+                </xhtml:div>
+            </fr:case>
+            <fr:case selected="true" id="_314466">
+                <fr:label>#314466:Datatable generates an error in IE when used within an xxforms:dialog.</fr:label>
+                <xhtml:div>
+                    <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314466&amp;group_id=168&amp;atid=350207"
                             >314466</xhtml:a>.</xhtml:p>
-                    <xhtml:p>The fact that the test suite starts is already an indication that the
-                        bug has been fixed (otherwise, a JavaScript error is generated before the
-                        suite even starts).</xhtml:p>
+                    <xhtml:p>The fact that the test suite starts is already an indication that the bug has been fixed (otherwise, a JavaScript error
+                        is generated before the suite even starts).</xhtml:p>
                     <xforms:trigger id="show-314466">
                         <xforms:label>show 314466</xforms:label>
                         <xxforms:show ev:event="DOMActivate" dialog="_314466-dialog"/>
@@ -142,11 +191,10 @@
                 </xhtml:div>
             </fr:case>
             <fr:case selected="true" id="_314459">
-                <fr:label>#314459:Paginated datatables: the page number is not properly set when the
-                    datatable is hidden (by an empty context) and show again.</fr:label>
+                <fr:label>#314459:Paginated datatables: the page number is not properly set when the datatable is hidden (by an empty context) and
+                    show again.</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
-                            href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314459&amp;group_id=168&amp;atid=350207"
+                    <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314459&amp;group_id=168&amp;atid=350207"
                             >314459</xhtml:a>.</xhtml:p>
                     <xforms:group ref="instance('lorem')[instance('controls')/show = 'true']">
                         <fr:datatable id="_314459-table" paginated="true" rowsPerPage="5">
@@ -156,8 +204,7 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat
-                                    nodeset="line[string-length() &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
+                                <xforms:repeat nodeset="line[string-length() &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="."/>
@@ -170,24 +217,21 @@
                 </xhtml:div>
             </fr:case>
             <fr:case selected="true" id="_314415">
-                <fr:label>#314415:Datatable within an xforms:repeat are not properly initialized
-                    when iterations are deleted and added again</fr:label>
+                <fr:label>#314415:Datatable within an xforms:repeat are not properly initialized when iterations are deleted and added
+                    again</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
-                            href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314415&amp;group_id=168&amp;atid=350207"
+                    <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314415&amp;group_id=168&amp;atid=350207"
                             >314415</xhtml:a>.</xhtml:p>
                     <xforms:group ref="instance('lorem')[instance('controls')/show = 'true']">
                         <xforms:repeat nodeset="line[position() = (1, 2)]">
-                            <fr:datatable id="_314415-table" scrollable="both" width="500px"
-                                height="200px">
+                            <fr:datatable id="_314415-table" scrollable="both" width="500px" height="200px">
                                 <xhtml:thead>
                                     <xhtml:tr>
                                         <xhtml:th>Text</xhtml:th>
                                     </xhtml:tr>
                                 </xhtml:thead>
                                 <xhtml:tbody>
-                                    <xforms:repeat
-                                        nodeset="instance('lorem')/line[string-length(.) > 100]">
+                                    <xforms:repeat nodeset="instance('lorem')/line[string-length(.) > 100]">
                                         <xhtml:tr>
                                             <xhtml:td>
                                                 <xforms:output value="."/>
@@ -201,15 +245,12 @@
                 </xhtml:div>
             </fr:case>
             <fr:case selected="true" id="_314422">
-                <fr:label>#314422: Datatable: go to the last page when the current page
-                    disappears</fr:label>
+                <fr:label>#314422: Datatable: go to the last page when the current page disappears</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
-                            href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314422&amp;group_id=168&amp;atid=350207"
+                    <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314422&amp;group_id=168&amp;atid=350207"
                             >314422</xhtml:a>.</xhtml:p>
                     <xforms:group ref="instance('detailed-lorem')">
-                        <fr:datatable id="_314422-table" debug="false" paginated="true"
-                            rowsPerPage="5">
+                        <fr:datatable id="_314422-table" debug="false" paginated="true" rowsPerPage="5">
                             <xhtml:thead>
                                 <xhtml:tr>
                                     <xhtml:th>Position</xhtml:th>
@@ -217,8 +258,7 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat
-                                    nodeset="line[length &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
+                                <xforms:repeat nodeset="line[length &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="position"/>
@@ -234,11 +274,9 @@
                 </xhtml:div>
             </fr:case>
             <fr:case selected="true" id="_314359">
-                <fr:label>#314359: Scrollable datatables get their header and body columns
-                    desynchronized in Firefox</fr:label>
+                <fr:label>#314359: Scrollable datatables get their header and body columns desynchronized in Firefox</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
-                            href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314359&amp;group_id=168&amp;atid=350207"
+                    <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314359&amp;group_id=168&amp;atid=350207"
                             >314359</xhtml:a>.</xhtml:p>
                     <fr:datatable id="table-314359" scrollable="horizontal" width="500px">
                         <xhtml:thead>
@@ -263,11 +301,9 @@
                 </xhtml:div>
             </fr:case>
             <fr:case selected="true" id="_314292">
-                <fr:label>#314292: Datatable is not properly rendered. It looks like it's slightly
-                    shifted to the left in IE6/7</fr:label>
+                <fr:label>#314292: Datatable is not properly rendered. It looks like it's slightly shifted to the left in IE6/7</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
-                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314292&amp;group_id=168&amp;atid=350207"
+                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314292&amp;group_id=168&amp;atid=350207"
                             >314292</xhtml:a>.</xhtml:p>
                     <fr:datatable id="table-314292">
                         <xhtml:thead>
@@ -292,11 +328,9 @@
                 </xhtml:div>
             </fr:case>
             <fr:case selected="true" id="_314217">
-                <fr:label>#314217: empty horizontally scrollable datatables do not display a
-                    scrollbar in Firefox</fr:label>
+                <fr:label>#314217: empty horizontally scrollable datatables do not display a scrollbar in Firefox</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
-                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314217&amp;group_id=168&amp;atid=350207"
+                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314217&amp;group_id=168&amp;atid=350207"
                             >314217</xhtml:a>.</xhtml:p>
                     <fr:datatable id="table-314217" scrollable="horizontal" width="150px">
                         <xhtml:thead>
@@ -323,8 +357,7 @@
             <fr:case selected="true" id="widths">
                 <fr:label>Check column and table widths</fr:label>
                 <xhtml:div>
-                    <xhtml:p>This table is used to check that column and table widths are
-                        consistent</xhtml:p>
+                    <xhtml:p>This table is used to check that column and table widths are consistent</xhtml:p>
                     <fr:datatable id="table-widths">
                         <xhtml:thead>
                             <xhtml:tr>
@@ -350,8 +383,7 @@
             <fr:case selected="true" id="widths-resizeable">
                 <fr:label>Check column and table widths with resizeabled columns</fr:label>
                 <xhtml:div>
-                    <xhtml:p>This table is used to check that column and table widths are
-                        consistent</xhtml:p>
+                    <xhtml:p>This table is used to check that column and table widths are consistent</xhtml:p>
                     <fr:datatable id="table-widths-resizeable">
                         <xhtml:thead>
                             <xhtml:tr>
@@ -377,8 +409,7 @@
             <fr:case selected="true" id="_314216">
                 <fr:label>#314216: reduce the width of the right column</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
-                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314216&amp;group_id=168&amp;atid=350207"
+                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314216&amp;group_id=168&amp;atid=350207"
                             >314216</xhtml:a>.</xhtml:p>
                     <fr:datatable id="table-314216">
                         <xhtml:thead>
@@ -405,8 +436,7 @@
             <fr:case selected="true" id="_314209">
                 <fr:label>#314209: Hide/Show cycle</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
-                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314209&amp;group_id=168&amp;atid=350207"
+                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314209&amp;group_id=168&amp;atid=350207"
                             >314209</xhtml:a>.</xhtml:p>
                     <fr:datatable id="table-314209" scrollable="horizontal" width="100%">
                         <xhtml:thead>
@@ -429,8 +459,7 @@
             <fr:case selected="true" id="_314211">
                 <fr:label>#314211: Most simple datatable</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
-                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314211&amp;group_id=168&amp;atid=350207"
+                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314211&amp;group_id=168&amp;atid=350207"
                             >314211</xhtml:a>.</xhtml:p>
                     <fr:datatable id="table-314211">
                         <xhtml:thead>
@@ -453,13 +482,10 @@
             <fr:case selected="true" id="_314174">
                 <fr:label>#314174: External pagination</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
-                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314174&amp;group_id=168&amp;atid=350207"
+                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314174&amp;group_id=168&amp;atid=350207"
                             >314174</xhtml:a>.</xhtml:p>
-                    <xhtml:p>The pagination isn't supposed to work, the purpose of this test is just
-                        to display the table.</xhtml:p>
-                    <fr:datatable id="table-314174" paginated="true"
-                        sortAndPaginationMode="external" nbPages="5" page="2">
+                    <xhtml:p>The pagination isn't supposed to work, the purpose of this test is just to display the table.</xhtml:p>
+                    <fr:datatable id="table-314174" paginated="true" sortAndPaginationMode="external" nbPages="5" page="2">
                         <xhtml:thead>
                             <xhtml:tr>
                                 <xhtml:th>Text</xhtml:th>
@@ -480,8 +506,7 @@
             <fr:case selected="true" id="_314210">
                 <fr:label>#314210: 100% width, horizontal scroll, short lines</fr:label>
                 <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
-                            href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314210&amp;group_id=168&amp;atid=350207"
+                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314210&amp;group_id=168&amp;atid=350207"
                             >314210</xhtml:a>.</xhtml:p>
                     <fr:datatable width="100%" scrollable="horizontal" id="table-314210">
                         <xhtml:thead>

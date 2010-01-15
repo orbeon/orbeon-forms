@@ -14,19 +14,19 @@
 package org.orbeon.oxf.xforms.function;
 
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.BooleanValue;
 
-public class BooleanFromString extends XFormsFunction {
+/**
+ * XForms 1.1 choose() function.
+ */
+public class Choose extends XFormsFunction {
 
-    public Item evaluateItem(XPathContext c) throws XPathException {
-        String value = argument[0].evaluateAsString(c);
-        if("1".equals(value) || "true".equalsIgnoreCase(value))
-            return BooleanValue.TRUE;
-        else if("0".equals(value) || "false".equalsIgnoreCase(value))
-            return BooleanValue.FALSE;
+    @Override
+    public SequenceIterator iterate(XPathContext context) throws XPathException {
+    	if(argument[0].effectiveBooleanValue(context))
+            return argument[1].iterate(context);
         else
-        	return BooleanValue.FALSE;
+            return argument[2].iterate(context);
     }
 }

@@ -828,5 +828,426 @@
             </xxf:event-response>
         </output>
     </test>
+    
+    <test description="hmac() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                    </xforms:model>
+
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output1" value="hmac('key', 'abc', 'SHA-1', 'hex')"/>
+                    <xforms:output id="output2" value="hmac('key', 'abc', 'MD5', 'hex')"/>
+                    <xforms:output id="output3" value="hmac('key', 'abc', 'SHA-256', 'hex')"/>
+                    <xforms:output id="output4" value="hmac('key', 'abc', 'SHA-1', 'base64')"/>
+                    <xforms:output id="output5" value="hmac('key', 'abc', 'MD5', 'base64')"/>
+                    <xforms:output id="output6" value="hmac('key', 'abc', 'SHA-256', 'base64')"/>
+                    <xforms:output id="output7" value="hmac('key', 'abc', 'SHA-384', 'hex')"/>
+                    <xforms:output id="output8" value="hmac('key', 'abc', 'SHA-512', 'hex')"/>
+                    <xforms:output id="output9" value="hmac('key', 'abc', 'SHA-384', 'base64')"/>
+                    <xforms:output id="output10" value="hmac('key', 'abc', 'SHA-512', 'base64')"/>
+                    <xforms:output id="output11" value="hmac('key', 'abc', 'SHA-256')"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:dynamic-state>
+		        <dynamic-state>
+		            <instances/>
+		        </dynamic-state>
+		    </xxf:dynamic-state>
+            <xxf:action>
+                <xxf:control-values>
+                    <xxf:control id="output1">4fd0b215276ef12f2b3e4c8ecac2811498b656fc</xxf:control>
+                    <xxf:control id="output2">d2fe98063f876b03193afb49b4979591</xxf:control>
+                    <xxf:control id="output3">9c196e32dc0175f86f4b1cb89289d6619de6bee699e4c378e68309ed97a1a6ab</xxf:control>
+                    <xxf:control id="output4">T9CyFSdu8S8rPkyOysKBFJi2Vvw=</xxf:control>
+                    <xxf:control id="output5">0v6YBj+HawMZOvtJtJeVkQ==</xxf:control>
+                    <xxf:control id="output6">nBluMtwBdfhvSxy4konWYZ3mvuaZ5MN45oMJ7Zehpqs=</xxf:control>
+                    <xxf:control id="output7">30ddb9c8f347cffbfb44e519d814f074cf4047a55d6f563324f1c6a33920e5edfb2a34bac60bdc96cd33a95623d7d638</xxf:control>
+                    <xxf:control id="output8">3926a207c8c42b0c41792cbd3e1a1aaaf5f7a25704f62dfc939c4987dd7ce060009c5bb1c2447355b3216f10b537e9afa7b64a4e5391b0d631172d07939e087a</xxf:control>
+                    <xxf:control id="output9">MN25yPNHz/v7ROUZ2BTwdM9AR6Vdb1YzJPHGozkg5e37KjS6xgvcls0zqVYj19Y4</xxf:control>
+                    <xxf:control id="output10">OSaiB8jEKwxBeSy9PhoaqvX3olcE9i38k5xJh9184GAAnFuxwkRzVbMhbxC1N+mvp7ZKTlORsNYxFy0Hk54Ieg==</xxf:control>
+                    <xxf:control id="output11">nBluMtwBdfhvSxy4konWYZ3mvuaZ5MN45oMJ7Zehpqs=</xxf:control>
+                </xxf:control-values>
+            </xxf:action>
+        </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="is-card-number() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                        <xforms:instance>
+                            <root>341111111111111</root>
+                        </xforms:instance>
+                    </xforms:model>
+
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output1" value="is-card-number('541234567890125')">
+                        <xforms:label>Test 1 : </xforms:label>
+                        <!-- must output true -->
+                    </xforms:output>
+                    <xforms:output id="output2" value="is-card-number('1002312234567990000')">
+                        <xforms:label>Test 2 : </xforms:label>
+                        <!-- must output true -->
+                    </xforms:output>
+                    <xforms:output id="output3" value="is-card-number(.)">
+                        <xforms:label>Test 3 : </xforms:label>
+                        <!-- must output true -->
+                    </xforms:output>
+                    <xforms:output id="output4" value="is-card-number('123456789012')">
+                        <xforms:label>Test 4 : </xforms:label>
+                        <!-- must output true -->
+                    </xforms:output>
+                    <xforms:output id="output5" value="is-card-number('123')">
+                        <xforms:label>Test 5 : </xforms:label>
+                        <!-- must output true -->
+                    </xforms:output>
+                    <xforms:output id="output6" value="is-card-number('12345a789012')">
+                        <xforms:label>Test 6 : </xforms:label>
+                        <!-- must output true -->
+                    </xforms:output>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="xf-1" model-id="model1">
+                                <root>341111111111111</root>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1" label="Test 1 : ">true</xxf:control>
+                        <xxf:control id="output2" label="Test 2 : ">true</xxf:control>
+                        <xxf:control id="output3" label="Test 3 : ">true</xxf:control>
+                        <xxf:control id="output4" label="Test 4 : ">false</xxf:control>
+                        <xxf:control id="output5" label="Test 5 : ">false</xxf:control>
+                        <xxf:control id="output6" label="Test 6 : ">false</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="power() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                    </xforms:model>
+
+                </xhtml:head>
+                <xhtml:body>
+                     <xforms:output id="output1" value="power(2,3)">
+                        <xforms:label>power(2,3) : </xforms:label>
+                     </xforms:output>
+                     <xforms:output id="output2" value="power(-1,0.5)">
+                        <xforms:label>power(-1,0.5) : </xforms:label>
+                     </xforms:output>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1" label="power(2,3) : ">8</xxf:control>
+                        <xxf:control id="output2" label="power(-1,0.5) : ">NaN</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="local-date() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                    </xforms:model>
+
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output1" value="local-date('test')">
+                        <xforms:label>local-date() : </xforms:label>
+                    </xforms:output>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1" label="local-date() : ">2004-12-31-07:00</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="local-date-time() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                    </xforms:model>
+
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output1" value="local-date-time('test')">
+                        <xforms:label>local-date-time() : </xforms:label>
+                    </xforms:output>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1" label="local-date-time() : ">2004-12-31T12:00:00-07:00</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="days-to-date() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                    </xforms:model>
+
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output1" value="days-to-date(11688)">
+                        <xforms:label>Test 1 : </xforms:label>
+                    </xforms:output>
+                    <xforms:output id="output2" value="days-to-date(-1)">
+                        <xforms:label>Test 2 : </xforms:label>
+                    </xforms:output>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1" label="Test 1 : ">2002-01-01</xxf:control>
+                        <xxf:control id="output2" label="Test 2 : ">1969-12-31</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="choose() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model1">
+                        <xforms:instance xmlns="">
+                            <petlist>
+                                <dogs>
+                        
+                                    <dog name="Benji" />
+                                    <dog name="Cujo" />
+                                    <dog name="Lassie" />
+                                </dogs>
+                                <cats>
+                                    <cat name="Garfield" />
+                                    <cat name="Heathcliff" />
+                                    <cat name="Felix" />
+                                    <cat name="Tom" />
+                        
+                                </cats>
+                            </petlist>
+                        </xforms:instance>
+                                    
+                    </xforms:model>
+
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat nodeset="choose(count(dogs/dog) &gt; count(cats/cat), dogs/dog, cats/cat)">
+                        <xforms:output ref="@name">
+                            <xforms:label>Nodeset : </xforms:label>
+                        </xforms:output>
+                    </xforms:repeat>
+
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="xf-1" model-id="model1">
+                                <petlist>
+                                    <dogs>
+                                        <dog name="Benji"/>
+                                        <dog name="Cujo"/>
+                                        <dog name="Lassie"/>
+                                    </dogs>
+                                    <cats>
+                                        <cat name="Garfield"/>
+                                        <cat name="Heathcliff"/>
+                                        <cat name="Felix"/>
+                                        <cat name="Tom"/>
+                                    </cats>
+                                </petlist>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="xf-2" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="xf-2" parent-indexes="" start-suffix="2" end-suffix="4"/>
+                        <xxf:control id="xf-3·1" label="Nodeset : ">Garfield</xxf:control>
+                        <xxf:control id="xf-3·2" label="Nodeset : ">Heathcliff</xxf:control>
+                        <xxf:control id="xf-3·3" label="Nodeset : ">Felix</xxf:control>
+                        <xxf:control id="xf-3·4" label="Nodeset : ">Tom</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="boolean-from-string() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+           <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ex="http://example.com">
+              <xhtml:head>
+                <xhtml:title>7.6.1.a boolean-from-string() function</xhtml:title>
+                <xhtml:link rel="stylesheet" href="/apps/xforms-test-suite/TestSuite11.css" type="text/css"/>
+                <xforms:model id="model1">
+                    <xforms:instance>
+                        <ex:driver>
+                            <ex:safe>true</ex:safe>
+                            <ex:experienced>TRUE</ex:experienced>
+                            <ex:insured>1</ex:insured>
+                            <ex:points>false</ex:points>
+                            <ex:accidents>FALSE</ex:accidents>
+                            <ex:mv_violation>0</ex:mv_violation>
+                            <ex:junk>3dod0</ex:junk>
+                        </ex:driver>
+                    </xforms:instance>
+                </xforms:model>
+              </xhtml:head>
+              <xhtml:body>
+                <xforms:output value="boolean-from-string(ex:safe)" id="xf-output-1">
+                    <xforms:label>Safe Driver : </xforms:label>
+                </xforms:output>
+                <xforms:output value="boolean-from-string(ex:experienced)" id="xf-output-2">
+                    <xforms:label>Experienced Driver : </xforms:label>
+                </xforms:output>
+                <xforms:output value="boolean-from-string(ex:insured)" id="xf-output-3">
+                    <xforms:label>Insured Driver : </xforms:label>
+                </xforms:output>
+                <xforms:output value="boolean-from-string(ex:points)" id="xf-output-4">
+                    <xforms:label>License Points : </xforms:label>
+                </xforms:output>
+                <xforms:output value="boolean-from-string(ex:accidents)" id="xf-output-5">
+                    <xforms:label>Accidents : </xforms:label>
+                </xforms:output>
+                <xforms:output value="boolean-from-string(ex:mv_violation)" id="xf-output-6">
+                    <xforms:label>Moving Violations : </xforms:label>
+                </xforms:output>
+                <xforms:output value="boolean-from-string(ex:junk)" id="xf-output-7">
+                    <xforms:label>Junk Instance Data : </xforms:label>
+                </xforms:output>
+                
+              </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="xf-2" model-id="model1">
+                                <ex:driver xmlns:ex="http://example.com">
+                                    <ex:safe>true</ex:safe>
+                                    <ex:experienced>TRUE</ex:experienced>
+                                    <ex:insured>1</ex:insured>
+                                    <ex:points>false</ex:points>
+                                    <ex:accidents>FALSE</ex:accidents>
+                                    <ex:mv_violation>0</ex:mv_violation>
+                                    <ex:junk>3dod0</ex:junk>
+                                </ex:driver>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="xf-output-1" label="Safe Driver : ">true</xxf:control>
+                        <xxf:control id="xf-output-2" label="Experienced Driver : ">true</xxf:control>
+                        <xxf:control id="xf-output-3" label="Insured Driver : ">true</xxf:control>
+                        <xxf:control id="xf-output-4" label="License Points : ">false</xxf:control>
+                        <xxf:control id="xf-output-5" label="Accidents : ">false</xxf:control>
+                        <xxf:control id="xf-output-6" label="Moving Violations : ">false</xxf:control>
+                        <xxf:control id="xf-output-7" label="Junk Instance Data : ">false</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>    
 
 </group>

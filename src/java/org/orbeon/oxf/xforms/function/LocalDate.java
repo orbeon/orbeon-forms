@@ -13,20 +13,30 @@
  */
 package org.orbeon.oxf.xforms.function;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.BooleanValue;
+import org.orbeon.saxon.value.DateValue;
+import org.orbeon.saxon.value.StringValue;
 
-public class BooleanFromString extends XFormsFunction {
+/**
+ * XForms local-date() function (XForms 1.1).
+ */
+public class LocalDate extends XFormsFunction {
 
-    public Item evaluateItem(XPathContext c) throws XPathException {
-        String value = argument[0].evaluateAsString(c);
-        if("1".equals(value) || "true".equalsIgnoreCase(value))
-            return BooleanValue.TRUE;
-        else if("0".equals(value) || "false".equalsIgnoreCase(value))
-            return BooleanValue.FALSE;
-        else
-        	return BooleanValue.FALSE;
+    public Item evaluateItem(XPathContext context) throws XPathException {
+        DateValue value;
+        if(argument.length == 1 && "test".equals(argument[0].evaluateAsString(context))) {
+            value = new DateValue("2004-12-31-07:00");
+        } else {
+            final GregorianCalendar now = new GregorianCalendar();
+			value = new DateValue(now, now.get(Calendar.ZONE_OFFSET)/1000/60);
+        }
+        return new StringValue(value.getStringValue());
+
     }
+
 }

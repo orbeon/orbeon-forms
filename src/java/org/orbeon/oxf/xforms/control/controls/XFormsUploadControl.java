@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -230,6 +230,11 @@ public class XFormsUploadControl extends XFormsValueControl {
 
             // Call the super method
             super.storeExternalValue(propertyContext, newValue, type, null);
+
+            // When a value is set, make sure associated file information is cleared, because even though the control might
+            // not be re-evaluated, a submission might attempt to access file name, etc. information for bound upload
+            // controls. A little tricky: can we find a better solution?
+            fileInfo.markDirty();
         } catch (Exception e) {
             throw new ValidationException(e, getLocationData());
         }
@@ -251,15 +256,15 @@ public class XFormsUploadControl extends XFormsValueControl {
         return fileInfo.getFileSize(propertyContext);
     }
 
-    public void setMediatype(PropertyContext propertyContext, String mediatype) {
+    private void setMediatype(PropertyContext propertyContext, String mediatype) {
         fileInfo.setMediatype(propertyContext, mediatype);
     }
 
-    public void setFilename(PropertyContext propertyContext, String filename) {
+    private void setFilename(PropertyContext propertyContext, String filename) {
         fileInfo.setFilename(propertyContext, filename);
     }
 
-    public void setSize(PropertyContext propertyContext, String size) {
+    private void setSize(PropertyContext propertyContext, String size) {
         fileInfo.setSize(propertyContext, size);
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -150,15 +150,15 @@ public class XFormsServer extends ProcessorImpl {
             eventElements.addAll(Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_EVENT_QNAME));
         }
 
+        // Hit session if it exists (it's probably not even necessary to do so)
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext.Session session = externalContext.getSession(false);
+
         // Check for message where there is only the heartbeat event
         if (eventElements.size() == 1) {
             final Element eventElement = eventElements.get(0);
             final String eventName = eventElement.attributeValue("name");
             if (eventName.equals(XFormsEvents.XXFORMS_SESSION_HEARTBEAT)) {
-
-                // Hit session if it exists (it's probably not even necessary to do so)
-                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                final ExternalContext.Session session = externalContext.getSession(false);
 
                 if (indentedLogger.isDebugEnabled()) {
                     if (session != null)
@@ -197,6 +197,10 @@ public class XFormsServer extends ProcessorImpl {
         {
             final Element dynamicStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_DYNAMIC_STATE_QNAME);
             encodedClientDynamicStateString = dynamicStateElement.getTextTrim();
+        }
+
+        if (session == null && XFormsStateManager.isSessionDependentState(encodedClientStaticStateString, encodedClientDynamicStateString)) {
+            throw new OXFException("Session has expired. Unable to process incoming request.");
         }
 
         // Decode state
@@ -243,7 +247,6 @@ public class XFormsServer extends ProcessorImpl {
             final IndentedLogger eventsIndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
             try {
                 // Run events if any
-                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
 
                 // Set URL rewriter resource path information based on information in static state

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -167,6 +167,15 @@ public class XFormsStateManager {
             else
                 heartbeatDelay = -1;
             return heartbeatDelay;
+        }
+    }
+
+    public static boolean isSessionDependentState(String staticStateString, String dynamicStateString) {
+        if (staticStateString.length() > PREFIX_COLON_POSITION && staticStateString.charAt(PREFIX_COLON_POSITION) == ':') {
+            final String staticStatePrefix = staticStateString.substring(0, PREFIX_COLON_POSITION + 1);
+            return staticStatePrefix.equals(PERSISTENT_STATE_PREFIX) || staticStatePrefix.equals(SESSION_STATE_PREFIX) || staticStatePrefix.equals(APPLICATION_STATE_PREFIX);
+        } else {
+            return false;
         }
     }
 

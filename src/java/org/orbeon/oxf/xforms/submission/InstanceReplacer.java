@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -90,7 +90,7 @@ public class InstanceReplacer extends BaseReplacer {
         return resultingDocument;
     }
 
-    public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+    public Runnable replace(final PropertyContext propertyContext, final ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
 
         // Set new instance document to replace the one submitted
 
@@ -106,6 +106,7 @@ public class InstanceReplacer extends BaseReplacer {
             // xforms-binding-error.
 
             submission.getXBLContainer(containingDocument).dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, submission));
+            return null;
         } else {
 
             final NodeInfo destinationNodeInfo = submission.evaluateTargetRef(propertyContext,
@@ -226,7 +227,7 @@ public class InstanceReplacer extends BaseReplacer {
             }
 
             // Dispatch xforms-submit-done
-            dispatchSubmitDone(propertyContext, connectionResult);
+            return dispatchSubmitDone(propertyContext, connectionResult);
         }
     }
 

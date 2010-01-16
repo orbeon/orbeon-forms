@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -33,8 +33,12 @@ public abstract class BaseReplacer implements Replacer {
         return submission.getDetailsLogger(p, p2);
     }
 
-    protected void dispatchSubmitDone(PropertyContext propertyContext, ConnectionResult connectionResult) {
-        submission.getXBLContainer(containingDocument)
-                .dispatchEvent(propertyContext, new XFormsSubmitDoneEvent(containingDocument, submission, connectionResult));
+    protected Runnable dispatchSubmitDone(final PropertyContext propertyContext, final ConnectionResult connectionResult) {
+        return new Runnable() {
+            public void run() {
+                submission.getXBLContainer(containingDocument)
+                    .dispatchEvent(propertyContext, new XFormsSubmitDoneEvent(containingDocument, submission, connectionResult));
+            }
+        };
     }
 }

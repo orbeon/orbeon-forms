@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -35,13 +35,9 @@ public class AllReplacer extends BaseReplacer {
         // NOP
     }
 
-    public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
+    public Runnable replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
 
         // When we get here, we are in a mode where we need to send the reply directly to an external context, if any.
-
-        // "the event xforms-submit-done may be dispatched"
-        if (!p.isDeferredSubmissionSecondPassReplaceAll) // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
-            dispatchSubmitDone(propertyContext, connectionResult);
 
         // Remember that we got a submission producing output
         containingDocument.setGotSubmissionReplaceAll();
@@ -67,5 +63,13 @@ public class AllReplacer extends BaseReplacer {
         // http://forge.objectweb.org/tracker/index.php?func=detail&aid=306918&group_id=168&atid=350207
         // Suggestion is to write either binary or XML to processor output ContentHandler,
         // and make sure the code which would output the XHTML+XForms is disabled.
+
+        // "the event xforms-submit-done may be dispatched"
+        // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
+        if (!p.isDeferredSubmissionSecondPassReplaceAll) {
+            return dispatchSubmitDone(propertyContext, connectionResult);
+        } else {
+            return null;
+        }
     }
 }

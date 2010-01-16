@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -30,8 +30,8 @@ public class NoneReplacer extends BaseReplacer {
         // NOP
     }
 
-    public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
+    public Runnable replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
         // Just notify that processing is terminated by dispatching xforms-submit-done
-        dispatchSubmitDone(propertyContext, connectionResult);
+        return dispatchSubmitDone(propertyContext, connectionResult);
     }
 }

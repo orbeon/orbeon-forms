@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -53,7 +53,7 @@ public class TextReplacer extends BaseReplacer {
         }
     }
 
-    public void replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
+    public Runnable replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
 
         // XForms 1.1: "If the replace attribute contains the value "text" and the submission response conforms to an
         // XML mediatype (as defined by the content type specifiers in [RFC 3023]) or a text media type (as defined by
@@ -98,6 +98,6 @@ public class TextReplacer extends BaseReplacer {
         XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY), submission, destinationNodeInfo, responseBody, null, false);
 
         // Dispatch xforms-submit-done
-        dispatchSubmitDone(propertyContext, connectionResult);
+        return dispatchSubmitDone(propertyContext, connectionResult);
     }
 }

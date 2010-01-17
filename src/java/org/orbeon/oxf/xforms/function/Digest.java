@@ -29,11 +29,11 @@ public class Digest extends XFormsFunction {
 
         final Expression dataExpression = argument[0];
         final Expression algorithmExpression = argument[1];
-        final Expression encodingExpression = argument[2];
+        final Expression encodingExpression = argument.length == 3?argument[2]:null;
 
         final String data = dataExpression.evaluateAsString(xpathContext);
         final String algorithm = algorithmExpression.evaluateAsString(xpathContext);
-        final String encoding = encodingExpression.evaluateAsString(xpathContext);
+        final String encoding = encodingExpression!=null?encodingExpression.evaluateAsString(xpathContext):"base64";
 
         // Create digest
         final String result = SecureUtils.digestString(data, algorithm, encoding);

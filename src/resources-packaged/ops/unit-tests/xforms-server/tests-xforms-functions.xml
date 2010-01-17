@@ -1250,4 +1250,48 @@
         </output>
     </test>    
 
+    <test description="seconds-to-dateTime() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+           <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ex="http://example.org">
+                <xhtml:head>
+                    <xhtml:title>7.9.6.a seconds-from-dateTime() function</xhtml:title>
+                    <xhtml:link rel="stylesheet" href="/apps/xforms-test-suite/TestSuite11.css" type="text/css"/>
+                    <xforms:model>
+                        <xforms:instance>
+                            <ex:root/>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output value="seconds-to-dateTime(0)" id="xf-output-1">
+                        <xforms:label>Test 1 : </xforms:label>
+                    </xforms:output>
+                    <xforms:output value="seconds-to-dateTime(number('NaN'))" id="xf-output-2">
+                        <xforms:label>Test 2 : </xforms:label>
+                    </xforms:output>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="xf-3" model-id="xf-2">
+                                <ex:root xmlns:ex="http://example.org"></ex:root>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="xf-output-1" label="Test 1 : ">1970-01-01T00:00:00Z</xxf:control>
+                        <xxf:control id="xf-output-2" label="Test 2 : "/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>    
+
 </group>

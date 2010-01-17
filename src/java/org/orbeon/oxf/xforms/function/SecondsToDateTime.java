@@ -13,9 +13,13 @@
  */
 package org.orbeon.oxf.xforms.function;
 
+import java.util.Collections;
+
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.AtomicValue;
 import org.orbeon.saxon.value.DateTimeValue;
@@ -27,8 +31,12 @@ public class SecondsToDateTime extends XFormsFunction {
 
     private static final long SECONDS_PER_DAY = 60 * 60 * 24;
 
-    public Item evaluateItem(XPathContext context) throws XPathException {
+    public SequenceIterator iterate(XPathContext context) throws XPathException {
         final NumericValue atomicValue = (NumericValue) ((AtomicValue) argument[0].evaluateItem(context)).getPrimitiveValue();
+        
+        if (atomicValue.isNaN())
+        		return EmptyIterator.getInstance();
+        
         final long totalSeconds = atomicValue.longValue();
 
         // "returns string containing a lexical xsd:dateTime that corresponds to the number of seconds passed as the
@@ -44,6 +52,6 @@ public class SecondsToDateTime extends XFormsFunction {
         if (days > Integer.MAX_VALUE)
             throw new OXFException("Number of seconds exceeds implementation-defined limits: " + totalSeconds);
 
-        return new DateTimeValue("1970-01-01T00:00:00Z").add(new SecondsDurationValue(1, (int) days, 0, 0, seconds, 0));
+        return new ListIterator(Collections.singletonList(new DateTimeValue("1970-01-01T00:00:00Z").add(new SecondsDurationValue(1, (int) days, 0, 0, seconds, 0))));
     }
 }

@@ -133,8 +133,8 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("seconds-from-dateTime", SecondsFromDateTime.class, 0, 1, 1, Type.INTEGER_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
-        e = register("seconds-to-dateTime", SecondsToDateTime.class, 0, 1, 1, Type.DATE_TIME_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 0, Type.INTEGER_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("seconds-to-dateTime", SecondsToDateTime.class, 0, 1, 1, Type.DATE_TIME_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        StandardFunction.arg(e, 0, Type.NUMBER_TYPE, StaticProperty.EXACTLY_ONE);
 
         e = register("seconds", Seconds.class, 0, 1, 1, Type.DOUBLE_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
@@ -143,7 +143,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // 7.10 Node-set Functions
-
+        
         // 7.10.1 The instance() Function
         e = register("instance", Instance.class, 0, 0, 1, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);

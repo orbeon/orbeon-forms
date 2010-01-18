@@ -867,25 +867,25 @@ ORBEON.util.DateTime = {
         // 4th Jan
         {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+)$/i,
             handler: function(bits) {
-                return new Date(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
+                return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
             }
         },
         // 4th Jan 2003
         {   re: /^(\d{1,2})(?:st|nd|rd|th)? (\w+),? (\d{2,4})$/i,
             handler: function(bits) {
-                return new Date(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
+                return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[2]), parseInt(bits[1], 10));
             }
         },
         // Jan 4th
         {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?$/i,
             handler: function(bits) {
-                return new Date(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
+                return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
             }
         },
         // Jan 4th 2003
         {   re: /^(\w+) (\d{1,2})(?:st|nd|rd|th)?,? (\d{2,4})$/i,
             handler: function(bits) {
-                return new Date(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
+                return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), ORBEON.util.DateTime._parseMonth(bits[1]), parseInt(bits[2], 10));
             }
         },
         // next Tuesday - this is suspect due to weird meaning of "next"
@@ -913,9 +913,9 @@ ORBEON.util.DateTime = {
             handler: function(bits) {
                 var d;
                 if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D]/[M]/[Y]") {
-                    d = new Date(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
+                    d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
                 } else {
-                    d = new Date(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
+                    d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
                 }
                 return d;
             }
@@ -925,9 +925,9 @@ ORBEON.util.DateTime = {
             handler: function(bits) {
                 var d;
                 if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D]/[M]/[Y]") {
-                    d = new Date(ORBEON.util.DateTime._currentYear, parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
+                    d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
                 } else {
-                    d = new Date(ORBEON.util.DateTime._currentYear, parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
+                    d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
                 }
                 return d;
             }
@@ -935,13 +935,13 @@ ORBEON.util.DateTime = {
         // dd.mm.yyyy (Swiss style)
         {   re: /^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/,
             handler: function(bits) {
-                return new Date(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
+                return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
             }
         },
         // yyyy-mm-dd (ISO style)
         {   re: /(^\d{2,4})-(\d{1,2})-(\d{1,2})$/,
             handler: function(bits) {
-                return new Date(ORBEON.util.DateTime._parseYear(bits[1]), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10));
+                return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[1]), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10));
             }
         }
     ],
@@ -1008,6 +1008,12 @@ ORBEON.util.DateTime = {
                 ? twentiethCentury : twentyFirstCentury;
         }
         return year;
+    },
+
+    _newDate: function(year, month, day) {
+        var result = new Date(year, month, day);
+        return result.getFullYear() == year && result.getMonth() == month && result.getDate() == day
+            ? result : null;
     }
 };
 

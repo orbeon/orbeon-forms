@@ -85,7 +85,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     getSelect: function(controlId) {
         var control = YAHOO.util.Dom.get(controlId);
-        return ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+        return ORBEON.util.Utils.isNewXHTMLLayout()
             ? control.getElementsByTagName("select")[0]
             : control;
     },
@@ -309,7 +309,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 ORBEON.xforms.Document.setValue("repeat-shown", "true");
             }, function() {
                 var trigger = YAHOO.util.Dom.get(this.triggerId);
-                var link = ORBEON.util.Utils.getProperty(NEW_XHTML_LAYOUT_PROPERTY)
+                var link = ORBEON.util.Utils.isNewXHTMLLayout()
                     ? YAHOO.util.Dom.getFirstChild(trigger) : trigger;
                 YAHOO.util.Assert.areEqual("a", link.tagName.toLowerCase());
                 YAHOO.util.Assert.areEqual("Label", link.innerHTML);

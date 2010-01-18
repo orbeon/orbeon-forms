@@ -231,7 +231,22 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     testTwoDigitClose: function() { this.checkDateConversion ("02", "2002"); },
     testTwoDigitTwentyFirst: function() { this.checkDateConversion ("40", "2040"); },
-    testTwoDigitTwentieth: function() { this.checkDateConversion ("85", "1985"); }
+    testTwoDigitTwentieth: function() { this.checkDateConversion ("85", "1985"); },
+    
+    testDateOverflow: function() {
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            // Enter invalid date
+            ORBEON.xforms.Document.setValue(this.dateValueControlId, "1/40/10");
+        }, function() {
+            YAHOO.util.Assert.areEqual("1/40/10", ORBEON.xforms.Document.getValue(this.dateValueControlId), "value still what we entered");
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                // Enter valid date
+                ORBEON.xforms.Document.setValue(this.dateValueControlId, "1/31/10");
+            }, function() {
+                YAHOO.util.Assert.areEqual("2010-01-31", ORBEON.xforms.Document.getValue(this.dateValueControlId), "value was parsed");
+            });
+        });
+    }
 }));
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({

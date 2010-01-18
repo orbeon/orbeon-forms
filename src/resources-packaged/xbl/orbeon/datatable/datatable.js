@@ -739,9 +739,10 @@ ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
                 ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id, innerTableWidth);
                 container.fr_dt_initialized = true;
             } else {
-                //Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
-                var cmd = "ORBEON.widgets.datatable.init(document.getElementById('" + target.id + "'), " + innerTableWidth + ");";
-                setTimeout(cmd, 100);
+                // Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
+                setTimeout(function() {
+                    ORBEON.widgets.datatable.init(target, innerTableWidth);
+                }, 100);
             }
         } else {
             ORBEON.widgets.datatable.datatables[id].update();

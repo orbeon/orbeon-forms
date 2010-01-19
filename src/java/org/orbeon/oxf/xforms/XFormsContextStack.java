@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -741,6 +741,11 @@ public class XFormsContextStack {
         return (bindingElement == null) && (parentBindingElement != null) && parentBindingElement.getName().equals("repeat");
     }
 
+    private boolean isRepeatBindingContext(BindingContext bindingContext) {
+        final Element bindingElement = bindingContext.getControlElement();
+        return bindingElement != null && bindingElement.getName().equals("repeat");
+    }
+
     /**
      * Return the closest enclosing repeat id.
      *
@@ -749,7 +754,9 @@ public class XFormsContextStack {
     public String getEnclosingRepeatId() {
         BindingContext currentBindingContext = getCurrentBindingContext();
         do {
-            if (isRepeatIterationBindingContext(currentBindingContext)) {
+            // Handle case where we are within a repeat iteration, as well as case where we are directly within the
+            // repeat container object.
+            if (isRepeatIterationBindingContext(currentBindingContext) || isRepeatBindingContext(currentBindingContext)) {
                 // Found binding context for relevant repeat iteration
                 return currentBindingContext.parent.elementId;
             }

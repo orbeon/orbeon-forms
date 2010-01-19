@@ -2372,7 +2372,8 @@
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
-                                                 xxforms:attribute('target', event('xxforms:targetid'))
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 xxforms:attribute('index', xxforms:index())
                                                  ))"/>
                         </xforms:repeat>
 
@@ -2416,7 +2417,7 @@
                                 <events>
                                     <event type="xforms-enabled" target="my-group"/>
                                     <event type="xforms-enabled" target="my-repeat-1a"/>
-                                    <event type="xforms-enabled" target="my-repeat-3"/>
+                                    <event type="xforms-enabled" target="my-repeat-3" index="1"/>
                                 </events>
                             </instance>
                         </instances>

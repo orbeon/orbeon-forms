@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -52,7 +52,7 @@
                             </xsl:when>
                             <xsl:otherwise>
                                 <!-- Standard header -->
-                                <xsl:if test="not($mode = ('view', 'pdf', 'email'))">
+                                <xsl:if test="not($mode = ('view', 'email'))">
 
                                     <xsl:variable name="default-objects" as="element()+">
                                         <fr:logo/>

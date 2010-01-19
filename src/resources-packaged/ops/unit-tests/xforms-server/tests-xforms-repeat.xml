@@ -2378,8 +2378,8 @@
                                                  ))"/>
                         </xforms:repeat>
 
-                        <!-- Test handler with ev:observer -->
-                        <xforms:insert ev:event="xforms-enabled" ev:observer="my-repeat-3"
+                        <!-- Test handler with ev:observer and ev:target -->
+                        <xforms:insert ev:event="xforms-enabled" ev:observer="my-repeat-3" ev:target="my-repeat-3"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),

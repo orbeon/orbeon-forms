@@ -2368,6 +2368,7 @@
                         <xforms:repeat nodeset="()" id="my-repeat-1b"/>
                         <xforms:repeat nodeset="instance('instance-2')/value" id="my-repeat-2"/>
                         <xforms:repeat nodeset="instance('instance-3')/value" id="my-repeat-3">
+                            <!-- Test handler with ev:target="#observer" -->
                             <xforms:insert ev:event="xforms-enabled" ev:target="#observer" ev:propagate="stop"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
@@ -2376,6 +2377,15 @@
                                                  xxforms:attribute('index', xxforms:index())
                                                  ))"/>
                         </xforms:repeat>
+
+                        <!-- Test handler with ev:observer -->
+                        <xforms:insert ev:event="xforms-enabled" ev:observer="my-repeat-3"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 xxforms:attribute('index', index('my-repeat-3'))
+                                                 ))"/>
 
                         <xforms:group id="my-group-2" ref="()">
                             <xforms:repeat nodeset="instance('instance-1')/value" id="my-repeat-4"/>
@@ -2417,6 +2427,7 @@
                                 <events>
                                     <event type="xforms-enabled" target="my-group"/>
                                     <event type="xforms-enabled" target="my-repeat-1a"/>
+                                    <event type="xforms-enabled" target="my-repeat-3" index="1"/>
                                     <event type="xforms-enabled" target="my-repeat-3" index="1"/>
                                 </events>
                             </instance>

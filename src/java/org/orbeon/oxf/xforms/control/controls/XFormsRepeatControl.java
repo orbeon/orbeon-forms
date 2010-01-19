@@ -19,10 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.ControlTree;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -670,5 +667,33 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public boolean supportsRefreshEvents() {
+        return true;
+    }
+
+    @Override
+    protected boolean computeRelevant() {
+
+        // If parent is not relevant then we are not relevant either
+        if (!super.computeRelevant())
+            return false;
+
+        final List<Item> currentItems = bindingContext.getNodeset();
+        for (Item currentItem: currentItems) {
+            // If bound to non-node, consider as relevant (e.g. nodeset="(1 to 10)")
+            if (!(currentItem instanceof NodeInfo))
+                return true;
+
+            // Bound to node and node is relevant
+            final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
+            if (InstanceData.getInheritedRelevant(currentNodeInfo))
+                return true;
+        }
+
+        // No item was relevant so we are not relevant either
+        return false;
     }
 }

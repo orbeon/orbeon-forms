@@ -19,7 +19,10 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.control.*;
+import org.orbeon.oxf.xforms.control.XFormsComponentControl;
+import org.orbeon.oxf.xforms.control.XFormsContainerControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
@@ -679,10 +682,9 @@ public class XFormsControls implements XFormsObjectResolver {
             final XFormsControl control = currentControlTree.getControl(controlEffectiveId);
 
             if (XFormsControl.supportsRefreshEvents(control)) {
-                final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
 
-                final boolean oldRelevantState = singleNodeControl.wasRelevant();
-                final boolean newRelevantState = singleNodeControl.isRelevant();
+                final boolean oldRelevantState = control.wasRelevant();
+                final boolean newRelevantState = control.isRelevant();
 
                 if (newRelevantState && !oldRelevantState) {
                     // Control has become relevant

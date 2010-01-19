@@ -1867,6 +1867,15 @@
                             <instance id="events" model-id="model">
                                 <events>
                                     <event observer="main-group" type="xforms-enabled" target="main-group" phase="target" original-target="main-group" indexes=""/>
+                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level1-repeat" indexes=""/>
+                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level1-repeat" indexes=""/>
+                                    <event observer="fr-level2-binding" type="xforms-enabled" target="level2-repeat" phase="bubbling" original-target="level2-repeat" indexes="1"/>
+                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level2-repeat" indexes="1"/>
+                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level2-repeat" indexes="1"/>
+                                    <event observer="fr-level3-binding" type="xforms-enabled" target="level3-repeat" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
+                                    <event observer="fr-level2-binding" type="xforms-enabled" target="level3-repeat" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
+                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
+                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
                                     <event observer="fr-level3-binding" type="xforms-enabled" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="fr-level2-binding" type="xforms-enabled" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>

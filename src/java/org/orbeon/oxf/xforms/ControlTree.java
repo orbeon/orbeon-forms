@@ -153,33 +153,35 @@ public class ControlTree implements Cloneable {
     public void dispatchCreationEvents(PropertyContext propertyContext, XFormsControl control) {
         if (XFormsControl.supportsRefreshEvents(control)) {
             if (control.isRelevant()) {
-                final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                final XBLContainer container = singleNodeControl.getXBLContainer();
+                final XBLContainer container = control.getXBLContainer();
                 final XFormsContainingDocument containingDocument = container.getContainingDocument();
 
                 // Dispatch xforms-enabled if needed
                 if (isAllowSendingRelevantEvents) {
-                    container.dispatchEvent(propertyContext, new XFormsEnabledEvent(containingDocument, singleNodeControl));
+                    container.dispatchEvent(propertyContext, new XFormsEnabledEvent(containingDocument, control));
                 }
 
-                // Dispatch events only if the MIP value is different from the default
+                if (control instanceof XFormsSingleNodeControl) {
+                    final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
+                    // Dispatch events only if the MIP value is different from the default
 
-                // Dispatch xforms-required if needed
-                // TODO: must reacquire control and test for relevance again
-                if (isAllowSendingRequiredEvents && singleNodeControl.isRequired()) {
-                    container.dispatchEvent(propertyContext, new XFormsRequiredEvent(containingDocument, singleNodeControl));
-                }
+                    // Dispatch xforms-required if needed
+                    // TODO: must reacquire control and test for relevance again
+                    if (isAllowSendingRequiredEvents && singleNodeControl.isRequired()) {
+                        container.dispatchEvent(propertyContext, new XFormsRequiredEvent(containingDocument, singleNodeControl));
+                    }
 
-                // Dispatch xforms-readonly if needed
-                // TODO: must reacquire control and test for relevance again
-                if (isAllowSendingReadonlyEvents && singleNodeControl.isReadonly()) {
-                    container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(containingDocument, singleNodeControl));
-                }
+                    // Dispatch xforms-readonly if needed
+                    // TODO: must reacquire control and test for relevance again
+                    if (isAllowSendingReadonlyEvents && singleNodeControl.isReadonly()) {
+                        container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(containingDocument, singleNodeControl));
+                    }
 
-                // Dispatch xforms-invalid if needed
-                // TODO: must reacquire control and test for relevance again
-                if (isAllowSendingValidEvents && !singleNodeControl.isValid()) {
-                    container.dispatchEvent(propertyContext, new XFormsInvalidEvent(containingDocument, singleNodeControl));
+                    // Dispatch xforms-invalid if needed
+                    // TODO: must reacquire control and test for relevance again
+                    if (isAllowSendingValidEvents && !singleNodeControl.isValid()) {
+                        container.dispatchEvent(propertyContext, new XFormsInvalidEvent(containingDocument, singleNodeControl));
+                    }
                 }
             }
         }
@@ -221,8 +223,7 @@ public class ControlTree implements Cloneable {
 
     public void dispatchDestructionEvents(PropertyContext propertyContext, XFormsControl control) {
         if (XFormsControl.supportsRefreshEvents(control)) {
-            final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-            final XBLContainer container = singleNodeControl.getXBLContainer();
+            final XBLContainer container = control.getXBLContainer();
             final XFormsContainingDocument containingDocument = container.getContainingDocument();
 
             // Don't test for relevance here
@@ -231,7 +232,7 @@ public class ControlTree implements Cloneable {
 
             // Dispatch xforms-disabled if needed
             if (isAllowSendingRelevantEvents) {
-                container.dispatchEvent(propertyContext, new XFormsDisabledEvent(containingDocument, singleNodeControl));
+                container.dispatchEvent(propertyContext, new XFormsDisabledEvent(containingDocument, control));
             }
 
             // TODO: if control *becomes* non-relevant and value changed, arguably we should dispatch the value-changed event
@@ -246,7 +247,7 @@ public class ControlTree implements Cloneable {
         // iterations if they are bound.
 
         if (XFormsControl.supportsRefreshEvents(control)) {
-            if (control.isRelevant()) {
+            if (control.isRelevant() && control instanceof XFormsSingleNodeControl) {
                 final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
                 final XBLContainer container = singleNodeControl.getXBLContainer();
                 final XFormsContainingDocument containingDocument = container.getContainingDocument();

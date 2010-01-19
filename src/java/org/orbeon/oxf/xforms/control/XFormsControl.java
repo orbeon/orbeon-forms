@@ -203,7 +203,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     protected boolean computeRelevant() {
-        // If there is a parent, as it, otherwise we are top-level so say relevant by default
+        // By default: if there is a parent, we have the same relevance as the parent, otherwise we are top-level so
+        // we are relevant by default
         final XFormsControl parent = getParent();
         return (parent == null) || parent.isRelevant();
     }

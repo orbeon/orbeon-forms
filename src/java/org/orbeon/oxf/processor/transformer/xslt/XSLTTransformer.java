@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -41,6 +41,7 @@ import org.orbeon.saxon.event.Emitter;
 import org.orbeon.saxon.event.SaxonOutputKeys;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.functions.FunctionLibrary;
+import org.orbeon.saxon.instruct.TerminationException;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NamePool;
 import org.orbeon.saxon.om.NodeInfo;
@@ -98,108 +99,82 @@ public abstract class XSLTTransformer extends ProcessorImpl {
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+
+                // Get URI references from cache
+                final KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
+                final URIReferences uriReferences = getURIReferences(pipelineContext, configKeyValidity);
+
+                // Get transformer from cache
                 TemplatesInfo templatesInfo = null;
-                TransformerHandler transformerHandler = null;
+                if (uriReferences != null) {
+                    // FIXME: this won't depend on the transformer input.
+                    final KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(pipelineContext, configKeyValidity, uriReferences);
+                    if (stylesheetKeyValidity != null)
+                        templatesInfo = (TemplatesInfo) ObjectCache.instance()
+                                .findValid(pipelineContext, stylesheetKeyValidity.key, stylesheetKeyValidity.validity);
+                }
+
+                // Get transformer attributes if any
+                Map<String, Boolean> attributes = null;
+                {
+                    // Read attributes input only if connected
+                    if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
+                        // Read input as an attribute Map and cache it
+                        attributes = (Map<String, Boolean>) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
+                            public Object read(PipelineContext context, ProcessorInput input) {
+                                final Document preferencesDocument = readInputAsDOM4J(context, input);
+                                final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
+                                final PropertySet propertySet = propertyStore.getGlobalPropertySet();
+                                return propertySet.getObjectMap();
+                            }
+                        });
+                    }
+                }
+
+                // Output location mode
+                final String outputLocationMode = getPropertySet().getString(OUTPUT_LOCATION_MODE_PROPERTY, OUTPUT_LOCATION_MODE_DEFAULT);
+                final boolean isDumbOutputLocation = OUTPUT_LOCATION_DUMB.equals(outputLocationMode);
+                final boolean isSmartOutputLocation = OUTPUT_LOCATION_SMART.equals(outputLocationMode);
+                if (isSmartOutputLocation) {
+                    // Create new HashMap as we don't want to change the one in cache
+                    attributes = (attributes == null) ? new HashMap<String, Boolean>() : new HashMap<String, Boolean>(attributes);
+                    // Set attributes for Saxon source location
+                    attributes.put(FeatureKeys.LINE_NUMBERING, Boolean.TRUE);
+                    attributes.put(FeatureKeys.COMPILE_WITH_TRACING, Boolean.TRUE);
+                }
+
+                // Create transformer if we did not find one in cache
+                if (templatesInfo == null) {
+                    // Get transformer configuration
+                    final Node config = readCacheInputAsDOM4J(pipelineContext, INPUT_TRANSFORMER);
+                    final String transformerClass = XPathUtils.selectStringValueNormalize(config, "/config/class");
+                    // Create transformer
+                    // NOTE: createTransformer() handles its own exceptions
+                    templatesInfo = createTransformer(pipelineContext, transformerClass, attributes);
+                }
+
+                // At this point, we have a templatesInfo, so run the transformation
+                runTransformer(pipelineContext, contentHandler, templatesInfo, attributes, isDumbOutputLocation, isSmartOutputLocation);
+            }
+
+            private void runTransformer(PipelineContext pipelineContext, final ContentHandler contentHandler, TemplatesInfo templatesInfo,
+                                        Map<String, Boolean> attributes, final boolean dumbOutputLocation, final boolean smartOutputLocation) {
+
+                StringWriter saxonStringWriter = null;
                 try {
-                    // Get URI references from cache
-                    KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
-                    URIReferences uriReferences = getURIReferences(pipelineContext, configKeyValidity);
-
-                    // Get transformer from cache
-                    if (uriReferences != null) {
-                        // FIXME: this won't depend on the transformer input.
-                        KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(pipelineContext, configKeyValidity, uriReferences);
-                        if (stylesheetKeyValidity != null)
-                            templatesInfo = (TemplatesInfo) ObjectCache.instance()
-                                    .findValid(pipelineContext, stylesheetKeyValidity.key, stylesheetKeyValidity.validity);
-                    }
-
-                    // Get transformer attributes if any
-                    Map<String, Boolean> attributes = null;
-                    {
-                        // Read attributes input only if connected
-                        if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
-                            // Read input as an attribute Map and cache it
-                            attributes = (Map<String, Boolean>) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
-                                public Object read(PipelineContext context, ProcessorInput input) {
-                                    final Document preferencesDocument = readInputAsDOM4J(context, input);
-                                    final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
-                                    final PropertySet propertySet = propertyStore.getGlobalPropertySet();
-                                    return propertySet.getObjectMap();
-                                }
-                            });
-                        }
-                    }
-
-                    // Output location mode
-                    final String outputLocationMode = getPropertySet().getString(OUTPUT_LOCATION_MODE_PROPERTY, OUTPUT_LOCATION_MODE_DEFAULT);
-                    final boolean isDumbOutputLocation = OUTPUT_LOCATION_DUMB.equals(outputLocationMode);
-                    final boolean isSmartOutputLocation = OUTPUT_LOCATION_SMART.equals(outputLocationMode);
-                    if (isSmartOutputLocation) {
-                        // Create new HashMap as we don't want to change the one in cache
-                        attributes = (attributes == null) ? new HashMap<String, Boolean>() : new HashMap<String, Boolean>(attributes);
-                        // Set attributes for Saxon source location
-                        attributes.put(FeatureKeys.LINE_NUMBERING, Boolean.TRUE);
-                        attributes.put(FeatureKeys.COMPILE_WITH_TRACING, Boolean.TRUE);
-                    }
-
-                    // Create transformer if we did not find one in cache
-                    if (templatesInfo == null) {
-                        // Get transformer configuration
-                        Node config = readCacheInputAsDOM4J(pipelineContext, INPUT_TRANSFORMER);
-                        String transformerClass = XPathUtils.selectStringValueNormalize(config, "/config/class");
-                        // Create transformer
-                        templatesInfo = createTransformer(pipelineContext, transformerClass, attributes);
-                    }
-
                     // Create transformer handler and set output writer for Saxon
-                    StringWriter saxonStringWriter = null;
                     final StringErrorListener errorListener = new StringErrorListener(logger);
-                    transformerHandler = TransformerUtils.getTransformerHandler(templatesInfo.templates, templatesInfo.transformerClass, attributes);
+                    final TransformerHandler transformerHandler = TransformerUtils.getTransformerHandler(templatesInfo.templates, templatesInfo.transformerClass, attributes);
 
                     final Transformer transformer = transformerHandler.getTransformer();
                     final TransformerURIResolver transformerURIResolver = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
                     transformer.setURIResolver(transformerURIResolver);
                     transformer.setErrorListener(errorListener);
-                    if (isSmartOutputLocation)
+                    if (smartOutputLocation)
                         transformer.setOutputProperty(SaxonOutputKeys.SUPPLY_SOURCE_LOCATOR, "yes");
 
-                    final String transformerClassName = transformerHandler.getTransformer().getClass().getName();
-
-                    // NOTE: 2007-07-05 MK suggests that since we depend on Saxon anyway, we shouldn't use reflection
-                    // here but directly the Saxon classes to avoid the cost of reflection.
-
-                    if (transformerClassName.equals("org.orbeon.saxon.Controller")) {
-                        // Built-in Saxon transformer
-                        saxonStringWriter = new StringWriter();
-                        final Controller saxonController = (Controller) transformerHandler.getTransformer();
-                        // NOTE: Saxon 9 returns a Receiver (MessageEmitter -> XMLEmitter -> Emitter -> Receiver)
-                        Emitter messageEmitter = saxonController.getMessageEmitter();
-                        if (messageEmitter == null) {
-                            // NOTE: Saxon 9 makes this method private, use setMessageEmitter() instead
-                            messageEmitter = saxonController.makeMessageEmitter();
-                        }
-                        messageEmitter.setWriter(saxonStringWriter);
-                    } else if (transformerClassName.equals("net.sf.saxon.Controller")) {
-                        // A Saxon transformer, we don't know which version
-                        saxonStringWriter = new StringWriter();
-                        final Transformer saxonController = transformerHandler.getTransformer();
-                        final Method getMessageEmitter = saxonController.getClass().getMethod("getMessageEmitter");
-                        Object messageEmitter = getMessageEmitter.invoke(saxonController);
-                        if (messageEmitter == null) {
-                            // Try to set a Saxon MessageEmitter 
-
-                            final String messageEmitterClassName = "net.sf.saxon.event.MessageEmitter";
-                            final Class messageEmitterClass = Class.forName(messageEmitterClassName);
-                            messageEmitter = messageEmitterClass.newInstance();
-
-                            final Class receiverClass = Class.forName("net.sf.saxon.event.Receiver");
-                            final Method setMessageEmitter = saxonController.getClass().getMethod("setMessageEmitter", receiverClass);
-                            setMessageEmitter.invoke(saxonController, messageEmitter);
-                        }
-                        final Method setWriter = messageEmitter.getClass().getMethod("setWriter", new Class[]{Writer.class});
-                        setWriter.invoke(messageEmitter, saxonStringWriter);
-                    }
+                    // Create writer for transformation errors
+                    saxonStringWriter = createErrorStringWriter(transformerHandler);
 
                     // Fallback location data
                     final LocationData processorLocationData = getLocationData();
@@ -253,11 +228,11 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                         public void setDocumentLocator(final Locator locator) {
                             this.inputLocator = locator;
-                            if (isSmartOutputLocation) {
+                            if (smartOutputLocation) {
                                 this.outputLocator = new OutputLocator();
                                 this.startElementLocationStack = new Stack<LocationData>();
                                 super.setDocumentLocator(this.outputLocator);
-                            } else if (isDumbOutputLocation) {
+                            } else if (dumbOutputLocation) {
                                 super.setDocumentLocator(this.inputLocator);
                             } else {
                                 // NOP: don't set a locator
@@ -267,7 +242,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         public void startDocument() throws SAXException {
                             // Try to set fallback Locator
                             if (((outputLocator != null && outputLocator.getSystemId() == null) || (inputLocator != null && inputLocator.getSystemId() == null))
-                                    && processorLocationData != null && isDumbOutputLocation) {
+                                    && processorLocationData != null && dumbOutputLocation) {
                                 final Locator locator = new ConstantLocator(processorLocationData);
                                 super.setDocumentLocator(locator);
                             }
@@ -412,29 +387,32 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
                         }
                     }
-                } catch (TransformerException e) {
-                    // This exception occurred during transformation (we make sure creating the transformer wraps into ValidationException or OXFException)
-
-                    // Add location data of TransformerException if possible
-                    final LocationData transformerLocationData =
-                            (e.getLocator() != null && e.getLocator().getSystemId() != null)
-                                ? new LocationData(e.getLocator())
-                                : (templatesInfo.systemId != null)
-                                    ? new LocationData(templatesInfo.systemId, -1, -1)
-                                    : null;
-
-                    throw new ValidationException(e, new ExtendedLocationData(transformerLocationData, "executing XSLT transformation"));
                 } catch (Exception e) {
 
-                    if (templatesInfo != null) {
-                        // Transformer was created, this exception occurred during transformation
+                    final Throwable rootCause = ValidationException.getRootThrowable(e);
+                    if (rootCause instanceof TransformerException) {
+                        final TransformerException transformerException = (TransformerException) rootCause;
 
+                        // Add location data of TransformerException if possible
+                        final LocationData locationData =
+                                (transformerException.getLocator() != null && transformerException.getLocator().getSystemId() != null)
+                                    ? new LocationData(transformerException.getLocator())
+                                    : (templatesInfo.systemId != null)
+                                        ? new LocationData(templatesInfo.systemId, -1, -1)
+                                        : null;
+
+                        if (rootCause instanceof TerminationException) {
+                            // Saxon-specific exception thrown by xsl:message terminate="yes"
+                            final ValidationException customException = new ValidationException("Processing terminated by xsl:message: " + saxonStringWriter.toString(), locationData);
+                            throw new ValidationException(customException, new ExtendedLocationData(locationData, "executing XSLT transformation"));
+                        } else {
+                            // Other transformation error
+                            throw new ValidationException(rootCause, new ExtendedLocationData(locationData, "executing XSLT transformation"));
+                        }
+                    } else {
                         // Add template location data if possible
                         final LocationData templatesLocationData = (templatesInfo.systemId != null) ? new LocationData(templatesInfo.systemId, -1, -1) : null;
-                        throw ValidationException.wrapException(e, new ExtendedLocationData(templatesLocationData, "executing XSLT transformation"));
-                    } else {
-                        // No transformer was created, this exception occurred while creating the transformer
-                        throw ValidationException.wrapException(e, new ExtendedLocationData((LocationData) null, "creating XSLT transformer"));
+                        throw ValidationException.wrapException(rootCause, new ExtendedLocationData(templatesLocationData, "executing XSLT transformation"));
                     }
                 }
             }
@@ -574,12 +552,12 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
 
                         // Put in cache: configKey -> uriReferences
-                        KeyValidity configKeyValidty = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
-                        if (configKeyValidty != null)
-                            ObjectCache.instance().add(pipelineContext, configKeyValidty.key, configKeyValidty.validity, uriReferences);
+                        final KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
+                        if (configKeyValidity != null)
+                            ObjectCache.instance().add(pipelineContext, configKeyValidity.key, configKeyValidity.validity, uriReferences);
 
                         // Put in cache: (configKey, uriReferences.stylesheetReferences) -> transformer
-                        KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(pipelineContext, configKeyValidty, uriReferences);
+                        final KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(pipelineContext, configKeyValidity, uriReferences);
                         if (stylesheetKeyValidity != null)
                             ObjectCache.instance().add(pipelineContext, stylesheetKeyValidity.key, stylesheetKeyValidity.validity, templatesInfo);
                     }
@@ -588,8 +566,8 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                 } catch (TransformerException e) {
                     if (errorListener.hasErrors()) {
-                        // Use error messages information and provide location data of first errror
-                        final ValidationException validationException = new ValidationException(errorListener.getMessages(), (LocationData) errorListener.getErrors().get(0));
+                        // Use error messages information and provide location data of first error
+                        final ValidationException validationException = new ValidationException(errorListener.getMessages(), errorListener.getErrors().get(0));
                         // If possible add location of top-level stylesheet
                         if (topStylesheetContentHandler.getSystemId() != null)
                             validationException.addLocationData(new ExtendedLocationData(new LocationData(topStylesheetContentHandler.getSystemId(), -1, -1), "creating XSLT transformer"));
@@ -632,6 +610,47 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
+    }
+
+    private StringWriter createErrorStringWriter(TransformerHandler transformerHandler) throws Exception {
+        final String transformerClassName = transformerHandler.getTransformer().getClass().getName();
+
+        // NOTE: 2007-07-05 MK suggests that since we depend on Saxon anyway, we shouldn't use reflection
+        // here but directly the Saxon classes to avoid the cost of reflection.
+
+        StringWriter saxonStringWriter = null;
+        if (transformerClassName.equals("org.orbeon.saxon.Controller")) {
+            // Built-in Saxon transformer
+            saxonStringWriter = new StringWriter();
+            final Controller saxonController = (Controller) transformerHandler.getTransformer();
+            // NOTE: Saxon 9 returns a Receiver (MessageEmitter -> XMLEmitter -> Emitter -> Receiver)
+            Emitter messageEmitter = saxonController.getMessageEmitter();
+            if (messageEmitter == null) {
+                // NOTE: Saxon 9 makes this method private, use setMessageEmitter() instead
+                messageEmitter = saxonController.makeMessageEmitter();
+            }
+            messageEmitter.setWriter(saxonStringWriter);
+        } else if (transformerClassName.equals("net.sf.saxon.Controller")) {
+            // A Saxon transformer, we don't know which version
+            saxonStringWriter = new StringWriter();
+            final Transformer saxonController = transformerHandler.getTransformer();
+            final Method getMessageEmitter = saxonController.getClass().getMethod("getMessageEmitter");
+            Object messageEmitter = getMessageEmitter.invoke(saxonController);
+            if (messageEmitter == null) {
+                // Try to set a Saxon MessageEmitter
+
+                final String messageEmitterClassName = "net.sf.saxon.event.MessageEmitter";
+                final Class messageEmitterClass = Class.forName(messageEmitterClassName);
+                messageEmitter = messageEmitterClass.newInstance();
+
+                final Class receiverClass = Class.forName("net.sf.saxon.event.Receiver");
+                final Method setMessageEmitter = saxonController.getClass().getMethod("setMessageEmitter", receiverClass);
+                setMessageEmitter.invoke(saxonController, messageEmitter);
+            }
+            final Method setWriter = messageEmitter.getClass().getMethod("setWriter", new Class[]{Writer.class});
+            setWriter.invoke(messageEmitter, saxonStringWriter);
+        }
+        return saxonStringWriter;
     }
 
     /**
@@ -741,10 +760,10 @@ public abstract class XSLTTransformer extends ProcessorImpl {
             initDummySaxonXPathContext();
         }
 
-        public StylesheetForwardingContentHandler(ContentHandler contentHandler) {
-            super(contentHandler);
-            initDummySaxonXPathContext();
-        }
+//        public StylesheetForwardingContentHandler(ContentHandler contentHandler) {
+//            super(contentHandler);
+//            initDummySaxonXPathContext();
+//        }
 
         public URIReferences getURIReferences() {
             return uriReferences;

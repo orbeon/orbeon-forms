@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.transformer.xslt;
 
@@ -24,14 +24,14 @@ import javax.xml.transform.ErrorListener;
 import javax.xml.transform.SourceLocator;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMLocator;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class StringErrorListener implements ErrorListener {
 
     private Logger logger;
     private boolean hasErrors;
-    private List errorLocationData;
+    private List<LocationData> errorLocationData;
     private StringBuffer messages = new StringBuffer();
 
     public StringErrorListener(Logger logger) {
@@ -89,7 +89,7 @@ public class StringErrorListener implements ErrorListener {
         hasErrors = true;
 
         if (errorLocationData == null)
-            errorLocationData = new ArrayList();
+            errorLocationData = new ArrayList<LocationData>();
 
         final LocationData locationData = getTransformerExceptionLocationData(exception, null);
         if (locationData != null)
@@ -104,7 +104,7 @@ public class StringErrorListener implements ErrorListener {
         return messages.toString();
     }
 
-    public List getErrors() {
+    public List<LocationData> getErrors() {
         return errorLocationData;
     }
 
@@ -128,7 +128,7 @@ public class StringErrorListener implements ErrorListener {
             } else if (locator.getClass().getName().equals("net.sf.saxon.instruct.InstructionDetails")
                     || locator.getClass().getName().equals("org.orbeon.saxon.instruct.InstructionDetails")) {
                 try {
-                    description = locator.getClass().getMethod("getInstructionName", new Class[]{}).invoke(locator, new Object[]{}).toString();
+                    description = locator.getClass().getMethod("getInstructionName", new Class[]{}).invoke(locator).toString();
                 } catch (Exception e) {
                     // Let's not consider this a real issue, just clear the description
                     description = null;

@@ -471,7 +471,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             }
         } finally {
             // Log total time spent in submission
-            if (indentedLogger.isDebugEnabled()) {
+            if (p != null && indentedLogger.isDebugEnabled()) {
                 indentedLogger.endHandleOperation();
             }
         }

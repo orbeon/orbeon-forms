@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -310,14 +310,14 @@ public class XFormsToXHTML extends ProcessorImpl {
                         if (!currentInstance.isCache()) {
                             // Add dependency only for instances that are not globally shared
                             if (indentedLogger.isDebugEnabled())
-                                indentedLogger.logDebug("", "adding document cache dependency for instance", "instance URI", instanceSourceURI);
+                                indentedLogger.logDebug("", "adding document cache dependency for non-cacheable instance", "instance URI", instanceSourceURI);
                             inputDependencies.addReference(null, instanceSourceURI, currentInstance.getUsername(), currentInstance.getPassword(),
                                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
                         } else {
                             // Don't add the dependency as we don't want the instance URI to be hit
                             // For all practical purposes, globally shared instances must remain constant!
                             if (indentedLogger.isDebugEnabled())
-                                indentedLogger.logDebug("", "not adding document cache dependency for application shared instance", "instance URI", instanceSourceURI);
+                                indentedLogger.logDebug("", "not adding document cache dependency for cacheable instance", "instance URI", instanceSourceURI);
                         }
                     }
                 }

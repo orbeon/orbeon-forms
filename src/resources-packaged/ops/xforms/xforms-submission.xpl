@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -51,7 +51,7 @@
             <xsl:stylesheet version="2.0">
                 <xsl:output name="xml-output" method="xml" version="1.0" encoding="UTF-8" indent="no" omit-xml-declaration="no"/>
                 <xsl:template match="/">
-                    <xsl:variable name="is-shared-result" select="exists(doc('input:submission')/xforms:submission[@xxforms:shared = 'application'])" as="xs:boolean"/>
+                    <xsl:variable name="is-shared-result" select="exists(doc('input:submission')/xforms:submission[@xxforms:shared = 'application' or @xxforms:cache = 'true'])" as="xs:boolean"/>
                     <xxforms:event-request xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
                         <xxforms:static-state>
                             <xsl:variable name="static-state" as="document-node()">
@@ -70,7 +70,7 @@
                                                 </xforms:instance>
                                             </xsl:if>
                                             <xforms:submission id="default-submission" replace="instance">
-                                                <xsl:copy-of select="doc('input:submission')/xforms:submission/@*[local-name() != 'id' and local-name() != 'id']"/>
+                                                <xsl:copy-of select="doc('input:submission')/xforms:submission/@*[local-name() != 'id']"/>
                                                 <xsl:copy-of select="doc('input:submission')/xforms:submission/namespace::*"/>
                                                 <xsl:copy-of select="doc('input:submission')/xforms:submission/*"/>
                                                 <!-- If the result is shared, it's not directly present in the dynamic state, so we copy it to another instance -->
@@ -95,9 +95,7 @@
                                                 <xsl:value-of select="saxon:serialize(doc('input:request'), 'xml-output')"/>
                                             </instance>
                                             <xsl:if test="$is-shared-result">
-                                                <instance id="result-instance" model-id="default-model">
-                                                    <dummy/>
-                                                </instance>
+                                                <instance id="result-instance" model-id="default-model">&lt;dummy/></instance>
                                             </xsl:if>
                                         </instances>
                                     </dynamic-state>

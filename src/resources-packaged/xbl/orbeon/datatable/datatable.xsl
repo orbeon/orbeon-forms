@@ -422,7 +422,8 @@
                         else max((1, $nbPages - $maxNbPagesToDisplay + 1))
                         else 1) cast as xs:integer"
                         xxbl:scope="inner"/>
-                    <xxforms:variable name="pages" select="if ($nbPages castable as xs:integer) 
+                    <xxforms:variable name="pages"
+                        select="if ($nbPages castable as xs:integer) 
                                 then for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)
                                 else ()"
                         xxbl:scope="inner"/>
@@ -920,7 +921,7 @@
         <xforms:repeat nodeset="$fr-dt-rewrittenNodeset">
             <xsl:apply-templates select="@*[not(name()='nodeset')]" mode="dynamic"/>
 
-            <xforms:action ev:event="xxforms-nodeset-changed" ev:target="#observer">
+            <xforms:action ev:event="xxforms-nodeset-changed">
                 <xxforms:script> ORBEON.widgets.datatable.update(this); </xxforms:script>
                 <xsl:if test="$paginated and not($sortAndPaginationMode='external')">
                     <!-- Workaround, see https://forge.ow2.org/tracker/index.php?func=detail&aid=314429&group_id=168&atid=350207 -->
@@ -929,6 +930,29 @@
                                          value="if (. cast as xs:integer > $nbPages) then $nbPages else ."/>-->
                 </xsl:if>
             </xforms:action>
+
+            <!-- 
+                Send  fr-selection-changed events when needed: 
+                    - xforms-enabled is triggered at init time
+                    - xxforms-index-changed is fired when the index is changed (by the user or using xforms:setindex)
+                    - xxforms-nodeset-changed is fired when the nodeset changed (happens also when the user changes the sort order or page)
+            -->
+            <xforms:action ev:event="xforms-enabled xxforms-index-changed xxforms-nodeset-changed" ev:target="#observer">
+
+                <xxforms:variable name="context" xxbl:scope="inner">
+                    <xxforms:sequence select="xxforms:repeat-nodeset()[xxforms:index()]" xxbl:scope="outer"/>
+                </xxforms:variable>
+                <xxforms:variable name="index" xxbl:scope="inner">
+                    <xxforms:sequence select="xxforms:index()" xxbl:scope="outer"/>
+                </xxforms:variable>
+
+                <xforms:dispatch name="fr-selection-changed" target="fr.datatable" xxbl:scope="inner">
+                    <xxforms:context name="index" select="$index"/>
+                    <xxforms:context name="selected" select="$context"/>
+                </xforms:dispatch>
+                
+            </xforms:action>
+
             <xsl:apply-templates select="node()" mode="dynamic"/>
         </xforms:repeat>
 

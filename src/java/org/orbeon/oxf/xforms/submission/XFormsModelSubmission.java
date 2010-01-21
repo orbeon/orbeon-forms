@@ -169,12 +169,17 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             if (avtActionOrResource == null) // @resource has precedence over @action
                 avtActionOrResource = submissionElement.attributeValue("action");
             if (avtActionOrResource == null) {
-                // TODO: For XForms 1.1, support @resource and nested xforms:resource
+                // TODO: support XForms 1.1 nested xforms:resource element
                 throw new XFormsSubmissionException(this, "xforms:submission: action attribute or resource attribute is missing.",
                         "processing xforms:submission attributes");
             }
 
             avtMethod = submissionElement.attributeValue("method");
+            if (avtMethod == null) {
+                // TODO: support XForms 1.1 nested xforms:method element
+                throw new XFormsSubmissionException(this, "xforms:submission: method attribute is missing.",
+                        "processing xforms:submission attributes");
+            }
             avtValidate = submissionElement.attributeValue("validate");
             avtRelevant = submissionElement.attributeValue("relevant");
 

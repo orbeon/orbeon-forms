@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2007 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import java.util.Collections;
-
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.EmptyIterator;
@@ -26,6 +24,8 @@ import org.orbeon.saxon.value.DateTimeValue;
 import org.orbeon.saxon.value.NumericValue;
 import org.orbeon.saxon.value.SecondsDurationValue;
 
+import java.util.Collections;
+
 
 public class SecondsToDateTime extends XFormsFunction {
 
@@ -35,7 +35,7 @@ public class SecondsToDateTime extends XFormsFunction {
         final NumericValue atomicValue = (NumericValue) ((AtomicValue) argument[0].evaluateItem(context)).getPrimitiveValue();
         
         if (atomicValue.isNaN())
-        		return EmptyIterator.getInstance();
+            return EmptyIterator.getInstance();
         
         final long totalSeconds = atomicValue.longValue();
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,10 +15,8 @@ package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.saxon.om.NodeInfo;
 
 /**
  * A container control which supports value change events. Currently:
@@ -42,15 +40,7 @@ public abstract class XFormsValueContainerControl extends XFormsSingleNodeContai
         // Evaluate control values
         if (isRelevant()) {
             // Control is relevant
-
-            // Just get the value from the bound node if not null
-            // NOTE: As a special case, we allow binding to a document node, but consider the value is empty in this case
-            final NodeInfo boundNode = getBoundNode();
-            if (boundNode != null && boundNode.getNodeKind() != org.w3c.dom.Document.DOCUMENT_NODE) {
-                value = XFormsInstance.getValueForNodeInfo(boundNode);
-            } else {
-                value = null;
-            }
+            value = XFormsUtils.getBoundItemValue(getBoundItem());
         } else {
             // Control is not relevant
             value = null;

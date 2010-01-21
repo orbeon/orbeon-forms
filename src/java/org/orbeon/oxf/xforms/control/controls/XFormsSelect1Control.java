@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -139,8 +139,9 @@ public class XFormsSelect1Control extends XFormsValueControl {
     public Itemset getItemset(PropertyContext propertyContext, boolean setBinding) {
         try {
             // Non-relevant control does not return an itemset
-            final NodeInfo boundNode = getBoundNode();
-            final boolean isRelevant = boundNode != null && InstanceData.getInheritedRelevant(boundNode);
+            final org.orbeon.saxon.om.Item boundItem = getBoundItem();
+            // TODO: this relevance logic duplicates what's in XFormsSingleNodeControl, which is no good; can we simply use isRelevant()?
+            final boolean isRelevant = boundItem != null && (!(boundItem instanceof NodeInfo) || InstanceData.getInheritedRelevant((NodeInfo) boundItem));
             if (!isRelevant)
                 return null;
 

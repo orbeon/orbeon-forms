@@ -33,7 +33,10 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents an xforms:repeat container control.
@@ -618,10 +621,10 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         return newIterations;
     }
 
-    private int indexOfNodeInfo(List<Item> nodeset, NodeInfo nodeInfo) {
+    private int indexOfItem(List<Item> nodeset, Item nodeInfo) {
         int index = 0;
-        for (Item currentNodeInfo: nodeset) {
-            if (((NodeInfo) currentNodeInfo).isSameNodeInfo(nodeInfo)) {
+        for (Item currentItem: nodeset) {
+            if (currentItem.equals(nodeInfo)) {// equals() is the same as isSameNodeInfo() for NodeInfo, and compares the values for values
                 return index;
             }
             index++;
@@ -633,9 +636,9 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         final int[] result = new int[nodeset1.size()];
 
         int index = 0;
-        for (Iterator i = nodeset1.iterator(); i.hasNext(); index++) {
-            final NodeInfo currentNodeInfo = (NodeInfo) i.next();
-            result[index] = indexOfNodeInfo(nodeset2, currentNodeInfo);
+        for (final Item currentItem: nodeset1) {
+            result[index] = indexOfItem(nodeset2, currentItem);
+            index++;
         }
         return result;
     }

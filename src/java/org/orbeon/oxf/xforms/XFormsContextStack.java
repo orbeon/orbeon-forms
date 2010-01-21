@@ -368,7 +368,7 @@ public class XFormsContextStack {
                             pushBinding(propertyContext, null, null, context, modelId, null, null, bindingElementNamespaceContext, sourceEffectiveId, scope);
                             hasOverriddenContext = true;
                             final BindingContext newBindingContext = getCurrentBindingContext();
-                            contextItem = newBindingContext.getSingleNode();
+                            contextItem = newBindingContext.getSingleItem();
                             variableInfo = newBindingContext.getVariables();
                             evaluationContextBinding = newBindingContext;
                         } else if (isNewModel) {
@@ -376,7 +376,7 @@ public class XFormsContextStack {
                             pushBinding(propertyContext, null, null, null, modelId, null, null, bindingElementNamespaceContext, sourceEffectiveId, scope);
                             hasOverriddenContext = false;
                             final BindingContext newBindingContext = getCurrentBindingContext();
-                            contextItem = newBindingContext.getSingleNode();
+                            contextItem = newBindingContext.getSingleItem();
                             variableInfo = newBindingContext.getVariables();
                             evaluationContextBinding = newBindingContext;
                         } else {
@@ -502,7 +502,7 @@ public class XFormsContextStack {
                             newPosition = getCurrentPosition();
                             isNewBind = false;
                             hasOverriddenContext = true;
-                            contextItem = getCurrentSingleNode();
+                            contextItem = getCurrentSingleItem();
                             isPushModelVariables = false;
                             variableInfo = null;
                         }
@@ -655,14 +655,7 @@ public class XFormsContextStack {
     }
 
     /**
-     * Get the current single node binding, if any.
-     */
-    public NodeInfo getCurrentSingleNode() {
-        return getCurrentBindingContext().getSingleNode();
-    }
-
-    /**
-     * Get the current single node binding, if any.
+     * Get the current single item, if any.
      */
     public Item getCurrentSingleItem() {
         return getCurrentBindingContext().getSingleItem();
@@ -706,21 +699,21 @@ public class XFormsContextStack {
     }
 
     /**
-     * Return the single node associated with the iteration of the repeat specified. If a null
-     * repeat id is passed, return the single node associated with the closest enclosing repeat
+     * Return the single item associated with the iteration of the repeat specified. If a null
+     * repeat id is passed, return the single item associated with the closest enclosing repeat
      * iteration.
      *
      * NOTE: Use getContextForId() instead.
      *
      * @param repeatId  enclosing repeat id, or null
-     * @return          the single node
+     * @return          the single item
      */
-    public NodeInfo getRepeatCurrentSingleNode(String repeatId) {
+    public Item getRepeatCurrentSingleNode(String repeatId) {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
             final BindingContext currentBindingContext = contextStack.get(i);
             if (isRepeatIterationBindingContext(currentBindingContext) && (repeatId == null || currentBindingContext.parent.elementId.equals(repeatId))) {
                 // Found binding context for relevant repeat iteration
-                return currentBindingContext.getSingleNode();
+                return currentBindingContext.getSingleItem();
             }
         }
         // It is required that there is a relevant enclosing xforms:repeat
@@ -917,15 +910,8 @@ public class XFormsContextStack {
         }
 
         /**
-         * Get the current single node binding, if any.
+         * Get the current single item, if any.
          */
-        public NodeInfo getSingleNode() {
-            if (nodeset == null || nodeset.size() == 0)
-                return null;
-
-            return (NodeInfo) nodeset.get(position - 1);
-        }
-
         public Item getSingleItem() {
             if (nodeset == null || nodeset.size() == 0)
                 return null;
@@ -995,8 +981,8 @@ public class XFormsContextStack {
         public XFormsInstance getInstance() {
             // NOTE: This is as of 2009-09-17 used only to determine the submission instance based on a submission node.
             // May return null
-            final NodeInfo currentNode = getSingleNode();
-            return (currentNode == null) ? null : model.getContainingDocument().getInstanceForNode(currentNode);
+            final Item currentNode = getSingleItem();
+            return (currentNode instanceof NodeInfo) ? model.getContainingDocument().getInstanceForNode((NodeInfo) currentNode) : null;
         }
     }
 }

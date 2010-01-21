@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -30,6 +30,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.io.*;
@@ -297,18 +298,21 @@ public class XFormsSubmissionUtils {
             for (Object o: uploadControls.values()) {
                 final XFormsUploadControl currentControl = (XFormsUploadControl) o;
                 if (currentControl.isRelevant()) {
-                    final NodeInfo controlBoundNodeInfo = currentControl.getBoundNode();
-                    if (currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode(controlBoundNodeInfo)) {
-                        // Found one relevant upload control bound to the instance we are submitting
-                        // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those
-                        // will be removed during the next recalculate.
-                        final String fileName = currentControl.getFileName(propertyContext);
-                        if (fileName != null) {
-                            InstanceData.setCustom(controlBoundNodeInfo, "xxforms-filename", fileName);
-                        }
-                        final String mediatype = currentControl.getFileMediatype(propertyContext);
-                        if (mediatype != null) {
-                            InstanceData.setCustom(controlBoundNodeInfo, "xxforms-mediatype", mediatype);
+                    final Item controlBoundItem = currentControl.getBoundItem();
+                    if (controlBoundItem instanceof NodeInfo) {
+                        final NodeInfo controlBoundNodeInfo = (NodeInfo) controlBoundItem;
+                        if (currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode(controlBoundNodeInfo)) {
+                            // Found one relevant upload control bound to the instance we are submitting
+                            // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those
+                            // will be removed during the next recalculate.
+                            final String fileName = currentControl.getFileName(propertyContext);
+                            if (fileName != null) {
+                                InstanceData.setCustom(controlBoundNodeInfo, "xxforms-filename", fileName);
+                            }
+                            final String mediatype = currentControl.getFileMediatype(propertyContext);
+                            if (mediatype != null) {
+                                InstanceData.setCustom(controlBoundNodeInfo, "xxforms-mediatype", mediatype);
+                            }
                         }
                     }
                 }
@@ -330,8 +334,8 @@ public class XFormsSubmissionUtils {
             for (Object o: uploadControls.values()) {
                 final XFormsUploadControl currentControl = (XFormsUploadControl) o;
                 if (currentControl.isRelevant()) {
-                    final NodeInfo controlBoundNodeInfo = currentControl.getBoundNode();
-                    if (currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode(controlBoundNodeInfo)) {
+                    final Item controlBoundItem = currentControl.getBoundItem();
+                    if (controlBoundItem instanceof NodeInfo && currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode((NodeInfo) controlBoundItem)) {
                         // Found one relevant upload control bound to the instance we are submitting
                         return true;
                     }

@@ -490,9 +490,9 @@ public class XFormsUtils {
         {
             final boolean hasSingleNodeBinding = currentBindingContext.isNewBind();
             if (hasSingleNodeBinding) {
-                final NodeInfo currentNode = currentBindingContext.getSingleNode();
-                if (currentNode != null) {
-                    final String tempResult = XFormsInstance.getValueForNodeInfo(currentNode);
+                final Item boundItem = currentBindingContext.getSingleItem();
+                final String tempResult = XFormsUtils.getBoundItemValue(boundItem);
+                if (tempResult != null) {
                     return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } else
                     return null;
@@ -1781,5 +1781,46 @@ public class XFormsUtils {
      */
     public static boolean isStaticId(String staticId) {
         return staticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) == -1 && staticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) == -1;
+    }
+
+    /**
+     * Check if an item is an element node.
+     *
+     * @param item  item to check
+     * @return      true iif the item is an element node
+     */
+    public static boolean isElement(Item item) {
+        return (item instanceof NodeInfo) && ((NodeInfo) item).getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE;
+    }
+
+    /**
+     * Check if an item is an document node.
+     *
+     * @param item  item to check
+     * @return      true iif the item is an document node
+     */
+    public static boolean isDocument(Item item) {
+        return (item instanceof NodeInfo) && ((NodeInfo) item).getNodeKind() == org.w3c.dom.Document.DOCUMENT_NODE;
+    }
+
+    /**
+     * Return the value of a bound item, whether a NodeInfo or an AtomicValue. If none of those, return null;
+     *
+     * @param boundItem item to get value
+     * @return          value or null
+     */
+    public static String getBoundItemValue(Item boundItem) {
+        if (boundItem instanceof NodeInfo && XFormsUtils.isDocument(boundItem)) {
+            // As a special case, we sometimes allow binding to a document node, but consider the value is empty in this case
+            return null;
+        } else if (boundItem instanceof NodeInfo) {
+            // Bound to element or attribute
+            return XFormsInstance.getValueForNodeInfo((NodeInfo) boundItem);
+        } else if (boundItem instanceof AtomicValue) {
+            // Bound to an atomic value
+            return ((AtomicValue) boundItem).getStringValue();
+        } else {
+            return null;
+        }
     }
 }

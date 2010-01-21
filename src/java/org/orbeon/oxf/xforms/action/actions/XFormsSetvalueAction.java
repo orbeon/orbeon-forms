@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -68,15 +68,15 @@ public class XFormsSetvalueAction extends XFormsAction {
         }
 
         // Set value on current node
-        final NodeInfo currentNode = contextStack.getCurrentSingleNode();
-        if (currentNode != null) {
+        final Item currentItem = contextStack.getCurrentSingleItem();
+        if (currentItem instanceof NodeInfo) {
             // TODO: XForms 1.1: "Element nodes: If element child nodes are present, then an xforms-binding-exception
             // occurs. Otherwise, regardless of how many child nodes the element has, the result is that the string
             // becomes the new content of the element. In accord with the data model of [XPath 1.0], the element will
             // have either a single non-empty text node child, or no children string was empty.
 
             // Node exists, we can try to set the value
-            doSetValue(propertyContext, containingDocument, indentedLogger, eventObserver, currentNode, valueToSet, null, false);
+            doSetValue(propertyContext, containingDocument, indentedLogger, eventObserver, (NodeInfo) currentItem, valueToSet, null, false);
         } else {
             // Node doesn't exist, don't do anything
             // NOP

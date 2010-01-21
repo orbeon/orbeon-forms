@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -521,19 +521,19 @@ public class XFormsModelBinds {
                     && (currentControl instanceof XFormsRepeatIterationControl || !(currentControl instanceof XFormsPseudoControl))) {
                 // Only check real single-node controls (includes xforms:group, xforms:switch, xforms:trigger) which have a new binding
                 // But also support repeat iterations, as their MIPs
-                final NodeInfo boundNode = ((XFormsSingleNodeControl) currentControl).getBoundNode();
-                if (boundNode != null) {
+                final Item boundItem = ((XFormsSingleNodeControl) currentControl).getBoundItem();
+                if (boundItem != null) {
                     // There is a match
-                    final Object existing = result.get(boundNode);// multiple controls may be bound to a node
+                    final Object existing = result.get(boundItem);// multiple controls may be bound to a node
                     if (existing == null) {
                         // No control yet, put the control in (hopefully the most frequent case)
-                        result.put(boundNode, currentControl);
+                        result.put(boundItem, currentControl);
                     } else if (existing instanceof XFormsControl) {
                         // There is just one control, which we replace with a list
                         final List<Object> newList = new ArrayList<Object>();
                         newList.add(existing);
                         newList.add(currentControl);
-                        result.put(boundNode, newList);
+                        result.put(boundItem, newList);
                     } else  {
                         // More than one control already, just add to it
                         final List<Object> existingList = (List<Object>) existing;

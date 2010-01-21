@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -74,7 +74,7 @@ public class XFormsInsertAction extends XFormsAction {
         }
 
         // Handle insert context (with @context attribute)
-        final NodeInfo insertContextNodeInfo;
+        final Item insertContextItem;
         if (hasOverriddenContext) {
             // "If the result is an empty nodeset or not a nodeset, then the insert action is terminated with no effect. "
             if (overriddenContext == null || !(overriddenContext instanceof NodeInfo)) {
@@ -82,15 +82,15 @@ public class XFormsInsertAction extends XFormsAction {
                     indentedLogger.logDebug("xforms:insert", "overridden context is an empty nodeset or not a nodeset, terminating");
                 return;
             } else {
-                insertContextNodeInfo = (NodeInfo) overriddenContext;
+                insertContextItem = overriddenContext;
             }
         } else {
-            insertContextNodeInfo = contextStack.getCurrentSingleNode();
+            insertContextItem = contextStack.getCurrentSingleItem();
         }
 
         // "The insert action is terminated with no effect if [...] b. The context attribute is given, the insert
         // context does not evaluate to an element node and the Node Set Binding node-set is the empty node-set."
-        if (contextAttribute != null && insertContextNodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE && isEmptyNodesetBinding) {
+        if (contextAttribute != null && isEmptyNodesetBinding && !XFormsUtils.isElement(insertContextItem)) {
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("xforms:insert", "insert context is not an element node and binding node-set is empty, terminating");
             return;
@@ -108,7 +108,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // origin attribute in the insert context."
 
                 originObjects = actionInterpreter.evaluateExpression(propertyContext, actionElement,
-                        Collections.singletonList((Item) insertContextNodeInfo), 1, originAttribute);
+                        Collections.singletonList((Item) insertContextItem), 1, originAttribute);
                 //XFormsUtils.resolveXMLBase(actionElement, ".").toString()
 
                 // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
@@ -155,7 +155,8 @@ public class XFormsInsertAction extends XFormsAction {
             }
         }
 
-        doInsert(propertyContext, containingDocument, indentedLogger, positionAttribute, collectionToBeUpdated, insertContextNodeInfo, originObjects, insertionIndex, true, true);
+        doInsert(propertyContext, containingDocument, indentedLogger, positionAttribute, collectionToBeUpdated,
+                (NodeInfo) insertContextItem, originObjects, insertionIndex, true, true);
     }
 
     public static List doInsert(PropertyContext propertyContext, XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, String positionAttribute,

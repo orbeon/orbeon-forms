@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -44,7 +44,7 @@ public class XFormsToggleAction extends XFormsAction {
             throw new OXFException("Missing mandatory case attribute on xforms:toggle element.");
 
         final String caseStaticId;
-        if (bindingContext.getSingleNode() != null) {
+        if (bindingContext.getSingleItem() != null) {
             caseStaticId = actionInterpreter.resolveAVTProvideValue(propertyContext, actionElement, caseAttribute, true);
         } else {
             // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not

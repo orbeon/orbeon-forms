@@ -37,7 +37,6 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.ValueRepresentation;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -894,7 +893,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         } else {
             // Possible AVT
 
-            // NOTE: the control may or may not be bound, so don't use getBoundNode()
+            // NOTE: the control may or may not be bound, so don't use getBoundItem()
             final List<Item> contextNodeset = bindingContext.getNodeset();
             if (contextNodeset == null || contextNodeset.size() == 0) {
                 // TODO: in the future we should be able to try evaluating anyway
@@ -1147,13 +1146,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             return false;
 
         final Iterator<Item> j = nodeset2.iterator();
-        for (Item item1: nodeset1) {
-            final NodeInfo currentNodeInfo1 = (NodeInfo) item1;
-            final NodeInfo currentNodeInfo2 = (NodeInfo) j.next();
-
-            // Found a difference
-            if (!currentNodeInfo1.isSameNodeInfo(currentNodeInfo2))
+        for (Item currentItem1: nodeset1) {
+            final Item currentItem2 = j.next();
+            if (!currentItem1.equals(currentItem2)) {// equals() is the same as isSameNodeInfo() for NodeInfo, and compares the values for values
+                // Found a difference
                 return false;
+            }
         }
         return true;
     }

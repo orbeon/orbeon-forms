@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -17,14 +17,16 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
 
 /**
  * 10.1.8 The load Element
@@ -58,10 +60,9 @@ public class XFormsLoadAction extends XFormsAction {
 
         if (bindingContext.isNewBind()) {
             // Use single-node binding
-            final NodeInfo currentNode = bindingContext.getSingleNode();
-            if (currentNode != null) {
-                final String value = XFormsInstance.getValueForNodeInfo(currentNode);
-                final String encodedValue = XFormsUtils.encodeHRRI(value, true);
+            final String tempValue = XFormsUtils.getBoundItemValue(bindingContext.getSingleItem());
+            if (tempValue != null) {
+                final String encodedValue = XFormsUtils.encodeHRRI(tempValue, true);
                 resolveStoreLoadValue(containingDocument, propertyContext, actionElement, doReplace, encodedValue, target, urlType, urlNorewrite, isShowProgress);
             } else {
                 // The action is a NOP if it's not bound to a node
@@ -71,7 +72,7 @@ public class XFormsLoadAction extends XFormsAction {
             // Use resource attribute
 
             // NOP if there is an AVT but no context node
-            if (bindingContext.getSingleNode() == null && resourceAttributeValue.indexOf('{') != -1)
+            if (bindingContext.getSingleItem() == null && resourceAttributeValue.indexOf('{') != -1)
                 return;
 
             // Resolve AVT

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -20,14 +20,12 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -97,14 +95,10 @@ public class XFormsOutputControl extends XFormsValueControl {
         final String value;
         if (valueAttribute == null) {
             // Get value from single-node binding
-            final NodeInfo currentSingleNode = bindingContext.getSingleNode();
-            if (currentSingleNode != null)
-                value = XFormsInstance.getValueForNodeInfo(currentSingleNode);
-            else
-                value = "";
+            final String tempValue = XFormsUtils.getBoundItemValue(bindingContext.getSingleItem());
+            value = (tempValue != null) ? tempValue : "";
         } else {
             // Value comes from the XPath expression within the value attribute
-
             value = evaluateAsString(propertyContext, valueAttribute);
         }
         setValue((value != null) ? value : "");

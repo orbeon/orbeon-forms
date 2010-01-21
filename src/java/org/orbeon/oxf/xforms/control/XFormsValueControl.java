@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -17,12 +17,12 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.HashMap;
@@ -86,12 +86,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     protected void evaluateValue(PropertyContext propertyContext) {
-        // Just get the value from the bound node
-        final NodeInfo boundNode = getBoundNode();
-        if (boundNode == null)
-            return;
-
-        setValue(XFormsInstance.getValueForNodeInfo(boundNode));
+        setValue(XFormsUtils.getBoundItemValue(getBoundItem()));
     }
 
     protected void evaluateExternalValue(PropertyContext propertyContext) {
@@ -116,10 +111,10 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
         // Set value into the instance
 
-        final NodeInfo boundNode = getBoundNode();
-        if (boundNode == null) // this should not happen
+        final Item boundItem = getBoundItem();
+        if (!(boundItem instanceof NodeInfo)) // this should not happen
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.");
-        XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, getIndentedLogger(), this, boundNode, value, type, false);
+        XFormsSetvalueAction.doSetValue(propertyContext, containingDocument, getIndentedLogger(), this, (NodeInfo) boundItem, value, type, false);
 
         // NOTE: We do *not* call evaluate() here, as that will break the difference engine. doSetValue() above marks
         // the controls as dirty, and they will be evaluated when necessary later.
@@ -144,7 +139,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
             }
 
             if (format != null) {
-                result = evaluateAsString(propertyContext, getBoundNode(), format,
+                result = evaluateAsString(propertyContext, getBoundItem(), format,
                         prefixToURIMap, getContextStack().getCurrentVariables());
             } else {
                 result = null;

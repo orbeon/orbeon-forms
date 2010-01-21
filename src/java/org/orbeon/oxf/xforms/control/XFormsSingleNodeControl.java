@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.value.AtomicValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,8 +33,8 @@ import java.util.Map;
  */
 public abstract class XFormsSingleNodeControl extends XFormsControl {
 
-    // Bound node
-    private NodeInfo boundNode;
+    // Bound item
+    private Item boundItem;
 
     // Whether MIPs have been read from the node
     private boolean mipsRead;
@@ -81,19 +82,19 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         // Keep binding context
         super.setBindingContext(propertyContext, bindingContext, isCreate);
 
-        // Set bound node, only considering actual bindings with @bind, @ref or @nodeset
+        // Set bound item, only considering actual bindings with @bind, @ref or @nodeset
         if (bindingContext.isNewBind())
-            this.boundNode = bindingContext.getSingleNode();
+            this.boundItem = bindingContext.getSingleItem();
     }
 
     /**
-     * Return the node to which the control is bound, if any. If the control is not bound to any node, return null. If
-     * the node to which the control no longer exists, return null.
+     * Return the item (usually a node) to which the control is bound, if any. If the control is not bound to any item,
+     * return null.
      *
-     * @return bound node or null
+     * @return bound item or null
      */
-    public NodeInfo getBoundNode() {
-        return boundNode;
+    public Item getBoundItem() {
+        return boundItem;
     }
 
     public boolean isReadonly() {
@@ -281,8 +282,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                     if (XFormsProperties.isReadonly(containingDocument))
                         this.readonly = true;
                 } else {
-                    // Control is not bound to a node - it becomes non-relevant
-                    // TODO: We could probably optimize and not even *create* the control object and its descendants
+                    // Control is not bound to a node, MIPs get default values
                     this.readonly = false;
                     this.required = false;
                     this.valid = true;// by default, a control is not invalid
@@ -303,21 +303,28 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
 
     @Override
     protected boolean computeRelevant() {
-        final boolean parentRelevant = super.computeRelevant();
+
+        // If parent is not relevant then we are not relevant either
+        if (!super.computeRelevant())
+            return false;
 
         final Item currentItem = bindingContext.getSingleItem();
         if (bindingContext.isNewBind()) {
+            // There is a binding
             if (currentItem instanceof NodeInfo) {
                 final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
-                // Control is bound to a node - get model item properties
-                return parentRelevant && InstanceData.getInheritedRelevant(currentNodeInfo);
+                // Control is bound to a node, get node relevance
+                return InstanceData.getInheritedRelevant(currentNodeInfo);
+            } else if (currentItem instanceof AtomicValue) {
+                // Control bound to a value is considered relevant
+                return true;
             } else {
-                // Control is not bound to a node - it becomes non-relevant
+                // Control is not bound to a node or item, consider non-relevant
                 return false;
             }
         } else {
-            // Control is not bound to a node because it doesn't have a binding (group, trigger, dialog, etc. without @ref)
-            return parentRelevant;
+            // Control is not bound because it doesn't have a binding (group, trigger, dialog, etc. without @ref)
+            return true;
         }
     }
 

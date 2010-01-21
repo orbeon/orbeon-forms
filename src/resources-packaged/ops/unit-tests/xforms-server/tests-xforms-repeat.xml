@@ -2462,4 +2462,58 @@
         </output>
     </test>
 
+    <test description="Repeat bound to items" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <order>ascending</order>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:refresh/>
+                            <xforms:setvalue ref="order">descending</xforms:setvalue>
+                        </xforms:action>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat id="my-repeat" nodeset="if (order = 'ascending') then (1 to 2) else reverse(1 to 2)">
+                        <xforms:output id="my-position" value="position()"/>
+                        <xforms:output id="my-value" ref="."/>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <order>descending</order>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
+                        <xxf:control id="my-position·1">1</xxf:control>
+                        <xxf:control id="my-value·1">2</xxf:control>
+                        <xxf:control id="my-position·2">2</xxf:control>
+                        <xxf:control id="my-value·2">1</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

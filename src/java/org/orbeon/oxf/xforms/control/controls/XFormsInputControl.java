@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -20,13 +20,12 @@ import org.orbeon.oxf.processor.MatchProcessor;
 import org.orbeon.oxf.processor.Perl5MatchProcessor;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.value.CalendarValue;
 import org.orbeon.saxon.value.DateValue;
@@ -69,11 +68,6 @@ public class XFormsInputControl extends XFormsValueControl {
 
     public String getAutocomplete() {
         return getExtensionAttributeValue(XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME);
-    }
-
-    @Override
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
-        super.setBindingContext(propertyContext, bindingContext, isCreate);
     }
 
     @Override
@@ -466,8 +460,8 @@ public class XFormsInputControl extends XFormsValueControl {
         final Map<String, ValueRepresentation> variables = new HashMap<String, ValueRepresentation>();
         variables.put("v", new StringValue(value));
 
-        final NodeInfo boundNode = getBoundNode();
-        if (boundNode == null) {
+        final Item boundItem = getBoundItem();
+        if (boundItem == null) {
             // No need to format
             return null;
         } else {
@@ -477,7 +471,7 @@ public class XFormsInputControl extends XFormsValueControl {
                             + XFormsProperties.getTypeInputFormat(containingDocument, valueType)
                             + "', 'en', (), ()) else $v";
 
-            return evaluateAsString(pipelineContext, boundNode, xpathExpression, prefixToURIMap, variables);
+            return evaluateAsString(pipelineContext, boundItem, xpathExpression, prefixToURIMap, variables);
         }
     }
 

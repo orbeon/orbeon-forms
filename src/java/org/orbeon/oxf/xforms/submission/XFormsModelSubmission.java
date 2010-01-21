@@ -688,7 +688,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             final XFormsContextStack.BindingContext bindingContext = getBindingContext(propertyContext, containingDocument);
             final XFormsFunction.Context functionContext = contextStack.getFunctionContext(getEffectiveId());
 
-            refNodeInfo = bindingContext.getSingleNode();
+            refNodeInfo = (NodeInfo) bindingContext.getSingleItem();
             submissionElementContextItem = bindingContext.getContextItem();
             // NOTE: Current instance may be null if the document submitted is not part of an instance
             refInstance = bindingContext.getInstance();

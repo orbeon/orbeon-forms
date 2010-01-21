@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -423,14 +424,9 @@ class FileInfo implements Cloneable {
     private String getInfoValue(PropertyContext propertyContext, Element element) {
         contextStack.setBinding(control);
         contextStack.pushBinding(propertyContext, element, control.getEffectiveId(), control.getChildElementScope(element));
-        final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
-        if (currentSingleNode == null) {
-            return null;
-        } else {
-            final String value = XFormsInstance.getValueForNodeInfo(currentSingleNode);
-            contextStack.popBinding();
-            return value;
-        }
+        final String tempValue = XFormsUtils.getBoundItemValue(contextStack.getCurrentSingleItem());
+        contextStack.popBinding();
+        return tempValue;
     }
 
     public void setMediatype(PropertyContext propertyContext, String mediatype) {
@@ -458,9 +454,10 @@ class FileInfo implements Cloneable {
 
         contextStack.setBinding(control);
         contextStack.pushBinding(propertyContext, element, control.getEffectiveId(), control.getChildElementScope(element));
-        final NodeInfo currentSingleNode = contextStack.getCurrentSingleNode();
-        if (currentSingleNode != null) {
-            XFormsSetvalueAction.doSetValue(propertyContext, control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(), control, currentSingleNode, value, null, false);
+        final Item currentSingleItem = contextStack.getCurrentSingleItem();
+        if (currentSingleItem instanceof NodeInfo) {
+            XFormsSetvalueAction.doSetValue(propertyContext, control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(),
+                    control, (NodeInfo) currentSingleItem, value, null, false);
             contextStack.popBinding();
         }
     }

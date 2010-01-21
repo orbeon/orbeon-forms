@@ -59,7 +59,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
 
             // Return the node to which the control is bound
             if (targetXFormsControl instanceof XFormsSingleNodeControl) {
-                return SingletonIterator.makeIterator(((XFormsSingleNodeControl) targetXFormsControl).getBoundNode());
+                return SingletonIterator.makeIterator(((XFormsSingleNodeControl) targetXFormsControl).getBoundItem());
             } else {
                 return EmptyIterator.getInstance();
             }

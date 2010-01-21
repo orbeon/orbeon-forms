@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -450,7 +451,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 final XFormsControl newRepeatControl = controlElementVisitorListener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
 
                 // Iterate over current xforms:repeat nodeset
-                final List currentNodeSet = currentContextStack.getCurrentNodeset();
+                final List<Item> currentNodeSet = currentContextStack.getCurrentNodeset();
                 if (currentNodeSet != null) {
                     for (int iterationIndex = 1; iterationIndex <= currentNodeSet.size(); iterationIndex++) {
                         // Push "artificial" binding with just current node in nodeset
@@ -499,9 +500,10 @@ public class XFormsControls implements XFormsObjectResolver {
                                     staticState, currentXBLContainer, newContainerControl, currentControlElement, idPrefix, idPostfix);
                         }
                     } else {
+                        // TODO: relevance logic here is wrong, see correct logic in XFormsSingleNodeControl
                         if (!isOptimizeRelevance
                                 || (!currentBindingContext.isNewBind()
-                                || (currentBindingContext.getSingleNode() != null && InstanceData.getInheritedRelevant(currentBindingContext.getSingleNode())))) {
+                                || (currentBindingContext.getSingleItem() != null && InstanceData.getInheritedRelevant((NodeInfo) currentBindingContext.getSingleItem())))) {
 
                             visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                                     staticState, currentXBLContainer, newContainerControl, currentControlElement, idPrefix, idPostfix);

@@ -41,12 +41,12 @@ public class XXFormsBinding extends XFormsFunction {
         if (object instanceof XFormsSingleNodeControl) {
             // Get and return control binding
             final XFormsSingleNodeControl control = (XFormsSingleNodeControl) object;
-            final NodeInfo boundNode = control.getBoundNode();
+            final Item boundItem = control.getBoundItem();
 
-            if (boundNode == null)
+            if (boundItem == null)
                 return EmptyIterator.getInstance();
 
-            return SingletonIterator.makeIterator(boundNode);
+            return SingletonIterator.makeIterator(boundItem);
         } else if (object instanceof XFormsContainerControl) {
             final XFormsControl control = (XFormsControl) object;
             final XFormsContextStack.BindingContext bindingContext = control.getBindingContext();

@@ -24,12 +24,16 @@
         <p:input name="source" href="#source"/>
         <p:input name="language-pair" href="#language-pair"/>
         <p:input name="config">
-            <config xsl:version="2.0">
+            <config xsl:version="2.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <url>
-                    <xsl:text>http://translate.google.com/translate_t?text=</xsl:text>
+                    <xsl:variable name="language-pair" as="xs:string" select="doc('input:language-pair')"/>
+                    <xsl:text>http://translate.google.com/translate_a/t?client=t&amp;text=</xsl:text>
                     <xsl:value-of select="encode-for-uri(doc('input:source'))"/>
-                    <xsl:text>&amp;langpair=</xsl:text>
-                    <xsl:value-of select="encode-for-uri(doc('input:language-pair'))"/>
+                    <xsl:text>&amp;sl=</xsl:text>
+                    <xsl:value-of select="substring-before($language-pair, '|')"></xsl:value-of>
+                    <xsl:text>&amp;tl=</xsl:text>
+                    <xsl:value-of select="substring-after($language-pair, '|')"></xsl:value-of>
+                    <xsl:text>&amp;otf=1&amp;pc=0</xsl:text>
                 </url>
                 <content-type>text/html</content-type>
                 <header>
@@ -46,8 +50,16 @@
         <p:output name="data" id="google-translation"/>
     </p:processor>
 
-    <p:processor name="oxf:identity">
-        <p:input name="data" href="aggregate('r', #google-translation#xpointer(string(//div[@id = 'result_box'])))"/>
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#google-translation"/>
+        <p:input name="config">
+            <data xsl:version="2.0">
+                <xsl:variable name="after-opening-quote" select="substring-after(., '&quot;trans&quot;:&quot;')"/>
+                <xsl:variable name="before-closing-quote" select="substring-before($after-opening-quote, '&quot;,&quot;')"/>
+                <xsl:variable name="replace-escaped-quotes" select="replace($before-closing-quote, '\\&quot;', '&quot;')"/>
+                <xsl:value-of select="$replace-escaped-quotes"/>
+            </data>
+        </p:input>
         <p:output name="data" ref="data"/>
     </p:processor>
 

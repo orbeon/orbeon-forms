@@ -408,7 +408,7 @@
 
             <xsl:choose>
                 <xsl:when test="$paginated and $maxNbPagesToDisplay &lt; 0">
-                    <xxforms:variable name="pages" select="for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)"
+                    <xxforms:variable name="pages" select="1 to xs:integer($nbPages)"
                         xxbl:scope="inner"/>
                 </xsl:when>
                 <xsl:when test="$paginated">
@@ -424,7 +424,7 @@
                         xxbl:scope="inner"/>
                     <xxforms:variable name="pages"
                         select="if ($nbPages castable as xs:integer) 
-                                then for $p in 1 to $nbPages cast as xs:integer return xxforms:element('page', $p)
+                                then 1 to xs:integer($nbPages)
                                 else ()"
                         xxbl:scope="inner"/>
                 </xsl:when>

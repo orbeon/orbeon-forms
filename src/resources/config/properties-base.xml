@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -52,8 +52,12 @@
     <property as="xs:string"  processor-name="oxf:page-flow" name="instance-passing"         value="redirect"/>
     <property as="xs:string"  processor-name="oxf:page-flow" name="xforms-submission-path"   value="/xforms-server-submit"/>
     <property as="xs:anyURI"  processor-name="oxf:page-flow" name="xforms-submission-model"  value="oxf:/ops/xforms/xforms-server-submit.xpl"/>
-    <property as="xs:string"  processor-name="oxf:saxon8"    name="location-mode"            value="none"/>
     <property as="xs:boolean" processor-name="oxf:sql"       name="legacy-implicit-prefixes" value="false"/>
+
+    <property as="xs:string"  processor-name="oxf:builtin-saxon"        name="location-mode" value="none"/>
+    <property as="xs:string"  processor-name="oxf:unsafe-builtin-saxon" name="location-mode" value="none"/>
+    <!-- This property was used prior to January 2010 builds -->
+    <property as="xs:string"  processor-name="oxf:saxon8"               name="location-mode" value="none"/>
 
     <!-- Deprecated -->
     <!--<property as="xs:boolean" processor-name="oxf:saxon8"    name="generate-source-location" value="false"/>-->

@@ -1026,7 +1026,7 @@ public class XFormsUtils {
         // Note that the XML Schema spec says "Spaces are, in principle, allowed in the ·lexical space· of anyURI,
         // however, their use is highly discouraged (unless they are encoded by %20).".
 
-        // We assume that we never want leading or trailing spaces. You can use %20 if you realy want this.
+        // We assume that we never want leading or trailing spaces. You can use %20 if you really want this.
         uriString = uriString.trim();
 
         // We try below to follow the "Human Readable Resource Identifiers" RFC, in draft as of 2007-06-06.

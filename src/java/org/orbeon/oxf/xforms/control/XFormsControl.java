@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.converter.XHTMLRewrite;
 import org.orbeon.oxf.util.IndentedLogger;
@@ -35,6 +36,7 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ValueRepresentation;
@@ -564,14 +566,19 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     public final void evaluateIfNeeded(PropertyContext propertyContext, boolean isRefresh) {
         if (!isEvaluated) {
             isEvaluated = true;// be careful with this flag, you can get into a recursion if you don't set it before calling evaluate()
-            evaluate(propertyContext, isRefresh);
+            try {
+                evaluate(propertyContext, isRefresh);
 
-            // Evaluate standard extension attributes
-            evaluateExtensionAttributes(propertyContext, STANDARD_EXTENSION_ATTRIBUTES);
-            // Evaluate custom extension attributes
-            final QName[] extensionAttributes = getExtensionAttributes();
-            if (extensionAttributes != null) {
-                evaluateExtensionAttributes(propertyContext, extensionAttributes);
+                // Evaluate standard extension attributes
+                evaluateExtensionAttributes(propertyContext, STANDARD_EXTENSION_ATTRIBUTES);
+                // Evaluate custom extension attributes
+                final QName[] extensionAttributes = getExtensionAttributes();
+                if (extensionAttributes != null) {
+                    evaluateExtensionAttributes(propertyContext, extensionAttributes);
+                }
+            } catch (ValidationException e) {
+                    throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating control",
+                        getControlElement(), "element", Dom4jUtils.elementToDebugString(getControlElement())));
             }
         }
     }

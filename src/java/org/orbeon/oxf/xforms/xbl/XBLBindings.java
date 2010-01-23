@@ -425,7 +425,7 @@ public class XBLBindings {
                     }
 
                     staticState.analyzeComponentTree(propertyContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(),
-                            repeatHierarchyStringBuffer, repeatAncestorsStack, true);
+                            repeatHierarchyStringBuffer, repeatAncestorsStack);
                 }
             }
         }

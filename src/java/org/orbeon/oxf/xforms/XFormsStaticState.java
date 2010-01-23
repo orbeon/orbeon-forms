@@ -794,8 +794,8 @@ public class XFormsStaticState {
             final Configuration xpathConfiguration = new Configuration();
             final StringBuilder repeatHierarchyStringBuffer = new StringBuilder(1024);
             final Stack<String> repeatAncestorsStack = new Stack<String>();
-            // NOTE: Say we DO want to exclude gathering event handlers within nested models, since those are gathered below
-            analyzeComponentTree(propertyContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer, repeatAncestorsStack, true);
+
+            analyzeComponentTree(propertyContext, xpathConfiguration, "", controlsDocument.getRootElement(), repeatHierarchyStringBuffer, repeatAncestorsStack);
 
             if (xxformsScripts != null && xxformsScripts.size() > 0)
                 indentedLogger.logDebug("", "extracted script elements", "count", Integer.toString(xxformsScripts.size()));
@@ -989,7 +989,7 @@ public class XFormsStaticState {
 
     public void analyzeComponentTree(final PropertyContext propertyContext, final Configuration xpathConfiguration,
                                      final String prefix, Element startElement, final StringBuilder repeatHierarchyStringBuffer,
-                                     final Stack<String> repeatAncestorsStack, boolean excludeModelEventHandlers) {
+                                     final Stack<String> repeatAncestorsStack) {
 
         final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(startElement.getDocument(), null, xpathConfiguration);
 

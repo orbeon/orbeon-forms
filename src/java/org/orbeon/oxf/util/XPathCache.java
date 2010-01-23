@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -286,7 +286,7 @@ public class XPathCache {
      * @throws Exception        if the expression is not correct
      */
     public static void checkXPathExpression(String xpathString, Map<String, String> prefixToURIMap, FunctionLibrary functionLibrary) throws Exception {
-        new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, null, functionLibrary, null, false, true).makeObject();
+        new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, null, functionLibrary, null, false, true, null).makeObject();
     }
 
     public static PooledXPathExpression getXPathExpression(PropertyContext propertyContext,
@@ -359,14 +359,14 @@ public class XPathCache {
             final PooledXPathExpression expr;
             if (testNoCache) {
                 // For testing only: don't get expression from cache
-                final Object o = new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt, false).makeObject();
+                final Object o = new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt, false, locationData).makeObject();
                 expr = (PooledXPathExpression) o;
             } else {
                 // Get or create pool
                 final InternalCacheKey cacheKey = new InternalCacheKey("XPath Expression2", cacheKeyString.toString());
                 ObjectPool pool = (ObjectPool) cache.findValid(propertyContext, cacheKey, validity);
                 if (pool == null) {
-                    pool = createXPathPool(xpathString, prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt);
+                    pool = createXPathPool(xpathString, prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt, locationData);
                     cache.add(propertyContext, cacheKey, validity, pool);
                 }
 
@@ -404,12 +404,13 @@ public class XPathCache {
                                               Set<String> variableNames,
                                               FunctionLibrary functionLibrary,
                                               String baseURI,
-                                              boolean isAvt) {
+                                              boolean isAvt,
+                                              LocationData locationData) {
         try {
             // TODO: pool should have at least one hard reference
             final SoftReferenceObjectPool pool = new SoftReferenceObjectPool();
             pool.setFactory(new XFormsCachePoolableObjetFactory(pool, xpathString,
-                    prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt, false));
+                    prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt, false, locationData));
 
             return pool;
         } catch (Exception e) {
@@ -427,6 +428,7 @@ public class XPathCache {
         private final String baseURI;
         private final boolean isAvt;
         private final boolean allowAllVariables;
+        private final LocationData locationData;
 
         public XFormsCachePoolableObjetFactory(ObjectPool pool,
                                           String xpathString,
@@ -435,7 +437,8 @@ public class XPathCache {
                                           FunctionLibrary functionLibrary,
                                           String baseURI,
                                           boolean isAvt,
-                                          boolean allowAllVariables) {
+                                          boolean allowAllVariables,
+                                          LocationData locationData) {
             this.pool = pool;
             this.xpathString = xpathString;
             this.prefixToURIMap = prefixToURIMap;
@@ -444,6 +447,7 @@ public class XPathCache {
             this.baseURI = baseURI;
             this.isAvt = isAvt;
             this.allowAllVariables = allowAllVariables;
+            this.locationData = locationData;
         }
 
         public void activateObject(Object o) throws Exception {
@@ -540,19 +544,19 @@ public class XPathCache {
                             }
 
                             public int getColumnNumber() {
-                                return computedExpression.getColumnNumber();
+                                return (locationData != null) ? locationData.getCol() : -1;
                             }
 
                             public int getLineNumber() {
-                                return computedExpression.getLineNumber();
+                                return (locationData != null) ? locationData.getLine() : -1;
                             }
 
                             public String getPublicId() {
-                                return computedExpression.getPublicId();
+                                return (locationData != null) ? locationData.getPublicID() : null;
                             }
 
                             public String getSystemId() {
-                                return computedExpression.getSystemId();
+                                return (locationData != null) ? locationData.getSystemID() : null;
                             }
                         });
                     }

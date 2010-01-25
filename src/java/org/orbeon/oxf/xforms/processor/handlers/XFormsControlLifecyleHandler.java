@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -274,13 +274,6 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
     protected void handleHelp(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
         // May be overridden by subclasses
         handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LHHAC.HELP, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
-    }
-
-    protected String getForEffectiveId(String controlEffectiveId) {
-        // Default:
-        // o new layout: point to foo$bar$$c.1-2-3
-        // o old layout: point to foo$bar.1-2-3
-        return handlerContext.isNewXHTMLLayout() ? getLHHACId(controlEffectiveId, LHHAC_CODES.get(LHHAC.CONTROL)) : controlEffectiveId;
     }
 
     // Must be overridden by subclasses

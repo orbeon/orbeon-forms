@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,10 +13,13 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xml.ElementHandler;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -32,15 +35,16 @@ public class XFormsLabelHintHelpAlertHandler extends XFormsBaseHandler {
     @Override
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        final String lhhaEffectiveId = handlerContext.getEffectiveId(attributes);
-        final String forAttribute = attributes.getValue("for");
-        if (forAttribute == null) {
+        final String controlStaticId = attributes.getValue("for");
+        if (controlStaticId == null) {
             // This can happen if the author forgot a @for attribute, but also for xforms:group/xforms:label[not(@for)]
             return;
         }
 
-        // Find control effective id based on @for attribute
-        final String controlEffectiveId = XFormsUtils.getRelatedEffectiveId(lhhaEffectiveId, forAttribute);
+        // Find control ids based on @for attribute
+        final String lhhaEffectiveId = handlerContext.getEffectiveId(attributes);
+        final String controlPrefixedId = handlerContext.getIdPrefix() + controlStaticId;
+        final String controlEffectiveId = XFormsUtils.getRelatedEffectiveId(lhhaEffectiveId, controlStaticId);
 
         final boolean isTemplate = handlerContext.isTemplate();
         final XFormsControl xformsControl;
@@ -59,10 +63,28 @@ public class XFormsLabelHintHelpAlertHandler extends XFormsBaseHandler {
             xformsControl = null;
         }
 
-        // Output element
-        // TODO: must ask the control or handler what's the for effective id, for cases like xf:input, etc. where id of HTML element is not id of control
-        final String forEffectiveId = controlEffectiveId;
-//        xxx TODO
-        handleLabelHintHelpAlert(controlEffectiveId, forEffectiveId, LHHAC.valueOf(localname.toUpperCase()), (XFormsSingleNodeControl) xformsControl, isTemplate, true);
+        // Find control element so we know which handler to use
+        final Element controlElement = containingDocument.getStaticState().getControlElement(controlPrefixedId);
+        if (controlElement != null) {
+            // Get handler
+            final ElementHandler handler = handlerContext.getController().getHandler(controlElement);
+            if (handler instanceof XFormsControlLifecyleHandler) {
+                final XFormsControlLifecyleHandler xformsHandler = (XFormsControlLifecyleHandler) handler;
+
+                // Perform minimal handler initialization because we just want to use it to get the effective id
+                xformsHandler.setContext(handlerContext);
+
+                final String controlNamespaceURI = controlElement.getNamespaceURI();
+                final String controlPrefix = controlElement.getNamespacePrefix();
+                final String controlLocalname = controlElement.getName();
+
+                xformsHandler.prepareHandler(controlNamespaceURI, controlLocalname, XMLUtils.buildQName(controlPrefix, controlLocalname),
+                        XMLUtils.convertAttributes(controlElement), controlStaticId, controlEffectiveId, (XFormsSingleNodeControl) xformsControl);
+
+                final String forEffectiveId = xformsHandler.getForEffectiveId(controlEffectiveId);
+                handleLabelHintHelpAlert(controlEffectiveId, forEffectiveId, LHHAC.valueOf(localname.toUpperCase()), (XFormsSingleNodeControl) xformsControl, isTemplate, true);
+            }
+        }
     }
 }
+    

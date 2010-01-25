@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -38,7 +38,6 @@ import org.orbeon.oxf.util.SequenceReader;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -231,7 +230,7 @@ public class XMLUtils {
         if ("".equals(uri))
             return localname;
         else {
-            final FastStringBuffer sb = new FastStringBuffer(uri.length() + localname.length() + 2);
+            final StringBuilder sb = new StringBuilder(uri.length() + localname.length() + 2);
             sb.append('{');
             sb.append(uri);
             sb.append('}');

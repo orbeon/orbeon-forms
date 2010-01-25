@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xml;
 
+import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
@@ -389,6 +390,18 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
 
     public Locator getLocator() {
         return locator;
+    }
+
+    /**
+     * Get an ElementHandler based on a dom4j element.
+     *
+     * @param element   element
+     * @return          handler if found
+     */
+    public ElementHandler getHandler(Element element) {
+        return getHandler(element.getNamespaceURI(),
+                XMLUtils.buildExplodedQName(element.getNamespaceURI(), element.getName()),
+                XMLUtils.convertAttributes(element));
     }
 
     private ElementHandler getHandler(String uri, String explodedQName, Attributes attributes) {

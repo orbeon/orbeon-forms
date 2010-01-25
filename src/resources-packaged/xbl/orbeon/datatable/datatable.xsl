@@ -708,7 +708,7 @@
                                         <xforms:output value="{@fr:sortMessage}"/>
                                     </xforms:hint>
                                     <xforms:dispatch ev:event="DOMActivate" name="fr-update-sort" target="fr.datatable" xxbl:scope="inner">
-                                        <xxforms:context name="fr-column" select="$columnDesc/@index"/>
+                                        <xxforms:context name="fr-column" select="xs:integer($columnDesc/@index)"/>
                                     </xforms:dispatch>
                                 </xsl:when>
                                 <xsl:otherwise>

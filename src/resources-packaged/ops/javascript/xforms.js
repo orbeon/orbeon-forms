@@ -3466,10 +3466,12 @@ ORBEON.xforms.Events = {
      * because the server told use to close the dialog), then we want to notify the server that this happened.
      */
     dialogClose: function(type, args, me) {
-        var dialogId = me;
-        var dialog = ORBEON.util.Dom.getElementById(dialogId);
-        var event = new ORBEON.xforms.Server.Event(null, dialog.id, null, null, "xxforms-dialog-close");
-        ORBEON.xforms.Server.fireEvents([event], false);
+        if (! ORBEON.xforms.Globals.maskDialogCloseEvents) {
+            var dialogId = me;
+            var dialog = ORBEON.util.Dom.getElementById(dialogId);
+            var event = new ORBEON.xforms.Server.Event(null, dialog.id, null, null, "xxforms-dialog-close");
+            ORBEON.xforms.Server.fireEvents([event], false);
+        }
     },
 
     /**
@@ -4538,6 +4540,7 @@ ORBEON.xforms.Init = {
             requestRetries: 3,                   // How many retries we have left before we give up with this Ajax request
             executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
             maskFocusEvents: false,              // Avoid catching focus event when we do call setfocus upon server request
+            maskDialogCloseEvents: false,        // Avoid catching a dialog close event received from the server, so we don't sent it back to the server
             currentFocusControlId: null,         // Track which control has focus
             htmlAreaNames: [],                   // Names of the FCK editors, which we need to reenable them on Firefox
             repeatTreeChildToParent: {},         // Describes the repeat hierarchy
@@ -6788,7 +6791,9 @@ ORBEON.xforms.Server = {
                                                 ORBEON.xforms.Controls.showDialog(controlId, neighbor);
                                                 children[0] = ORBEON.util.Dom.getElementById(controlId);
                                             } else {
+                                                ORBEON.xforms.Globals.maskDialogCloseEvents = true;
                                                 yuiDialog.hide();
+                                                ORBEON.xforms.Globals.maskDialogCloseEvents = false;
                                                 // Fixes cursor Firefox issue; more on this in dialog init code
                                                 yuiDialog.element.style.display = "none";
                                             }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -39,7 +39,7 @@
          URL design perspective having the language better identifies the resource -->
 
     <xforms:submission id="fr-edit-switch-script-summary-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}/?{$common-get-parameters}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
+        resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}?{$common-get-parameters}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
         method="get" serialization="none" replace="all" validate="false" relevant="false"/>
 
     <xforms:submission id="fr-edit-switch-script-submission"

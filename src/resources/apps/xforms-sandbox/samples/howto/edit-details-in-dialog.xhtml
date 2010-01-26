@@ -67,9 +67,11 @@
             </xforms:instance>
             <xforms:instance id="ui">
                 <ui>
+                    <valid/>
                     <edited-planet/>
                 </ui>
             </xforms:instance>
+            <xforms:bind nodeset="instance('ui')/edited-planet/planet/description" required="true()"/>
             <xforms:action ev:event="xforms-model-construct-done" xxforms:iterate="instance('planets')/planet/description">
                 <xforms:setvalue ref="." value="normalize-space(.)"/>
             </xforms:action>
@@ -77,7 +79,7 @@
         <xhtml:style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent; }
             .xforms-label { font-weight: bold; display: block; margin-top: .5em; }
-            .edit-planet-textarea { width: 40em; height: 15em; }
+            .edit-planet-textarea, .edit-planet-textarea textarea { width: 40em; height: 15em; }
             .buttons { display: block; }
         </xhtml:style>
     </xhtml:head>
@@ -85,26 +87,38 @@
         <xxforms:dialog id="edit-planet-dialog">
             <xforms:label>Edit Planet</xforms:label>
             <xforms:delete ev:event="xxforms-dialog-close" nodeset="instance('ui')/edited-planet/planet"/>
-            <xxforms:hide ev:event="DOMActivate" dialog="edit-planet-dialog"/>
-            <xforms:group ref="instance('ui')/edited-planet/planet">
+            <xforms:group ref="instance('ui')/edited-planet/planet" id="edit-planet-group">
                 <xforms:output value="name">
                     <xforms:label>Planet</xforms:label>
                 </xforms:output>
                 <xforms:textarea ref="description" class="edit-planet-textarea">
                     <xforms:label>Description</xforms:label>
+                    <xforms:alert>Required field</xforms:alert>
                 </xforms:textarea>
                 <xhtml:div class="buttons">
                     <xforms:trigger>
                         <xforms:label>Cancel</xforms:label>
+                        <xxforms:hide ev:event="DOMActivate" dialog="edit-planet-dialog"/>
                     </xforms:trigger>
                     <xforms:trigger>
                         <xforms:label>OK</xforms:label>
-                        <xforms:setvalue ev:event="DOMActivate"
-                            ref="instance('planets')/planet[name = context()/name]/description"
-                            value="context()/description"/>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:dispatch name="fr-visit-all" targetid="planet-error-summary"/>
+                            <xforms:refresh/>
+                            <xforms:dispatch name="fr-update" targetid="planet-error-summary"/>
+                            <xforms:action if="instance('ui')/valid = 'true'">
+                                <xforms:setvalue
+                                    ref="instance('planets')/planet[name = context()/name]/description"
+                                    value="context()/description"/>
+                                <xxforms:hide ev:event="DOMActivate" dialog="edit-planet-dialog"/>
+                            </xforms:action>
+                        </xforms:action>
                     </xforms:trigger>
                 </xhtml:div>
             </xforms:group>
+            <fr:error-summary id="planet-error-summary" observer="edit-planet-group" valid-ref="instance('ui')/valid" incremental="false">
+                <fr:label>This dialog contains an error:</fr:label>
+            </fr:error-summary>
         </xxforms:dialog>
         <xhtml:table class="gridtable">
             <xhtml:thead>

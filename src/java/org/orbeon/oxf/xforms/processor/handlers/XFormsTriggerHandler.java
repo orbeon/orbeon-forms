@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -50,22 +50,24 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
     }
 
     @Override
-    protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleLabel() throws SAXException {
         // Label is handled differently
     }
 
     @Override
-    protected void handleHint(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleHint() throws SAXException {
         // Hint is handled differently
     }
 
     @Override
-    protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleAlert() throws SAXException {
         // Triggers don't need an alert (in theory, they could have one)
     }
 
     @Override
-    protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
+    public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        super.init(uri, localname, qName, attributes);
+        
         final String modalAttribute = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "modal");
         this.isModal = "true".equals(modalAttribute);
     }

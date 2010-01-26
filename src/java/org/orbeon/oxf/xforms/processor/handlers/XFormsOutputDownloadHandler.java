@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -30,7 +30,7 @@ import org.xml.sax.helpers.AttributesImpl;
 public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
 
     @Override
-    protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) {
+    protected void handleLabel() {
         // NOP because the label is output as the text within <a>
     }
 

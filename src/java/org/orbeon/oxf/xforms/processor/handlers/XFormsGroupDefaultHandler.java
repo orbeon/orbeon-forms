@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -42,7 +42,8 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
     private OutputInterceptor outputInterceptor;
 
     @Override
-    protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
+    public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        super.init(uri, localname, qName, attributes);
 
         // Determine whether the closest xhtml:* parent is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
         final ElementHandlerController controller = handlerContext.getController();
@@ -167,9 +168,13 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
     }
 
     @Override
-    protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleLabel() throws SAXException {
         if (!isGroupInTable) {
             // TODO: check why we output our own label here
+
+            final XFormsSingleNodeControl xformsControl = getXFormsControl();
+            final String effectiveId = getEffectiveId();
+
             reusableAttributes.clear();
             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, getLabelClasses(xformsControl));
             outputLabelFor(handlerContext, reusableAttributes, effectiveId, effectiveId, LHHAC.LABEL, handlerContext.getLabelElementName(),
@@ -178,20 +183,20 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
     }
 
     @Override
-    protected void handleHint(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleHint() throws SAXException {
         if (!isGroupInTable)
-            super.handleHint(staticId, effectiveId, xformsControl, isTemplate);
+            super.handleHint();
     }
 
     @Override
-    protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleAlert() throws SAXException {
         if (!isGroupInTable)
-            super.handleAlert(staticId, effectiveId, attributes, xformsControl, isTemplate);
+            super.handleAlert();
     }
 
     @Override
-    protected void handleHelp(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleHelp() throws SAXException {
         if (!isGroupInTable)
-            super.handleHelp(staticId, effectiveId, xformsControl, isTemplate);
+            super.handleHelp();
     }
 }

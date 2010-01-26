@@ -44,15 +44,17 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
+    public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        super.init(uri, localname, qName, attributes);
 
         // Handle appearance
         if (!handlerContext.isTemplate()) {
-            if (xformsControl != null) {
+            final XFormsSingleNodeControl control = getXFormsControl();
+            if (control != null) {
 
-                appearance = xformsControl.getAppearance();
+                appearance = control.getAppearance();
 
-                final String controlTypeName = xformsControl.getBuiltinTypeName();
+                final String controlTypeName = control.getBuiltinTypeName();
                 isDateTime = "dateTime".equals(controlTypeName);
                 isDateMinimal = "date".equals(controlTypeName) && "minimal".equals(appearance) ;
                 isBoolean = "boolean".equals(controlTypeName);
@@ -290,11 +292,11 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    public String getForEffectiveId(String effectiveId) {
+    public String getForEffectiveId() {
         if (isBoolean) {
-            return XFormsSelect1Handler.getItemId(effectiveId, "0");
+            return XFormsSelect1Handler.getItemId(getEffectiveId(), "0");
         } else {
-            return getFirstInputEffectiveId(effectiveId);
+            return getFirstInputEffectiveId(getEffectiveId());
         }
     }
 }

@@ -41,6 +41,8 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
+    private boolean isTemplate;
+
     private String staticId;
     private String prefixedId;
     private String effectiveId;
@@ -84,7 +86,9 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
     }
 
     @Override
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+    public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
+        isTemplate = handlerContext.isTemplate();
 
         staticId = handlerContext.getId(attributes);
         prefixedId = handlerContext.getIdPrefix() + staticId;
@@ -92,10 +96,10 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
         xformsControl = handlerContext.isTemplate()
                 ? null : (XFormsSingleNodeControl) containingDocument.getObjectByEffectiveId(effectiveId);
+    }
 
-        // Give the handler a chance to do some prep work
-        prepareHandler(uri, localname, qName, attributes, staticId, effectiveId, xformsControl);
-
+    @Override
+    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         if (isMustOutputControl(xformsControl)) {
 
             final ContentHandler contentHandler = handlerContext.getController().getOutput();
@@ -127,8 +131,6 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
                 }
             }
 
-            final boolean isTemplate = handlerContext.isTemplate();
-
             // Process everything up to and including the control
             for (int i = 0; i < config.length; i++) {
                 final String current = config[i];
@@ -148,19 +150,19 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
                 } else if ("label".equals(current)) {
                     // xforms:label
                     if (hasLocalLabel())
-                        handleLabel(staticId, effectiveId, attributes, xformsControl, isTemplate);
+                        handleLabel();
                 } else if ("alert".equals(current)) {
                     // xforms:alert
                     if (hasLocalAlert())
-                        handleAlert(staticId, effectiveId, attributes, xformsControl, isTemplate);
+                        handleAlert();
                 } else if ("hint".equals(current)) {
                     // xforms:hint
                     if (hasLocalHint())
-                        handleHint(staticId, effectiveId, xformsControl, isTemplate);
+                        handleHint();
                 } else {
                     // xforms:help
                     if (hasLocalHelp())
-                        handleHelp(staticId, effectiveId, xformsControl, isTemplate);
+                        handleHelp();
                 }
             }
         }
@@ -171,7 +173,6 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         if (isMustOutputControl(xformsControl)) {
             // Process everything after the control has been shown
             if (endConfig != null) {
-                final boolean isTemplate = handlerContext.isTemplate();
 
                 for (final String current: endConfig) {
                     if ("control".equals(current)) {
@@ -180,19 +181,19 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
                     } else if ("label".equals(current)) {
                         // xforms:label
                         if (hasLocalLabel())
-                            handleLabel(staticId, effectiveId, attributes, xformsControl, isTemplate);
+                            handleLabel();
                     } else if ("alert".equals(current)) {
                         // xforms:alert
                         if (hasLocalAlert())
-                            handleAlert(staticId, effectiveId, attributes, xformsControl, isTemplate);
+                            handleAlert();
                     } else if ("hint".equals(current)) {
                         // xforms:hint
                         if (hasLocalHint())
-                            handleHint(staticId, effectiveId, xformsControl, isTemplate);
+                            handleHint();
                     } else {
                         // xforms:help
                         if (hasLocalHelp())
-                            handleHelp(staticId, effectiveId, xformsControl, isTemplate);
+                            handleHelp();
                     }
                 }
             }
@@ -233,10 +234,6 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         return lhhaElement.getParent() == controlElement;
     }
 
-    protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
-        // May be overridden by subclasses
-    }
-
     protected boolean isMustOutputControl(XFormsSingleNodeControl xformsControl) {
         // May be overridden by subclasses
         return true;
@@ -256,24 +253,24 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         return false;
     }
 
-    protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleLabel() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LHHAC.LABEL, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.LABEL, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
     }
 
-    protected void handleAlert(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleAlert() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LHHAC.ALERT, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.ALERT, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
     }
 
-    protected void handleHint(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleHint() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LHHAC.HINT, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.HINT, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
     }
 
-    protected void handleHelp(String staticId, String effectiveId, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
+    protected void handleHelp() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(effectiveId), LHHAC.HELP, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.HELP, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
     }
 
     // Must be overridden by subclasses
@@ -326,5 +323,17 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
             xformsControl.addExtensionAttributes(newAttributes, "");
         }
         return newAttributes;
+    }
+
+    /**
+     * Return the effective id of the element to which label/@for, etc. must point to.
+     *
+     * @return                      @for effective id
+     */
+    public String getForEffectiveId() {
+        // Default:
+        // o new layout: point to foo$bar$$c.1-2-3
+        // o old layout: point to foo$bar.1-2-3
+        return handlerContext.isNewXHTMLLayout() ? getLHHACId(effectiveId, LHHAC_CODES.get(LHHAC.CONTROL)) : effectiveId;
     }
 }

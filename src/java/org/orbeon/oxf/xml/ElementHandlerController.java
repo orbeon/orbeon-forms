@@ -180,7 +180,8 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
                         currentHandlerInfo = new HandlerInfo(level, explodedQName, elementHandler);
                         // Push current handler
                         handlerInfos.push(currentHandlerInfo);
-                        // Signal start to current handler
+                        // Signal init/start to current handler
+                        elementHandler.init(uri, localname, qName, attributes);
                         elementHandler.start(uri, localname, qName, attributes);
                     }
                 } else {
@@ -203,6 +204,7 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
                     // Was filling-up SAXStore
                     isFillingUpSAXStore = false;
                     // Process body once
+                    currentHandlerInfo.elementHandler.init(uri, localname, qName, currentHandlerInfo.attributes);
                     currentHandlerInfo.elementHandler.start(uri, localname, qName, currentHandlerInfo.attributes);
                     currentHandlerInfo.elementHandler.end(uri, localname, qName);
                 } else {

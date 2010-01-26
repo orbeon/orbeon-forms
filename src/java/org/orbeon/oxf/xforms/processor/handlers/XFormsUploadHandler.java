@@ -67,7 +67,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
                     reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "file");
                     // Generate an id, because JS event handlers are not attached to elements that don't have an id, and
                     // this causes issues with IE where we register handlers directly on controls
-                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getForEffectiveId(effectiveId));
+                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getForEffectiveId());
                     reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
                     // IE causes issues when the user types in or pastes in an incorrect file name. Some sites use this to
                     // disable pasting in the file. See http://tinyurl.com/6dcd6a
@@ -138,7 +138,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    public String getForEffectiveId(String effectiveId) {
-        return XFormsUtils.appendToEffectiveId(effectiveId, "$xforms-input");
+    public String getForEffectiveId() {
+        return XFormsUtils.appendToEffectiveId(getEffectiveId(), "$xforms-input");
     }
 }

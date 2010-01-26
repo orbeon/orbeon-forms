@@ -584,17 +584,4 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     protected QName getAppearance(Attributes controlAttributes) {
         return handlerContext.getController().getAttributeQNameValue(controlAttributes.getValue("appearance"));
     }
-
-    /**
-     * Return the effective id of the element to which label/@for, etc. must point to.
-     *
-     * @param controlEffectiveId    control effective id
-     * @return                      @for effective id
-     */
-    public String getForEffectiveId(String controlEffectiveId) {
-        // Default:
-        // o new layout: point to foo$bar$$c.1-2-3
-        // o old layout: point to foo$bar.1-2-3
-        return handlerContext.isNewXHTMLLayout() ? getLHHACId(controlEffectiveId, LHHAC_CODES.get(LHHAC.CONTROL)) : controlEffectiveId;
-    }
 }

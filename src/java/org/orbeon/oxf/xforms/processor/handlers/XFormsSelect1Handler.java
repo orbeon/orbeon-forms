@@ -61,7 +61,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    protected void prepareHandler(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
+    public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        super.init(uri, localname, qName, attributes);
 
         this.isMultiple = localname.equals("select");
         this.isOpenSelection = "open".equals(attributes.getValue("selection"));
@@ -619,16 +620,16 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    public String getForEffectiveId(String effectiveId) {
+    public String getForEffectiveId() {
         // For full appearance we don't put a @for attribute so that selecting the main label doesn't select the item
-        return isFull ? null : super.getForEffectiveId(effectiveId);
+        return isFull ? null : super.getForEffectiveId();
     }
 
     @Override
-    protected void handleLabel(String staticId, String effectiveId, Attributes attributes, XFormsSingleNodeControl xformsControl, boolean isTemplate) throws SAXException {
-        if (isStaticReadonly(xformsControl) || !isFull || !handlerContext.isNoScript()) {
+    protected void handleLabel() throws SAXException {
+        if (isStaticReadonly(getXFormsControl()) || !isFull || !handlerContext.isNoScript()) {
             // In noscript mode for full items, this is handled by fieldset/legend
-            super.handleLabel(staticId, effectiveId, attributes, xformsControl, isTemplate);
+            super.handleLabel();
         }
     }
 }

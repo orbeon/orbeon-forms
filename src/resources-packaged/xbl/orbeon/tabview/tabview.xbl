@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -36,6 +36,12 @@
         <xbl:resources>
             <xbl:style src="/ops/yui/tabview/assets/skins/sam/tabview.css"/>
         </xbl:resources>
+        <xbl:handlers>
+            <xbl:handler event="xforms-focus" phase="target" defaultAction="cancel">
+                <!-- Override default behavior and focus on content-->
+                <xforms:setfocus control="fr-tabview-content"/>
+            </xbl:handler>
+        </xbl:handlers>
         <xbl:implementation>
             <!-- Local model -->
             <xforms:model id="tabview-model">
@@ -107,35 +113,39 @@
                                     </xhtml:li>
                                 </xsl:for-each>
                             </xhtml:ul>
+                            <!-- TODO: would be good to combine the following div and group. Need div appearance for group. -->
                             <xhtml:div class="yui-content">
-                                <xsl:for-each select="fr:tab">
-                                    <xsl:variable name="case-id" as="xs:string?" select="@id"/>
-                                    <xhtml:div>
-                                        <!-- Tab content has outer scope -->
-                                        <xforms:group xxbl:scope="outer">
-                                            <xsl:if test="$case-id">
-                                                <xsl:attribute name="id" select="$case-id"/>
-                                                <!-- Custom events -->
-                                                <!-- TODO: implement switching -->
-                                                <!--<xforms:setvalue ev:event="fr-toggle" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">toggle</xforms:setvalue>-->
-                                                <!--<xforms:setvalue ev:event="fr-show" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">show</xforms:setvalue>-->
-                                                <!--<xforms:setvalue ev:event="fr-hide" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">hide</xforms:setvalue>-->
-                                            </xsl:if>
+                                <xforms:group id="fr-tabview-content" appearance="xxforms:internal">
+                                    <xsl:for-each select="fr:tab">
+                                        <xsl:variable name="case-id" as="xs:string?" select="@id"/>
+                                        <xhtml:div>
+                                            <!-- Tab content has outer scope -->
+                                            <xforms:group xxbl:scope="outer">
+                                                <xsl:if test="$case-id">
+                                                    <xsl:attribute name="id" select="$case-id"/>
+                                                    <!-- Custom events -->
+                                                    <!-- TODO: implement switching -->
+                                                    <!--<xforms:setvalue ev:event="fr-toggle" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">toggle</xforms:setvalue>-->
+                                                    <!--<xforms:setvalue ev:event="fr-show" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">show</xforms:setvalue>-->
+                                                    <!--<xforms:setvalue ev:event="fr-hide" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">hide</xforms:setvalue>-->
+                                                </xsl:if>
 
-                                            <!-- Triggers by the JavaScript to notify the XForms code of events -->
-                                            <xforms:trigger id="fr-tabview-select-{position()}" class="fr-tabview-select-{position()}" style="display: none" xxbl:scope="inner">
-                                                <xforms:label/>
-                                                <xforms:dispatch ev:event="DOMActivate" name="fr-select" target="fr-tabview-select-{position()}"/>
-                                            </xforms:trigger>
-                                            <xforms:trigger id="fr-tabview-deselect-{position()}" class="fr-tabview-deselect-{position()}" style="display: none" xxbl:scope="inner">
-                                                <xforms:label/>
-                                                <xforms:dispatch ev:event="DOMActivate" name="fr-deselect" target="fr-tabview-deselect-{position()}"/>
-                                            </xforms:trigger>
-
-                                            <xsl:apply-templates select="node() except fr:label"/>
-                                        </xforms:group>
-                                    </xhtml:div>
-                                </xsl:for-each>
+                                                <xsl:apply-templates select="node() except fr:label"/>
+                                                
+                                                <!-- Triggers by the JavaScript to notify the XForms code of events -->
+                                                <!-- NOTE: Put them after the content so that xforms:setfocus works -->
+                                                <xforms:trigger id="fr-tabview-select-{position()}" class="fr-tabview-select-{position()}" style="display: none" xxbl:scope="inner">
+                                                    <xforms:label/>
+                                                    <xforms:dispatch ev:event="DOMActivate" name="fr-select" target="fr-tabview-select-{position()}"/>
+                                                </xforms:trigger>
+                                                <xforms:trigger id="fr-tabview-deselect-{position()}" class="fr-tabview-deselect-{position()}" style="display: none" xxbl:scope="inner">
+                                                    <xforms:label/>
+                                                    <xforms:dispatch ev:event="DOMActivate" name="fr-deselect" target="fr-tabview-deselect-{position()}"/>
+                                                </xforms:trigger>
+                                            </xforms:group>
+                                        </xhtml:div>
+                                    </xsl:for-each>
+                                </xforms:group>
                             </xhtml:div>
                         </xhtml:div>
                     </xforms:group>

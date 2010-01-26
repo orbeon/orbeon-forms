@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -38,10 +38,6 @@
                     <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
                         <xbl:content includes="xforms|label"/>
                         <xsl:variable name="fr-prefix" as="xs:string" select="namespace::*[. = 'http://orbeon.org/oxf/xml/form-runner']/local-name()"/>
-                        <!-- Properties -->
-                        <xsl:copy-of select="xxbl:parameter(., 'mindate')"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'maxdate')"/>
-                        <xsl:copy-of select="xxbl:parameter(., 'pagedate')"/>
                         <xsl:choose>
                             <!-- Inline data picker-->
                             <xsl:when test="@appearance = concat($fr-prefix, ':', 'inline')">
@@ -58,6 +54,12 @@
                             </xsl:otherwise>
                         </xsl:choose>
                         <xbl:content includes="xforms|help,xforms|hint,xforms|alert"/>
+
+                        <!-- Properties -->
+                        <!-- NOTE: Put this last so that xforms:setfocus works properly on xforms:input above -->
+                        <xsl:copy-of select="xxbl:parameter(., 'mindate')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'maxdate')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'pagedate')"/>
                     </xforms:group>
                 </xsl:template>
             </xsl:transform>

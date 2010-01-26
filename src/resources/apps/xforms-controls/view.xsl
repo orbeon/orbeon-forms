@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -217,6 +217,9 @@
             <xforms:submission id="fr-upload-attachment-submission"
                                ref="xxforms:instance('fr-form-instance')" validate="false" relevant="false"
                                method="post" replace="none" resource="test:"/>
+
+            <!-- Set focus on first focusable control -->
+            <xforms:setfocus ev:event="xforms-ready" control="fr-form-group"/>
         </xsl:copy>
     </xsl:template>
 

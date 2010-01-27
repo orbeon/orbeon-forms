@@ -5851,7 +5851,7 @@ ORBEON.xforms.Server = {
                     && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
             var responseRoot = responseXML.documentElement;
             // The verbose code below implements this XPath expression:
-            // exists(/*/xxf:action[xxf:server-events and (not(xxf:submission) or xxf:submission[@replace == 'instance' or (@replace == 'all' && not(@target))])])
+            // exists(/*/xxf:action[xxf:server-events and (not(xxf:submission) or xxf:submission[@replace == ('instance', 'none') or (@replace == 'all' && not(@target))])])
             for (var i = 0; i < responseRoot.childNodes.length; i++) {
                 if (ORBEON.util.Utils.getLocalName(responseRoot.childNodes[i]) == "action") {
                     var actionElement = responseRoot.childNodes[i];
@@ -5876,8 +5876,9 @@ ORBEON.xforms.Server = {
                     } else if (serverEventsElement) {
                         // There is a submission
                         var replaceAttribute = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
-                        if (replaceAttribute == "instance" || replaceAttribute == "all" && ORBEON.util.Dom.getAttribute(submissionElement, "target") == null) {
-                            // Server events will return for sure with replace="instance". With replace="all", they will
+                        if (replaceAttribute == "instance" || replaceAttribute == "none" ||
+                                (replaceAttribute == "all" && ORBEON.util.Dom.getAttribute(submissionElement, "target") == null)) {
+                            // Server events will return for sure with replace="instance | none". With replace="all", they will
                             // return if there is no target. They could return as well with a target, but should we
                             // take the risk?
                             return true;

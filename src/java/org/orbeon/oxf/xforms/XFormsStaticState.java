@@ -846,12 +846,15 @@ public class XFormsStaticState {
 
         // Two expressions depending on whether handlers within models are excluded or not
         final String xpathExpression = isControls ?
-                "//*[@ev:event and not(ancestor::xforms:instance) and not(ancestor::xforms:model) and (parent::*/@id or ev:observer)]" :
-                "//*[@ev:event and not(ancestor::xforms:instance) and (parent::*/@id or ev:observer)]";
+                "//*[@ev:event and not(ancestor::xforms:instance) and not(ancestor::xforms:model) and (parent::*/@id or @ev:observer)]" :
+                "//*[@ev:event and not(ancestor::xforms:instance) and (parent::*/@id or @ev:observer)]";
 
         // Get all candidate elements
         final List actionHandlers = XPathCache.evaluate(propertyContext, documentInfo,
                 xpathExpression, BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
+
+        final XBLBindings.Scope innerScope = xblBindings.getResolutionScopeByPrefix(prefix); // if at top-level, prefix is ""
+        final XBLBindings.Scope outerScope = (prefix.length() == 0) ? xblBindings.getResolutionScopeByPrefix("") : xblBindings.getResolutionScopeByPrefixedId(innerScope.scopeId);
 
         // Check all candidate elements
         for (Object actionHandler: actionHandlers) {
@@ -865,45 +868,39 @@ public class XFormsStaticState {
 
                     // Determine if the action is a child of a bound element. If so, we must annotate it here.
                     final Element newActionElement;
-                    final String observersStaticIds = actionElement.attributeValue(XFormsConstants.XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME);
+                    final String evObserversStaticIds = actionElement.attributeValue(XFormsConstants.XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME);
 
                     final String parentStaticId = actionElement.getParent().attributeValue("id");
                     if (isControls) {
                         // Analyzing controls
-                        if (observersStaticIds == null) {
-                            // Observer is containing element
-                            if (parentStaticId != null) {
-                                final String parentPrefixedId = prefix + parentStaticId;
-                                if (xblBindings.hasBinding(parentPrefixedId)) {
-                                    // Parent is a bound node, so we found an action handler which is a child of a bound element
+                        if (parentStaticId != null) {
+                            final String parentPrefixedId = prefix + parentStaticId;
+                            if (xblBindings.hasBinding(parentPrefixedId)) {
+                                // Parent is a bound node, so we found an action handler which is a child of a bound element
 
-                                    // Annotate handler
-                                    final XBLBindings.Scope innerScope = xblBindings.getResolutionScopeByPrefix(prefix); // if at top-level, prefix is ""
-                                    final XBLBindings.Scope outerScope = (prefix.length() == 0) ? xblBindings.getResolutionScopeByPrefix("") : xblBindings.getResolutionScopeByPrefixedId(innerScope.scopeId);
-                                    final XBLBindings.Scope bindingScope = xblBindings.getResolutionScopeByPrefixedId(parentPrefixedId);
-                                    final XFormsConstants.XXBLScope startScope = innerScope.equals(bindingScope) ? XFormsConstants.XXBLScope.inner : XFormsConstants.XXBLScope.outer;
-                                    newActionElement = xblBindings.annotateHandler(actionElement, prefix, innerScope, outerScope, startScope).getRootElement();
+                                // Annotate handler
+                                final XBLBindings.Scope bindingScope = xblBindings.getResolutionScopeByPrefixedId(parentPrefixedId);
+                                final XFormsConstants.XXBLScope startScope = innerScope.equals(bindingScope) ? XFormsConstants.XXBLScope.inner : XFormsConstants.XXBLScope.outer;
+                                newActionElement = xblBindings.annotateHandler(actionElement, prefix, innerScope, outerScope, startScope).getRootElement();
 
-                                    // Extract scripts in the handler
-                                    final DocumentWrapper handlerWrapper = new DocumentWrapper(newActionElement.getDocument(), null, xpathConfiguration);
-                                    extractXFormsScripts(propertyContext, handlerWrapper, prefix);
+                                // Extract scripts in the handler
+                                final DocumentWrapper handlerWrapper = new DocumentWrapper(newActionElement.getDocument(), null, xpathConfiguration);
+                                extractXFormsScripts(propertyContext, handlerWrapper, prefix);
 
-                                } else if (controlInfoMap.containsKey(parentPrefixedId)) {
-                                    // Parent is a control but not a bound node
-                                    newActionElement = actionElement;
-                                } else {
-                                    // Neither
-                                    newActionElement = null;
-                                }
+                            } else if (controlInfoMap.containsKey(parentPrefixedId)) {
+                                // Parent is a control but not a bound node
+                                newActionElement = actionElement;
                             } else {
-                                // No parent id: we ignore the handler
+                                // Neither
                                 newActionElement = null;
                             }
-
-                        } else {
-                            // Observer is specified with ev:observer
+                        } else if (evObserversStaticIds != null) {
+                            // There is no parent static id but an explicit @ev:observer
                             // TODO: if the element is a descendant of a bound node, it must be ignored
                             newActionElement = actionElement;
+                        } else {
+                            // No parent id and no @ev:observer, so we ignore the handler
+                            newActionElement = null;
                         }
                     } else {
                         // Analyzing models
@@ -919,7 +916,7 @@ public class XFormsStaticState {
                         // The observers to which this handler is attached might not be in the same scope. Try to find
                         // that scope.
                         final String observersPrefix;
-                        if (observersStaticIds != null) {
+                        if (evObserversStaticIds != null) {
                             // Explicit ev:observer, prefix might be different
                             final XBLBindings.Scope actionScope = xblBindings.getResolutionScopeByPrefixedId(prefix + newActionElement.attributeValue("id"));
                             observersPrefix = (actionScope != null) ? actionScope.getFullPrefix() : prefix;

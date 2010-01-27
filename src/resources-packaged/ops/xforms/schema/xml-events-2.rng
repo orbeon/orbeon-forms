@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- -*- rnc -*- -->
+<grammar ns="http://www.w3.org/2001/xml-events" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:x="http://www.w3.org/1999/xhtml" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <x:h1>XML Events Module in RELAX NG</x:h1>
+  <x:pre>
+    This is the RELAX NG Schema for the XML Events 2 XML Events module.
+    
+    Copyright (C) 2003-2009 W3C (R) (MIT, ERCIM, Keio), All Rights Reserved.
+
+    URI: http://www.w3.org/MarkUp/RELAXNG/xml-events-2.rng
+    Editors:   Masayasu Ishikawa &lt;mimasa@w3.org&gt;
+               Markus Gylling &lt;markus.gylling@tpb.se&gt;
+    Revision: $Id: xml-events-2.rng,v 1.1.2.3 2009/02/25 12:09:46 mgylling Exp $
+
+    Permission to use, copy, modify and distribute this RELAX NG schema
+    for XML Events and its accompanying documentation for any purpose and
+    without fee is hereby granted in perpetuity, provided that the above
+    copyright notice and this paragraph appear in all copies. The copyright
+    holders make no representation about the suitability of this RELAX NG
+    schema for any purpose.
+
+    It is provided "as is" without expressed or implied warranty.
+    For details, please refer to the W3C software license at:
+
+      <x:a href="http://www.w3.org/Consortium/Legal/copyright-software">http://www.w3.org/Consortium/Legal/copyright-software</x:a>
+
+  </x:pre>
+  <define name="xmlEvents.listener">
+    <element name="listener">
+      <ref name="xmlEvents.listener.attlist"/>
+    </element>
+  </define>
+  <define name="xmlEvents.listener.attlist">
+    <ref name="xmlEvents.event.attrib"/>
+    <optional>
+      <ref name="xmlEvents.observer.attrib"/>
+    </optional>
+    <optional>
+      <ref name="xmlEvents.eventTarget.attrib"/>
+    </optional>
+    <optional>
+      <ref name="xmlEvents.function.attrib"/>
+    </optional>
+    <optional>
+      <ref name="xmlEvents.handler.attrib"/>
+    </optional>
+    <optional>
+      <ref name="xmlEvents.phase.attrib"/>
+    </optional>
+    <optional>
+      <ref name="xmlEvents.propagate.attrib"/>
+    </optional>
+    <optional>
+      <ref name="xmlEvents.defaultAction.attrib"/>
+    </optional>
+    <ref name="xmlEvents.Common.attrib"/>
+  </define>
+  <define name="xmlEvents.Common.attrib">
+    <!--
+      The host grammar must contribute an
+      attribute of type ID to this class
+    -->
+    <empty/>
+  </define>
+  <define name="xmlEvents.event.attrib">
+    <attribute name="ev:event">
+      <list>
+        <oneOrMore>
+          <data type="QName"/>
+        </oneOrMore>
+      </list>
+    </attribute>
+  </define>
+  <define name="xmlEvents.eventTarget.attrib">
+    <attribute name="ev:eventTarget">
+      <data type="IDREFS"/>
+    </attribute>
+  </define>
+  <define name="xmlEvents.phase.attrib">
+    <!-- a:defaultValue="default" -->
+    <attribute name="ev:phase">
+      <choice>
+        <value>bubble</value>
+        <value>capture</value>
+        <value>target</value>
+        <value>default</value>
+      </choice>
+    </attribute>
+  </define>
+  <define name="xmlEvents.handler.attrib">
+    <attribute name="ev:handler">
+      <data type="anyURI"/>
+    </attribute>
+  </define>
+  <define name="xmlEvents.observer.attrib">
+    <attribute name="ev:observer">
+      <data type="IDREFS"/>
+    </attribute>
+  </define>
+  <define name="xmlEvents.function.attrib">
+    <attribute name="ev:function"/>
+  </define>
+  <define name="xmlEvents.propagate.attrib">
+    <!-- a:defaultValue="continue" -->
+    <attribute name="ev:propagate">
+      <choice>
+        <value>stop</value>
+        <value>continue</value>
+      </choice>
+    </attribute>
+  </define>
+  <define name="xmlEvents.defaultAction.attrib">
+    <!-- a:defaultValue="perform" -->
+    <attribute name="ev:defaultAction">
+      <choice>
+        <value>cancel</value>
+        <value>perform</value>
+      </choice>
+    </attribute>
+  </define>
+</grammar>

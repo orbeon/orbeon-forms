@@ -1,0 +1,114 @@
+# -*- rnc -*-
+# Copyright (C) 2010 Orbeon, Inc.
+#
+# This program is free software; you can redistribute it and/or modify it under the terms of the
+# GNU Lesser General Public License as published by the Free Software Foundation; either version
+# 2.1 of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU Lesser General Public License for more details.
+#
+# The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+default namespace = "http://www.w3.org/ns/xbl"
+namespace ns1 = "http://www.w3.org/2001/xml-events"
+namespace ns2 = "http://orbeon.org/oxf/xml/form-runner"
+namespace xforms = "http://www.w3.org/2002/xforms"
+namespace xhtml = "http://www.w3.org/1999/xhtml"
+namespace xxforms = "http://orbeon.org/oxf/xml/xforms"
+
+# Include XML Events
+include "xml-events-2.rnc" inherit = ns1
+# Include XForms 1.1
+include "xforms-nons-11.rnc" inherit = xforms {
+  # Redefine some stuff
+  xforms.Events.attrib =
+    # TODO: top-level actions should have event attributes, nested ones not
+    xmlEvents.listener.attlist?
+  xforms.label.Text.content = empty
+  xforms.message.Text.content = empty
+  xforms.UI.Inline.content = orbeon.inline
+  xforms.repeat.content = orbeon.element*
+  xforms.group.content = xforms.label? & orbeon.element*
+  xforms.Common.attrib =
+    attribute id { xsd:ID }?,
+    attribute class { text }?,
+    attribute style { text }?
+  xforms.bind =
+    element xforms:bind {
+      attribute name { text }?,
+      xforms.bind.attrib,
+      xforms.bind.content
+    }
+  xforms.instance =
+    element xforms:instance {
+      attribute xxforms:readonly { text }?,
+      attribute xxforms:exclude-result-prefixes { text }?,
+      attribute xxforms:cache { text }?,
+      xforms.instance.attrib,
+      xforms.instance.content
+    }
+}
+# Start with xhtml:html
+start =
+  element xhtml:html {
+    (attribute * { text }
+     | text
+     | orbeon.element)*
+  }
+orbeon.inline = (text | xforms.output | orbeon.inline.xhtml.element)*
+orbeon.inline.xhtml.element =
+  element xhtml:* {
+    (attribute * { text }
+     | orbeon.inline)*
+  }
+orbeon.element =
+  orbeon.xhtml.element
+  | orbeon.xxforms.element
+  | orbeon.fr.element
+  | orbeon.xbl.xbl
+  | xforms.Core.Form.Controls
+  | xforms.Container.Form.Controls
+  | xforms.Actions
+  | xforms.model
+orbeon.xxforms.element =
+  orbeon.xxforms.variable
+  | # TODO: dialog must be at top-level or in XBL component
+    orbeon.xxforms.dialog
+orbeon.xhtml.element =
+  element xhtml:* {
+    (attribute * { text }
+     | text
+     | orbeon.element)*
+  }
+orbeon.xxforms.dialog =
+  element xxforms:dialog {
+    # XXX TEMP
+    orbeon.anyContent
+  }
+orbeon.xxforms.variable =
+  element xxforms:variable {
+    # XXX TEMP
+    orbeon.anyContent
+  }
+orbeon.xbl.xbl =
+  element xbl {
+    # XXX TEMP
+    orbeon.anyContent
+  }
+orbeon.fr.element =
+  element ns2:* {
+    # XXX TEMP
+    orbeon.anyContent
+  }
+orbeon.anyContent =
+  (attribute * { text }
+   | text
+   | orbeon.anyElement)*
+orbeon.anyElement =
+  element * {
+    (attribute * { text }
+     | text
+     | orbeon.anyElement)*
+  }

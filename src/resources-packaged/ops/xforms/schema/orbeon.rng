@@ -1,0 +1,232 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml"
+
+         datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+    <!-- Include XML Events -->
+    <include href="xml-events-2.rng" ns="http://www.w3.org/2001/xml-events"/>
+    <!-- Include XForms 1.1 -->
+    <include href="xforms-nons-11.rng" ns="http://www.w3.org/2002/xforms">
+        <!-- Redefine some stuff -->
+        <define name="xforms.Events.attrib">
+            <!-- TODO: top-level actions should have event attributes, nested ones not -->
+            <optional>
+                <ref name="xmlEvents.listener.attlist"/>
+            </optional>
+        </define>
+        <define name="xforms.label.Text.content">
+            <empty/>
+        </define>
+        <define name="xforms.message.Text.content">
+            <empty/>
+        </define>
+        <define name="xforms.UI.Inline.content">
+            <ref name="orbeon.inline"/>
+        </define>
+        <define name="xforms.repeat.content">
+            <zeroOrMore>
+                <ref name="orbeon.element"/>
+            </zeroOrMore>
+        </define>
+        <define name="xforms.group.content">
+            <interleave>
+                <optional>
+                  <ref name="xforms.label"/>
+                </optional>
+                <zeroOrMore>
+                    <ref name="orbeon.element"/>
+                </zeroOrMore>
+            </interleave>
+        </define>
+        <define name="xforms.Common.attrib">
+            <optional>
+                <attribute name="id">
+                    <data type="ID"/>
+                </attribute>
+            </optional>
+            <optional>
+                <attribute name="class"/>
+            </optional>
+            <optional>
+                <attribute name="style"/>
+            </optional>
+        </define>
+        <define name="xforms.bind">
+            <element name="bind">
+                <optional>
+                    <attribute name="name"/>
+                </optional>
+                <ref name="xforms.bind.attrib"/>
+                <ref name="xforms.bind.content"/>
+            </element>
+        </define>
+        <define name="xforms.instance">
+            <element name="instance">
+                <optional>
+                    <attribute name="xxforms:readonly"/>
+                </optional>
+                <optional>
+                    <attribute name="xxforms:exclude-result-prefixes"/>
+                </optional>
+                <optional>
+                    <attribute name="xxforms:cache"/>
+                </optional>
+                <ref name="xforms.instance.attrib"/>
+                <ref name="xforms.instance.content"/>
+            </element>
+        </define>
+    </include>
+
+    <!-- Start with xhtml:html -->
+    <start>
+        <element name="xhtml:html">
+            <zeroOrMore>
+                <choice>
+                    <attribute>
+                        <anyName/>
+                    </attribute>
+                    <text/>
+                    <ref name="orbeon.element"/>
+                </choice>
+            </zeroOrMore>
+        </element>
+    </start>
+
+    <define name="orbeon.inline">
+        <zeroOrMore>
+            <choice>
+                <text/>
+                <ref name="xforms.output"/>
+                <ref name="orbeon.inline.xhtml.element"/>
+            </choice>
+        </zeroOrMore>
+    </define>
+
+    <define name="orbeon.inline.xhtml.element">
+        <element>
+            <nsName ns="http://www.w3.org/1999/xhtml"/>
+            <zeroOrMore>
+                <choice>
+                    <attribute>
+                        <anyName/>
+                    </attribute>
+                    <ref name="orbeon.inline"/>
+                </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+
+    <define name="orbeon.element">
+        <choice>
+            <ref name="orbeon.xhtml.element"/>
+            <ref name="orbeon.xxforms.element"/>
+            <ref name="orbeon.fr.element"/>
+            <ref name="xforms.Core.Form.Controls"/>
+            <ref name="xforms.Container.Form.Controls"/>
+            <ref name="xforms.Actions"/>
+            <ref name="xforms.model"/>
+
+            <!-- TODO: only allowed under xhtml:head -->
+            <ref name="orbeon.xbl.xbl"/>
+        </choice>
+    </define>
+    
+    <define name="orbeon.xxforms.element">
+        <choice>
+            <ref name="orbeon.xxforms.variable"/>
+            <!-- TODO: dialog must be at top-level or in XBL component -->
+            <ref name="orbeon.xxforms.dialog"/>
+        </choice>
+    </define>
+
+    <define name="orbeon.xhtml.element">
+        <element>
+            <nsName ns="http://www.w3.org/1999/xhtml"/>
+            <zeroOrMore>
+                <choice>
+                    <attribute>
+                        <anyName/>
+                    </attribute>
+                    <text/>
+                    <ref name="orbeon.element"/>
+                </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+
+    <define name="orbeon.xxforms.dialog">
+        <element name="dialog" ns="http://orbeon.org/oxf/xml/xforms">
+            <!-- TODO: actual dialog content -->
+            <ref name="orbeon.anyContent"/>
+        </element>
+    </define>
+
+    <define name="orbeon.xxforms.variable">
+        <element name="variable" ns="http://orbeon.org/oxf/xml/xforms">
+            <!-- TODO: actual variable content -->
+            <ref name="orbeon.anyContent"/>
+        </element>
+    </define>
+
+    <define name="orbeon.xbl.xbl">
+        <element name="xbl" ns="http://www.w3.org/ns/xbl">
+            <!-- TODO: actual XBL content -->
+            <ref name="orbeon.anyContent"/>
+        </element>
+    </define>
+
+    <define name="orbeon.fr.element">
+        <element>
+            <nsName ns="http://orbeon.org/oxf/xml/form-runner"/>
+            <!-- TODO: individual controls -->
+            <ref name="orbeon.anyContent"/>
+        </element>
+    </define>
+
+    <define name="orbeon.anyContent">
+        <zeroOrMore>
+            <choice>
+                <attribute>
+                    <anyName/>
+                </attribute>
+                <text/>
+                <ref name="orbeon.anyElement"/>
+            </choice>
+        </zeroOrMore>
+    </define>
+
+    <define name="orbeon.anyElement">
+        <element>
+            <anyName/>
+            <zeroOrMore>
+                <choice>
+                    <attribute>
+                        <anyName/>
+                    </attribute>
+                    <text/>
+                    <ref name="orbeon.anyElement"/>
+                </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+
+</grammar>
+
+
+
+

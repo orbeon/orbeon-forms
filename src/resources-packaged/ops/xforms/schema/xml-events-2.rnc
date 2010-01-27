@@ -1,0 +1,68 @@
+# -*- rnc -*-
+
+default namespace ev = "http://www.w3.org/2001/xml-events"
+namespace x = "http://www.w3.org/1999/xhtml"
+
+x:h1 [ "XML Events Module in RELAX NG" ]
+x:pre [
+  "\x{a}" ~
+  "    This is the RELAX NG Schema for the XML Events 2 XML Events module.\x{a}" ~
+  "    \x{a}" ~
+  "    Copyright (C) 2003-2009 W3C (R) (MIT, ERCIM, Keio), All Rights Reserved.\x{a}" ~
+  "\x{a}" ~
+  "    URI: http://www.w3.org/MarkUp/RELAXNG/xml-events-2.rng\x{a}" ~
+  "    Editors:   Masayasu Ishikawa <mimasa@w3.org>\x{a}" ~
+  "               Markus Gylling <markus.gylling@tpb.se>\x{a}" ~
+  "    Revision: $Id: xml-events-2.rng,v 1.1.2.3 2009/02/25 12:09:46 mgylling Exp $\x{a}" ~
+  "\x{a}" ~
+  "    Permission to use, copy, modify and distribute this RELAX NG schema\x{a}" ~
+  "    for XML Events and its accompanying documentation for any purpose and\x{a}" ~
+  "    without fee is hereby granted in perpetuity, provided that the above\x{a}" ~
+  "    copyright notice and this paragraph appear in all copies. The copyright\x{a}" ~
+  "    holders make no representation about the suitability of this RELAX NG\x{a}" ~
+  "    schema for any purpose.\x{a}" ~
+  "\x{a}" ~
+  '    It is provided "as is" without expressed or implied warranty.\x{a}' ~
+  "    For details, please refer to the W3C software license at:\x{a}" ~
+  "\x{a}" ~
+  "      "
+  x:a [
+    href = "http://www.w3.org/Consortium/Legal/copyright-software"
+    "http://www.w3.org/Consortium/Legal/copyright-software"
+  ]
+  "\x{a}" ~
+  "\x{a}" ~
+  "  "
+]
+xmlEvents.listener = element listener { xmlEvents.listener.attlist }
+xmlEvents.listener.attlist =
+  xmlEvents.event.attrib,
+  xmlEvents.observer.attrib?,
+  xmlEvents.eventTarget.attrib?,
+  xmlEvents.function.attrib?,
+  xmlEvents.handler.attrib?,
+  xmlEvents.phase.attrib?,
+  xmlEvents.propagate.attrib?,
+  xmlEvents.defaultAction.attrib?,
+  xmlEvents.Common.attrib
+xmlEvents.Common.attrib =
+  # The host grammar must contribute an
+  # attribute of type ID to this class
+  empty
+xmlEvents.event.attrib =
+  attribute ev:event {
+    list { xsd:QName+ }
+  }
+xmlEvents.eventTarget.attrib = attribute ev:eventTarget { xsd:IDREFS }
+xmlEvents.phase.attrib =
+  # a:defaultValue="default"
+  attribute ev:phase { "bubble" | "capture" | "target" | "default" }
+xmlEvents.handler.attrib = attribute ev:handler { xsd:anyURI }
+xmlEvents.observer.attrib = attribute ev:observer { xsd:IDREFS }
+xmlEvents.function.attrib = attribute ev:function { text }
+xmlEvents.propagate.attrib =
+  # a:defaultValue="continue"
+  attribute ev:propagate { "stop" | "continue" }
+xmlEvents.defaultAction.attrib =
+  # a:defaultValue="perform"
+  attribute ev:defaultAction { "cancel" | "perform" }

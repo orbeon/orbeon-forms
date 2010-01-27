@@ -81,11 +81,11 @@ third-party software.
 
 A complete list of changes can be found online at:
 
-  http://www.orbeon.com/ops/doc/home-changes-371
+  http://www.orbeon.com/ops/doc/home-changes-372
 
 or in this distribution under:
 
-  doc/home-changes-371.html
+  doc/home-changes-372.html
 
 
 ****************************************
@@ -187,10 +187,12 @@ In addition, this product includes the following software:
     * SAXPath (http://sourceforge.net/projects/saxpath/)
     * Sun Multi-Schema XML Validator (https://msv.dev.java.net/)
 
-This software makes use of a schema for XSLT 2.0 provided under W3C
-Software License. The schema is available at the following location:
+This software makes use of schemas for XSLT 2.0 and XForms 1.1 provided
+under W3C Software License. The schemas are available at the following
+locations:
 
     jar:orbeon.jar!/org/orbeon/oxf/xml/schemas/xslt-2_0.xsd
+    jar:orbeon-resources-private.jar!/ops/xforms/schema/*.rn[c|g]
 
 This software makes use of the Silk Icons, released under a Creative Commons
 Attribution 2.5 License: http://www.famfamfam.com/lab/icons/silk/
@@ -200,6 +202,6 @@ This software makes use of the PixelMixer icons at http://pixel-mixer.com/
 Please consult the third-party-licenses directory for more information
 about individual licenses.
 
-Copyright 1999-2009 (C) Orbeon, Inc. All rights reserved.
+Copyright 1999-2010 (C) Orbeon, Inc. All rights reserved.
 
 --

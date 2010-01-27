@@ -1,0 +1,682 @@
+# -*- rnc -*-
+# Copyright (C) 2009 W3C (R); (MIT, ERCIM, Keio), All Rights Reserved.
+# 
+# Permission to use, copy, modify and distribute this RELAX NG schema
+# for XForms 1.1 and its accompanying documentation for any purpose and
+# without fee is hereby granted in perpetuity, provided that the above
+# copyright notice and this paragraph appear in all copies. The copyright
+# holders make no representation about the suitability of this RELAX NG
+# schema for any purpose.
+# 
+# It is provided "as is" without expressed or implied warranty.
+# For details, please refer to the W3C software license at:
+# 
+#   http://www.w3.org/Consortium/Legal/copyright-software
+
+namespace xs = "http://www.w3.org/2001/XMLSchema"
+namespace xsd = "http://www.w3.org/2001/XMLSchema-datatypes"
+
+xforms.Common.attrib =
+  # host language to add common attributes here
+  attribute id { xsd:ID }?
+xforms.Events.attrib =
+  # host language to add XML Events attributes here
+  empty
+xforms.Linking.attrib =
+  # host language to add src attribute here
+  empty
+xforms.Single.Node.Binding.attrib =
+  attribute model { xsd:IDREF }?,
+  attribute ref { XPathExpression }?,
+  attribute bind { xsd:IDREF }?
+xforms.Nodeset.Binding.attrib =
+  attribute model { xsd:IDREF }?,
+  attribute nodeset { XPathExpression }?,
+  attribute bind { xsd:IDREF }?
+# To use external xmlschema.rnc such as http://www.jenitennison.com/schema/xmlschema.rng
+# change its start pattern to be a pattern named "xsd.schema" and use the following lines.
+# include "../xmlschema-component.rnc"
+# xforms.schema = xsd.schema
+# Placeholder for XML Schema RNG
+xforms.schema =
+  element xs:schema {
+    attribute * { text }*,
+    xforms.anyXSElement*
+  }
+xforms.model =
+  element model { xforms.model.attrib, xforms.model.content }
+xforms.model.attrib =
+  xforms.Common.attrib,
+  # ORBEON: why this?
+  
+  # <ref name="xforms.Events.attrib"/>
+  attribute functions {
+    list { xsd:QName+ }
+  }?,
+  attribute schema {
+    list { xsd:anyURI+ }
+  }?,
+  attribute version { xforms.versionList }?
+xforms.model.content =
+  xforms.instance*
+  & xforms.schema*
+  & xforms.submission*
+  & xforms.bind*
+  & xforms.Actions*
+  & xforms.extension?
+xforms.instance =
+  element instance { xforms.instance.attrib, xforms.instance.content }
+xforms.instance.attrib =
+  xforms.Common.attrib,
+  xforms.Linking.attrib?,
+  # note: XForms 1.1 Recommendation defines this as a special attribute of instance, 
+  # but XHTML integrations will add it in xforms.Linking.attrib
+  # attribute src { xsd:anyURI }?,
+  # note: instance/@resource collides with rdf/a @resource
+  attribute resource { xsd:anyURI }?
+xforms.instance.content = xforms.anyElement?
+xforms.submission = element submission { xforms.submission.model }
+xforms.submission.resource.attr =
+  attribute resource {
+    # ORBEON: temp changed to string to allow test:
+    
+    # <data type="anyURI"/>
+    xsd:string
+  }
+xforms.submission.resource.element =
+  element resource { xforms.ValueTemplate.anyURI }?
+xforms.submission.action.attr = attribute action { xsd:anyURI }
+xforms.submission.model =
+  # There should only be zero or one resource, zero or one method, and zero or more header
+  xforms.Common.attrib
+  & (# either the attribute method or the element method must be specified
+     attribute method {
+       QNameButNotNCName
+       | "post"
+       | "get"
+       | "delete"
+       | "put"
+       | "multipart-post"
+       | "form-data-post"
+       | "urlencoded-post"
+     }
+     | element method { xforms.ValueTemplate })
+  & # note: resource attribute collides with rdf/a resource attribute
+    ((xforms.submission.action.attr
+      & xforms.submission.resource.attr?
+      & xforms.submission.resource.element)
+     | (xforms.submission.action.attr?
+        & xforms.submission.resource.attr
+        & xforms.submission.resource.element?)
+     | (xforms.submission.action.attr?
+        & xforms.submission.resource.attr?
+        & xforms.submission.resource.element))
+  & element header {
+      attribute nodeset { XPathExpression }?
+      & attribute combine {
+          "combine" | "append" | "prepend" | "replace"
+        }?
+      & element name { xforms.ValueTemplate }
+      & element value { xforms.ValueTemplate }+
+    }*
+  & attribute bind { xsd:IDREF }?
+  & attribute ref { XPathExpression }?
+  & attribute includenamespaceprefixes {
+      list { (xsd:NMTOKEN | "#default")* }
+    }?
+  & # note: collides with xhtml common encoding attribute
+    attribute encoding { text }?
+  & attribute mode { "asynchronous" | "synchronous" }?
+  & attribute omit-xml-declaration { xsd:boolean }?
+  & attribute indent { xsd:boolean }?
+  & attribute mediatype { text }?
+  & attribute standalone { xsd:boolean }?
+  & attribute cdata-section-elements {
+      list { xsd:QName+ }
+    }?
+  & attribute replace {
+      QNameButNotNCName | "all" | "instance" | "text" | "none"
+    }?
+  & attribute instance { xsd:IDREF }?
+  & attribute relevant { xsd:boolean }?
+  & attribute separator { ";" | "&" }?
+  & attribute serialization {
+      "application/xml"
+      | "application/x-www-form-urlencoded"
+      | "multipart/related"
+      | "multipart/form-data"
+      | "none"
+    }?
+  & attribute validate { xsd:boolean }?
+  & attribute version { xforms.versionList }?
+  & attribute targetref { XPathExpression }?
+  & xforms.Actions
+xforms.bind = element bind { xforms.bind.attrib, xforms.bind.content }
+xforms.bind.attrib =
+  xforms.Common.attrib,
+  attribute nodeset { XPathExpression }?,
+  attribute calculate { XPathExpression }?,
+  attribute type { xsd:QName }?,
+  attribute required { XPathExpression }?,
+  attribute constraint { XPathExpression }?,
+  attribute relevant { XPathExpression }?,
+  attribute readonly { XPathExpression }?,
+  attribute p3ptype { text }?
+xforms.bind.content = xforms.bind* & xforms.extension?
+# Form Controls
+xforms.Core.Form.Controls =
+  xforms.input
+  | xforms.textarea
+  | xforms.secret
+  | xforms.output
+  | xforms.upload
+  | xforms.select1
+  | xforms.select
+  | xforms.range
+  | xforms.submit
+  | xforms.trigger
+xforms.UI.Messages.attrib = empty
+xforms.UI.Common.attrib =
+  # host language to add accesskey and navindex here
+  attribute appearance {
+    xsd:QName { pattern = "[^:]+:[^:]+" }
+    | "minimal"
+    | "compact"
+    | "full"
+  }?
+xforms.UI.Inline.class = xforms.output
+xforms.UI.Inline.content = xforms.UI.Inline.class?
+xforms.UI.Common.content =
+  (xforms.help
+   | xforms.hint
+   | xforms.alert
+   | xforms.Actions
+   | xforms.extension)*
+xforms.List.UI.Common.content =
+  (xforms.item | xforms.itemset | xforms.choices)+
+# host language must override xforms.label.Text.content to be empty if xforms.UI.Inline.content also includes text
+xforms.label.Text.content = text
+xforms.label.attrib = xforms.Common.attrib, xforms.UI.Messages.attrib?
+xforms.label.content =
+  xforms.label.Text.content & xforms.UI.Inline.content
+xforms.label =
+  element label {
+    xforms.label.attrib
+    & (xforms.Linking.attrib | xforms.Single.Node.Binding.attrib)
+    & xforms.label.content?
+  }
+xforms.help =
+  element help {
+    xforms.help.attrib,
+    xforms.help.content,
+    attribute appearance {
+      xsd:QName { pattern = "[^:]+:[^:]+" }
+      | "minimal"
+      | "compact"
+      | "full"
+    }?,
+    attribute href { xsd:anyURI }?
+  }
+xforms.help.attrib =
+  xforms.Common.attrib,
+  xforms.Linking.attrib?,
+  xforms.Single.Node.Binding.attrib?,
+  xforms.UI.Messages.attrib?
+xforms.help.content = xforms.UI.Inline.content
+xforms.hint = element hint { xforms.hint.attrib, xforms.hint.content }
+xforms.hint.attrib =
+  xforms.Common.attrib,
+  xforms.Linking.attrib?,
+  xforms.Single.Node.Binding.attrib?,
+  xforms.UI.Messages.attrib?
+xforms.hint.content = xforms.UI.Inline.content
+xforms.alert =
+  element alert { xforms.alert.attrib, xforms.alert.content }
+xforms.alert.attrib =
+  xforms.Common.attrib,
+  xforms.Linking.attrib?,
+  xforms.Single.Node.Binding.attrib,
+  xforms.UI.Messages.attrib?
+xforms.alert.content = xforms.UI.Inline.content
+xforms.choices =
+  element choices { xforms.choices.attrib, xforms.choices.content }
+xforms.choices.attrib = xforms.Common.attrib
+xforms.choices.content =
+  xforms.label?, (xforms.choices | xforms.item | xforms.itemset)+
+xforms.value =
+  element value { xforms.value.attrib, xforms.value.content }
+xforms.value.attrib =
+  xforms.Common.attrib, xforms.Single.Node.Binding.attrib?
+xforms.value.content = text
+xforms.item = element item { xforms.item.attrib, xforms.item.content }
+xforms.item.attrib = xforms.Common.attrib
+xforms.item.content =
+  xforms.label, xforms.value, xforms.UI.Common.content
+xforms.itemset =
+  element itemset { xforms.itemset.attrib, xforms.itemset.content }
+xforms.itemset.attrib =
+  xforms.Common.attrib, xforms.Nodeset.Binding.attrib
+xforms.itemset.content =
+  xforms.label, (xforms.value | xforms.copy), xforms.UI.Common.content
+xforms.copy = element copy { xforms.copy.attrib, xforms.copy.content }
+xforms.copy.attrib =
+  xforms.Common.attrib, xforms.Single.Node.Binding.attrib
+xforms.copy.content = empty
+xforms.filename =
+  element filename { xforms.filename.attrib, xforms.filename.content }
+xforms.filename.attrib =
+  xforms.Common.attrib, xforms.Single.Node.Binding.attrib
+xforms.filename.content = empty
+xforms.upload.mediatype =
+  element mediatype {
+    xforms.upload.mediatype.attrib, xforms.upload.mediatype.content
+  }
+xforms.upload.mediatype.attrib =
+  xforms.Common.attrib, xforms.Single.Node.Binding.attrib
+xforms.upload.mediatype.content = empty
+xforms.output =
+  element output { xforms.output.attrib & xforms.output.content }
+xforms.output.attrib =
+  xforms.Common.attrib,
+  xforms.UI.Common.attrib,
+  xforms.Single.Node.Binding.attrib?,
+  attribute mediatype { text }?,
+  attribute value { XPathExpression }?
+xforms.output.content =
+  xforms.label?, (xforms.output.mediatype? & xforms.UI.Common.content)
+xforms.output.mediatype =
+  element mediatype {
+    xforms.output.mediatype.attrib, xforms.output.mediatype.content
+  }
+xforms.output.mediatype.attrib =
+  xforms.Common.attrib,
+  (attribute value { XPathExpression }
+   | xforms.Single.Node.Binding.attrib)
+xforms.output.mediatype.content = empty
+# If erratum accepted, change xforms.output.mediatype to use xforms.ValueTemplate
+xforms.input =
+  element input { xforms.input.attrib, xforms.input.content }
+xforms.input.attrib =
+  xforms.Common.attrib,
+  xforms.Single.Node.Binding.attrib,
+  attribute inputmode { text }?,
+  xforms.UI.Common.attrib,
+  attribute incremental { xsd:boolean }?
+xforms.input.content = xforms.label, xforms.UI.Common.content
+xforms.textarea =
+  element textarea { xforms.textarea.attrib, xforms.textarea.content }
+xforms.textarea.attrib =
+  xforms.Common.attrib,
+  xforms.Single.Node.Binding.attrib,
+  attribute inputmode { text }?,
+  xforms.UI.Common.attrib,
+  attribute incremental { xsd:boolean }?
+xforms.textarea.content = xforms.label, xforms.UI.Common.content
+xforms.secret =
+  element secret { xforms.secret.attrib, xforms.secret.content }
+xforms.secret.attrib =
+  xforms.Common.attrib,
+  xforms.Single.Node.Binding.attrib,
+  attribute inputmode { text }?,
+  xforms.UI.Common.attrib,
+  attribute incremental { xsd:boolean }?
+xforms.secret.content = xforms.label, xforms.UI.Common.content
+xforms.upload =
+  element upload { xforms.upload.attrib, xforms.upload.content }
+xforms.upload.attrib =
+  xforms.Common.attrib,
+  xforms.Single.Node.Binding.attrib,
+  attribute mediatype { text }?,
+  xforms.UI.Common.attrib,
+  attribute incremental { xsd:boolean }?
+xforms.upload.content =
+  xforms.label,
+  xforms.filename?,
+  xforms.upload.mediatype?,
+  xforms.UI.Common.content
+xforms.select1 =
+  element select1 { xforms.select1.attrib, xforms.select1.content }
+xforms.select1.attrib =
+  xforms.Common.attrib,
+  xforms.Single.Node.Binding.attrib,
+  xforms.UI.Common.attrib,
+  attribute selection { "open" | "closed" }?,
+  attribute incremental { xsd:boolean }?
+xforms.select1.content =
+  xforms.label,
+  ((xforms.UI.Common.content, xforms.List.UI.Common.content)
+   | (xforms.List.UI.Common.content, xforms.UI.Common.content))
+xforms.select =
+  element select { xforms.select.attrib, xforms.select.content }
+xforms.select.attrib =
+  xforms.Common.attrib,
+  xforms.Single.Node.Binding.attrib,
+  xforms.UI.Common.attrib,
+  attribute selection { "open" | "closed" }?,
+  attribute incremental { xsd:boolean }?
+xforms.select.content =
+  xforms.label,
+  ((xforms.UI.Common.content, xforms.List.UI.Common.content)
+   | (xforms.List.UI.Common.content, xforms.UI.Common.content))
+xforms.range =
+  element range { xforms.range.attrib, xforms.range.content }
+xforms.range.attrib =
+  xforms.Common.attrib,
+  xforms.Single.Node.Binding.attrib,
+  xforms.UI.Common.attrib,
+  attribute start { text }?,
+  attribute end { text }?,
+  attribute step { text }?,
+  attribute incremental { xsd:boolean }?
+xforms.range.content = xforms.label, xforms.UI.Common.content
+xforms.trigger =
+  element trigger { xforms.trigger.attrib, xforms.trigger.content }
+xforms.trigger.attrib =
+  xforms.Common.attrib,
+  xforms.Single.Node.Binding.attrib?,
+  xforms.UI.Common.attrib?
+xforms.trigger.content =
+  # ORBEON: added interleave, because order shouldn't matter
+  xforms.label & xforms.UI.Common.content
+xforms.submit =
+  element submit { xforms.submit.attrib, xforms.submit.content }
+xforms.submit.attrib =
+  xforms.Common.attrib,
+  attribute submission { xsd:IDREF },
+  xforms.Single.Node.Binding.attrib?,
+  xforms.UI.Common.attrib?
+xforms.submit.content = xforms.label, xforms.UI.Common.content
+# Actions
+xforms.action =
+  element action { xforms.action.attrib, xforms.action.content }
+xforms.action.attrib = xforms.Common.attrib, xforms.actions.attrib
+xforms.action.content = xforms.Actions
+xforms.dispatch =
+  element dispatch { xforms.dispatch.attrib, xforms.dispatch.content }
+xforms.dispatch.attrib =
+  xforms.Common.attrib,
+  # ORBEON: don't need this because part of xforms.actions.attrib
+  
+  # <ref name="xforms.Events.attrib"/>
+  xforms.actions.attrib,
+  attribute name { xforms.ActionName }?,
+  attribute targetid { xsd:IDREF }?,
+  attribute target { xsd:IDREF }?,
+  # ORBEON: don't think this is deprecated
+  
+  # deprecated
+  attribute delay { xsd:string }?,
+  attribute bubbles { xsd:boolean }?,
+  attribute cancelable { xsd:boolean }?
+xforms.dispatch.content =
+  element name { xforms.ValueTemplate.IDREF }?
+  & element targetid { xforms.ValueTemplate.IDREF }?
+  & element target { xforms.ValueTemplate.IDREF }?
+  & # target is deprecated
+    element delay { xforms.ValueTemplate }?
+xforms.rebuild =
+  element rebuild { xforms.rebuild.attrib, xforms.rebuild.content }
+xforms.rebuild.attrib =
+  xforms.Common.attrib,
+  attribute model { xsd:IDREF }?,
+  xforms.actions.attrib
+xforms.rebuild.content = empty
+xforms.revalidate =
+  element revalidate {
+    xforms.revalidate.attrib, xforms.revalidate.content
+  }
+xforms.revalidate.attrib =
+  xforms.Common.attrib,
+  attribute model { xsd:IDREF }?,
+  xforms.actions.attrib
+xforms.revalidate.content = empty
+xforms.recalculate =
+  element recalculate {
+    xforms.recalculate.attrib, xforms.recalculate.content
+  }
+xforms.recalculate.attrib =
+  xforms.Common.attrib,
+  attribute model { xsd:IDREF }?,
+  xforms.actions.attrib
+xforms.recalculate.content = empty
+xforms.refresh =
+  element refresh { xforms.refresh.attrib, xforms.refresh.content }
+xforms.refresh.attrib =
+  xforms.Common.attrib,
+  attribute model { xsd:IDREF }?,
+  xforms.actions.attrib
+xforms.refresh.content = empty
+xforms.setfocus =
+  element setfocus { xforms.setfocus.attrib, xforms.setfocus.content }
+xforms.setfocus.attrib =
+  xforms.Common.attrib,
+  attribute control { xsd:IDREF }?,
+  element control { xforms.ValueTemplate.IDREF }?,
+  xforms.actions.attrib
+xforms.setfocus.content = empty
+xforms.load = element load { xforms.load.attrib, xforms.load.content }
+xforms.load.attrib =
+  xforms.Common.attrib,
+  attribute resource { xsd:anyURI }?,
+  # note: collides with rdf/a resource attribute
+  attribute show { "new" | "replace" }?,
+  xforms.Single.Node.Binding.attrib,
+  xforms.actions.attrib
+xforms.load.content = element resource { xforms.ValueTemplate.anyURI }?
+xforms.setvalue =
+  element setvalue { xforms.setvalue.attrib, xforms.ValueTemplate }
+xforms.setvalue.attrib =
+  xforms.Common.attrib,
+  xforms.Single.Node.Binding.attrib?,
+  xforms.actions.attrib
+xforms.send = element send { xforms.send.attrib, xforms.send.content }
+xforms.send.attrib =
+  xforms.Common.attrib,
+  attribute submission { xsd:IDREF },
+  xforms.actions.attrib
+xforms.send.content = empty
+xforms.reset =
+  element reset { xforms.reset.attrib, xforms.reset.content }
+xforms.reset.attrib =
+  xforms.Common.attrib,
+  attribute model { xsd:IDREF }?,
+  xforms.actions.attrib
+xforms.reset.content = empty
+xforms.insert =
+  element insert { xforms.insert.attrib, xforms.insert.content }
+xforms.insert.attrib =
+  xforms.Common.attrib,
+  attribute context { XPathExpression }?,
+  attribute origin { XPathExpression }?,
+  attribute at { XPathExpression }?,
+  attribute position { "before" | "after" }?,
+  xforms.Nodeset.Binding.attrib?,
+  xforms.actions.attrib
+xforms.insert.content = empty
+xforms.delete =
+  element delete { xforms.delete.attrib, xforms.delete.content }
+xforms.delete.attrib =
+  xforms.Common.attrib,
+  attribute context { XPathExpression }?,
+  attribute at { XPathExpression }?,
+  xforms.Nodeset.Binding.attrib?,
+  xforms.actions.attrib
+xforms.delete.content = empty
+xforms.setindex =
+  element setindex { xforms.setindex.attrib, xforms.setindex.content }
+xforms.setindex.attrib =
+  xforms.Common.attrib,
+  attribute repeat { xsd:IDREF },
+  attribute index { XPathExpression },
+  xforms.actions.attrib
+xforms.setindex.content = empty
+xforms.toggle =
+  element toggle { xforms.toggle.attrib, xforms.toggle.content }
+xforms.toggle.attrib =
+  xforms.Common.attrib,
+  attribute case { xsd:IDREF }?,
+  xforms.actions.attrib
+xforms.toggle.content = element case { xforms.ValueTemplate.IDREF }?
+xforms.message =
+  element message { xforms.message.attrib, xforms.message.content }
+xforms.message.attrib =
+  xforms.Common.attrib,
+  attribute level { "ephemeral" | "modeless" | "modal" },
+  xforms.Linking.attrib?,
+  xforms.Single.Node.Binding.attrib?,
+  xforms.actions.attrib
+# host language must override xforms.message.Text.content to be empty if xforms.UI.Inline.content also includes text
+xforms.message.Text.content = text
+xforms.message.content =
+  xforms.message.Text.content & xforms.UI.Inline.content
+xforms.Actions =
+  (xforms.action
+   | xforms.dispatch
+   | xforms.rebuild
+   | xforms.recalculate
+   | xforms.refresh
+   | xforms.setfocus
+   | xforms.load
+   | xforms.setvalue
+   | xforms.send
+   | xforms.reset
+   | xforms.insert
+   | xforms.delete
+   | xforms.setindex
+   | xforms.toggle
+   | xforms.message)*
+xforms.actions.attrib =
+  xforms.Events.attrib,
+  attribute if { XPathExpression }?,
+  attribute while { XPathExpression }?
+# Container Form Controls
+xforms.Container.Form.Controls =
+  xforms.group | xforms.repeat | xforms.switch
+xforms.repeat =
+  element repeat { xforms.repeat.attrib, xforms.repeat.content }
+xforms.repeat.attrib =
+  xforms.Common.attrib,
+  xforms.Nodeset.Binding.attrib,
+  xforms.UI.Common.attrib,
+  attribute startindex { xsd:positiveInteger }?,
+  attribute number { xsd:nonNegativeInteger }?
+xforms.repeat.content =
+  (xforms.Core.Form.Controls
+   | xforms.Container.Form.Controls
+   | # ORBEON: why?
+     xforms.UI.Inline.content)*
+xforms.group =
+  element group { xforms.group.attrib, xforms.group.content }
+xforms.group.attrib =
+  xforms.Common.attrib,
+  xforms.Single.Node.Binding.attrib?,
+  xforms.UI.Common.attrib
+xforms.group.content =
+  xforms.label?,
+  (xforms.Core.Form.Controls
+   | xforms.Container.Form.Controls
+   | xforms.UI.Common.content
+   | # ORBEON: why?
+     xforms.UI.Inline.content)*
+xforms.switch =
+  element switch { xforms.switch.attrib, xforms.switch.content }
+xforms.switch.attrib =
+  xforms.Common.attrib,
+  xforms.Single.Node.Binding.attrib?,
+  xforms.UI.Common.attrib
+xforms.switch.content = xforms.switch.case+
+xforms.switch.case =
+  element case { xforms.switch.case.attrib, xforms.switch.case.content }
+xforms.switch.case.attrib =
+  xforms.Common.attrib,
+  attribute selected { xsd:boolean }?
+xforms.switch.case.content =
+  xforms.label?,
+  (xforms.Core.Form.Controls
+   | xforms.Container.Form.Controls
+   | xforms.action
+   | xforms.UI.Inline.content)*
+xforms.extension =
+  element extension {
+    xforms.extension.attrib, xforms.extension.content
+  }
+xforms.extension.attrib = xforms.Common.attrib
+xforms.extension.content = xforms.anyForeignElement*
+# Simple Types
+QNameButNotNCName = xsd:QName { pattern = "[^:]+:[^:]+" }
+XPathExpression = xsd:string
+xforms.versionList = list { xforms.versionNumber+ }
+xforms.versionNumber = xsd:string { pattern = "[1-9]\d*\.\d+" }
+# Templates
+xforms.ValueTemplate =
+  attribute value { XPathExpression }?
+  & xsd:string
+xforms.ValueTemplate.IDREF =
+  attribute value { XPathExpression }?
+  | (attribute value { XPathExpression }?
+     & xsd:IDREF)
+xforms.ValueTemplate.anyURI =
+  attribute value { XPathExpression }?
+  | (attribute value { XPathExpression }?
+     & xsd:anyURI)
+# Actions
+xforms.ActionName =
+  "xforms-model-construct"
+  | "xforms-model-construct-done"
+  | "xforms-ready"
+  | "xforms-model-destruct"
+  | "xforms-rebuild"
+  | "xforms-recalculate"
+  | "xforms-revalidate"
+  | "xforms-refresh"
+  | "xforms-reset"
+  | "xforms-previous"
+  | "xforms-next"
+  | "xforms-focus"
+  | "xforms-help"
+  | "xforms-hint"
+  | "xforms-submit"
+  | "xforms-submit-serialize"
+  | "xforms-insert"
+  | "xforms-delete"
+  | "xforms-value-changed"
+  | "xforms-valid"
+  | "xforms-invalid"
+  | "xforms-readonly"
+  | "xforms-readwrite"
+  | "xforms-required"
+  | "xforms-optional"
+  | "xforms-enabled"
+  | "xforms-disabled"
+  | "xforms-select"
+  | "xforms-deselect"
+  | "xforms-in-range"
+  | "xforms-out-of-range"
+  | "xforms-scroll-first"
+  | "xforms-scroll-last"
+  | "xforms-submit-done"
+  | "xforms-binding-exception"
+  | "xforms-compute-exception"
+  | "xforms-link-error"
+  | "xforms-link-exception"
+  | "xforms-output-error"
+  | "xforms-submit-error"
+  | "xforms-version-exception"
+  | xsd:NMTOKEN - (xsd:NMTOKEN { pattern = "xforms-.*" })
+xforms.anyElement =
+  element * {
+    (attribute * { text }
+     | text
+     | xforms.anyElement)*
+  }
+xforms.anyXSElement =
+  element xs:* {
+    (attribute * { text }
+     | text
+     | xforms.anyXSElement)*
+  }
+xforms.anyForeignElement = empty
+# Portions Copyright 2004-2005 Brain Attic, L.L.C.
+# Licensed under W3C Software License:
+# http://lists.w3.org/Archives/Public/www-forms/2009Jun/0015.html
+# For changes, see CHANGELOG.txt

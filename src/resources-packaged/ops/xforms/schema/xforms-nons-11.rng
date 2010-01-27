@@ -1,0 +1,1736 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  -*- rnc -*-
+  Copyright (C) 2009 W3C (R); (MIT, ERCIM, Keio), All Rights Reserved.
+  
+  Permission to use, copy, modify and distribute this RELAX NG schema
+  for XForms 1.1 and its accompanying documentation for any purpose and
+  without fee is hereby granted in perpetuity, provided that the above
+  copyright notice and this paragraph appear in all copies. The copyright
+  holders make no representation about the suitability of this RELAX NG
+  schema for any purpose.
+  
+  It is provided "as is" without expressed or implied warranty.
+  For details, please refer to the W3C software license at:
+  
+    http://www.w3.org/Consortium/Legal/copyright-software
+-->
+<grammar xmlns:xsd="http://www.w3.org/2001/XMLSchema-datatypes" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <define name="xforms.Common.attrib">
+    <optional>
+      <!-- host language to add common attributes here -->
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.Events.attrib">
+    <!-- host language to add XML Events attributes here -->
+    <empty/>
+  </define>
+  <define name="xforms.Linking.attrib">
+    <!-- host language to add src attribute here -->
+    <empty/>
+  </define>
+  <define name="xforms.Single.Node.Binding.attrib">
+    <optional>
+      <attribute name="model">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="ref">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="bind">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.Nodeset.Binding.attrib">
+    <optional>
+      <attribute name="model">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="nodeset">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="bind">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+  </define>
+  <!--
+    To use external xmlschema.rnc such as http://www.jenitennison.com/schema/xmlschema.rng
+    change its start pattern to be a pattern named "xsd.schema" and use the following lines.
+    include "../xmlschema-component.rnc"
+    xforms.schema = xsd.schema
+    Placeholder for XML Schema RNG
+  -->
+  <define name="xforms.schema">
+    <element name="xs:schema">
+      <zeroOrMore>
+        <attribute>
+          <anyName/>
+        </attribute>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="xforms.anyXSElement"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="xforms.model">
+    <element name="model">
+      <ref name="xforms.model.attrib"/>
+      <ref name="xforms.model.content"/>
+    </element>
+  </define>
+  <define name="xforms.model.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <!-- ORBEON: why this? -->
+    <!--<ref name="xforms.Events.attrib"/>-->
+    <optional>
+      <attribute name="functions">
+        <list>
+          <oneOrMore>
+            <data type="QName"/>
+          </oneOrMore>
+        </list>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="schema">
+        <list>
+          <oneOrMore>
+            <data type="anyURI"/>
+          </oneOrMore>
+        </list>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="version">
+        <ref name="xforms.versionList"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.model.content">
+    <interleave>
+      <zeroOrMore>
+        <ref name="xforms.instance"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="xforms.schema"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="xforms.submission"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="xforms.bind"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="xforms.Actions"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="xforms.extension"/>
+      </optional>
+    </interleave>
+  </define>
+  <define name="xforms.instance">
+    <element name="instance">
+      <ref name="xforms.instance.attrib"/>
+      <ref name="xforms.instance.content"/>
+    </element>
+  </define>
+  <define name="xforms.instance.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <ref name="xforms.Linking.attrib"/>
+    </optional>
+    <optional>
+      <!--
+        note: XForms 1.1 Recommendation defines this as a special attribute of instance, 
+        but XHTML integrations will add it in xforms.Linking.attrib
+        attribute src { xsd:anyURI }?,
+        note: instance/@resource collides with rdf/a @resource
+      -->
+      <attribute name="resource">
+        <data type="anyURI"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.instance.content">
+    <optional>
+      <ref name="xforms.anyElement"/>
+    </optional>
+  </define>
+  <define name="xforms.submission">
+    <element name="submission">
+      <ref name="xforms.submission.model"/>
+    </element>
+  </define>
+  <define name="xforms.submission.resource.attr">
+    <attribute name="resource">
+      <!-- ORBEON: temp changed to string to allow test: -->
+        <!--<data type="anyURI"/>-->
+          <data type="string"/>
+    </attribute>
+  </define>
+  <define name="xforms.submission.resource.element">
+    <optional>
+      <element name="resource">
+        <ref name="xforms.ValueTemplate.anyURI"/>
+      </element>
+    </optional>
+  </define>
+  <define name="xforms.submission.action.attr">
+    <attribute name="action">
+      <data type="anyURI"/>
+    </attribute>
+  </define>
+  <define name="xforms.submission.model">
+    <interleave>
+      <!-- There should only be zero or one resource, zero or one method, and zero or more header -->
+      <ref name="xforms.Common.attrib"/>
+      <choice>
+        <!-- either the attribute method or the element method must be specified -->
+        <attribute name="method">
+          <choice>
+            <ref name="QNameButNotNCName"/>
+            <value>post</value>
+            <value>get</value>
+            <value>delete</value>
+            <value>put</value>
+            <value>multipart-post</value>
+            <value>form-data-post</value>
+            <value>urlencoded-post</value>
+          </choice>
+        </attribute>
+        <element name="method">
+          <ref name="xforms.ValueTemplate"/>
+        </element>
+      </choice>
+      <!-- note: resource attribute collides with rdf/a resource attribute -->
+      <choice>
+        <interleave>
+          <ref name="xforms.submission.action.attr"/>
+          <optional>
+            <ref name="xforms.submission.resource.attr"/>
+          </optional>
+          <ref name="xforms.submission.resource.element"/>
+        </interleave>
+        <interleave>
+          <optional>
+            <ref name="xforms.submission.action.attr"/>
+          </optional>
+          <ref name="xforms.submission.resource.attr"/>
+          <optional>
+            <ref name="xforms.submission.resource.element"/>
+          </optional>
+        </interleave>
+        <interleave>
+          <optional>
+            <ref name="xforms.submission.action.attr"/>
+          </optional>
+          <optional>
+            <ref name="xforms.submission.resource.attr"/>
+          </optional>
+          <ref name="xforms.submission.resource.element"/>
+        </interleave>
+      </choice>
+      <zeroOrMore>
+        <element name="header">
+          <interleave>
+            <optional>
+              <attribute name="nodeset">
+                <ref name="XPathExpression"/>
+              </attribute>
+            </optional>
+            <optional>
+              <attribute name="combine">
+                <choice>
+                  <value>combine</value>
+                  <value>append</value>
+                  <value>prepend</value>
+                  <value>replace</value>
+                </choice>
+              </attribute>
+            </optional>
+            <element name="name">
+              <ref name="xforms.ValueTemplate"/>
+            </element>
+            <oneOrMore>
+              <element name="value">
+                <ref name="xforms.ValueTemplate"/>
+              </element>
+            </oneOrMore>
+          </interleave>
+        </element>
+      </zeroOrMore>
+      <optional>
+        <attribute name="bind">
+          <data type="IDREF"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="ref">
+          <ref name="XPathExpression"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="includenamespaceprefixes">
+          <list>
+            <zeroOrMore>
+              <choice>
+                <data type="NMTOKEN"/>
+                <value>#default</value>
+              </choice>
+            </zeroOrMore>
+          </list>
+        </attribute>
+      </optional>
+      <optional>
+        <!-- note: collides with xhtml common encoding attribute -->
+        <attribute name="encoding"/>
+      </optional>
+      <optional>
+        <attribute name="mode">
+          <choice>
+            <value>asynchronous</value>
+            <value>synchronous</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="omit-xml-declaration">
+          <data type="boolean"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="indent">
+          <data type="boolean"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="mediatype"/>
+      </optional>
+      <optional>
+        <attribute name="standalone">
+          <data type="boolean"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="cdata-section-elements">
+          <list>
+            <oneOrMore>
+              <data type="QName"/>
+            </oneOrMore>
+          </list>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="replace">
+          <choice>
+            <ref name="QNameButNotNCName"/>
+            <value>all</value>
+            <value>instance</value>
+            <value>text</value>
+            <value>none</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="instance">
+          <data type="IDREF"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="relevant">
+          <data type="boolean"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="separator">
+          <choice>
+            <value>;</value>
+            <value>&amp;</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="serialization">
+          <choice>
+            <value>application/xml</value>
+            <value>application/x-www-form-urlencoded</value>
+            <value>multipart/related</value>
+            <value>multipart/form-data</value>
+            <value>none</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="validate">
+          <data type="boolean"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="version">
+          <ref name="xforms.versionList"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="targetref">
+          <ref name="XPathExpression"/>
+        </attribute>
+      </optional>
+      <ref name="xforms.Actions"/>
+    </interleave>
+  </define>
+  <define name="xforms.bind">
+    <element name="bind">
+      <ref name="xforms.bind.attrib"/>
+      <ref name="xforms.bind.content"/>
+    </element>
+  </define>
+  <define name="xforms.bind.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <attribute name="nodeset">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="calculate">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="type">
+        <data type="QName"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="required">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="constraint">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="relevant">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="readonly">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="p3ptype"/>
+    </optional>
+  </define>
+  <define name="xforms.bind.content">
+    <interleave>
+      <zeroOrMore>
+        <ref name="xforms.bind"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="xforms.extension"/>
+      </optional>
+    </interleave>
+  </define>
+  <!-- Form Controls -->
+  <define name="xforms.Core.Form.Controls">
+    <choice>
+      <ref name="xforms.input"/>
+      <ref name="xforms.textarea"/>
+      <ref name="xforms.secret"/>
+      <ref name="xforms.output"/>
+      <ref name="xforms.upload"/>
+      <ref name="xforms.select1"/>
+      <ref name="xforms.select"/>
+      <ref name="xforms.range"/>
+      <ref name="xforms.submit"/>
+      <ref name="xforms.trigger"/>
+    </choice>
+  </define>
+  <define name="xforms.UI.Messages.attrib">
+    <empty/>
+  </define>
+  <define name="xforms.UI.Common.attrib">
+    <optional>
+      <!-- host language to add accesskey and navindex here -->
+      <attribute name="appearance">
+        <choice>
+          <data type="QName">
+            <param name="pattern">[^:]+:[^:]+</param>
+          </data>
+          <value>minimal</value>
+          <value>compact</value>
+          <value>full</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.UI.Inline.class">
+    <ref name="xforms.output"/>
+  </define>
+  <define name="xforms.UI.Inline.content">
+    <optional>
+      <ref name="xforms.UI.Inline.class"/>
+    </optional>
+  </define>
+  <define name="xforms.UI.Common.content">
+    <zeroOrMore>
+      <choice>
+        <ref name="xforms.help"/>
+        <ref name="xforms.hint"/>
+        <ref name="xforms.alert"/>
+        <ref name="xforms.Actions"/>
+        <ref name="xforms.extension"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="xforms.List.UI.Common.content">
+    <oneOrMore>
+      <choice>
+        <ref name="xforms.item"/>
+        <ref name="xforms.itemset"/>
+        <ref name="xforms.choices"/>
+      </choice>
+    </oneOrMore>
+  </define>
+  <!-- host language must override xforms.label.Text.content to be empty if xforms.UI.Inline.content also includes text -->
+  <define name="xforms.label.Text.content">
+    <text/>
+  </define>
+  <define name="xforms.label.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <ref name="xforms.UI.Messages.attrib"/>
+    </optional>
+  </define>
+  <define name="xforms.label.content">
+    <interleave>
+      <ref name="xforms.label.Text.content"/>
+      <ref name="xforms.UI.Inline.content"/>
+    </interleave>
+  </define>
+  <define name="xforms.label">
+    <element name="label">
+      <interleave>
+        <ref name="xforms.label.attrib"/>
+        <choice>
+          <ref name="xforms.Linking.attrib"/>
+          <ref name="xforms.Single.Node.Binding.attrib"/>
+        </choice>
+        <optional>
+          <ref name="xforms.label.content"/>
+        </optional>
+      </interleave>
+    </element>
+  </define>
+  <define name="xforms.help">
+    <element name="help">
+      <ref name="xforms.help.attrib"/>
+      <ref name="xforms.help.content"/>
+      <optional>
+        <attribute name="appearance">
+          <choice>
+            <data type="QName">
+              <param name="pattern">[^:]+:[^:]+</param>
+            </data>
+            <value>minimal</value>
+            <value>compact</value>
+            <value>full</value>
+          </choice>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="href">
+          <data type="anyURI"/>
+        </attribute>
+      </optional>
+    </element>
+  </define>
+  <define name="xforms.help.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <ref name="xforms.Linking.attrib"/>
+    </optional>
+    <optional>
+      <ref name="xforms.Single.Node.Binding.attrib"/>
+    </optional>
+    <optional>
+      <ref name="xforms.UI.Messages.attrib"/>
+    </optional>
+  </define>
+  <define name="xforms.help.content">
+    <ref name="xforms.UI.Inline.content"/>
+  </define>
+  <define name="xforms.hint">
+    <element name="hint">
+      <ref name="xforms.hint.attrib"/>
+      <ref name="xforms.hint.content"/>
+    </element>
+  </define>
+  <define name="xforms.hint.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <ref name="xforms.Linking.attrib"/>
+    </optional>
+    <optional>
+      <ref name="xforms.Single.Node.Binding.attrib"/>
+    </optional>
+    <optional>
+      <ref name="xforms.UI.Messages.attrib"/>
+    </optional>
+  </define>
+  <define name="xforms.hint.content">
+    <ref name="xforms.UI.Inline.content"/>
+  </define>
+  <define name="xforms.alert">
+    <element name="alert">
+      <ref name="xforms.alert.attrib"/>
+      <ref name="xforms.alert.content"/>
+    </element>
+  </define>
+  <define name="xforms.alert.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <ref name="xforms.Linking.attrib"/>
+    </optional>
+    <ref name="xforms.Single.Node.Binding.attrib"/>
+    <optional>
+      <ref name="xforms.UI.Messages.attrib"/>
+    </optional>
+  </define>
+  <define name="xforms.alert.content">
+    <ref name="xforms.UI.Inline.content"/>
+  </define>
+  <define name="xforms.choices">
+    <element name="choices">
+      <ref name="xforms.choices.attrib"/>
+      <ref name="xforms.choices.content"/>
+    </element>
+  </define>
+  <define name="xforms.choices.attrib">
+    <ref name="xforms.Common.attrib"/>
+  </define>
+  <define name="xforms.choices.content">
+    <optional>
+      <ref name="xforms.label"/>
+    </optional>
+    <oneOrMore>
+      <choice>
+        <ref name="xforms.choices"/>
+        <ref name="xforms.item"/>
+        <ref name="xforms.itemset"/>
+      </choice>
+    </oneOrMore>
+  </define>
+  <define name="xforms.value">
+    <element name="value">
+      <ref name="xforms.value.attrib"/>
+      <ref name="xforms.value.content"/>
+    </element>
+  </define>
+  <define name="xforms.value.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <ref name="xforms.Single.Node.Binding.attrib"/>
+    </optional>
+  </define>
+  <define name="xforms.value.content">
+    <text/>
+  </define>
+  <define name="xforms.item">
+    <element name="item">
+      <ref name="xforms.item.attrib"/>
+      <ref name="xforms.item.content"/>
+    </element>
+  </define>
+  <define name="xforms.item.attrib">
+    <ref name="xforms.Common.attrib"/>
+  </define>
+  <define name="xforms.item.content">
+    <ref name="xforms.label"/>
+    <ref name="xforms.value"/>
+    <ref name="xforms.UI.Common.content"/>
+  </define>
+  <define name="xforms.itemset">
+    <element name="itemset">
+      <ref name="xforms.itemset.attrib"/>
+      <ref name="xforms.itemset.content"/>
+    </element>
+  </define>
+  <define name="xforms.itemset.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.Nodeset.Binding.attrib"/>
+  </define>
+  <define name="xforms.itemset.content">
+    <ref name="xforms.label"/>
+    <choice>
+      <ref name="xforms.value"/>
+      <ref name="xforms.copy"/>
+    </choice>
+    <ref name="xforms.UI.Common.content"/>
+  </define>
+  <define name="xforms.copy">
+    <element name="copy">
+      <ref name="xforms.copy.attrib"/>
+      <ref name="xforms.copy.content"/>
+    </element>
+  </define>
+  <define name="xforms.copy.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.Single.Node.Binding.attrib"/>
+  </define>
+  <define name="xforms.copy.content">
+    <empty/>
+  </define>
+  <define name="xforms.filename">
+    <element name="filename">
+      <ref name="xforms.filename.attrib"/>
+      <ref name="xforms.filename.content"/>
+    </element>
+  </define>
+  <define name="xforms.filename.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.Single.Node.Binding.attrib"/>
+  </define>
+  <define name="xforms.filename.content">
+    <empty/>
+  </define>
+  <define name="xforms.upload.mediatype">
+    <element name="mediatype">
+      <ref name="xforms.upload.mediatype.attrib"/>
+      <ref name="xforms.upload.mediatype.content"/>
+    </element>
+  </define>
+  <define name="xforms.upload.mediatype.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.Single.Node.Binding.attrib"/>
+  </define>
+  <define name="xforms.upload.mediatype.content">
+    <empty/>
+  </define>
+  <define name="xforms.output">
+    <element name="output">
+      <interleave>
+        <ref name="xforms.output.attrib"/>
+        <ref name="xforms.output.content"/>
+      </interleave>
+    </element>
+  </define>
+  <define name="xforms.output.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.UI.Common.attrib"/>
+    <optional>
+      <ref name="xforms.Single.Node.Binding.attrib"/>
+    </optional>
+    <optional>
+      <attribute name="mediatype"/>
+    </optional>
+    <optional>
+      <attribute name="value">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.output.content">
+    <optional>
+      <ref name="xforms.label"/>
+    </optional>
+    <interleave>
+      <optional>
+        <ref name="xforms.output.mediatype"/>
+      </optional>
+      <ref name="xforms.UI.Common.content"/>
+    </interleave>
+  </define>
+  <define name="xforms.output.mediatype">
+    <element name="mediatype">
+      <ref name="xforms.output.mediatype.attrib"/>
+      <ref name="xforms.output.mediatype.content"/>
+    </element>
+  </define>
+  <define name="xforms.output.mediatype.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <choice>
+      <attribute name="value">
+        <ref name="XPathExpression"/>
+      </attribute>
+      <ref name="xforms.Single.Node.Binding.attrib"/>
+    </choice>
+  </define>
+  <define name="xforms.output.mediatype.content">
+    <empty/>
+  </define>
+  <!-- If erratum accepted, change xforms.output.mediatype to use xforms.ValueTemplate -->
+  <define name="xforms.input">
+    <element name="input">
+      <ref name="xforms.input.attrib"/>
+      <ref name="xforms.input.content"/>
+    </element>
+  </define>
+  <define name="xforms.input.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.Single.Node.Binding.attrib"/>
+    <optional>
+      <attribute name="inputmode"/>
+    </optional>
+    <ref name="xforms.UI.Common.attrib"/>
+    <optional>
+      <attribute name="incremental">
+        <data type="boolean"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.input.content">
+    <ref name="xforms.label"/>
+    <ref name="xforms.UI.Common.content"/>
+  </define>
+  <define name="xforms.textarea">
+    <element name="textarea">
+      <ref name="xforms.textarea.attrib"/>
+      <ref name="xforms.textarea.content"/>
+    </element>
+  </define>
+  <define name="xforms.textarea.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.Single.Node.Binding.attrib"/>
+    <optional>
+      <attribute name="inputmode"/>
+    </optional>
+    <ref name="xforms.UI.Common.attrib"/>
+    <optional>
+      <attribute name="incremental">
+        <data type="boolean"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.textarea.content">
+    <ref name="xforms.label"/>
+    <ref name="xforms.UI.Common.content"/>
+  </define>
+  <define name="xforms.secret">
+    <element name="secret">
+      <ref name="xforms.secret.attrib"/>
+      <ref name="xforms.secret.content"/>
+    </element>
+  </define>
+  <define name="xforms.secret.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.Single.Node.Binding.attrib"/>
+    <optional>
+      <attribute name="inputmode"/>
+    </optional>
+    <ref name="xforms.UI.Common.attrib"/>
+    <optional>
+      <attribute name="incremental">
+        <data type="boolean"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.secret.content">
+    <ref name="xforms.label"/>
+    <ref name="xforms.UI.Common.content"/>
+  </define>
+  <define name="xforms.upload">
+    <element name="upload">
+      <ref name="xforms.upload.attrib"/>
+      <ref name="xforms.upload.content"/>
+    </element>
+  </define>
+  <define name="xforms.upload.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.Single.Node.Binding.attrib"/>
+    <optional>
+      <attribute name="mediatype"/>
+    </optional>
+    <ref name="xforms.UI.Common.attrib"/>
+    <optional>
+      <attribute name="incremental">
+        <data type="boolean"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.upload.content">
+    <ref name="xforms.label"/>
+    <optional>
+      <ref name="xforms.filename"/>
+    </optional>
+    <optional>
+      <ref name="xforms.upload.mediatype"/>
+    </optional>
+    <ref name="xforms.UI.Common.content"/>
+  </define>
+  <define name="xforms.select1">
+    <element name="select1">
+      <ref name="xforms.select1.attrib"/>
+      <ref name="xforms.select1.content"/>
+    </element>
+  </define>
+  <define name="xforms.select1.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.Single.Node.Binding.attrib"/>
+    <ref name="xforms.UI.Common.attrib"/>
+    <optional>
+      <attribute name="selection">
+        <choice>
+          <value>open</value>
+          <value>closed</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="incremental">
+        <data type="boolean"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.select1.content">
+    <ref name="xforms.label"/>
+    <choice>
+      <group>
+        <ref name="xforms.UI.Common.content"/>
+        <ref name="xforms.List.UI.Common.content"/>
+      </group>
+      <group>
+        <ref name="xforms.List.UI.Common.content"/>
+        <ref name="xforms.UI.Common.content"/>
+      </group>
+    </choice>
+  </define>
+  <define name="xforms.select">
+    <element name="select">
+      <ref name="xforms.select.attrib"/>
+      <ref name="xforms.select.content"/>
+    </element>
+  </define>
+  <define name="xforms.select.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.Single.Node.Binding.attrib"/>
+    <ref name="xforms.UI.Common.attrib"/>
+    <optional>
+      <attribute name="selection">
+        <choice>
+          <value>open</value>
+          <value>closed</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="incremental">
+        <data type="boolean"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.select.content">
+    <ref name="xforms.label"/>
+    <choice>
+      <group>
+        <ref name="xforms.UI.Common.content"/>
+        <ref name="xforms.List.UI.Common.content"/>
+      </group>
+      <group>
+        <ref name="xforms.List.UI.Common.content"/>
+        <ref name="xforms.UI.Common.content"/>
+      </group>
+    </choice>
+  </define>
+  <define name="xforms.range">
+    <element name="range">
+      <ref name="xforms.range.attrib"/>
+      <ref name="xforms.range.content"/>
+    </element>
+  </define>
+  <define name="xforms.range.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.Single.Node.Binding.attrib"/>
+    <ref name="xforms.UI.Common.attrib"/>
+    <optional>
+      <attribute name="start"/>
+    </optional>
+    <optional>
+      <attribute name="end"/>
+    </optional>
+    <optional>
+      <attribute name="step"/>
+    </optional>
+    <optional>
+      <attribute name="incremental">
+        <data type="boolean"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.range.content">
+    <ref name="xforms.label"/>
+    <ref name="xforms.UI.Common.content"/>
+  </define>
+  <define name="xforms.trigger">
+    <element name="trigger">
+      <ref name="xforms.trigger.attrib"/>
+      <ref name="xforms.trigger.content"/>
+    </element>
+  </define>
+  <define name="xforms.trigger.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <ref name="xforms.Single.Node.Binding.attrib"/>
+    </optional>
+    <optional>
+      <ref name="xforms.UI.Common.attrib"/>
+    </optional>
+  </define>
+  <define name="xforms.trigger.content">
+      <!-- ORBEON: added interleave, because order shouldn't matter -->
+      <interleave>
+        <ref name="xforms.label"/>
+        <ref name="xforms.UI.Common.content"/>
+      </interleave>
+  </define>
+  <define name="xforms.submit">
+    <element name="submit">
+      <ref name="xforms.submit.attrib"/>
+      <ref name="xforms.submit.content"/>
+    </element>
+  </define>
+  <define name="xforms.submit.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <attribute name="submission">
+      <data type="IDREF"/>
+    </attribute>
+    <optional>
+      <ref name="xforms.Single.Node.Binding.attrib"/>
+    </optional>
+    <optional>
+      <ref name="xforms.UI.Common.attrib"/>
+    </optional>
+  </define>
+  <define name="xforms.submit.content">
+    <ref name="xforms.label"/>
+    <ref name="xforms.UI.Common.content"/>
+  </define>
+  <!-- Actions -->
+  <define name="xforms.action">
+    <element name="action">
+      <ref name="xforms.action.attrib"/>
+      <ref name="xforms.action.content"/>
+    </element>
+  </define>
+  <define name="xforms.action.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.action.content">
+    <ref name="xforms.Actions"/>
+  </define>
+  <define name="xforms.dispatch">
+    <element name="dispatch">
+      <ref name="xforms.dispatch.attrib"/>
+      <ref name="xforms.dispatch.content"/>
+    </element>
+  </define>
+  <define name="xforms.dispatch.attrib">
+    <ref name="xforms.Common.attrib"/>
+      <!-- ORBEON: don't need this because part of xforms.actions.attrib -->
+    <!--<ref name="xforms.Events.attrib"/>-->
+    <ref name="xforms.actions.attrib"/>
+    <optional>
+      <attribute name="name">
+        <ref name="xforms.ActionName"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="targetid">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="target">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <optional>
+        <!-- ORBEON: don't think this is deprecated -->
+      <!-- deprecated -->
+      <attribute name="delay">
+        <data type="string"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="bubbles">
+        <data type="boolean"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="cancelable">
+        <data type="boolean"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.dispatch.content">
+    <interleave>
+      <optional>
+        <element name="name">
+          <ref name="xforms.ValueTemplate.IDREF"/>
+        </element>
+      </optional>
+      <optional>
+        <element name="targetid">
+          <ref name="xforms.ValueTemplate.IDREF"/>
+        </element>
+      </optional>
+      <optional>
+        <element name="target">
+          <ref name="xforms.ValueTemplate.IDREF"/>
+        </element>
+      </optional>
+      <optional>
+        <!-- target is deprecated -->
+        <element name="delay">
+          <ref name="xforms.ValueTemplate"/>
+        </element>
+      </optional>
+    </interleave>
+  </define>
+  <define name="xforms.rebuild">
+    <element name="rebuild">
+      <ref name="xforms.rebuild.attrib"/>
+      <ref name="xforms.rebuild.content"/>
+    </element>
+  </define>
+  <define name="xforms.rebuild.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <attribute name="model">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.rebuild.content">
+    <empty/>
+  </define>
+  <define name="xforms.revalidate">
+    <element name="revalidate">
+      <ref name="xforms.revalidate.attrib"/>
+      <ref name="xforms.revalidate.content"/>
+    </element>
+  </define>
+  <define name="xforms.revalidate.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <attribute name="model">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.revalidate.content">
+    <empty/>
+  </define>
+  <define name="xforms.recalculate">
+    <element name="recalculate">
+      <ref name="xforms.recalculate.attrib"/>
+      <ref name="xforms.recalculate.content"/>
+    </element>
+  </define>
+  <define name="xforms.recalculate.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <attribute name="model">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.recalculate.content">
+    <empty/>
+  </define>
+  <define name="xforms.refresh">
+    <element name="refresh">
+      <ref name="xforms.refresh.attrib"/>
+      <ref name="xforms.refresh.content"/>
+    </element>
+  </define>
+  <define name="xforms.refresh.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <attribute name="model">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.refresh.content">
+    <empty/>
+  </define>
+  <define name="xforms.setfocus">
+    <element name="setfocus">
+      <ref name="xforms.setfocus.attrib"/>
+      <ref name="xforms.setfocus.content"/>
+    </element>
+  </define>
+  <define name="xforms.setfocus.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <attribute name="control">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <optional>
+      <element name="control">
+        <ref name="xforms.ValueTemplate.IDREF"/>
+      </element>
+    </optional>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.setfocus.content">
+    <empty/>
+  </define>
+  <define name="xforms.load">
+    <element name="load">
+      <ref name="xforms.load.attrib"/>
+      <ref name="xforms.load.content"/>
+    </element>
+  </define>
+  <define name="xforms.load.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <attribute name="resource">
+        <data type="anyURI"/>
+      </attribute>
+    </optional>
+    <optional>
+      <!-- note: collides with rdf/a resource attribute -->
+      <attribute name="show">
+        <choice>
+          <value>new</value>
+          <value>replace</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="xforms.Single.Node.Binding.attrib"/>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.load.content">
+    <optional>
+      <element name="resource">
+        <ref name="xforms.ValueTemplate.anyURI"/>
+      </element>
+    </optional>
+  </define>
+  <define name="xforms.setvalue">
+    <element name="setvalue">
+      <ref name="xforms.setvalue.attrib"/>
+      <ref name="xforms.ValueTemplate"/>
+    </element>
+  </define>
+  <define name="xforms.setvalue.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <ref name="xforms.Single.Node.Binding.attrib"/>
+    </optional>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.send">
+    <element name="send">
+      <ref name="xforms.send.attrib"/>
+      <ref name="xforms.send.content"/>
+    </element>
+  </define>
+  <define name="xforms.send.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <attribute name="submission">
+      <data type="IDREF"/>
+    </attribute>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.send.content">
+    <empty/>
+  </define>
+  <define name="xforms.reset">
+    <element name="reset">
+      <ref name="xforms.reset.attrib"/>
+      <ref name="xforms.reset.content"/>
+    </element>
+  </define>
+  <define name="xforms.reset.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <attribute name="model">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.reset.content">
+    <empty/>
+  </define>
+  <define name="xforms.insert">
+    <element name="insert">
+      <ref name="xforms.insert.attrib"/>
+      <ref name="xforms.insert.content"/>
+    </element>
+  </define>
+  <define name="xforms.insert.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <attribute name="context">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="origin">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="at">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="position">
+        <choice>
+          <value>before</value>
+          <value>after</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <ref name="xforms.Nodeset.Binding.attrib"/>
+    </optional>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.insert.content">
+    <empty/>
+  </define>
+  <define name="xforms.delete">
+    <element name="delete">
+      <ref name="xforms.delete.attrib"/>
+      <ref name="xforms.delete.content"/>
+    </element>
+  </define>
+  <define name="xforms.delete.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <attribute name="context">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="at">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <ref name="xforms.Nodeset.Binding.attrib"/>
+    </optional>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.delete.content">
+    <empty/>
+  </define>
+  <define name="xforms.setindex">
+    <element name="setindex">
+      <ref name="xforms.setindex.attrib"/>
+      <ref name="xforms.setindex.content"/>
+    </element>
+  </define>
+  <define name="xforms.setindex.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <attribute name="repeat">
+      <data type="IDREF"/>
+    </attribute>
+    <attribute name="index">
+      <ref name="XPathExpression"/>
+    </attribute>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.setindex.content">
+    <empty/>
+  </define>
+  <define name="xforms.toggle">
+    <element name="toggle">
+      <ref name="xforms.toggle.attrib"/>
+      <ref name="xforms.toggle.content"/>
+    </element>
+  </define>
+  <define name="xforms.toggle.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <attribute name="case">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <define name="xforms.toggle.content">
+    <optional>
+      <element name="case">
+        <ref name="xforms.ValueTemplate.IDREF"/>
+      </element>
+    </optional>
+  </define>
+  <define name="xforms.message">
+    <element name="message">
+      <ref name="xforms.message.attrib"/>
+      <ref name="xforms.message.content"/>
+    </element>
+  </define>
+  <define name="xforms.message.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <attribute name="level">
+      <choice>
+        <value>ephemeral</value>
+        <value>modeless</value>
+        <value>modal</value>
+      </choice>
+    </attribute>
+    <optional>
+      <ref name="xforms.Linking.attrib"/>
+    </optional>
+    <optional>
+      <ref name="xforms.Single.Node.Binding.attrib"/>
+    </optional>
+    <ref name="xforms.actions.attrib"/>
+  </define>
+  <!-- host language must override xforms.message.Text.content to be empty if xforms.UI.Inline.content also includes text -->
+  <define name="xforms.message.Text.content">
+    <text/>
+  </define>
+  <define name="xforms.message.content">
+    <interleave>
+      <ref name="xforms.message.Text.content"/>
+      <ref name="xforms.UI.Inline.content"/>
+    </interleave>
+  </define>
+  <define name="xforms.Actions">
+    <zeroOrMore>
+      <choice>
+        <ref name="xforms.action"/>
+        <ref name="xforms.dispatch"/>
+        <ref name="xforms.rebuild"/>
+        <ref name="xforms.recalculate"/>
+        <ref name="xforms.refresh"/>
+        <ref name="xforms.setfocus"/>
+        <ref name="xforms.load"/>
+        <ref name="xforms.setvalue"/>
+        <ref name="xforms.send"/>
+        <ref name="xforms.reset"/>
+        <ref name="xforms.insert"/>
+        <ref name="xforms.delete"/>
+        <ref name="xforms.setindex"/>
+        <ref name="xforms.toggle"/>
+        <ref name="xforms.message"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="xforms.actions.attrib">
+    <ref name="xforms.Events.attrib"/>
+    <optional>
+      <attribute name="if">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="while">
+        <ref name="XPathExpression"/>
+      </attribute>
+    </optional>
+  </define>
+  <!-- Container Form Controls -->
+  <define name="xforms.Container.Form.Controls">
+    <choice>
+      <ref name="xforms.group"/>
+      <ref name="xforms.repeat"/>
+      <ref name="xforms.switch"/>
+    </choice>
+  </define>
+  <define name="xforms.repeat">
+    <element name="repeat">
+      <ref name="xforms.repeat.attrib"/>
+      <ref name="xforms.repeat.content"/>
+    </element>
+  </define>
+  <define name="xforms.repeat.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <ref name="xforms.Nodeset.Binding.attrib"/>
+    <ref name="xforms.UI.Common.attrib"/>
+    <optional>
+      <attribute name="startindex">
+        <data type="positiveInteger"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="number">
+        <data type="nonNegativeInteger"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.repeat.content">
+    <zeroOrMore>
+      <choice>
+        <ref name="xforms.Core.Form.Controls"/>
+        <ref name="xforms.Container.Form.Controls"/>
+        <!-- ORBEON: why? -->
+        <ref name="xforms.UI.Inline.content"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="xforms.group">
+    <element name="group">
+      <ref name="xforms.group.attrib"/>
+      <ref name="xforms.group.content"/>
+    </element>
+  </define>
+  <define name="xforms.group.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <ref name="xforms.Single.Node.Binding.attrib"/>
+    </optional>
+    <ref name="xforms.UI.Common.attrib"/>
+  </define>
+  <define name="xforms.group.content">
+    <optional>
+      <ref name="xforms.label"/>
+    </optional>
+    <zeroOrMore>
+      <choice>
+        <ref name="xforms.Core.Form.Controls"/>
+        <ref name="xforms.Container.Form.Controls"/>
+        <ref name="xforms.UI.Common.content"/>
+          <!-- ORBEON: why? -->
+        <ref name="xforms.UI.Inline.content"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="xforms.switch">
+    <element name="switch">
+      <ref name="xforms.switch.attrib"/>
+      <ref name="xforms.switch.content"/>
+    </element>
+  </define>
+  <define name="xforms.switch.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <ref name="xforms.Single.Node.Binding.attrib"/>
+    </optional>
+    <ref name="xforms.UI.Common.attrib"/>
+  </define>
+  <define name="xforms.switch.content">
+    <oneOrMore>
+      <ref name="xforms.switch.case"/>
+    </oneOrMore>
+  </define>
+  <define name="xforms.switch.case">
+    <element name="case">
+      <ref name="xforms.switch.case.attrib"/>
+      <ref name="xforms.switch.case.content"/>
+    </element>
+  </define>
+  <define name="xforms.switch.case.attrib">
+    <ref name="xforms.Common.attrib"/>
+    <optional>
+      <attribute name="selected">
+        <data type="boolean"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xforms.switch.case.content">
+    <optional>
+      <ref name="xforms.label"/>
+    </optional>
+    <zeroOrMore>
+      <choice>
+        <ref name="xforms.Core.Form.Controls"/>
+        <ref name="xforms.Container.Form.Controls"/>
+        <ref name="xforms.action"/>
+        <ref name="xforms.UI.Inline.content"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="xforms.extension">
+    <element name="extension">
+      <ref name="xforms.extension.attrib"/>
+      <ref name="xforms.extension.content"/>
+    </element>
+  </define>
+  <define name="xforms.extension.attrib">
+    <ref name="xforms.Common.attrib"/>
+  </define>
+  <define name="xforms.extension.content">
+    <zeroOrMore>
+      <ref name="xforms.anyForeignElement"/>
+    </zeroOrMore>
+  </define>
+  <!-- Simple Types -->
+  <define name="QNameButNotNCName">
+    <data type="QName">
+      <param name="pattern">[^:]+:[^:]+</param>
+    </data>
+  </define>
+  <define name="XPathExpression">
+    <data type="string"/>
+  </define>
+  <define name="xforms.versionList">
+    <list>
+      <oneOrMore>
+        <ref name="xforms.versionNumber"/>
+      </oneOrMore>
+    </list>
+  </define>
+  <define name="xforms.versionNumber">
+    <data type="string">
+      <param name="pattern">[1-9]\d*\.\d+</param>
+    </data>
+  </define>
+  <!-- Templates -->
+  <define name="xforms.ValueTemplate">
+    <interleave>
+      <optional>
+        <attribute name="value">
+          <ref name="XPathExpression"/>
+        </attribute>
+      </optional>
+      <data type="string"/>
+    </interleave>
+  </define>
+  <define name="xforms.ValueTemplate.IDREF">
+    <choice>
+      <optional>
+        <attribute name="value">
+          <ref name="XPathExpression"/>
+        </attribute>
+      </optional>
+      <interleave>
+        <optional>
+          <attribute name="value">
+            <ref name="XPathExpression"/>
+          </attribute>
+        </optional>
+        <data type="IDREF"/>
+      </interleave>
+    </choice>
+  </define>
+  <define name="xforms.ValueTemplate.anyURI">
+    <choice>
+      <optional>
+        <attribute name="value">
+          <ref name="XPathExpression"/>
+        </attribute>
+      </optional>
+      <interleave>
+        <optional>
+          <attribute name="value">
+            <ref name="XPathExpression"/>
+          </attribute>
+        </optional>
+        <data type="anyURI"/>
+      </interleave>
+    </choice>
+  </define>
+  <!-- Actions -->
+  <define name="xforms.ActionName">
+    <choice>
+      <value>xforms-model-construct</value>
+      <value>xforms-model-construct-done</value>
+      <value>xforms-ready</value>
+      <value>xforms-model-destruct</value>
+      <value>xforms-rebuild</value>
+      <value>xforms-recalculate</value>
+      <value>xforms-revalidate</value>
+      <value>xforms-refresh</value>
+      <value>xforms-reset</value>
+      <value>xforms-previous</value>
+      <value>xforms-next</value>
+      <value>xforms-focus</value>
+      <value>xforms-help</value>
+      <value>xforms-hint</value>
+      <value>xforms-submit</value>
+      <value>xforms-submit-serialize</value>
+      <value>xforms-insert</value>
+      <value>xforms-delete</value>
+      <value>xforms-value-changed</value>
+      <value>xforms-valid</value>
+      <value>xforms-invalid</value>
+      <value>xforms-readonly</value>
+      <value>xforms-readwrite</value>
+      <value>xforms-required</value>
+      <value>xforms-optional</value>
+      <value>xforms-enabled</value>
+      <value>xforms-disabled</value>
+      <value>xforms-select</value>
+      <value>xforms-deselect</value>
+      <value>xforms-in-range</value>
+      <value>xforms-out-of-range</value>
+      <value>xforms-scroll-first</value>
+      <value>xforms-scroll-last</value>
+      <value>xforms-submit-done</value>
+      <value>xforms-binding-exception</value>
+      <value>xforms-compute-exception</value>
+      <value>xforms-link-error</value>
+      <value>xforms-link-exception</value>
+      <value>xforms-output-error</value>
+      <value>xforms-submit-error</value>
+      <value>xforms-version-exception</value>
+      <data type="NMTOKEN">
+        <except>
+          <data type="NMTOKEN">
+            <param name="pattern">xforms-.*</param>
+          </data>
+        </except>
+      </data>
+    </choice>
+  </define>
+  <define name="xforms.anyElement">
+    <element>
+      <anyName/>
+      <zeroOrMore>
+        <choice>
+          <attribute>
+            <anyName/>
+          </attribute>
+          <text/>
+          <ref name="xforms.anyElement"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="xforms.anyXSElement">
+    <element>
+      <nsName ns="http://www.w3.org/2001/XMLSchema"/>
+      <zeroOrMore>
+        <choice>
+          <attribute>
+            <anyName/>
+          </attribute>
+          <text/>
+          <ref name="xforms.anyXSElement"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="xforms.anyForeignElement">
+    <empty/>
+  </define>
+</grammar>
+<!--
+  Portions Copyright 2004-2005 Brain Attic, L.L.C.
+  Licensed under W3C Software License:
+  http://lists.w3.org/Archives/Public/www-forms/2009Jun/0015.html
+  For changes, see CHANGELOG.txt
+-->

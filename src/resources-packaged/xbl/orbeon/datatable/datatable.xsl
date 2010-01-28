@@ -609,10 +609,10 @@
                 <!--  <xforms:group appearance="xxforms:internal" xxbl:scope="outer"> would be better but doesn't work! -->
                 <xforms:group xxbl:scope="outer">
                     <xhtml:table id="{$id}-table"
-                        class="datatable datatable-{$id} yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
+                        class="{@class} datatable datatable-{$id} yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
                         style="{$height} {$width}">
                         <!-- Copy attributes that are not parameters! -->
-                        <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id' ))]" mode="dynamic"/>
+                        <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id', 'class'))]" mode="dynamic"/>
                         <xhtml:thead id="{$id}-thead">
                             <xhtml:tr class="yui-dt-first yui-dt-last {@class}" id="{$id}-thead-tr">
                                 <xsl:apply-templates select="$columns/*" mode="dynamic"/>

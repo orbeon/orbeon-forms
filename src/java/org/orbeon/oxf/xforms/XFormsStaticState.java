@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandler;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.SAXStore;
@@ -92,9 +93,10 @@ public class XFormsStaticState {
     private Map<String, Map<String, String>> namespacesMap;                 // Map<String prefixedId, Map<String prefix, String uri>> of namespace mappings
 
     // Event handlers
-    private Map<String, String> eventNamesMap;                              // Map<String eventName, String "">
+    private Set<String> eventNames;                                         // used event names
     private Map<String, List<XFormsEventHandler>> eventHandlersMap;         // Map<String observerPrefixedId, List<XFormsEventHandler> eventHandler>: for all observers with handlers
     private Map<String, String> eventHandlerAncestorsMap;                   // Map<String actionPrefixId, String ancestorPrefixedId>
+    private List<XFormsEventHandler> keyHandlers;
 
     // Controls
     private Map<String, Map<String, ControlInfo>> controlTypes;             // Map<String type, Map<String prefixedId, ControlInfo info>>
@@ -125,6 +127,7 @@ public class XFormsStaticState {
     private XBLBindings xblBindings;
 
     private static final Map<String, String> BASIC_NAMESPACE_MAPPINGS = new HashMap<String, String>();
+
     static {
         BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XFORMS_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
         BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XXFORMS_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);
@@ -653,10 +656,6 @@ public class XFormsStaticState {
         }
     }
 
-    public Map<String, String> getEventNamesMap() {
-        return eventNamesMap;
-    }
-
     public List<XFormsEventHandler> getEventHandlers(String observerPrefixedId) {
         return eventHandlersMap.get(observerPrefixedId);
     }
@@ -784,9 +783,10 @@ public class XFormsStaticState {
             final long startTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
             controlTypes = new HashMap<String, Map<String, ControlInfo>>();
-            eventNamesMap = new HashMap<String, String>();
+            eventNames = new HashSet<String>();
             eventHandlersMap = new HashMap<String, List<XFormsEventHandler>>();
             eventHandlerAncestorsMap = new HashMap<String, String>();
+            keyHandlers = new ArrayList<XFormsEventHandler>();
             controlInfoMap = new HashMap<String, ControlInfo>();
             repeatChildrenMap = new HashMap<String, List<String>>();
 
@@ -1349,7 +1349,11 @@ public class XFormsStaticState {
      */
     public boolean hasHandlerForEvent(String eventName) {
         // Check for #all as well as specific event
-        return eventNamesMap.get(XFormsConstants.XXFORMS_ALL_EVENTS) != null || eventNamesMap.get(eventName) != null;
+        return eventNames.contains(XFormsConstants.XXFORMS_ALL_EVENTS) || eventNames.contains(eventName);
+    }
+
+    public List<XFormsEventHandler> getKeyHandlers() {
+        return keyHandlers;
     }
 
     /**
@@ -1407,10 +1411,14 @@ public class XFormsStaticState {
 
             // Remember all event names
             if (newEventHandlerImpl.isAllEvents()) {
-                eventNamesMap.put(XFormsConstants.XXFORMS_ALL_EVENTS, "");
+                eventNames.add(XFormsConstants.XXFORMS_ALL_EVENTS);
             } else {
-                for (final String eventName: newEventHandlerImpl.getEventNames().keySet()) {
-                    eventNamesMap.put(eventName, "");
+                for (final String eventName: newEventHandlerImpl.getEventNames()) {
+                    eventNames.add(eventName);
+                    // Remember specially keypress events (could have eventNames<String, List<XFormsEventHandlerImpl>)
+                    // instead of separate list, if useful for more events
+                    if (XFormsEvents.KEYPRESS.equals(eventName))
+                        keyHandlers.add(newEventHandlerImpl);
                 }
             }
         }

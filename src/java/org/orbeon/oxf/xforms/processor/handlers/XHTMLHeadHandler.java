@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
+import org.orbeon.oxf.xforms.event.XFormsEventHandler;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsFeatures;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
@@ -424,47 +425,86 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         "type", "text/javascript"});
 
                 // Produce JSON output
-                if (javaScriptControlsAppearancesMap.size() > 0) {
-                    final StringBuilder sb = new StringBuilder("var opsXFormsControls = {\"controls\":{");
+                final boolean hasInitControls = javaScriptControlsAppearancesMap.size() > 0;
+                final boolean hasKeyListeners = containingDocument.getStaticState().getKeyHandlers().size() > 0;
+                final boolean outputInitData = hasInitControls || hasKeyListeners;
+                if (outputInitData) {
+                    final StringBuilder sb = new StringBuilder("var orbeonInitData = {");
 
-                    for (Iterator<Map.Entry<String,Map<String,List<String>>>> i = javaScriptControlsAppearancesMap.entrySet().iterator(); i.hasNext();) {
-                        final Map.Entry<String,Map<String,List<String>>> currentEntry1 = i.next();
-                        final String controlName = currentEntry1.getKey();
-                        final Map<String, List<String>> controlMap = currentEntry1.getValue();
+                    // Output controls initialization
+                    if (hasInitControls) {
+                        sb.append("\"controls\":{");
 
-                        sb.append("\"");
-                        sb.append(controlName);
-                        sb.append("\":{");
+                        for (Iterator<Map.Entry<String,Map<String,List<String>>>> i = javaScriptControlsAppearancesMap.entrySet().iterator(); i.hasNext();) {
+                            final Map.Entry<String,Map<String,List<String>>> currentEntry1 = i.next();
+                            final String controlName = currentEntry1.getKey();
+                            final Map<String, List<String>> controlMap = currentEntry1.getValue();
 
-                        for (Iterator<Map.Entry<String,List<String>>> j = controlMap.entrySet().iterator(); j.hasNext();) {
-                            final Map.Entry<String,List<String>> currentEntry2 = j.next();
-                            final String controlAppearance = currentEntry2.getKey();
-                            final List<String> idsForAppearanceList = currentEntry2.getValue();
+                            sb.append("\"");
+                            sb.append(controlName);
+                            sb.append("\":{");
 
-                            sb.append('"');
-                            sb.append(controlAppearance != null ? controlAppearance : "");
-                            sb.append("\":[");
+                            for (Iterator<Map.Entry<String,List<String>>> j = controlMap.entrySet().iterator(); j.hasNext();) {
+                                final Map.Entry<String,List<String>> currentEntry2 = j.next();
+                                final String controlAppearance = currentEntry2.getKey();
+                                final List<String> idsForAppearanceList = currentEntry2.getValue();
 
-                            for (Iterator<String> k = idsForAppearanceList.iterator(); k.hasNext();) {
-                                final String controlId = k.next();
                                 sb.append('"');
-                                sb.append(controlId);
-                                sb.append('"');
-                                if (k.hasNext())
+                                sb.append(controlAppearance != null ? controlAppearance : "");
+                                sb.append("\":[");
+
+                                for (Iterator<String> k = idsForAppearanceList.iterator(); k.hasNext();) {
+                                    final String controlId = k.next();
+                                    sb.append('"');
+                                    sb.append(controlId);
+                                    sb.append('"');
+                                    if (k.hasNext())
+                                        sb.append(',');
+                                }
+
+                                sb.append(']');
+                                if (j.hasNext())
                                     sb.append(',');
                             }
 
-                            sb.append(']');
-                            if (j.hasNext())
+                            sb.append("}");
+                            if (i.hasNext())
                                 sb.append(',');
                         }
-
-                        sb.append("}");
-                        if (i.hasNext())
-                            sb.append(',');
+                        sb.append('}');
                     }
 
-                    sb.append("}};");
+                    // Output key listener information
+                    if (hasKeyListeners) {
+                        if (hasInitControls)
+                            sb.append(',');
+
+                        sb.append("\"keylisteners\":[");
+
+                        boolean first = true;
+                        for (XFormsEventHandler handler: containingDocument.getStaticState().getKeyHandlers()) {
+                            if (!first)
+                                sb.append(',');
+
+                            final String[] observers = handler.getObserversStaticIds();
+                            for (String observer: observers) {
+                                sb.append('{');
+                                sb.append("observer:\"");
+                                sb.append(observer);
+                                sb.append("\",modifier:\"");
+                                sb.append(handler.getKeyModifiers());
+                                sb.append("\",text:\"");
+                                sb.append(handler.getKeyText());
+                                sb.append("\"}");
+
+                                first = false;
+                            }
+                        }
+
+                        sb.append(']');
+                    }
+
+                    sb.append("};");
 
                     helper.text(sb.toString());
                 }

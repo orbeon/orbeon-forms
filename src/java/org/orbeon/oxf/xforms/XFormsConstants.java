@@ -155,6 +155,9 @@ public class XFormsConstants {
     public static final QName XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate", XML_EVENTS_NAMESPACE);
     public static final QName XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME = new QName("defaultAction", XML_EVENTS_NAMESPACE);
 
+    public static final QName XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME = new QName("modifiers", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME = new QName("text", XXFORMS_NAMESPACE);
+
     public static final String XXFORMS_ALL_EVENTS = "#all";
 
     public static final QName XFORMS_FILENAME_QNAME = new QName("filename", XFORMS_NAMESPACE);

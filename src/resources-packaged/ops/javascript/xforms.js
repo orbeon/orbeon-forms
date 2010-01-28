@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -4815,12 +4815,12 @@ ORBEON.xforms.Init = {
         }
 
         // Initialize special controls
-        if (!(window.opsXFormsControls === undefined)) {
+        if (!(window.orbeonInitData === undefined)) {
             var initFunctions = ORBEON.xforms.Init._getSpecialControlsInitFunctions();
             // Iterate over controls
-            for (var controlType in window.opsXFormsControls["controls"]) {
+            for (var controlType in window.orbeonInitData["controls"]) {
                 if (initFunctions[controlType]) {
-                    var controlAppearances = window.opsXFormsControls["controls"][controlType];
+                    var controlAppearances = window.orbeonInitData["controls"][controlType];
                     // Iterate over appearance for current control
                     for (var controlAppearance in controlAppearances) {
                         var initFunction = initFunctions[controlType][controlAppearance];
@@ -4867,7 +4867,7 @@ ORBEON.xforms.Init = {
      * Initialize a newly copied subtree.
      *
      * Some of the more advanced controls are initialized when the page first loads. The server sets the value of the
-     * opsXFormsControls variable to tell the client the id of those controls and the type of each control. When new
+     * orbeonInitData variable to tell the client the id of those controls and the type of each control. When new
      * controls are added, this function must be called so those the inserted advanced controls are initialized as
      * well.
      */

@@ -23,7 +23,9 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents an XForms (or just plain XML Events) event handler implementation.
@@ -37,7 +39,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     private final Element eventHandlerElement;
     private final String ancestorObserverStaticId;
 
-    private final Map<String, String> eventNames;
+    private final Set<String> eventNames;
     private final boolean isAllEvents;
     private final String[] observerStaticIds;
     private final Set<String> targetStaticIds;
@@ -52,6 +54,10 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     private final boolean isPerformDefaultAction; // "true" means "perform", "false" means "cancel"
 
     private final boolean isXBLHandler;
+
+    private final String keyModifiers;
+    private final String keyText;
+
 
     /**
      * Initialize an action handler based on an action element.
@@ -68,7 +74,9 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME),
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME),
                 eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME),
-                eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME));
+                eventHandlerElement.attributeValue(XFormsConstants.XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME),
+                eventHandlerElement.attributeValue(XFormsConstants.XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME),
+                eventHandlerElement.attributeValue(XFormsConstants.XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME));
     }
 
     /**
@@ -85,15 +93,20 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
      * @param phase                     event phase ("capture" | "default", poss. more later as XBL has "capture" | "target" | "bubble" | "default-action")
      * @param propagate                 whether event must propagate ("stop" | "continue")
      * @param defaultAction             whether default action must run ("cancel" | "perform")
+     * @param keyModifiers               key modifier for keypress event, or null
+     * @param keyText                   key text for keypress event, or null
      */
     public XFormsEventHandlerImpl(String prefix, Element eventHandlerElement, String parentStaticId, String ancestorObserverStaticId,
                                   boolean isXBLHandler, String observersStaticIds, String eventNamesAttribute, String targets,
-                                  String phase, String propagate, String defaultAction) {
+                                  String phase, String propagate, String defaultAction, String keyModifiers, String keyText) {
 
         this.prefix = prefix;
         this.eventHandlerElement = eventHandlerElement;
         this.ancestorObserverStaticId = ancestorObserverStaticId;
         this.isXBLHandler = isXBLHandler;
+
+        this.keyModifiers = keyModifiers;
+        this.keyText = keyText;
 
         // Gather observers
         // NOTE: Supporting space-separated handlers is an extension, which may make it into XML Events 2
@@ -110,13 +123,12 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
 
         // Gather event names
         // NOTE: Supporting space-separated event names is an extension, which may make it into XML Events 2
-        final Map<String, String> eventNames = new HashMap<String, String>();
+        final Set<String> eventNames = new HashSet<String>();
         final String[] eventNamesArray = StringUtils.split(eventNamesAttribute);
-        for (String anEventNamesArray: eventNamesArray) {
-            eventNames.put(anEventNamesArray, "");
-        }
+        eventNames.addAll(Arrays.asList(eventNamesArray));
+
         // Special #all value catches all events
-        if (eventNames.get(XFormsConstants.XXFORMS_ALL_EVENTS) != null) {
+        if (eventNames.contains(XFormsConstants.XXFORMS_ALL_EVENTS)) {
             this.eventNames = null;
             isAllEvents = true;
         } else {
@@ -217,7 +229,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     }
 
     public boolean isMatchEventName(String eventName) {
-        return isAllEvents || eventNames.get(eventName) != null;
+        return isAllEvents || eventNames.contains(eventName);
     }
 
     public boolean isMatchTarget(String targetStaticId) {
@@ -229,7 +241,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         return isAllEvents;
     }
 
-    public Map<String, String> getEventNames() {
+    public Set<String> getEventNames() {
         return eventNames;
     }
 
@@ -247,5 +259,13 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
 
     public String getAncestorObserverStaticId() {
         return ancestorObserverStaticId;
+    }
+
+    public String getKeyModifiers() {
+        return keyModifiers;
+    }
+
+    public String getKeyText() {
+        return keyText;
     }
 }

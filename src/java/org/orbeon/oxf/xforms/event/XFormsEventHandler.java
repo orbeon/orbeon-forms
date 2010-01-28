@@ -16,6 +16,8 @@ package org.orbeon.oxf.xforms.event;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
+import java.util.Set;
+
 /**
  * Represent an XForms event handler.
  */
@@ -29,8 +31,12 @@ public interface XFormsEventHandler {
     boolean isPerformDefaultAction();
 
     String[] getObserversStaticIds();
+    Set<String> getEventNames();
     boolean isMatchEventName(String eventName);
     boolean isMatchTarget(String targetId);
+
+    String getKeyModifiers();
+    String getKeyText();
 
     void handleEvent(PropertyContext propertyContext, XBLContainer container,
                      XFormsEventObserver eventObserver, XFormsEvent event);

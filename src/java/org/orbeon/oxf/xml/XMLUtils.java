@@ -59,10 +59,7 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class XMLUtils {
 
@@ -1237,5 +1234,51 @@ public class XMLUtils {
         contentHandler.endElement("", "null", "null");
         contentHandler.endPrefixMapping(XMLConstants.XSI_PREFIX);
         contentHandler.endDocument();
+    }
+
+    public static String saxElementToDebugString(String uri, String qName, Attributes attributes) {
+        // Open start tag
+        final StringBuilder sb = new StringBuilder("<");
+        sb.append(qName);
+
+        final Set<String> declaredPrefixes = new HashSet<String>();
+        mapPrefixIfNeeded(declaredPrefixes, uri, qName, sb);
+
+        // Attributes if any
+        for (int i = 0; i < attributes.getLength(); i++) {
+            mapPrefixIfNeeded(declaredPrefixes, attributes.getURI(i), attributes.getQName(i), sb);
+
+            sb.append(' ');
+            sb.append(attributes.getQName(i));
+            sb.append("=\"");
+            sb.append(attributes.getValue(i));
+            sb.append('\"');
+        }
+
+        // Close start tag
+        sb.append('>');
+
+        // Content
+        sb.append("[...]");
+
+        // Close element with end tag
+        sb.append("</");
+        sb.append(qName);
+        sb.append('>');
+
+        return sb.toString();
+    }
+
+    private static void mapPrefixIfNeeded(Set<String> declaredPrefixes, String uri, String qName, StringBuilder sb) {
+        final String prefix = XMLUtils.prefixFromQName(qName);
+        if (prefix.length() > 0 && !declaredPrefixes.contains(prefix)) {
+            sb.append(" xmlns:");
+            sb.append(prefix);
+            sb.append("=\"");
+            sb.append(uri);
+            sb.append("\"");
+
+            declaredPrefixes.add(prefix);
+        }
     }
 }

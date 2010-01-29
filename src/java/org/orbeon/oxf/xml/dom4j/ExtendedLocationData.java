@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,7 +15,6 @@ package org.orbeon.oxf.xml.dom4j;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Locator;
 
 /**
@@ -114,7 +113,7 @@ public class ExtendedLocationData extends LocationData {
      * @param description
      * @param parameters
      */
-    public ExtendedLocationData(LocationData locationData, String description, String[] parameters) {
+    public ExtendedLocationData(LocationData locationData, String description, String... parameters) {
         super((locationData == null) ? null : locationData.getSystemID(), (locationData == null) ? -1 : locationData.getLine(), (locationData == null) ? -1 : locationData.getCol());
         this.description = description;
         if (parameters != null) {
@@ -143,7 +142,7 @@ public class ExtendedLocationData extends LocationData {
     }
 
     public String toString() {
-        final FastStringBuffer sb = new FastStringBuffer(super.toString());
+        final StringBuilder sb = new StringBuilder(super.toString());
         final String parametersString = getParametersString();
         final boolean hasDescription = getDescription() != null;
         final boolean hasParameters = parametersString.length() > 0;
@@ -162,7 +161,7 @@ public class ExtendedLocationData extends LocationData {
     }
 
     private String getParametersString() {
-        final FastStringBuffer sb = new FastStringBuffer("");
+        final StringBuilder sb = new StringBuilder("");
         if (parameters != null) {
             boolean first = true;
             for (int i = 0; i < parameters.length; i += 2) {

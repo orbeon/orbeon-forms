@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -24,6 +24,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.xml.ExceptionWrapperContentHandler;
 import org.orbeon.oxf.xml.TeeContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -110,14 +111,14 @@ public class MSVValidationProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
             protected void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, final ContentHandler contentHandler) {
                 try {
                     // read config input ot determine of we should decorate or not
-                    Document configDoc = readCacheInputAsDOM4J(context, INPUT_CONFIG);
+                    final Document configDoc = readCacheInputAsDOM4J(context, INPUT_CONFIG);
                     final boolean decorateOutput = Boolean.valueOf(XPathUtils.selectStringValueNormalize(configDoc, "/config/decorate")).booleanValue();
 
-                    Schema schema = (Schema) readCacheInputAsObject(context,
+                    final Schema schema = (Schema) readCacheInputAsObject(context,
                             getInputByName(INPUT_SCHEMA),
                             new CacheableInputReader() {
                                 public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
@@ -127,26 +128,26 @@ public class MSVValidationProcessor extends ProcessorImpl {
                                             logger.debug("Reading Schema: " + schemaId);
                                             time = System.currentTimeMillis();
                                         }
-                                        Document schemaDoc = readInputAsDOM4J(context, input);
-                                        LocationData locator = (LocationData) schemaDoc.getRootElement().getData();
+                                        final Document schemaDoc = readInputAsDOM4J(context, input);
+                                        final LocationData locator = (LocationData) schemaDoc.getRootElement().getData();
                                         final String schemaSystemId = (locator != null && locator.getSystemID() != null) ? locator.getSystemID() : null;
                                         // Be sure to set our own XML parser factory
-                                        VerifierFactory verifierFactory = new TheFactoryImpl(factory);
+                                        final VerifierFactory verifierFactory = new TheFactoryImpl(factory);
                                         verifierFactory.setEntityResolver(new EntityResolver() {
                                             public InputSource resolveEntity(String publicId, String systemId) throws IOException {
-                                                URL url = URLFactory.createURL(schemaSystemId, systemId);
-                                                InputSource i = new InputSource(url.openStream());
+                                                final URL url = URLFactory.createURL(schemaSystemId, systemId);
+                                                final InputSource i = new InputSource(url.openStream());
                                                 i.setSystemId(url.toString());
                                                 return i;
                                             }
                                         });
                                         verifierFactory.setFeature(Const.PANIC_MODE_FEATURE, false);
-                                        InputSource is = new InputSource(new StringReader(Dom4jUtils.domToString(schemaDoc)));
+                                        final InputSource is = new InputSource(new StringReader(Dom4jUtils.domToString(schemaDoc)));
                                         is.setSystemId(schemaSystemId);
 
                                         // Just a precaution, as the factory is not thread-safe. Does this makes sense?
                                         synchronized (MSVValidationProcessor.class) {
-                                            Schema schema = verifierFactory.compileSchema(is);
+                                            final Schema schema = verifierFactory.compileSchema(is);
 
                                             if (logger.isDebugEnabled())
                                                 logger.debug(schemaId + " : Schema compiled in " + (System.currentTimeMillis() - time));
@@ -160,15 +161,15 @@ public class MSVValidationProcessor extends ProcessorImpl {
                                 }
                             });
 
-                    Verifier verifier = schema.newVerifier();
+                    final Verifier verifier = schema.newVerifier();
                     verifier.setErrorHandler(new org.xml.sax.ErrorHandler() {
 
 
                         private void generateErrorElement(ValidationException ve) throws SAXException {
                             if (decorateOutput && ve != null) {
 
-                                String systemId = ve.getLocationData().getSystemID();
-                                AttributesImpl a = new AttributesImpl();
+                                final String systemId = ve.getLocationData().getSystemID();
+                                final AttributesImpl a = new AttributesImpl();
                                 a.addAttribute("", MESSAGE_ATTRIBUTE,
                                         MESSAGE_ATTRIBUTE, "CDATA", ve.getSimpleMessage());
                                 a.addAttribute("", SYSTEMID_ATTRIBUTE,
@@ -177,7 +178,6 @@ public class MSVValidationProcessor extends ProcessorImpl {
                                         LINE_ATTRIBUTE, "CDATA", Integer.toString(ve.getLocationData().getLine()));
                                 a.addAttribute("", COLUMN_ATTRIBUTE,
                                         COLUMN_ATTRIBUTE, "CDATA", Integer.toString(ve.getLocationData().getCol()));
-
 
                                 contentHandler.startElement(ORBEON_ERROR_NS,
                                         ERROR_ELEMENT,
@@ -192,31 +192,27 @@ public class MSVValidationProcessor extends ProcessorImpl {
                             }
                         }
 
-                        public void error(SAXParseException exception)
-                                throws SAXException {
+                        public void error(SAXParseException exception) throws SAXException {
                             generateErrorElement(new ValidationException("Error " + exception.getMessage() + "(schema: " + schemaId + ")", new LocationData(exception)));
                         }
 
-                        public void fatalError(SAXParseException exception)
-                                throws SAXException {
+                        public void fatalError(SAXParseException exception) throws SAXException {
                             generateErrorElement(new ValidationException("Fatal Error " + exception.getMessage() + "(schema: " + schemaId + ")", new LocationData(exception)));
                         }
 
-                        public void warning(SAXParseException exception)
-                                throws SAXException {
+                        public void warning(SAXParseException exception) throws SAXException {
                             generateErrorElement(new ValidationException("Warning " + exception.getMessage() + "(schema: " + schemaId + ")", new LocationData(exception)));
                         }
                     });
 
-                    VerifierHandler verifierHandler = verifier.getVerifierHandler();
-
-                    List dest = Arrays.asList(verifierHandler, contentHandler);
+                    final VerifierHandler verifierHandler = verifier.getVerifierHandler();
+                    final List contentHandlers = Arrays.asList(new ExceptionWrapperContentHandler(verifierHandler, "validating document"), contentHandler);
 
                     long time = 0;
                     if (logger.isDebugEnabled()) {
                         time = System.currentTimeMillis();
                     }
-                    readInputAsSAX(context, getInputByName(INPUT_DATA), new TeeContentHandler(dest));
+                    readInputAsSAX(context, getInputByName(INPUT_DATA), new TeeContentHandler(contentHandlers));
                     if (logger.isDebugEnabled()) {
                         logger.debug(schemaId + " validation completed in " + (System.currentTimeMillis() - time));
                     }

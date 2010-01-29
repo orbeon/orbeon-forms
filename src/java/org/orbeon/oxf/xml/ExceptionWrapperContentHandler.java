@@ -1,25 +1,26 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xml;
 
-import org.xml.sax.Locator;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 /**
  * ContentHandler which wraps exceptions with location information if possible.
@@ -43,7 +44,7 @@ public class ExceptionWrapperContentHandler extends SimpleForwardingContentHandl
         try {
             super.startElement(uri, localname, qName, attributes);
         } catch (RuntimeException e) {
-            wrapException(e);
+            wrapException(e, uri, qName, attributes);
         }
     }
 
@@ -122,6 +123,17 @@ public class ExceptionWrapperContentHandler extends SimpleForwardingContentHandl
     private void wrapException(Exception e) throws SAXException {
         if (locator != null)
             throw ValidationException.wrapException(e, new ExtendedLocationData(locator, message));
+        else if (e instanceof SAXException)
+            throw (SAXException) e;
+        else if (e instanceof RuntimeException)
+            throw (RuntimeException) e;
+        else
+            throw new OXFException(e);// this should not happen
+    }
+
+    private void wrapException(Exception e, String uri, String qName, Attributes attributes) throws SAXException {
+        if (locator != null)
+            throw ValidationException.wrapException(e, new ExtendedLocationData(new LocationData(locator), message, "element", XMLUtils.saxElementToDebugString(uri, qName, attributes)));
         else if (e instanceof SAXException)
             throw (SAXException) e;
         else if (e instanceof RuntimeException)

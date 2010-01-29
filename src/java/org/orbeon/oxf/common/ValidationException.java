@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.common;
 
@@ -19,19 +19,19 @@ import org.xml.sax.SAXParseException;
 import javax.xml.transform.SourceLocator;
 import javax.xml.transform.TransformerException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 public class ValidationException extends OXFException {
 
     /**
      * Return all the LocationData information for that throwable
      */
-    public static List getAllLocationData(Throwable throwable) {
+    public static List<LocationData> getAllLocationData(Throwable throwable) {
 
         // List of exceptions starting from root cause
-        final List exceptionChain = new ArrayList();
+        final List<Throwable> exceptionChain = new ArrayList<Throwable>();
         {
             Throwable currentThrowable = throwable;
             while (currentThrowable != null) {
@@ -42,10 +42,10 @@ public class ValidationException extends OXFException {
         }
 
         // Extract all location data starting from root cause and add to the list
-        final List locationDataList = new ArrayList();
-        for (Iterator i = exceptionChain.iterator(); i.hasNext();) {
-            final Throwable currentThrowable = (Throwable) i.next();
-            final List currentLocationDataList = getLocationData(currentThrowable);
+        final List<LocationData> locationDataList = new ArrayList<LocationData>();
+        for (Iterator<Throwable> i = exceptionChain.iterator(); i.hasNext();) {
+            final Throwable currentThrowable = i.next();
+            final List<LocationData> currentLocationDataList = getLocationData(currentThrowable);
             if (currentLocationDataList != null && currentLocationDataList.size() > 0)
                 locationDataList.addAll(currentLocationDataList);
         }
@@ -56,9 +56,9 @@ public class ValidationException extends OXFException {
     public static LocationData getRootLocationData(Throwable throwable) {
         LocationData locationData = null;
         while (true) {
-            final List currentLocationData = getLocationData(throwable);
+            final List<LocationData> currentLocationData = getLocationData(throwable);
             if (currentLocationData != null && currentLocationData.size() > 0)
-                locationData = (LocationData) currentLocationData.get(0);
+                locationData = currentLocationData.get(0);
             final Throwable nested = OXFException.getNestedException(throwable);
             if (nested == null)
                 break;
@@ -67,7 +67,7 @@ public class ValidationException extends OXFException {
         return locationData;
     }
 
-    private static List getLocationData(Throwable throwable) {
+    private static List<LocationData> getLocationData(Throwable throwable) {
         if (throwable instanceof ValidationException) {
             // Regular OPS case
             final ValidationException validationException = (ValidationException) throwable;
@@ -90,7 +90,7 @@ public class ValidationException extends OXFException {
         return null;
     }
 
-    private List locationDataList = new ArrayList();
+    private List<LocationData> locationDataList = new ArrayList<LocationData>();
     private String simpleMessage;
 
     public ValidationException(String message, LocationData locationData) {
@@ -129,7 +129,7 @@ public class ValidationException extends OXFException {
         return (LocationData) ((locationDataList.size() == 0) ? null : locationDataList.get(0));
     }
 
-    public List getAllLocationData() {
+    public List<LocationData> getAllLocationData() {
         return locationDataList;
     }
 

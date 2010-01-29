@@ -1,24 +1,24 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.common;
 
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.TransformerException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +59,7 @@ public class OXFException extends RuntimeException {
         } else {
             // Try to get a nested throwable by using introspection
             // Create a map of all classes and interfaces implemented by the throwable
-            final Map throwableClasses = new HashMap();
+            final Map<String, Class> throwableClasses = new HashMap<String, Class>();
             final Class throwableClass = t.getClass();
             throwableClasses.put(throwableClass.getName(), throwableClass);
             Class superClass = throwableClass;
@@ -78,8 +78,8 @@ public class OXFException extends RuntimeException {
                     // Found
                     final String getterName = exceptionGetters[i + 1];
                     try {
-                        final Method method = c.getMethod(getterName, null);
-                        final Object returnValue = method.invoke(t, null);
+                        final Method method = c.getMethod(getterName);
+                        final Object returnValue = method.invoke(t);
                         if (returnValue instanceof Throwable)// It should be
                             nested = (Throwable) returnValue;
                         break;
@@ -114,7 +114,6 @@ public class OXFException extends RuntimeException {
     }
 
     private static boolean methodsInitialized;
-    private static boolean getStackTraceUnsupported;
     private static Method getStackTraceMethod;
     private static Method getClassNameMethod;
     private static Method getMethodNameMethod;
@@ -128,43 +127,39 @@ public class OXFException extends RuntimeException {
      * prior to 1.4.
      */
     public static StackTraceElement[] getStackTraceElements(Throwable t) {
-        // Don't unnecessarily try more than once
-        if (getStackTraceUnsupported)
-            return null;
-
+        // TODO: we require 1.5 or later so stop using introspection below
         try {
             if (!methodsInitialized)
-                getStackTraceMethod = t.getClass().getMethod("getStackTrace", null);
-            Object returnValue = getStackTraceMethod.invoke(t, null);
+                getStackTraceMethod = t.getClass().getMethod("getStackTrace");
+            Object returnValue = getStackTraceMethod.invoke(t);
             if (returnValue == null)
                 return null;
             if (!(returnValue instanceof Object[]))
                 return null; // this should not happen
             Object[] elements = (Object[]) returnValue;
-            List result = new ArrayList();
+            List<StackTraceElement> result = new ArrayList<StackTraceElement>();
             for (int i = 0; i < elements.length; i++) {
                 Object element = elements[i];
                 Class elementClass = element.getClass();
 
                 if (!methodsInitialized) {
-                    getClassNameMethod = elementClass.getMethod("getClassName", null);
-                    getMethodNameMethod = elementClass.getMethod("getMethodName", null);
-                    getFileNameMethod = elementClass.getMethod("getFileName", null);
-                    getLineNumberMethod = elementClass.getMethod("getLineNumber", null);
+                    getClassNameMethod = elementClass.getMethod("getClassName");
+                    getMethodNameMethod = elementClass.getMethod("getMethodName");
+                    getFileNameMethod = elementClass.getMethod("getFileName");
+                    getLineNumberMethod = elementClass.getMethod("getLineNumber");
                     methodsInitialized = true;
                 }
 
-                result.add(new StackTraceElement((String) getClassNameMethod.invoke(element, null),
-                        (String) getMethodNameMethod.invoke(element, null),
-                        (String) getFileNameMethod.invoke(element, null),
-                        ((Integer) getLineNumberMethod.invoke(element, null)).intValue()));
+                result.add(new StackTraceElement((String) getClassNameMethod.invoke(element),
+                        (String) getMethodNameMethod.invoke(element),
+                        (String) getFileNameMethod.invoke(element),
+                        ((Integer) getLineNumberMethod.invoke(element)).intValue()));
             }
             StackTraceElement[] arrayResult = new StackTraceElement[result.size()];
             result.toArray(arrayResult);
             return arrayResult;
         } catch (Throwable f) {
             // Definitely give up if anything is caught
-            getStackTraceUnsupported = true;
             return null;
         }
     }

@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.generator;
 
@@ -20,14 +20,14 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.ContentHandler;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * ExceptionGenerator produces a structured XML document containing information about the
@@ -130,9 +130,12 @@ public class ExceptionGenerator extends ProcessorImpl {
                 
                 if (locationData instanceof ExtendedLocationData) {
                     final ExtendedLocationData extendedLocationData = (ExtendedLocationData) locationData;
+
                     final String description = extendedLocationData.getDescription();
                     if (description != null)
                         helper.element("description", description);
+
+                    String elementString = extendedLocationData.getElementString();
                     final String[] parameters = extendedLocationData.getParameters();
                     if (parameters != null) {
                         helper.startElement("parameters");
@@ -141,15 +144,22 @@ public class ExceptionGenerator extends ProcessorImpl {
                             final String paramValue = parameters[j + 1];
 
                             if (paramValue != null) {
-                                helper.startElement("parameter");
-                                helper.element("name", paramName);
-                                helper.element("value", paramValue);
-                                helper.endElement();
+                                if (elementString == null && paramName.equals("element")) {
+                                    // Use "element" parameter as element string if present and not already set
+                                    elementString = paramValue;
+                                } else {
+                                    // Just output the parameter
+                                    helper.startElement("parameter");
+                                    helper.element("name", paramName);
+                                    helper.element("value", paramValue);
+                                    helper.endElement();
+                                }
+
                             }
                         }
                         helper.endElement();
                     }
-                    final String elementString = extendedLocationData.getElementString();
+                    // Output element string if set
                     if (elementString != null)
                         helper.element("element", elementString);
                 }

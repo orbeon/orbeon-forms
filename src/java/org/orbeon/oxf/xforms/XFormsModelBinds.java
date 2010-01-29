@@ -602,8 +602,8 @@ public class XFormsModelBinds {
                 final NodeInfo currentNodeInfo = (NodeInfo) nodeset.get(position - 1);
                 return evaluateStringExpression(propertyContext, nodeset, position, bind, bind.getXXFormsDefault(), getVariables(currentNodeInfo));
             } catch (Exception e) {
-                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms calculate bind",
-                        bind.getBindElement(), new String[] { "expression", bind.getCalculate() }));
+                final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms default bind",
+                        bind.getBindElement(), "expression", bind.getCalculate()));
 
                 container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
                 throw new IllegalStateException(); // event above throw an exception anyway
@@ -643,7 +643,7 @@ public class XFormsModelBinds {
                 return evaluateStringExpression(propertyContext, nodeset, position, bind, bind.getCalculate(), getVariables(currentNodeInfo));
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms calculate bind",
-                        bind.getBindElement(), new String[] { "expression", bind.getCalculate() }));
+                        bind.getBindElement(), "expression", bind.getCalculate()));
 
                 container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
                 throw new IllegalStateException(); // event above throw an exception anyway
@@ -706,7 +706,7 @@ public class XFormsModelBinds {
                     return evaluateStringExpression(propertyContext, nodeset, position, bind, expression, currentVariables);
                 } catch (Exception e) {
                     final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms custom bind",
-                            bind.getBindElement(), new String[] { "name", propertyName, "expression", expression }));
+                            bind.getBindElement(), "name", propertyName, "expression", expression));
 
                     container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
                     throw new IllegalStateException(); // event above throw an exception anyway
@@ -735,7 +735,7 @@ public class XFormsModelBinds {
                 return evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getRequired(), currentVariables);
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms required bind",
-                        bind.getBindElement(), new String[] { "expression", bind.getRequired() }));
+                        bind.getBindElement(), "expression", bind.getRequired()));
 
                 container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
                 throw new IllegalStateException(); // event above throw an exception anyway
@@ -764,7 +764,7 @@ public class XFormsModelBinds {
                 return evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getReadonly(), currentVariables);
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms readonly bind",
-                        bind.getBindElement(), new String[] { "expression", bind.getReadonly() }));
+                        bind.getBindElement(), "expression", bind.getReadonly()));
 
 
                 container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
@@ -790,7 +790,7 @@ public class XFormsModelBinds {
                 return evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getRelevant(), currentVariables);
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms relevant bind",
-                        bind.getBindElement(), new String[] { "expression", bind.getRelevant() }));
+                        bind.getBindElement(), "expression", bind.getRelevant()));
 
                 container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
                 throw new IllegalStateException(); // event above throw an exception anyway
@@ -1054,7 +1054,7 @@ public class XFormsModelBinds {
                 return evaluateBooleanExpression1(propertyContext, nodeset, position, bind, bind.getConstraint(), getVariables(currentNodeInfo));
             } catch (Exception e) {
                 final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.getLocationData(), "evaluating XForms constraint bind",
-                        bind.getBindElement(), new String[] { "expression", bind.getConstraint() }));
+                        bind.getBindElement(), "expression", bind.getConstraint()));
 
                 container.dispatchEvent(propertyContext, new XFormsComputeExceptionEvent(containingDocument, model, ve.getMessage(), ve));
                 throw new IllegalStateException(); // event above throw an exception anyway

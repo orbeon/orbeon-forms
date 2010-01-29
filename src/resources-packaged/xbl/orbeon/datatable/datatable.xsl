@@ -408,8 +408,7 @@
 
             <xsl:choose>
                 <xsl:when test="$paginated and $maxNbPagesToDisplay &lt; 0">
-                    <xxforms:variable name="pages" select="1 to xs:integer($nbPages)"
-                        xxbl:scope="inner"/>
+                    <xxforms:variable name="pages" select="1 to xs:integer($nbPages)" xxbl:scope="inner"/>
                 </xsl:when>
                 <xsl:when test="$paginated">
                     <xxforms:variable name="maxNbPagesToDisplay" select="{$maxNbPagesToDisplay} cast as xs:integer" xxbl:scope="inner"/>
@@ -950,7 +949,7 @@
                     <xxforms:context name="index" select="$index"/>
                     <xxforms:context name="selected" select="$context"/>
                 </xforms:dispatch>
-                
+
             </xforms:action>
 
             <xsl:apply-templates select="node()" mode="dynamic"/>
@@ -1065,7 +1064,14 @@
             <xsl:if test="$isInternallySortedAndPaginated">
                 <xsl:attribute name="type"/>
                 <xsl:attribute name="sortKey">
-                    <xsl:apply-templates select="$body" mode="dyn-sortKey"/>
+                    <xsl:choose>
+                        <xsl:when test="@fr:sortKey">
+                            <xsl:value-of select="@fr:sortKey"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:apply-templates select="$body" mode="dyn-sortKey"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:attribute>
             </xsl:if>
             <xsl:copy-of select="@*"/>

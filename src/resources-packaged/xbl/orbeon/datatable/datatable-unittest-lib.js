@@ -457,15 +457,19 @@ ORBEON.widgets.datatable.unittests_lib = {
         //TODO: support scrollable tables
         var rows = table.tBodies[0].rows;
         var precedingValue = null;
+        var rowIndex = 0;
         for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
             if (this.isSignificant(row)) {
+                rowIndex ++;
                 var cell = this.getSignificantElementByIndex(row.cells, columnIndex);
                 var currentValue = this.trim(this.textContent(cell));
                 if (sortType == 'number') {
                     currentValue = parseFloat(currentValue);
                 }
-                if (precedingValue != null) {
+                if (typeof sortType == 'object') {
+                    YAHOO.util.Assert.areEqual(sortType[rowIndex - 1], currentValue, 'Column ' + columnIndex + ', row ' + rowIndex +', value "' + currentValue + '" should be equal to "' + sortType[rowIndex - 1] + '"');   
+                } else if (precedingValue != null) {
                     if (expectedOrder == 'ascending') {
                         YAHOO.util.Assert.isTrue(currentValue >= precedingValue, 'Column ' + columnIndex + ' value "' + currentValue + '" should be bigger than "' + precedingValue + '"');
                     } else {

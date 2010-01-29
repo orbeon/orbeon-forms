@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -18,6 +18,8 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 
+import java.util.Map;
+
 /**
  * Internal xxforms-dnd event.
  */
@@ -26,12 +28,14 @@ public class XXFormsDndEvent extends XFormsEvent {
     private static final String DND_START_ATTRIBUTE = "dnd-start";
     private static final String DND_END_ATTRIBUTE = "dnd-end";
 
-    public XXFormsDndEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, String dndStart, String dndEnd) {
+    public XXFormsDndEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, Map<String, String> parameters) {
         super(containingDocument, XFormsEvents.XXFORMS_DND, targetObject, false, false);
 
         // Store as attributes so we can test for this event by using xxforms:context
-        setAttributeAsString(DND_START_ATTRIBUTE, dndStart);
-        setAttributeAsString(DND_END_ATTRIBUTE, dndEnd);
+        if (parameters != null) {
+            setAttributeAsString(DND_START_ATTRIBUTE, parameters.get(DND_START_ATTRIBUTE));
+            setAttributeAsString(DND_END_ATTRIBUTE, parameters.get(DND_END_ATTRIBUTE));
+        }
     }
 
     public String getDndStart() {

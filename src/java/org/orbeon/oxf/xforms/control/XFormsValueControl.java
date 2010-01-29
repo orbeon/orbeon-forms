@@ -20,13 +20,16 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Base class for all controls that hold a value.
@@ -211,5 +214,20 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
             return false;
 
         return super.equalsExternal(pipelineContext, obj);
+    }
+
+    private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
+    static {
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_FOCUS_IN);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_FOCUS_OUT);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_HELP);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_ACTIVATE);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);// for noscript mode
+    }
+
+    @Override
+    protected Set<String> getAllowedExternalEvents() {
+        return ALLOWED_EXTERNAL_EVENTS;
     }
 }

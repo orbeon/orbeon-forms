@@ -18,9 +18,12 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents xforms:repeat iteration information.
@@ -118,5 +121,15 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
                 currentControl.updateEffectiveId();
             }
         }
+    }
+
+    private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
+    static {
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_FOCUS_IN);
+    }
+
+    @Override
+    protected Set<String> getAllowedExternalEvents() {
+        return ALLOWED_EXTERNAL_EVENTS;
     }
 }

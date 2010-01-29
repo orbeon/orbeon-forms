@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -1121,5 +1121,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     public XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument) {
         contextStack.resetBindingContext(propertyContext, this);
         return contextStack.getCurrentBindingContext();
+    }
+
+    // Don't allow any external events
+    public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
+        return false;
     }
 }

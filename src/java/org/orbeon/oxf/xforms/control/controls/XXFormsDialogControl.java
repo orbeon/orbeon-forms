@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -24,9 +24,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents an extension xxforms:dialog control.
@@ -182,5 +180,16 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
                 this.setChildren(null);
             }
         }
+    }
+
+    // Only allow xxforms-dialog-close from client
+    private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
+    static {
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_DIALOG_CLOSE);
+    }
+
+    @Override
+    protected Set<String> getAllowedExternalEvents() {
+        return ALLOWED_EXTERNAL_EVENTS;
     }
 }

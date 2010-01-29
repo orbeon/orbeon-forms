@@ -33,10 +33,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents an xforms:repeat container control.
@@ -698,5 +695,16 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
         // No item was relevant so we are not relevant either
         return false;
+    }
+
+    // Only allow xxforms-dnd from client
+    private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
+    static {
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_DND);
+    }
+
+    @Override
+    protected Set<String> getAllowedExternalEvents() {
+        return ALLOWED_EXTERNAL_EVENTS;
     }
 }

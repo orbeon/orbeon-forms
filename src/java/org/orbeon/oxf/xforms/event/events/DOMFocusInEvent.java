@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -24,8 +24,8 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  *
  * Target: form control / Bubbles: Yes / Cancelable: No / Context Info: None
  */
-public class XFormsDOMFocusInEvent extends XFormsUIEvent {
-    public XFormsDOMFocusInEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
-        super(containingDocument, XFormsEvents.XFORMS_DOM_FOCUS_IN, (XFormsControl) targetObject, true, false);
+public class DOMFocusInEvent extends XFormsUIEvent {
+    public DOMFocusInEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
+        super(containingDocument, XFormsEvents.DOM_FOCUS_IN, (XFormsControl) targetObject, true, false);
     }
 }

@@ -48,8 +48,10 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents an XForms model submission instance.
@@ -1226,5 +1228,26 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
     private static boolean isLogDetails() {
         return XFormsProperties.getDebugLogging().contains("submission-details");
+    }
+
+    // Only allow xxforms-submit from client
+    private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
+    static {
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_SUBMIT);
+    }
+
+    public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
+        if (ALLOWED_EXTERNAL_EVENTS.contains(eventName)) {
+            return true;
+        } else {
+            logIgnoredExternalEvent(indentedLogger, logType, eventName);
+            return false;
+        }
+    }
+
+    protected void logIgnoredExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
+        if (indentedLogger.isDebugEnabled()) {
+            indentedLogger.logDebug(logType, "ignoring invalid client event on submission", "submission id", getEffectiveId(), "event name", eventName);
+        }
     }
 }

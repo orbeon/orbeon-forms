@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event;
 
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
@@ -31,4 +32,5 @@ public interface XFormsEventTarget {
     void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event);
     void performDefaultAction(PropertyContext propertyContext, XFormsEvent event);
     XFormsContextStack.BindingContext getBindingContext(PropertyContext propertyContext, XFormsContainingDocument containingDocument);
+    boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName);
 }

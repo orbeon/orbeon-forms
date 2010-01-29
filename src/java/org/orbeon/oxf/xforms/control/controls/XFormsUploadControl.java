@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -38,6 +39,8 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents an xforms:upload control.
@@ -348,6 +351,20 @@ public class XFormsUploadControl extends XFormsValueControl {
         // NOTE: this keeps old refs to control/contextStack, is it ok?
         cloned.fileInfo = (FileInfo) fileInfo.clone();
         return cloned;
+    }
+
+    private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
+    static {
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_FOCUS_IN);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_FOCUS_OUT);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_HELP);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_SELECT);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE);
+    }
+
+    @Override
+    protected Set<String> getAllowedExternalEvents() {
+        return ALLOWED_EXTERNAL_EVENTS;
     }
 }
 

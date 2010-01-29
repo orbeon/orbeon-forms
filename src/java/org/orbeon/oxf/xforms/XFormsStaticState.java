@@ -75,7 +75,7 @@ public class XFormsStaticState {
     private Map<String, String> xxformsScripts;                             // Map of id to script content
 
     private Map<String, Object> nonDefaultProperties = new HashMap<String, Object>();    // Map of property name to property value (String, Integer, Boolean)
-    private Map<String, String> externalEventsMap;                          // Map<String, ""> of event names
+    private final Set<String> allowedExternalEvents = new HashSet<String>();             // Set<String eventName>
 
     private boolean isSeparateDeployment;
     private String requestContextPath;
@@ -396,9 +396,7 @@ public class XFormsStaticState {
         if (externalEvents != null) {
             final StringTokenizer st = new StringTokenizer(externalEvents);
             while (st.hasMoreTokens()) {
-                if (externalEventsMap == null)
-                    externalEventsMap = new HashMap<String, String>();
-                externalEventsMap.put(st.nextToken(), "");
+                allowedExternalEvents.add(st.nextToken());
             }
         }
     }
@@ -592,12 +590,8 @@ public class XFormsStaticState {
         return requestContextPath;
     }
 
-    public String getBaseURI() {
-        return baseURI;
-    }
-
-    public Map<String, String> getExternalEventsMap() {
-        return externalEventsMap;
+    public Set<String> getAllowedExternalEvents() {
+        return allowedExternalEvents;
     }
 
     public String getContainerType() {

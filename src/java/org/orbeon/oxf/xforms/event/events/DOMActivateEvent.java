@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -25,9 +25,9 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  * Target: form control / Bubbles: Yes / Cancelable: Yes / Context Info: None
  * The default action for this event results in the following: None; notification event only.
  */
-public class XFormsDOMActivateEvent extends XFormsUIEvent {
+public class DOMActivateEvent extends XFormsUIEvent {
 
-    public XFormsDOMActivateEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
-        super(containingDocument, XFormsEvents.XFORMS_DOM_ACTIVATE, (XFormsControl) targetObject, true, true);
+    public DOMActivateEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
+        super(containingDocument, XFormsEvents.DOM_ACTIVATE, (XFormsControl) targetObject, true, true);
     }
 }

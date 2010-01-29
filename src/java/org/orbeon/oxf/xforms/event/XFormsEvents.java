@@ -92,9 +92,9 @@ public class XFormsEvents {
     public static final String XFORMS_HINT = "xforms-hint";
 
     // DOM events
-    public static final String XFORMS_DOM_ACTIVATE = "DOMActivate";
-    public static final String XFORMS_DOM_FOCUS_OUT = "DOMFocusOut";
-    public static final String XFORMS_DOM_FOCUS_IN = "DOMFocusIn";
+    public static final String DOM_ACTIVATE = "DOMActivate";
+    public static final String DOM_FOCUS_OUT = "DOMFocusOut";
+    public static final String DOM_FOCUS_IN = "DOMFocusIn";
 
     public static final String KEYPRESS = "keypress";
 

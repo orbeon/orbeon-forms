@@ -1002,7 +1002,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     : null;
 
             throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "dispatching XForms event",
-                    new String[] { "event", originalEvent.getEventName(), "target id", targetObject.getEffectiveId() }));
+                    "event", originalEvent.getEventName(), "target id", targetObject.getEffectiveId()));
         }
 
         if (indentedLogger.isDebugEnabled()) {
@@ -1038,5 +1038,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
         // This container requires refresh
         requireRefresh();
+    }
+
+    public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
+        return false;
     }
 }

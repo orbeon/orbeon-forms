@@ -24,9 +24,13 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.helpers.AttributesImpl;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents an xforms:output control.
@@ -275,5 +279,31 @@ public class XFormsOutputControl extends XFormsValueControl {
         // NOTE: this keeps old refs to control/contextStack, is it ok?
         cloned.fileInfo = (FileInfo) fileInfo.clone();
         return cloned;
+    }
+
+//    @Override
+//    public boolean setFocus() {
+//        // Can't focus on output controls
+//        return false;
+//    }
+
+    private static final Set<String> IGNORED_EXTERNAL_EVENTS = new HashSet<String>();
+    private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
+    static {
+        IGNORED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_FOCUS_IN);
+        IGNORED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_FOCUS_OUT);
+
+        ALLOWED_EXTERNAL_EVENTS.addAll(IGNORED_EXTERNAL_EVENTS);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_HELP);
+    }
+
+    @Override
+    protected Set<String> getAllowedExternalEvents() {
+        return ALLOWED_EXTERNAL_EVENTS;
+    }
+
+    public boolean isIgnoredExternalEvent(String eventName) {
+        // Mmh, this looks like some legacy stuff?
+        return IGNORED_EXTERNAL_EVENTS.contains(eventName);
     }
 }

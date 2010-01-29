@@ -407,6 +407,7 @@ public class XFormsServer extends ProcessorImpl {
         final List<XFormsEvent> events = new ArrayList<XFormsEvent>();
 
         // Iterate through all events to dispatch them
+        final Map<String, String> parameters = new HashMap<String, String>();
         int eventElementIndex = 0;
         for (Iterator i = eventElements.iterator(); i.hasNext(); eventElementIndex++) {
             final Element eventElement = (Element) i.next();
@@ -421,8 +422,21 @@ public class XFormsServer extends ProcessorImpl {
             final boolean cancelable = !"false".equals(eventElement.attributeValue("cancelable"));// default is true
 
             final String otherControlId = eventElement.attributeValue("other-control-id");
-            final String dndStart = eventElement.attributeValue("dnd-start");
-            final String dndEnd = eventElement.attributeValue("dnd-end");
+            {
+                parameters.clear();
+                final String dndStart = eventElement.attributeValue("dnd-start");
+                if (dndStart != null)
+                    parameters.put("dnd-start", dndStart);
+                final String dndEnd = eventElement.attributeValue("dnd-end");
+                if (dndEnd != null)
+                    parameters.put("dnd-end", dndEnd);
+                final String modifiers = eventElement.attributeValue("modifiers");
+                if (modifiers != null)
+                    parameters.put("modifiers", modifiers);
+                final String text = eventElement.attributeValue("text");
+                if (text != null)
+                    parameters.put("text", text);
+            }
 
             final String value = eventElement.getText();
 
@@ -451,7 +465,7 @@ public class XFormsServer extends ProcessorImpl {
                     } else {
                         // Send old event
                         createCheckEvent(containingDocument, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE,
-                                lastSourceControlId, true, true, null, lastValueChangeEventValue, filesElement, null, null, events);
+                                lastSourceControlId, true, true, null, lastValueChangeEventValue, filesElement, events, null);
                         // Remember new event
                         lastSourceControlId = sourceTargetId;
                         lastValueChangeEventValue = value;
@@ -466,13 +480,13 @@ public class XFormsServer extends ProcessorImpl {
                     if (lastSourceControlId != null) {
                         // Send old event
                         createCheckEvent(containingDocument, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE,
-                                lastSourceControlId, true, true, null, lastValueChangeEventValue, filesElement, null, null, events);
+                                lastSourceControlId, true, true, null, lastValueChangeEventValue, filesElement, events, null);
                         lastSourceControlId = null;
                         lastValueChangeEventValue = null;
                     }
                     // Send new event
                     createCheckEvent(containingDocument, isTrustedEvent, eventName, sourceTargetId, bubbles, cancelable,
-                            otherControlId, value, filesElement, dndStart, dndEnd, events);
+                            otherControlId, value, filesElement, events, parameters);
                 }
 
                 if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
@@ -488,7 +502,7 @@ public class XFormsServer extends ProcessorImpl {
         if (lastSourceControlId != null) {
             // Send old event
             createCheckEvent(containingDocument, false, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE,
-                    lastSourceControlId, true, true, null, lastValueChangeEventValue, filesElement, null, null, events);
+                    lastSourceControlId, true, true, null, lastValueChangeEventValue, filesElement, events, null);
         }
 
         // Iterate and dispatch the events
@@ -502,7 +516,7 @@ public class XFormsServer extends ProcessorImpl {
     private void createCheckEvent(XFormsContainingDocument containingDocument, boolean isTrustedEvent,
                                   String eventName, String targetEffectiveId, boolean bubbles, boolean cancelable,
                                   String otherControlEffectiveId, String valueString, Element filesElement,
-                                  String dndStart, String dndEnd, List<XFormsEvent> events) {
+                                  List<XFormsEvent> events, Map<String, String> parameters) {
 
         final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
 
@@ -539,7 +553,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     return;
                 }
-                eventName = XFormsEvents.XFORMS_DOM_ACTIVATE;
+                eventName = XFormsEvents.DOM_ACTIVATE;
             } else {
                 // Other controls get a value change
                 eventName = XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE;
@@ -559,7 +573,7 @@ public class XFormsServer extends ProcessorImpl {
             if (indentedLogger.isDebugEnabled()) {
                 indentedLogger.logDebug(XFormsContainingDocument.EVENT_LOG_TYPE, "processing trusted event", "target id", eventTarget.getEffectiveId(), "event name", eventName);
             }
-        } else if (!containingDocument.checkForAllowedEvents(indentedLogger, eventName, eventTarget)) {
+        } else if (!containingDocument.checkAllowedExternalEvents(indentedLogger, eventName, eventTarget)) {
             // Event is not trusted and is not allowed
             return;
         }
@@ -582,7 +596,7 @@ public class XFormsServer extends ProcessorImpl {
 
         // Create event
         events.add(XFormsEventFactory.createEvent(containingDocument, eventName, eventTarget, otherEventTarget, true,
-                bubbles, cancelable, valueString, filesElement, new String[] { dndStart, dndEnd} ));
+                bubbles, cancelable, valueString, filesElement, parameters));
     }
 
     private boolean processEventsForNoscript(List<Element> eventElements, XFormsContainingDocument containingDocument, IndentedLogger eventsIndentedLogger, boolean noscript) {

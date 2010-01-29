@@ -29,7 +29,8 @@ import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
-import org.orbeon.oxf.xforms.control.controls.*;
+import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
@@ -131,55 +132,6 @@ public class XFormsContainingDocument extends XBLContainer {
 
     private boolean goingOffline;
 //    private boolean goingOnline;  // never used at the moment
-
-    // Event information
-    private static final Set<String> ignoredXFormsOutputExternalEvents = new HashSet<String>();
-    private static final Set<String> allowedXFormsOutputExternalEvents = new HashSet<String>();
-    private static final Set<String> allowedXFormsUploadExternalEvents = new HashSet<String>();
-    private static final Set<String> allowedXFormsControlsExternalEvents = new HashSet<String>();
-
-    private static final Set<String> allowedXFormsRepeatExternalEvents = new HashSet<String>();
-    private static final Set<String> allowedXFormsSubmissionExternalEvents = new HashSet<String>();
-    private static final Set<String> allowedXFormsContainingDocumentExternalEvents = new HashSet<String>();
-    private static final Set<String> allowedXXFormsDialogExternalEvents = new HashSet<String>();
-
-    static {
-        // External events ignored on xforms:output
-        ignoredXFormsOutputExternalEvents.add(XFormsEvents.XFORMS_DOM_FOCUS_IN);
-        ignoredXFormsOutputExternalEvents.add(XFormsEvents.XFORMS_DOM_FOCUS_OUT);
-
-        // External events allowed on xforms:output
-        allowedXFormsOutputExternalEvents.addAll(ignoredXFormsOutputExternalEvents);
-        allowedXFormsOutputExternalEvents.add(XFormsEvents.XFORMS_HELP);
-
-        // External events allowed on xforms:upload
-        allowedXFormsUploadExternalEvents.addAll(allowedXFormsOutputExternalEvents);
-        allowedXFormsUploadExternalEvents.add(XFormsEvents.XFORMS_SELECT);
-        allowedXFormsUploadExternalEvents.add(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE);
-
-        // External events allowed on other controls
-        allowedXFormsControlsExternalEvents.addAll(allowedXFormsOutputExternalEvents);
-        allowedXFormsControlsExternalEvents.add(XFormsEvents.XFORMS_DOM_ACTIVATE);
-        allowedXFormsControlsExternalEvents.add(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE);
-        allowedXFormsControlsExternalEvents.add(XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);// for noscript mode
-
-        // External events allowed on xforms:repeat
-        allowedXFormsRepeatExternalEvents.add(XFormsEvents.XXFORMS_DND);
-
-        // External events allowed on xforms:submission
-        allowedXFormsSubmissionExternalEvents.add(XFormsEvents.XXFORMS_SUBMIT);
-
-        // External events allowed on containing document
-        allowedXFormsContainingDocumentExternalEvents.add(XFormsEvents.XXFORMS_LOAD);
-        allowedXFormsContainingDocumentExternalEvents.add(XFormsEvents.XXFORMS_OFFLINE);
-        allowedXFormsContainingDocumentExternalEvents.add(XFormsEvents.XXFORMS_ONLINE);
-
-        // External events allowed on xxforms:dialog
-        allowedXXFormsDialogExternalEvents.add(XFormsEvents.XXFORMS_DIALOG_CLOSE);
-    }
-
-    // For testing only
-//    private static int testAjaxToggleValue = 0;
 
     /**
      * Return the global function library.
@@ -340,13 +292,6 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     /**
-     * Return the document base URI.
-     */
-    public String getBaseURI() {
-        return xformsStaticState.getBaseURI();
-    }
-
-    /**
      * Return the container type that generate the XForms page, either "servlet" or "portlet".
      */
     public String getContainerType() {
@@ -363,8 +308,8 @@ public class XFormsContainingDocument extends XBLContainer {
     /**
      * Return external-events configuration attribute.
      */
-    private Map<String, String> getExternalEventsMap() {
-        return xformsStaticState.getExternalEventsMap();
+    private Set<String> getExternalEventsMap() {
+        return xformsStaticState.getAllowedExternalEvents();
     }
 
     /**
@@ -374,7 +319,7 @@ public class XFormsContainingDocument extends XBLContainer {
      * @return          true if allowed, false otherwise
      */
     private boolean isExplicitlyAllowedExternalEvent(String eventName) {
-        return !XFormsEventFactory.isBuiltInEvent(eventName) && getExternalEventsMap() != null && getExternalEventsMap().get(eventName) != null;
+        return !XFormsEventFactory.isBuiltInEvent(eventName) && getExternalEventsMap().contains(eventName);
     }
 
     /**
@@ -1011,7 +956,7 @@ public class XFormsContainingDocument extends XBLContainer {
 
                 // Handle repeat focus. Don't dispatch event on DOMFocusOut however.
                 if (eventTargetEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1
-                        && !(event instanceof XFormsDOMFocusOutEvent)) {
+                        && !(event instanceof DOMFocusOutEvent)) {
 
                     // The event target is in a repeated structure, so make sure it gets repeat focus
                     dispatchEventCheckTarget(pipelineContext, new XXFormsRepeatFocusEvent(this, eventTarget));
@@ -1021,17 +966,17 @@ public class XFormsContainingDocument extends XBLContainer {
                 if (eventTarget instanceof XFormsOutputControl) {
                     // Special xforms:output case
 
-                    if (event instanceof XFormsDOMFocusInEvent) {
+                    final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) eventTarget;
+                    if (event instanceof DOMFocusInEvent) {
 
                         // First, dispatch DOMFocusIn
                         dispatchEventCheckTarget(pipelineContext, event);
 
                         // Then, dispatch DOMActivate unless the control is read-only
-                        final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) eventTarget;
                         if (!xformsOutputControl.isReadonly()) {
-                            dispatchEventCheckTarget(pipelineContext, new XFormsDOMActivateEvent(this, xformsOutputControl));
+                            dispatchEventCheckTarget(pipelineContext, new DOMActivateEvent(this, xformsOutputControl));
                         }
-                    } else if (!ignoredXFormsOutputExternalEvents.contains(eventName)) {
+                    } else if (!xformsOutputControl.isIgnoredExternalEvent(eventName)) {
                         // Dispatch other event
                         dispatchEventCheckTarget(pipelineContext, event);
                     }
@@ -1061,10 +1006,10 @@ public class XFormsContainingDocument extends XBLContainer {
                             // Dispatch DOMFocusOut
                             // NOTE: setExternalValue() above may cause e.g. xforms-select / xforms-deselect events to be
                             // dispatched, so we get the control again to have a fresh reference
-                            dispatchEventCheckTarget(pipelineContext, new XFormsDOMFocusOutEvent(this, eventTarget));
+                            dispatchEventCheckTarget(pipelineContext, new DOMFocusOutEvent(this, eventTarget));
 
                             // Dispatch DOMFocusIn
-                            dispatchEventCheckTarget(pipelineContext, new XFormsDOMFocusInEvent(this, valueChangeWithFocusChangeEvent.getOtherTargetObject()));
+                            dispatchEventCheckTarget(pipelineContext, new DOMFocusInEvent(this, valueChangeWithFocusChangeEvent.getOtherTargetObject()));
                         }
 
                         // NOTE: Refresh is done with the automatic deferred updates
@@ -1173,110 +1118,20 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     /**
-     * Check whether the external event is allowed on the gtiven target/
+     * Check whether the external event is allowed on the given target.
      *
      * @param indentedLogger    logger
      * @param eventName         event name
      * @param eventTarget       event target
      * @return                  true iif the event is allowed
      */
-    public boolean checkForAllowedEvents(IndentedLogger indentedLogger, String eventName, XFormsEventTarget eventTarget) {
-        // Don't allow for events on non-relevant, readonly or xforms:output controls (we accept focus events on
-        // xforms:output though).
+    public boolean checkAllowedExternalEvents(IndentedLogger indentedLogger, String eventName, XFormsEventTarget eventTarget) {
         // This is also a security measure that also ensures that somebody is not able to change values in an instance
         // by hacking external events.
 
-        // TODO: should do this by asking each control what event it supports!
-        final String eventTargetEffectiveId = eventTarget.getEffectiveId();
-        if (eventTarget instanceof XFormsControl) {
-            // Target is a control
+        if (!isExplicitlyAllowedExternalEvent(eventName) && !eventTarget.allowExternalEvent(indentedLogger, EVENT_LOG_TYPE, eventName))
+            return false;
 
-            if (eventTarget instanceof XXFormsDialogControl) {
-                // Target is a dialog
-                // Check for implicitly allowed events
-                if (!allowedXXFormsDialogExternalEvents.contains(eventName)) {
-                    if (indentedLogger.isDebugEnabled()) {
-                        indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on xxforms:dialog", "control id", eventTargetEffectiveId, "event name", eventName);
-                    }
-                    return false;
-                }
-            } else if (eventTarget instanceof XFormsRepeatControl) {
-                // Target is a repeat
-                if (!allowedXFormsRepeatExternalEvents.contains(eventName)) {
-                    if (indentedLogger.isDebugEnabled()) {
-                        indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on xforms:repeat", "control id", eventTargetEffectiveId, "event name", eventName);
-                    }
-                    return false;
-                }
-
-            } else {
-                // Target is a regular control
-
-                // Only single-node controls accept events from the client
-                if (!(eventTarget instanceof XFormsSingleNodeControl)) {// NOTE: This includes xforms:trigger/xforms:submit
-                    if (indentedLogger.isDebugEnabled()) {
-                        indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on non-single-node control", "control id", eventTargetEffectiveId, "event name", eventName);
-                    }
-                    return false;
-                }
-
-                final XFormsSingleNodeControl xformsControl = (XFormsSingleNodeControl) eventTarget;
-                if (!isExplicitlyAllowedExternalEvent(eventName)) {
-                    // The event is not explicitly allowed: check for implicitly allowed events
-                    if (xformsControl instanceof XFormsOutputControl) {
-                        if (!allowedXFormsOutputExternalEvents.contains(eventName)) {
-                            if (indentedLogger.isDebugEnabled()) {
-                                indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on xforms:output", "control id", eventTargetEffectiveId, "event name", eventName);
-                            }
-                            return false;
-                        }
-                    } else if (xformsControl instanceof XFormsUploadControl) {
-                        if (!allowedXFormsUploadExternalEvents.contains(eventName)) {
-                            if (indentedLogger.isDebugEnabled()) {
-                                indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on xforms:upload", "control id", eventTargetEffectiveId, "event name", eventName);
-                            }
-                            return false;
-                        }
-                    } else {
-                        if (!allowedXFormsControlsExternalEvents.contains(eventName)) {
-                            if (indentedLogger.isDebugEnabled()) {
-                                indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event", "control id", eventTargetEffectiveId, "event name", eventName);
-                            }
-                            return false;
-                        }
-                    }
-                }
-            }
-        } else if (eventTarget instanceof XFormsModelSubmission) {
-            // Target is a submission
-            if (!isExplicitlyAllowedExternalEvent(eventName)) {
-                // The event is not explicitly allowed: check for implicitly allowed events
-                if (!allowedXFormsSubmissionExternalEvents.contains(eventName)) {
-                    if (indentedLogger.isDebugEnabled()) {
-                        indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on xforms:submission", "submission id", eventTargetEffectiveId, "event name", eventName);
-                    }
-                    return false;
-                }
-            }
-        } else if (eventTarget instanceof XFormsContainingDocument) {
-            // Target is the containing document
-            // Check for implicitly allowed events
-            if (!allowedXFormsContainingDocumentExternalEvents.contains(eventName)) {
-                if (indentedLogger.isDebugEnabled()) {
-                    indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on containing document", "target id", eventTargetEffectiveId, "event name", eventName);
-                }
-                return false;
-            }
-        } else {
-            // Target is not a control
-            if (!isExplicitlyAllowedExternalEvent(eventName)) {
-                // The event is not explicitly allowed
-                if (indentedLogger.isDebugEnabled()) {
-                    indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event", "target id", eventTargetEffectiveId, "event name", eventName);
-                }
-                return false;
-            }
-        }
         return true;
     }
 
@@ -1382,7 +1237,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 final Object o = getObjectByEffectiveId(currentPrefixedId);// NOTE: won't work for triggers within repeats
                 if (o instanceof XFormsTriggerControl) {
                     final XFormsTriggerControl trigger = (XFormsTriggerControl) o;
-                    final XFormsEvent event = new XFormsDOMActivateEvent(this, trigger);
+                    final XFormsEvent event = new DOMActivateEvent(this, trigger);
                     // This attribute is a temporary HACK, used to improve performance when going offline. It causes
                     // the insert action to not rebuild controls to adjust indexes after insertion, as well as always
                     // inserting based on the last node of the insert nodes-set. This probably wouldn't be needed if
@@ -1622,5 +1477,16 @@ public class XFormsContainingDocument extends XBLContainer {
     @Override
     protected List<XFormsControl> getChildrenControls(XFormsControls controls) {
         return controls.getCurrentControlTree().getChildren();
+    }
+
+    private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
+    static {
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_LOAD);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_OFFLINE);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_ONLINE);
+    }
+
+    public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
+        return ALLOWED_EXTERNAL_EVENTS.contains(eventName);
     }
 }

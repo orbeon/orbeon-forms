@@ -29,7 +29,6 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -164,7 +163,7 @@ public class XFormsSubmissionUtils {
      */
     public static String createWwwFormUrlEncoded(final Document document, final String separator) {
 
-        final FastStringBuffer sb = new FastStringBuffer(100);
+        final StringBuilder sb = new StringBuilder(100);
         document.accept(new VisitorSupport() {
             public final void visit(Element element) {
                 // We only care about elements

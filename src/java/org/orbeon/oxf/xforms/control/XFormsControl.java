@@ -413,10 +413,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public XFormsControl getParent() {
         return parent;
     }
@@ -1171,5 +1167,34 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     public boolean setFocus() {
         // By default, a control doesn't accept focus
         return false;
+    }
+
+    // Allow special keypress event everywhere as client-side observer for those might be any control
+    private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
+    static {
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.KEYPRESS);
+    }
+
+    /**
+     * Check whether this concrete control supports receiving the external event specified.
+     *
+     * @param indentedLogger    logger
+     * @param logType           log type
+     * @param eventName         event name to check
+     * @return                  true iif the event is supported
+     */
+    public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
+        if (getAllowedExternalEvents().contains(eventName) || ALLOWED_EXTERNAL_EVENTS.contains(eventName)) {
+            return true;
+        } else {
+            if (indentedLogger.isDebugEnabled()) {
+                indentedLogger.logDebug(logType, "ignoring invalid client event on control", "control type", getName(), "control id", getEffectiveId(), "event name", eventName);
+            }
+            return false;
+        }
+    }
+
+    protected Set<String> getAllowedExternalEvents() {
+        return Collections.emptySet();
     }
 }

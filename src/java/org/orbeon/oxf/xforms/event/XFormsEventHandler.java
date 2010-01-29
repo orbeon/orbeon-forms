@@ -32,8 +32,8 @@ public interface XFormsEventHandler {
 
     String[] getObserversStaticIds();
     Set<String> getEventNames();
-    boolean isMatchEventName(String eventName);
-    boolean isMatchTarget(String targetId);
+
+    boolean isMatch(XFormsEvent event);
 
     String getKeyModifiers();
     String getKeyText();

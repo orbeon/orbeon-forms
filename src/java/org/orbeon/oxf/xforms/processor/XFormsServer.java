@@ -391,6 +391,8 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
+    private static String[] EVENT_PARAMETERS = new String[] { "dnd-start", "dnd-end", "modifiers", "text" };
+
     private boolean createAndDispatchEvents(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
                            XFormsStateManager.XFormsDecodedClientState xformsDecodedInitialClientState, Element filesElement,
                            List<Element> eventElements, int serverEventsCount, Set<String> valueChangeControlIds, boolean hasXXFormsOnline) {
@@ -422,20 +424,13 @@ public class XFormsServer extends ProcessorImpl {
             final boolean cancelable = !"false".equals(eventElement.attributeValue("cancelable"));// default is true
 
             final String otherControlId = eventElement.attributeValue("other-control-id");
-            {
-                parameters.clear();
-                final String dndStart = eventElement.attributeValue("dnd-start");
-                if (dndStart != null)
-                    parameters.put("dnd-start", dndStart);
-                final String dndEnd = eventElement.attributeValue("dnd-end");
-                if (dndEnd != null)
-                    parameters.put("dnd-end", dndEnd);
-                final String modifiers = eventElement.attributeValue("modifiers");
-                if (modifiers != null)
-                    parameters.put("modifiers", modifiers);
-                final String text = eventElement.attributeValue("text");
-                if (text != null)
-                    parameters.put("text", text);
+
+            // Gather parameters corresponding to special event attributes
+            parameters.clear();
+            for (final String attributeName: EVENT_PARAMETERS) {
+                final String attributeValue = eventElement.attributeValue(attributeName);
+                if (attributeValue != null)
+                    parameters.put(attributeName, attributeValue);
             }
 
             final String value = eventElement.getText();

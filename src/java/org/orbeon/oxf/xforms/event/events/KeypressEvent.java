@@ -13,9 +13,12 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
+import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.event.XFormsEventHandler;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 
@@ -32,10 +35,23 @@ public class KeypressEvent extends XFormsUIEvent {
         super(containingDocument, XFormsEvents.KEYPRESS, (XFormsControl) targetObject, true, false);
 
         if (parameters != null) {
-            this.keyModifiers = parameters.get(XFormsConstants.XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME.getName());
-            this.keyText = parameters.get(XFormsConstants.XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME.getName());
+            final String keyModifiersParameter = parameters.get(XFormsConstants.XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME.getName());
+            this.keyModifiers = StringUtils.isBlank(keyModifiersParameter) ? null : keyModifiersParameter.trim();
+            final String keyTextParameter = parameters.get(XFormsConstants.XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME.getName());
+            this.keyText = StringUtils.isEmpty(keyTextParameter) ? null : keyTextParameter;// allow for e.g. " ";
         } else {
             this.keyModifiers = this.keyText = null;
         }
+    }
+
+    @Override
+    public boolean matches(XFormsEventHandler handler) {
+
+        final String handlerKeyModifiers = handler.getKeyModifiers();
+        final String handlerKeyText = handler.getKeyText();
+
+        // NOTE: We check on an exact match for modifiers, should be smarter
+        return XFormsUtils.compareStrings(keyModifiers, handlerKeyModifiers)
+                && XFormsUtils.compareStrings(keyText, handlerKeyText);
     }
 }

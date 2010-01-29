@@ -275,4 +275,17 @@ public abstract class XFormsEvent implements Cloneable {
         // Default implementation is good enough
         return super.clone();
     }
+
+    /**
+     * Whether this event matches filters placed on the given event handler.
+     *
+     * This is used e.g. for checking modifiers and text on keypress.
+     *
+     * @param handler   event handler to check
+     * @return          true iif the event matches the filter
+     */
+    public boolean matches(XFormsEventHandler handler) {
+        // By default, all events match and only very specific events have special matching rules (keypress)
+        return true;
+    }
 }

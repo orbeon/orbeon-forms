@@ -105,8 +105,9 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         this.ancestorObserverStaticId = ancestorObserverStaticId;
         this.isXBLHandler = isXBLHandler;
 
-        this.keyModifiers = keyModifiers;
-        this.keyText = keyText;
+        // Normalize these
+        this.keyModifiers = StringUtils.isBlank(keyModifiers) ? null : keyModifiers.trim();
+        this.keyText = StringUtils.isEmpty(keyText) ? null : keyText;// allow for e.g. " "
 
         // Gather observers
         // NOTE: Supporting space-separated handlers is an extension, which may make it into XML Events 2
@@ -228,13 +229,17 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
         return isPerformDefaultAction;
     }
 
-    public boolean isMatchEventName(String eventName) {
+    private boolean isMatchEventName(String eventName) {
         return isAllEvents || eventNames.contains(eventName);
     }
 
-    public boolean isMatchTarget(String targetStaticId) {
+    private boolean isMatchTarget(String targetStaticId) {
         // Match if no target id is specified, or if any specified target matches
         return targetStaticIds == null || targetStaticIds.contains(targetStaticId);
+    }
+
+    public boolean isMatch(XFormsEvent event) {
+        return isMatchEventName(event.getEventName()) && isMatchTarget(event.getTargetObject().getId()) && event.matches(this);
     }
 
     public boolean isAllEvents() {

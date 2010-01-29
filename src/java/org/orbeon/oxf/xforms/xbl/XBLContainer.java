@@ -864,9 +864,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                         // Process event handlers
                         for (Object currentEventHandler: currentEventHandlers) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) currentEventHandler;
-                            if (eventHandler.isCapturePhaseOnly()
-                                    && eventHandler.isMatchEventName(retargetedEvent.getEventName())
-                                    && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
+                            if (eventHandler.isCapturePhaseOnly() && eventHandler.isMatch(retargetedEvent)) {
                                 // Capture phase match on event name and target is specified
                                 indentedLogger.startHandleOperation("dispatchEvent", "capture handler");
                                 containingDocument.startHandleEvent(retargetedEvent);
@@ -959,8 +957,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                         for (Object currentEventHandler: currentEventHandlers) {
                             final XFormsEventHandler eventHandler = (XFormsEventHandler) currentEventHandler;
                             if ((eventHandler.isTargetPhase() && isAtTarget || eventHandler.isBubblingPhase() && !isAtTarget && originalEvent.isBubbles())
-                                    && eventHandler.isMatchEventName(retargetedEvent.getEventName())
-                                    && eventHandler.isMatchTarget(retargetedEvent.getTargetObject().getId())) {
+                                    && eventHandler.isMatch(retargetedEvent)) {
                                 // Bubbling phase match on event name and target is specified
                                 indentedLogger.startHandleOperation("dispatchEvent", isAtTarget ? "target handler" : "bubble handler");
                                 containingDocument.startHandleEvent(retargetedEvent);

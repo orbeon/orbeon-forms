@@ -4493,6 +4493,7 @@ ORBEON.xforms.Init = {
     },
 
     registerDraggableListenersOnRepeatElements: function(form) {
+        return;
         var dndElements = YAHOO.util.Dom.getElementsByClassName("xforms-dnd", null, form);
         for (var dnElementIndex = 0; dnElementIndex < dndElements.length; dnElementIndex++) {
             var dndElement = dndElements[dnElementIndex];
@@ -4833,6 +4834,42 @@ ORBEON.xforms.Init = {
                             }
                         }
                     }
+                }
+            }
+            // Register key listeners
+            var keyListeners = window.orbeonInitData["keylisteners"];
+            if (YAHOO.lang.isArray(keyListeners)) {
+                for (var keyListenerIndex = 0; keyListenerIndex < keyListeners.length; keyListenerIndex++) {
+                    var keyListener = keyListeners[keyListenerIndex];
+                    var observer = YAHOO.util.Dom.get(keyListener.observer);
+                    var keyData = {};
+                    // Handle optional modifiers
+                    if (YAHOO.lang.isString(keyListener.modifier)) {
+                        var modifiers = keyListener.modifier.split(" ");
+                        for (var modifierIndex = 0; modifierIndex < modifiers.length; modifierIndex++) {
+                            var modifier = modifiers[modifierIndex];
+                            console.log("modifier", modifier);
+                            if (modifier.toLowerCase() == "control") keyData["ctrl"] = true;
+                            if (modifier.toLowerCase() == "shift") keyData["shift"] = true;
+                            if (modifier.toLowerCase() == "alt") keyData["alt"] = true;
+                        };
+                    }
+                    // Handle text string by building array of key codes
+                    keyData["keys"] = [];
+                    var text = keyListener.text.toUpperCase();
+                    for (var textIndex = 0; textIndex < text.length; textIndex++)
+                        keyData["keys"].push(text.charCodeAt(textIndex));
+                    // Register YUI listener
+                    console.log("observer", observer);
+                    var yuiKeyListener = new YAHOO.util.KeyListener(observer, keyData, { fn:function(event) {
+                        // YUI doesn't give us the target of the event, so we provide the observer as the target to the server
+                        var form = ORBEON.xforms.Controls.getForm(observer);
+                        var event = new ORBEON.xforms.Server.Event(form, keyListener.observer, null, null, "keypress", null, null, null, null, null,
+                            ["modifiers", keyListener.modifier, "text", keyListener.text]);
+                        ORBEON.xforms.Server.fireEvents([event], false);
+                    }});
+    				yuiKeyListener.enable();
+                    console.log("keylistener", keyData, observer);
                 }
             }
         }

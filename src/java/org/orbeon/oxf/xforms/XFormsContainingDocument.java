@@ -64,7 +64,7 @@ import java.util.concurrent.*;
 public class XFormsContainingDocument extends XBLContainer {
 
     // Special id name for the top-level containing document
-    public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";
+    public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "#document";
 
     // Per-document current logging indentation
     private final IndentedLogger.Indentation indentation = new IndentedLogger.Indentation();

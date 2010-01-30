@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -33,8 +33,10 @@ import java.util.*;
 public class OldControlsComparator extends BaseControlsComparator {
 
     public OldControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
-                                 Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2, Set<String> valueChangeControlIds) {
-        super(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                                 Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2, Set<String> valueChangeControlIds,
+                                 boolean isTestMode) {
+
+        super(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds, isTestMode);
     }
 
     public void diff(List<XFormsControl> state1, List<XFormsControl> state2) {

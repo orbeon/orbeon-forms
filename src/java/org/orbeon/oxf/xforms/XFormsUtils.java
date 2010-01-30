@@ -1823,4 +1823,14 @@ public class XFormsUtils {
             return null;
         }
     }
+
+    /**
+     * Return the id of the enclosing HTML <form> element.
+     *
+     * @param containingDocument    containing document
+     * @return                      id, possibly namespaced
+     */
+    public static String getFormId(XFormsContainingDocument containingDocument) {
+        return namespaceId(containingDocument, "xforms-form");
+    }
 }

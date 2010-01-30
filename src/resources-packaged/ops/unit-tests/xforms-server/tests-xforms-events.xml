@@ -336,27 +336,21 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="repeat1" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="output1·1">row2</xxf:control>
                         <xxf:control id="output1·2">row1</xxf:control>
                         <xxf:control id="output1·3">row3</xxf:control>
-                        <xxf:copy-repeat-template id="repeat2" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="output2·1">row2</xxf:control>
                         <xxf:control id="output2·2">row3</xxf:control>
                         <xxf:control id="output2·3">row1</xxf:control>
-                        <xxf:copy-repeat-template id="repeat3" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="output3·1">row2</xxf:control>
                         <xxf:control id="output3·2">row1</xxf:control>
                         <xxf:control id="output3·3">row3</xxf:control>
-                        <xxf:copy-repeat-template id="repeat4" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="output4·1">row1</xxf:control>
                         <xxf:control id="output4·2">row3</xxf:control>
                         <xxf:control id="output4·3">row2</xxf:control>
-                        <xxf:copy-repeat-template id="repeat5" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="output5·1">row3</xxf:control>
                         <xxf:control id="output5·2">row1</xxf:control>
                         <xxf:control id="output5·3">row2</xxf:control>
-                        <xxf:copy-repeat-template id="repeat6" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="output6·1">row1</xxf:control>
                         <xxf:control id="output6·2">row3</xxf:control>
                         <xxf:control id="output6·3">row2</xxf:control>
@@ -822,9 +816,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="5"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -894,9 +886,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:delete-repeat-elements id="my-repeat" parent-indexes="" count="1"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1295,6 +1285,278 @@
             </xxf:event-response>
         </output>
     </test>
+
+    <test description="Event listener on #document" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+                                    <xforms:instance xmlns="" id="instance">
+                                        <values>
+                                            <value/>
+                                        </values>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready">
+                                        <xforms:dispatch name="my-event" targetid="my-input"/>
+                                    </xforms:action>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xxforms:variable name="answer" select="42"/>
+                                <xforms:setvalue ev:observer="#document" ev:event="my-event" ref="value" value="$answer"/>
+
+                                <xforms:input id="my-input" ref="value"/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value>42</value>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input">42</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Event listener on #document resolves index()" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+                                    <xforms:instance xmlns="" id="instance">
+                                        <values>
+                                            <value>1</value>
+                                            <value>2</value>
+                                            <value>3</value>
+                                            <value>4</value>
+                                            <result/>
+                                        </values>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready">
+                                        <xforms:dispatch name="my-event" targetid="my-repeat"/>
+                                    </xforms:action>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:setvalue ev:observer="#document" ev:event="my-event" ref="result" value="index('my-repeat')"/>
+
+                                <xforms:repeat id="my-repeat" nodeset="value" startindex="3"/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value>1</value>
+                                    <value>2</value>
+                                    <value>3</value>
+                                    <value>4</value>
+                                    <result>3</result>
+                                </values>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="3"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Top-level event listener implicitly listens on #document" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+                                    <xforms:instance xmlns="" id="instance">
+                                        <values>
+                                            <value/>
+                                        </values>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready">
+                                        <xforms:dispatch name="my-event" targetid="my-input"/>
+                                    </xforms:action>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xxforms:variable name="answer" select="42"/>
+                                <xforms:setvalue ev:event="my-event" ref="value" value="$answer"/>
+
+                                <xforms:input id="my-input" ref="value"/>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value>42</value>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input">42</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="keypress event modifiers and text filtering" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+                                    <xforms:instance xmlns="" id="instance">
+                                        <values>
+                                            <value/>
+                                        </values>
+                                    </xforms:instance>
+
+                                    <!-- TEST: Events to gather -->
+                                    <xforms:instance id="events">
+                                        <events/>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready">
+                                        <!-- Dispatch custom keypress events -->
+                                        <xforms:dispatch name="keypress" targetid="my-group">
+                                            <xxforms:context name="modifiers" select="'control alt'"/>
+                                            <xxforms:context name="text" select="'v'"/>
+                                        </xforms:dispatch>
+                                        <xforms:dispatch name="keypress" targetid="my-group">
+                                            <xxforms:context name="modifiers" select="'control alt'"/>
+                                            <xxforms:context name="text" select="'w'"/>
+                                        </xforms:dispatch>
+                                        <xforms:dispatch name="keypress" targetid="my-group">
+                                            <xxforms:context name="modifiers" select="'shift'"/>
+                                            <xxforms:context name="text" select="'v'"/>
+                                        </xforms:dispatch>
+                                    </xforms:action>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <!-- Match both -->
+                                <xforms:group id="my-group">
+                                    <xforms:insert ev:event="keypress" xxforms:modifiers="control alt" xxforms:text="v"
+                                                   context="instance('events')" nodeset="*" origin="xxforms:element('handler1')"/>
+                                    <xforms:insert ev:event="keypress" xxforms:modifiers="shift" xxforms:text="w"
+                                                   context="instance('events')" nodeset="*" origin="xxforms:element('handler2')"/>
+                                    <xforms:insert ev:event="keypress" xxforms:modifiers="control alt"
+                                                   context="instance('events')" nodeset="*" origin="xxforms:element('handler3')"/>
+                                    <xforms:insert ev:event="keypress" xxforms:text="v"
+                                                   context="instance('events')" nodeset="*" origin="xxforms:element('handler4')"/>
+                                </xforms:group>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value/>
+                                </values>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <handler1/>
+                                    <handler3/>
+                                    <handler4/>
+                                    <handler3/>
+                                    <handler4/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 
     <!--
         TODO: More tests of client events:

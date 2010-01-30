@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -113,7 +113,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="items-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="my-count·1" label="One:">4</xxf:control>
                         <xxf:control id="my-count·2" label="Two:">5</xxf:control>
                         <xxf:control id="my-count·3" label="Three:">6</xxf:control>

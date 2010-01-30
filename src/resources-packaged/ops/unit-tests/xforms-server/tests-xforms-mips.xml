@@ -476,7 +476,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="8"/>
                         <xxf:control id="my-control·1" class="foo-bar-is-not-g">bloody</xxf:control>
                         <xxf:control id="my-control·2" class="foo-bar-is-not-g">valencia</xxf:control>
                         <xxf:control id="my-control·3" class="foo-bar-is-g">green</xxf:control>
@@ -1017,7 +1016,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="repeat" parent-indexes="" start-suffix="2" end-suffix="4"/>
                         <xxf:control id="output-relevant·1">true</xxf:control>
                         <xxf:control id="output-readonly·1">true</xxf:control>
                         <xxf:control id="output-required·1">true</xxf:control>

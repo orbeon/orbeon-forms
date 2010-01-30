@@ -842,13 +842,16 @@ public class XFormsServer extends ProcessorImpl {
                         // Only output changes if needed
                         if (containingDocument.isDirtySinceLastRequest() || testOutputAllActions) {
                             final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
-                            diffControls(pipelineContext, ch, containingDocument, indentedLogger, testOutputAllActions ? null : xformsControls.getInitialControlTree().getChildren(), currentControlTree.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                            diffControls(pipelineContext, ch, containingDocument, indentedLogger,
+                                    xformsControls.getInitialControlTree().getChildren(),
+                                    currentControlTree.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds, testOutputAllActions);
                         }
                     } else {
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
-                        diffControls(pipelineContext, ch, containingDocument, indentedLogger, initialControlTree.getChildren(), currentControlTree.getChildren(), itemsetsFull1, itemsetsFull2, null);
+                        diffControls(pipelineContext, ch, containingDocument, indentedLogger, initialControlTree.getChildren(),
+                                currentControlTree.getChildren(), itemsetsFull1, itemsetsFull2, null, testOutputAllActions);
                     }
 
                     ch.endElement();
@@ -1064,12 +1067,18 @@ public class XFormsServer extends ProcessorImpl {
                                     IndentedLogger indentedLogger,
                                     List<XFormsControl> state1, List<XFormsControl> state2,
                                     Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2,
-                                    Set<String> valueChangeControlIds) {
+                                    Set<String> valueChangeControlIds,
+                                    boolean isTestMode) {
+
+        // In test mode, ignore first tree
+        if (isTestMode)
+            state1 = null;
+
         indentedLogger.startHandleOperation("", "computing differences");
         if (XFormsProperties.isOptimizeRelevance(containingDocument)) {
-            new NewControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds).diff(state1, state2);
+            new NewControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds, isTestMode).diff(state1, state2);
         } else {
-            new OldControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds).diff(state1, state2);
+            new OldControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds, isTestMode).diff(state1, state2);
         }
         indentedLogger.endHandleOperation();
     }

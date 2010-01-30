@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -38,12 +38,13 @@ public abstract class BaseControlsComparator implements ControlsComparator {
     protected final Map<String, Itemset> itemsetsFull1;
     protected final Map<String, Itemset> itemsetsFull2;
     protected final Set<String> valueChangeControlIds;
+    protected final boolean isTestMode;
 
     protected final boolean isStaticReadonly;
 
     public BaseControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
                                   Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2,
-                                  Set<String> valueChangeControlIds) {
+                                  Set<String> valueChangeControlIds, boolean isTestMode) {
         this.pipelineContext = pipelineContext;
         this.ch = ch;
         this.containingDocument = containingDocument;
@@ -51,6 +52,7 @@ public abstract class BaseControlsComparator implements ControlsComparator {
         this.itemsetsFull2 = itemsetsFull2;
         this.valueChangeControlIds = valueChangeControlIds;
         this.isStaticReadonly = XFormsProperties.isStaticReadonlyAppearance(containingDocument);
+        this.isTestMode = isTestMode;
     }
 
     protected static boolean addOrAppendToAttributeIfNeeded(AttributesImpl attributesImpl, String name, String value, boolean isNewRepeatIteration, boolean isDefaultValue) {
@@ -62,28 +64,32 @@ public abstract class BaseControlsComparator implements ControlsComparator {
         }
     }
 
-    protected static void outputDeleteRepeatTemplate(ContentHandlerHelper ch, XFormsControl xformsControl2, int count) {
-        final String repeatControlId = xformsControl2.getEffectiveId();
-        final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
-        final String templateId = (indexOfRepeatHierarchySeparator == -1) ? repeatControlId : repeatControlId.substring(0, indexOfRepeatHierarchySeparator);
-        final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
+    protected void outputDeleteRepeatTemplate(ContentHandlerHelper ch, XFormsControl xformsControl2, int count) {
+        if (!isTestMode) {
+            final String repeatControlId = xformsControl2.getEffectiveId();
+            final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+            final String templateId = (indexOfRepeatHierarchySeparator == -1) ? repeatControlId : repeatControlId.substring(0, indexOfRepeatHierarchySeparator);
+            final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
 
-        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
-                new String[] { "id", templateId, "parent-indexes", parentIndexes, "count", "" + count });
+            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
+                    new String[] { "id", templateId, "parent-indexes", parentIndexes, "count", "" + count });
+        }
     }
 
-    protected static void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsRepeatControl repeatControlInfo, int startSuffix, int endSuffix) {
-        final String repeatControlId = repeatControlInfo.getEffectiveId();
-        final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
-        final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
+    protected void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsRepeatControl repeatControlInfo, int startSuffix, int endSuffix) {
+        if (!isTestMode) {
+            final String repeatControlId = repeatControlInfo.getEffectiveId();
+            final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+            final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
 
-        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "copy-repeat-template",
-                new String[] {
-                        // Get prefixed id without suffix as templates are global 
-                        "id", repeatControlInfo.getPrefixedId(),
-                        "parent-indexes", parentIndexes,
-                        "start-suffix", Integer.toString(startSuffix), "end-suffix", Integer.toString(endSuffix)
-                });
+            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "copy-repeat-template",
+                    new String[] {
+                            // Get prefixed id without suffix as templates are global
+                            "id", repeatControlInfo.getPrefixedId(),
+                            "parent-indexes", parentIndexes,
+                            "start-suffix", Integer.toString(startSuffix), "end-suffix", Integer.toString(endSuffix)
+                    });
+        }
     }
 
     protected void diffOutOfBand(XFormsControl xformsControl1, XFormsControl xformsControl2) {

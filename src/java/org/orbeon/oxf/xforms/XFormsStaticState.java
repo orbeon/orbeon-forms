@@ -830,8 +830,11 @@ public class XFormsStaticState {
         // Register event handlers on any element which has an id or an observer attribute. This also allows
         // registering event handlers on XBL components. This follows the semantics of XML Events.
 
-        // NOTE: Special work is done to annotate handlers children of bound nodes, because that annotation is not done
+        // Special work is done to annotate handlers children of bound nodes, because that annotation is not done
         // in XFormsAnnotatorContentHandler. Maybe it should be done there?
+
+        // Top-level handlers within controls are also handled. If they don't have an @ev:observer attribute, they
+        // are assumed to listen to a virtual element around all controls. 
 
         // NOTE: Placing a listener on say a <div> element won't work at this point. Listeners have to be placed within
         // elements which have a representation in the compact component tree.
@@ -840,8 +843,8 @@ public class XFormsStaticState {
 
         // Two expressions depending on whether handlers within models are excluded or not
         final String xpathExpression = isControls ?
-                "//*[@ev:event and not(ancestor::xforms:instance) and not(ancestor::xforms:model) and (parent::*/@id or @ev:observer)]" :
-                "//*[@ev:event and not(ancestor::xforms:instance) and (parent::*/@id or @ev:observer)]";
+                "//*[@ev:event and not(ancestor::xforms:instance) and not(ancestor::xforms:model) and (parent::*/@id or @ev:observer or /* is ..)]" :
+                "//*[@ev:event and not(ancestor::xforms:instance) and (parent::*/@id or @ev:observer or /* is ..)]";
 
         // Get all candidate elements
         final List actionHandlers = XPathCache.evaluate(propertyContext, documentInfo,
@@ -860,13 +863,21 @@ public class XFormsStaticState {
                 if (XFormsActions.isActionName(actionElement.getNamespaceURI(), actionElement.getName())) {
                     // This is a known action name
 
-                    // Determine if the action is a child of a bound element. If so, we must annotate it here.
                     final Element newActionElement;
                     final String evObserversStaticIds = actionElement.attributeValue(XFormsConstants.XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME);
 
-                    final String parentStaticId = actionElement.getParent().attributeValue("id");
+                    final String parentStaticId;
                     if (isControls) {
                         // Analyzing controls
+
+                        if (isControlsTopLevelHandler(actionElement)) {
+                            // Specially handle #document static id for top-level handlers
+                            parentStaticId = XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID;
+                        } else {
+                             // Nested handler
+                            parentStaticId = actionElement.getParent().attributeValue("id");
+                        }
+
                         if (parentStaticId != null) {
                             final String parentPrefixedId = prefix + parentStaticId;
                             if (xblBindings.hasBinding(parentPrefixedId)) {
@@ -884,6 +895,9 @@ public class XFormsStaticState {
                             } else if (controlInfoMap.containsKey(parentPrefixedId)) {
                                 // Parent is a control but not a bound node
                                 newActionElement = actionElement;
+                            } else if (isControlsTopLevelHandler(actionElement)) {
+                                // Handler is a top-level handler
+                                newActionElement = actionElement;
                             } else {
                                 // Neither
                                 newActionElement = null;
@@ -899,13 +913,25 @@ public class XFormsStaticState {
                     } else {
                         // Analyzing models
                         newActionElement = actionElement;
+                        parentStaticId = actionElement.getParent().attributeValue("id");
                     }
 
                     // Register action handler
                     if (newActionElement != null) {
                         // If possible, find closest ancestor observer for XPath context evaluation
-                        final Element ancestorObserver = findAncestorObserver(actionElement);
-                        final String ancestorObserverStaticId = (ancestorObserver != null) ? ancestorObserver.attributeValue("id") : null;
+
+                        final String ancestorObserverStaticId; {
+                            final Element ancestorObserver = findAncestorObserver(actionElement);
+                            if (ancestorObserver != null) {
+                                assert ancestorObserver.attributeValue("id") != null : "ancestor observer must have an id";
+                                ancestorObserverStaticId = ancestorObserver.attributeValue("id");
+                            } else if (isControls && isControlsTopLevelHandler(actionElement)) {
+                                // Specially handle #document static id for top-level handlers
+                                ancestorObserverStaticId = XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID;
+                            } else {
+                                ancestorObserverStaticId = null;
+                            }
+                        }
 
                         // The observers to which this handler is attached might not be in the same scope. Try to find
                         // that scope.
@@ -919,6 +945,7 @@ public class XFormsStaticState {
                             observersPrefix = prefix;
                         }
 
+                        // Create and register the handler
                         final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(prefix, newActionElement, parentStaticId, ancestorObserverStaticId);
                         registerActionHandler(eventHandler, observersPrefix);
                     }
@@ -927,15 +954,25 @@ public class XFormsStaticState {
         }
     }
 
-    private Element findAncestorObserver(Element actionElement) {
+    private boolean isControlsTopLevelHandler(Element actionElement) {
+        // Structure is:
+        // <controls>
+        //   <xforms:action .../>
+        //   ...
+        // </controls>
+        return actionElement.getParent() == actionElement.getDocument().getRootElement();
+    }
 
+    private Element findAncestorObserver(Element actionElement) {
         // Recurse until we find an element which is an event observer
         Element currentAncestor = actionElement.getParent();
-        while (currentAncestor.getParent() != null && !isEventObserver(currentAncestor)) {
+        while (currentAncestor != null) {
+            if (isEventObserver(currentAncestor))
+                return currentAncestor;
             currentAncestor = currentAncestor.getParent();
         }
 
-        return currentAncestor;
+        return null;
     }
 
     private boolean hasAncestorBinding(String prefix, Element element) {

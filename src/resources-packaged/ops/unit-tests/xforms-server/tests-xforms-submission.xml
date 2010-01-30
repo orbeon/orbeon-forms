@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -145,13 +145,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="repeat1" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:delete-repeat-elements id="repeat2" parent-indexes="1" count="1"/>
-                        <xxf:delete-repeat-elements id="repeat2" parent-indexes="3" count="1"/>
-                        <xxf:delete-repeat-elements id="repeat3" parent-indexes="" count="1"/>
-                        <xxf:copy-repeat-template id="repeat4" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:copy-repeat-template id="repeat5" parent-indexes="2" start-suffix="2" end-suffix="2"/>
-                        <xxf:delete-repeat-elements id="repeat5" parent-indexes="3" count="1"/>
                         <xxf:control id="test-trigger" label="Test"/>
                     </xxf:control-values>
                 </xxf:action>

@@ -26,8 +26,8 @@ import java.util.Map;
 
 public class KeypressEvent extends XFormsUIEvent {
 
-    private final String keyModifiers;
-    private final String keyText;
+    private static final String MODIFIERS_ATTRIBUTE = XFormsConstants.XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME.getName();
+    private static final String TEXT_ATTRIBUTE = XFormsConstants.XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME.getName();
 
     public KeypressEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, Map<String, String> parameters) {
         // NOTE: Not sure if should be cancelable, this seems to indicate that "special keys" should not
@@ -35,12 +35,14 @@ public class KeypressEvent extends XFormsUIEvent {
         super(containingDocument, XFormsEvents.KEYPRESS, (XFormsControl) targetObject, true, false);
 
         if (parameters != null) {
-            final String keyModifiersParameter = parameters.get(XFormsConstants.XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME.getName());
-            this.keyModifiers = StringUtils.isBlank(keyModifiersParameter) ? null : keyModifiersParameter.trim();
-            final String keyTextParameter = parameters.get(XFormsConstants.XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME.getName());
-            this.keyText = StringUtils.isEmpty(keyTextParameter) ? null : keyTextParameter;// allow for e.g. " ";
-        } else {
-            this.keyModifiers = this.keyText = null;
+            // NOTE: See also normalization logic in XFormsEventHandlerImpl
+            final String keyModifiersParameter = parameters.get(MODIFIERS_ATTRIBUTE);
+            if (StringUtils.isNotBlank(keyModifiersParameter))
+                setAttributeAsString(MODIFIERS_ATTRIBUTE,  keyModifiersParameter.trim());
+
+            final String keyTextParameter = parameters.get(TEXT_ATTRIBUTE);
+            if (StringUtils.isNotEmpty(keyTextParameter))// allow for e.g. " "
+                setAttributeAsString(TEXT_ATTRIBUTE, keyTextParameter);
         }
     }
 
@@ -51,7 +53,15 @@ public class KeypressEvent extends XFormsUIEvent {
         final String handlerKeyText = handler.getKeyText();
 
         // NOTE: We check on an exact match for modifiers, should be smarter
-        return XFormsUtils.compareStrings(keyModifiers, handlerKeyModifiers)
-                && XFormsUtils.compareStrings(keyText, handlerKeyText);
+        return (handlerKeyModifiers == null || XFormsUtils.compareStrings(getKeyModifiers(), handlerKeyModifiers))
+                && (handlerKeyText ==null || XFormsUtils.compareStrings(getKeyText(), handlerKeyText));
+    }
+
+    private String getKeyModifiers() {
+        return getAttributeAsString(MODIFIERS_ATTRIBUTE);
+    }
+
+    private String getKeyText() {
+        return getAttributeAsString(TEXT_ATTRIBUTE);
     }
 }

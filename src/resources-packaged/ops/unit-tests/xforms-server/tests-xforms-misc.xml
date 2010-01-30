@@ -585,7 +585,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
                         <xxf:control id="my-trigger·1" label="Do Stuff"/>
                         <xxf:control id="my-trigger·2" readonly="true" label="Do Stuff"/>
                     </xxf:control-values>
@@ -768,7 +767,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="my-input·1">Ada</xxf:control>
                         <xxf:control id="my-input·2">Marie</xxf:control>
                         <xxf:control id="my-input·3">Clara</xxf:control>

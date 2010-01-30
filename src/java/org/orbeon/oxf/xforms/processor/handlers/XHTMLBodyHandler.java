@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -91,7 +91,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         final boolean hasUpload = staticState.hasControlByName("upload");
         helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
                 // Add id so that things work in portals    
-                "id", XFormsUtils.namespaceId(containingDocument, "xforms-form"),
+                "id", XFormsUtils.getFormId(containingDocument),
                 // Regular classes
                 "class", "xforms-form" + (handlerContext.isNoScript() ? " xforms-noscript" : " xforms-initially-hidden")
                         + (handlerContext.isNewXHTMLLayout() ? " xforms-layout-span" : " xforms-layout-nospan"),

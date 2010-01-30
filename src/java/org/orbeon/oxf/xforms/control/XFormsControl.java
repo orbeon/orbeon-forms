@@ -655,7 +655,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public XFormsEventObserver getParentEventObserver(XBLContainer container) {
-        return parent;
+        // Consider that the parent of top-level controls is the containing document. This allows events to propagate to
+        // the top-level.
+        return parent != null ? parent : containingDocument;
     }
 
     public List getEventHandlers(XBLContainer container) {

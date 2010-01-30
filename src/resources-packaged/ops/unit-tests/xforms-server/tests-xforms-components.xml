@@ -542,7 +542,6 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-summary$body" class="fr-error-summary-body"/>
-                        <xxf:copy-repeat-template id="my-summary$er" parent-indexes="" start-suffix="2" end-suffix="2"/>
                         <xxf:control id="my-summary$xf-103·1" relevant="false"/>
                         <xxf:attribute id="my-summary$xf-105·1" for="my-summary$xf-104·1" name="href"/>
                         <xxf:control id="my-summary$xf-106·1" relevant="false" class="fr-error-label"/>
@@ -558,7 +557,6 @@
                         <xxf:control id="my-summary$xf-115·2" class="fr-error-dash">-</xxf:control>
                         <xxf:control id="my-summary$ao·2" class="fr-error-alert">Invalid last name</xxf:control>
                         <xxf:control id="first-name-control" required="true" valid="false" label="First name" alert="Invalid first name"/>
-                        <xxf:copy-repeat-template id="repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="note-control·1" required="true" valid="false" label="Note" alert="Invalid note"/>
                         <xxf:control id="note-control·2" required="true" valid="false" label="Note" alert="Invalid note"/>
                         <xxf:control id="note-control·3" required="true" valid="false" label="Note" alert="Invalid note"/>

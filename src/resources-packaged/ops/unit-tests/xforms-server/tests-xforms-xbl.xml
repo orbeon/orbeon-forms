@@ -411,7 +411,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="date-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="fr-dropdown-date$xf-25·1" label="Date: "/>
                         <xxf:control id="fr-dropdown-date$year-select·1">2009</xxf:control>
                         <xxf:control id="fr-dropdown-date$month-select·1">1</xxf:control>
@@ -837,7 +836,7 @@
                     <xxf:control-values>
                         <xxf:attribute id="fr-super-control-1$xf-5" for="fr-super-control-1$my-div" name="style">color: red</xxf:attribute>
                         <xxf:attribute id="fr-super-control-2$xf-8" for="fr-super-control-2$my-div" name="style">font-weight: bold</xxf:attribute>
-                        <xxf:copy-repeat-template id="repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
+
                         <xxf:attribute id="fr-super-control-3$xf-11·1" for="fr-super-control-3$my-div·1" name="style">color: red</xxf:attribute>
                         <xxf:attribute id="fr-super-control-3$xf-11·2" for="fr-super-control-3$my-div·2" name="style">font-weight: bold</xxf:attribute>
                     </xxf:control-values>
@@ -1171,13 +1170,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="repeat-no-xbl" parent-indexes="" start-suffix="2" end-suffix="2"/>
                         <xxf:control id="my-output·1">2</xxf:control>
                         <xxf:control id="my-output·2">2</xxf:control>
-                        <xxf:copy-repeat-template id="my-foo$repeat-xbl-foo" parent-indexes="" start-suffix="2" end-suffix="2"/>
                         <xxf:control id="my-foo$my-output-foo·1">2</xxf:control>
                         <xxf:control id="my-foo$my-output-foo·2">2</xxf:control>
-                        <xxf:copy-repeat-template id="my-bar$repeat-xbl-bar" parent-indexes="" start-suffix="2" end-suffix="2"/>
                         <xxf:control id="my-bar$my-output-bar·1">2</xxf:control>
                         <xxf:control id="my-bar$my-output-bar·2">2</xxf:control>
                     </xxf:control-values>
@@ -1303,13 +1299,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="repeat-no-xbl" parent-indexes="" start-suffix="2" end-suffix="2"/>
                         <xxf:control id="my-output·1">1</xxf:control>
                         <xxf:control id="my-output·2">1</xxf:control>
-                        <xxf:copy-repeat-template id="my-foo$repeat-xbl-foo" parent-indexes="" start-suffix="2" end-suffix="2"/>
                         <xxf:control id="my-foo$my-output-foo·1">2</xxf:control>
                         <xxf:control id="my-foo$my-output-foo·2">2</xxf:control>
-                        <xxf:copy-repeat-template id="my-bar$repeat-xbl-bar" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="my-bar$my-output-bar·1">2</xxf:control>
                         <xxf:control id="my-bar$my-output-bar·2">2</xxf:control>
                         <xxf:control id="my-bar$my-output-bar·3">2</xxf:control>
@@ -1379,7 +1372,6 @@
                 <!--<xxf:action>-->
                     <!--<xxf:control-values>-->
                         <!--<xxf:control id="clash" label="NOP"/>-->
-                        <!--<xxf:copy-repeat-template id="my-foobar$clash" parent-indexes="" start-suffix="2" end-suffix="2"/>-->
                         <!--<xxf:control id="my-foobar$xf-4·1">1</xxf:control>-->
                         <!--<xxf:control id="my-foobar$xf-4·2">1</xxf:control>-->
                     <!--</xxf:control-values>-->
@@ -2266,9 +2258,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-foo$my-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -3159,9 +3149,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-foobar$my-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -3240,9 +3228,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-foobar$my-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>

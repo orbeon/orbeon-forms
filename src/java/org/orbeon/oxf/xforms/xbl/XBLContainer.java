@@ -57,11 +57,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     public static final String XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES = "xforms-dynamic-state-instances";
     protected static final String XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS = "xforms-dynamic-state-controls";
 
-    // Static id of the control containing this container, e.g. "$containing-document$" for root container, "my-foo-bar", etc.
+    // Static id of the control containing this container, e.g. "#document" for root container, "my-foo-bar", etc.
     private String staticId;
-    // Effective id of the control containing this container, e.g. "$containing-document$" for root container, "my-stuff$my-foo-bar.1-2", etc.
+    // Effective id of the control containing this container, e.g. "#document" for root container, "my-stuff$my-foo-bar.1-2", etc.
     private String effectiveId;
-    // Prefixed id of the control containing this container, e.g. "$containing-document$" for root container, "my-stuff$my-foo-bar", etc.
+    // Prefixed id of the control containing this container, e.g. "#document" for root container, "my-stuff$my-foo-bar", etc.
     private String prefixedId;
     // Prefix of controls and models within this container, e.g. "" for the root container, "my-stuff$my-foo-bar$", etc.
     private String fullPrefix;

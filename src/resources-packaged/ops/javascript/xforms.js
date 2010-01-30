@@ -1563,7 +1563,7 @@ ORBEON.xforms.Document = {
                         }
                     }, 100);
                     // Send offline event to the server
-                    offlineIframe.contentWindow.ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-offline");
+                    offlineIframe.contentWindow.ORBEON.xforms.Document.dispatchEvent("#document", "xxforms-offline");
                 });
             }
         }, 100);
@@ -7651,7 +7651,7 @@ ORBEON.xforms.Offline = {
         }
 
         // Tell the server we are going online
-        ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-online");
+        ORBEON.xforms.Document.dispatchEvent("#document", "xxforms-online");
 
         // Give a chance to some code to run before the online event is sent to the server
         if (!YAHOO.lang.isUndefined(beforeOnlineListener))

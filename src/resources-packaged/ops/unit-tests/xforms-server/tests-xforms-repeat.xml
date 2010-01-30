@@ -127,15 +127,12 @@
                 </xxf:dynamic-state>
                 <xxf:action xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="id123" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="1" start-suffix="2" end-suffix="2"/>
                         <xxf:control id="id125·1-1">f11</xxf:control>
                         <xxf:control id="id126·1-1">l11</xxf:control>
                         <xxf:control id="id125·1-2">f12</xxf:control>
                         <xxf:control id="id126·1-2">l12</xxf:control>
                         <xxf:control id="id125·2-1">f21</xxf:control>
                         <xxf:control id="id126·2-1">l21</xxf:control>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="3" start-suffix="2" end-suffix="4"/>
                         <xxf:control id="id125·3-1">f31</xxf:control>
                         <xxf:control id="id126·3-1">l31</xxf:control>
                         <xxf:control id="id125·3-2">f32</xxf:control>
@@ -222,8 +219,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="id123" parent-indexes="" start-suffix="2" end-suffix="4"/>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="1" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="id127·1-1" label="Insert"/>
                         <xxf:control id="id125·1-1">f11</xxf:control>
                         <xxf:control id="id126·1-1">l11</xxf:control>
@@ -236,7 +231,6 @@
                         <xxf:control id="id127·2-1" label="Insert"/>
                         <xxf:control id="id125·2-1">f21</xxf:control>
                         <xxf:control id="id126·2-1">l21</xxf:control>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="3" start-suffix="2" end-suffix="4"/>
                         <xxf:control id="id127·3-1" label="Insert"/>
                         <xxf:control id="id125·3-1">f31</xxf:control>
                         <xxf:control id="id126·3-1">l31</xxf:control>
@@ -249,7 +243,6 @@
                         <xxf:control id="id127·3-4" label="Insert"/>
                         <xxf:control id="id125·3-4">f34</xxf:control>
                         <xxf:control id="id126·3-4">l34</xxf:control>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="4" start-suffix="2" end-suffix="4"/>
                         <xxf:control id="id127·4-1" label="Insert"/>
                         <xxf:control id="id125·4-1">f31</xxf:control>
                         <xxf:control id="id126·4-1">l31</xxf:control>
@@ -328,14 +321,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="id123" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="id127·1-1" label="Delete"/>
                         <xxf:control id="id125·1-1">f11</xxf:control>
                         <xxf:control id="id126·1-1">l11</xxf:control>
                         <xxf:control id="id127·2-1" label="Delete"/>
                         <xxf:control id="id125·2-1">f21</xxf:control>
                         <xxf:control id="id126·2-1">l21</xxf:control>
-                        <xxf:copy-repeat-template id="id124" parent-indexes="3" start-suffix="2" end-suffix="4"/>
                         <xxf:control id="id127·3-1" label="Delete"/>
                         <xxf:control id="id125·3-1">f31</xxf:control>
                         <xxf:control id="id126·3-1">l31</xxf:control>
@@ -419,11 +410,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:copy-repeat-template id="department-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="1" start-suffix="2" end-suffix="2"/>
-                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="3" start-suffix="2" end-suffix="4"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -504,11 +491,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:copy-repeat-template id="department-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="1" start-suffix="2" end-suffix="2"/>
-                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="3" start-suffix="2" end-suffix="4"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -671,7 +654,6 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="test-trigger" label="Add"/>
-                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="first-name-input·1">Joe</xxf:control>
                         <xxf:control id="first-name-input·2">Billy</xxf:control>
                         <xxf:control id="first-name-input·3">Mary</xxf:control>
@@ -837,7 +819,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="book-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="title-control·1" required="true" label="Title">Don Quixote de la Mancha</xxf:control>
                         <xxf:control id="author-control·1" required="true" label="Author">Miguel de Cervantes Saavedra</xxf:control>
                         <xxf:control id="title-control·2" required="true" label="Title">Jacques le fataliste et son maître</xxf:control>
@@ -899,7 +880,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="city-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="my-input·1" readonly="true" label="City: ">San Francisco</xxf:control>
                         <xxf:control id="my-output·1" label="Position: ">1</xxf:control>
                         <xxf:control id="my-input·2" readonly="true" label="City: ">Los Angeles</xxf:control>
@@ -998,7 +978,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="my-input·1">bloody</xxf:control>
                         <xxf:control id="my-input·2">yellow</xxf:control>
                         <xxf:control id="my-input·3">green</xxf:control>
@@ -1244,7 +1223,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="orange-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
                         <xxf:control id="orange-repeat-output·1" label="Orange type:">Persian</xxf:control>
                         <xxf:control id="orange-repeat-output·2" label="Orange type:">Navel</xxf:control>
                         <xxf:control id="detail-type" label="Orange type:">Persian</xxf:control>
@@ -1407,7 +1385,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="4"/>
                         <xxf:control id="my-input·1">1</xxf:control>
                         <xxf:control id="my-input·2">2</xxf:control>
                         <xxf:control id="my-input·3">3</xxf:control>
@@ -1497,7 +1474,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="4"/>
                         <xxf:control id="my-output·1">5</xxf:control>
                         <xxf:control id="my-output·2">4</xxf:control>
                         <xxf:control id="my-output·3">3</xxf:control>
@@ -1610,9 +1586,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-inner-repeat" parent-indexes="1" start-suffix="2" end-suffix="2"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1840,12 +1814,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-outer-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
-                        <xxf:copy-repeat-template id="my-inner-repeat" parent-indexes="1" start-suffix="2" end-suffix="2"/>
-                        <xxf:copy-repeat-template id="my-inner-repeat" parent-indexes="2" start-suffix="2" end-suffix="2"/>
-                        <xxf:copy-repeat-template id="my-inner-repeat" parent-indexes="3" start-suffix="2" end-suffix="3"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1934,10 +1903,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="department-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="department-output-1·1">3</xxf:control>
                         <xxf:control id="department-output-2·1">3</xxf:control>
-                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="1" start-suffix="2" end-suffix="2"/>
                         <xxf:control id="employee-output-1·1-1">2</xxf:control>
                         <xxf:control id="employee-output-2·1-1">2</xxf:control>
                         <xxf:control id="department-output-3·1-1">3</xxf:control>
@@ -1951,7 +1918,6 @@
                         <xxf:control id="department-output-3·2-1">3</xxf:control>
                         <xxf:control id="department-output-1·3">3</xxf:control>
                         <xxf:control id="department-output-2·3">3</xxf:control>
-                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="3" start-suffix="2" end-suffix="4"/>
                         <xxf:control id="employee-output-1·3-1">4</xxf:control>
                         <xxf:control id="employee-output-2·3-1">4</xxf:control>
                         <xxf:control id="department-output-3·3-1">3</xxf:control>
@@ -2064,10 +2030,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="department-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="department-output-1·1">3</xxf:control>
                         <xxf:control id="department-output-2·1">3</xxf:control>
-                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="1" start-suffix="2" end-suffix="2"/>
+
                         <xxf:control id="employee-output-1·1-1">2</xxf:control>
                         <xxf:control id="employee-output-2·1-1">2</xxf:control>
                         <xxf:control id="department-output-3·1-1">3</xxf:control>
@@ -2081,7 +2046,6 @@
                         <xxf:control id="department-output-3·2-1">3</xxf:control>
                         <xxf:control id="department-output-1·3">3</xxf:control>
                         <xxf:control id="department-output-2·3">3</xxf:control>
-                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="3" start-suffix="2" end-suffix="4"/>
                         <xxf:control id="employee-output-1·3-1">3</xxf:control>
                         <xxf:control id="employee-output-2·3-1">3</xxf:control>
                         <xxf:control id="department-output-3·3-1">3</xxf:control>
@@ -2238,7 +2202,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
                         <xxf:control id="my-output·1">000000000001</xxf:control>
                         <xxf:control id="my-output·2">000000000000</xxf:control>
                     </xxf:control-values>
@@ -2310,9 +2273,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:delete-repeat-elements id="my-repeat" parent-indexes="" count="1"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -2443,19 +2404,14 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-repeat-1a" parent-indexes="" start-suffix="2" end-suffix="4"/>
-                        <xxf:delete-repeat-elements id="my-repeat-1b" parent-indexes="" count="1"/>
-                        <xxf:copy-repeat-template id="my-repeat-2" parent-indexes="" start-suffix="2" end-suffix="4"/>
                         <xxf:repeat-iteration id="my-repeat-2" relevant="false" iteration="1"/>
                         <xxf:repeat-iteration id="my-repeat-2" relevant="false" iteration="2"/>
                         <xxf:repeat-iteration id="my-repeat-2" relevant="false" iteration="3"/>
                         <xxf:repeat-iteration id="my-repeat-2" relevant="false" iteration="4"/>
-                        <xxf:copy-repeat-template id="my-repeat-3" parent-indexes="" start-suffix="2" end-suffix="4"/>
                         <xxf:repeat-iteration id="my-repeat-3" relevant="false" iteration="1"/>
                         <xxf:repeat-iteration id="my-repeat-3" relevant="false" iteration="2"/>
                         <xxf:repeat-iteration id="my-repeat-3" relevant="false" iteration="3"/>
                         <xxf:control id="my-group-2" relevant="false"/>
-                        <xxf:delete-repeat-elements id="my-repeat-4" parent-indexes="" count="1"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2505,7 +2461,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
                         <xxf:control id="my-position·1">1</xxf:control>
                         <xxf:control id="my-value·1">2</xxf:control>
                         <xxf:control id="my-position·2">2</xxf:control>

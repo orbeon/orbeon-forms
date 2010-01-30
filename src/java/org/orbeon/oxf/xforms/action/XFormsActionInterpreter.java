@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -68,6 +68,18 @@ public class XFormsActionInterpreter {
             // Initialize context stack based on container context (based on local models if any)
             container.getContextStack().resetBindingContext(propertyContext);
             actionBlockContextStack = new XFormsContextStack(container, container.getContextStack().getCurrentBindingContext());
+        } else if (eventObserver == containingDocument) {
+            // Observer is the containing document itself
+
+            // Since we are at the top-level, the effective id of the action is the same as its static id
+            outerActionElementEffectiveId = getActionStaticId(outerActionElement);
+
+            // Start with default model as context
+            actionBlockContextStack = new XFormsContextStack(container, containingDocument.getDefaultModel().getBindingContext(propertyContext, containingDocument));
+
+            // TODO: Does sourceEffectiveId work
+            scopeVariables(propertyContext, containingDocument, outerActionElement, outerActionElement.getParent(), containingDocument.getDefaultModel().getEffectiveId());
+
         } else {
             // Set XPath context based on lexical location
             final XFormsEventObserver xpathContextObserver;
@@ -90,21 +102,25 @@ public class XFormsActionInterpreter {
             // used by the controls during refresh. Contemplate handling this differently, e.g. see
             // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements#TOC-Representation-of-outer-action-hand
             if (xpathContextObserver instanceof XFormsControl) {
-                final List<Element> actionPrecedingElements = Dom4jUtils.findPrecedingElements(outerActionElement, ((XFormsControl) xpathContextObserver).getControlElement());
-                if (actionPrecedingElements.size() > 0) {
-                    Collections.reverse(actionPrecedingElements);
-                    final List<XFormsContextStack.BindingContext.VariableInfo> variableInfos
-                            = actionBlockContextStack.addAndScopeVariables(propertyContext, container, actionPrecedingElements, xpathContextObserver.getEffectiveId());
-                    if (variableInfos != null && variableInfos.size() > 0 && indentedLogger.isDebugEnabled()) {
-                        indentedLogger.logDebug("interpreter", "evaluated variables for outer action",
-                                "count", Integer.toString(variableInfos.size()));
-                    }
-                }
+                scopeVariables(propertyContext, container, outerActionElement, ((XFormsControl) xpathContextObserver).getControlElement(), xpathContextObserver.getEffectiveId());
             }
         }
 
         // Push binding for outermost action
         actionBlockContextStack.pushBinding(propertyContext, outerActionElement, getSourceEffectiveId(outerActionElement), getActionScope(outerActionElement));
+    }
+
+    private void scopeVariables(PropertyContext propertyContext, XBLContainer container, Element outerActionElement, Element ancestorElement, String sourceEffectiveId) {
+        final List<Element> actionPrecedingElements = Dom4jUtils.findPrecedingElements(outerActionElement, ancestorElement);
+        if (actionPrecedingElements.size() > 0) {
+            Collections.reverse(actionPrecedingElements);
+            final List<XFormsContextStack.BindingContext.VariableInfo> variableInfos
+                    = actionBlockContextStack.addAndScopeVariables(propertyContext, container, actionPrecedingElements, sourceEffectiveId);
+            if (variableInfos != null && variableInfos.size() > 0 && indentedLogger.isDebugEnabled()) {
+                indentedLogger.logDebug("interpreter", "evaluated variables for outer action",
+                        "count", Integer.toString(variableInfos.size()));
+            }
+        }
     }
 
     public XBLContainer getXBLContainer() {

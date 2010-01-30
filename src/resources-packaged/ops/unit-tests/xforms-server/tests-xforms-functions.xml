@@ -533,7 +533,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="my-repeat" parent-indexes="" start-suffix="2" end-suffix="8"/>
                         <xxf:control id="my-group·1" readonly="true"/>
                         <xxf:control id="repeat-current-output-1·1">bloody</xxf:control>
                         <xxf:control id="repeat-current-output-2·1">bloody</xxf:control>
@@ -677,19 +676,15 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="exforms-sort-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="exforms-sort-output·1">3-AAA</xxf:control>
                         <xxf:control id="exforms-sort-output·2">2-BBB</xxf:control>
                         <xxf:control id="exforms-sort-output·3">1-CCC</xxf:control>
-                        <xxf:copy-repeat-template id="xxforms-sort-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="xxforms-sort-output·1">3-AAA</xxf:control>
                         <xxf:control id="xxforms-sort-output·2">2-BBB</xxf:control>
                         <xxf:control id="xxforms-sort-output·3">1-CCC</xxf:control>
-                        <xxf:copy-repeat-template id="exforms-sort-v-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="exforms-sort-v-output·1">3-AAA</xxf:control>
                         <xxf:control id="exforms-sort-v-output·2">2-BBB</xxf:control>
                         <xxf:control id="exforms-sort-v-output·3">1-CCC</xxf:control>
-                        <xxf:copy-repeat-template id="xxforms-sort-v-repeat" parent-indexes="" start-suffix="2" end-suffix="3"/>
                         <xxf:control id="xxforms-sort-v-output·1">3-AAA</xxf:control>
                         <xxf:control id="xxforms-sort-v-output·2">2-BBB</xxf:control>
                         <xxf:control id="xxforms-sort-v-output·3">1-CCC</xxf:control>
@@ -746,7 +741,6 @@
                 <xxf:control-values>
                     <xxf:control id="output1">state=CA</xxf:control>
                     <xxf:control id="output2">state=CA&amp;city=San Francisco</xxf:control>
-                    <xxf:copy-repeat-template id="repeat" parent-indexes="" start-suffix="2" end-suffix="2"/>
                     <xxf:control id="output3·1">position=1&amp;index=1</xxf:control>
                     <xxf:control id="output3·2">position=2&amp;index=1</xxf:control>
                 </xxf:control-values>
@@ -1158,7 +1152,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="xf-2" parent-indexes="" start-suffix="2" end-suffix="4"/>
                         <xxf:control id="xf-3·1" label="Nodeset : ">Garfield</xxf:control>
                         <xxf:control id="xf-3·2" label="Nodeset : ">Heathcliff</xxf:control>
                         <xxf:control id="xf-3·3" label="Nodeset : ">Felix</xxf:control>

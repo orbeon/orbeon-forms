@@ -40,7 +40,7 @@
                 <!-- Move from "instance" to "instance-copy" -->
                 <xforms:insert nodeset="instance('instance-copy')" origin="instance('instance')"/>
                 <xforms:delete while="instance('instance')/*" nodeset="instance('instance')/*"/>
-                <xxforms:script>ORBEON.xforms.Document.dispatchEvent("$containing-document$", "xxforms-offline");</xxforms:script>
+                <xxforms:script>ORBEON.xforms.Document.dispatchEvent("#document", "xxforms-offline");</xxforms:script>
             </xforms:action>
             <xforms:action ev:event="xxforms-offline">
                 <!-- Move from "instance-copy" to "instance" -->

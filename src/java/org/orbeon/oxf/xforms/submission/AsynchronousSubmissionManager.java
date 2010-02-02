@@ -86,11 +86,16 @@ public class AsynchronousSubmissionManager {
 
         final AsynchronousSubmissions asynchronousSubmissions = getAsynchronousSubmissions(propertyContext, true);
 
+        // NOTE: If we want to re-enable foreground async submissions, we must:
+        // o do a better detection: !(xf-submit-done/xf-submit-error listener) && replace="none"
+        // o OR provide an explicit hint on xf:submission
+        asynchronousSubmissions.submit(callable);
+
         // Add submission future
-        if (isBackground) {
-            // Background async submission
-            asynchronousSubmissions.submit(callable);
-        } else {
+//        if (isBackground) {
+//            // Background async submission
+//            asynchronousSubmissions.submit(callable);
+//        } else {
 //            // Foreground async submission
 //            final Future<SubmissionResult> future = new Future<SubmissionResult>() {
 //
@@ -145,17 +150,13 @@ public class AsynchronousSubmissionManager {
 //
 //            // TODO: Do something with result, e.g. log?
 //            // final ConnectionResult connectionResult = ...
-        }
+//        }
     }
 
     public boolean hasPendingAsynchronousSubmissions(PropertyContext propertyContext) {
         final AsynchronousSubmissions asynchronousSubmissions = getAsynchronousSubmissions(propertyContext, false);
         return asynchronousSubmissions != null && asynchronousSubmissions.getPendingCount() > 0;
     }
-
-//    private boolean hasForegroundAsynchronousSubmissions() {
-//        return foregroundAsynchronousSubmissions != null && foregroundAsynchronousSubmissions.size() > 0;
-//    }
 
     /**
      * Process all pending asynchronous submissions if any. If processing of a particular submission causes new
@@ -243,6 +244,39 @@ public class AsynchronousSubmissionManager {
         }
     }
 
+    private static class AsynchronousSubmissions {
+        private final CompletionService<SubmissionResult> completionService = new ExecutorCompletionService<SubmissionResult>(threadPool);
+        private int pendingCount = 0;
+
+        public Future<SubmissionResult> submit(Callable<SubmissionResult> task) {
+            final Future<SubmissionResult> future = completionService.submit(task);
+            pendingCount++;
+            return future;
+        }
+
+        public Future<SubmissionResult> poll() {
+            final Future<SubmissionResult> future = completionService.poll();
+            if (future != null)
+                pendingCount--;
+            return future;
+        }
+
+        public Future<SubmissionResult> take() throws InterruptedException {
+            final Future<SubmissionResult> future = completionService.take();
+            pendingCount--;
+            return future;
+        }
+
+        public int getPendingCount() {
+            return pendingCount;
+        }
+    }
+
+
+//    private boolean hasForegroundAsynchronousSubmissions() {
+//        return foregroundAsynchronousSubmissions != null && foregroundAsynchronousSubmissions.size() > 0;
+//    }
+
     /**
      * Process all current foreground submissions if any. Submissions are processed in the order in which they were
      * executed.
@@ -272,34 +306,6 @@ public class AsynchronousSubmissionManager {
 //                indentedLogger.endHandleOperation("count", Integer.toString(count));
 //            }
 //        }
-    }
-
-    private static class AsynchronousSubmissions {
-        private final CompletionService<SubmissionResult> completionService = new ExecutorCompletionService<SubmissionResult>(threadPool);
-        private int pendingCount = 0;
-
-        public Future<SubmissionResult> submit(Callable<SubmissionResult> task) {
-            final Future<SubmissionResult> future = completionService.submit(task);
-            pendingCount++;
-            return future;
-        }
-
-        public Future<SubmissionResult> poll() {
-            final Future<SubmissionResult> future = completionService.poll();
-            if (future != null)
-                pendingCount--;
-            return future;
-        }
-
-        public Future<SubmissionResult> take() throws InterruptedException {
-            final Future<SubmissionResult> future = completionService.take();
-            pendingCount--;
-            return future;
-        }
-
-        public int getPendingCount() {
-            return pendingCount;
-        }
     }
 
 //    private static class AsynchronousSubmission {

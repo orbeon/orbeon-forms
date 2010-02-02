@@ -292,9 +292,12 @@
                             <optional>
                                 <attribute name="delay"/>
                             </optional>
-                            <!-- Optional maximum delay after which the client must send the event (for async submissions) -->
+                            <!-- If discardable="true", the client can discard the event if another Ajax request is sent before the delay expires -->
                             <optional>
-                                <attribute name="max-delay"/>
+                                <attribute name="discardable">
+                                    <value>true</value>
+                                    <value>false</value>
+                                </attribute>
                             </optional>
                             <optional>
                                 <attribute name="show-progress">

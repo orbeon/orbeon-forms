@@ -898,7 +898,8 @@ public class XFormsServer extends ProcessorImpl {
                         for (XFormsContainingDocument.DelayedEvent delayedEvent: delayedEvents) {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events",
                                     new String[] {
-                                            delayedEvent.isMaxDelay() ? "max-delay" : "delay", Long.toString(delayedEvent.getTime() - currentTime),
+                                            "delay", Long.toString(delayedEvent.getTime() - currentTime),
+                                            "discardable", delayedEvent.isMaxDelay() ? "true" : null,
                                             "show-progress", Boolean.toString(delayedEvent.isShowProgress()),
                                             "progress-message", delayedEvent.isShowProgress() ? delayedEvent.getProgressMessage() : null
                                     });

@@ -73,7 +73,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         });
     },
     
-    testDocumentKeyPressNotListeningDialog: function() {
+    testDocumentKeyPress: function() {
         this.resetKeyPress(function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 YAHOO.util.UserAction.keydown(document, { keyCode: "Y".charCodeAt(0), ctrlKey: true });

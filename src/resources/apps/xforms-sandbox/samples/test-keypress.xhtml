@@ -9,14 +9,33 @@
     <xhtml:head>
         <xforms:model>
             <xforms:instance id="instance">
-                <dummy/>
+                <keypress/>
             </xforms:instance>
+            <xforms:setvalue ev:event="reset-keypress" ref="."/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:action ev:event="keypress" xxforms:modifiers="Control" xxforms:text="y"/>
-        <xforms:input ref=".">
-            <xforms:label>Name</xforms:label>
-        </xforms:input>
+        <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="y">document</xforms:setvalue>
+        <xhtml:div>
+            <xforms:output value="." id="keypress">
+                <xforms:label>Keypress: </xforms:label>
+            </xforms:output>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:trigger id="reset-keypress">
+                <xforms:label>Reset keypress</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="."/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xforms:group>
+            <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="u">div</xforms:setvalue>
+            <xforms:input ref=".">
+                <xforms:label>Name</xforms:label>
+            </xforms:input>
+        </xforms:group>
+        <xxforms:dialog>
+            <xforms:label>Dialog with keylistener</xforms:label>
+            <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="i">dialog</xforms:setvalue>
+        </xxforms:dialog>
     </xhtml:body>
 </xhtml:html>

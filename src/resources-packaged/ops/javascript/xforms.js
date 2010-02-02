@@ -4841,14 +4841,21 @@ ORBEON.xforms.Init = {
             if (YAHOO.lang.isArray(keyListeners)) {
                 for (var keyListenerIndex = 0; keyListenerIndex < keyListeners.length; keyListenerIndex++) {
                     var keyListener = keyListeners[keyListenerIndex];
-                    var observer = YAHOO.util.Dom.get(keyListener.observer);
-                    var keyData = {};
+
+                    // When listening on events from the document, the server gives us the id of the form
+                    keyListener.observerElement = YAHOO.util.Dom.get(keyListener.observer);
+                    keyListener.isDocumentListener = YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-form");
+                    if (keyListener.isDocumentListener) keyListener.observerElement = document;
+
+                    // Save current form, which we'll need when creating an event
+                    keyListener.form = form;
+
                     // Handle optional modifiers
+                    var keyData = {};
                     if (YAHOO.lang.isString(keyListener.modifier)) {
                         var modifiers = keyListener.modifier.split(" ");
                         for (var modifierIndex = 0; modifierIndex < modifiers.length; modifierIndex++) {
                             var modifier = modifiers[modifierIndex];
-                            console.log("modifier", modifier);
                             if (modifier.toLowerCase() == "control") keyData["ctrl"] = true;
                             if (modifier.toLowerCase() == "shift") keyData["shift"] = true;
                             if (modifier.toLowerCase() == "alt") keyData["alt"] = true;
@@ -4859,17 +4866,20 @@ ORBEON.xforms.Init = {
                     var text = keyListener.text.toUpperCase();
                     for (var textIndex = 0; textIndex < text.length; textIndex++)
                         keyData["keys"].push(text.charCodeAt(textIndex));
+
                     // Register YUI listener
-                    console.log("observer", observer);
-                    var yuiKeyListener = new YAHOO.util.KeyListener(observer, keyData, { fn:function(event) {
-                        // YUI doesn't give us the target of the event, so we provide the observer as the target to the server
-                        var form = ORBEON.xforms.Controls.getForm(observer);
-                        var event = new ORBEON.xforms.Server.Event(form, keyListener.observer, null, null, "keypress", null, null, null, null, null,
-                            ["modifiers", keyListener.modifier, "text", keyListener.text]);
-                        ORBEON.xforms.Server.fireEvents([event], false);
-                    }});
+                    var yuiKeyListener = new YAHOO.util.KeyListener(keyListener.observerElement, keyData, {
+                        scope: keyListener,
+                        correctScope: false,
+                        fn: function(event, event, keyListener) {
+                            // YUI doesn't give us the target of the event, so we provide the observer as the target to the server
+                            var targetId = keyListener.isDocumentListener ? "#document" : keyListener.observer;
+                            var event = new ORBEON.xforms.Server.Event(keyListener.form, targetId, null, null, "keypress", null, null, null, null, null,
+                                ["modifiers", keyListener.modifier, "text", keyListener.text]);
+                            ORBEON.xforms.Server.fireEvents([event], false);
+                        }
+                    });
     				yuiKeyListener.enable();
-                    console.log("keylistener", keyData, observer);
                 }
             }
         }

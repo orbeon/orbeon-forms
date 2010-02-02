@@ -13,6 +13,10 @@
             </xforms:instance>
             <xforms:setvalue ev:event="reset-keypress" ref="."/>
         </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-keypress.js"/>
     </xhtml:head>
     <xhtml:body>
         <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="y">document</xforms:setvalue>
@@ -33,7 +37,7 @@
         </xhtml:div>
         <xforms:group>
             <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="u">div</xforms:setvalue>
-            <xforms:input ref=".">
+            <xforms:input ref="." id="input">
                 <xforms:label>Name</xforms:label>
             </xforms:input>
         </xforms:group>
@@ -41,6 +45,10 @@
             <xforms:label>Dialog with keylistener</xforms:label>
             <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="i">dialog1</xforms:setvalue>
             <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="j">dialog2</xforms:setvalue>
+            <xforms:trigger id="hide-dialog">
+                <xforms:label>Hide dialog</xforms:label>
+                <xxforms:hide ev:event="DOMActivate" dialog="dialog"/>
+            </xforms:trigger>
         </xxforms:dialog>
     </xhtml:body>
 </xhtml:html>

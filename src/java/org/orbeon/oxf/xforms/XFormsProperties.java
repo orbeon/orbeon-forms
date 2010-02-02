@@ -209,7 +209,7 @@ public class XFormsProperties {
             new PropertyDefinition(ENCRYPT_ITEM_VALUES_PROPERTY, true, false),
             new PropertyDefinition(OFFLINE_REPEAT_COUNT_PROPERTY, 4, false),
             new PropertyDefinition(FORWARD_SUBMISSION_HEADERS, DEFAULT_FORWARD_SUBMISSION_HEADERS, false),
-            new PropertyDefinition(ASYNC_SUBMISSION_POLL_DELAY, 30 * 1000, false), // 30 seconds
+            new PropertyDefinition(ASYNC_SUBMISSION_POLL_DELAY, 10 * 1000, false), // 10 seconds
 
             // Properties to propagate to the client
             new PropertyDefinition(NEW_XHTML_LAYOUT, false, true),

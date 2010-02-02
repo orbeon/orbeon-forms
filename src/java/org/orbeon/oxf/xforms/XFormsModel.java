@@ -19,7 +19,6 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
@@ -731,7 +730,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 // NOTE: Optimizing with include() for servlets has limitations, in particular
                 // the proper split between servlet path and path info is not done.
-                final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
                 final ExternalContext.Request request = externalContext.getRequest();
                 final boolean optimizeLocal =
                         !NetUtils.urlHasProtocol(instanceResourceHHRI)
@@ -776,7 +775,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("load", "loading instance into cache", "id", instanceStaticId, "URI", instanceSourceURI);
 
-            final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+            final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
             final ConnectionResult connectionResult = new Connection().open(externalContext,
                     indentedLogger, BaseSubmission.isLogBody(), Connection.Method.GET.name(), sourceURL, null, null, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));

@@ -205,8 +205,7 @@ public class XFormsUploadControl extends XFormsValueControl {
                     // Try to delete the file on exit and on session termination
                     {
                         newFile.deleteOnExit();
-                        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                        final ExternalContext.Session session = externalContext.getSession(false);
+                        final ExternalContext.Session session = XFormsUtils.getExternalContext(propertyContext).getSession(false);
                         if (session != null) {
                             session.addListener(new ExternalContext.Session.SessionListener() {
                                 public void sessionDestroyed() {

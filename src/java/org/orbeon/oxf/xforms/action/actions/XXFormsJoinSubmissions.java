@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 
@@ -25,7 +26,9 @@ public class XXFormsJoinSubmissions extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetEffectiveId,
                         XFormsEventObserver eventObserver, Element actionElement, XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        // Just process all background async submissions. The action will block until the method returns.
-        actionInterpreter.getContainingDocument().processBackgroundAsynchronousSubmissions(propertyContext);
+        // Process all pending async submissions. The action will block until the method returns.
+        final AsynchronousSubmissionManager asynchronousSubmissionManager = actionInterpreter.getContainingDocument().getAsynchronousSubmissionManager(false);
+        if (asynchronousSubmissionManager != null)
+            asynchronousSubmissionManager.processAllAsynchronousSubmissions(propertyContext);
     }
 }

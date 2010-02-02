@@ -13,18 +13,15 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -39,7 +36,7 @@ import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.state.XFormsState;
-import org.orbeon.oxf.xforms.submission.SubmissionResult;
+import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -50,7 +47,6 @@ import org.orbeon.saxon.value.SequenceExtent;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * Represents an XForms containing document.
@@ -95,6 +91,7 @@ public class XFormsContainingDocument extends XBLContainer {
         }
     }
 
+    private String uuid;
     private final IndentedLogger indentedLogger = getIndentedLogger(LOGGING_CATEGORY);
 
     // Global XForms function library
@@ -118,8 +115,6 @@ public class XFormsContainingDocument extends XBLContainer {
 
     // Client state
     private XFormsModelSubmission activeSubmission;
-    private List<AsynchronousSubmission> backgroundAsynchronousSubmissions;
-    private List<AsynchronousSubmission> foregroundAsynchronousSubmissions;
     private boolean gotSubmission;
     private boolean gotSubmissionSecondPass;
     private boolean gotSubmissionReplaceAll;
@@ -131,7 +126,6 @@ public class XFormsContainingDocument extends XBLContainer {
     private List<DelayedEvent> delayedEvents;
 
     private boolean goingOffline;
-//    private boolean goingOnline;  // never used at the moment
 
     /**
      * Return the global function library.
@@ -143,48 +137,51 @@ public class XFormsContainingDocument extends XBLContainer {
     /**
      * Create an XFormsContainingDocument from an XFormsEngineStaticState object.
      *
-     * @param pipelineContext           current pipeline context
+     * @param pipelineContext           current context
      * @param xformsStaticState         static state object
      * @param uriResolver               optional URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsStaticState xformsStaticState, XFormsURIResolver uriResolver) {
-
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null);
+
+        // Remember location data
         setLocationData(xformsStaticState.getLocationData());
 
-        indentedLogger.startHandleOperation("initialization", "creating new ContainingDocument (static state object provided).");
+        // Create UUID for this document instance
+        this.uuid = UUIDUtils.createPseudoUUID();
 
-        // Remember static state
-        this.xformsStaticState = xformsStaticState;
+        indentedLogger.startHandleOperation("initialization", "creating new ContainingDocument (static state object provided).", "uuid", this.uuid);
+        {
+            // Remember static state
+            this.xformsStaticState = xformsStaticState;
 
-        // Remember URI resolver for initialization
-        this.uriResolver = uriResolver;
-        this.isInitializing = true;
+            // Remember URI resolver for initialization
+            this.uriResolver = uriResolver;
+            this.isInitializing = true;
 
-        // Initialize the containing document
-        try {
-            initialize(pipelineContext);
-        } catch (Exception e) {
-            throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "initializing XForms containing document"));
+            // Initialize the containing document
+            try {
+                initialize(pipelineContext);
+            } catch (Exception e) {
+                throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "initializing XForms containing document"));
+            }
+
+            // Clear URI resolver, since it is of no use after initialization, and it may keep dangerous references (PipelineContext)
+            this.uriResolver = null;
+
+            // NOTE: we clear isInitializing when Ajax requests come in
         }
-
-        // Clear URI resolver, since it is of no use after initialization, and it may keep dangerous references (PipelineContext)
-        this.uriResolver = null;
-
-        // NOTE: we clear isInitializing when Ajax requests come in
-
         indentedLogger.endHandleOperation();
     }
 
     /**
      * Restore an XFormsContainingDocument from XFormsState and XFormsStaticState.
      *
-     * @param pipelineContext         current pipeline context
+     * @param pipelineContext         current context
      * @param xformsState             static and dynamic state information
      * @param xformsStaticState       static state object, or null if not available
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, XFormsStaticState xformsStaticState) {
-
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null);
 
         if (xformsStaticState != null) {
@@ -197,32 +194,31 @@ public class XFormsContainingDocument extends XBLContainer {
             indentedLogger.startHandleOperation("initialization", "restoring containing document (static state object not provided).");
             this.xformsStaticState = new XFormsStaticState(pipelineContext, xformsState.getStaticState());
         }
+        {
+            // Make sure there is location data
+            setLocationData(this.xformsStaticState.getLocationData());
 
-        // Make sure there is location data
-        setLocationData(this.xformsStaticState.getLocationData());
-
-        // Restore the containing document's dynamic state
-        final String encodedDynamicState = xformsState.getDynamicState();
-
-        try {
-            if (encodedDynamicState == null || encodedDynamicState.equals("")) {
-                // Just for tests, we allow the dynamic state to be empty
-                initialize(pipelineContext);
-            } else {
-                // Regular case
-                restoreDynamicState(pipelineContext, encodedDynamicState);
+            // Restore the containing document's dynamic state
+            final String encodedDynamicState = xformsState.getDynamicState();
+            try {
+                if (StringUtils.isEmpty(encodedDynamicState)) {
+                    // Just for tests, we allow the dynamic state to be empty
+                    initialize(pipelineContext);
+                } else {
+                    // Regular case
+                    restoreDynamicState(pipelineContext, encodedDynamicState);
+                }
+            } catch (Exception e) {
+                throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "re-initializing XForms containing document"));
             }
-        } catch (Exception e) {
-            throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "re-initializing XForms containing document"));
         }
-
         indentedLogger.endHandleOperation();
     }
 
     /**
      * Restore an XFormsContainingDocument from XFormsState only.
      *
-     * @param pipelineContext   current pipeline context
+     * @param pipelineContext   current context
      * @param xformsState       XFormsState containing static and dynamic state
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState) {
@@ -245,6 +241,10 @@ public class XFormsContainingDocument extends XBLContainer {
 
     public XFormsURIResolver getURIResolver() {
         return uriResolver;
+    }
+
+    public String getUUID() {
+        return uuid;
     }
 
     public boolean isInitializing() {
@@ -368,8 +368,6 @@ public class XFormsContainingDocument extends XBLContainer {
         this.gotSubmission = false;
         this.gotSubmissionSecondPass = false;
         this.gotSubmissionReplaceAll = false;
-        this.backgroundAsynchronousSubmissions = null;
-        this.foregroundAsynchronousSubmissions = null;
 
         this.messagesToRun = null;
         this.loadsToRun = null;
@@ -379,7 +377,6 @@ public class XFormsContainingDocument extends XBLContainer {
         this.delayedEvents = null;
 
         this.goingOffline = false;
-//        this.goingOnline = false;
     }
 
     /**
@@ -435,178 +432,6 @@ public class XFormsContainingDocument extends XBLContainer {
         return gotSubmissionReplaceAll;
     }
 
-    private static class AsynchronousSubmission {
-        public Future<SubmissionResult> future;
-        public String submissionEffectiveId;
-
-        public AsynchronousSubmission(Future<SubmissionResult> future, String submissionEffectiveId) {
-            this.future = future;
-            this.submissionEffectiveId = submissionEffectiveId;
-        }
-    }
-
-    // Global thread pool
-    private static ExecutorService threadPool = Executors.newCachedThreadPool();
-
-    // See http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/ExecutorCompletionService.html
-    private CompletionService<SubmissionResult> completionService = new ExecutorCompletionService<SubmissionResult>(threadPool);
-
-    public void addAsynchronousSubmission(final Callable<SubmissionResult> callable, String submissionEffectiveId, boolean isBackground) {
-
-        // Add submission future
-        if (isBackground) {
-            // Background async submission
-            final Future<SubmissionResult> future = completionService.submit(callable);
-
-            if (backgroundAsynchronousSubmissions == null)
-                backgroundAsynchronousSubmissions = new ArrayList<AsynchronousSubmission>();
-            backgroundAsynchronousSubmissions.add(new AsynchronousSubmission(future, submissionEffectiveId));
-        } else {
-            // Foreground async submission
-            final Future<SubmissionResult> future = new Future<SubmissionResult>() {
-
-                private boolean isDone;
-                private boolean isCanceled;
-
-                private SubmissionResult result;
-
-                public boolean cancel(boolean b) {
-                    if (isDone)
-                        return false;
-                    isCanceled = true;
-                    return true;
-                }
-
-                public boolean isCancelled() {
-                    return isCanceled;
-                }
-
-                public boolean isDone() {
-                    return isDone;
-                }
-
-                public SubmissionResult get() throws InterruptedException, ExecutionException {
-                    if (isCanceled)
-                        throw new CancellationException();
-
-                    if (!isDone) {
-                        try {
-                            result = callable.call();
-                        } catch (Exception e) {
-                            throw new ExecutionException(e);
-                        }
-
-                        isDone = true;
-                    }
-
-                    return result;
-                }
-
-                public SubmissionResult get(long l, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
-                    return get();
-                }
-            };
-
-            if (foregroundAsynchronousSubmissions == null)
-                foregroundAsynchronousSubmissions = new ArrayList<AsynchronousSubmission>();
-            foregroundAsynchronousSubmissions.add(new AsynchronousSubmission(future, submissionEffectiveId));
-
-            // NOTE: In this very basic level of support, we don't support
-            // xforms-submit-done / xforms-submit-error handlers
-
-            // TODO: Do something with result, e.g. log?
-            // final ConnectionResult connectionResult = ...
-        }
-    }
-
-    public boolean hasBackgroundAsynchronousSubmissions() {
-        return backgroundAsynchronousSubmissions != null && backgroundAsynchronousSubmissions.size() > 0;
-    }
-
-    private boolean hasForegroundAsynchronousSubmissions() {
-        return foregroundAsynchronousSubmissions != null && foregroundAsynchronousSubmissions.size() > 0;
-    }
-
-    public void processBackgroundAsynchronousSubmissions(PropertyContext propertyContext) {
-
-        // Processing a series of background asynchronous submission might in turn trigger the creation of new
-        // background asynchronous submissions. We need to process until no submissions are left.
-        while (hasBackgroundAsynchronousSubmissions())
-            processBackgroundAsynchronousSubmissionsBatch(propertyContext);
-    }
-
-    /**
-     * Process all current background submissions if any. Submissions are processed in the order in which they are made
-     * available upon termination by the completion service.
-     *
-     * @param propertyContext   current context
-     */
-    private void processBackgroundAsynchronousSubmissionsBatch(PropertyContext propertyContext) {
-
-        // Get then reset current batch list
-        final List<AsynchronousSubmission> submissionsToProcess = backgroundAsynchronousSubmissions;
-        backgroundAsynchronousSubmissions = null;
-
-        // NOTE: See http://wiki.orbeon.com/forms/projects/asynchronous-submissions
-
-        final IndentedLogger indentedLogger = getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
-        indentedLogger.startHandleOperation("", "processing background asynchronous submissions");
-        int count = 0;
-        try {
-            final int size = submissionsToProcess.size();
-            for (; count < size; count++) {
-                try {
-                    // Handle next completed task
-                    final SubmissionResult result = completionService.take().get();
-
-                    // Process response by dispatching an event to the submission
-                    final XFormsModelSubmission submission = (XFormsModelSubmission) getObjectByEffectiveId(result.getSubmissionEffectiveId());
-                    final XBLContainer container = submission.getXBLContainer(this);
-                    // NOTE: not clear whether we should use an event for this as there doesn't seem to be a benefit
-                    container.dispatchEvent(propertyContext, new XXFormsSubmitReplaceEvent(this, submission, result));
-
-                } catch (Throwable throwable) {
-                    // Something bad happened
-                    throw new OXFException(throwable);
-                }
-            }
-        } finally {
-            indentedLogger.endHandleOperation("count", Integer.toString(count));
-        }
-    }
-
-    /**
-     * Process all current foreground submissions if any. Submissions are processed in the order in which they were
-     * executed.
-     */
-    public void processForegroundAsynchronousSubmissions() {
-        // NOTE: See http://wiki.orbeon.com/forms/doc/developer-guide/asynchronous-submissions
-        if (hasForegroundAsynchronousSubmissions()) {
-            final IndentedLogger indentedLogger = getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
-            indentedLogger.startHandleOperation("", "processing foreground asynchronous submissions");
-            int count = 0;
-            try {
-                for (Iterator<AsynchronousSubmission> i = foregroundAsynchronousSubmissions.iterator(); i.hasNext(); count++) {
-                    final AsynchronousSubmission asyncSubmission = i.next();
-                    try {
-                        // Submission is run at this point
-                        asyncSubmission.future.get();
-
-                        // NOTE: We do not process the response at all
-
-                    } catch (Throwable throwable) {
-                        // Something happened but we swallow the exception and keep going
-                        indentedLogger.logError("", "asynchronous submission: throwable caught", throwable);
-                    }
-                    // Remove submission from list of submission so we can gc the Runnable
-                    i.remove();
-                }
-            } finally {
-                indentedLogger.endHandleOperation("count", Integer.toString(count));
-            }
-        }
-    }
-
     /**
      * Add an XForms message to send to the client.
      */
@@ -635,14 +460,17 @@ public class XFormsContainingDocument extends XBLContainer {
      * @param bubbles           whether the event bubbles
      * @param cancelable        whether the event is cancelable
      * @param delay             delay after which to dispatch the event
+     * @param isMaxDelay        whether the delay indicates a maximum delay
      * @param showProgress      whether to show the progress indicator when submitting the event
      * @param progressMessage   message to show if the progress indicator is visible
      */
-    public void addDelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, int delay, boolean showProgress, String progressMessage) {
+    public void addDelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, int delay,
+                                boolean isMaxDelay, boolean showProgress, String progressMessage) {
         if (delayedEvents == null)
             delayedEvents = new ArrayList<DelayedEvent>();
 
-        delayedEvents.add(new DelayedEvent(eventName, targetStaticId, bubbles, cancelable, System.currentTimeMillis() + delay, showProgress, progressMessage));
+        delayedEvents.add(new DelayedEvent(eventName, targetStaticId, bubbles, cancelable, System.currentTimeMillis() + delay,
+                isMaxDelay, showProgress, progressMessage));
     }
 
     public List<DelayedEvent> getDelayedEvents() {
@@ -650,20 +478,25 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     public static class DelayedEvent {
-        private String eventName;
-        private String targetStaticId;
-        private boolean bubbles;
-        private boolean cancelable;
-        private long time;
-        private boolean showProgress;
-        private String progressMessage;
+        // Event information
+        private final String eventName;
+        private final String targetStaticId;
+        private final boolean bubbles;
+        private final boolean cancelable;
+        // Meta information
+        private final long time;
+        private final boolean isMaxDelay;
+        private final boolean showProgress;
+        private final String progressMessage;
 
-        public DelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, long time, boolean showProgress, String progressMessage) {
+        public DelayedEvent(String eventName, String targetStaticId, boolean bubbles, boolean cancelable, long time,
+                            boolean isMaxDelay, boolean showProgress, String progressMessage) {
             this.eventName = eventName;
             this.targetStaticId = targetStaticId;
             this.bubbles = bubbles;
             this.cancelable = cancelable;
             this.time = time;
+            this.isMaxDelay = isMaxDelay;
             this.showProgress = showProgress;
             this.progressMessage = progressMessage;
         }
@@ -691,6 +524,10 @@ public class XFormsContainingDocument extends XBLContainer {
 
         public long getTime() {
             return time;
+        }
+
+        public boolean isMaxDelay() {
+            return isMaxDelay;
         }
     }
 
@@ -1187,7 +1024,7 @@ public class XFormsContainingDocument extends XBLContainer {
         if (XFormsEvents.XXFORMS_LOAD.equals(eventName)) {
             // Internal load event
             final XXFormsLoadEvent xxformsLoadEvent = (XXFormsLoadEvent) event;
-            final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+            final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
             try {
                 final String resource = xxformsLoadEvent.getResource();
 
@@ -1206,6 +1043,9 @@ public class XFormsContainingDocument extends XBLContainer {
             } catch (IOException e) {
                 throw new ValidationException(e, getLocationData());
             }
+        } else if (XFormsEvents.XXFORMS_POLL.equals(eventName)) {
+            // Poll event for submissions
+            // NOP, as we check for async submission in the client event loop
         } else if (XFormsEvents.XXFORMS_ONLINE.equals(eventName)) {
             // Internal event for going online
             goOnline(propertyContext);
@@ -1223,7 +1063,6 @@ public class XFormsContainingDocument extends XBLContainer {
             // TODO: Dispatch to children containers?
             dispatchEvent(propertyContext, new XXFormsOnlineEvent(this, currentModel));
         }
-//        this.goingOnline = true;
         this.goingOffline = false;
     }
 
@@ -1257,7 +1096,6 @@ public class XFormsContainingDocument extends XBLContainer {
             // TODO: Dispatch to children containers
             dispatchEvent(propertyContext, new XXFormsOfflineEvent(this, currentModel));
         }
-//        this.goingOnline = false;
         this.goingOffline = true;
     }
 
@@ -1268,12 +1106,12 @@ public class XFormsContainingDocument extends XBLContainer {
     /**
      * Create an encoded dynamic state that represents the dynamic state of this XFormsContainingDocument.
      *
-     * @param pipelineContext       current PipelineContext
-     * @param isForceEncryption      whether to force encryption or not
+     * @param propertyContext       current context
+     * @param isForceEncryption     whether to force encryption or not
      * @return                      encoded dynamic state
      */
-    public String createEncodedDynamicState(PipelineContext pipelineContext, boolean isForceEncryption) {
-        return XFormsUtils.encodeXML(pipelineContext, createDynamicStateDocument(),
+    public String createEncodedDynamicState(PropertyContext propertyContext, boolean isForceEncryption) {
+        return XFormsUtils.encodeXML(propertyContext, createDynamicStateDocument(),
             (isForceEncryption || XFormsProperties.isClientStateHandling(this)) ? XFormsProperties.getXFormsPassword() : null, false);
     }
 
@@ -1284,6 +1122,9 @@ public class XFormsContainingDocument extends XBLContainer {
         {
             dynamicStateDocument = Dom4jUtils.createDocument();
             final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
+            // Add UUID
+            dynamicStateElement.addAttribute("uuid", uuid);
+
             // Serialize instances
             {
                 final Element instancesElement = dynamicStateElement.addElement("instances");
@@ -1309,6 +1150,10 @@ public class XFormsContainingDocument extends XBLContainer {
 
         // Get dynamic state document
         final Document dynamicStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedDynamicState);
+
+        // Restore UUID
+        this.uuid = dynamicStateDocument.getRootElement().attributeValue("uuid");
+        indentedLogger.logDebug("initialization", "restoring UUID", "uuid", this.uuid);
 
         // Restore models state
         {
@@ -1353,7 +1198,7 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     private void initialize(PipelineContext pipelineContext) {
-        // This is called upon the first creation of the XForms engine only
+        // This is called upon the first creation of the XForms engine or for testing only
 
         // Create XForms controls and models
         createControlsAndModels(pipelineContext, true);
@@ -1362,15 +1207,43 @@ public class XFormsContainingDocument extends XBLContainer {
         // order to optimize events
         // Perform deferred updates only for xforms-ready
         startOutermostActionHandler();
+        {
+            // Initialize models
+            initializeModels(pipelineContext);
 
-        // Initialize models
-        initializeModels(pipelineContext);
+            // After initialization, some async submissions might be running
+            if (asynchronousSubmissionManager != null) {
+                // Process completed submissions
+                asynchronousSubmissionManager.processCompletedAsynchronousSubmissions(pipelineContext);
 
-        // Check for background asynchronous submissions
-        processBackgroundAsynchronousSubmissions(pipelineContext);
-
+                // Remember to send a poll event if needed
+                asynchronousSubmissionManager.addClientDelayEventIfNeeded(pipelineContext);
+            }
+        }
         // End deferred behavior
         endOutermostActionHandler(pipelineContext);
+    }
+
+    private AsynchronousSubmissionManager asynchronousSubmissionManager;
+
+    public AsynchronousSubmissionManager getAsynchronousSubmissionManager(boolean create) {
+        if (asynchronousSubmissionManager == null && create)
+            asynchronousSubmissionManager = new AsynchronousSubmissionManager(this);
+        return asynchronousSubmissionManager;
+    }
+
+    public void processCompletedAsynchronousSubmissions(PropertyContext propertyContext, boolean skipDeferredEventHandling, boolean addPollEvent) {
+        if (asynchronousSubmissionManager != null && asynchronousSubmissionManager.hasPendingAsynchronousSubmissions(propertyContext)) {
+            if (!skipDeferredEventHandling)
+                startOutermostActionHandler();
+            asynchronousSubmissionManager.processCompletedAsynchronousSubmissions(propertyContext);
+            if (!skipDeferredEventHandling)
+                endOutermostActionHandler(propertyContext);
+
+            // Remember to send a poll event if needed
+            if (addPollEvent)
+                asynchronousSubmissionManager.addClientDelayEventIfNeeded(propertyContext);
+        }
     }
 
     private void createControlsAndModels(PipelineContext pipelineContext, boolean isInitialization) {
@@ -1484,6 +1357,7 @@ public class XFormsContainingDocument extends XBLContainer {
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_LOAD);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_OFFLINE);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_ONLINE);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_POLL);
     }
 
     public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {

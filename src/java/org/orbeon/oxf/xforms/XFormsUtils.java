@@ -237,11 +237,11 @@ public class XFormsUtils {
         }
     }
 
-    public static String ensureEncrypted(PipelineContext pipelineContext, String encoded) {
+    public static String ensureEncrypted(PropertyContext propertyContext, String encoded) {
         if (encoded.startsWith("X3") || encoded.startsWith("X4")) {
             // Data is currently not encrypted, so encrypt it
-            final byte[] decodedValue = XFormsUtils.decodeBytes(pipelineContext, encoded, XFormsProperties.getXFormsPassword());
-            return XFormsUtils.encodeBytes(pipelineContext, decodedValue, XFormsProperties.getXFormsPassword());
+            final byte[] decodedValue = XFormsUtils.decodeBytes(propertyContext, encoded, XFormsProperties.getXFormsPassword());
+            return XFormsUtils.encodeBytes(propertyContext, decodedValue, XFormsProperties.getXFormsPassword());
         } else {
             // Data is already encrypted
             return encoded;
@@ -872,6 +872,16 @@ public class XFormsUtils {
     }
 
     /**
+     * Get the external context from the property context.
+     *
+     * @param propertyContext   current context
+     * @return                  external context if found, null otherwise
+     */
+    public static ExternalContext getExternalContext(PropertyContext propertyContext) {
+        return (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+    }
+
+    /**
      * Resolve a render URL including xml:base resolution.
      *
      * @param isPortletLoad         whether this is called within a portlet
@@ -883,7 +893,6 @@ public class XFormsUtils {
     public static String resolveRenderURL(boolean isPortletLoad, PropertyContext propertyContext, Element currentElement, String url) {
         final URI resolvedURI = resolveXMLBase(currentElement, url);
         final String resolvedURIString = resolvedURI.toString();
-        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
         final String externalURL;
         // NOTE: Keep in mind that this is going to run from within a servlet, as the XForms server
@@ -891,7 +900,7 @@ public class XFormsUtils {
         // TODO: is this the case with JSR-268? Don't/can't we run xforms-server in the portlet?
         if (!isPortletLoad) {
             // XForms page was loaded from a servlet
-            externalURL = externalContext.getResponse().rewriteRenderURL(resolvedURIString, null, null);
+            externalURL = XFormsUtils.getExternalContext(propertyContext).getResponse().rewriteRenderURL(resolvedURIString, null, null);
         } else {
             // XForms page was loaded from a portlet
             if (resolvedURI.getFragment() != null) {
@@ -922,8 +931,7 @@ public class XFormsUtils {
 
         final URI resolvedURI = resolveXMLBase(element, url);
 
-        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        return externalContext.getResponse().rewriteResourceURL(resolvedURI.toString(), rewriteMode);
+        return XFormsUtils.getExternalContext(propertyContext).getResponse().rewriteResourceURL(resolvedURI.toString(), rewriteMode);
     }
 
     /**
@@ -939,8 +947,7 @@ public class XFormsUtils {
 
         final URI resolvedURI = resolveXMLBase(element, url);
 
-        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        return externalContext.rewriteServiceURL(resolvedURI.toString(), rewriteMode == ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+        return XFormsUtils.getExternalContext(propertyContext).rewriteServiceURL(resolvedURI.toString(), rewriteMode == ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
     }
 
     /**

@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -84,6 +84,7 @@
     <property as="xs:boolean" name="oxf.xforms.local-submission-include"                    value="false"/>
     <property as="xs:boolean" name="oxf.xforms.local-instance-include"                      value="false"/>
     <property as="xs:string"  name="oxf.xforms.forward-submission-headers"                  value=""/>
+    <property as="xs:integer" name="oxf.xforms.submission-poll-delay"                       value="30000"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"                      value="true"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                            value="true"/>
     <property as="xs:boolean" name="oxf.xforms.gzip-state"                                  value="true"/>

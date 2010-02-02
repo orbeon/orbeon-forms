@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -63,6 +63,8 @@
                         <xsl:apply-templates select="context:decodeXML(normalize-space(.))"/>
                     </xsl:copy>
                 </xsl:template>
+                <!-- Filter out @uuid so that unit tests are reproducible -->
+                <xsl:template match="/dynamic-state/@uuid"/>
                 <xsl:template match="instances/instance">
                     <xsl:copy>
                         <xsl:copy-of select="@*"/>

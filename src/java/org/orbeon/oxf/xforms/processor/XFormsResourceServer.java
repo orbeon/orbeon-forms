@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -17,16 +17,13 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.io.*;
 import java.net.URI;
@@ -50,8 +47,8 @@ public class XFormsResourceServer extends ProcessorImpl {
         return XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
     }
 
-    public void start(PipelineContext pipelineContext) {
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+    public void start(PropertyContext propertyContext) {
+        final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
         final ExternalContext.Request request = externalContext.getRequest();
         final ExternalContext.Response response = externalContext.getResponse();
 
@@ -218,7 +215,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
                     if (XFormsProperties.isCacheCombinedResources()) {
                         // Caching requested
-                        final File resourceFile = cacheResources(indentedLogger, resources, pipelineContext, requestPath, combinedLastModified, isCSS, isMinimal);
+                        final File resourceFile = cacheResources(indentedLogger, resources, propertyContext, requestPath, combinedLastModified, isCSS, isMinimal);
                         if (resourceFile != null) {
                             // Caching could take place, send out cached result
                             if (isDebugEnabled)
@@ -231,13 +228,13 @@ public class XFormsResourceServer extends ProcessorImpl {
                             // Was unable to cache, just serve
                             if (isDebugEnabled)
                                 indentedLogger.logDebug("resources", "caching requested but not possible, serving directly", "request path", requestPath);
-                            generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
+                            generate(indentedLogger, resources, propertyContext, os, isCSS, isMinimal);
                         }
                     } else {
                         // Should not cache, just serve
                         if (isDebugEnabled)
                             indentedLogger.logDebug("resources", "caching not requested, serving directly", "request path", requestPath);
-                        generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
+                        generate(indentedLogger, resources, propertyContext, os, isCSS, isMinimal);
                     }
                 }
             } catch (OXFException e) {
@@ -278,7 +275,7 @@ public class XFormsResourceServer extends ProcessorImpl {
      *
      * @param indentedLogger        logger
      * @param resources             list of XFormsFeatures.ResourceConfig to consider
-     * @param pipelineContext       current PipelineContext (used for rewriting and matchers)
+     * @param propertyContext       current PipelineContext (used for rewriting and matchers)
      * @param resourcePath          path to store the cached resource to
      * @param combinedLastModified  last modification date of the resources to combine
      * @param isCSS                 whether to generate CSS or JavaScript resources
@@ -286,7 +283,7 @@ public class XFormsResourceServer extends ProcessorImpl {
      * @return                      File pointing to the generated resource, null if caching could not take place
      */
     public static File cacheResources(IndentedLogger indentedLogger, List<XFormsFeatures.ResourceConfig> resources,
-                                      PipelineContext pipelineContext, String resourcePath, long combinedLastModified,
+                                      PropertyContext propertyContext, String resourcePath, long combinedLastModified,
                                       boolean isCSS, boolean isMinimal) {
         try {
             final File resourceFile;
@@ -303,7 +300,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                         if (isDebugEnabled)
                             indentedLogger.logDebug("resources", "cached combined resources out of date, saving", "resource path", resourcePath);
                         final FileOutputStream fos = new FileOutputStream(resourceFile);
-                        generate(indentedLogger, resources, pipelineContext, fos, isCSS, isMinimal);
+                        generate(indentedLogger, resources, propertyContext, fos, isCSS, isMinimal);
                     } else {
                         if (isDebugEnabled)
                             indentedLogger.logDebug("resources", "cached combined resources exist and are up-to-date", "resource path", resourcePath);
@@ -315,7 +312,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     resourceFile.getParentFile().mkdirs();
                     resourceFile.createNewFile();
                     final FileOutputStream fos = new FileOutputStream(resourceFile);
-                    generate(indentedLogger, resources, pipelineContext, fos, isCSS, isMinimal);
+                    generate(indentedLogger, resources, propertyContext, fos, isCSS, isMinimal);
                 }
             } else {
                 if (isDebugEnabled)
@@ -333,18 +330,18 @@ public class XFormsResourceServer extends ProcessorImpl {
      *
      * @param indentedLogger        logger
      * @param resources             list of XFormsFeatures.ResourceConfig to consider
-     * @param pipelineContext       current PipelineContext (used for rewriting and matchers)
+     * @param propertyContext       current PipelineContext (used for rewriting and matchers)
      * @param os                    OutputStream to write to
      * @param isCSS                 whether to generate CSS or JavaScript resources
      * @param isMinimal             whether to use minimal resources
      * @throws URISyntaxException
      * @throws IOException
      */
-    private static void generate(IndentedLogger indentedLogger, List<XFormsFeatures.ResourceConfig> resources, PipelineContext pipelineContext, OutputStream os, boolean isCSS, boolean isMinimal) throws URISyntaxException, IOException {
+    private static void generate(IndentedLogger indentedLogger, List<XFormsFeatures.ResourceConfig> resources, PropertyContext propertyContext, OutputStream os, boolean isCSS, boolean isMinimal) throws URISyntaxException, IOException {
         if (isCSS) {
             // CSS: rewrite url() in content
 
-            final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+            final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
 
             final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
 

@@ -41,6 +41,7 @@ import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
+import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -106,10 +107,6 @@ public class XFormsServer extends ProcessorImpl {
 
     private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler) {
 
-        final Element filesElement;
-        final Element actionElement;
-        final List<Element> serverEventsElements;
-
         // Use request input provided by client
         final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
 
@@ -122,13 +119,13 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         // Get action
-        actionElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_ACTION_QNAME);
+        final Element actionElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_ACTION_QNAME);
 
         // Get files if any (those come from xforms-server-submit.xpl upon submission)
-        filesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_FILES_QNAME);
+        final Element filesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_FILES_QNAME);
 
         // Get server events if any
-        serverEventsElements = Dom4jUtils.elements(requestDocument.getRootElement(), XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
+        final List<Element> serverEventsElements = Dom4jUtils.elements(requestDocument.getRootElement(), XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
 
         // Get events requested by the client
         final List<Element> eventElements = new ArrayList<Element>();
@@ -151,7 +148,7 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         // Hit session if it exists (it's probably not even necessary to do so)
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
         final ExternalContext.Session session = externalContext.getSession(false);
 
         // Check for message where there is only the heartbeat event
@@ -306,26 +303,27 @@ public class XFormsServer extends ProcessorImpl {
                     // Iterate through events to:
                     // 1. Reorder events if needed for noscript mode
                     // 2. Detect whether we got xxforms-online
-                    boolean hasXXFormsOnline = processEventsForNoscript(eventElements, containingDocument, eventsIndentedLogger, isNoscript);
+                    boolean handleGoingOnline = processEventsForNoscript(eventElements, containingDocument, eventsIndentedLogger, isNoscript);
 
-                    // Start external events
-                    containingDocument.startExternalEventsSequence(pipelineContext, response, hasXXFormsOnline);
                     eventsIndentedLogger.startHandleOperation("", "handling external events");
+                    {
+                        // Start external events
+                        containingDocument.startExternalEventsSequence(pipelineContext, response, handleGoingOnline);
 
-                    // Dispatch everything
-                    allEvents = createAndDispatchEvents(pipelineContext, containingDocument, xformsDecodedInitialClientState,
-                            filesElement, eventElements, serverEventsCount, valueChangeControlIds, hasXXFormsOnline);
+                        // Process completed asynchronous submissions if any
+                        containingDocument.processCompletedAsynchronousSubmissions(pipelineContext, handleGoingOnline, false);
 
-                    // End external events
-                    containingDocument.endExternalEventsSequence(pipelineContext, hasXXFormsOnline);
-                    eventsIndentedLogger.endHandleOperation();
+                        // Dispatch everything
+                        allEvents = createAndDispatchEvents(pipelineContext, containingDocument, xformsDecodedInitialClientState,
+                                filesElement, eventElements, serverEventsCount, valueChangeControlIds, handleGoingOnline);
 
-                    // Check for background asynchronous submissions
-                    if (containingDocument.hasBackgroundAsynchronousSubmissions()) {
-                        containingDocument.startOutermostActionHandler();
-                        containingDocument.processBackgroundAsynchronousSubmissions(pipelineContext);
-                        containingDocument.endOutermostActionHandler(pipelineContext);
+                        // Process completed asynchronous submissions if any
+                        containingDocument.processCompletedAsynchronousSubmissions(pipelineContext, handleGoingOnline, true);
+
+                        // End external events
+                        containingDocument.endExternalEventsSequence(pipelineContext, handleGoingOnline);
                     }
+                    eventsIndentedLogger.endHandleOperation();
                 } else {
                     allEvents = false;
                 }
@@ -362,8 +360,10 @@ public class XFormsServer extends ProcessorImpl {
                         indentedLogger.endHandleOperation();
                     }
 
-                    // Process asynchronous submissions if any
-                    containingDocument.processForegroundAsynchronousSubmissions();
+                    // Process foreground asynchronous submissions if any
+                    final AsynchronousSubmissionManager asynchronousSubmissionManager = containingDocument.getAsynchronousSubmissionManager(false);
+                    if (asynchronousSubmissionManager != null)
+                        asynchronousSubmissionManager.processForegroundAsynchronousSubmissions();
                 } else {
                     // This is the second pass of a submission with replace="all". We make it so that the document is
                     // not modified. However, we must then return it to its pool.
@@ -395,7 +395,7 @@ public class XFormsServer extends ProcessorImpl {
 
     private boolean createAndDispatchEvents(PipelineContext pipelineContext, XFormsContainingDocument containingDocument,
                            XFormsStateManager.XFormsDecodedClientState xformsDecodedInitialClientState, Element filesElement,
-                           List<Element> eventElements, int serverEventsCount, Set<String> valueChangeControlIds, boolean hasXXFormsOnline) {
+                           List<Element> eventElements, int serverEventsCount, Set<String> valueChangeControlIds, boolean handleGoingOnline) {
 
         // NOTE: We store here the last xxforms-value-change-with-focus-change event so
         // we can coalesce values in case several such events are sent for the same
@@ -502,7 +502,7 @@ public class XFormsServer extends ProcessorImpl {
 
         // Iterate and dispatch the events
         for (XFormsEvent event: events) {
-            containingDocument.handleExternalEvent(pipelineContext, event, hasXXFormsOnline);
+            containingDocument.handleExternalEvent(pipelineContext, event, handleGoingOnline);
         }
 
         return hasAllEvents;
@@ -898,7 +898,7 @@ public class XFormsServer extends ProcessorImpl {
                         for (XFormsContainingDocument.DelayedEvent delayedEvent: delayedEvents) {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events",
                                     new String[] {
-                                            "delay",  Long.toString(delayedEvent.getTime() - currentTime),
+                                            delayedEvent.isMaxDelay() ? "max-delay" : "delay", Long.toString(delayedEvent.getTime() - currentTime),
                                             "show-progress", Boolean.toString(delayedEvent.isShowProgress()),
                                             "progress-message", delayedEvent.isShowProgress() ? delayedEvent.getProgressMessage() : null
                                     });

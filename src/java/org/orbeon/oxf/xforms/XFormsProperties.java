@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -114,6 +114,8 @@ public class XFormsProperties {
     public static final String FORWARD_SUBMISSION_HEADERS = "forward-submission-headers";
     public static final String DEFAULT_FORWARD_SUBMISSION_HEADERS = "Authorization";
 
+    private static final String ASYNC_SUBMISSION_POLL_DELAY = "submission-poll-delay";
+
     private static final String COMPUTED_BINDS_PROPERTY = "computed-binds";
     public static final String COMPUTED_BINDS_RECALCULATE_VALUE = "recalculate";
     public static final String COMPUTED_BINDS_REVALIDATE_VALUE = "revalidate";
@@ -207,6 +209,7 @@ public class XFormsProperties {
             new PropertyDefinition(ENCRYPT_ITEM_VALUES_PROPERTY, true, false),
             new PropertyDefinition(OFFLINE_REPEAT_COUNT_PROPERTY, 4, false),
             new PropertyDefinition(FORWARD_SUBMISSION_HEADERS, DEFAULT_FORWARD_SUBMISSION_HEADERS, false),
+            new PropertyDefinition(ASYNC_SUBMISSION_POLL_DELAY, 30 * 1000, false), // 30 seconds
 
             // Properties to propagate to the client
             new PropertyDefinition(NEW_XHTML_LAYOUT, false, true),
@@ -565,6 +568,10 @@ public class XFormsProperties {
             return result;
         else
             return Connection.getForwardHeaders();
+    }
+
+    public static int getSubmissionPollDelay(XFormsContainingDocument containingDocument) {
+        return getIntegerProperty(containingDocument, ASYNC_SUBMISSION_POLL_DELAY);
     }
 
     public static String getDatePicker(XFormsContainingDocument containingDocument) {

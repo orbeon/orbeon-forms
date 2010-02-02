@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -193,7 +193,7 @@ public class CacheableSubmission extends BaseSubmission {
 
             // Submit the callable
             // This returns null if the execution is asynchronous
-            return submitCallable(p, p2, callable);
+            return submitCallable(propertyContext, p, p2, callable);
         }
     }
 

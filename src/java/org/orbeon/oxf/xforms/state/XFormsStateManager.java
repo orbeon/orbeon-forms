@@ -16,9 +16,9 @@ package org.orbeon.oxf.xforms.state;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -182,14 +182,14 @@ public class XFormsStateManager {
     /**
      * Decode static and dynamic state strings coming from the client.
      *
-     * @param pipelineContext       pipeline context
+     * @param propertyContext       current context
      * @param staticStateString     static state string as sent by client
      * @param dynamicStateString    dynamic state string as sent by client
      * @return                      decoded state
      */
-    public static XFormsDecodedClientState decodeClientState(PipelineContext pipelineContext, String staticStateString, String dynamicStateString) {
+    public static XFormsDecodedClientState decodeClientState(PropertyContext propertyContext, String staticStateString, String dynamicStateString) {
 
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
 
         final XFormsDecodedClientState xformsDecodedClientState;
         if (staticStateString.length() > PREFIX_COLON_POSITION && staticStateString.charAt(PREFIX_COLON_POSITION) == ':') {
@@ -271,11 +271,11 @@ public class XFormsStateManager {
      * doesn't attempt to cache the containing document.
      *
      * @param containingDocument        containing document
-     * @param pipelineContext           pipeline context
+     * @param propertyContext           current context
      * @param xformsDecodedClientState  decoded state as received in Ajax request
      * @return                          XFormsState serialized and encrypted
      */
-    public static XFormsState getEncryptedSerializedClientState(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, XFormsDecodedClientState xformsDecodedClientState) {
+    public static XFormsState getEncryptedSerializedClientState(XFormsContainingDocument containingDocument, PropertyContext propertyContext, XFormsDecodedClientState xformsDecodedClientState) {
 
         // Create encoded static state and make sure encryption is used
         final String newEncodedStaticState;
@@ -283,7 +283,7 @@ public class XFormsStateManager {
             final long startTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
 
             final String encodedStaticState = xformsDecodedClientState.getXFormsState().getStaticState();
-            newEncodedStaticState = XFormsUtils.ensureEncrypted(pipelineContext, encodedStaticState);
+            newEncodedStaticState = XFormsUtils.ensureEncrypted(propertyContext, encodedStaticState);
 
             if (indentedLogger.isDebugEnabled()) {
                 final long elapsedTime = System.currentTimeMillis() - startTime;
@@ -295,7 +295,7 @@ public class XFormsStateManager {
         final String newEncodedDynamicState;
         {
             final long startTime = indentedLogger.isDebugEnabled() ? System.currentTimeMillis() : 0;
-            newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext, true);
+            newEncodedDynamicState = containingDocument.createEncodedDynamicState(propertyContext, true);
             if (indentedLogger.isDebugEnabled()) {
                 final long elapsedTime = System.currentTimeMillis() - startTime;
                 indentedLogger.logDebug(LOG_TYPE, "encoded dynamic state", "time", Long.toString(elapsedTime));
@@ -310,15 +310,15 @@ public class XFormsStateManager {
      * Get the encoded XForms state as it must be sent to the client within an Ajax response.
      *
      * @param containingDocument        containing document
-     * @param pipelineContext           pipeline context
+     * @param propertyContext           current context
      * @param xformsDecodedClientState  decoded state as received in Ajax request
      * @param isAllEvents               whether this is a special "all events" request
      * @return                          XFormsState containing the encoded static and dynamic states
      */
-    public static XFormsState getEncodedClientStateDoCache(XFormsContainingDocument containingDocument, PipelineContext pipelineContext,
+    public static XFormsState getEncodedClientStateDoCache(XFormsContainingDocument containingDocument, PropertyContext propertyContext,
                                                     XFormsDecodedClientState xformsDecodedClientState, boolean isAllEvents) {
 
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
 
         // Compute static state and dynamic state
         final String staticStateString;
@@ -345,7 +345,7 @@ public class XFormsStateManager {
                 staticStateString = xformsDecodedClientState.getIncomingStaticStateEncoded(containingDocument, currentPageGenerationId);
 
                 // Create and encode dynamic state (encoded static state is reused)
-                final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext, false);
+                final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(propertyContext, false);
                 newXFormsState = new XFormsState(xformsDecodedClientState.getXFormsState().getStaticState(), newEncodedDynamicState);
 
                 if (!XFormsProperties.isClientStateHandling(containingDocument)) {
@@ -400,7 +400,7 @@ public class XFormsStateManager {
 
             // Cache document if requested and possible
             if (XFormsProperties.isCacheDocument()) {
-                XFormsDocumentCache.instance().add(pipelineContext, newXFormsState, containingDocument);
+                XFormsDocumentCache.instance().add(propertyContext, newXFormsState, containingDocument);
             }
         }
 

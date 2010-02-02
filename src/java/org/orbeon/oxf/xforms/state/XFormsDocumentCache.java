@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -21,6 +21,7 @@ import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.SoftReferenceObjectPool;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -51,18 +52,18 @@ public class XFormsDocumentCache {
         return instance;
     }
 
-    public synchronized void add(PipelineContext pipelineContext, XFormsState xformsState, XFormsContainingDocument containingDocument) {
+    public synchronized void add(PropertyContext propertyContext, XFormsState xformsState, XFormsContainingDocument containingDocument) {
 
         final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME, XFORMS_DOCUMENT_CACHE_DEFAULT_SIZE);
         // NOTE: For special Ajax test, key by static state only
         final String cacheKeyString = XFormsProperties.isAjaxTest() ? xformsState.getStaticState() : xformsState.toString();
 
         final InternalCacheKey cacheKey = new InternalCacheKey(CONTAINING_DOCUMENT_KEY_TYPE, cacheKeyString);
-        ObjectPool destinationPool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
+        ObjectPool destinationPool = (ObjectPool) cache.findValid(propertyContext, cacheKey, CONSTANT_VALIDITY);
         if (destinationPool == null) {
             // The pool is not in cache
             destinationPool = createXFormsContainingDocumentPool(xformsState);
-            cache.add(pipelineContext, cacheKey, CONSTANT_VALIDITY, destinationPool);
+            cache.add(propertyContext, cacheKey, CONSTANT_VALIDITY, destinationPool);
             XFormsStateManager.getIndentedLogger().logDebug(LOG_TYPE, "add: did not find document pool in cache; creating new pool and returning document to it");
         } else {
             // Pool is already in cache

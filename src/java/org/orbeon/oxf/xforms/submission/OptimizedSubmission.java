@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -54,7 +54,7 @@ public class OptimizedSubmission extends BaseSubmission {
     public boolean isMatch(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
-        final ExternalContext.Request request = getExternalContext(propertyContext).getRequest();
+        final ExternalContext.Request request = XFormsUtils.getExternalContext(propertyContext).getRequest();
         final IndentedLogger indentedLogger = getDetailsLogger(p, p2);
 
         final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
@@ -171,7 +171,7 @@ public class OptimizedSubmission extends BaseSubmission {
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(propertyContext, p.contextStack);
 
         final ConnectionResult connectionResult
-                = openOptimizedConnection(propertyContext, getExternalContext(propertyContext),
+                = openOptimizedConnection(propertyContext, XFormsUtils.getExternalContext(propertyContext),
                 containingDocument, getDetailsLogger(p, p2), p.isDeferredSubmissionSecondPassReplaceAll ? null : submission,
                 p.actualHttpMethod, resolvedURI.toString(), submission.isURLNorewrite(), sp.actualRequestMediatype, sp.messageBody,
                 sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues);

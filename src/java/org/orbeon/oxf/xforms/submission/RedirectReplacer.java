@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.io.IOException;
 
@@ -38,8 +38,7 @@ public class RedirectReplacer extends BaseReplacer {
 
     public Runnable replace(PropertyContext propertyContext, ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) throws IOException {
 
-        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        final ExternalContext.Response response = externalContext.getResponse();
+        final ExternalContext.Response response = XFormsUtils.getExternalContext(propertyContext).getResponse();
 
         // Forward headers to response
         connectionResult.forwardHeaders(response);

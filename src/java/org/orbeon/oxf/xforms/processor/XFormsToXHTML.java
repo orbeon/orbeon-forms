@@ -33,6 +33,7 @@ import org.orbeon.oxf.xforms.processor.handlers.*;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
+import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.xml.sax.ContentHandler;
@@ -89,8 +90,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             public KeyValidity getLocalKeyValidity(PipelineContext pipelineContext, URIReferences uriReferences) {
                 if (ALLOW_CACHING_OUTPUT) {
                     // Use the container namespace as a dependency
-                    final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                    final String containerNamespace = externalContext.getRequest().getContainerNamespace();
+                    final String containerNamespace = XFormsUtils.getExternalContext(pipelineContext).getRequest().getContainerNamespace();
 
                     return new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, NAMESPACE_CACHE_KEY, containerNamespace), CONSTANT_VALIDITY);
                 } else {
@@ -109,7 +109,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler, final URIProcessorOutputImpl processorOutput, String outputName) {
 
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
         final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsToXHTML.logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
 
         // ContainingDocument and XFormsState created below
@@ -403,10 +403,12 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Process the entire input
             annotatedDocument.replay(new ExceptionWrapperContentHandler(controller, "converting XHTML+XForms document to XHTML"));
 
-            // Process asynchronous submissions
+            // Process foreground asynchronous submissions
             // NOTE: Given the complexity of the epilogue, this could cause the page to stop loading until all submissions
-            // are processed.
-            containingDocument.processForegroundAsynchronousSubmissions();
+            // are processed, even though that is not meant to happen.
+            final AsynchronousSubmissionManager asynchronousSubmissionManager = containingDocument.getAsynchronousSubmissionManager(false);
+            if (asynchronousSubmissionManager != null)
+                asynchronousSubmissionManager.processForegroundAsynchronousSubmissions();
         }
     }
 

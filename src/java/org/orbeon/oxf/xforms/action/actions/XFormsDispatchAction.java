@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -133,7 +133,7 @@ public class XFormsDispatchAction extends XFormsAction {
                 progressMessage = null;
             }
 
-            containingDocument.addDelayedEvent(resolvedNewEventName, resolvedNewEventTargetStaticId, newEventBubbles, newEventCancelable, resolvedDelay, showProgress, progressMessage);
+            containingDocument.addDelayedEvent(resolvedNewEventName, resolvedNewEventTargetStaticId, newEventBubbles, newEventCancelable, resolvedDelay, false, showProgress, progressMessage);
         }
     }
 }

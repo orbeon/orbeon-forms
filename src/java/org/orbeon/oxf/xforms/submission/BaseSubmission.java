@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.submission;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
@@ -38,10 +37,6 @@ public abstract class BaseSubmission implements Submission {
     protected BaseSubmission(XFormsModelSubmission submission) {
         this.submission = submission;
         this.containingDocument = submission.getContainingDocument();
-    }
-
-    protected ExternalContext getExternalContext(PropertyContext propertyContext) {
-        return (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
     }
 
     protected String getAbsoluteSubmissionURL(PropertyContext propertyContext, String resolvedActionOrResource, String queryString) {
@@ -186,13 +181,17 @@ public abstract class BaseSubmission implements Submission {
     /**
      * Submit the Callable for synchronous or asynchronous execution.
      *
-     * @param p         parameters
-     * @param p2        parameters
-     * @param callable  callable performing the submission
+     * @param propertyContext   current context
+     * @param p                 parameters
+     * @param p2                parameters
+     * @param callable          callable performing the submission
      * @return ConnectionResult or null if asynchronous
      * @throws Exception
      */
-    protected SubmissionResult submitCallable(XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2, final Callable<SubmissionResult> callable) throws Exception {
+    protected SubmissionResult submitCallable(final PropertyContext propertyContext,
+                                              final XFormsModelSubmission.SubmissionParameters p,
+                                              final XFormsModelSubmission.SecondPassParameters p2,
+                                              final Callable<SubmissionResult> callable) throws Exception {
         if (p2.isAsynchronous) {
 
             // This is probably a temporary setting: we run replace="none" in the foreground later, and
@@ -200,7 +199,7 @@ public abstract class BaseSubmission implements Submission {
             final boolean isRunInBackground = !p.isReplaceNone;
 
             // Tell XFCD that we have one more async submission
-            containingDocument.addAsynchronousSubmission(callable, submission.getEffectiveId(), isRunInBackground);
+            containingDocument.getAsynchronousSubmissionManager(true).addAsynchronousSubmission(propertyContext, callable, isRunInBackground);
 
             // Tell caller he doesn't need to do anything
             return null;

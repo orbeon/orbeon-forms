@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -48,7 +49,7 @@ public class RegularSubmission extends BaseSubmission {
     public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
 
-        final ExternalContext externalContext = getExternalContext(propertyContext);
+        final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
         final URL absoluteResolvedURL;
         try {
             absoluteResolvedURL = URLFactory.createURL(getAbsoluteSubmissionURL(propertyContext, p2.actionOrResource, sp.queryString));
@@ -124,6 +125,6 @@ public class RegularSubmission extends BaseSubmission {
 
         // Submit the callable
         // This returns null if the execution is asynchronous
-        return submitCallable(p, p2, callable);
+        return submitCallable(propertyContext, p, p2, callable);
     }
 }

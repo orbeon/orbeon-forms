@@ -295,8 +295,10 @@
                             <!-- If discardable="true", the client can discard the event if another Ajax request is sent before the delay expires -->
                             <optional>
                                 <attribute name="discardable">
-                                    <value>true</value>
-                                    <value>false</value>
+                                    <choice>
+                                        <value>true</value>
+                                        <value>false</value>
+                                    </choice>
                                 </attribute>
                             </optional>
                             <optional>

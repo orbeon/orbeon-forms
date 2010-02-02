@@ -26,6 +26,10 @@
                 <xforms:label>Reset keypress</xforms:label>
                 <xforms:setvalue ev:event="DOMActivate" ref="."/>
             </xforms:trigger>
+            <xforms:trigger id="show-dialog">
+                <xforms:label>Show dialog</xforms:label>
+                <xxforms:show ev:event="DOMActivate" dialog="dialog"/>
+            </xforms:trigger>
         </xhtml:div>
         <xforms:group>
             <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="u">div</xforms:setvalue>
@@ -33,9 +37,10 @@
                 <xforms:label>Name</xforms:label>
             </xforms:input>
         </xforms:group>
-        <xxforms:dialog>
+        <xxforms:dialog id="dialog">
             <xforms:label>Dialog with keylistener</xforms:label>
-            <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="i">dialog</xforms:setvalue>
+            <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="i">dialog1</xforms:setvalue>
+            <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="j">dialog2</xforms:setvalue>
         </xxforms:dialog>
     </xhtml:body>
 </xhtml:html>

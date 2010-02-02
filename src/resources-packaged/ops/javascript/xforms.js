@@ -4845,7 +4845,8 @@ ORBEON.xforms.Init = {
                     // When listening on events from the document, the server gives us the id of the form
                     keyListener.observerElement = YAHOO.util.Dom.get(keyListener.observer);
                     keyListener.isDocumentListener = YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-form");
-                    if (keyListener.isDocumentListener) keyListener.observerElement = document;
+                    keyListener.isDialogListener = YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-dialog");
+                    if (keyListener.isDocumentListener || keyListener.isDialogListener) keyListener.observerElement = document;
 
                     // Save current form, which we'll need when creating an event
                     keyListener.form = form;
@@ -4867,7 +4868,7 @@ ORBEON.xforms.Init = {
                     for (var textIndex = 0; textIndex < text.length; textIndex++)
                         keyData["keys"].push(text.charCodeAt(textIndex));
 
-                    // Register YUI listener
+                    // Create YUI listener
                     var yuiKeyListener = new YAHOO.util.KeyListener(keyListener.observerElement, keyData, {
                         scope: keyListener,
                         correctScope: false,
@@ -4879,7 +4880,17 @@ ORBEON.xforms.Init = {
                             ORBEON.xforms.Server.fireEvents([event], false);
                         }
                     });
-    				yuiKeyListener.enable();
+
+                    // Register listener on dialog or enable
+                    if (keyListener.isDialogListener) {
+                        var yuiDialog = ORBEON.xforms.Globals.dialogs[keyListener.observer];
+                        var dialogKeyListeners = yuiDialog.cfg.getProperty("keylisteners");
+                        if (YAHOO.lang.isUndefined(dialogKeyListeners)) dialogKeyListeners = [];
+                        dialogKeyListeners.push(yuiKeyListener);
+                        yuiDialog.cfg.setProperty("keylisteners", dialogKeyListeners);
+                    } else {
+        				yuiKeyListener.enable();
+                    }
                 }
             }
         }

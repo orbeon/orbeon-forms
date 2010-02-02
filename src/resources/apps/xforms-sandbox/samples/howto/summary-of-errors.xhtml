@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Summary of errors</xhtml:title>
+        <xforms:model>
+            
+            <!-- Instance with the sub-documents -->
+            <xforms:instance id="employees">
+                <employees>
+                    <employee id="1">
+                        <first-name>Jason</first-name>
+                        <last-name>Mraz</last-name>
+                        <expenses>9000</expenses>
+                    </employee>
+                    <employee id="2">
+                        <first-name>Lady</first-name>
+                        <last-name>Gaga</last-name>
+                        <expenses>50000</expenses>
+                    </employee>
+                    <employee id="3">
+                        <first-name>Boyoncé</first-name>
+                        <last-name/>
+                        <expenses>20000</expenses>
+                    </employee>
+                </employees>
+            </xforms:instance>
+            
+            <xforms:instance id="ui">
+                <ui>
+                    <current-employee/>
+                </ui>
+            </xforms:instance>
+            
+            <!-- Validation rules  -->
+            <xforms:bind nodeset="employee">
+                <xforms:bind nodeset="first-name, last-name" required="true()"/>
+                <xforms:bind nodeset="expenses" constraint=". castable as xs:integer and xs:integer(.) lt 25000"/>
+            </xforms:bind>
+            
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-repeat-selected-item-1 { background-color: transparent }
+            .xforms-label { display: block; margin-top: 1em; }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        
+        <!-- Summary of errors; the magic is done by the xxforms:valid() function -->
+        <xhtml:ul>
+            <xforms:repeat nodeset="employee[not(xxforms:valid(., true()))]">
+                <xhtml:li>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>Correct errors for employee <xforms:output value="@id"/></xforms:label>
+                        <xforms:setvalue ev:event="DOMActivate" ref="instance('ui')/current-employee" value="context()/@id"/>
+                    </xforms:trigger>
+                </xhtml:li>
+            </xforms:repeat>
+        </xhtml:ul>
+        
+        <!-- Show current employee -->
+        <xforms:group ref="employee[@id = instance('ui')/current-employee]">
+            <xforms:input ref="first-name">
+                <xforms:label>First name</xforms:label>
+                <xforms:alert>First name is mandatory</xforms:alert>
+            </xforms:input>
+            <xforms:input ref="last-name">
+                <xforms:label>Last name</xforms:label>
+                <xforms:alert>Last name is mandatory</xforms:alert>
+            </xforms:input>
+            <xforms:input ref="expenses">
+                <xforms:label>Expenses</xforms:label>
+                <xforms:alert>Expenses cannot be over $25,000</xforms:alert>
+            </xforms:input>
+        </xforms:group>
+        
+    </xhtml:body>
+</xhtml:html>

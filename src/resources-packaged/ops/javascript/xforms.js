@@ -4875,8 +4875,14 @@ ORBEON.xforms.Init = {
                         fn: function(event, event, keyListener) {
                             // YUI doesn't give us the target of the event, so we provide the observer as the target to the server
                             var targetId = keyListener.isDocumentListener ? "#document" : keyListener.observer;
-                            var event = new ORBEON.xforms.Server.Event(keyListener.form, targetId, null, null, "keypress", null, null, null, null, null,
-                                ["modifiers", keyListener.modifier, "text", keyListener.text]);
+                            var additionalAttributes = ["text", keyListener.text];
+                            if (! YAHOO.lang.isUndefined(keyListener.modifier)) {
+                                console.log("keyListener.modifier", keyListener.modifier);
+                                additionalAttributes.push("modifiers");
+                                additionalAttributes.push(keyListener.modifier);
+                            }
+                            var event = new ORBEON.xforms.Server.Event(keyListener.form, targetId, null, null, "keypress",
+                                null, null, null, null, null, additionalAttributes);
                             ORBEON.xforms.Server.fireEvents([event], false);
                         }
                     });

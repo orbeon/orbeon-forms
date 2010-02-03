@@ -113,9 +113,11 @@
                                 <attribute name="source-control-id">
                                     <data type="string"/>
                                 </attribute>
-                                <attribute name="modifiers">
-                                    <data type="string"/>
-                                </attribute>
+                                <optional>
+                                    <attribute name="modifiers">
+                                        <data type="string"/>
+                                    </attribute>
+                                </optional>
                                 <attribute name="text">
                                     <data type="string"/>
                                 </attribute>

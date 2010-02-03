@@ -589,7 +589,7 @@ ORBEON.widgets.datatable.colResizer = function (index, th, datatable) {
     this.resizer.style.right = '0pt';
     this.resizer.style.top = 'auto';
     this.resizer.style.bottom = '0pt';
-    this.resizer.style.height = '25px';
+    this.resizer.style.height = datatable.headerHeight + 'px';
 
 
     this.init(this.resizer, this.resizer, {

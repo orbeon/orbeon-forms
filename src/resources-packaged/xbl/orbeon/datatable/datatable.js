@@ -91,7 +91,11 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 
     // See how big the table would be without its size restriction
     if (this.scrollH) {
-        YAHOO.util.Dom.setStyle(this.table, 'width', 'auto');
+        if (this.innerTableWidth != null) {
+            YAHOO.util.Dom.setStyle(this.table, 'width', this.innerTableWidth);
+        } else {
+            YAHOO.util.Dom.setStyle(this.table, 'width', 'auto');
+        }
     }
     if (this.scrollV) {
         YAHOO.util.Dom.setStyle(this.table, 'height', 'auto');
@@ -102,13 +106,13 @@ ORBEON.widgets.datatable.prototype.finish = function () {
         this.tableWidth = pxWidth;
     }
     this.tableHeight = this.table.clientHeight;
+    this.headerHeight = this.thead.rows[0].clientHeight;
     if (this.scrollH) {
         if (pxWidth > this.tableWidth) {
             // Can be the case if table width was expressed as %
             this.tableWidth = pxWidth;
         }
         if (this.innerTableWidth != null) {
-            YAHOO.util.Dom.setStyle(this.table, 'width', this.innerTableWidth);
             this.tableWidth = this.table.clientWidth;
         } else {
             var minWidth;
@@ -151,7 +155,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
     // Resize the header container
     //YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
     if (this.height != 'auto' && this.headBodySplit) {
-        YAHOO.util.Dom.setStyle(this.headerContainer, 'height', this.thead.rows[0].clientHeight + 'px');
+        YAHOO.util.Dom.setStyle(this.headerContainer, 'height', this.headerHeight + 'px');
     } else if (! this.headBodySplit && this.height == 'auto') {
         //	YAHOO.util.Dom.setStyle(this.headerContainer, 'border', '1px solid #7F7F7F')
     }
@@ -204,7 +208,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 
         // Do more resizing
         if (this.height != 'auto') {
-            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.container.clientHeight - this.thead.rows[0].clientHeight - 5) + 'px');
+            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.container.clientHeight - this.headerHeight - 5) + 'px');
         }
 
         // And more assembly

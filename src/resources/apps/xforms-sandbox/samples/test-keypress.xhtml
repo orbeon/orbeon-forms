@@ -19,7 +19,7 @@
         <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-keypress.js"/>
     </xhtml:head>
     <xhtml:body>
-        <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="y">document</xforms:setvalue>
+        <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control Shift" xxforms:text="y">document</xforms:setvalue>
         <xhtml:div>
             <xforms:output value="." id="keypress">
                 <xforms:label>Keypress: </xforms:label>
@@ -44,7 +44,7 @@
         <xxforms:dialog id="dialog">
             <xforms:label>Dialog with keylistener</xforms:label>
             <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="i">dialog1</xforms:setvalue>
-            <xforms:setvalue ev:event="keypress" xxforms:modifiers="Control" xxforms:text="j">dialog2</xforms:setvalue>
+            <xforms:setvalue ev:event="keypress" xxforms:text="j">dialog2</xforms:setvalue>
             <xforms:trigger id="hide-dialog">
                 <xforms:label>Hide dialog</xforms:label>
                 <xxforms:hide ev:event="DOMActivate" dialog="dialog"/>

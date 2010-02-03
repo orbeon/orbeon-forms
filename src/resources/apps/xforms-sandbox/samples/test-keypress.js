@@ -40,7 +40,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 }, function() {
                     YAHOO.util.Assert.areEqual("dialog1", ORBEON.xforms.Document.getValue("keypress"));
                     ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                        YAHOO.util.UserAction.keydown(document, { keyCode: "J".charCodeAt(0), ctrlKey: true });
+                        YAHOO.util.UserAction.keydown(document, { keyCode: "J".charCodeAt(0) });
                     }, function() {
                         YAHOO.util.Assert.areEqual("dialog2", ORBEON.xforms.Document.getValue("keypress"));
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
@@ -76,7 +76,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     testDocumentKeyPress: function() {
         this.resetKeyPress(function() {
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                YAHOO.util.UserAction.keydown(document, { keyCode: "Y".charCodeAt(0), ctrlKey: true });
+                YAHOO.util.UserAction.keydown(document, { keyCode: "Y".charCodeAt(0), ctrlKey: true, shiftKey: true });
             }, function() {
                 YAHOO.util.Assert.areEqual("document", ORBEON.xforms.Document.getValue("keypress"));
             });

@@ -1382,6 +1382,7 @@ public class XFormsContainingDocument extends XBLContainer {
 
     private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
     static {
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.KEYPRESS);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_LOAD);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_OFFLINE);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_ONLINE);

@@ -530,11 +530,18 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         sb.append('{');
                         sb.append("\"observer\":\"");
                         sb.append(clientObserver);
-                        sb.append("\",\"modifier\":\"");
-                        sb.append(handler.getKeyModifiers());
-                        sb.append("\",\"text\":\"");
-                        sb.append(handler.getKeyText());
-                        sb.append("\"}");
+                        sb.append('"');
+                        if (handler.getKeyModifiers() != null) {
+                            sb.append(",\"modifier\":\"");
+                            sb.append(handler.getKeyModifiers());
+                            sb.append('"');
+                        }
+                        if (handler.getKeyText() != null) {
+                            sb.append(",\"text\":\"");
+                            sb.append(handler.getKeyText());
+                            sb.append('"');
+                        }
+                        sb.append('}');
 
                         first = false;
                     }

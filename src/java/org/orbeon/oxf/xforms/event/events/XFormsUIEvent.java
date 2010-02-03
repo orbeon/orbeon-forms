@@ -38,16 +38,16 @@ public abstract class XFormsUIEvent extends XFormsEvent {
     private static final String XXFORMS_HELP_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "help");
     private static final String XXFORMS_POSITION_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "control-position");
 
-    private XFormsControl targetXFormsControl;
+    private XFormsControl targetControl;
 
-    public XFormsUIEvent(XFormsContainingDocument containingDocument, String eventName, XFormsControl targetObject) {
-        super(containingDocument, eventName, targetObject, true, false);
-        this.targetXFormsControl = targetObject;
+    public XFormsUIEvent(XFormsContainingDocument containingDocument, String eventName, XFormsControl targetControl) {
+        super(containingDocument, eventName, targetControl, true, false);
+        this.targetControl = targetControl;
     }
 
-    protected XFormsUIEvent(XFormsContainingDocument containingDocument, String eventName, XFormsControl targetObject, boolean bubbles, boolean cancelable) {
-        super(containingDocument, eventName, targetObject, bubbles, cancelable);
-        this.targetXFormsControl = targetObject;
+    protected XFormsUIEvent(XFormsContainingDocument containingDocument, String eventName, XFormsControl targetControl, boolean bubbles, boolean cancelable) {
+        super(containingDocument, eventName, targetControl, bubbles, cancelable);
+        this.targetControl = targetControl;
     }
 
     public SequenceIterator getAttribute(String name) {
@@ -58,8 +58,8 @@ public abstract class XFormsUIEvent extends XFormsEvent {
             }
 
             // Return the node to which the control is bound
-            if (targetXFormsControl instanceof XFormsSingleNodeControl) {
-                return SingletonIterator.makeIterator(((XFormsSingleNodeControl) targetXFormsControl).getBoundItem());
+            if (targetControl instanceof XFormsSingleNodeControl) {
+                return SingletonIterator.makeIterator(((XFormsSingleNodeControl) targetControl).getBoundItem());
             } else {
                 return EmptyIterator.getInstance();
             }
@@ -69,7 +69,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
                 getIndentedLogger().logWarning("", "event('alert') is deprecated. Use event('xxforms:alert') instead.");
             }
 
-            final String alert = targetXFormsControl.getAlert(getPipelineContext());
+            final String alert = targetControl.getAlert(getPipelineContext());
             if (alert != null)
                 return SingletonIterator.makeIterator(new StringValue(alert));
             else
@@ -80,7 +80,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
                 getIndentedLogger().logWarning("", "event('label') is deprecated. Use event('xxforms:label') instead.");
             }
 
-            final String label = targetXFormsControl.getLabel(getPipelineContext());
+            final String label = targetControl.getLabel(getPipelineContext());
             if (label != null)
                 return SingletonIterator.makeIterator(new StringValue(label));
             else
@@ -91,7 +91,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
                 getIndentedLogger().logWarning("", "event('hint') is deprecated. Use event('xxforms:hint') instead.");
             }
 
-            final String hint = targetXFormsControl.getHint(getPipelineContext());
+            final String hint = targetControl.getHint(getPipelineContext());
             if (hint != null)
                 return SingletonIterator.makeIterator(new StringValue(hint));
             else
@@ -102,14 +102,14 @@ public abstract class XFormsUIEvent extends XFormsEvent {
                 getIndentedLogger().logWarning("", "event('help') is deprecated. Use event('xxforms:help') instead.");
             }
 
-            final String help = targetXFormsControl.getHelp(getPipelineContext());
+            final String help = targetControl.getHelp(getPipelineContext());
             if (help != null)
                 return SingletonIterator.makeIterator(new StringValue(help));
             else
                 return EmptyIterator.getInstance();
         } else if (XXFORMS_POSITION_ATTRIBUTE.equals(name)) {
             // Return the control's static position in the document
-            final int controlStaticPosition = getContainingDocument().getStaticState().getControlPosition(targetXFormsControl.getPrefixedId()); 
+            final int controlStaticPosition = getContainingDocument().getStaticState().getControlPosition(targetControl.getPrefixedId());
             if (controlStaticPosition >= 0)
                 return SingletonIterator.makeIterator(new IntegerValue(controlStaticPosition));
             else
@@ -121,7 +121,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
 
     public XFormsEvent retarget(XFormsEventTarget newTargetObject) {
         final XFormsUIEvent newEvent = (XFormsUIEvent) super.retarget(newTargetObject);
-        newEvent.targetXFormsControl = (XFormsControl) newTargetObject;
+        newEvent.targetControl = (XFormsControl) newTargetObject;
         return newEvent;
     }
 }

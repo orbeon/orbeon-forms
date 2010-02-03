@@ -17,14 +17,14 @@ import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventHandler;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 
 import java.util.Map;
 
-public class KeypressEvent extends XFormsUIEvent {
+public class KeypressEvent extends XFormsEvent {
 
     private static final String MODIFIERS_ATTRIBUTE = XFormsConstants.XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME.getName();
     private static final String TEXT_ATTRIBUTE = XFormsConstants.XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME.getName();
@@ -32,7 +32,8 @@ public class KeypressEvent extends XFormsUIEvent {
     public KeypressEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, Map<String, String> parameters) {
         // NOTE: Not sure if should be cancelable, this seems to indicate that "special keys" should not
         // be cancelable: http://www.quirksmode.org/dom/events/keys.html
-        super(containingDocument, XFormsEvents.KEYPRESS, (XFormsControl) targetObject, true, false);
+        // NOTE: For now, not an XFormsUIEvent because can also be targeted at XFormsContainingDocument
+        super(containingDocument, XFormsEvents.KEYPRESS, targetObject, true, false);
 
         if (parameters != null) {
             // NOTE: See also normalization logic in XFormsEventHandlerImpl

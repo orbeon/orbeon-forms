@@ -143,8 +143,8 @@ public class XFormsUtils {
         }
     }
 
-    public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, boolean encodeLocationData) {
-        return encodeXML(pipelineContext, documentToEncode, XFormsProperties.getXFormsPassword(), encodeLocationData);
+    public static String encodeXML(PropertyContext propertyContext, Document documentToEncode, boolean encodeLocationData) {
+        return encodeXML(propertyContext, documentToEncode, XFormsProperties.getXFormsPassword(), encodeLocationData);
     }
 
     // Use a Deflater pool as creating deflaters is expensive

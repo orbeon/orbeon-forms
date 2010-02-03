@@ -458,7 +458,11 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
         // Produce JSON output
         final boolean hasInitControls = javaScriptControlsAppearancesMap.size() > 0;
         final boolean hasKeyListeners = containingDocument.getStaticState().getKeyHandlers().size() > 0;
-        final boolean outputInitData = hasInitControls || hasKeyListeners;
+        final boolean hasServerEvents; {
+            final List<XFormsContainingDocument.DelayedEvent> delayedEvents = containingDocument.getDelayedEvents();
+            hasServerEvents = delayedEvents != null && delayedEvents.size() > 0;
+        }
+        final boolean outputInitData = hasInitControls || hasKeyListeners || hasServerEvents;
         if (outputInitData) {
             final StringBuilder sb = new StringBuilder("var orbeonInitData = {");
 
@@ -524,16 +528,38 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                                 = observer.equals(XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID) ? XFormsUtils.getFormId(containingDocument) : observer;
 
                         sb.append('{');
-                        sb.append("observer:\"");
+                        sb.append("\"observer\":\"");
                         sb.append(clientObserver);
-                        sb.append("\",modifier:\"");
+                        sb.append("\",\"modifier\":\"");
                         sb.append(handler.getKeyModifiers());
-                        sb.append("\",text:\"");
+                        sb.append("\",\"text\":\"");
                         sb.append(handler.getKeyText());
                         sb.append("\"}");
 
                         first = false;
                     }
+                }
+
+                sb.append(']');
+            }
+            
+            // Output server events
+            if (hasServerEvents) {
+                if (hasInitControls || hasKeyListeners)
+                    sb.append(',');
+
+                sb.append("\"server-events\":[");
+
+                final long currentTime = System.currentTimeMillis();
+                boolean first = true;
+                for (XFormsContainingDocument.DelayedEvent delayedEvent: containingDocument.getDelayedEvents()) {
+
+                    if (!first)
+                        sb.append(',');
+
+                    delayedEvent.toJSON(pipelineContext, sb, currentTime);
+
+                    first = false;
                 }
 
                 sb.append(']');

@@ -896,15 +896,7 @@ public class XFormsServer extends ProcessorImpl {
                     if (delayedEvents != null && delayedEvents.size() > 0) {
                         final long currentTime = System.currentTimeMillis();
                         for (XFormsContainingDocument.DelayedEvent delayedEvent: delayedEvents) {
-                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events",
-                                    new String[] {
-                                            "delay", Long.toString(delayedEvent.getTime() - currentTime),
-                                            "discardable", delayedEvent.isMaxDelay() ? "true" : null,
-                                            "show-progress", Boolean.toString(delayedEvent.isShowProgress()),
-                                            "progress-message", delayedEvent.isShowProgress() ? delayedEvent.getProgressMessage() : null
-                                    });
-                            ch.text(delayedEvent.getEncodedDocument(pipelineContext));
-                            ch.endElement();
+                            delayedEvent.toSAX(pipelineContext, ch, currentTime);
                         }
                     }
                 }

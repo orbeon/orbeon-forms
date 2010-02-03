@@ -39,6 +39,7 @@ import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.Item;
@@ -501,7 +502,7 @@ public class XFormsContainingDocument extends XBLContainer {
             this.progressMessage = progressMessage;
         }
 
-        public String getEncodedDocument(PipelineContext pipelineContext) {
+        public String getEncodedDocument(PropertyContext propertyContext) {
             final Document eventsDocument = Dom4jUtils.createDocument();
             final Element eventsElement = eventsDocument.addElement(XFormsConstants.XXFORMS_EVENTS_QNAME);
 
@@ -511,7 +512,7 @@ public class XFormsContainingDocument extends XBLContainer {
             eventElement.addAttribute("bubbles", Boolean.toString(bubbles));
             eventElement.addAttribute("cancelable", Boolean.toString(cancelable));
 
-            return XFormsUtils.encodeXML(pipelineContext, eventsDocument, false);
+            return XFormsUtils.encodeXML(propertyContext, eventsDocument, false);
         }
 
         public boolean isShowProgress() {
@@ -528,6 +529,39 @@ public class XFormsContainingDocument extends XBLContainer {
 
         public boolean isMaxDelay() {
             return isMaxDelay;
+        }
+
+        public void toSAX(PropertyContext propertyContext, ContentHandlerHelper ch, long currentTime) {
+            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events",
+                    new String[] {
+                            "delay", Long.toString(getTime() - currentTime),
+                            "discardable", isMaxDelay() ? "true" : null,
+                            "show-progress", Boolean.toString(isShowProgress()),
+                            "progress-message", isShowProgress() ? getProgressMessage() : null
+                    });
+            ch.text(getEncodedDocument(propertyContext));
+            ch.endElement();
+        }
+
+        public void toJSON(PropertyContext propertyContext, StringBuilder sb, long currentTime) {
+            sb.append('{');
+            sb.append("\"delay\":");
+            sb.append(getTime() - currentTime);
+            if (isMaxDelay()) {
+                sb.append(",\"discardable\":true");
+            }
+            sb.append(",\"show-progress\":");
+            sb.append(isShowProgress());
+            if (isShowProgress()) {
+                sb.append(",\"progress-message\":\"");
+                XFormsUtils.escapeJavaScript(getProgressMessage());
+                sb.append('"');
+            }
+            sb.append(",\"event\":\"");
+            sb.append(getEncodedDocument(propertyContext));
+            sb.append('"');
+
+            sb.append("}");
         }
     }
 
@@ -1212,13 +1246,7 @@ public class XFormsContainingDocument extends XBLContainer {
             initializeModels(pipelineContext);
 
             // After initialization, some async submissions might be running
-            if (asynchronousSubmissionManager != null) {
-                // Process completed submissions
-                asynchronousSubmissionManager.processCompletedAsynchronousSubmissions(pipelineContext);
-
-                // Remember to send a poll event if needed
-                asynchronousSubmissionManager.addClientDelayEventIfNeeded(pipelineContext);
-            }
+            processCompletedAsynchronousSubmissions(pipelineContext, true, true);
         }
         // End deferred behavior
         endOutermostActionHandler(pipelineContext);

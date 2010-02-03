@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
@@ -47,8 +48,9 @@ public class XFormsResourceServer extends ProcessorImpl {
         return XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
     }
 
-    public void start(PropertyContext propertyContext) {
-        final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
+    @Override
+    public void start(PipelineContext pipelineContext) {
+        final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
         final ExternalContext.Request request = externalContext.getRequest();
         final ExternalContext.Response response = externalContext.getResponse();
 
@@ -215,7 +217,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
                     if (XFormsProperties.isCacheCombinedResources()) {
                         // Caching requested
-                        final File resourceFile = cacheResources(indentedLogger, resources, propertyContext, requestPath, combinedLastModified, isCSS, isMinimal);
+                        final File resourceFile = cacheResources(indentedLogger, resources, pipelineContext, requestPath, combinedLastModified, isCSS, isMinimal);
                         if (resourceFile != null) {
                             // Caching could take place, send out cached result
                             if (isDebugEnabled)
@@ -228,13 +230,13 @@ public class XFormsResourceServer extends ProcessorImpl {
                             // Was unable to cache, just serve
                             if (isDebugEnabled)
                                 indentedLogger.logDebug("resources", "caching requested but not possible, serving directly", "request path", requestPath);
-                            generate(indentedLogger, resources, propertyContext, os, isCSS, isMinimal);
+                            generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
                         }
                     } else {
                         // Should not cache, just serve
                         if (isDebugEnabled)
                             indentedLogger.logDebug("resources", "caching not requested, serving directly", "request path", requestPath);
-                        generate(indentedLogger, resources, propertyContext, os, isCSS, isMinimal);
+                        generate(indentedLogger, resources, pipelineContext, os, isCSS, isMinimal);
                     }
                 }
             } catch (OXFException e) {

@@ -5,7 +5,8 @@
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <xhtml:head>
         <xhtml:title>Summary of errors</xhtml:title>
@@ -58,14 +59,17 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal">
                         <xforms:label>Correct errors for employee <xforms:output value="@id"/></xforms:label>
-                        <xforms:setvalue ev:event="DOMActivate" ref="instance('ui')/current-employee" value="context()/@id"/>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:setvalue ref="instance('ui')/current-employee" value="context()/@id"/>
+                            <xforms:dispatch name="fr-visit-all" targetid="error-summary"/>
+                        </xforms:action>
                     </xforms:trigger>
                 </xhtml:li>
             </xforms:repeat>
         </xhtml:ul>
         
         <!-- Show current employee -->
-        <xforms:group ref="employee[@id = instance('ui')/current-employee]">
+        <xforms:group ref="employee[@id = instance('ui')/current-employee]" id="edit-employee">
             <xforms:input ref="first-name">
                 <xforms:label>First name</xforms:label>
                 <xforms:alert>First name is mandatory</xforms:alert>
@@ -80,5 +84,10 @@
             </xforms:input>
         </xforms:group>
         
+        <!-- Error summary for the current employee -->
+        <fr:error-summary observer="edit-employee" id="error-summary">
+            <fr:label>Errors for this employee</fr:label>
+        </fr:error-summary>
+
     </xhtml:body>
 </xhtml:html>

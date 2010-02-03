@@ -4877,7 +4877,6 @@ ORBEON.xforms.Init = {
                             var targetId = keyListener.isDocumentListener ? "#document" : keyListener.observer;
                             var additionalAttributes = ["text", keyListener.text];
                             if (! YAHOO.lang.isUndefined(keyListener.modifier)) {
-                                console.log("keyListener.modifier", keyListener.modifier);
                                 additionalAttributes.push("modifiers");
                                 additionalAttributes.push(keyListener.modifier);
                             }

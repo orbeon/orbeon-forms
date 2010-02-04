@@ -4534,6 +4534,7 @@ ORBEON.xforms.Init = {
             xformsServerURL: ORBEON.xforms.Globals.xformsServerURL,     // XForms Server URL
             eventQueue: [],                      // Events to be sent to the server
             eventsFirstEventTime: 0,             // Time when the first event in the queue was added
+            discardableTimerIds: {},             // Maps form id to array of discardable events (which are used by the server as a form of polling)
             requestForm: null,                   // HTML for the request currently in progress
             requestIgnoreErrors: false,          // Should we ignore errors that result from running this request
             requestInProgress: false,            // Indicates whether an Ajax request is currently in process
@@ -4836,6 +4837,7 @@ ORBEON.xforms.Init = {
                     }
                 }
             }
+
             // Register key listeners
             var keyListeners = window.orbeonInitData["keylisteners"];
             if (YAHOO.lang.isArray(keyListeners)) {
@@ -4896,6 +4898,19 @@ ORBEON.xforms.Init = {
                     } else {
         				yuiKeyListener.enable();
                     }
+                }
+            }
+
+            // Handle server events
+            var serverEvents = window.orbeonInitData["server-events"];
+            if (YAHOO.lang.isArray(serverEvents)) {
+                // For now just take the id of the first XForms form; this will need to be changed to support multiple forms
+                var formId = document.getElementsByClassName("xforms-form")[0].id;
+                for (var serverEventIndex = 0; serverEventIndex < serverEvents.length; serverEventIndex++) {
+                    var serverEvent = serverEvents[serverEventIndex];
+                    var discardable = ! YAHOO.lang.isUndefined(serverEvent["discardable"]) && serverEvent["discardable"];
+                    ORBEON.xforms.Server.createDelayedServerEvent(serverEvent["event"], serverEvent["delay"],
+                        serverEvent["show-progress"], serverEvent["progress-message"], discardable, formId);
                 }
             }
         }
@@ -5436,6 +5451,23 @@ ORBEON.xforms.Server = {
         }
     },
 
+    /**
+     * Create a timer which after the specified delay will fire a server event.
+     */
+    createDelayedServerEvent: function(serverEvents, delay, showProgress, progressMessage, discardable, formID) {
+        var timerId = window.setTimeout(function () {
+            var event = new ORBEON.xforms.Server.Event(ORBEON.util.Dom.getElementById(formID), null, null,
+                    serverEvents, "server-events", null, null, null, showProgress, progressMessage);
+            ORBEON.xforms.Server.fireEvents([event]);
+        }, delay);
+        // Save timer id for this discardable timer
+        if (discardable) {
+            var discardableTimerIds = ORBEON.xforms.Globals.discardableTimerIds;
+            discardableTimerIds[formID] = discardableTimerIds[formID] || [];
+            discardableTimerIds[formID].push(timerId);
+        }
+    },
+
     _debugEventQueue: function() {
         ORBEON.util.Utils.logMessage("Event queue:");
         for (var eventIndex = 0; eventIndex < ORBEON.xforms.Globals.eventQueue.length; eventIndex++) {
@@ -5635,6 +5667,14 @@ ORBEON.xforms.Server = {
 
                     // Mark this as loading
                     ORBEON.xforms.Globals.requestInProgress = true;
+
+                    // Since we are sendng a request, throw out all the discardable timers
+                    var discardableTimerIds = ORBEON.xforms.Globals.discardableTimerIds[formID] || [];
+                    for (var discardableTimerIdIndex = 0; discardableTimerIdIndex < discardableTimerIds.length; discardableTimerIdIndex++) {
+                        var discardableTimerId = discardableTimerIds[discardableTimerIdIndex];
+                        window.clearTimeout(discardableTimerId);
+                    }
+                    ORBEON.xforms.Globals.discardableTimerIds[formID] = [];
 
                     // Show loading indicator, unless all the events asked us not to display it
                     if (showProgress) {
@@ -6974,6 +7014,8 @@ ORBEON.xforms.Server = {
                                     var delay = ORBEON.util.Dom.getAttribute(serverEventsElement, "delay");
                                     var showProgress = ORBEON.util.Dom.getAttribute(serverEventsElement, "show-progress");
                                     showProgress = YAHOO.lang.isNull(showProgress) || showProgress == "true";
+                                    var discardable = ORBEON.util.Dom.getAttribute(serverEventsElement, "discardable")
+                                    discardable = ! YAHOO.lang.isNull(discardable) & discardable == "true";
                                     var progressMessage = ORBEON.util.Dom.getAttribute(serverEventsElement, "progress-message");
                                     if (delay == null) {
                                         // Case of 2-phase submission: store position of this element, and later when we
@@ -6983,13 +7025,9 @@ ORBEON.xforms.Server = {
                                         serverEventsIndex = actionIndex;
                                     } else {
                                         // Case where we need to send those events to the server with a regular Ajax request
-                                        //  after the given delay.
+                                        // after the given delay.
                                         var serverEvents = ORBEON.util.Dom.getStringValue(serverEventsElement);
-                                        window.setTimeout(function () {
-                                            var event = new ORBEON.xforms.Server.Event(ORBEON.util.Dom.getElementById(formID), null, null,
-                                                    serverEvents, "server-events", null, null, null, showProgress, progressMessage);
-                                            ORBEON.xforms.Server.fireEvents([event]);
-                                        }, delay);
+                                        ORBEON.xforms.Server.createDelayedServerEvent(serverEvents, delay, showProgress, progressMessage, discardable, formID);
                                     }
                                     break;
                                 }

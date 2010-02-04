@@ -4850,7 +4850,8 @@ ORBEON.xforms.Init = {
 
                     // When listening on events from the document, the server gives us the id of the form
                     keyListener.observerElement = YAHOO.util.Dom.get(keyListener.observer);
-                    keyListener.isDocumentListener = YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-form");
+                    keyListener.isDocumentListener = keyListener.observer == "#document"
+                        || YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-form");
                     keyListener.isDialogListener = YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-dialog");
                     if (keyListener.isDocumentListener || keyListener.isDialogListener) keyListener.observerElement = document;
 

@@ -62,8 +62,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     // Static information (never changes for the lifetime of the containing document)
     private final Element controlElement;
-    private String id;
-    private String name;
+    private final String id;
+    private final String prefixedId;
+    private final String name;
+
     private String appearance;// could become more dynamic in the future
     private String mediatype;// could become more dynamic in the future
 
@@ -71,8 +73,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     private XFormsControl parent;
 
     // Dynamic information (changes depending on the content of XForms instances)
+    private String previousEffectiveId;
+    private String tempEffectiveId;
     private String effectiveId;
-    private String prefixedId;
 
     protected XFormsContextStack.BindingContext bindingContext;
 
@@ -122,11 +125,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         this.parent = parent;
         this.controlElement = element;
         this.name = name;
-        this.effectiveId = effectiveId;
 
-        if (element != null) {
-            id = element.attributeValue("id");
-        }
+        this.id = (element != null) ? element.attributeValue("id") : null;
+        this.prefixedId = XFormsUtils.getPrefixedId(effectiveId);
+        this.effectiveId = effectiveId;
     }
 
     public String getId() {
@@ -169,6 +171,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         final String parentSuffix = XFormsUtils.getEffectiveIdSuffix(parentEffectiveId);
 
         if (!parentSuffix.equals("")) {
+            // Keep initial effective id for the next refresh
+            if (tempEffectiveId == null)
+                tempEffectiveId = effectiveId;
             // Update effective id
             effectiveId = XFormsUtils.getPrefixedId(effectiveId) + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + parentSuffix;
         } else {
@@ -181,9 +186,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public String getPrefixedId() {
-        if (prefixedId == null) {
-            prefixedId = XFormsUtils.getPrefixedId(effectiveId);
-        }
         return prefixedId;
     }
 
@@ -208,6 +210,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         // we are relevant by default
         final XFormsControl parent = getParent();
         return (parent == null) || parent.isRelevant();
+    }
+
+    public String getPreviousEffectiveId() {
+        return previousEffectiveId;
     }
 
     public boolean wasRelevant() {
@@ -596,9 +602,23 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         }
     }
 
+    /**
+     * Mark a control as "dirty" to mean that the control:
+     *
+     * o needs to be re-evaluated
+     * o must save its current state for purposes of refresh events dispatch
+     *
+     * As of 2010-02 this is called during:
+     *
+     * o by UpdateBindingsListener during a refresh, just before evaluation
+     * o when going online, before handling each external event
+     */
     public void markDirty() {
 
-        // Keep previous values
+        // Keep previous values for refresh updates
+        // NOTE: effectiveId might have changed already upon updateEffectiveId(); in which case, use tempEffectiveId
+        previousEffectiveId = (tempEffectiveId != null) ? tempEffectiveId : effectiveId;
+        tempEffectiveId = null;
         wasRelevant = relevant;
 
         // Clear everything
@@ -611,6 +631,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             extensionAttributesValues.clear();
     }
 
+    /**
+     * Evaluate this control.
+     *
+     * @param propertyContext   current context
+     * @param isRefresh         true if part of the refresh process, false if initialization and new repeat iteration creation
+     */
     protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
 
         setRelevant(computeRelevant());
@@ -623,6 +649,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             getAlert(propertyContext);
         } else {
             // Control is not relevant
+
+            // TODO: if the control is not relevant, nobody should ask about the label
             label = null;
             isLabelEvaluated = true;
             isHTMLLabel = false;
@@ -642,6 +670,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         if (!isRefresh) {
             // Sync values
+            previousEffectiveId = effectiveId;
             wasRelevant = relevant;
         }
     }

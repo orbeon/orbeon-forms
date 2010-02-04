@@ -406,9 +406,9 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         sb.append("ORBEON.xforms.Server.callUserScript(\"");
                         sb.append(script.getFunctionName());
                         sb.append("\",\"");
-                        sb.append(script.getEventTargetId());
+                        sb.append(script.getEventTarget().getEffectiveId());
                         sb.append("\",\"");
-                        sb.append(script.getEventObserverId());
+                        sb.append(script.getEventObserver().getEffectiveId());
                         sb.append("\");");
                     }
                 }

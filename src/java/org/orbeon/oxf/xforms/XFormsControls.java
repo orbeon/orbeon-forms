@@ -61,7 +61,7 @@ public class XFormsControls implements XFormsObjectResolver {
     
     private Map<String, Itemset> constantItems;
 
-    public XFormsControls(XFormsContainingDocument containingDocument, boolean isInitialization) {
+    public XFormsControls(XFormsContainingDocument containingDocument) {
 
         this.indentedLogger = containingDocument.getIndentedLogger(LOGGING_CATEGORY);
 
@@ -258,7 +258,7 @@ public class XFormsControls implements XFormsObjectResolver {
      * @param propertyContext   current context
      * @param isRefresh
      */
-    private void evaluateControlValuesIfNeeded(PropertyContext propertyContext, boolean isRefresh) {
+    private void evaluateControlValuesIfNeeded(PropertyContext propertyContext) {
 
         indentedLogger.startHandleOperation("controls", "evaluating");
         {
@@ -267,7 +267,7 @@ public class XFormsControls implements XFormsObjectResolver {
             if (effectiveIdsToControls != null) {
                 for (final Map.Entry<String, XFormsControl> currentEntry: effectiveIdsToControls.entrySet()) {
                     final XFormsControl currentControl = currentEntry.getValue();
-                    currentControl.evaluateIfNeeded(propertyContext, isRefresh);
+                    currentControl.evaluateIfNeeded(propertyContext, true);
                 }
             }
         }
@@ -634,13 +634,13 @@ public class XFormsControls implements XFormsObjectResolver {
             // Update control bindings
             updateControlBindingsIfNeeded(propertyContext);
             // Update control values
-            evaluateControlValuesIfNeeded(propertyContext, true);
+            evaluateControlValuesIfNeeded(propertyContext);
 
             if (currentControlTree.isAllowSendingRefreshEvents()) {
                 // There are potentially event handlers for UI events, so do the whole processing
 
-                // Gather events
-                final List<String> eventsToDispatch = gatherRefreshEvents();
+                // Gather controls to which to dispatch refresh events
+                final List<String> eventsToDispatch = gatherControlsForRefresh();
 
                 // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
                 // effect, and clear the corresponding flag."
@@ -661,7 +661,7 @@ public class XFormsControls implements XFormsObjectResolver {
         indentedLogger.endHandleOperation();
     }
 
-    private List<String> gatherRefreshEvents() {
+    private List<String> gatherControlsForRefresh() {
 
         final List<String> eventsToDispatch = new ArrayList<String>();
 

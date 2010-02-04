@@ -202,7 +202,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
 
         // Create a new top-level action interpreter to handle this event
         new XFormsActionInterpreter(propertyContext, contextContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId, isXBLHandler)
-                    .runAction(propertyContext, event.getTargetObject().getEffectiveId(), eventObserver, eventHandlerElement);
+                    .runAction(propertyContext, event.getTargetObject(), eventObserver, eventHandlerElement);
     }
 
     public String[] getObserversStaticIds() {

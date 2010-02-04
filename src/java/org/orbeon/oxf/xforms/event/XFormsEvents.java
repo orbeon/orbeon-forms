@@ -53,6 +53,7 @@ public class XFormsEvents {
     public static final String XXFORMS_VALUE_CHANGED = "xxforms-value-changed";
     public static final String XXFORMS_NODESET_CHANGED = "xxforms-nodeset-changed";
     public static final String XXFORMS_INDEX_CHANGED = "xxforms-index-changed";
+    public static final String XXFORMS_ITERATION_MOVED = "xxforms-iteration-moved";
 
     // Standard XForms events
     public static final String XFORMS_MODEL_CONSTRUCT = "xforms-model-construct";

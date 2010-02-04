@@ -305,7 +305,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         return dndAttribute != null && !"none".equals(dndAttribute);
     }
 
-    public void updateNodeset(PropertyContext propertyContext, List<Item> insertedNodeInfos) {
+    public void updateNodesetForInsertDelete(PropertyContext propertyContext, List<Item> insertedNodeInfos) {
 
         // Get old nodeset
         final List<Item> oldRepeatNodeset = getBindingContext().getNodeset();
@@ -334,7 +334,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         // Move things around and create new iterations if needed
         if (!compareNodesets(oldRepeatNodeset, newRepeatNodeset)) {
             // Update iterations
-            final List<XFormsRepeatIterationControl> newIterations = updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, insertedNodeInfos);
+            final List<XFormsRepeatIterationControl> newIterations
+                    = updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, insertedNodeInfos);
             // Initialize all new iterations
             final ControlTree currentControlTree = containingDocument.getControls().getCurrentControlTree();
             for (XFormsRepeatIterationControl newIteration: newIterations) {
@@ -502,7 +503,6 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             final XFormsContextStack contextStack = getXBLContainer().getContextStack();
             for (int repeatIndex = 1; repeatIndex <= newSize; repeatIndex++) {// 1-based index
 
-                final XFormsRepeatIterationControl newIteration;
                 final int currentOldIndex = oldIndexes[repeatIndex - 1];
                 if (currentOldIndex == -1) {
                     // This new node was not in the old nodeset so create a new one
@@ -513,7 +513,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
                     // Create repeat iteration with proper binding context
                     contextStack.pushIteration(repeatIndex);
-                    newIteration = controls.createRepeatIterationTree(propertyContext, contextStack.getCurrentBindingContext(), this, repeatIndex);
+                    final XFormsRepeatIterationControl newIteration
+                            = controls.createRepeatIterationTree(propertyContext, contextStack.getCurrentBindingContext(), this, repeatIndex);
                     contextStack.popBinding();
 
                     updated = true;
@@ -523,10 +524,13 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     if (isDebugEnabled) {
                         indentedLogger.endHandleOperation();
                     }
+
+                    // Add new iteration
+                    newChildren.add(newIteration);
                 } else {
                     // This new node was in the old nodeset so keep it
-                    newIteration = (XFormsRepeatIterationControl) oldChildren.get(currentOldIndex);
-                    final int newIterationOldIndex = newIteration.getIterationIndex();
+                    final XFormsRepeatIterationControl existingIteration = (XFormsRepeatIterationControl) oldChildren.get(currentOldIndex);
+                    final int newIterationOldIndex = existingIteration.getIterationIndex();
                     if (newIterationOldIndex != repeatIndex) {
                         // Iteration index changed
 
@@ -538,27 +542,28 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                         }
 
                         // Set new index
-                        newIteration.setIterationIndex(repeatIndex);
+                        existingIteration.setIterationIndex(repeatIndex);
 
                         // Update binding context on iteration for consistency (since binding context on xf:repeat control was updated by caller)
 
                         // TODO: Then should the bindings for the whole subtree of control be updated at this time? Probably!
                         contextStack.pushIteration(repeatIndex);
-                        newIteration.setBindingContext(propertyContext, contextStack.getCurrentBindingContext(), false);
+                        existingIteration.setBindingContext(propertyContext, contextStack.getCurrentBindingContext(), false);
                         contextStack.popBinding();
 
                         // Index new iteration
-                        currentControlTree.indexSubtree(newIteration, true);
+                        currentControlTree.indexSubtree(existingIteration, true);
                         updated = true;
 
-                        // Add context information
+
+                        // Add information for moved iterations
                         movedIterationsOldPositions.add(newIterationOldIndex);
                         movedIterationsNewPositions.add(repeatIndex);
                     }
-                }
 
-                // Add new iteration
-                newChildren.add(newIteration);
+                    // Add existing iteration
+                    newChildren.add(existingIteration);
+                }
             }
             // Set the new children iterations
             setChildren(newChildren);
@@ -604,7 +609,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         }
 
         if (updated) {
-            // Dispatch custom event to notify that the nodeset has changed
+
+            // Dispatch custom event to xforms:repeat to notify that the nodeset has changed
             getXBLContainer().dispatchEvent(propertyContext, new XXFormsNodesetChangedEvent(containingDocument, this,
                     newIterations, movedIterationsOldPositions, movedIterationsNewPositions));
         }

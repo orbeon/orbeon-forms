@@ -582,7 +582,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                     // Only update controls within same scope as modified instance
                     // NOTE: This can clearly break with e.g. xxforms:instance()
                     if (newRepeatControl.getResolutionScope() == instanceScope) {
-                        newRepeatControl.updateNodeset(propertyContext, insertedNodeInfos);
+                        newRepeatControl.updateNodesetForInsertDelete(propertyContext, insertedNodeInfos);
                     }
                 }
             }

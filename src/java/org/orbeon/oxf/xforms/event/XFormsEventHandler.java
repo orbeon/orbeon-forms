@@ -32,6 +32,7 @@ public interface XFormsEventHandler {
 
     String[] getObserversStaticIds();
     Set<String> getEventNames();
+    boolean isAllEvents();
 
     boolean isMatch(XFormsEvent event);
 

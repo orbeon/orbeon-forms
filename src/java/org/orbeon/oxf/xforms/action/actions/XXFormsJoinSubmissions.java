@@ -18,12 +18,13 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 
 public class XXFormsJoinSubmissions extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetEffectiveId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventTarget eventTarget,
                         XFormsEventObserver eventObserver, Element actionElement, XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         // Process all pending async submissions. The action will block until the method returns.

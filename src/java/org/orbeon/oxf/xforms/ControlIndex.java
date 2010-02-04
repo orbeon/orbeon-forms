@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -106,10 +106,15 @@ public class ControlIndex {
                 || (isNoscript && control instanceof XFormsSelectControl && ((XFormsSelectControl) control).isFullAppearance());
     }
 
-    public void evaluateAll(IndentedLogger indentedLogger, PropertyContext propertyContext) {
-        evaluateAll(indentedLogger, propertyContext, getEffectiveIdsToControls().values());
-    }
-
+    /**
+     * Evaluate all the given controls.
+     *
+     * Called during initial controls creation and for creation of repeat iterations.
+     *
+     * @param indentedLogger            logger
+     * @param propertyContext           current context
+     * @param effectiveIdsToControls    controls to evaluate
+     */
     public static void evaluateAll(IndentedLogger indentedLogger, PropertyContext propertyContext, Collection<XFormsControl> effectiveIdsToControls) {
         indentedLogger.startHandleOperation("controls", "evaluating");
         {

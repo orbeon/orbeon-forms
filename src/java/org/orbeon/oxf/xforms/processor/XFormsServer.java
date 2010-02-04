@@ -101,6 +101,7 @@ public class XFormsServer extends ProcessorImpl {
     /**
      * Case where the response is generated through the ExternalContext (submission with replace="all").
      */
+    @Override
     public void start(PipelineContext pipelineContext) {
         doIt(pipelineContext, null);
     }
@@ -263,10 +264,12 @@ public class XFormsServer extends ProcessorImpl {
                             private String charset;
                             private PrintWriter printWriter;
 
+                            @Override
                             public OutputStream getOutputStream() throws IOException {
                                 return contentHandlerOutputStream;
                             }
 
+                            @Override
                             public PrintWriter getWriter() throws IOException {
                                 // Return this just because Tomcat 5.5, when doing a servlet forward, may ask for one, just to close it!
                                 if (printWriter == null) {
@@ -275,6 +278,7 @@ public class XFormsServer extends ProcessorImpl {
                                 return printWriter;
                             }
 
+                            @Override
                             public void setContentType(String contentType) {
                                 try {
                                     // Assume that content type is always set, otherwise this won't work
@@ -285,10 +289,12 @@ public class XFormsServer extends ProcessorImpl {
                                 }
                             }
 
+                            @Override
                             public Object getNativeResponse() {
                                 return externalContext.getNativeResponse();
                             }
 
+                            @Override
                             public void setHeader(String name, String value) {
                                 // TODO: It is not sound that we output headers here as they should be passed to the
                                 // binary document in the pipeline instead.
@@ -1135,7 +1141,11 @@ public class XFormsServer extends ProcessorImpl {
     public static void outputScriptsInfo(ContentHandlerHelper ch, List<XFormsContainingDocument.Script> scripts) {
         for (XFormsContainingDocument.Script script: scripts) {
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "script",
-                    new String[]{ "name", script.getFunctionName(), "target-id", script.getEventTargetId(), "observer-id", script.getEventObserverId() });
+                    new String[]{
+                            "name", script.getFunctionName(),
+                            "target-id", script.getEventTarget().getEffectiveId(),
+                            "observer-id", script.getEventObserver().getEffectiveId()
+                    });
         }
     }
 

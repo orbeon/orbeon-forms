@@ -2471,4 +2471,178 @@
         </output>
     </test>
 
+    <test description="xforms-enabled dispatch when new iteration appears upon refresh" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <values size="1">
+                                <value>1</value>
+                                <value>2</value>
+                                <value>3</value>
+                                <value>4</value>
+                            </values>
+                        </xforms:instance>
+
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+
+                        <xforms:insert ev:event="xforms-refresh" context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('refresh')"/>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <!-- Clear until now -->
+                            <xforms:refresh/>
+                            <!-- This causes a change of repeat nodeset upon next refresh -->
+                            <xforms:setvalue ref="@size">2</xforms:setvalue>
+                        </xforms:action>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:insert ev:event="xforms-enabled"
+                                   context="instance('events')" nodeset="*"
+                                   origin="xxforms:element('event',
+                                            (xxforms:attribute('type', event('xxforms:type')),
+                                             xxforms:attribute('target', event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))
+                                             ))"/>
+
+                    <xforms:repeat id="my-repeat" nodeset="value[position() le xs:integer(../@size)]">
+                        <xforms:input id="my-input" ref="."/>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values size="2">
+                                    <value>1</value>
+                                    <value>2</value>
+                                    <value>3</value>
+                                    <value>4</value>
+                                </values>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xforms-enabled" target="my-repeat" indexes=""/>
+                                    <event type="xforms-enabled" target="my-input" indexes="1"/>
+                                    <refresh/>
+                                    <event type="xforms-enabled" target="my-input" indexes="2"/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input·1">1</xxf:control>
+                        <xxf:control id="my-input·2">2</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xxforms-iteration-changed event" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance order="0">
+                                <state>
+                                    <name>CA</name>
+                                    <value>222</value>
+                                </state>
+                                <state>
+                                    <name>WA</name>
+                                    <value>111</value>
+                                </state>
+                            </instance>
+                        </xforms:instance>
+
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <!-- Clear until now -->
+                            <xforms:refresh/>
+                            <!-- This causes a change of repeat nodeset upon next refresh -->
+                            <xforms:setvalue ev:event="DOMActivate" ref="@order" value="(. + 1) mod 2"/>
+                        </xforms:action>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat nodeset="if (@order = '0') then (state[1], state[2]) else (state[2], state[1])">
+                        <xhtml:div>
+                            <xforms:output id="my-name" value="name">
+                                <xforms:insert ev:event="xxforms-iteration-moved"
+                                   context="instance('events')" nodeset="*"
+                                   origin="xxforms:element('event',
+                                            (xxforms:attribute('type', event('xxforms:type')),
+                                             xxforms:attribute('target', event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))
+                                             ))"/>
+                            </xforms:output>
+                            <xforms:output id="my-value" value="value"/>
+                        </xhtml:div>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance order="1">
+                                    <state>
+                                        <name>CA</name>
+                                        <value>222</value>
+                                    </state>
+                                    <state>
+                                        <name>WA</name>
+                                        <value>111</value>
+                                    </state>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xxforms-iteration-moved" target="my-name" indexes="1"/>
+                                    <event type="xxforms-iteration-moved" target="my-name" indexes="2"/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="xf-4" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-name·1">WA</xxf:control>
+                        <xxf:control id="my-value·1">111</xxf:control>
+                        <xxf:control id="my-name·2">CA</xxf:control>
+                        <xxf:control id="my-value·2">222</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

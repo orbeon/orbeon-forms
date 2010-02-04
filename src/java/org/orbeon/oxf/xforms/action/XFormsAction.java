@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -33,7 +34,7 @@ import org.orbeon.saxon.value.SequenceExtent;
  */
 public abstract class XFormsAction {
     public abstract void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext,
-                                 String targetEffectiveId, XFormsEventObserver eventObserver, Element actionElement,
+                                 XFormsEventTarget eventTarget, XFormsEventObserver eventObserver, Element actionElement,
                                  XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext);
 
     /**

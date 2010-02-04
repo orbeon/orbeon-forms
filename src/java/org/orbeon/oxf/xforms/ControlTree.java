@@ -40,6 +40,7 @@ public class ControlTree implements Cloneable {
     private final boolean isAllowSendingReadonlyEvents;
     private final boolean isAllowSendingValidEvents;
     private final boolean isAllowSendingRefreshEvents;
+    private final boolean isAllowSendingIterationMovedEvents;
 
     private final IndentedLogger indentedLogger;
 
@@ -68,8 +69,14 @@ public class ControlTree implements Cloneable {
         isAllowSendingRelevantEvents = staticState.hasHandlerForEvent(XFormsEvents.XFORMS_ENABLED) || staticState.hasHandlerForEvent(XFormsEvents.XFORMS_DISABLED);
         isAllowSendingReadonlyEvents = staticState.hasHandlerForEvent(XFormsEvents.XFORMS_READONLY) || staticState.hasHandlerForEvent(XFormsEvents.XFORMS_READWRITE);
         isAllowSendingValidEvents = staticState.hasHandlerForEvent(XFormsEvents.XFORMS_VALID) || staticState.hasHandlerForEvent(XFormsEvents.XFORMS_INVALID);
+        isAllowSendingIterationMovedEvents = staticState.hasHandlerForEvent(XFormsEvents.XXFORMS_ITERATION_MOVED);
 
-        isAllowSendingRefreshEvents = isAllowSendingValueChangedEvents || isAllowSendingRequiredEvents || isAllowSendingRelevantEvents || isAllowSendingReadonlyEvents || isAllowSendingValidEvents;
+        isAllowSendingRefreshEvents = isAllowSendingValueChangedEvents
+                || isAllowSendingRequiredEvents
+                || isAllowSendingRelevantEvents
+                || isAllowSendingReadonlyEvents
+                || isAllowSendingValidEvents
+                || isAllowSendingIterationMovedEvents;
     }
 
     /**
@@ -84,56 +91,102 @@ public class ControlTree implements Cloneable {
 
         indentedLogger.startHandleOperation("controls", "building");
 
-        final int PROFILING_ITERATIONS = 1;
-        for (int k = 0; k < PROFILING_ITERATIONS; k++) {
-
-            // Create temporary root control
-            final XXFormsRootControl rootControl = new XXFormsRootControl(containingDocument) {
-                public void addChild(XFormsControl XFormsControl) {
-                    // Add child to root control
-                    super.addChild(XFormsControl);
-                    // Forward children list to ControlTree. This so that the tree is made available during construction
-                    // to XPath functions like index() or xxforms:case()
-                    if (ControlTree.this.children == null) {
-                        ControlTree.this.children = super.getChildren();
-                    }
-                }
-            };
-
-            // Visit the static tree of controls to create the actual tree of controls
-            final CreateControlsListener listener
-                    = new CreateControlsListener(propertyContext, controlIndex, rootControl, containingDocument.getSerializedControlStatesMap(propertyContext), isRestoringState);
-            XFormsControls.visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener);
-
-            // Detach all root XFormsControl
-            if (children != null) {
-                for (XFormsControl currentXFormsControl: children) {
-                    currentXFormsControl.detach();
+        // Create temporary root control
+        final XXFormsRootControl rootControl = new XXFormsRootControl(containingDocument) {
+            public void addChild(XFormsControl XFormsControl) {
+                // Add child to root control
+                super.addChild(XFormsControl);
+                // Forward children list to ControlTree. This so that the tree is made available during construction
+                // to XPath functions like index() or xxforms:case()
+                if (ControlTree.this.children == null) {
+                    ControlTree.this.children = super.getChildren();
                 }
             }
+        };
 
-            // Evaluate controls
-            controlIndex.evaluateAll(indentedLogger, propertyContext);
+        // Visit the static tree of controls to create the actual tree of controls
+        final CreateControlsListener listener
+                = new CreateControlsListener(propertyContext, controlIndex, rootControl, containingDocument.getSerializedControlStatesMap(propertyContext), isRestoringState);
+        XFormsControls.visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener);
 
-            // Dispatch initialization events for all controls created in index
-            if (!isRestoringState) {
-                // Copy list because it can be modified concurrently as events are being dispatched and handled
-                final List<String> controlsEffectiveIds = new ArrayList<String>(controlIndex.getEffectiveIdsToControls().keySet());
-                dispatchCreationEvents(propertyContext, controlsEffectiveIds);
-            }
-
-            if (k == PROFILING_ITERATIONS - 1) {
-                indentedLogger.endHandleOperation(
-                        "controls updated", Integer.toString(listener.getUpdateCount()),
-                        "repeat iterations", Integer.toString(listener.getIterationCount())
-                );
-            } else {
-                // This is for profiling only
-                children = null;
-                controlIndex.clear();
+        // Detach all root XFormsControl
+        if (children != null) {
+            for (XFormsControl currentXFormsControl: children) {
+                currentXFormsControl.detach();
             }
         }
+
+        // Evaluate all controls
+        ControlIndex.evaluateAll(indentedLogger, propertyContext, controlIndex.getEffectiveIdsToControls().values());
+
+
+        // Dispatch initialization events for all controls created in index
+        if (!isRestoringState) {
+            // Copy list because it can be modified concurrently as events are being dispatched and handled
+            final List<String> controlsEffectiveIds = new ArrayList<String>(controlIndex.getEffectiveIdsToControls().keySet());
+            dispatchCreationEvents(propertyContext, controlsEffectiveIds);
+        }
+
+        indentedLogger.endHandleOperation(
+                "controls updated", Integer.toString(listener.getUpdateCount()),
+                "repeat iterations", Integer.toString(listener.getIterationCount())
+        );
     }
+
+//    public void initializeProfile(PropertyContext propertyContext, XFormsContainingDocument containingDocument, XBLContainer rootContainer, boolean isRestoringState) {
+//
+//        indentedLogger.startHandleOperation("controls", "building");
+//
+//        final int PROFILING_ITERATIONS = 1;
+//        for (int k = 0; k < PROFILING_ITERATIONS; k++) {
+//
+//            // Create temporary root control
+//            final XXFormsRootControl rootControl = new XXFormsRootControl(containingDocument) {
+//                public void addChild(XFormsControl XFormsControl) {
+//                    // Add child to root control
+//                    super.addChild(XFormsControl);
+//                    // Forward children list to ControlTree. This so that the tree is made available during construction
+//                    // to XPath functions like index() or xxforms:case()
+//                    if (ControlTree.this.children == null) {
+//                        ControlTree.this.children = super.getChildren();
+//                    }
+//                }
+//            };
+//
+//            // Visit the static tree of controls to create the actual tree of controls
+//            final CreateControlsListener listener
+//                    = new CreateControlsListener(propertyContext, controlIndex, rootControl, containingDocument.getSerializedControlStatesMap(propertyContext), isRestoringState);
+//            XFormsControls.visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener);
+//
+//            // Detach all root XFormsControl
+//            if (children != null) {
+//                for (XFormsControl currentXFormsControl: children) {
+//                    currentXFormsControl.detach();
+//                }
+//            }
+//
+//            // Evaluate controls
+//            controlIndex.evaluateAll(indentedLogger, propertyContext);
+//
+//            // Dispatch initialization events for all controls created in index
+//            if (!isRestoringState) {
+//                // Copy list because it can be modified concurrently as events are being dispatched and handled
+//                final List<String> controlsEffectiveIds = new ArrayList<String>(controlIndex.getEffectiveIdsToControls().keySet());
+//                dispatchCreationEvents(propertyContext, controlsEffectiveIds);
+//            }
+//
+//            if (k == PROFILING_ITERATIONS - 1) {
+//                indentedLogger.endHandleOperation(
+//                        "controls updated", Integer.toString(listener.getUpdateCount()),
+//                        "repeat iterations", Integer.toString(listener.getIterationCount())
+//                );
+//            } else {
+//                // This is for profiling only
+//                children = null;
+//                controlIndex.clear();
+//            }
+//        }
+//    }
 
     public boolean isAllowSendingRefreshEvents() {
         return isAllowSendingRefreshEvents;
@@ -252,8 +305,16 @@ public class ControlTree implements Cloneable {
                 final XBLContainer container = singleNodeControl.getXBLContainer();
                 final XFormsContainingDocument containingDocument = container.getContainingDocument();
 
+                // xforms-value-changed
                 if (isAllowSendingValueChangedEvents && singleNodeControl.isValueChanged()) {
                     container.dispatchEvent(propertyContext, new XFormsValueChangeEvent(containingDocument, singleNodeControl));
+                }
+
+                // Dispatch moved xxforms-iteration-changed if needed
+                if (isAllowSendingIterationMovedEvents
+                        && control.getPreviousEffectiveId() != control.getEffectiveId()
+                        && staticState.observerHasHandlerForEvent(control.getPrefixedId(), XFormsEvents.XXFORMS_ITERATION_MOVED)) {
+                    container.dispatchEvent(propertyContext, new XXFormsIterationMovedEvent(containingDocument, control));
                 }
 
                 // Dispatch events only if the MIP value is different from the previous value
@@ -505,9 +566,9 @@ public class ControlTree implements Cloneable {
     /**
      * Visit all the descendant controls of the given container control.
      */
-    public static void visitDescendantControls(XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener, XFormsContainerControl containerControl) {
-        handleControl(xformsControlVisitorListener, containerControl.getChildren());
-    }
+//    public static void visitDescendantControls(XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener, XFormsContainerControl containerControl) {
+//        handleControl(xformsControlVisitorListener, containerControl.getChildren());
+//    }
 
     private static void visitChildrenControls(XFormsContainerControl containerControl, boolean includeCurrent, XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener) {
         boolean doContinue;
@@ -835,7 +896,7 @@ public class ControlTree implements Cloneable {
             this.effectiveIdsToControls = effectiveIdsToControls;
         }
 
-        private Map<String, XFormsRepeatIterationControl> newIterationsMap = new HashMap<String, XFormsRepeatIterationControl>();
+        private Set<String> newIterationsSet = new HashSet<String>();
 
         public XFormsControl startVisitControl(XBLContainer container, Element controlElement, String effectiveControlId) {
 
@@ -869,7 +930,8 @@ public class ControlTree implements Cloneable {
                 // o It is not needed to recurse into them because their bindings are up to date since they have just been created
                 // o However they have not yet been evaluated. They will be evaluated at the same time the other controls are evaluated
                 for (XFormsRepeatIterationControl newIteration: newIterations) {
-                    newIterationsMap.put(newIteration.getEffectiveId(), newIteration);
+                    newIterationsSet.add(newIteration.getEffectiveId());
+                    // NOTE: don't call initializeRepeatIterationTree() here because refresh evaluates controls and dispatches events
                 }
             } else if (TESTING_DIALOG_OPTIMIZATION && control instanceof XXFormsDialogControl) {// TODO: TESTING DIALOG OPTIMIZATION
                 // Handle dialog
@@ -907,7 +969,7 @@ public class ControlTree implements Cloneable {
             final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl) effectiveIdsToControls.get(effectiveIterationId);
 
             // Check whether this is an existing iteration as opposed to a newly created iteration
-            final boolean isExistingIteration = newIterationsMap.get(effectiveIterationId) == null;
+            final boolean isExistingIteration = !newIterationsSet.contains(effectiveIterationId);
             if (isExistingIteration) {
                 // Mark the control as dirty so it gets reevaluated
                 repeatIterationControl.markDirty();

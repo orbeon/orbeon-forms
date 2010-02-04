@@ -28,10 +28,7 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventFactory;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
@@ -583,7 +580,7 @@ public class XFormsContainingDocument extends XBLContainer {
         }
     }
 
-    public void addScriptToRun(String scriptId, String eventTargetId, String eventObserverId) {
+    public void addScriptToRun(String scriptId, XFormsEventTarget eventTarget, XFormsEventObserver eventObserver) {
 
         if (activeSubmission != null) {
             // Scripts occurring after the submission takes place should not run
@@ -597,34 +594,56 @@ public class XFormsContainingDocument extends XBLContainer {
 
         if (scriptsToRun == null)
             scriptsToRun = new ArrayList<Script>();
-        scriptsToRun.add(new Script(XFormsUtils.scriptIdToScriptName(scriptId), eventTargetId, eventObserverId));
+        scriptsToRun.add(new Script(XFormsUtils.scriptIdToScriptName(scriptId), eventTarget, eventObserver));
     }
 
     public static class Script {
         private String functionName;
-        private String eventTargetId;
-        private String eventObserverId;
+        private final XFormsEventTarget eventTarget;
+        private final XFormsEventObserver eventObserver;
 
-        public Script(String functionName, String eventTargetId, String eventObserverId) {
+        public Script(String functionName, XFormsEventTarget eventTarget, XFormsEventObserver eventObserver) {
             this.functionName = functionName;
-            this.eventTargetId = eventTargetId;
-            this.eventObserverId = eventObserverId;
+            this.eventTarget = eventTarget;
+            this.eventObserver = eventObserver;
         }
 
         public String getFunctionName() {
             return functionName;
         }
 
-        public String getEventTargetId() {
-            return eventTargetId;
+        public XFormsEventTarget getEventTarget() {
+            return eventTarget;
         }
 
-        public String getEventObserverId() {
-            return eventObserverId;
+        public XFormsEventObserver getEventObserver() {
+            return eventObserver;
         }
     }
 
     public List<Script> getScriptsToRun() {
+        // Only keep script with:
+        // o still existing target/observer
+        // o relevant target/observer
+        if (scriptsToRun != null && scriptsToRun.size() > 0) {
+            for (final Iterator<Script> i = scriptsToRun.iterator(); i.hasNext();) {
+                final Script script = i.next();
+                final XFormsEventTarget scriptEventTarget = script.getEventTarget();
+                final Object currentEventTarget = getObjectByEffectiveId(scriptEventTarget.getEffectiveId());
+                if (scriptEventTarget != currentEventTarget
+                        || (currentEventTarget instanceof XFormsControl && !((XFormsControl) currentEventTarget).isRelevant())) {
+                    i.remove();
+                    continue;
+                }
+                
+                final XFormsEventObserver scriptEventObserver = script.getEventObserver();
+                final Object currentEventObserver = getObjectByEffectiveId(scriptEventObserver.getEffectiveId());
+                if (scriptEventObserver != currentEventObserver
+                        || (currentEventObserver instanceof XFormsControl && !((XFormsControl) currentEventObserver).isRelevant())) {
+                    i.remove();
+                }
+            }
+        }
         return scriptsToRun;
     }
 
@@ -649,12 +668,12 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     public static class Load {
-        private String resource;
-        private String target;
-        private String urlType;
-        private boolean isReplace;
-        private boolean isPortletLoad;
-        private boolean isShowProgress;
+        private final String resource;
+        private final String target;
+        private final String urlType;
+        private final boolean isReplace;
+        private final boolean isPortletLoad;
+        private final boolean isShowProgress;
 
         public Load(String resource, String target, String urlType, boolean isReplace, boolean isPortletLoad, boolean isShowProgress) {
             this.resource = resource;
@@ -1196,7 +1215,7 @@ public class XFormsContainingDocument extends XBLContainer {
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, instancesElement);
 
             // Create XForms controls and models
-            createControlsAndModels(pipelineContext, false);
+            createControlsAndModels(pipelineContext);
 
             // Restore top-level models state, including instances
             restoreModelsState(pipelineContext);
@@ -1235,7 +1254,7 @@ public class XFormsContainingDocument extends XBLContainer {
         // This is called upon the first creation of the XForms engine or for testing only
 
         // Create XForms controls and models
-        createControlsAndModels(pipelineContext, true);
+        createControlsAndModels(pipelineContext);
 
         // Group all xforms-model-construct-done and xforms-ready events within a single outermost action handler in
         // order to optimize events
@@ -1274,13 +1293,13 @@ public class XFormsContainingDocument extends XBLContainer {
         }
     }
 
-    private void createControlsAndModels(PipelineContext pipelineContext, boolean isInitialization) {
+    private void createControlsAndModels(PipelineContext pipelineContext) {
 
         // Gather static analysis information
         xformsStaticState.analyzeIfNecessary(pipelineContext);
 
         // Create XForms controls
-        xformsControls = new XFormsControls(this, isInitialization);
+        xformsControls = new XFormsControls(this);
 
         // Add models
         addAllModels();

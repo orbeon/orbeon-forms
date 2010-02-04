@@ -122,9 +122,11 @@ YAHOO.xbl.fr.Currency.prototype = {
         // XForms value without currency formatting
         var currencyFormattedValue = this.numberToCurrency(xformsValue);
         this.visibleInputElement.value = this.hasFocus ? this.currencyToNumber(currencyFormattedValue) : currencyFormattedValue;
+        // Also update disabled because this might be called upon an iteration being moved, in which case all the control properties must be updated
+        this.visibleInputElement.disabled = ORBEON.util.Dom.hasClass(this.xformsInputElement, "xforms-readonly");
     },
 
-    valueChanged: function() {
+    update: function() {
         this.xformsToVisible();
     },
 

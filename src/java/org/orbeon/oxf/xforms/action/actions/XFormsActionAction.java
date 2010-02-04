@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 
@@ -32,7 +33,7 @@ import java.util.List;
  * 10.1.1 The action Element
  */
 public class XFormsActionAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventTarget eventTarget,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -62,7 +63,7 @@ public class XFormsActionAction extends XFormsAction {
                 contextStack.pushBinding(propertyContext, currentActionElement, actionInterpreter.getSourceEffectiveId(actionElement), currentActionScope);
 
                 // Run action
-                actionInterpreter.runAction(propertyContext, targetId, eventObserver, currentActionElement);
+                actionInterpreter.runAction(propertyContext, eventTarget, eventObserver, currentActionElement);
 
                 // Restore context
                 contextStack.popBinding();

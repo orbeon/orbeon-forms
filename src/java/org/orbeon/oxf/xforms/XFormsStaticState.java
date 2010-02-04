@@ -74,8 +74,8 @@ public class XFormsStaticState {
 
     private Map<String, String> xxformsScripts;                             // Map of id to script content
 
-    private Map<String, Object> nonDefaultProperties = new HashMap<String, Object>();    // Map of property name to property value (String, Integer, Boolean)
-    private final Set<String> allowedExternalEvents = new HashSet<String>();             // Set<String eventName>
+    private final Map<String, Object> nonDefaultProperties = new HashMap<String, Object>(); // Map of property name to property value (String, Integer, Boolean)
+    private final Set<String> allowedExternalEvents = new HashSet<String>();        // Set<String eventName>
 
     private boolean isSeparateDeployment;
     private String requestContextPath;
@@ -118,10 +118,10 @@ public class XFormsStaticState {
     private List<String> offlineInsertTriggerIds;                           // List<String triggerPrefixedId> of triggers can do inserts
 
     // All these are Map<String controlPrefixedId, Element element>
-    private Map<String, Element> labelsMap = new HashMap<String, Element>();
-    private Map<String, Element> helpsMap = new HashMap<String, Element>();
-    private Map<String, Element> hintsMap = new HashMap<String, Element>();
-    private Map<String, Element> alertsMap = new HashMap<String, Element>();
+    private final Map<String, Element> labelsMap = new HashMap<String, Element>();
+    private final Map<String, Element> helpsMap = new HashMap<String, Element>();
+    private final Map<String, Element> hintsMap = new HashMap<String, Element>();
+    private final Map<String, Element> alertsMap = new HashMap<String, Element>();
 
     // Components
     private XBLBindings xblBindings;
@@ -652,6 +652,17 @@ public class XFormsStaticState {
 
     public List<XFormsEventHandler> getEventHandlers(String observerPrefixedId) {
         return eventHandlersMap.get(observerPrefixedId);
+    }
+
+    public boolean observerHasHandlerForEvent(String observerPrefixedId, String eventName) {
+        final List<XFormsEventHandler> handlers = getEventHandlers(observerPrefixedId);
+        if (handlers == null || handlers.isEmpty())
+            return false;
+        for (XFormsEventHandler handler: handlers) {
+            if (handler.isAllEvents() || handler.getEventNames().contains(eventName))
+                return true;
+        }
+        return false;
     }
 
     public Map<String, ControlInfo> getRepeatControlInfoMap() {

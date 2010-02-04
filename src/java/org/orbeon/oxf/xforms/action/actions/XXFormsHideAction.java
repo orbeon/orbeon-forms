@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -32,7 +32,7 @@ import org.orbeon.saxon.om.Item;
  */
 public class XXFormsHideAction extends XFormsAction {
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, String targetId,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventTarget eventTarget,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -48,10 +48,10 @@ public class XXFormsHideAction extends XFormsAction {
             // Dispatch xxforms-dialog-close event to dialog
             final Object controlObject = actionInterpreter.resolveEffectiveControl(propertyContext, actionElement, dialogStaticId);
             if (controlObject instanceof XXFormsDialogControl) {
-                final XFormsEventTarget eventTarget = (XFormsEventTarget) controlObject;
-                final XFormsEvent newEvent = new XXFormsDialogCloseEvent(containingDocument, eventTarget);
+                final XXFormsDialogControl targetDialog = (XXFormsDialogControl) controlObject;
+                final XFormsEvent newEvent = new XXFormsDialogCloseEvent(containingDocument, targetDialog);
                 addContextAttributes(actionInterpreter, propertyContext, actionElement, newEvent);
-                eventTarget.getXBLContainer(containingDocument).dispatchEvent(propertyContext, newEvent);
+                targetDialog.getXBLContainer(containingDocument).dispatchEvent(propertyContext, newEvent);
             } else {
                 final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
                 if (indentedLogger.isDebugEnabled())

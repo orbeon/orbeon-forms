@@ -4818,6 +4818,10 @@ ORBEON.xforms.Init = {
 
         // Initialize special controls
         if (!(window.orbeonInitData === undefined)) {
+
+            if (! YAHOO.lang.isUndefined(window.orbeonInitData["xforms-form"]))
+                window.orbeonInitData = window.orbeonInitData["xforms-form"];
+
             var initFunctions = ORBEON.xforms.Init._getSpecialControlsInitFunctions();
             // Iterate over controls
             for (var controlType in window.orbeonInitData["controls"]) {

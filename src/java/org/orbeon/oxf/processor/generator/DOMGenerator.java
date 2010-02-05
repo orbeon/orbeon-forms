@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -38,11 +38,11 @@ import javax.xml.transform.sax.SAXResult;
  *
  * A note wrt caching.  Each instance of DOMGenerator creates a unique key for caching.  The
  * validity, however, is provided by whoever instantiates the DOMGenerator.  The intent is that
- * a.) we don't get cache hits for two different DOM objs that happen to have equivalent content.
+ * a.) we don't get cache hits for two different DOM objects that happen to have equivalent content.
  * ( source of performance problem in past ), and
  * b.) two doc fragments are considered equivalent input iff they are the same fragment.
  *
- * Unfortunately at the moment (b) happens more by coincedence than by design.  That is just so
+ * Unfortunately at the moment (b) happens more by coincidence than by design.  That is just so
  * happens that that with current impl and usage of DOMGenerator we get this result.  It would
  * be better if there was code that made this happen explicitly.
  */

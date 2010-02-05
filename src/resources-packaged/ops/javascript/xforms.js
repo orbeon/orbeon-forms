@@ -5148,7 +5148,6 @@ ORBEON.xforms.Init = {
     },
 
     _tree: function(treeDiv) {
-
         var controlId = treeDiv.id;
         if (ORBEON.util.Utils.isNewXHTMLLayout())
             treeDiv = treeDiv.getElementsByTagName("div")[0];
@@ -5162,8 +5161,9 @@ ORBEON.xforms.Init = {
         // Create YUI tree and save a copy
         var yuiTree = new YAHOO.widget.TreeView(treeDiv.id);
         ORBEON.xforms.Globals.treeYui[controlId] = yuiTree;
-        // Build the tree
-        ORBEON.xforms.Init._initTreeDivFromArray(treeDiv, yuiTree, treeArray);
+        // Build the tree if there is something to build (JSON is not an empty string)
+        if (! YAHOO.lang.isUndefined(treeArray))
+            ORBEON.xforms.Init._initTreeDivFromArray(treeDiv, yuiTree, treeArray);
         // Save value in tree
         ORBEON.xforms.Globals.serverValue[controlId] = treeDiv.value
         // Register event handler for click on label

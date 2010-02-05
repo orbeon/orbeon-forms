@@ -120,20 +120,17 @@
                     </xforms:action>
                     <!-- Delete -->
                     <xforms:action if="instance('instance')/operation = ('delete', 'move')">
-                        <xforms:delete while="exists(instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')])"
-                                nodeset="instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')]"/>
+                        <xforms:delete nodeset="instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')]"/>
                         <xforms:setvalue ref="instance('instance')/select"/>
                     </xforms:action>
                     <!-- Move from purgatory -->
                     <xforms:action if="instance('instance')/operation = 'move'">
                         <xforms:insert context="instance('items')//item[@value = instance('instance')/select1]"
                             origin="instance('instance')/purgatory/*"/>
-                        <xforms:delete while="exists(instance('instance')/purgatory/*)"
-                                nodeset="instance('instance')/purgatory/*"/>
+                        <xforms:delete nodeset="instance('instance')/purgatory/*"/>
                     </xforms:action>
                 </xforms:action>
             </xforms:trigger>
         </xhtml:div>
-        <!-- <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/> -->
     </xhtml:body>
 </xhtml:html>

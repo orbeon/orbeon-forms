@@ -6281,17 +6281,33 @@ ORBEON.xforms.Server = {
                                                 || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-xxforms-tree")) {
 
                                             // Case of a tree
+                                            var yuiTree = ORBEON.xforms.Globals.treeYui[documentElement.id];
+
+                                            // Remember the values for the expanded nodes
+                                            var expandedValues = [];
+                                            var nodes = yuiTree.getNodesByProperty();
+                                            if (! YAHOO.lang.isNull(nodes)) {
+                                                for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++) {
+                                                    var node = nodes[nodeIndex];
+                                                    if (node.expanded) expandedValues.push(node.data.value);
+                                                }
+                                            }
 
                                             // Remove markup for current tree
-                                            var yuiTree = ORBEON.xforms.Globals.treeYui[documentElement.id];
                                             var yuiRoot = yuiTree.getRoot();
                                             yuiTree.removeChildren(yuiRoot);
-                                            // Expand root. If we don't the tree with checkboxes does not show.
+                                            // Expand root; if we don't the tree with checkboxes does not show
                                             yuiRoot.expand();
 
                                             // Re-populate the tree
                                             ORBEON.xforms.Init._initTreeDivFromArray(documentElement, yuiTree, itemsetTree);
 
+                                            // Expand nodes corresponding to values that were previously expanded
+                                            for (var expandedValueIndex = 0; expandedValueIndex < expandedValues.length; expandedValueIndex++) {
+                                                var expandedValue = expandedValues[expandedValueIndex];
+                                                var nodeToExpand = yuiTree.getNodeByProperty("value", expandedValue);
+                                                if (nodeToExpand != null) nodeToExpand.expand();
+                                            }
                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-compact")
                                                 || ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-compact")
                                                 || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-minimal")) {

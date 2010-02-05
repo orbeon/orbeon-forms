@@ -42,13 +42,16 @@
                 </items>
             </xforms:instance>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .section { margin-bottom: 1em }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
         <!-- Operation -->
-        <xhtml:p>
+        <xhtml:div class="section">
             <xhtml:b>1. Select which operation you want to perform.</xhtml:b>
-        </xhtml:p>
-        <xhtml:p>
+        </xhtml:div>
+        <xhtml:div class="section">
             <xforms:select1 ref="instance('instance')/operation" appearance="full">
                 <xforms:item>
                     <xforms:label>Delete</xforms:label>
@@ -63,35 +66,36 @@
                     <xforms:value>move</xforms:value>
                 </xforms:item>
             </xforms:select1>
-        </xhtml:p>
+        </xhtml:div>
         <!-- Select node on which to operate -->
-        <xhtml:p>
+        <xhtml:div class="section">
             <xhtml:b>2. Select nodes on which the operation functions.</xhtml:b>
-        </xhtml:p>
-        <xhtml:p>
+        </xhtml:div>
+        <xhtml:div class="section">
             <xforms:group ref=".[select = '']">
                 You haven't selected any node.
             </xforms:group>
             <xforms:group ref=".[select != '']">
                 You selected <xforms:output value="select"/>.
             </xforms:group>
-        </xhtml:p>
-        <xhtml:p>
+        </xhtml:div>
+        <xhtml:div class="section">
             <xforms:select ref="select" appearance="xxforms:tree" id="select-tree" incremental="true">
                 <xforms:itemset nodeset="instance('items')//item">
                     <xforms:label ref="@label"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
             </xforms:select>
-        </xhtml:p>
+        </xhtml:div>
         <!-- Select target -->
         <xforms:group ref=".[instance('instance')/operation = ('move', 'copy')]">
-            <xhtml:p>
+            <xhtml:div class="section">
                 <xhtml:b>3. Select point where to insert or move the selected nodes.</xhtml:b>
-            </xhtml:p>
-            <xhtml:p>
+            </xhtml:div>
+            <xhtml:div class="section">
                 You selected <xforms:output value="select1"/> (click on node in tree below to change selection).
-            </xhtml:p>
+            </xhtml:div>
+            <!-- appearance="xxforms:tree"  -->
             <xforms:select1 ref="select1" appearance="xxforms:tree" id="select1-tree" incremental="true">
                 <xforms:itemset nodeset="instance('items')//item">
                     <xforms:label ref="@label"/>
@@ -100,7 +104,7 @@
             </xforms:select1>
         </xforms:group>
         <!-- Do it -->
-        <xhtml:p>
+        <xhtml:div class="section">
             <xforms:trigger>
                 <xforms:label>Do it</xforms:label>
                 <xforms:action ev:event="DOMActivate">
@@ -129,7 +133,7 @@
                     </xforms:action>
                 </xforms:action>
             </xforms:trigger>
-        </xhtml:p>
-        <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
+        </xhtml:div>
+        <!-- <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/> -->
     </xhtml:body>
 </xhtml:html>

@@ -4813,109 +4813,108 @@ ORBEON.xforms.Init = {
                         ORBEON.xforms.Server.fireEvents([event], false);
                     }
                 }
-            }
-        }
 
-        // Initialize special controls
-        if (!(window.orbeonInitData === undefined)) {
+                // Initialize controls, listeners, server-events
+                if (!(window.orbeonInitData === undefined)) {
 
-            if (! YAHOO.lang.isUndefined(window.orbeonInitData["xforms-form"]))
-                window.orbeonInitData = window.orbeonInitData["xforms-form"];
+                    var formInitData = window.orbeonInitData[formID];
 
-            var initFunctions = ORBEON.xforms.Init._getSpecialControlsInitFunctions();
-            // Iterate over controls
-            for (var controlType in window.orbeonInitData["controls"]) {
-                if (initFunctions[controlType]) {
-                    var controlAppearances = window.orbeonInitData["controls"][controlType];
-                    // Iterate over appearance for current control
-                    for (var controlAppearance in controlAppearances) {
-                        var initFunction = initFunctions[controlType][controlAppearance];
-                        if (initFunction) {
-                            var controlIds = controlAppearances[controlAppearance];
-                            // Iterate over controls
-                            for (var controlIndex = 0; controlIndex < controlIds.length; controlIndex++) {
-                                var control = ORBEON.util.Dom.getElementById(controlIds[controlIndex]);
-                                initFunction(control);
+                    var initFunctions = ORBEON.xforms.Init._getSpecialControlsInitFunctions();
+                    // Iterate over controls
+                    for (var controlType in formInitData["controls"]) {
+                        if (initFunctions[controlType]) {
+                            var controlAppearances = formInitData["controls"][controlType];
+                            // Iterate over appearance for current control
+                            for (var controlAppearance in controlAppearances) {
+                                var initFunction = initFunctions[controlType][controlAppearance];
+                                if (initFunction) {
+                                    var controlIds = controlAppearances[controlAppearance];
+                                    // Iterate over controls
+                                    for (var controlIndex = 0; controlIndex < controlIds.length; controlIndex++) {
+                                        var control = ORBEON.util.Dom.getElementById(controlIds[controlIndex]);
+                                        initFunction(control);
+                                    }
+                                }
                             }
                         }
                     }
-                }
-            }
 
-            // Register key listeners
-            var keyListeners = window.orbeonInitData["keylisteners"];
-            if (YAHOO.lang.isArray(keyListeners)) {
-                for (var keyListenerIndex = 0; keyListenerIndex < keyListeners.length; keyListenerIndex++) {
-                    var keyListener = keyListeners[keyListenerIndex];
+                    // Register key listeners
+                    var keyListeners = formInitData["keylisteners"];
+                    if (YAHOO.lang.isArray(keyListeners)) {
+                        for (var keyListenerIndex = 0; keyListenerIndex < keyListeners.length; keyListenerIndex++) {
+                            var keyListener = keyListeners[keyListenerIndex];
 
-                    // When listening on events from the document, the server gives us the id of the form
-                    keyListener.observerElement = YAHOO.util.Dom.get(keyListener.observer);
-                    keyListener.isDocumentListener = keyListener.observer == "#document"
-                        || YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-form");
-                    keyListener.isDialogListener = YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-dialog");
-                    if (keyListener.isDocumentListener || keyListener.isDialogListener) keyListener.observerElement = document;
+                            // When listening on events from the document, the server gives us the id of the form
+                            keyListener.observerElement = YAHOO.util.Dom.get(keyListener.observer);
+                            keyListener.isDocumentListener = keyListener.observer == "#document"
+                                || YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-form");
+                            keyListener.isDialogListener = YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-dialog");
+                            if (keyListener.isDocumentListener || keyListener.isDialogListener) keyListener.observerElement = document;
 
-                    // Save current form, which we'll need when creating an event
-                    keyListener.form = form;
+                            // Save current form, which we'll need when creating an event
+                            keyListener.form = form;
 
-                    // Handle optional modifiers
-                    var keyData = {};
-                    if (YAHOO.lang.isString(keyListener.modifier)) {
-                        var modifiers = keyListener.modifier.split(" ");
-                        for (var modifierIndex = 0; modifierIndex < modifiers.length; modifierIndex++) {
-                            var modifier = modifiers[modifierIndex];
-                            if (modifier.toLowerCase() == "control") keyData["ctrl"] = true;
-                            if (modifier.toLowerCase() == "shift") keyData["shift"] = true;
-                            if (modifier.toLowerCase() == "alt") keyData["alt"] = true;
-                        };
-                    }
-                    // Handle text string by building array of key codes
-                    keyData["keys"] = [];
-                    var text = keyListener.text.toUpperCase();
-                    for (var textIndex = 0; textIndex < text.length; textIndex++)
-                        keyData["keys"].push(text.charCodeAt(textIndex));
-
-                    // Create YUI listener
-                    var yuiKeyListener = new YAHOO.util.KeyListener(keyListener.observerElement, keyData, {
-                        scope: keyListener,
-                        correctScope: false,
-                        fn: function(event, event, keyListener) {
-                            // YUI doesn't give us the target of the event, so we provide the observer as the target to the server
-                            var targetId = keyListener.isDocumentListener ? "#document" : keyListener.observer;
-                            var additionalAttributes = ["text", keyListener.text];
-                            if (! YAHOO.lang.isUndefined(keyListener.modifier)) {
-                                additionalAttributes.push("modifiers");
-                                additionalAttributes.push(keyListener.modifier);
+                            // Handle optional modifiers
+                            var keyData = {};
+                            if (YAHOO.lang.isString(keyListener.modifier)) {
+                                var modifiers = keyListener.modifier.split(" ");
+                                for (var modifierIndex = 0; modifierIndex < modifiers.length; modifierIndex++) {
+                                    var modifier = modifiers[modifierIndex];
+                                    if (modifier.toLowerCase() == "control") keyData["ctrl"] = true;
+                                    if (modifier.toLowerCase() == "shift") keyData["shift"] = true;
+                                    if (modifier.toLowerCase() == "alt") keyData["alt"] = true;
+                                };
                             }
-                            var event = new ORBEON.xforms.Server.Event(keyListener.form, targetId, null, null, "keypress",
-                                null, null, null, null, null, additionalAttributes);
-                            ORBEON.xforms.Server.fireEvents([event], false);
+                            // Handle text string by building array of key codes
+                            keyData["keys"] = [];
+                            var text = keyListener.text.toUpperCase();
+                            for (var textIndex = 0; textIndex < text.length; textIndex++)
+                                keyData["keys"].push(text.charCodeAt(textIndex));
+
+                            // Create YUI listener
+                            var yuiKeyListener = new YAHOO.util.KeyListener(keyListener.observerElement, keyData, {
+                                scope: keyListener,
+                                correctScope: false,
+                                fn: function(event, event, keyListener) {
+                                    // YUI doesn't give us the target of the event, so we provide the observer as the target to the server
+                                    var targetId = keyListener.isDocumentListener ? "#document" : keyListener.observer;
+                                    var additionalAttributes = ["text", keyListener.text];
+                                    if (! YAHOO.lang.isUndefined(keyListener.modifier)) {
+                                        additionalAttributes.push("modifiers");
+                                        additionalAttributes.push(keyListener.modifier);
+                                    }
+                                    var event = new ORBEON.xforms.Server.Event(keyListener.form, targetId, null, null, "keypress",
+                                        null, null, null, null, null, additionalAttributes);
+                                    ORBEON.xforms.Server.fireEvents([event], false);
+                                }
+                            });
+
+                            // Register listener on dialog or enable
+                            if (keyListener.isDialogListener) {
+                                var yuiDialog = ORBEON.xforms.Globals.dialogs[keyListener.observer];
+                                var dialogKeyListeners = yuiDialog.cfg.getProperty("keylisteners");
+                                if (YAHOO.lang.isUndefined(dialogKeyListeners)) dialogKeyListeners = [];
+                                dialogKeyListeners.push(yuiKeyListener);
+                                yuiDialog.cfg.setProperty("keylisteners", dialogKeyListeners);
+                            } else {
+                				yuiKeyListener.enable();
+                            }
                         }
-                    });
-
-                    // Register listener on dialog or enable
-                    if (keyListener.isDialogListener) {
-                        var yuiDialog = ORBEON.xforms.Globals.dialogs[keyListener.observer];
-                        var dialogKeyListeners = yuiDialog.cfg.getProperty("keylisteners");
-                        if (YAHOO.lang.isUndefined(dialogKeyListeners)) dialogKeyListeners = [];
-                        dialogKeyListeners.push(yuiKeyListener);
-                        yuiDialog.cfg.setProperty("keylisteners", dialogKeyListeners);
-                    } else {
-        				yuiKeyListener.enable();
                     }
-                }
-            }
 
-            // Handle server events
-            var serverEvents = window.orbeonInitData["server-events"];
-            if (YAHOO.lang.isArray(serverEvents)) {
-                // For now just take the id of the first XForms form; this will need to be changed to support multiple forms
-                var formId = document.getElementsByClassName("xforms-form")[0].id;
-                for (var serverEventIndex = 0; serverEventIndex < serverEvents.length; serverEventIndex++) {
-                    var serverEvent = serverEvents[serverEventIndex];
-                    var discardable = ! YAHOO.lang.isUndefined(serverEvent["discardable"]) && serverEvent["discardable"];
-                    ORBEON.xforms.Server.createDelayedServerEvent(serverEvent["event"], serverEvent["delay"],
-                        serverEvent["show-progress"], serverEvent["progress-message"], discardable, formId);
+                    // Handle server events
+                    var serverEvents = formInitData["server-events"];
+                    if (YAHOO.lang.isArray(serverEvents)) {
+                        // For now just take the id of the first XForms form; this will need to be changed to support multiple forms
+                        var formId = document.getElementsByClassName("xforms-form")[0].id;
+                        for (var serverEventIndex = 0; serverEventIndex < serverEvents.length; serverEventIndex++) {
+                            var serverEvent = serverEvents[serverEventIndex];
+                            var discardable = ! YAHOO.lang.isUndefined(serverEvent["discardable"]) && serverEvent["discardable"];
+                            ORBEON.xforms.Server.createDelayedServerEvent(serverEvent["event"], serverEvent["delay"],
+                                serverEvent["show-progress"], serverEvent["progress-message"], discardable, formId);
+                        }
+                    }
                 }
             }
         }

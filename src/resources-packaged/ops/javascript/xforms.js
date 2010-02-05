@@ -1740,7 +1740,7 @@ ORBEON.xforms.Controls = {
                         return node.data.value;
                 } else {
                     // Select
-                    if (node.checked) {
+                    if (node.checkState == 2) {
                         if (result != "") result += " ";
                         result += node.data.value;
                     }

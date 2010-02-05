@@ -216,7 +216,9 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                     handleReadOnlyAttribute(containerAttributes, containingDocument, xformsSelect1Control);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, containerAttributes);
-                    outputJSONTreeInfo(xformsSelect1Control, itemset, isMultiple, contentHandler);
+                    if (itemset != null) { // can be null if the control is non-relevant
+                        outputJSONTreeInfo(xformsSelect1Control, itemset, isMultiple, contentHandler);
+                    }
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
                 } else if (isMenu) {
@@ -307,7 +309,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                         reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-initially-hidden");
 
                         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-                        {
+                        if (itemset != null) { // can be null if the control is non-relevant
                             outputJSONTreeInfo(xformsSelect1Control, itemset, isMultiple, contentHandler);
                         }
                         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);

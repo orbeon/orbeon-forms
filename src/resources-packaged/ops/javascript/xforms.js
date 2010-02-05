@@ -5640,16 +5640,17 @@ ORBEON.xforms.Server = {
                     var sendInitialDynamicState = false;
                     var showProgress = false;
                     var progressMessage;
+                    var foundEventOtherThanHeartBeat = false;
                     for (var eventIndex = 0; eventIndex < ORBEON.xforms.Globals.eventQueue.length; eventIndex++) {
                         var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
                         // Figure out if we will be ignoring error during this request or not
-                        if (!event.ignoreErrors) {
+                        if (!event.ignoreErrors)
                             ORBEON.xforms.Globals.requestIgnoreErrors = false;
-                        }
                         // Figure out whether we need to send the initial dynamic state
-                        if (event.eventName == "xxforms-all-events-required" || event.eventName == "xxforms-offline") {
+                        if (event.eventName == "xxforms-all-events-required" || event.eventName == "xxforms-offline")
                             sendInitialDynamicState = true;
-                        }
+                        // Remember if we see an event other than a session heartbeat
+                        if (event.eventName != "xxforms-session-heartbeat") foundEventOtherThanHeartBeat = true;
                         // Figure out if any of the events asks for the progress to be shown (the default)
                         if (event.showProgress)
                             showProgress = true;
@@ -5674,13 +5675,18 @@ ORBEON.xforms.Server = {
                     // Mark this as loading
                     ORBEON.xforms.Globals.requestInProgress = true;
 
-                    // Since we are sendng a request, throw out all the discardable timers
-                    var discardableTimerIds = ORBEON.xforms.Globals.discardableTimerIds[formID] || [];
-                    for (var discardableTimerIdIndex = 0; discardableTimerIdIndex < discardableTimerIds.length; discardableTimerIdIndex++) {
-                        var discardableTimerId = discardableTimerIds[discardableTimerIdIndex];
-                        window.clearTimeout(discardableTimerId);
+                    // Since we are sending a request, throw out all the discardable timers.
+                    // But only do this if we are not just sending a heartbeat event, which is handled in a more efficient
+                    // way by the server, skipping the "normal" processing which includes checking if there are
+                    // any discarable events waiting to be executed.
+                    if (foundEventOtherThanHeartBeat) {
+                        var discardableTimerIds = ORBEON.xforms.Globals.discardableTimerIds[formID] || [];
+                        for (var discardableTimerIdIndex = 0; discardableTimerIdIndex < discardableTimerIds.length; discardableTimerIdIndex++) {
+                            var discardableTimerId = discardableTimerIds[discardableTimerIdIndex];
+                            window.clearTimeout(discardableTimerId);
+                        }
+                        ORBEON.xforms.Globals.discardableTimerIds[formID] = [];
                     }
-                    ORBEON.xforms.Globals.discardableTimerIds[formID] = [];
 
                     // Show loading indicator, unless all the events asked us not to display it
                     if (showProgress) {

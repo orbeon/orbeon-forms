@@ -4846,10 +4846,12 @@ ORBEON.xforms.Init = {
                             var keyListener = keyListeners[keyListenerIndex];
 
                             // When listening on events from the document, the server gives us the id of the form
-                            keyListener.observerElement = YAHOO.util.Dom.get(keyListener.observer);
-                            keyListener.isDocumentListener = keyListener.observer == "#document"
-                                || YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-form");
-                            keyListener.isDialogListener = YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-dialog");
+                            keyListener.isDocumentListener = keyListener.observer == "#document";
+                            keyListener.isDialogListener = false;
+                            if (! keyListener.isDocumentListener) {
+                                keyListener.observerElement = YAHOO.util.Dom.get(keyListener.observer);
+                                keyListener.isDialogListener = YAHOO.util.Dom.hasClass(keyListener.observerElement, "xforms-dialog");
+                            }
                             if (keyListener.isDocumentListener || keyListener.isDialogListener) keyListener.observerElement = document;
 
                             // Save current form, which we'll need when creating an event
@@ -4878,7 +4880,7 @@ ORBEON.xforms.Init = {
                                 correctScope: false,
                                 fn: function(event, event, keyListener) {
                                     // YUI doesn't give us the target of the event, so we provide the observer as the target to the server
-                                    var targetId = keyListener.isDocumentListener ? "#document" : keyListener.observer;
+                                    var targetId = keyListener.observer;
                                     var additionalAttributes = ["text", keyListener.text];
                                     if (! YAHOO.lang.isUndefined(keyListener.modifier)) {
                                         additionalAttributes.push("modifiers");

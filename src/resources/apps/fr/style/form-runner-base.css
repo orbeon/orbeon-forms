@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -486,7 +486,7 @@ span.xforms-textarea { white-space: -moz-pre-wrap; white-space: pre-wrap }
     .xbl-fr-attachment .xforms-output-appearance-xxforms-download { display: none }
     /* There should not be a <style> element in the body, but if there is hide it for Flying Saucer */
     style { display: none }
-    /* This must now show in the PDF */
+    /* This must not show in the PDF */
     noscript { display: none }
     /* Since only value is shown, no need for special height */
     .fr-grid .xforms-select1-appearance-compact, .fr-grid .xforms-select-appearance-compact { height: auto }

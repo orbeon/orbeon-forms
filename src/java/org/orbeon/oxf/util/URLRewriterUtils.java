@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -321,6 +321,11 @@ public class URLRewriterUtils {
         }
     }
 
+    // TODO: add test for /forms/orbeon; should make this a property!
+    public static final String[] PLATFORM_PATHS = {
+        "/ops/", "/config/", "/xbl/orbeon/", "/xforms-server"
+    };
+
     /**
      * Check if the given path is a platform path (as opposed to a user application path).
      *
@@ -328,13 +333,24 @@ public class URLRewriterUtils {
      * @return                      true iif path is a platform path
      */
     public static boolean isPlatformPath(String absolutePathNoContext) {
-        // TODO: add test for /forms/orbeon; should make this a property!
-        // See PageFlowController as well
-        return absolutePathNoContext.startsWith("/ops/")
-                || absolutePathNoContext.startsWith("/config/")
-                || absolutePathNoContext.startsWith("/xbl/orbeon/")
-                || absolutePathNoContext.startsWith("/xforms-server");
+        for (final String path: PLATFORM_PATHS) {
+            if (absolutePathNoContext.startsWith(path))
+                return true;
+        }
+        return false;
     }
+
+//    public static String getPlatformPathsAsSequence() {
+//        final StringBuilder sb = new StringBuilder("(");
+//        for (final String path: PLATFORM_PATHS) {
+//            sb.append('\'');
+//            sb.append(path);
+//            sb.append('\'');
+//        }
+//        sb.append(')');
+//        return sb.toString();
+//        // XXX issue: PFC tests tokenize($path, '/')[3] = ('ops', 'config'), need better way
+//    }
 
     public static boolean isResourcesVersioned() {
         return Properties.instance().getPropertySet().getBoolean(RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSIONED_DEFAULT);

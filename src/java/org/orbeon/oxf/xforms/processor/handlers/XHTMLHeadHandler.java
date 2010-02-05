@@ -464,7 +464,9 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
         }
         final boolean outputInitData = hasInitControls || hasKeyListeners || hasServerEvents;
         if (outputInitData) {
-            final StringBuilder sb = new StringBuilder("var orbeonInitData = {");
+            final StringBuilder sb = new StringBuilder("var orbeonInitData = orbeonInitData || {}; orbeonInitData[\"");
+            sb.append(XFormsUtils.getFormId(containingDocument));
+            sb.append("\"] = {");
 
             // Output controls initialization
             if (hasInitControls) {
@@ -522,14 +524,9 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         sb.append(',');
 
                     for (final String observer: handler.getObserversStaticIds()) {
-
-                        // If we have a top-level observer, give the client the id of the form
-                        final String clientObserver
-                                = observer.equals(XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID) ? XFormsUtils.getFormId(containingDocument) : observer;
-
                         sb.append('{');
                         sb.append("\"observer\":\"");
-                        sb.append(clientObserver);
+                        sb.append(observer);
                         sb.append('"');
                         if (handler.getKeyModifiers() != null) {
                             sb.append(",\"modifier\":\"");

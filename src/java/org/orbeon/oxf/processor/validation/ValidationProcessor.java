@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.validation;
 
@@ -79,6 +79,7 @@ public class ValidationProcessor extends ProcessorImpl {
         this.schemaId = schemaId;
     }
 
+    @Override
     public ProcessorOutput createOutput(final String name) {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
             protected void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, ContentHandler contentHandler) {
@@ -98,6 +99,7 @@ public class ValidationProcessor extends ProcessorImpl {
 
                         chosenValidator.validatorType = -1;
                         schemaSAXStore[0] = new SAXStore() {
+                            @Override
                             public void startElement(String uri, String localname, String qName, Attributes attributes)
                                     throws SAXException {
                                 if (chosenValidator.validatorType == -1)
@@ -136,12 +138,14 @@ public class ValidationProcessor extends ProcessorImpl {
                         }
 
                         // Forward to config input
+                        @Override
                         protected OutputCacheKey getKeyImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {
                             return schemaInput instanceof Cacheable
                                     ? ((Cacheable) schemaInput).getKey(context) : null;
                         }
 
                         // Forward to config input
+                        @Override
                         protected Object getValidityImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {
                             return schemaInput instanceof Cacheable
                                     ? ((Cacheable) schemaInput).getValidity(context) : null;

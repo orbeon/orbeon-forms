@@ -78,12 +78,6 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         // NOTE: We used to initialize the repeat index here, but this made the index() function non-functional during
         // repeat construction. Instead, we now initialize the index in setBindingContext(), when that method is called
         // during control creation.
-
-//        if (!restoredState && getIndex() > 0) {
-            // Dispatch custom event to notify that the repeat index has changed
-//            getXBLContainer().dispatchEvent(propertyContext, new XXFormsIndexChangedEvent(containingDocument, this,
-//                    0, getIndex()));
-//        }
     }
 
     @Override
@@ -609,8 +603,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             movedIterationsNewPositions = Collections.emptyList();
         }
 
+        // NOTE: There is a question of whether it is reasonable to dispatch events here.
         if (updated) {
-
             // Dispatch custom event to xforms:repeat to notify that the nodeset has changed
             getXBLContainer().dispatchEvent(propertyContext, new XXFormsNodesetChangedEvent(containingDocument, this,
                     newIterations, movedIterationsOldPositions, movedIterationsNewPositions));

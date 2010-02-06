@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
@@ -18,7 +18,6 @@ import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -65,7 +64,7 @@ public class SAXLoggerProcessor extends ProcessorImpl {
         }
 
         public void characters(char[] chars, int start, int length) throws SAXException {
-            final FastStringBuffer message = new FastStringBuffer(getLogSpaces());
+            final StringBuilder message = new StringBuilder(getLogSpaces());
             message.append("characters('" + new String(chars, start, length) + "', " + start + ", " + length + ")");
             addLocatorInfo(message);
             logger.info(message.toString());
@@ -73,7 +72,7 @@ public class SAXLoggerProcessor extends ProcessorImpl {
         }
 
         public void endDocument() throws SAXException {
-            final FastStringBuffer message = new FastStringBuffer(getLogSpaces());
+            final StringBuilder message = new StringBuilder(getLogSpaces());
             message.append("endDocument()");
             addLocatorInfo(message);
             logger.info(message.toString());
@@ -82,7 +81,7 @@ public class SAXLoggerProcessor extends ProcessorImpl {
 
         public void endElement(String uri, String localname, String qName) throws SAXException {
             level--;
-            final FastStringBuffer message = new FastStringBuffer(getLogSpaces());
+            final StringBuilder message = new StringBuilder(getLogSpaces());
             message.append("endElement('" + uri + "', '" + localname + "', '" + qName + "')");
             addLocatorInfo(message);
             logger.info(message.toString());
@@ -90,14 +89,14 @@ public class SAXLoggerProcessor extends ProcessorImpl {
         }
 
         public void endPrefixMapping(String s) throws SAXException {
-            final FastStringBuffer message = new FastStringBuffer(getLogSpaces());
+            final StringBuilder message = new StringBuilder(getLogSpaces());
             message.append("endPrefixMapping('" + s + "')");
             logger.info(message);
             super.endPrefixMapping(s);
         }
 
         public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {
-            final FastStringBuffer message = new FastStringBuffer(getLogSpaces());
+            final StringBuilder message = new StringBuilder(getLogSpaces());
             message.append("ignorableWhitespace('" + new String(chars, start, length) + "', " + start + ", " + length + ")");
             addLocatorInfo(message);
             logger.info(message.toString());
@@ -105,7 +104,7 @@ public class SAXLoggerProcessor extends ProcessorImpl {
         }
 
         public void processingInstruction(String s, String s1) throws SAXException {
-            final FastStringBuffer message = new FastStringBuffer(getLogSpaces());
+            final StringBuilder message = new StringBuilder(getLogSpaces());
             message.append("processingInstruction('" + s + "', '" + s1 + "')");
             addLocatorInfo(message);
             logger.info(message.toString());
@@ -119,7 +118,7 @@ public class SAXLoggerProcessor extends ProcessorImpl {
         }
 
         public void skippedEntity(String s) throws SAXException {
-            final FastStringBuffer message = new FastStringBuffer(getLogSpaces());
+            final StringBuilder message = new StringBuilder(getLogSpaces());
             message.append("skippedEntity('" + s + "')");
             addLocatorInfo(message);
             logger.info(message.toString());
@@ -127,7 +126,7 @@ public class SAXLoggerProcessor extends ProcessorImpl {
         }
 
         public void startDocument() throws SAXException {
-            final FastStringBuffer message = new FastStringBuffer(getLogSpaces());
+            final StringBuilder message = new StringBuilder(getLogSpaces());
             message.append("startDocument()");
             addLocatorInfo(message);
             logger.info(message.toString());
@@ -135,7 +134,7 @@ public class SAXLoggerProcessor extends ProcessorImpl {
         }
 
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-            final FastStringBuffer message = new FastStringBuffer(getLogSpaces());
+            final StringBuilder message = new StringBuilder(getLogSpaces());
             message.append("startElement('" + uri + "', '" + localname + "', '" + qName + "'");
             for (int i = 0; i < attributes.getLength(); i++)
                 message.append(", ('" + attributes.getURI(i) + "', '" + attributes.getLocalName(i)
@@ -149,13 +148,13 @@ public class SAXLoggerProcessor extends ProcessorImpl {
         }
 
         public void startPrefixMapping(String s, String s1) throws SAXException {
-            final FastStringBuffer message = new FastStringBuffer(getLogSpaces());
+            final StringBuilder message = new StringBuilder(getLogSpaces());
             message.append("startPrefixMapping('" + s + "', '" + s1 + "')");
             logger.info(message);
             super.startPrefixMapping(s, s1);
         }
 
-        private void addLocatorInfo(FastStringBuffer message) {
+        private void addLocatorInfo(StringBuilder message) {
             if (locator != null) {
                 message.append(" [");
                 if (locator.getSystemId() != null)

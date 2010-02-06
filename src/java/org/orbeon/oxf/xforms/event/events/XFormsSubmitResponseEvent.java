@@ -24,7 +24,10 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.SingletonIterator;
 import org.orbeon.saxon.value.IntegerValue;
 import org.orbeon.saxon.value.StringValue;
 
@@ -83,7 +86,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
 
             if (headers != null && headers.size() > 0) {
                 // Create and return sequence of <header> elements
-                final FastStringBuffer sb = new FastStringBuffer(100);
+                final StringBuilder sb = new StringBuilder(100);
                 sb.append("<headers>");
                 for (Map.Entry<String, List<String>> currentEntry: headers.entrySet()) {
                     sb.append("<header><name>");

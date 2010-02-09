@@ -139,7 +139,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     if (xformsSubmissionPath != null) {
                         final Element firstPageElement = controllerDocument.getRootElement().element("page");
                         if (firstPageElement != null) {
-                            final List<Element> allElements = controllerDocument.getRootElement().elements();
+                            final List<Element> allElements = Dom4jUtils.elements(controllerDocument.getRootElement());
                             final int firstPageElementIndex = allElements.indexOf(firstPageElement);
                             final Element newElement = Dom4jUtils.createElement("page", CONTROLLER_NAMESPACE_URI);
                             newElement.addAttribute("path-info", xformsSubmissionPath);
@@ -192,24 +192,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         }
                         addInput(new ASTInput("config", config));
                         addOutput(request);
-                    }});
-
-                    // Generate request parameters
-                    // Do this separately, so that we do not "tee" (and store in memory) the request parameters
-                    final ASTOutput requestWithParameters = new ASTOutput("data", "request-with-parameters");// {{setDebug("request params");}};
-                    addStatement(new ASTProcessorCall(XMLConstants.REQUEST_PROCESSOR_QNAME) {{
-                        final Document config;
-                        try {
-                            config = Dom4jUtils.readDom4j
-                                    ("<config><include>/request/parameters</include></config>", false, false);
-//                                    ("<config xmlns:xs='http://www.w3.org/2001/XMLSchema' stream-type='xs:anyURI'><include>/request/parameters</include></config>");
-                        } catch (DocumentException e) {
-                            throw new OXFException(e);
-                        } catch ( final SAXException e ) {
-                            throw new OXFException( e );
-                        }
-                        addInput(new ASTInput("config", config));
-                        addOutput(requestWithParameters);
                     }});
 
                     // Dummy matcher output
@@ -276,11 +258,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                             // Create <p:when>
                             ASTWhen when;
-                            final ASTOutput _matcherOutput;
+                            final ASTOutput matcherOutput;
                             if (matcherURI == null && matcherQName == null) {
                                 // There is no matcher, use basic rules
 
-                                _matcherOutput = dummyMatcherOutput;
+                                matcherOutput = dummyMatcherOutput;
 
                                 // Add <p:choose> / <p:otherwise> when necessary
                                 if (!previousIsSimple) {
@@ -335,7 +317,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                                 // Execute regexp
                                 final ASTOutput realMatcherOutput = new ASTOutput("data", "matcher-" + (++matcherCount));
-                                _matcherOutput = realMatcherOutput;
+                                matcherOutput = realMatcherOutput;
                                 statements.add(new ASTProcessorCall(matcherQName, matcherURI) {{
                                     Document config = new NonLazyUserDataDocument(new NonLazyUserDataElement("regexp"));
                                     config.getRootElement().addText(pathInfo);
@@ -345,11 +327,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 }});
 
                                 // Add <p:choose>
-                                currentChoose = new ASTChoose(new ASTHrefId(_matcherOutput));
+                                currentChoose = new ASTChoose(new ASTHrefId(matcherOutput));
                                 statements.add(currentChoose);
                                 when = new ASTWhen("/result/matches = 'true'");
                             }
-                            final ASTOutput matcherOutput = _matcherOutput;
 
                             if (canAddToPreviousWhen) {
                                 // Do not create new "when", add current condition to previous "when"
@@ -374,7 +355,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                     // Get unique page number
                                     int pageNumber = element.getParent().elements().indexOf(element);
                                     handlePage(stepProcessorContext, controllerContext, when.getStatements(), element,
-                                            pageNumber, requestWithParameters, matcherOutput, epilogueData, epilogueModelData,
+                                            pageNumber, matcherOutput, epilogueData, epilogueModelData,
                                             epilogueInstance, pageIdToPathInfo, pageIdToXFormsModel, pageIdToSetvaluesDocument,
                                             globalInstancePassing);
                                 }
@@ -403,7 +384,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 throw new OXFException("Cannot find \"not found\" page with id '" + notFoundPageId + "' in page flow");
                             // Create an artificial page number (must be different from the other page numbers)
                             handlePage(stepProcessorContext, controllerContext, statementsList, notFoundPageElement,
-                                    pageCount, requestWithParameters, dummyMatcherOutput, epilogueData, epilogueModelData,
+                                    pageCount, dummyMatcherOutput, epilogueData, epilogueModelData,
                                     epilogueInstance, pageIdToPathInfo, pageIdToXFormsModel, pageIdToSetvaluesDocument,
                                     globalInstancePassing);
                         } else {
@@ -474,7 +455,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         // actually know what a "resource" is.
         final List<URLRewriterUtils.PathMatcher> pathMatchers = pageFlow.getPathMatchers();
         if (pathMatchers != null && pathMatchers.size() > 0) {
-            final List<URLRewriterUtils.PathMatcher> existingFileInfos = (List) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+            final List<URLRewriterUtils.PathMatcher> existingFileInfos = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
             if (existingFileInfos == null) {
                 // Set if we are the first
                 pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, pathMatchers);
@@ -568,7 +549,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
      */
     private void handlePage(final StepProcessorContext stepProcessorContext, final String controllerContext,
                             List<ASTStatement> statementsList, final Element pageElement, final int pageNumber,
-                            final ASTOutput requestWithParameters, final ASTOutput matcherOutput,
+                            final ASTOutput matcherOutput,
                             final ASTOutput viewData, final ASTOutput epilogueModelData, final ASTOutput viewInstance,
                             final Map<String, String> pageIdToPathInfo,
                             final Map<String, String> pageIdToXFormsModel,
@@ -1152,6 +1133,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             } else if (isVersioned) {
                 // Path is versioned for Orbeon resources, but not for app resources
                 // TODO: add test for /xbl/orbeon and /forms/orbeon
+                // TODO: don't hardcode these paths, see URLRewriterUtils
                 addInput(new ASTInput("config",
                             new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request),
                                     "for $path in string(/request/request-path) return" +

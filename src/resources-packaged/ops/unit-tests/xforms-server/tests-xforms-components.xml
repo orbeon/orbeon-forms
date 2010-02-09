@@ -734,15 +734,13 @@
                         <xxf:attribute id="my-autocomplete$xf-10" for="my-autocomplete$xf-10" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-autocomplete$select1" class="fr-autocomplete-select1">One</xxf:control>
                         <xxf:attribute id="my-autocomplete$select1" for="my-autocomplete$select1" name="style">display: none</xxf:attribute>
+                        <xxf:itemset id="my-autocomplete$select1">[["One","One"],["Two","Two"],["Three","Three"],["One","One"],["Two","Two"],["Three","Three"]]</xxf:itemset>
                         <xxf:control id="my-autocomplete$external-value" class="fr-autocomplete-external-value">One</xxf:control>
                         <xxf:attribute id="my-autocomplete$external-value" for="my-autocomplete$external-value" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-autocomplete$value-selected" class="fr-autocomplete-value-selected"/>
                         <xxf:attribute id="my-autocomplete$value-selected" for="my-autocomplete$value-selected" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-autocomplete$search" class="fr-autocomplete-search"/>
                     </xxf:control-values>
-                    <xxf:itemsets>
-                        <xxf:itemset id="my-autocomplete$select1">[["One","One"],["Two","Two"],["Three","Three"],["One","One"],["Two","Two"],["Three","Three"]]</xxf:itemset>
-                    </xxf:itemsets>
                     <xxf:script name="my_autocomplete_init_xforms_function" target-id="my-autocomplete$component-inner-group" observer-id="my-autocomplete$component-inner-group"/>
                     <xxf:setfocus control-id="my-autocomplete$search"/>
                 </xxf:action>

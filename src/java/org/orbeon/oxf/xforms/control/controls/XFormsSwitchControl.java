@@ -15,12 +15,16 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.Collections;
 import java.util.List;
@@ -177,5 +181,71 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     @Override
     public boolean setFocus() {
         return getSelectedCase().setFocus();
+    }
+
+    @Override
+    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
+
+        if (other == null || !(other instanceof XFormsSwitchControl))
+            return false;
+
+        if (this == other)
+            return true;
+
+        final XFormsSwitchControl otherSwitchControl = (XFormsSwitchControl) other;
+
+        // Check whether selected case has changed
+        final String selectedCaseEffectiveId = getSelectedCase().getEffectiveId();
+        final String previousSelectedCaseId
+                = (otherSwitchControl != null)
+                    ? ((XFormsSwitchControl.XFormsSwitchControlLocal) otherSwitchControl.getInitialLocal()).getSelectedCaseControl().getEffectiveId() : null;
+        if (!selectedCaseEffectiveId.equals(previousSelectedCaseId))
+            return false;
+
+        return super.equalsExternal(propertyContext, other);
+    }
+
+    @Override
+    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
+        // Output regular diff
+        super.outputAjaxDiff(pipelineContext, ch, other, attributesImpl, isNewlyVisibleSubtree);
+
+        // Output switch-specific diff
+        final XFormsSwitchControl switchControl1 = (XFormsSwitchControl) other;
+        final XFormsSwitchControl switchControl2 = this;
+
+        final String selectedCaseEffectiveId = switchControl2.getSelectedCase().getEffectiveId();
+
+        // Only output the information if it has changed
+        final String previousSelectedCaseId
+                = (switchControl1 != null)
+                    ? ((XFormsSwitchControl.XFormsSwitchControlLocal) switchControl1.getInitialLocal()).getSelectedCaseControl().getEffectiveId() : null;
+
+        // Output selected case id
+        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
+                "id", selectedCaseEffectiveId,
+                "visibility", "visible"
+        });
+
+        if (previousSelectedCaseId != null) {
+            // Output deselected case ids
+            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
+                    "id", previousSelectedCaseId,
+                    "visibility", "hidden"}
+            );
+        } else {
+            // This is a new switch (can happen with repeat), send all deselected to be sure
+            final List<XFormsControl> children = switchControl2.getChildren();
+            if (children != null && children.size() > 0) {
+                for (final XFormsControl caseControl: children) {
+                    if (!caseControl.getEffectiveId().equals(selectedCaseEffectiveId)) {
+                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
+                                "id", caseControl.getEffectiveId(),
+                                "visibility", "hidden"
+                        });
+                    }
+                }
+            }
+        }
     }
 }

@@ -1,22 +1,22 @@
 /**
- *  Copyright (C) 2004-2007 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xml;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.orbeon.oxf.processor.SAXLoggerProcessor;
+import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -27,8 +27,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * SAXStore keeps a compact representation of SAX events sent to the ContentHandler interface.
@@ -71,12 +71,44 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     private int[] attributeCountBuffer;
     private int attributeCountBufferPosition;
 
-    private List stringBuffer = new ArrayList();
+    private List<String> stringBuffer = new ArrayList<String>();
 
     private boolean hasDocumentLocator;
     private String publicId;
 
     private transient Locator locator; // used only for recording events, MUST be cleared afterwards
+
+    private static final Mark START_MARK = new Mark();
+
+    public static class Mark {
+        public final int eventBufferPosition;
+        public final int charBufferPosition;
+        public final int intBufferPosition;
+        public final int lineBufferPosition;
+        public final int systemIdBufferPosition;
+        public final int attributeCountBufferPosition;
+        public final int stringBufferPosition;
+
+        private Mark() {
+            this.eventBufferPosition = 0;
+            this.charBufferPosition = 0;
+            this.intBufferPosition = 0;
+            this.lineBufferPosition = 0;
+            this.systemIdBufferPosition = 0;
+            this.attributeCountBufferPosition = 0;
+            this.stringBufferPosition = 0;
+        }
+
+        private Mark(final SAXStore store) {
+            this.eventBufferPosition = store.eventBufferPosition;
+            this.charBufferPosition = store.charBufferPosition;
+            this.intBufferPosition = store.intBufferPosition;
+            this.lineBufferPosition = store.lineBufferPosition;
+            this.systemIdBufferPosition = store.systemIdBufferPosition;
+            this.attributeCountBufferPosition = store.attributeCountBufferPosition;
+            this.stringBufferPosition = store.stringBuffer.size();
+        }
+    }
 
     public long getApproximateSize() {
         long size = eventBufferPosition * 4;
@@ -99,8 +131,8 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
 
         {
             String previousString = null;
-            for (Iterator i = stringBuffer.iterator(); i.hasNext();) {
-                final String currentString = (String) i.next();
+            for (Iterator<String> i = stringBuffer.iterator(); i.hasNext();) {
+                final String currentString = i.next();
                 // This is rough, but entries in the list could point to the same string, so we try to detect this case.
                 if (currentString != null && currentString != previousString)
                     size += currentString.length() * 2;
@@ -159,17 +191,19 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         locator = null;
     }
 
-
     public void replay(ContentHandler ch) throws SAXException {
-        int intBufferPos = 0;
-        int charBufferPos = 0;
-        int stringBufferPos = 0;
-        int attributeCountBufferPos = 0;
-        final int[] lineBufferPos = { 0 } ;
-        final int[] systemIdBufferPos = { 0 } ;
-        AttributesImpl attributes = new AttributesImpl();
-        int length;
-        int event = 0;
+        replay(ch, START_MARK);
+    }
+
+    public void replay(ContentHandler ch, Mark mark) throws SAXException {
+        int intBufferPos = mark.intBufferPosition;
+        int charBufferPos = mark.charBufferPosition;
+        int stringBufferPos = mark.stringBufferPosition;
+        int attributeCountBufferPos = mark.attributeCountBufferPosition;
+        final int[] lineBufferPos = { mark.lineBufferPosition } ;
+        final int[] systemIdBufferPos = { mark.systemIdBufferPosition } ;
+        final AttributesImpl attributes = new AttributesImpl();
+        int currentEventPosition = mark.eventBufferPosition;
 
         final Locator outputLocator = !hasDocumentLocator ? null : new Locator() {
             public String getPublicId() {
@@ -209,66 +243,91 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
             ch.setDocumentLocator(outputLocator);
         }
 
-        while (event < eventBufferPosition) {
-            final byte eventType = eventBuffer[event];
+        // Handle element marks
+        final boolean handleElementMark = (mark != START_MARK) && (eventBuffer[currentEventPosition] == START_ELEMENT);
+
+        int elementLevel = 0;
+        eventLoop: while (currentEventPosition < eventBufferPosition) {
+            final byte eventType = eventBuffer[currentEventPosition];
             final boolean eventHasLocation = hasDocumentLocator && eventType != END_PREFIX_MAPPING && eventType != START_PREFIX_MAPPING;
             switch (eventType) {
-                case START_DOCUMENT:
+                case START_DOCUMENT: {
                     ch.startDocument();
                     break;
-                case START_ELEMENT:
-                    String namespaceURI = (String) stringBuffer.get(stringBufferPos++);
-                    String localName = (String) stringBuffer.get(stringBufferPos++);
-                    String qName = (String) stringBuffer.get(stringBufferPos++);
+                }
+                case START_ELEMENT: {
+                    final String namespaceURI = stringBuffer.get(stringBufferPos++);
+                    final String localName = stringBuffer.get(stringBufferPos++);
+                    final String qName = stringBuffer.get(stringBufferPos++);
                     attributes.clear();
-                    int attributeCount = attributeCountBuffer[attributeCountBufferPos++];
+                    final int attributeCount = attributeCountBuffer[attributeCountBufferPos++];
                     for (int i = 0; i < attributeCount; i++) {
-                        attributes.addAttribute((String) stringBuffer.get(stringBufferPos++),
-                                (String) stringBuffer.get(stringBufferPos++), (String) stringBuffer.get(stringBufferPos++),
-                                (String) stringBuffer.get(stringBufferPos++), (String) stringBuffer.get(stringBufferPos++));
+                        attributes.addAttribute(stringBuffer.get(stringBufferPos++),
+                                stringBuffer.get(stringBufferPos++), stringBuffer.get(stringBufferPos++),
+                                stringBuffer.get(stringBufferPos++), stringBuffer.get(stringBufferPos++));
                     }
                     ch.startElement(namespaceURI, localName, qName, attributes);
+                    elementLevel++;
                     break;
-                case CHARACTERS:
-                    length = intBuffer[intBufferPos++];
+                }
+                case CHARACTERS: {
+                    final int length = intBuffer[intBufferPos++];
                     ch.characters(charBuffer, charBufferPos, length);
                     charBufferPos += length;
                     break;
-                case END_ELEMENT:
-                    ch.endElement((String) stringBuffer.get(stringBufferPos++),
-                            (String) stringBuffer.get(stringBufferPos++),
-                            (String) stringBuffer.get(stringBufferPos++));
+                }
+                case END_ELEMENT: {
+                    elementLevel--;
+                    ch.endElement(stringBuffer.get(stringBufferPos++),
+                            stringBuffer.get(stringBufferPos++),
+                            stringBuffer.get(stringBufferPos++));
+
+                    if (handleElementMark && elementLevel == 0) {
+                        // Back to ground level, we are done!
+                        break eventLoop;
+                    }
+
                     break;
-                case END_DOCUMENT:
+                }
+                case END_DOCUMENT: {
                     ch.endDocument();
                     break;
-                case END_PREFIX_MAPPING:
-                    ch.endPrefixMapping((String) stringBuffer.get(stringBufferPos++));
+                }
+                case END_PREFIX_MAPPING: {
+                    ch.endPrefixMapping(stringBuffer.get(stringBufferPos++));
                     break;
-                case IGN_WHITESPACE:
-                    length = intBuffer[intBufferPos++];
+                }
+                case IGN_WHITESPACE: {
+                    final int length = intBuffer[intBufferPos++];
                     ch.ignorableWhitespace(charBuffer, charBufferPos, length);
                     charBufferPos += length;
                     break;
-                case PI:
-                    ch.processingInstruction((String) stringBuffer.get(stringBufferPos++),
-                            (String) stringBuffer.get(stringBufferPos++));
+                }
+                case PI: {
+                    ch.processingInstruction(stringBuffer.get(stringBufferPos++),
+                            stringBuffer.get(stringBufferPos++));
                     break;
-                case SKIPPED_ENTITY:
-                    ch.skippedEntity((String) stringBuffer.get(stringBufferPos++));
+                }
+                case SKIPPED_ENTITY: {
+                    ch.skippedEntity(stringBuffer.get(stringBufferPos++));
                     break;
-                case START_PREFIX_MAPPING:
-                    ch.startPrefixMapping((String) stringBuffer.get(stringBufferPos++),
-                            (String) stringBuffer.get(stringBufferPos++));
+                }
+                case START_PREFIX_MAPPING: {
+                    ch.startPrefixMapping(stringBuffer.get(stringBufferPos++),
+                            stringBuffer.get(stringBufferPos++));
                     break;
+                }
             }
-            event++;
+            currentEventPosition++;
             if (eventHasLocation) {
                 lineBufferPos[0] += 2;
                 systemIdBufferPos[0]++;
             }
         }
+    }
 
+    public Mark getElementMark() {
+        return new Mark(this);
     }
 
     /**
@@ -287,7 +346,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     }
 
     /**
-     * This outputs the content to the SAXLoggerProcessor logger. For debug only
+     * This outputs the content to the SAXLoggerProcessor logger. For debug only.
      */
     public void logContents() {
         try {
@@ -311,6 +370,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         }
     }
 
+    @Override
     public void characters(char[] chars, int start, int length) throws SAXException {
 
         addToEventBuffer(CHARACTERS);
@@ -326,6 +386,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         super.characters(chars, start, length);
     }
 
+    @Override
     public void endDocument() throws SAXException {
 
         addToEventBuffer(END_DOCUMENT);
@@ -340,6 +401,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         locator = null;
     }
 
+    @Override
     public void endElement(String uri, String localname, String qName) throws SAXException {
 
         addToEventBuffer(END_ELEMENT);
@@ -355,6 +417,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         super.endElement(uri, localname, qName);
     }
 
+    @Override
     public void endPrefixMapping(String s) throws SAXException {
 
         addToEventBuffer(END_PREFIX_MAPPING);
@@ -364,6 +427,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         super.endPrefixMapping(s);
     }
 
+    @Override
     public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {
 
 //        if (ended) return;
@@ -381,6 +445,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         super.ignorableWhitespace(chars, start, length);
     }
 
+    @Override
     public void processingInstruction(String s, String s1) throws SAXException {
 
         addToEventBuffer(PI);
@@ -395,12 +460,14 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         super.processingInstruction(s, s1);
     }
 
+    @Override
     public void setDocumentLocator(Locator locator) {
         this.hasDocumentLocator = locator != null;
         this.locator = locator;
         super.setDocumentLocator(locator);
     }
 
+    @Override
     public void skippedEntity(String s) throws SAXException {
 
         addToEventBuffer(SKIPPED_ENTITY);
@@ -414,6 +481,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         super.skippedEntity(s);
     }
 
+    @Override
     public void startDocument() throws SAXException {
 
         addToEventBuffer(START_DOCUMENT);
@@ -425,6 +493,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         super.startDocument();
     }
 
+    @Override
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         addToEventBuffer(START_ELEMENT);
@@ -533,6 +602,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         }
     }
 
+
     protected void addToEventBuffer(byte b) {
         if (eventBuffer.length - eventBufferPosition == 1) {
             // double the array
@@ -608,7 +678,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
 
         out.writeInt(stringBuffer.size());
         for (int i = 0; i < stringBuffer.size(); i++)
-            out.writeUTF((String) stringBuffer.get(i));
+            out.writeUTF(stringBuffer.get(i));
 
         out.writeBoolean(hasDocumentLocator);
         out.writeUTF(publicId == null ? "" : publicId);

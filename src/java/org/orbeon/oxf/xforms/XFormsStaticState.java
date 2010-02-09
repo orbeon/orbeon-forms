@@ -89,8 +89,7 @@ public class XFormsStaticState {
     // Static analysis
     private boolean isAnalyzed;                                             // whether this document has been analyzed already
 
-    // Namespace information
-    private Map<String, Map<String, String>> namespacesMap;                 // Map<String prefixedId, Map<String prefix, String uri>> of namespace mappings
+    private XFormsAnnotatorContentHandler.Metadata metadata;
 
     // Event handlers
     private Set<String> eventNames;                                         // used event names
@@ -141,12 +140,11 @@ public class XFormsStaticState {
      *
      * @param propertyContext       current context
      * @param staticStateDocument   document containing the static state, may be modified by this constructor and must be discarded afterwards by the caller
-     * @param idGenerator           generator for the top-level scope
-     * @param namespacesMap         map of namespace mappings, null if not available
+     * @param metadata              metadata or null if not available
      * @param annotatedDocument     SAXStore containing the XHTML for noscript mode, null if not available
      */
-    public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, IdGenerator idGenerator, Map<String, Map<String, String>> namespacesMap, SAXStore annotatedDocument) {
-        initialize(propertyContext, staticStateDocument, idGenerator, namespacesMap, annotatedDocument, null);
+    public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, XFormsAnnotatorContentHandler.Metadata metadata, SAXStore annotatedDocument) {
+        initialize(propertyContext, staticStateDocument, metadata, annotatedDocument, null);
     }
 
     /**
@@ -162,7 +160,7 @@ public class XFormsStaticState {
         final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedStaticState);
 
         // Initialize
-        initialize(pipelineContext, staticStateDocument, null, null, null, encodedStaticState);
+        initialize(pipelineContext, staticStateDocument, null, null, encodedStaticState);
     }
 
     public IndentedLogger getIndentedLogger() {
@@ -186,13 +184,13 @@ public class XFormsStaticState {
      *
      * @param propertyContext       current context
      * @param staticStateDocument   document containing the static state, may be modified by this constructor and must be discarded afterwards by the caller
-     * @param idGenerator           generator for the top-level scope
-     * @param namespacesMap         map of namespace mappings, null if not available
+     * @param metadata              metadata or null if not available
      * @param xhtmlDocument         SAXStore containing the XHTML for noscript mode, null if not available
      * @param encodedStaticState    existing serialization of static state, null if not available
      */
-    private void initialize(PropertyContext propertyContext, Document staticStateDocument, IdGenerator idGenerator,
-                            Map<String, Map<String, String>> namespacesMap, SAXStore xhtmlDocument, String encodedStaticState) {
+    private void initialize(PropertyContext propertyContext, Document staticStateDocument,
+                            XFormsAnnotatorContentHandler.Metadata metadata,
+                            SAXStore xhtmlDocument, String encodedStaticState) {
 
         indentedLogger.startHandleOperation("", "initializing static state");
 
@@ -221,10 +219,8 @@ public class XFormsStaticState {
 
         // Recompute namespace mappings if needed
         final Element htmlElement = staticStateElement.element(XMLConstants.XHTML_HTML_QNAME);
-        if (namespacesMap == null) {
-            assert idGenerator == null : "idGenerator must be null if namespacesMap is null";
-            this.namespacesMap = new HashMap<String, Map<String, String>>();
-
+        if (metadata == null) {
+            final IdGenerator idGenerator;
             {
                 // Use the last id used for id generation. During state restoration, XBL components must start with this id.
                 final Element currentIdElement = staticStateElement.element(XFormsExtractorContentHandler.LAST_ID_QNAME);
@@ -233,6 +229,8 @@ public class XFormsStaticState {
                 assert lastId != null;
                 idGenerator = new IdGenerator(Integer.parseInt(lastId));
             }
+            final Map<String, Map<String, String>> namespacesMap = new HashMap<String, Map<String, String>>();
+            this.metadata = new XFormsAnnotatorContentHandler.Metadata(idGenerator, namespacesMap);
             try {
 //                if (xhtmlDocument == null) {
                     // Recompute from staticStateDocument
@@ -243,7 +241,7 @@ public class XFormsStaticState {
                     if (htmlElement != null)
                         htmlElement.detach();
                     // Compute namespaces map
-                    identity.transform(new DocumentSource(staticStateDocument), new SAXResult(new XFormsAnnotatorContentHandler(this.namespacesMap, idGenerator)));
+                    identity.transform(new DocumentSource(staticStateDocument), new SAXResult(new XFormsAnnotatorContentHandler(this.metadata)));
                     // Re-attach xhtml element
                     if (htmlElement != null)
                         staticStateElement.add(htmlElement);
@@ -258,11 +256,11 @@ public class XFormsStaticState {
             }
         } else {
             // Use map that was passed
-            this.namespacesMap = namespacesMap;
+            this.metadata = metadata;
         }
 
         // Extract controls, models and components documents
-        extractControlsModelsComponents(propertyContext, staticStateElement, idGenerator);
+        extractControlsModelsComponents(propertyContext, staticStateElement, this.metadata.idGenerator);
 
         // Extract properties information
         extractProperties(staticStateElement);
@@ -274,9 +272,15 @@ public class XFormsStaticState {
                 final Document htmlDocument = Dom4jUtils.createDocument();
                 htmlDocument.setRootElement((Element) htmlElement.detach());
                 this.xhtmlDocument = TransformerUtils.dom4jToSAXStore(htmlDocument);
-            } else if (getBooleanProperty(XFormsProperties.NOSCRIPT_PROPERTY)) {
+            } else if (isNoScript()) {
                 // Use provided SAXStore ONLY if noscript mode is requested
                 this.xhtmlDocument = xhtmlDocument;
+            } else if (this.metadata.marks.size() > 0) {
+                // Keep XHTML if we have marks
+                this.xhtmlDocument = xhtmlDocument;
+            } else {
+                // Otherwise there is no need to keep XHTML
+                this.xhtmlDocument = null;
             }
         }
 
@@ -461,7 +465,7 @@ public class XFormsStaticState {
         }
 
         // Extract components
-        xblBindings = new XBLBindings(indentedLogger, this, idGenerator, namespacesMap, staticStateElement);
+        xblBindings = new XBLBindings(indentedLogger, this, idGenerator, metadata.namespaceMappings, staticStateElement);
     }
 
     /**
@@ -559,6 +563,15 @@ public class XFormsStaticState {
 
         // Return all containers
         return Dom4jUtils.elements(modelDocument.getRootElement(), XFormsConstants.XFORMS_INSTANCE_QNAME);
+    }
+
+    /**
+     * Whether the noscript mode is enabled.
+     *
+     * @return true iif noscript mode is enabled
+     */
+    public boolean isNoScript() {
+        return getBooleanProperty(XFormsProperties.NOSCRIPT_PROPERTY);
     }
 
     /**
@@ -725,7 +738,7 @@ public class XFormsStaticState {
         if (id != null) {
             // There is an id attribute
             final String prefixedId = (prefix != null) ? prefix + id : id; 
-            final Map<String, String> cachedMap = namespacesMap.get(prefixedId);
+            final Map<String, String> cachedMap = metadata.namespaceMappings.get(prefixedId);
             if (cachedMap != null) {
                 return cachedMap;
             } else {
@@ -1605,5 +1618,9 @@ public class XFormsStaticState {
             repeatControlInfo = repeatControlInfo.ancestorRepeat;
         }
         return result;
+    }
+
+    public SAXStore.Mark getElementMark(String prefixedId) {
+        return metadata.marks.get(prefixedId);
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -113,10 +113,8 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="select-control" label="Items">1</xxf:control>
-                    </xxf:control-values>
-                    <xxf:itemsets>
                         <xxf:itemset id="select-control">[["Apple","1"],["Banana","2"],["Orange","3"],["Kiwi","4"]]</xxf:itemset>
-                    </xxf:itemsets>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -205,10 +203,8 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="select-control" label="Items"/>
-                    </xxf:control-values>
-                    <xxf:itemsets>
                         <xxf:itemset id="select-control">[["Encyclopedia","en1",["Science","sc1"],["Culture","cu1",["Art","ar1"],["Craft","cr1"]]],["Encyclopedia","en2",["Science","sc2"],["Culture","cu2",["Art","ar2"],["Craft","cr2"]]]]</xxf:itemset>
-                    </xxf:itemsets>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -386,12 +382,11 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values/>
-                    <xxf:itemsets>
+                    <xxf:control-values>
                         <xxf:itemset id="select-1">[["1","1"],["2","2",["2.1","2.1"],["2.2","2.2"],["2.3","2.3",["2.3.1","2.3.1"],["2.3.2","2.3.2",["2.3.3","2.3.3"]]]],["3","3"]]</xxf:itemset>
                         <xxf:itemset id="select-2">[["2","2",["2.1","2.1"],["2.3","2.3",["2.3.1","2.3.1"],["2.3.2","2.3.2",["2.3.3","2.3.3"]]]],["3","3"]]</xxf:itemset>
                         <xxf:itemset id="select-3">[["1","1"],["2","2",["2.1","2.1"],["2.2","2.2"],["2.3","",["2.3.2","",["2.three.4","2.three.4"]]]]]</xxf:itemset>
-                    </xxf:itemsets>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -471,10 +466,9 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values/>
-                    <xxf:itemsets>
+                    <xxf:control-values>
                         <xxf:itemset id="select-1">[["1","1"],["2.1","2.1"],["2.2.1","2.2.1"],["2.2.2.1","2.2.2.1"]]</xxf:itemset>
-                    </xxf:itemsets>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -545,10 +539,9 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values/>
-                    <xxf:itemsets>
+                    <xxf:control-values>
                         <xxf:itemset id="select-1">[["1","1"],["2","2",["2.1","2.1"],["2.2","2.2",["2.2.1","2.2.1"],["2.2.2","2.2.2",["2.2.2.2","2.2.2.2"]]]]]</xxf:itemset>
-                    </xxf:itemsets>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>

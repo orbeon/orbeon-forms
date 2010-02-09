@@ -410,33 +410,31 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
+                     <xxf:control-values>
                         <xxf:control id="fr-dropdown-date$xf-25·1" label="Date: "/>
                         <xxf:control id="fr-dropdown-date$year-select·1">2009</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date$year-select·1">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
                         <xxf:control id="fr-dropdown-date$month-select·1">1</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date$month-select·1">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
                         <xxf:control id="fr-dropdown-date$day-select·1">2</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date$day-select·1">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
                         <xxf:control id="fr-dropdown-date$xf-25·2" label="Date: "/>
                         <xxf:control id="fr-dropdown-date$year-select·2">2008</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date$year-select·2">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
                         <xxf:control id="fr-dropdown-date$month-select·2">2</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date$month-select·2">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
                         <xxf:control id="fr-dropdown-date$day-select·2">1</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date$day-select·2">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
                         <xxf:control id="fr-dropdown-date$xf-25·3" label="Date: "/>
                         <xxf:control id="fr-dropdown-date$year-select·3">2008</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date$year-select·3">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
                         <xxf:control id="fr-dropdown-date$month-select·3">2</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date$month-select·3">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
                         <xxf:control id="fr-dropdown-date$day-select·3">1</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date$day-select·3">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
                         <xxf:control id="add-row-trigger" label="Add"/>
                         <xxf:control id="remove-row-trigger" label="Remove"/>
                     </xxf:control-values>
-                    <xxf:itemsets>
-                        <xxf:itemset id="fr-dropdown-date$year-select·1">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$month-select·1">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$day-select·1">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$year-select·2">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$month-select·2">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$day-select·2">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$year-select·3">[["Year",""],["2009","2009"],["2008","2008"],["2007","2007"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$month-select·3">[["Month",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                        <xxf:itemset id="fr-dropdown-date$day-select·3">[["Day",""],["1","1"],["2","2"],["3","3"]]</xxf:itemset>
-                    </xxf:itemsets>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -2521,13 +2519,11 @@
                     <xxf:control-values>
                         <xxf:control id="my-foo-1$xf-4">42</xxf:control>
                         <xxf:control id="my-foo-1$my-inner-select1">42</xxf:control>
+                        <xxf:itemset id="my-foo-1$my-inner-select1">[["Apple","apple"],["Banana","banana"]]</xxf:itemset>
                         <xxf:control id="my-foo-2$xf-12">43</xxf:control>
                         <xxf:control id="my-foo-2$my-inner-select1">43</xxf:control>
-                    </xxf:control-values>
-                    <xxf:itemsets>
-                        <xxf:itemset id="my-foo-1$my-inner-select1">[["Apple","apple"],["Banana","banana"]]</xxf:itemset>
                         <xxf:itemset id="my-foo-2$my-inner-select1">[["43","",["Pear","pear"]],["42","",["Orange","orange"],["Kiwi","kiwi"]],["Apple","apple"]]</xxf:itemset>
-                    </xxf:itemsets>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>

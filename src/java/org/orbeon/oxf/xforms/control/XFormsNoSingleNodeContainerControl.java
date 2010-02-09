@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public abstract class XFormsNoSingleNodeContainerControl extends XFormsControl implements XFormsContainerControl {
@@ -105,5 +106,39 @@ public abstract class XFormsNoSingleNodeContainerControl extends XFormsControl i
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean equalsExternalRecurse(PropertyContext propertyContext, XFormsControl other) {
+        // NOTE: This is duplicated in XFormsSingleNodeContainerControl
+
+        if (other == null || !(other instanceof XFormsNoSingleNodeContainerControl))
+            return false;
+
+        if (this == other)
+            return true;
+
+        // Check children sizes
+        final XFormsNoSingleNodeContainerControl otherContainerControl = (XFormsNoSingleNodeContainerControl) other;
+        if (otherContainerControl.getSize() != getSize())
+            return false;
+
+        // Check this here as that might be faster than checking the children
+        if (!super.equalsExternalRecurse(propertyContext, other))
+            return false;
+
+        // Check children
+        if (getSize() > 0) {
+            final Iterator<XFormsControl> otherIterator = otherContainerControl.children.iterator();
+            for (final XFormsControl control: children) {
+                final XFormsControl otherControl = otherIterator.next();
+
+                // This achieves depth-first (not sure which is better)
+                if (!control.equalsExternalRecurse(propertyContext, otherControl))
+                    return false;
+            }
+        }
+
+        return true;
     }
 }

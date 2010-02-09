@@ -6211,12 +6211,12 @@ ORBEON.xforms.Server = {
                             }
                         }
 
-                        // Second handle the <xxforms:itemsets> actions (we want to do this before we set the value of
+                        // Second handle the <xxforms:itemset> actions (we want to do this before we set the value of
                         // controls as the value of the select might be in the new values of the itemset).
                         var controlsWithUpdatedItemsets = {};
                         for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
                             // Change values in an itemset
-                            if (ORBEON.util.Utils.getLocalName(actionElement.childNodes[actionIndex]) == "itemsets") {
+                            if (ORBEON.util.Utils.getLocalName(actionElement.childNodes[actionIndex]) == "control-values") {
                                 var itemsetsElement = actionElement.childNodes[actionIndex];
                                 for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
                                     if (ORBEON.util.Utils.getLocalName(itemsetsElement.childNodes[j]) == "itemset") {
@@ -6787,6 +6787,18 @@ ORBEON.xforms.Server = {
                                                 && ORBEON.util.Utils.getProperty(HTML_EDITOR_PROPERTY) == "fck") {
                                             ORBEON.xforms.Controls.updateHTMLAreaClasses(documentElement);
                                         }
+                                    }
+
+                                    // Handle innerHTML updates
+                                    var innerElements = ORBEON.util.Dom.getElementsByName(controlValuesElement, "inner-html", xmlNamespace);
+                                    var innerElementsLength = innerElements.length;
+                                    for (var j = 0; j < innerElementsLength; j++) {
+                                        var innerElement = innerElements[j];
+                                        var innerHTML = ORBEON.util.Dom.getStringValue(innerElement);
+                                        var controlId = ORBEON.util.Dom.getAttribute(innerElement, "id");
+
+                                        var documentElement = ORBEON.util.Dom.getElementById(controlId);
+                                        documentElement.innerHTML = innerHTML;
                                     }
 
                                     // Handle updates to HTML attributes

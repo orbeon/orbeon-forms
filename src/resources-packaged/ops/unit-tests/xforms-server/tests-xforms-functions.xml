@@ -462,10 +462,8 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-select">+s85RSYyKV8=</xxf:control>
-                    </xxf:control-values>
-                    <xxf:itemsets>
                         <xxf:itemset id="my-select">[["Select...",""],["One","A21R1qCnPIg="],["Two","+s85RSYyKV8="],["Three","PAIYFi0+row="]]</xxf:itemset>
-                    </xxf:itemsets>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -36,5 +36,10 @@ public class XFormsGroupControl extends XFormsValueContainerControl {
         // Static readonly-ness doesn't seem to make much sense for xforms:group, and we don't want to see the
         // xforms-static class in the resulting HTML
         return false;
+    }
+
+    @Override
+    public boolean supportAjaxUpdates() {
+        return !INTERNAL_APPEARANCE.equals(getAppearance());
     }
 }

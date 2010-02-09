@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -20,10 +20,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
   * Represents an itemset.
@@ -184,5 +181,19 @@ public class Itemset implements ItemContainer {
             return false;
 
         return true;
+    }
+
+    /**
+     * Compare two itemsets, handling null as an itemset of size 0.
+     *
+     * @param itemset1  first itemset
+     * @param itemset2  second itemset
+     * @return          true iif the itemsets are identical
+     */
+    public static boolean compareItemsets(Itemset itemset1, Itemset itemset2) {
+        final List<Item> children1 = (itemset1 != null) ? itemset1.children : Collections.<Item>emptyList();
+        final List<Item> children2 = (itemset2 != null) ? itemset2.children : Collections.<Item>emptyList();
+
+        return XFormsUtils.compareCollections(children1, children2);
     }
 }

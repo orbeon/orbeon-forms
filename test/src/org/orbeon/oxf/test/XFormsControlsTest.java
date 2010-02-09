@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -16,7 +16,6 @@ package org.orbeon.oxf.test;
 import org.dom4j.QName;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
-import org.orbeon.oxf.xforms.processor.OldControlsComparator;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.LinkedHashMap;
@@ -61,7 +60,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
             }
         };
 
-        OldControlsComparator.diffCustomMIPs(attributes, control1, control2, false, false);
+        XFormsSingleNodeControl.diffCustomMIPs(attributes, control1, control2, false, false);
         assertEquals("-name2-value2 -name3-value3 +name3-newvalue3", attributes.getValue("class"));
     }
     
@@ -84,7 +83,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
             }
         };
 
-        OldControlsComparator.diffCustomMIPs(attributes, null, control2, false, false);
+        XFormsSingleNodeControl.diffCustomMIPs(attributes, null, control2, false, false);
         assertEquals("name1-value1 name2-value2 name3-value3 name4-value4", attributes.getValue("class"));
     }
 
@@ -105,7 +104,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
             }
         };
 
-        OldControlsComparator.diffClassAVT(attributes, control1, control2, false, false);
+        XFormsSingleNodeControl.diffClassAVT(attributes, control1, control2, false, false);
         assertEquals("-foo -gaga +toto", attributes.getValue("class"));
     }
 
@@ -119,7 +118,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
             }
         };
 
-        OldControlsComparator.diffClassAVT(attributes, null, control2, false, false);
+        XFormsSingleNodeControl.diffClassAVT(attributes, null, control2, false, false);
         assertEquals("foo bar", attributes.getValue("class"));
     }
 

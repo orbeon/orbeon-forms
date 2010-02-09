@@ -272,26 +272,26 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl obj) {
+    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
 
-        if (obj == null || !(obj instanceof XFormsUploadControl))
+        if (other == null || !(other instanceof XFormsUploadControl))
             return false;
 
-        if (this == obj)
+        if (this == other)
             return true;
 
-        final XFormsUploadControl other = (XFormsUploadControl) obj;
+        final XFormsUploadControl otherUploadControl = (XFormsUploadControl) other;
 
-        if (!XFormsUtils.compareStrings(getState(pipelineContext), other.getState(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getState(propertyContext), otherUploadControl.getState(propertyContext)))
             return false;
-        if (!XFormsUtils.compareStrings(getFileMediatype(pipelineContext), other.getFileMediatype(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getFileMediatype(propertyContext), otherUploadControl.getFileMediatype(propertyContext)))
             return false;
-        if (!XFormsUtils.compareStrings(getFileSize(pipelineContext), other.getFileSize(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getFileSize(propertyContext), otherUploadControl.getFileSize(propertyContext)))
             return false;
-        if (!XFormsUtils.compareStrings(getFileName(pipelineContext), other.getFileName(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getFileName(propertyContext), otherUploadControl.getFileName(propertyContext)))
             return false;
 
-        return super.equalsExternal(pipelineContext, obj);
+        return super.equalsExternal(propertyContext, other);
     }
 
     @Override

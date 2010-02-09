@@ -220,21 +220,21 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl obj) {
+    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
 
-        if (obj == null || !(obj instanceof XFormsValueControl))
+        if (other == null || !(other instanceof XFormsValueControl))
             return false;
 
-        if (this == obj)
+        if (this == other)
             return true;
 
-        final XFormsValueControl other = (XFormsValueControl) obj;
+        final XFormsValueControl otherValueControl = (XFormsValueControl) other;
 
         // Compare on external value, not internal value
-        if (!XFormsUtils.compareStrings(getExternalValue(pipelineContext), other.getExternalValue(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getExternalValue(propertyContext), otherValueControl.getExternalValue(propertyContext)))
             return false;
 
-        return super.equalsExternal(pipelineContext, obj);
+        return super.equalsExternal(propertyContext, other);
     }
 
     private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();

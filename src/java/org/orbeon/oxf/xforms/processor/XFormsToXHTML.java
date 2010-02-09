@@ -26,7 +26,6 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.analysis.IdGenerator;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
 import org.orbeon.oxf.xforms.processor.handlers.*;
@@ -41,9 +40,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
@@ -143,17 +140,16 @@ public class XFormsToXHTML extends ProcessorImpl {
 
 //                        annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, new SAXLoggerProcessor.DebugContentHandler(identity)));
 
-                        final IdGenerator idGenerator = new IdGenerator();
-                        annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity, idGenerator));
+                        final XFormsAnnotatorContentHandler.Metadata metadata = new XFormsAnnotatorContentHandler.Metadata();
+                        annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity, metadata.idGenerator));
 
                         // Read the input through the annotator and gather namespace mappings
-                        final Map<String, Map<String, String>> namespaceMappings = new HashMap<String, Map<String, String>>();
-                        readInputAsSAX(pipelineContext, processorInput, new XFormsAnnotatorContentHandler(annotatedSAXStore, externalContext, idGenerator, namespaceMappings));
+                        readInputAsSAX(pipelineContext, processorInput, new XFormsAnnotatorContentHandler(annotatedSAXStore, externalContext, metadata));
 
                         // Get static state document and create static state object
                         final Document staticStateDocument = documentResult.getDocument();
 //                        XFormsContainingDocument.logDebugStatic("XForms to XHTML", "static state", new String[] { "document", Dom4jUtils.domToString(staticStateDocument) });
-                        xformsStaticState = new XFormsStaticState(pipelineContext, staticStateDocument, idGenerator, namespaceMappings, annotatedSAXStore);
+                        xformsStaticState = new XFormsStaticState(pipelineContext, staticStateDocument, metadata, annotatedSAXStore);
                     }
 
                     // Create document here so we can do appropriate analysis of caching dependencies
@@ -350,8 +346,6 @@ public class XFormsToXHTML extends ProcessorImpl {
                                 final SAXStore annotatedDocument, final XFormsContainingDocument containingDocument,
                                 final ContentHandler contentHandler, final XFormsState encodedClientState) throws SAXException, IOException {
 
-        final ElementHandlerController controller = new ElementHandlerController();
-
         final List<XFormsContainingDocument.Load> loads = containingDocument.getLoadsToRun();
         if (containingDocument.isGotSubmissionReplaceAll()) {
             // 1. Got a submission with replace="all"
@@ -377,6 +371,8 @@ public class XFormsToXHTML extends ProcessorImpl {
             XMLUtils.streamNullDocument(contentHandler);
         } else {
             // 3. Regular case: produce an XHTML document out
+
+            final ElementHandlerController controller = new ElementHandlerController();
 
             // Register handlers on controller (the other handlers are registered by the body handler)
             {

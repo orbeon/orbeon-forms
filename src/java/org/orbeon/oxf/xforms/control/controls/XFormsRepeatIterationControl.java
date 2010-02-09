@@ -13,13 +13,17 @@
  */
 package org.orbeon.oxf.xforms.control.controls;
 
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.HashSet;
 import java.util.List;
@@ -131,5 +135,54 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
     @Override
     protected Set<String> getAllowedExternalEvents() {
         return ALLOWED_EXTERNAL_EVENTS;
+    }
+
+    @Override
+    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
+
+        if (other == null || !(other instanceof XFormsRepeatIterationControl))
+            return false;
+
+        if (this == other)
+            return true;
+
+        final XFormsRepeatIterationControl otherRepeatIterationControl = (XFormsRepeatIterationControl) other;
+
+        // Ad-hoc comparison, because we basically only care about relevance changes
+        return !mustSendIterationUpdate(otherRepeatIterationControl);
+    }
+
+    private boolean mustSendIterationUpdate(XFormsRepeatIterationControl otherSelect1Control) {
+
+        // NOTE: We only care about relevance changes. We should care about moving iterations around, but that's not
+        // handled that way yet!
+
+        // NOTE: We output if we are NOT relevant as the client must mark non-relevant elements. Ideally, we should not
+        // have non-relevant iterations actually present on the client.
+        return (otherSelect1Control == null && !isRelevant()
+                //|| XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl1) != XFormsSingleNodeControl.isRelevant(xformsSingleNodeControl2)) {
+                || otherSelect1Control != null && otherSelect1Control.isRelevant() != isRelevant());//TODO: not sure why the above alternative fails tests. Which is more correct?
+    }
+
+    @Override
+    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
+
+        assert attributesImpl.getLength() == 0;
+
+        final XFormsRepeatIterationControl repeatIterationControl1 = (XFormsRepeatIterationControl) other;
+        if (mustSendIterationUpdate(repeatIterationControl1)) {
+            // Use the effective id of the parent repeat
+            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getParent().getEffectiveId());
+
+            // Relevance
+            attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
+                    XFormsConstants.RELEVANT_ATTRIBUTE_NAME,
+                    ContentHandlerHelper.CDATA, Boolean.toString(isRelevant()));
+
+            attributesImpl.addAttribute("", "iteration", "iteration", ContentHandlerHelper.CDATA, Integer.toString(getIterationIndex()));
+            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl);
+        }
+
+        // NOTE: in this case, don't do the regular Ajax output (maybe in the future we should to be more consistent?)
     }
 }

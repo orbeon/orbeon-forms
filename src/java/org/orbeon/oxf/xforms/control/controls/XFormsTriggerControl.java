@@ -57,4 +57,10 @@ public class XFormsTriggerControl extends XFormsSingleNodeControl {
     protected Set<String> getAllowedExternalEvents() {
         return ALLOWED_EXTERNAL_EVENTS;
     }
+
+    @Override
+    public boolean supportAjaxUpdates() {
+        // Don't output anything for triggers in static readonly mode
+        return !(isStaticReadonly() && isReadonly());
+    }
 }

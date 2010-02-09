@@ -161,6 +161,31 @@
                                             <data type="string"/>
                                         </optional>
                                     </element>
+                                    <!-- For selection controls only -->
+                                    <element name="xxforms:itemset">
+                                        <attribute name="id"/>
+                                        <data type="string"/>
+                                    </element>
+                                    <!-- For switch/case and dialog only -->
+                                    <element name="xxforms:div">
+                                        <attribute name="id"/>
+                                        <attribute name="visibility">
+                                            <choice>
+                                                <value>hidden</value>
+                                                <value>visible</value>
+                                            </choice>
+                                        </attribute>
+                                        <!-- For dialog positioning -->
+                                        <optional>
+                                            <attribute name="neighbor"/>
+                                        </optional>
+                                        <!-- For dialog constraining to viewport -->
+                                        <optional>
+                                            <attribute name="constrain">
+                                                <data type="boolean"/>
+                                            </attribute>
+                                        </optional>
+                                    </element>
                                     <element name="xxforms:attribute">
                                         <attribute name="id"/>
                                         <attribute name="name"/>
@@ -208,6 +233,7 @@
                                             <data type="positiveInteger"/>
                                         </attribute>
                                     </element>
+                                    <!-- For repeat iterations only -->
                                     <element name="xxforms:repeat-iteration">
                                         <attribute name="id">
                                             <data type="string"/>
@@ -217,46 +243,14 @@
                                         </attribute>
                                         <ref name="model-item-properties"/>
                                     </element>
-                                    <element name="xxforms:div">
-                                        <attribute name="id"/>
-                                        <attribute name="visibility">
-                                            <choice>
-                                                <value>hidden</value>
-                                                <value>visible</value>
-                                            </choice>
+                                    <!-- Inner HTML for an entire control -->
+                                    <element name="xxforms:inner-html">
+                                        <attribute name="id">
+                                            <data type="string"/>
                                         </attribute>
-                                        <!-- For dialog positioning -->
-                                        <optional>
-                                            <attribute name="neighbor"/>
-                                        </optional>
-                                        <!-- For constraining to viewport -->
-                                        <optional>
-                                            <attribute name="constrain">
-                                                <data type="boolean"/>
-                                            </attribute>
-                                        </optional>
+                                        <data type="string"/>
                                     </element>
                                 </choice>
-                            </zeroOrMore>
-                        </element>
-                    </optional>
-                    <optional>
-                        <element name="xxforms:repeats">
-                            <zeroOrMore>
-                                <element name="xxforms:repeat-index">
-                                    <attribute name="id"/>
-                                    <attribute name="index">
-                                        <data type="nonNegativeInteger"/>
-                                    </attribute>
-                                </element>
-                            </zeroOrMore>
-                            <zeroOrMore>
-                                <element name="xxforms:repeat-iteration">
-                                    <attribute name="id"/>
-                                    <attribute name="occurs">
-                                        <data type="nonNegativeInteger"/>
-                                    </attribute>
-                                </element>
                             </zeroOrMore>
                         </element>
                     </optional>
@@ -271,16 +265,6 @@
                                     <attribute name="new-index">
                                         <data type="nonNegativeInteger"/>
                                     </attribute>
-                                </element>
-                            </zeroOrMore>
-                        </element>
-                    </optional>
-                    <optional>
-                        <element name="xxforms:itemsets">
-                            <zeroOrMore>
-                                <element name="xxforms:itemset">
-                                    <attribute name="id"/>
-                                    <data type="string"/>
                                 </element>
                             </zeroOrMore>
                         </element>

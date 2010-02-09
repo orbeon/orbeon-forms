@@ -22,6 +22,8 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * Represents an extension xxforms:attribute control.
@@ -116,5 +118,36 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     public boolean setFocus() {
         // Can't focus on AVTs
         return false;
+    }
+
+    @Override
+    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
+
+        assert attributesImpl.getLength() == 0;
+
+        final XXFormsAttributeControl attributeControlInfo2 = this;
+
+        // Whether it is necessary to output information about this control
+        boolean doOutputElement = false;
+
+        // Control id
+        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, attributeControlInfo2.getEffectiveId());
+
+        // The client does not store an HTML representation of the xxforms:attribute control, so we
+        // have to output these attributes.
+        {
+            // HTML element id
+            final String effectiveFor2 = attributeControlInfo2.getEffectiveForAttribute();
+            doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewlyVisibleSubtree, false);
+        }
+
+        {
+            // Attribute name
+            final String name2 = attributeControlInfo2.getNameAttribute();
+            doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "name", name2, isNewlyVisibleSubtree, false);
+        }
+
+        // Output element
+        outputElement(pipelineContext, ch, attributeControlInfo2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "attribute");
     }
 }

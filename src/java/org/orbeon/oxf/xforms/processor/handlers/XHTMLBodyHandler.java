@@ -48,7 +48,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         final XFormsStaticState staticState = containingDocument.getStaticState();
 
         // Register control handlers on controller
-        registerHandlers(staticState);
+        registerHandlers(handlerContext.getController(), staticState);
 
         // Add class for YUI skin
         // TODO: should be configurable somehow
@@ -197,8 +197,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         }
     }
 
-    private void registerHandlers(XFormsStaticState staticState) {
-        final ElementHandlerController controller = handlerContext.getController();
+    public static void registerHandlers(final ElementHandlerController controller, final XFormsStaticState staticState) {
 
         // xforms:input
         controller.registerHandler(XFormsInputHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "input");
@@ -232,7 +231,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         final ElementHandlerController.Matcher triggerSubmitMinimalMatcher = controller.new Matcher() {
             public boolean match(Attributes attributes) {
                 final QName appearance = getAppearance(attributes);
-                return appearance != null && !handlerContext.isNoScript() // is noscript mode, use the full appearance
+                return appearance != null && !staticState.isNoScript() // is noscript mode, use the full appearance
                         && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance)    // minimal appearance
                             || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance)); // legacy appearance
             }

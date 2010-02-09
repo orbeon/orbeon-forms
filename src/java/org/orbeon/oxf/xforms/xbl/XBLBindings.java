@@ -67,7 +67,6 @@ import java.util.*;
 public class XBLBindings {
 
     private final XFormsStaticState staticState;            // associated static state
-    private Map<String, Map<String, String>> namespacesMap; // namespace mappings
 
     private final boolean logShadowTrees;                   // whether to log shadow trees as they are built
 
@@ -172,13 +171,12 @@ public class XBLBindings {
      *
      * As of 2009-09-14, we use an IdGenerator shared among top-level and all XBL bindings.
      */
-    private IdGenerator idGenerator;
+    private XFormsAnnotatorContentHandler.Metadata metadata;
 
     public XBLBindings(IndentedLogger indentedLogger, XFormsStaticState staticState, final IdGenerator idGenerator,
                        Map<String, Map<String, String>> namespacesMap, Element staticStateElement) {
 
         this.staticState = staticState;
-        this.namespacesMap = namespacesMap;
 
         this.logShadowTrees = XFormsProperties.getDebugLogging().contains("analysis-xbl-tree");
 
@@ -199,28 +197,29 @@ public class XBLBindings {
             }
 
             // Create delegating top-level static id generator which just doesn't check for duplicate ids
-            this.idGenerator = new IdGenerator() {
-                @Override
-                public boolean isDuplicate(String id) {
-                    // Duplicate ids are checked separately by scope
-                    return false;
-                }
+            this.metadata = new XFormsAnnotatorContentHandler.Metadata(
+                new IdGenerator() {
+                    @Override
+                    public boolean isDuplicate(String id) {
+                        // Duplicate ids are checked separately by scope
+                        return false;
+                    }
 
-                @Override
-                public void add(String id) {
-                    idGenerator.add(id);
-                }
+                    @Override
+                    public void add(String id) {
+                        idGenerator.add(id);
+                    }
 
-                @Override
-                public String getNextId() {
-                    return idGenerator.getNextId();
-                }
+                    @Override
+                    public String getNextId() {
+                        return idGenerator.getNextId();
+                    }
 
-                @Override
-                public Iterator<String> iterator() {
-                    return idGenerator.iterator();
-                }
-            };
+                    @Override
+                    public Iterator<String> iterator() {
+                        return idGenerator.iterator();
+                    }
+                }, namespacesMap);
 
             xblComponentsFactories = new HashMap<QName, XFormsControlFactory.Factory>();
             xblComponentBindings = new HashMap<QName, Element>();
@@ -434,7 +433,7 @@ public class XBLBindings {
 
     public Document annotateHandler(Element currentHandlerElement, String newPrefix, Scope innerScope, Scope outerScope, XFormsConstants.XXBLScope startScope) {
         final Document handlerDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentHandlerElement, false);// for now, don't detach because element can be processed by multiple bindings
-        final Document annotatedDocument = annotateShadowTree(handlerDocument, newPrefix, idGenerator);
+        final Document annotatedDocument = annotateShadowTree(handlerDocument, newPrefix, metadata);
         gatherScopeMappingsAndTransform(annotatedDocument, newPrefix, innerScope, outerScope, startScope, null, false, "/");
         return annotatedDocument;
     }
@@ -445,7 +444,7 @@ public class XBLBindings {
 
             // Annotate if needed, otherwise leave as is
             if (annotate) {
-                currentModelDocument = annotateShadowTree(currentModelDocument, prefix, idGenerator);
+                currentModelDocument = annotateShadowTree(currentModelDocument, prefix, metadata);
                 gatherScopeMappingsAndTransform(currentModelDocument, prefix, innerScope, outerScope, startScope, null, false, "/");
             }
 
@@ -487,7 +486,7 @@ public class XBLBindings {
             applyXBLTransformation(propertyContext, documentWrapper, shadowTreeDocument, boundElement);
 
             // 3: Annotate tree
-            final Document annotatedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, prefix, idGenerator);
+            final Document annotatedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, prefix, metadata);
 
             if (indentedLogger.isDebugEnabled()) {
                 indentedLogger.endHandleOperation("document", logShadowTrees ? Dom4jUtils.domToString(annotatedShadowTreeDocument) : null);
@@ -741,7 +740,7 @@ public class XBLBindings {
     }
 
     // Keep public for unit tests
-    public Document annotateShadowTree(Document shadowTreeDocument, final String prefix, IdGenerator idGenerator) {
+    public Document annotateShadowTree(Document shadowTreeDocument, final String prefix, XFormsAnnotatorContentHandler.Metadata metadata) {
         // Create transformer
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
 
@@ -751,7 +750,7 @@ public class XBLBindings {
 
         // Write the document through the annotator
         // TODO: this adds xml:base on root element, must fix
-        TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsAnnotatorContentHandler(identity, "", false, idGenerator, namespacesMap) {
+        TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsAnnotatorContentHandler(identity, "", false, metadata) {
             @Override
             protected void addNamespaces(String id) {
                 // Store prefixed id in order to avoid clashes between top-level controls and shadow trees
@@ -1111,6 +1110,6 @@ public class XBLBindings {
 
     public void freeTransientState() {
         // Not needed after analysis
-        idGenerator = null;
+        metadata = null;
     }
 }

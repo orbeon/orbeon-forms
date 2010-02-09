@@ -14,8 +14,10 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.ControlTree;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
@@ -23,6 +25,8 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.*;
 
@@ -191,5 +195,38 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     @Override
     protected Set<String> getAllowedExternalEvents() {
         return ALLOWED_EXTERNAL_EVENTS;
+    }
+
+    @Override
+    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
+
+        if (other == null)
+            return false;
+
+        if (this == other)
+            return true;
+
+        // Compare only what matters
+
+        // NOTE: We only compare on isVisible as we don't support just changing other attributes for now
+        final XXFormsDialogControl dialogControl1 = (XXFormsDialogControl) other;
+        if (dialogControl1.wasVisible() != isVisible())
+            return false;
+
+        return super.equalsExternal(propertyContext, other);
+    }
+
+    @Override
+    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other,
+                               AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree
+    ) {
+
+        final String neighbor = getNeighborControlId();
+        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[] {
+                "id", getEffectiveId(),
+                "visibility", isVisible() ? "visible" : "hidden",
+                (neighbor != null && isVisible()) ? "neighbor" : null, neighbor,
+                isVisible() ? "constrain" : null, Boolean.toString(isConstrainToViewport())
+        });
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -47,6 +47,8 @@ import java.util.Map;
  */
 public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
 
+    private SAXStore saxStore;
+
     private int level = 0;
     private boolean inHead;
     private boolean inTitle;
@@ -56,8 +58,8 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
     private final String containerNamespace;
     private final boolean portlet;
 
-    private final IdGenerator idGenerator;
-    private final Map<String, Map<String, String>> namespaceMappings;
+
+    private final Metadata metadata;
     private final boolean isGenerateIds;
 
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
@@ -78,55 +80,65 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
 
     private Map<String, Map<String, String>> xblBindings;   // Map<String uri, Map<String localname, "">>
 
-    /**
-     * This constructor just computes the namespace mappings and AVT elements and gathers id information.
-     *
-     * @param namespaceMappings     namespace mappings
-     * @param idGenerator           id generator
-     */
-    public XFormsAnnotatorContentHandler(Map<String, Map<String, String>> namespaceMappings, IdGenerator idGenerator) {
+    public static class Metadata {
+        public final IdGenerator idGenerator;
+        public final Map<String, Map<String, String>> namespaceMappings;
+        public final Map<String, SAXStore.Mark> marks = new HashMap<String, SAXStore.Mark>();
 
-        // In this mode, all elements that need to have ids already have them, so set safe defaults
-        this.containerNamespace = "";
-        this.portlet = false;
+        public Metadata(IdGenerator idGenerator, Map<String, Map<String, String>> namespaceMappings) {
+            this.idGenerator = idGenerator;
+            this.namespaceMappings = namespaceMappings;
+        }
 
-        this.idGenerator = idGenerator;
-        this.namespaceMappings = namespaceMappings;
-        this.isGenerateIds = false;
+        public Metadata() {
+            this.idGenerator = new IdGenerator();
+            this.namespaceMappings = new HashMap<String, Map<String, String>>();
+        }
     }
 
     /**
-     * This constructor just computes the namespace mappings and AVT elements.
+     * Constructor for top-level document.
      *
      * @param contentHandler        output of transformation
-     * @param externalContext       ExternalContext
-     * @param idGenerator           id generator
-     * @param namespaceMappings     namespace mappings
+     * @param externalContext       external context
+     * @param metadata              metadata to gather
      */
-    public XFormsAnnotatorContentHandler(ContentHandler contentHandler, ExternalContext externalContext,
-                                         IdGenerator idGenerator, Map<String, Map<String, String>> namespaceMappings) {
-        this(contentHandler, externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), idGenerator, namespaceMappings);
+    public XFormsAnnotatorContentHandler(SAXStore contentHandler, ExternalContext externalContext, Metadata metadata) {
+        this(contentHandler, externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), metadata);
+        this.saxStore = contentHandler;
     }
 
     /**
-     *
+     * Constructor for XBL shadow trees and top-level documents.
      *
      * @param contentHandler        output of transformation
      * @param containerNamespace    container namespace for portlets
      * @param portlet               whether we are in portlet mode
-     * @param idGenerator           id generator
-     * @param namespaceMappings     namespace mappings
+     * @param metadata              metadata to gather
      */
-    public XFormsAnnotatorContentHandler(ContentHandler contentHandler, String containerNamespace, boolean portlet,
-                                         IdGenerator idGenerator, Map<String, Map<String, String>> namespaceMappings) {
+    public XFormsAnnotatorContentHandler(ContentHandler contentHandler, String containerNamespace, boolean portlet, Metadata metadata) {
         super(contentHandler, contentHandler != null);
 
         this.containerNamespace = containerNamespace;
         this.portlet = portlet;
 
-        this.idGenerator = idGenerator;
-        this.namespaceMappings = namespaceMappings;
+        this.metadata = metadata;
         this.isGenerateIds = true;
+    }
+
+    /**
+     * This constructor just computes the namespace mappings and AVT elements and gathers id information.
+     *
+     * @param metadata              metadata to gather
+     */
+    public XFormsAnnotatorContentHandler(Metadata metadata) {
+
+        // In this mode, all elements that need to have ids already have them, so set safe defaults
+        this.containerNamespace = "";
+        this.portlet = false;
+
+        this.metadata = metadata;
+        this.isGenerateIds = false;
     }
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -180,6 +192,12 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
 
             // Create a new id and update the attributes if needed
             attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
+
+            if (saxStore != null) {
+                final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
+                if ("inner".equals(xxformsUpdate))
+                    metadata.marks.put(reusableStringArray[0], saxStore.getElementMark());
+            }
 
             if (inTitle && "output".equals(localname)) {
                 // Special case of xforms:output within title, which produces an xxforms:text control
@@ -356,7 +374,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
         // Re-add standard "xml" prefix mapping
         // TODO: WHY?
         namespaces.put(XMLConstants.XML_PREFIX, XMLConstants.XML_URI);
-        namespaceMappings.put(id, namespaces);
+        metadata.namespaceMappings.put(id, namespaces);
     }
 
     private void storeXBLBinding(String elementAttribute) {
@@ -448,7 +466,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
             if (idIndex == -1) {
                 // Create a new "id" attribute, prefixing if needed
                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                newIdAttributeUnprefixed = idGenerator.getNextId();
+                newIdAttributeUnprefixed = metadata.idGenerator.getNextId();
                 newIdAttribute[0] = containerNamespace + newIdAttributeUnprefixed;
                 newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newIdAttribute[0]);
                 attributes = newAttributes;
@@ -465,7 +483,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
             }
 
             // Check for duplicate ids
-            if (idGenerator.isDuplicate(newIdAttribute[0])) // TODO: create Element to provide more location info?
+            if (metadata.idGenerator.isDuplicate(newIdAttribute[0])) // TODO: create Element to provide more location info?
                 throw new ValidationException("Duplicate id for XForms element: " + newIdAttributeUnprefixed,
                         new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", new String[] { "id", newIdAttributeUnprefixed }, false));
 
@@ -486,10 +504,10 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
         }
 
         // Remember that this id was used
-        idGenerator.add(newIdAttribute[0]);
+        metadata.idGenerator.add(newIdAttribute[0]);
 
         // Gather namespace information if there is an id
-        if (namespaceMappings != null && (isGenerateIds || idIndex != -1)) {
+        if (metadata.namespaceMappings != null && (isGenerateIds || idIndex != -1)) {
             addNamespaces(newIdAttribute[0]);
         }
 

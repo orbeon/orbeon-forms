@@ -230,9 +230,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return label.getEscapedValue(pipelineContext);
     }
 
-    public boolean isHTMLLabel(PipelineContext pipelineContext) {
-        getLabel(pipelineContext);
-        return label.isHTML(pipelineContext);
+    public boolean isHTMLLabel(PropertyContext propertyContext) {
+        getLabel(propertyContext);
+        return label.isHTML(propertyContext);
     }
 
     public String getHelp(PropertyContext propertyContext) {
@@ -249,9 +249,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return help.getEscapedValue(pipelineContext);
     }
 
-    public boolean isHTMLHelp(PipelineContext pipelineContext) {
-        getHelp(pipelineContext);
-        return help.isHTML(pipelineContext);
+    public boolean isHTMLHelp(PropertyContext propertyContext) {
+        getHelp(propertyContext);
+        return help.isHTML(propertyContext);
     }
 
     public String getHint(PropertyContext propertyContext) {
@@ -268,9 +268,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return hint.getEscapedValue(pipelineContext);
     }
 
-    public boolean isHTMLHint(PipelineContext pipelineContext) {
-        getHint(pipelineContext);
-        return hint.isHTML(pipelineContext);
+    public boolean isHTMLHint(PropertyContext propertyContext) {
+        getHint(propertyContext);
+        return hint.isHTML(propertyContext);
     }
 
     public String getAlert(PropertyContext propertyContext) {
@@ -278,8 +278,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             final Element lhhaElement = containingDocument.getStaticState().getAlertElement(getPrefixedId());
             alert = (lhhaElement == null) ? NULL_LHHA : new ConcreteLHHA(this, lhhaElement, true);
         }
-
         return alert.getValue(propertyContext);
+    }
+
+    public boolean isHTMLAlert(PropertyContext propertyContext) {
+        getAlert(propertyContext);
+        return alert.isHTML(propertyContext);
     }
 
     public String getEscapedAlert(PipelineContext pipelineContext) {
@@ -402,11 +406,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Compare this control with another control, as far as the comparison is relevant for the external world.
      *
-     * @param pipelineContext   current PipelineContext
-     * @param other               other control
-     * @return                  true is the controls have identical external values, false otherwise
+     * @param propertyContext   current context
+     * @param other             other control
+     * @return                  true if the controls are identical for the purpose of an external diff, false otherwise
      */
-    public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl other) {
+    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
 
         if (other == null)
             return false;
@@ -419,13 +423,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (relevant != other.relevant)
             return false;
 
-        if (!XFormsUtils.compareStrings(getLabel(pipelineContext), other.getLabel(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getLabel(propertyContext), other.getLabel(propertyContext)))
             return false;
-        if (!XFormsUtils.compareStrings(getHelp(pipelineContext), other.getHelp(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getHelp(propertyContext), other.getHelp(propertyContext)))
             return false;
-        if (!XFormsUtils.compareStrings(getHint(pipelineContext), other.getHint(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getHint(propertyContext), other.getHint(propertyContext)))
             return false;
-        if (!XFormsUtils.compareStrings(getAlert(pipelineContext), other.getAlert(pipelineContext)))
+        if (!XFormsUtils.compareStrings(getAlert(propertyContext), other.getAlert(propertyContext)))
             return false;
 
         // Compare values of extension attributes if any
@@ -1303,5 +1307,24 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             }
             return null;
         }
+    }
+
+    public boolean equalsExternalRecurse(PropertyContext propertyContext, XFormsControl other) {
+        // By default there are no children controls
+        return equalsExternal(propertyContext, other);
+    }
+
+    /**
+     * Whether the control support Ajax updates.
+     *
+     * @return true iif it does
+     */
+    public boolean supportAjaxUpdates() {
+        return true;
+    }
+
+    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other,
+                               AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
+        // NOP
     }
 }

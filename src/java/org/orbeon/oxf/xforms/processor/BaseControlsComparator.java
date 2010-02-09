@@ -28,9 +28,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.*;
 
-public abstract class BaseControlsComparator implements ControlsComparator {
-
-    public static final boolean DEFAULT_RELEVANCE_FOR_NEW_ITERATION = true;
+public abstract class BaseControlsComparator {
 
     protected final PipelineContext pipelineContext;
     protected final ContentHandlerHelper ch;

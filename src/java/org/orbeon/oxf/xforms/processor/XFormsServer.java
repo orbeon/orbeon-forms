@@ -37,7 +37,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.state.XFormsDocumentCache;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
@@ -837,27 +836,22 @@ public class XFormsServer extends ProcessorImpl {
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");
 
                 // Output new controls values and associated information
-                final Map<String, Itemset> itemsetsFull1 = new LinkedHashMap<String, Itemset>();
-                final Map<String, Itemset> itemsetsFull2 = new LinkedHashMap<String, Itemset>();
                 {
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
-                    if (!allEvents) {
-                        // Common case
-
-                        // Only output changes if needed
-                        if (containingDocument.isDirtySinceLastRequest() || testOutputAllActions) {
-                            final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
-                            diffControls(pipelineContext, ch, containingDocument, indentedLogger,
-                                    xformsControls.getInitialControlTree().getChildren(),
-                                    currentControlTree.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds, testOutputAllActions);
-                        }
-                    } else {
+                    if (allEvents) {
+                        // All events
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
                         diffControls(pipelineContext, ch, containingDocument, indentedLogger, initialControlTree.getChildren(),
-                                currentControlTree.getChildren(), itemsetsFull1, itemsetsFull2, null, testOutputAllActions);
+                                currentControlTree.getChildren(), null, testOutputAllActions);
+                    } else if (testOutputAllActions || containingDocument.isDirtySinceLastRequest()) {
+                        // Only output changes if needed
+                        final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
+                        diffControls(pipelineContext, ch, containingDocument, indentedLogger,
+                                xformsControls.getInitialControlTree().getChildren(),
+                                currentControlTree.getChildren(), valueChangeControlIds, testOutputAllActions);
                     }
 
                     ch.endElement();
@@ -867,28 +861,18 @@ public class XFormsServer extends ProcessorImpl {
                 {
                     // Output index updates
                     final XFormsStaticState staticState = containingDocument.getStaticState();
-                    if (!allEvents) {
-                        if (!testOutputAllActions) {
-                            if (containingDocument.isDirtySinceLastRequest()) {
-                                // Only diff if controls are dirty
-                                diffIndexState(ch, xformsControls.getInitialControlTree().getInitialMinimalRepeatIdToIndex(staticState),
-                                        xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex(staticState));
-                            }
-                        }
-                    } else {
+                    if (allEvents) {
+                        // All events
+                        // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
                         diffIndexState(ch, initialControlTree.getInitialMinimalRepeatIdToIndex(staticState),
                                 currentControlTree.getMinimalRepeatIdToIndex(staticState));
+                    } else if (!testOutputAllActions && containingDocument.isDirtySinceLastRequest()) {
+                        // Only output changes if needed
+                        diffIndexState(ch, xformsControls.getInitialControlTree().getInitialMinimalRepeatIdToIndex(staticState),
+                                xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex(staticState));
                     }
-                }
-
-                // Output itemset information
-                if (allEvents || containingDocument.isDirtySinceLastRequest() || testOutputAllActions) {
-                    // Diff itemset information
-                    final Map<String, Itemset> itemsetUpdate = diffItemsets(itemsetsFull1, itemsetsFull2);
-                    // TODO: Handle allEvents case. Something wrong here?
-                    outputItemsets(pipelineContext, ch, itemsetUpdate);
                 }
 
                 // Output server events
@@ -1036,48 +1020,18 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static Map<String, Itemset> diffItemsets(Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2) {
-        Map<String, Itemset> itemsetUpdate;
-        if (itemsetsFull2 == null) {
-            // There is no update in the first place
-            itemsetUpdate = null;
-        } else if (itemsetsFull1 == null) {
-            // There was nothing before, return update
-            itemsetUpdate = itemsetsFull2;
-        } else {
-            // Merge differences
-            itemsetUpdate = new LinkedHashMap<String, Itemset>();
-
-            for (Map.Entry<String, Itemset> currentEntry: itemsetsFull2.entrySet()) {
-                final String itemsetId = currentEntry.getKey();
-                final Itemset newItems = currentEntry.getValue();
-
-                final Itemset existingItems = itemsetsFull1.get(itemsetId);
-                if (existingItems == null || !existingItems.equals(newItems)) {
-                    // No existing items or new items are different from existing items
-                    itemsetUpdate.put(itemsetId, newItems);
-                }
-            }
-        }
-        return itemsetUpdate;
-    }
-
-    public static void diffControls(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
-                                    IndentedLogger indentedLogger,
+    public static void diffControls(PipelineContext pipelineContext, ContentHandlerHelper ch,
+                                    XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
                                     List<XFormsControl> state1, List<XFormsControl> state2,
-                                    Map<String, Itemset> itemsetsFull1, Map<String, Itemset> itemsetsFull2,
-                                    Set<String> valueChangeControlIds,
-                                    boolean isTestMode) {
+                                    Set<String> valueChangeControlIds, boolean isTestMode) {
 
         // In test mode, ignore first tree
         if (isTestMode)
             state1 = null;
 
         indentedLogger.startHandleOperation("", "computing differences");
-        if (XFormsProperties.isOptimizeRelevance(containingDocument)) {
-            new NewControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds, isTestMode).diff(state1, state2);
-        } else {
-            new OldControlsComparator(pipelineContext, ch, containingDocument, itemsetsFull1, itemsetsFull2, valueChangeControlIds, isTestMode).diff(state1, state2);
+        {
+            new ControlsComparator(pipelineContext, ch, containingDocument, valueChangeControlIds, isTestMode).diff(state1, state2);
         }
         indentedLogger.endHandleOperation();
     }
@@ -1157,25 +1111,5 @@ public class XFormsServer extends ProcessorImpl {
     private static void outputHelpInfo(ContentHandlerHelper ch, String helpEffectiveControlId) {
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "help",
                 new String[]{"control-id", helpEffectiveControlId});
-    }
-
-    private static void outputItemsets(PipelineContext pipelineContext, ContentHandlerHelper ch,
-                                       Map<String, Itemset> itemsetIdToItemsetInfoMap) {
-        if (itemsetIdToItemsetInfoMap != null && itemsetIdToItemsetInfoMap.size() > 0) {
-            // There are some xforms:itemset controls
-
-            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemsets");
-            for (Map.Entry<String, Itemset> currentEntry: itemsetIdToItemsetInfoMap.entrySet()) {
-                final String itemsetId = currentEntry.getKey();
-                final Itemset itemset = currentEntry.getValue();
-
-                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", itemsetId});
-                final String result = itemset.getJSONTreeInfo(pipelineContext, null, false, null);// TODO: pass LocationData
-                if (result.length() > 0)
-                    ch.text(result);
-                ch.endElement();
-            }
-            ch.endElement();
-        }
     }
 }

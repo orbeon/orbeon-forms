@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -46,7 +46,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
     public void testFormNamespaceElements() {
 
         final Map<String, Map<String, String>> mappings = new HashMap<String, Map<String, String>>();
-        final XFormsAnnotatorContentHandler ch = new XFormsAnnotatorContentHandler(mappings, new IdGenerator());
+        final XFormsAnnotatorContentHandler ch = new XFormsAnnotatorContentHandler(new XFormsAnnotatorContentHandler.Metadata(new IdGenerator(), mappings));
         XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", ch, false, false);
 
         // Test that ns information is provided for those elements
@@ -106,7 +106,8 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
 
         final Map<String, Map<String, String>> mappings = new HashMap<String, Map<String, String>>();
         final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);
-        final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.getLogger(), ""), null, null, mappings, null).annotateShadowTree(document, "", new IdGenerator());
+        final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.getLogger(), ""), null, null, mappings, null)
+                .annotateShadowTree(document, "", new XFormsAnnotatorContentHandler.Metadata(new IdGenerator(), mappings));
         final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, new Configuration());
 
         // Check there is an xxforms:attribute for "html" with correct name

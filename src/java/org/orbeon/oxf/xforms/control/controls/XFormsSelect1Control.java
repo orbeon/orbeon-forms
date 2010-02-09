@@ -21,6 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
@@ -29,9 +30,11 @@ import org.orbeon.oxf.xforms.itemset.Item;
 import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.om.NodeInfo;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -305,7 +308,70 @@ public class XFormsSelect1Control extends XFormsValueControl {
         }
     }
 
-// Work in progress for in-bounds/out-of-bounds
+    @Override
+    public boolean equalsExternal(PropertyContext propertyContext, XFormsControl other) {
+
+        if (other == null || !(other instanceof XFormsSelect1Control))
+            return false;
+
+        if (this == other)
+            return true;
+
+        final XFormsSelect1Control otherSelect1Control = (XFormsSelect1Control) other;
+
+        // Itemset comparison
+        if (mustSendItemsetUpdate(propertyContext, otherSelect1Control))
+            return false;
+
+        return super.equalsExternal(propertyContext, other);
+    }
+
+    private boolean mustSendItemsetUpdate(PropertyContext propertyContext, XFormsSelect1Control otherSelect1Control) {
+        final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(getPrefixedId());
+        if (itemsInfo != null && !itemsInfo.hasNonStaticItem()) {
+            // There is no need to send an update:
+            //
+            // 1. Items are static...
+            // 2. ...and they have been outputted statically in the HTML page, directly or in repeat template
+            return false;
+        } else if (isStaticReadonly()) {
+            // There is no need to send an update for static readonly controls
+            return false;
+        } else {
+            // There is a possible change
+            if (XFormsSingleNodeControl.isRelevant(otherSelect1Control) != XFormsSingleNodeControl.isRelevant(this)) {
+                // If relevance changed, then we need to send an itemset update
+                return true;
+            } else {
+                // If the itemsets changed, then we need to send an update
+                // NOTE: This also covers the case where the control was and is non-relevant
+                return !Itemset.compareItemsets(otherSelect1Control.getItemset(propertyContext, true), getItemset(propertyContext, true));
+            }
+        }
+    }
+
+    @Override
+    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other,
+                               AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
+        // Output regular diff
+        super.outputAjaxDiff(pipelineContext, ch, other, attributesImpl, isNewlyVisibleSubtree);
+
+        // Output itemset diff
+        if (mustSendItemsetUpdate(pipelineContext, (XFormsSelect1Control) other)) {
+            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", getEffectiveId()});
+            {
+                final Itemset itemset = getItemset(pipelineContext, true);
+                if (itemset != null) {
+                    final String result = itemset.getJSONTreeInfo(pipelineContext, null, false, null);// TODO: pass LocationData
+                    if (result.length() > 0)
+                        ch.text(result);
+                }
+            }
+            ch.endElement();
+        }
+    }
+
+    // Work in progress for in-bounds/out-of-bounds
 //    protected void evaluateValue(PipelineContext pipelineContext) {
 //        super.evaluateValue(pipelineContext);
 //    }

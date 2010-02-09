@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.main;
 
@@ -36,7 +36,7 @@ import javax.naming.NamingException;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -76,7 +76,7 @@ public class OPS {
 
         // 2. Initialize resource manager
         // Resources are first searched in a file hierarchy, then from the classloader
-        final Map props = new HashMap();
+        final Map<String, String> props = new LinkedHashMap<String, String>();
         props.put("oxf.resources.factory", "org.orbeon.oxf.resources.PriorityResourceManagerFactory");
         if (resourceManagerSandbox != null) {
             // Use a sandbox
@@ -91,7 +91,7 @@ public class OPS {
         // 3. Initialize properties with default properties file.
         Properties.init(Properties.DEFAULT_PROPERTIES_URI);
 
-        // 4. Initialize log4j (using the properies this time)
+        // 4. Initialize log4j (using the properties this time)
         LoggerFactory.initLogger();
 
         // 5. Build processor definition from command-line parameters

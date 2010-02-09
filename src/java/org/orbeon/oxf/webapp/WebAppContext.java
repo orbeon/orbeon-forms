@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004-2005 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.webapp;
 
@@ -23,7 +23,10 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.TomcatClasspathFix;
 
 import javax.servlet.ServletContext;
-import java.util.*;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * WebAppContext is a singleton that represents context information for OXF
@@ -85,9 +88,8 @@ public class WebAppContext {
             logger.info("Starting Orbeon Forms Release " + Version.getVersion());
 
             // 1. Initialize the Resource Manager
-            final Map<String, Object> properties = new HashMap<String, Object>();
-            for (Iterator i = getServletInitParametersMap().keySet().iterator(); i.hasNext();) {
-                final String name = (String) i.next();
+            final Map<String, Object> properties = new LinkedHashMap<String, Object>();
+            for (final String name: getServletInitParametersMap().keySet()) {
                 if (name.startsWith("oxf.resources."))
                     properties.put(name, getServletInitParametersMap().get(name));
             }
@@ -121,7 +123,7 @@ public class WebAppContext {
         if (contextInitParameters == null) {
             synchronized (this) {
                 if (contextInitParameters == null) {
-                    final Map<String, String> result = new HashMap<String, String>();
+                    final Map<String, String> result = new LinkedHashMap<String, String>();
                     for (Enumeration e = servletContext.getInitParameterNames(); e.hasMoreElements();) {
                         final String name = (String) e.nextElement();
                         result.put(name, servletContext.getInitParameter(name));

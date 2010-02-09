@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -39,10 +39,9 @@ public class PriorityResourceManagerImpl implements ResourceManager {
     public PriorityResourceManagerImpl(Map<String, String> props) {
 
         // Map an order number to a Map of local properties
-        final Map<Integer, Map<String, String>> orderToPropertyNames = new HashMap<Integer, Map<String, String>>();
+        final Map<Integer, Map<String, String>> orderToPropertyNames = new TreeMap<Integer, Map<String, String>>();
 
-        for (Iterator i = props.keySet().iterator(); i.hasNext();) {
-            final String key = (String) i.next();
+        for (final String key: props.keySet()) {
             if (key.startsWith(PriorityResourceManagerFactory.PRIORITY_PROPERTY)) {
                 final String substring = key.substring(PriorityResourceManagerFactory.PRIORITY_PROPERTY.length());
                 final int dotIndex = substring.indexOf('.');
@@ -64,26 +63,20 @@ public class PriorityResourceManagerImpl implements ResourceManager {
             }
         }
 
-        // Populate resource manager factories list with nulls
-        for (int i = 0; i < orderToPropertyNames.size(); i++) {
-            resourceManagers.add(null);
-        }
-
-        // Create resource managers
-        for (Iterator i = orderToPropertyNames.entrySet().iterator(); i.hasNext();) {
-            final Map.Entry currentEntry = (Map.Entry) i.next();
-            final int position = (Integer) currentEntry.getKey();
-            final Map localProperties = (Map) currentEntry.getValue();
+        // Create resource managers in order
+        for (final Map.Entry<Integer, Map<String, String>> entry: orderToPropertyNames.entrySet()) {
+            final int position = entry.getKey();
+            final Map<String, String> localProperties = entry.getValue();
             try {
                 // Create instance
                 final Class<ResourceManagerFactoryFunctor> clazz = (Class<ResourceManagerFactoryFunctor>) Class.forName((String) props.get(PriorityResourceManagerFactory.PRIORITY_PROPERTY + position));
                 final Constructor<ResourceManagerFactoryFunctor> constructor = clazz.getConstructor(Map.class);
-                final Map allProps = new HashMap(props);
+                final Map<String, String> allProps = new HashMap<String, String>(props);
                 allProps.putAll(localProperties);
                 final ResourceManagerFactoryFunctor factory = constructor.newInstance(allProps);
                 final ResourceManager instance = factory.makeInstance();
 
-                resourceManagers.set(position - 1, instance);
+                resourceManagers.add(instance);
             } catch (Exception e) {
                 throw new OXFException(e);
             }

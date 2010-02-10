@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2009 Orbeon, Inc.
+ *  Copyright (C) 2009-2010 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -30,7 +30,14 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
 
     YAHOO.log("Creating datatable index " + index, "info");
     // Store useful stuff as properties
+    this.initProperties(element, index, innerTableWidth);
+
+    this.finish();
+}
+
+ORBEON.widgets.datatable.prototype.initProperties = function (element, index, innerTableWidth) {
     this.table = element;
+    YAHOO.util.Dom.addClass(this.table, 'fr-dt-initialized');
     this.index = index;
     this.innerTableWidth = innerTableWidth;
     this.header = this.table;
@@ -52,23 +59,8 @@ ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
     this.hasFixedWidthContainer = this.originalWidth != 'auto';
     this.hasFixedWidthTable = this.hasFixedWidthContainer && ! this.scrollH;
     this.adjustHeightForIE = false;
-
-    // Create a global container
-    this.container = document.createElement('div');
-    YAHOO.util.Dom.addClass(this.container, 'yui-dt');
-    YAHOO.util.Dom.addClass(this.container, 'yui-dt-scrollable');
-
-    // Create a container for the header (or the whole table if there is no
-    // scrolling)
-    this.headerContainer = document.createElement('div');
-    YAHOO.util.Dom.addClass(this.headerContainer, 'yui-dt-hd');
-
-    // Assemble all that stuff
-    this.table.parentNode.replaceChild(this.container, this.table);
-    this.container.appendChild(this.headerContainer);
-    this.headerContainer.appendChild(this.header);
-
-    this.finish();
+    this.headerContainer = this.table.parentNode;
+    this.container = this.headerContainer.parentNode
 }
 
 ORBEON.widgets.datatable.prototype.finish = function () {
@@ -316,6 +308,13 @@ ORBEON.widgets.datatable.prototype.reset = function () {
         this.header.appendChild(body);
         this.table = this.header;
     }
+    if (!YAHOO.util.Dom.hasClass(this.table.parentNode, 'yui-dt-hd')) {
+        var div1 = this.table.parentNode;
+        var div2 = div1.parentNode;
+        div1.removeChild(this.table);
+        div2.removeChild(div1);
+        div2.appendChild(this.table);
+    }
     // Restore styles rules to the table
     this.table.style.width = this.originalWidth;
     this.table.style.height = this.originalHeight;
@@ -345,9 +344,12 @@ ORBEON.widgets.datatable.prototype.reset = function () {
             }
         }
     }
-    // Remove the containers
-    var parent = this.container.parentNode;
-    parent.replaceChild(this.table, this.container);
+    // Remove the containers widths and heights
+    this.container.style.height='';
+    this.headerContainer.style.height='';
+    this.container.style.width='';
+    this.headerContainer.style.width='';
+
     // remove the dynamic style sheet if it exists
     if (this.styleElt != undefined) {
         this.styleElt.parentNode.removeChild(this.styleElt);

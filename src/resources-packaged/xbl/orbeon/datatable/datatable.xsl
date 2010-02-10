@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2009 Orbeon, Inc.
+    Copyright (C) 2009-2010 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -607,18 +607,22 @@
 
                 <!--  <xforms:group appearance="xxforms:internal" xxbl:scope="outer"> would be better but doesn't work! -->
                 <xforms:group xxbl:scope="outer">
-                    <xhtml:table id="{$id}-table"
-                        class="{@class} datatable datatable-{$id} yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
-                        style="{$height} {$width}">
-                        <!-- Copy attributes that are not parameters! -->
-                        <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id', 'class'))]" mode="dynamic"/>
-                        <xhtml:thead id="{$id}-thead">
-                            <xhtml:tr class="yui-dt-first yui-dt-last {@class}" id="{$id}-thead-tr">
-                                <xsl:apply-templates select="$columns/*" mode="dynamic"/>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xsl:apply-templates select="xhtml:tbody" mode="dynamic"/>
-                    </xhtml:table>
+                    <xhtml:div class="yui-dt yui-dt-scrollable">
+                        <xhtml:div class="yui-dt-hd">
+                            <xhtml:table id="{$id}-table"
+                                class="{@class} datatable datatable-{$id} yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
+                                style="{$height} {$width}">
+                                <!-- Copy attributes that are not parameters! -->
+                                <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id', 'class'))]" mode="dynamic"/>
+                                <xhtml:thead id="{$id}-thead">
+                                    <xhtml:tr class="yui-dt-first yui-dt-last {@class}" id="{$id}-thead-tr">
+                                        <xsl:apply-templates select="$columns/*" mode="dynamic"/>
+                                    </xhtml:tr>
+                                </xhtml:thead>
+                                <xsl:apply-templates select="xhtml:tbody" mode="dynamic"/>
+                            </xhtml:table>
+                        </xhtml:div>
+                    </xhtml:div>
                 </xforms:group>
 
             </xforms:group>

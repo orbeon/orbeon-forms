@@ -67,8 +67,8 @@
                         <xbl:content includes="xforms|label"/>
 
                         <!-- Init event -->
-                        <!-- TODO: use ev:target so that xforms-enabled is called only once -->
-                        <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.Currency.instance(this).init();</xxforms:script>
+                        <xxforms:script ev:event="xforms-enabled" ev:target="#observer">YAHOO.xbl.fr.Currency.instance(this).init();</xxforms:script>
+                        <xxforms:script ev:event="xforms-disabled" ev:target="#observer"> </xxforms:script>
 
                         <!-- Inner group -->
                         <xforms:group appearance="xxforms:internal" xxbl:scope="inner">

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -18,6 +18,7 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
+import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
@@ -39,7 +40,6 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -487,7 +487,7 @@ public class TransformerUtils {
     public static String dom4jToString(Document document) {
         try {
             final Transformer identity = getXMLIdentityTransformer();
-            final StringWriter writer = new StringWriter();
+            final StringBuilderWriter writer = new StringBuilderWriter();
             identity.transform(new LocationDocumentSource(document), new StreamResult(writer));
             return writer.toString();
         } catch (TransformerException e) {
@@ -501,7 +501,7 @@ public class TransformerUtils {
     public static String tinyTreeToString(NodeInfo nodeInfo) {
         try {
             final Transformer identity = getXMLIdentityTransformer();
-            final StringWriter writer = new StringWriter();
+            final StringBuilderWriter writer = new StringBuilderWriter();
             identity.transform(nodeInfo, new StreamResult(writer));
             return writer.toString();
         } catch (TransformerException e) {

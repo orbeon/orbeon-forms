@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
@@ -28,6 +28,7 @@ import org.orbeon.oxf.resources.ExpirationMap;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.ContentHandler;
@@ -79,7 +80,7 @@ public class JavaProcessor extends ProcessorImpl {
             private ProcessorInput getInput(PipelineContext context) {
                 start(context);
                 State state = (State) getState(context);
-                return (ProcessorInput) state.bottomInputs.get(name);
+                return state.bottomInputs.get(name);
             }
         };
         addOutput(name, output);
@@ -99,14 +100,14 @@ public class JavaProcessor extends ProcessorImpl {
                     throw new OXFException("Processor used by Java processor cannot have a config input");
             }
 
-            Map inputMap = getConnectedInputs();
+            Map<String, List<ProcessorInput>> inputMap = getConnectedInputs();
 
-            for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
-                String inputName = (String) i.next();
-                List inputsForName = (List) inputMap.get(inputName);
+            for (Iterator<String> i = inputMap.keySet().iterator(); i.hasNext();) {
+                String inputName = i.next();
+                List<ProcessorInput> inputsForName = inputMap.get(inputName);
 
-                for (Iterator j = inputsForName.iterator(); j.hasNext();) {
-                    final ProcessorInput javaProcessorInput = (ProcessorInput) j.next();
+                for (Iterator<ProcessorInput> j = inputsForName.iterator(); j.hasNext();) {
+                    final ProcessorInput javaProcessorInput = j.next();
 
                     // Skip our own config input
                     if (inputName.equals(INPUT_CONFIG))
@@ -126,11 +127,11 @@ public class JavaProcessor extends ProcessorImpl {
             }
 
             boolean hasOutputs = false;
-            Map outputMap = getConnectedOutputs();
+            Map<String, ProcessorOutput> outputMap = getConnectedOutputs();
             // Connect processor outputs
-            for (Iterator i = outputMap.keySet().iterator(); i.hasNext();) {
+            for (Iterator<String> i = outputMap.keySet().iterator(); i.hasNext();) {
                 hasOutputs = true;
-                String outputName = (String) i.next();
+                String outputName = i.next();
 
                 ProcessorOutput processorOutput = processor.createOutput(outputName);
                 ProcessorInput bottomInput = new ProcessorImpl.ProcessorInputImpl(getClass(), outputName);
@@ -202,9 +203,9 @@ public class JavaProcessor extends ProcessorImpl {
 
             // Compile
             if (!fileUpToDate) {
-                StringWriter javacOutput = new StringWriter();
+                StringBuilderWriter javacOutput = new StringBuilderWriter();
 
-                final ArrayList argLst = new ArrayList();
+                final ArrayList<String> argLst = new ArrayList<String>();
                 final String[] cmdLine;
                 {
                     argLst.add("-g");
@@ -279,7 +280,7 @@ public class JavaProcessor extends ProcessorImpl {
 
                     // Get method and run compiler
                     Method compileMethod = compilerClass.getMethod("compile", new Class[]{String[].class, PrintWriter.class});
-                    Object result = compileMethod.invoke(null, new Object[]{cmdLine, new PrintWriter(javacOutput)});
+                    Object result = compileMethod.invoke(null, cmdLine, new PrintWriter(javacOutput));
                     exitCode = ((Integer) result).intValue();
 
                 } catch (final Throwable t) {
@@ -310,15 +311,15 @@ public class JavaProcessor extends ProcessorImpl {
             }
 
             // Get processor class
-            Class processorClass = (Class) sourcepath.callNameToProcessorClass.get(config.clazz);
+            Class<Processor> processorClass = sourcepath.callNameToProcessorClass.get(config.clazz);
             if (processorClass == null) {
-                processorClass = sourcepath.classLoader.loadClass(config.clazz);
+                processorClass = (Class<Processor>) sourcepath.classLoader.loadClass(config.clazz);
                 sourcepath.callNameToProcessorClass.put(config.clazz, processorClass);
             }
 
             // Create processor from class
             Thread.currentThread().setContextClassLoader(processorClass.getClassLoader());
-            return (Processor) processorClass.newInstance();
+            return processorClass.newInstance();
 
         } catch (final IOException e) {
             throw new OXFException(e);
@@ -462,11 +463,11 @@ public class JavaProcessor extends ProcessorImpl {
 
     private static class State {
         public boolean started = false;
-        public Map bottomInputs = new HashMap();
+        public Map<String, ProcessorInput> bottomInputs = new HashMap<String, ProcessorInput>();
     }
 
     private static class Sourcepath {
         public ClassLoader classLoader;
-        public Map callNameToProcessorClass = new HashMap();
+        public Map<String, Class<Processor>> callNameToProcessorClass = new HashMap<String, Class<Processor>>();
     }
 }

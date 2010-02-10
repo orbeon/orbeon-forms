@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -20,10 +20,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.servlet.ServletExternalContext;
-import org.orbeon.oxf.util.AttributesToMap;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.StringUtils;
-import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -484,7 +481,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         private String redirectPathInfo;
         private Map redirectParameters;
         private boolean redirectIsExitPortal;
-        private StringWriter stringWriter;
+        private StringBuilderWriter StringBuilderWriter;
         private PrintWriter printWriter;
         private LocalByteArrayOutputStream byteStream;
         private String title;
@@ -506,9 +503,9 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
 
         public PrintWriter getWriter() throws IOException {
-            if (stringWriter == null) {
-                stringWriter = new StringWriter();
-                printWriter = new PrintWriter(stringWriter);
+            if (StringBuilderWriter == null) {
+                StringBuilderWriter = new StringBuilderWriter();
+                printWriter = new PrintWriter(StringBuilderWriter);
             }
             return printWriter;
         }
@@ -559,9 +556,9 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             if (XMLUtils.isTextOrJSONContentType(contentType) || XMLUtils.isXMLMediatype(contentType)) {
                 // We are dealing with text content that may need rewriting
                 // CHECK: Is this check on the content-type going to cover the relevant cases?
-                if (stringWriter != null) {
+                if (StringBuilderWriter != null) {
                     // Write directly
-                    WSRP2Utils.write(response, stringWriter.toString(), XMLUtils.isXMLMediatype(contentType));
+                    WSRP2Utils.write(response, StringBuilderWriter.toString(), XMLUtils.isXMLMediatype(contentType));
                 } else if (byteStream != null) {
                     // Transform to string and write
                     String encoding = NetUtils.getContentTypeCharset(contentType);
@@ -573,9 +570,9 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
                 }
             } else {
                 // We are dealing with content that does not require rewriting
-                if (stringWriter != null) {
+                if (StringBuilderWriter != null) {
                     // Write directly
-                    response.getWriter().write(stringWriter.toString());
+                    response.getWriter().write(StringBuilderWriter.toString());
                 } else if (byteStream != null) {
                     // Transform to string and write
                     byteStream.writeTo(response.getPortletOutputStream());
@@ -590,7 +587,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
 
         public boolean isContent() {
-            return byteStream != null || stringWriter != null;
+            return byteStream != null || StringBuilderWriter != null;
         }
 
         public void setTitle(String title) {

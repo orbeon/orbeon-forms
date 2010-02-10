@@ -17,7 +17,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Stack;
 
 /**
@@ -229,7 +228,7 @@ public class IndentedLogger {
     }
 
     private static String throwableToString(Throwable throwable) {
-        final StringWriter sb = new StringWriter();
+        final StringBuilderWriter sb = new StringBuilderWriter();
         final PrintWriter writer = new PrintWriter(sb);
         throwable.printStackTrace(writer);
         return sb.toString();

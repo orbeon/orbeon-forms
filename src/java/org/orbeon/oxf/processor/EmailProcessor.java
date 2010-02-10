@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -26,6 +26,7 @@ import org.orbeon.oxf.processor.serializer.BinaryTextContentHandler;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.xml.ProcessorOutputXMLReader;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -383,7 +384,7 @@ public class EmailProcessor extends ProcessorImpl {
     private String handleInlinePartContent(Document document, String contentType) throws SAXException {
         if ("text/html".equals(contentType)) {
             // Convert XHTML into an HTML String
-            StringWriter writer = new StringWriter();
+            StringBuilderWriter writer = new StringBuilderWriter();
             TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
             identity.getTransformer().setOutputProperty(OutputKeys.METHOD, "html");
             identity.setResult(new StreamResult(writer));

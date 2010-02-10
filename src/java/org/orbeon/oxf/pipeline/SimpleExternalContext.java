@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.util.URLRewriterUtils;
 
 import java.io.*;
@@ -197,7 +198,7 @@ public class SimpleExternalContext implements ExternalContext {
 
     protected class Response implements ExternalContext.Response {
         protected ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        protected StringWriter writer = new StringWriter();
+        protected StringBuilderWriter writer = new StringBuilderWriter();
         protected String contentType;
         protected int status;
         protected Map<String, String> headers = new HashMap<String, String>();
@@ -216,7 +217,7 @@ public class SimpleExternalContext implements ExternalContext {
 
         public void reset() {
             outputStream.reset();
-            writer.getBuffer().delete(0, writer.getBuffer().length());
+            writer.getBuilder().delete(0, writer.getBuilder().length());
         }
 
         public void setContentType(String contentType) {

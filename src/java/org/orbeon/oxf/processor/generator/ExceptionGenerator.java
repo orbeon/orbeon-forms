@@ -19,13 +19,13 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.ContentHandler;
 
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.List;
 
@@ -110,10 +110,10 @@ public class ExceptionGenerator extends ProcessorImpl {
             helper.endElement();
         } else {
             // Just output the String version of the stack trace
-            final StringWriter stringWriter = new StringWriter();
-            final PrintWriter printWriter = new PrintWriter(stringWriter);
+            final StringBuilderWriter StringBuilderWriter = new StringBuilderWriter();
+            final PrintWriter printWriter = new PrintWriter(StringBuilderWriter);
             throwable.printStackTrace(printWriter);
-            helper.element("stack-trace", stringWriter.toString());
+            helper.element("stack-trace", StringBuilderWriter.toString());
         }
 
         helper.endElement();

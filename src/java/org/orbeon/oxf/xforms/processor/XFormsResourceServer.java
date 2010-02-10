@@ -360,10 +360,10 @@ public class XFormsResourceServer extends ProcessorImpl {
                 final String content;
                 {
                     final Reader reader = new InputStreamReader(is, "utf-8");
-                    final StringWriter stringWriter = new StringWriter();
-                    NetUtils.copyStream(reader, stringWriter);
+                    final StringBuilderWriter StringBuilderWriter = new StringBuilderWriter();
+                    NetUtils.copyStream(reader, StringBuilderWriter);
                     reader.close();
-                    content = stringWriter.toString();
+                    content = StringBuilderWriter.toString();
                 }
 
                 final URI unresolvedResourceURI = new URI(resourcePath);

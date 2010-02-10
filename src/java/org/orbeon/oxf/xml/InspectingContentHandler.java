@@ -1,10 +1,15 @@
-/*
- * Copyright 1998-2002, Orbeon, Inc.
- * All Rights Reserved
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- * This is unpublished proprietary source code of Orbeon, Inc. The
- * copyright notice above does not evidence any actual or intended
- * publication of such source code.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xml;
 
@@ -12,8 +17,8 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.Stack;
@@ -28,7 +33,7 @@ public class InspectingContentHandler extends ForwardingContentHandler {
 
     private Locator locator;
 
-    private Stack elementStack = new Stack();
+    private Stack<NameInfo> elementStack = new Stack<NameInfo>();
 
     private boolean documentStarted = false;
     private boolean documentEnded = false;
@@ -80,7 +85,7 @@ public class InspectingContentHandler extends ForwardingContentHandler {
         if (error != null)
             throw new ValidationException(error + ": element " + qname, new LocationData(locator));
 
-        final NameInfo startElementNameInfo = (InspectingContentHandler.NameInfo) elementStack.pop();
+        final NameInfo startElementNameInfo = elementStack.pop();
         final NameInfo endElementNameInfo = new NameInfo(uri, localname, qname, null);
         if (!startElementNameInfo.compareNames(endElementNameInfo))
             throw new ValidationException("endElement() doesn't match startElement(). startElement(): "

@@ -25,10 +25,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
-import org.orbeon.oxf.util.ContentHandlerOutputStream;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
@@ -52,7 +49,10 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.*;
 
 /**
@@ -955,7 +955,7 @@ public class XFormsServer extends ProcessorImpl {
                             // Send all the changes between the initial state and the time the form go offline, so when
                             // reloading the page the client can apply those changes when the page is reloaded from the
                             // client-side database.
-                            final StringWriter writer = new StringWriter();
+                            final StringBuilderWriter writer = new StringBuilderWriter();
                             final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
                             identity.getTransformer().setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");// no XML decl.
                             identity.setResult(new StreamResult(writer));

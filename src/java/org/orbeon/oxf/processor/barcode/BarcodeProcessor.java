@@ -1,25 +1,22 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.barcode;
-
-import java.awt.image.BufferedImage;
-import java.io.OutputStream;
-import java.io.StringWriter;
 
 import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.tools.ant.filters.StringInputStream;
+import org.dom4j.Document;
 import org.krysalis.barcode4j.BarcodeGenerator;
 import org.krysalis.barcode4j.BarcodeUtil;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
@@ -28,11 +25,14 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
+import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
-import org.dom4j.Document;
+
+import java.awt.image.BufferedImage;
+import java.io.OutputStream;
 
 /**
  * This processor wraps around barcode4j.
@@ -63,7 +63,7 @@ public class BarcodeProcessor extends HttpBinarySerializer {// TODO: HttpBinaryS
 				instanceDocument, null, new org.orbeon.saxon.Configuration());
 
 		try {
-            final StringWriter barcodeConfigWriter = new StringWriter();
+            final StringBuilderWriter barcodeConfigWriter = new StringBuilderWriter();
 			configDocument.write(barcodeConfigWriter);
 
 			final DefaultConfigurationBuilder builder = new DefaultConfigurationBuilder();

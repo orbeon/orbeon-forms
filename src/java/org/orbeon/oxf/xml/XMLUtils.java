@@ -31,10 +31,7 @@ import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.ContentHandlerOutputStream;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.util.SequenceReader;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.xerces.XercesSAXParserFactoryImpl;
@@ -512,7 +509,7 @@ public class XMLUtils {
             Transformer transformer = TransformerUtils.getXMLIdentityTransformer();
             DOMSource source = new DOMSource(node);
 
-            StringWriter writer = new StringWriter();
+            StringBuilderWriter writer = new StringBuilderWriter();
             transformer.transform(source, new StreamResult(writer));
             return writer.toString();
         } catch (TransformerException e) {

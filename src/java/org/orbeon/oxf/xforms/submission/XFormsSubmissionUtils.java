@@ -23,6 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
@@ -352,7 +353,7 @@ class ResponseAdapter implements ExternalContext.Response {
     private int status = 200;
     private String contentType;
 
-    private StringWriter stringWriter;
+    private StringBuilderWriter stringWriter;
     private PrintWriter printWriter;
     private ResponseAdapter.LocalByteArrayOutputStream byteStream;
 
@@ -375,7 +376,7 @@ class ResponseAdapter implements ExternalContext.Response {
             if (stringWriter != null) {
                 final byte[] bytes;
                 try {
-                    bytes = stringWriter.getBuffer().toString().getBytes("utf-8");
+                    bytes = stringWriter.getBuilder().toString().getBytes("utf-8");
                 } catch (UnsupportedEncodingException e) {
                     throw new OXFException(e); // should not happen
                 }
@@ -412,7 +413,7 @@ class ResponseAdapter implements ExternalContext.Response {
 
     public PrintWriter getWriter() throws IOException {
         if (stringWriter == null) {
-            stringWriter = new StringWriter();
+            stringWriter = new StringBuilderWriter();
             printWriter = new PrintWriter(stringWriter);
         }
         return printWriter;

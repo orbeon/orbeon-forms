@@ -29,6 +29,7 @@ import org.orbeon.oxf.processor.transformer.URIResolverListener;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.properties.PropertyStore;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.ConstantLocator;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -57,7 +58,6 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -160,7 +160,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
             private void runTransformer(PipelineContext pipelineContext, final ContentHandler contentHandler, TemplatesInfo templatesInfo,
                                         Map<String, Boolean> attributes, final boolean dumbOutputLocation, final boolean smartOutputLocation) {
 
-                StringWriter saxonStringWriter = null;
+                StringBuilderWriter saxonStringBuilderWriter = null;
                 try {
                     // Create transformer handler and set output writer for Saxon
                     final StringErrorListener errorListener = new StringErrorListener(logger);
@@ -174,7 +174,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         transformer.setOutputProperty(SaxonOutputKeys.SUPPLY_SOURCE_LOCATOR, "yes");
 
                     // Create writer for transformation errors
-                    saxonStringWriter = createErrorStringWriter(transformerHandler);
+                    saxonStringBuilderWriter = createErrorStringBuilderWriter(transformerHandler);
 
                     // Fallback location data
                     final LocationData processorLocationData = getLocationData();
@@ -361,8 +361,8 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     } finally {
 
                         // Log message from Saxon
-                        if (saxonStringWriter != null) {
-                            String message = saxonStringWriter.toString();
+                        if (saxonStringBuilderWriter != null) {
+                            String message = saxonStringBuilderWriter.toString();
                             if (message.length() > 0)
                                 logger.info(message);
                         }
@@ -403,7 +403,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                         if (rootCause instanceof TerminationException) {
                             // Saxon-specific exception thrown by xsl:message terminate="yes"
-                            final ValidationException customException = new ValidationException("Processing terminated by xsl:message: " + saxonStringWriter.toString(), locationData);
+                            final ValidationException customException = new ValidationException("Processing terminated by xsl:message: " + saxonStringBuilderWriter.toString(), locationData);
                             throw new ValidationException(customException, new ExtendedLocationData(locationData, "executing XSLT transformation"));
                         } else {
                             // Other transformation error
@@ -612,16 +612,16 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         return output;
     }
 
-    private StringWriter createErrorStringWriter(TransformerHandler transformerHandler) throws Exception {
+    private StringBuilderWriter createErrorStringBuilderWriter(TransformerHandler transformerHandler) throws Exception {
         final String transformerClassName = transformerHandler.getTransformer().getClass().getName();
 
         // NOTE: 2007-07-05 MK suggests that since we depend on Saxon anyway, we shouldn't use reflection
         // here but directly the Saxon classes to avoid the cost of reflection.
 
-        StringWriter saxonStringWriter = null;
+        StringBuilderWriter saxonStringBuilderWriter = null;
         if (transformerClassName.equals("org.orbeon.saxon.Controller")) {
             // Built-in Saxon transformer
-            saxonStringWriter = new StringWriter();
+            saxonStringBuilderWriter = new StringBuilderWriter();
             final Controller saxonController = (Controller) transformerHandler.getTransformer();
             // NOTE: Saxon 9 returns a Receiver (MessageEmitter -> XMLEmitter -> Emitter -> Receiver)
             Emitter messageEmitter = saxonController.getMessageEmitter();
@@ -629,10 +629,10 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 // NOTE: Saxon 9 makes this method private, use setMessageEmitter() instead
                 messageEmitter = saxonController.makeMessageEmitter();
             }
-            messageEmitter.setWriter(saxonStringWriter);
+            messageEmitter.setWriter(saxonStringBuilderWriter);
         } else if (transformerClassName.equals("net.sf.saxon.Controller")) {
             // A Saxon transformer, we don't know which version
-            saxonStringWriter = new StringWriter();
+            saxonStringBuilderWriter = new StringBuilderWriter();
             final Transformer saxonController = transformerHandler.getTransformer();
             final Method getMessageEmitter = saxonController.getClass().getMethod("getMessageEmitter");
             Object messageEmitter = getMessageEmitter.invoke(saxonController);
@@ -648,9 +648,9 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 setMessageEmitter.invoke(saxonController, messageEmitter);
             }
             final Method setWriter = messageEmitter.getClass().getMethod("setWriter", new Class[]{Writer.class});
-            setWriter.invoke(messageEmitter, saxonStringWriter);
+            setWriter.invoke(messageEmitter, saxonStringBuilderWriter);
         }
-        return saxonStringWriter;
+        return saxonStringBuilderWriter;
     }
 
     /**

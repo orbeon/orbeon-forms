@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -21,13 +21,17 @@ import org.dom4j.io.XMLWriter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.*;
 
@@ -183,7 +187,7 @@ public class Dom4jUtils {
 
     private static String domToString(final Node node, final OutputFormat format) {
         try {
-            final StringWriter writer = new StringWriter();
+            final StringBuilderWriter writer = new StringBuilderWriter();
             // Ugh, XMLWriter doesn't accept null formatter _and_ default formatter is protected.
             final XMLWriter xmlWriter = format == null ? new XMLWriter(writer) : new XMLWriter(writer, format);
             xmlWriter.write(node);

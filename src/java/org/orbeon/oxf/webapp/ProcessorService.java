@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.webapp;
 
@@ -24,13 +24,17 @@ import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.resources.ClassLoaderResourceManagerImpl;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.util.task.TaskScheduler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.HashMap;
 
 public class ProcessorService {
@@ -203,11 +207,11 @@ public class ProcessorService {
                     .append("</td></tr>");
         }
 
-        final StringWriter stringWriter = new StringWriter();
-        final PrintWriter printWriter = new PrintWriter(stringWriter);
+        final StringBuilderWriter StringBuilderWriter = new StringBuilderWriter();
+        final PrintWriter printWriter = new PrintWriter(StringBuilderWriter);
         rootThrowable.printStackTrace(printWriter);
         sb.append("<tr><th valign=\"top\">Stack Trace</th><td><pre>")
-                .append(XMLUtils.escapeHTML(stringWriter.toString()))
+                .append(XMLUtils.escapeHTML(StringBuilderWriter.toString()))
                 .append("</pre></td></tr></table></body></html>");
 
         // Get a Writer

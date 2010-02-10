@@ -1,20 +1,21 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.tamino.dom4j;
 // namespace dependencies
 import com.softwareag.tamino.db.api.namespace.TInoNamespace;
 import org.dom4j.*;
+import org.orbeon.oxf.util.StringBuilderWriter;
 
 import java.io.*;
 import java.util.*;
@@ -695,13 +696,13 @@ class TDOM4JXMLOutputter implements Cloneable {
     
     /**
 	 * Return a string representing a document.  Uses an internal
-	 * StringWriter. Warning: a String is Unicode, which may not match
+	 * StringBuilderWriter. Warning: a String is Unicode, which may not match
 	 * the outputter's specified encoding.
 	 *
 	 * @param doc <code>Document</code> to format.
 	 **/
     public String outputString(Document doc) throws IOException {
-		StringWriter out = new StringWriter();
+		StringBuilderWriter out = new StringBuilderWriter();
 		output(doc, out);
 		out.flush();
 		return out.toString();
@@ -715,7 +716,7 @@ class TDOM4JXMLOutputter implements Cloneable {
 	 * @param doc <code>Element</code> to format.
 	 **/
     public String outputString(Element element) throws IOException {
-		StringWriter out = new StringWriter();
+		StringBuilderWriter out = new StringBuilderWriter();
 		output(element, out);
 		out.flush();
 		return out.toString();

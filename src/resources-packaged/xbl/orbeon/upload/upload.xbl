@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         script-type="application/xhtml+xml">
+         
+    <xbl:script type="text/javascript" src="/ops/yui/element/element-beta-min.js"/>
+    <xbl:script type="text/javascript" src="/ops/yui/button/button-min.js"/>
+    <xbl:script src="/xbl/orbeon/upload/upload.js"/>
+         
+    <xbl:binding id="fr-upload" element="fr|upload">
+        <xbl:resources>
+            <xbl:style src="/ops/yui/button/assets/skins/sam/button.css"/>
+            <xbl:style>
+                .xbl-fr-upload {
+                	position: relative;
+                }
+
+                .xbl-fr-upload-fakefile {
+                    white-space: nowrap;
+                	position: absolute;
+                	top: 0px;
+                	left: 0px;
+                	z-index: 1;
+                }
+
+                .xbl-fr-upload .xforms-upload, .xbl-fr-upload .xforms-upload-select {
+                	position: relative;
+                	text-align: right;
+                	-moz-opacity:0 ;
+                	filter:alpha(opacity: 0);
+                	opacity: 0;
+                	z-index: 2;
+                }
+
+                .xbl-fr-upload-visible-input, .xbl-fr-upload .yui-button {
+                    vertical-align: middle;
+                }
+            </xbl:style>
+        </xbl:resources>
+        <xbl:template>
+            <xforms:upload xbl:attr="model context ref bind" xxbl:scope="outer">
+                <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Upload.instance(this).init();</xxforms:script>
+                <xbl:content includes="xforms|label, xforms|help, xforms|hint, xforms:filename, xforms:mediatype, xxforms:size"/>
+            </xforms:upload>
+        	<xhtml:div class="xbl-fr-upload-fakefile">
+        		<xhtml:input class="xbl-fr-upload-visible-input"/>
+        		<xhtml:span class="yui-button">
+        		    <xhtml:span class="first-child">
+                		<xhtml:button type="button">Select file</xhtml:button>
+        		    </xhtml:span>
+        		</xhtml:span>
+        	</xhtml:div>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

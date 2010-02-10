@@ -45,7 +45,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
         final ContentHandler contentHandler = controller.getOutput();
 
         // Start xhtml:fieldset element if needed
-        if (!handlerContext.isNewXHTMLLayout())
+        if (!handlerContext.isSpanHTMLLayout())
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName,
                     getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, false));
 
@@ -82,7 +82,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
         final String groupElementName = getContainingElementName();
         final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
 
-        if (!handlerContext.isNewXHTMLLayout())
+        if (!handlerContext.isSpanHTMLLayout())
             controller.getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName);
     }
 

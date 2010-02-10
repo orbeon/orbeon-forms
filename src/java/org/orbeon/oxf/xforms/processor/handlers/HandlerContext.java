@@ -58,7 +58,7 @@ public class HandlerContext {
     private final String alertElementName;
 
     public final boolean isNoscript;
-    public final boolean isNewXHTMLLayout;
+    public final boolean isSpanHTMLLayout;
 
     // UA information
     private boolean processedUserAgent;
@@ -87,7 +87,7 @@ public class HandlerContext {
         this.alertElementName = XFormsProperties.getAlertElementName(containingDocument);
 
         this.isNoscript = XFormsProperties.isNoscript(containingDocument);
-        this.isNewXHTMLLayout = XFormsProperties.isNewXHTMLLayout(containingDocument);
+        this.isSpanHTMLLayout = XFormsProperties.isSpanHTMLLayout(containingDocument);
     }
 
     final public ElementHandlerController getController() {
@@ -161,8 +161,8 @@ public class HandlerContext {
         return isNoscript;
     }
 
-    final public boolean isNewXHTMLLayout() {
-        return isNewXHTMLLayout;
+    final public boolean isSpanHTMLLayout() {
+        return isSpanHTMLLayout;
     }
 
     public String findXHTMLPrefix() {

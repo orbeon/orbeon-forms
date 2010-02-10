@@ -432,7 +432,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         {
 
             // Old layout always output container <span>/<fieldset>, and in new layout we only put it for select/select1
-            final boolean outputContainerElement = !isBooleanInput || !handlerContext.isNewXHTMLLayout();
+            final boolean outputContainerElement = !isBooleanInput || !handlerContext.isSpanHTMLLayout();
             if (outputContainerElement)
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName, containerAttributes);
             {

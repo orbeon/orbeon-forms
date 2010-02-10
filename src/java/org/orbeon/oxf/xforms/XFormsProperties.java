@@ -122,6 +122,7 @@ public class XFormsProperties {
 
     public static final String NEW_XHTML_LAYOUT = "new-xhtml-layout";   // deprecated
     public static final String XHTML_LAYOUT = "xhtml-layout";
+
     public enum XHTMLLayout { NOSPAN, SPAN }
 
     private static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
@@ -464,7 +465,7 @@ public class XFormsProperties {
         return getStringProperty(containingDocument, COMPUTED_BINDS_PROPERTY);
     }
 
-    public static boolean isNewXHTMLLayout(XFormsContainingDocument containingDocument) {
+    public static boolean isSpanHTMLLayout(XFormsContainingDocument containingDocument) {
         // Check both properties for backward compatibility
         final String value = getStringProperty(containingDocument, XHTML_LAYOUT);
         return XHTMLLayout.SPAN.toString().toLowerCase().equals(value) || getBooleanProperty(containingDocument, NEW_XHTML_LAYOUT);

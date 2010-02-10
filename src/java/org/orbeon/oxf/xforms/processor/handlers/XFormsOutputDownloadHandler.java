@@ -43,7 +43,7 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
 
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl);
 
-        if (!handlerContext.isNewXHTMLLayout())
+        if (!handlerContext.isSpanHTMLLayout())
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
         {
             final AttributesImpl aAttributes = getAnchorAttributes(outputControl, containerAttributes);
@@ -60,12 +60,12 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
             }
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
         }
-        if (!handlerContext.isNewXHTMLLayout())
+        if (!handlerContext.isSpanHTMLLayout())
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
     }
 
     private AttributesImpl getAnchorAttributes(XFormsOutputControl outputControl, AttributesImpl containerAttributes) {
-        final AttributesImpl aAttributes = handlerContext.isNewXHTMLLayout() ? containerAttributes : new AttributesImpl();
+        final AttributesImpl aAttributes = handlerContext.isSpanHTMLLayout() ? containerAttributes : new AttributesImpl();
         final String hrefValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, null);
 
         if (hrefValue == null || hrefValue.trim().equals("")) {

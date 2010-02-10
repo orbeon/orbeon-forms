@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -39,7 +39,7 @@ public class XFormsOutputImageHandler extends XFormsOutputHandler {
 
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl);
 
-        if (!handlerContext.isNewXHTMLLayout())
+        if (!handlerContext.isSpanHTMLLayout())
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
         {
             final AttributesImpl imgAttributes = getImgAttributes(outputControl, mediatypeValue, containerAttributes);
@@ -51,12 +51,12 @@ public class XFormsOutputImageHandler extends XFormsOutputHandler {
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
         }
-        if (!handlerContext.isNewXHTMLLayout())
+        if (!handlerContext.isSpanHTMLLayout())
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
     }
 
     private AttributesImpl getImgAttributes(XFormsOutputControl outputControl, String mediatypeValue, AttributesImpl newAttributes) {
-        final AttributesImpl imgAttributes = handlerContext.isNewXHTMLLayout() ? newAttributes : new AttributesImpl();
+        final AttributesImpl imgAttributes = handlerContext.isSpanHTMLLayout() ? newAttributes : new AttributesImpl();
         // @src="..."
         // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
         final String srcValue = XFormsOutputControl.getExternalValue(pipelineContext, outputControl, mediatypeValue);

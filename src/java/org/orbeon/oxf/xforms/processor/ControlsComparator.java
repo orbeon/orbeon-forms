@@ -38,11 +38,13 @@ import java.util.Set;
 
 public class ControlsComparator {
 
-    protected final PipelineContext pipelineContext;
-    protected final ContentHandlerHelper ch;
-    protected final XFormsContainingDocument containingDocument;
-    protected final Set<String> valueChangeControlIds;
-    protected final boolean isTestMode;
+    private final PipelineContext pipelineContext;
+    private final ContentHandlerHelper ch;
+    private final XFormsContainingDocument containingDocument;
+    private final Set<String> valueChangeControlIds;
+    private final boolean isTestMode;
+
+    public final boolean isSpanHTMLLayout;
 
     public ControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
                               Set<String> valueChangeControlIds, boolean isTestMode) {
@@ -52,6 +54,8 @@ public class ControlsComparator {
         this.containingDocument = containingDocument;
         this.valueChangeControlIds = valueChangeControlIds;
         this.isTestMode = isTestMode;
+
+        this.isSpanHTMLLayout = XFormsProperties.isSpanHTMLLayout(containingDocument);
     }
 
     public void diff(List<XFormsControl> state1, List<XFormsControl> state2) {
@@ -189,7 +193,13 @@ public class ControlsComparator {
     }
 
     private boolean testInnerHTML(XFormsControl control1, XFormsControl control2, AttributesImpl attributesImpl) {
-        if (control2 instanceof XFormsContainerControl && !(control2 instanceof XFormsPseudoControl)) {
+
+        // Only support innerHTML updates on:
+        //
+        // o span HTML layout
+        // o for container controls (group, switch, repeat, dialog, XBL components)
+        //
+        if (isSpanHTMLLayout && control2 instanceof XFormsContainerControl && !(control2 instanceof XFormsPseudoControl)) {
             final SAXStore.Mark mark = containingDocument.getStaticState().getElementMark(control2.getPrefixedId());
             if (mark != null) {
 
@@ -199,6 +209,16 @@ public class ControlsComparator {
                 // If so, compute new fragment
                 if (hasDifferences) {
                     try {
+
+                        // 1: Send differences for just this control if needed
+                        if (!control2.equalsExternal(pipelineContext, control1)) {
+                            final boolean isNewlyVisibleSubtree = control1 == null;
+                            attributesImpl.clear();
+                            control2.outputAjaxDiff(pipelineContext, ch, control1, attributesImpl, isNewlyVisibleSubtree);
+                        }
+
+                        // 2: Send difference for content of this control
+
                         final ElementHandlerController controller = new ElementHandlerController();
 
                         // Register handlers on controller
@@ -238,8 +258,9 @@ public class ControlsComparator {
                         // So for now, perform simple steps here, and later this can be revisited.
                         //
                         final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
+                        final boolean skipRootElement = !(control2 instanceof XFormsRepeatControl); // a little hacky to do this here, knowledge should be in control itself
                         controller.setOutput(new DeferredContentHandlerImpl(new XHTMLRewrite().getRewriteContentHandler(externalContext,
-                                new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getContentHandler())), true)));
+                                new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getContentHandler()), skipRootElement), true)));
 
                         // Create handler context
                         final HandlerContext handlerContext = new HandlerContext(controller, pipelineContext, containingDocument, null, externalContext) {

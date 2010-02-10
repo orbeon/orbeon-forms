@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.serializer;
 
@@ -56,7 +56,7 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
     private Writer writer;
     private ContentHandler outputContentHandler;
     private int elementLevel = 0;
-    private Map prefixMappings;
+    private Map<String, String> prefixMappings;
 
     /**
      * Simple constructor to write to a stream and close it.
@@ -105,7 +105,7 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
         if (elementLevel == 0) {
             // Record definitions only before root element arrives
             if (prefixMappings == null)
-                prefixMappings = new HashMap();
+                prefixMappings = new HashMap<String, String>();
             prefixMappings.put(prefix, uri);
         }
     }
@@ -130,7 +130,7 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
             if (prefixMappings == null)
                 throw new OXFException("Undeclared prefix in xsi:type: " + typePrefix);
 
-            String typeNamespaceURI = (String) prefixMappings.get(typePrefix);
+            String typeNamespaceURI = prefixMappings.get(typePrefix);
             if (typeNamespaceURI == null)
                 throw new OXFException("Undeclared prefix in xsi:type: " + typePrefix);
 

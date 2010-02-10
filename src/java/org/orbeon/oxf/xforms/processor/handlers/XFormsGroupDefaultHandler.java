@@ -79,7 +79,7 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
             // Group outside table
 
             // Start xhtml:span element
-            if (!handlerContext.isNewXHTMLLayout())
+            if (!handlerContext.isSpanHTMLLayout())
                 controller.getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName,
                         getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, false));
 
@@ -145,7 +145,7 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
             final String groupElementName = getContainingElementName();
             final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
 
-            if (!handlerContext.isNewXHTMLLayout())
+            if (!handlerContext.isSpanHTMLLayout())
                 controller.getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName);
         } else {
             // Group within table
@@ -178,7 +178,7 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
             reusableAttributes.clear();
             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, getLabelClasses(xformsControl));
             outputLabelFor(handlerContext, reusableAttributes, effectiveId, effectiveId, LHHAC.LABEL, handlerContext.getLabelElementName(),
-                    getLabelValue(xformsControl), xformsControl != null && xformsControl.isHTMLLabel(pipelineContext), !handlerContext.isNewXHTMLLayout());
+                    getLabelValue(xformsControl), xformsControl != null && xformsControl.isHTMLLabel(pipelineContext), !handlerContext.isSpanHTMLLayout());
         }
     }
 

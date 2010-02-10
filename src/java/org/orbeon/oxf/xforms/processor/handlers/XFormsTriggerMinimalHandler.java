@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -51,7 +51,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
 
     @Override
     protected void addCustomClasses(StringBuilder classes, XFormsSingleNodeControl xformsControl) {
-        if (handlerContext.isNewXHTMLLayout() && xformsControl != null && xformsControl.isReadonly()) {
+        if (handlerContext.isSpanHTMLLayout() && xformsControl != null && xformsControl.isReadonly()) {
             // Add a special class to facilitate styling of readonly links with IE 6
             classes.append(" xforms-trigger-readonly");
         }

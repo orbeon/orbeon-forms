@@ -30,9 +30,13 @@ import java.io.Writer;
 public class HTMLFragmentSerializer implements ContentHandler {
 
     private final Writer writer;
+    private final boolean skipRootElement;
 
-    public HTMLFragmentSerializer(Writer writer) {
+    private int level = 0;
+
+    public HTMLFragmentSerializer(Writer writer, boolean skipRootElement) {
         this.writer = writer;
+        this.skipRootElement = skipRootElement;
     }
 
     public void startDocument() {}
@@ -42,47 +46,55 @@ public class HTMLFragmentSerializer implements ContentHandler {
     public void setDocumentLocator(Locator locator) {}
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        try {
-            writer.write('<');
-            writer.write(localname);
-            final int attributesCount = attributes.getLength();
-            if (attributesCount > 0) {
-                for (int i = 0; i < attributesCount; i++) {
-                    final String currentAttributeName = attributes.getLocalName(i);
-                    final String currentAttributeValue = attributes.getValue(i);
+        if (!skipRootElement || level > 0) {
+            try {
+                writer.write('<');
+                writer.write(localname);
+                final int attributesCount = attributes.getLength();
+                if (attributesCount > 0) {
+                    for (int i = 0; i < attributesCount; i++) {
+                        final String currentAttributeName = attributes.getLocalName(i);
+                        final String currentAttributeValue = attributes.getValue(i);
 
-                    // Only consider attributes in no namespace
-                    if ("".equals(attributes.getURI(i))) {
-                        writer.write(' ');
-                        writer.write(currentAttributeName);
-                        writer.write("=\"");
-                        if (currentAttributeValue != null)
-                            writer.write(XMLUtils.escapeXMLMinimal(currentAttributeValue));
-                        writer.write('"');
+                        // Only consider attributes in no namespace
+                        if ("".equals(attributes.getURI(i))) {
+                            writer.write(' ');
+                            writer.write(currentAttributeName);
+                            writer.write("=\"");
+                            if (currentAttributeValue != null)
+                                writer.write(XMLUtils.escapeXMLMinimal(currentAttributeValue));
+                            writer.write('"');
+                        }
                     }
                 }
+                writer.write('>');
+            } catch (IOException e) {
+                throw new SAXException(e);
             }
-            writer.write('>');
-        } catch (IOException e) {
-            throw new SAXException(e);
         }
+        level++;
     }
 
     public void endElement(String uri, String localname, String qName) throws SAXException {
-        try {
-            writer.write("</");
-            writer.write(localname);
-            writer.write('>');
-        } catch (IOException e) {
-            throw new SAXException(e);
+        level--;
+        if (!skipRootElement || level > 0) {
+            try {
+                writer.write("</");
+                writer.write(localname);
+                writer.write('>');
+            } catch (IOException e) {
+                throw new SAXException(e);
+            }
         }
     }
 
     public void characters(char[] chars, int start, int length) throws SAXException {
-        try {
-            writer.write(XMLUtils.escapeXMLMinimal(new String(chars, start, length)));
-        } catch (IOException e) {
-            throw new SAXException(e);
+        if (!skipRootElement || level > 0) {
+            try {
+                writer.write(XMLUtils.escapeXMLMinimal(new String(chars, start, length)));
+            } catch (IOException e) {
+                throw new SAXException(e);
+            }
         }
     }
 

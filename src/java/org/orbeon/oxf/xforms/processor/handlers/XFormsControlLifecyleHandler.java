@@ -104,7 +104,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
             final ContentHandler contentHandler = handlerContext.getController().getOutput();
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            if (handlerContext.isNewXHTMLLayout() && isMustOutputContainerElement()) {
+            if (handlerContext.isSpanHTMLLayout() && isMustOutputContainerElement()) {
                 // Open control element, usually <span>
                 final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes);
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
@@ -198,7 +198,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
                 }
             }
 
-            if (handlerContext.isNewXHTMLLayout() && isMustOutputContainerElement()) {
+            if (handlerContext.isSpanHTMLLayout() && isMustOutputContainerElement()) {
                 // Close control element, usually <span>
                 final ContentHandler contentHandler = handlerContext.getController().getOutput();
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
@@ -255,22 +255,22 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     protected void handleLabel() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.LABEL, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.LABEL, xformsControl, isTemplate, !handlerContext.isSpanHTMLLayout());
     }
 
     protected void handleAlert() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.ALERT, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.ALERT, xformsControl, isTemplate, !handlerContext.isSpanHTMLLayout());
     }
 
     protected void handleHint() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.HINT, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.HINT, xformsControl, isTemplate, !handlerContext.isSpanHTMLLayout());
     }
 
     protected void handleHelp() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.HELP, xformsControl, isTemplate, !handlerContext.isNewXHTMLLayout());
+        handleLabelHintHelpAlert(effectiveId, getForEffectiveId(), LHHAC.HELP, xformsControl, isTemplate, !handlerContext.isSpanHTMLLayout());
     }
 
     // Must be overridden by subclasses
@@ -282,7 +282,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     protected AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsSingleNodeControl xformsControl, boolean addId) {
         final AttributesImpl containerAttributes;
-        if (handlerContext.isNewXHTMLLayout()) {
+        if (handlerContext.isSpanHTMLLayout()) {
             reusableAttributes.clear();
             containerAttributes = reusableAttributes;
             if (addId)
@@ -334,6 +334,6 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         // Default:
         // o new layout: point to foo$bar$$c.1-2-3
         // o old layout: point to foo$bar.1-2-3
-        return handlerContext.isNewXHTMLLayout() ? getLHHACId(effectiveId, LHHAC_CODES.get(LHHAC.CONTROL)) : effectiveId;
+        return handlerContext.isSpanHTMLLayout() ? getLHHACId(effectiveId, LHHAC_CODES.get(LHHAC.CONTROL)) : effectiveId;
     }
 }

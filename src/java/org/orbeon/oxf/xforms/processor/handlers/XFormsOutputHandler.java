@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -30,7 +30,7 @@ public abstract class XFormsOutputHandler extends XFormsControlLifecyleHandler {
     protected AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsSingleNodeControl outputControl) {
 
         final AttributesImpl containerAttributes = super.getContainerAttributes(uri, localname, attributes, effectiveId, outputControl, true);
-        if (handlerContext.isNewXHTMLLayout()) {
+        if (handlerContext.isSpanHTMLLayout()) {
             // Add custom class
             containerAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-output-output");
         }

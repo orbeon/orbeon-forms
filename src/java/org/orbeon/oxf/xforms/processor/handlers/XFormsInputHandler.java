@@ -141,7 +141,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
             final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, inputControl, false);
 
-            if (!handlerContext.isNewXHTMLLayout())
+            if (!handlerContext.isSpanHTMLLayout())
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);
 
             {
@@ -256,19 +256,19 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                             final String formattedValue = inputControl.getReadonlyValueUseFormat(pipelineContext);
                             final String outputValue = (formattedValue != null) ? formattedValue : inputControl.getExternalValue(pipelineContext);
 
-                            if (handlerContext.isNewXHTMLLayout())
+                            if (handlerContext.isSpanHTMLLayout())
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);
 
                             if (outputValue != null)
                                 contentHandler.characters(outputValue.toCharArray(), 0, outputValue.length());
 
-                            if (handlerContext.isNewXHTMLLayout())
+                            if (handlerContext.isSpanHTMLLayout())
                                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
                         }
                     }
                 }
             }
-            if (!handlerContext.isNewXHTMLLayout())
+            if (!handlerContext.isSpanHTMLLayout())
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
         }
     }

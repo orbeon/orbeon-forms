@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -30,7 +30,7 @@ public class XFormsSwitchHandler extends XFormsControlLifecyleHandler {
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
 
-        if (!handlerContext.isNewXHTMLLayout()) {
+        if (!handlerContext.isSpanHTMLLayout()) {
             // Start xhtml:span
             final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
             handlerContext.getController().getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
@@ -39,7 +39,7 @@ public class XFormsSwitchHandler extends XFormsControlLifecyleHandler {
 
     @Override
     protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
-        if (!handlerContext.isNewXHTMLLayout()) {
+        if (!handlerContext.isSpanHTMLLayout()) {
             // Close xhtml:span
             handlerContext.getController().getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
         }

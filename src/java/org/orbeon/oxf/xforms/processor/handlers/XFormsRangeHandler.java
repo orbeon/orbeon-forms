@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -41,7 +41,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
 
     @Override
     protected void addCustomClasses(StringBuilder classes, XFormsSingleNodeControl xformsControl) {
-        if (!handlerContext.isNewXHTMLLayout()) {
+        if (!handlerContext.isSpanHTMLLayout()) {
             if (classes.length() > 0)
                 classes.append(' ');
             classes.append(RANGE_BACKGROUND_CLASS);
@@ -76,7 +76,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
 
     protected AttributesImpl getBackgroundAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsSingleNodeControl xformsControl) {
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
-        if (handlerContext.isNewXHTMLLayout()) {
+        if (handlerContext.isSpanHTMLLayout()) {
             // Add custom class (added in addCustomClasses() for old layout)
             containerAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, RANGE_BACKGROUND_CLASS);
         }

@@ -17,6 +17,7 @@
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>XForms Upload</title>
@@ -111,12 +112,12 @@
                     </td>
                     <td>
                         <!-- Upload field -->
-                        <xforms:upload ref="." xxforms:size="60">
+                        <fr:upload ref="." xxforms:size="60">
                             <xforms:filename ref="@filename"/>
                             <xforms:mediatype ref="@mediatype"/>
                             <xxforms:size ref="@size"/>
                             <xforms:setvalue ev:event="xforms-select" ref="instance('selected')">Yes! A file got selected!</xforms:setvalue>
-                        </xforms:upload>
+                        </fr:upload>
                         <!-- Download link -->
                         <xforms:output ref="." appearance="xxforms:download">
                             <xforms:filename ref="@filename"/>

@@ -195,38 +195,29 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         final XFormsSwitchControl otherSwitchControl = (XFormsSwitchControl) other;
 
         // Check whether selected case has changed
-        final String selectedCaseEffectiveId = getSelectedCase().getEffectiveId();
-        final String previousSelectedCaseId
-                = (otherSwitchControl != null)
-                    ? ((XFormsSwitchControl.XFormsSwitchControlLocal) otherSwitchControl.getInitialLocal()).getSelectedCaseControl().getEffectiveId() : null;
-        if (!selectedCaseEffectiveId.equals(previousSelectedCaseId))
+        if (!getSelectedCase().getEffectiveId().equals(getOtherSelectedCaseEffectiveId(otherSwitchControl)))
             return false;
 
         return super.equalsExternal(propertyContext, other);
     }
 
     @Override
-    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
+    public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other,
+                               AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
         // Output regular diff
         super.outputAjaxDiff(pipelineContext, ch, other, attributesImpl, isNewlyVisibleSubtree);
 
         // Output switch-specific diff
         final XFormsSwitchControl switchControl1 = (XFormsSwitchControl) other;
-        final XFormsSwitchControl switchControl2 = this;
-
-        final String selectedCaseEffectiveId = switchControl2.getSelectedCase().getEffectiveId();
-
-        // Only output the information if it has changed
-        final String previousSelectedCaseId
-                = (switchControl1 != null)
-                    ? ((XFormsSwitchControl.XFormsSwitchControlLocal) switchControl1.getInitialLocal()).getSelectedCaseControl().getEffectiveId() : null;
 
         // Output selected case id
+        final String selectedCaseEffectiveId = getSelectedCase().getEffectiveId();
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
                 "id", selectedCaseEffectiveId,
                 "visibility", "visible"
         });
 
+        final String previousSelectedCaseId = getOtherSelectedCaseEffectiveId(switchControl1);
         if (previousSelectedCaseId != null) {
             // Output deselected case ids
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
@@ -235,7 +226,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
             );
         } else {
             // This is a new switch (can happen with repeat), send all deselected to be sure
-            final List<XFormsControl> children = switchControl2.getChildren();
+            final List<XFormsControl> children = getChildren();
             if (children != null && children.size() > 0) {
                 for (final XFormsControl caseControl: children) {
                     if (!caseControl.getEffectiveId().equals(selectedCaseEffectiveId)) {
@@ -247,5 +238,9 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
                 }
             }
         }
+    }
+
+    private String getOtherSelectedCaseEffectiveId(XFormsSwitchControl switchControl1) {
+        return (switchControl1 != null) ? ((XFormsSwitchControlLocal) switchControl1.getInitialLocal()).getSelectedCaseControl().getEffectiveId() : null;
     }
 }

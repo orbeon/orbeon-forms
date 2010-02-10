@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -21,6 +21,10 @@ import org.orbeon.oxf.util.UserAgent;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.control.XFormsComponentControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -29,6 +33,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -36,12 +43,14 @@ import java.util.Stack;
  */
 public class HandlerContext {
 
+    // Passed from constructor
     private final ElementHandlerController controller;
     private final PipelineContext pipelineContext;
     private final XFormsContainingDocument containingDocument;
     private final XFormsState encodedClientState;
     private final ExternalContext externalContext;
 
+    // Computed during construction
     private final String[] documentOrder;
     private final String labelElementName;
     private final String hintElementName;
@@ -51,12 +60,17 @@ public class HandlerContext {
     public final boolean isNoscript;
     public final boolean isNewXHTMLLayout;
 
+    // UA information
     private boolean processedUserAgent;
     private boolean isRenderingEngineTrident;
     private boolean isRenderingEngineIE6OrEarlier;
 
-    private static final int INDEX_INCREMENT = 100;
-    private int currentTabIndex = 0;
+    // Context information
+    private Stack<String> componentContextStack;
+    private Stack<RepeatContext> repeatContextStack;
+
+//    private static final int INDEX_INCREMENT = 100;
+//    private int currentTabIndex = 0;
 
     public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext,
                           XFormsContainingDocument containingDocument, XFormsState encodedClientState, ExternalContext externalContext) {
@@ -96,13 +110,13 @@ public class HandlerContext {
         return externalContext;
     }
 
-    public int nextTabIndex() {
-        // NIY
-//        final Integer[] repeatIndexes = XFormsUtils.getEffectiveIdSuffixParts(getIdPostfix());
-
-        currentTabIndex += INDEX_INCREMENT;
-        return currentTabIndex;
-    }
+//    public int nextTabIndex() {
+//        // NIY
+////        final Integer[] repeatIndexes = XFormsUtils.getEffectiveIdSuffixParts(getIdPostfix());
+//
+//        currentTabIndex += INDEX_INCREMENT;
+//        return currentTabIndex;
+//    }
 
     final public String[] getDocumentOrder() {
         return documentOrder;
@@ -124,10 +138,10 @@ public class HandlerContext {
         return alertElementName;
     }
 
-    final public boolean isRenderingEngineTrident() {
-        processedUserAgentIfNeeded();
-        return isRenderingEngineTrident;
-    }
+//    final public boolean isRenderingEngineTrident() {
+//        processedUserAgentIfNeeded();
+//        return isRenderingEngineTrident;
+//    }
 
     final public boolean isRenderingEngineIE6OrEarlier() {
         processedUserAgentIfNeeded();
@@ -163,7 +177,6 @@ public class HandlerContext {
         // TEMP: in this case, we should probably map our own prefix, or set
         // the default namespace and restore it on children elements
         throw new ValidationException("No prefix found for HTML namespace", new LocationData(controller.getLocator()));
-//                return null;
     }
 
     public String findFormattingPrefix() {
@@ -235,8 +248,6 @@ public class HandlerContext {
         return (locator == null) ? null : new LocationData(locator);
     }
 
-    private Stack<String> componentContextStack; // Stack<String> of static component id prefixes
-
     public String getIdPrefix() {
         return (componentContextStack == null || componentContextStack.size() == 0) ? "" : componentContextStack.peek();
     }
@@ -254,13 +265,11 @@ public class HandlerContext {
         componentContextStack.pop();
     }
 
-    private Stack<RepeatContext> repeatContextStack;
-
     public String getIdPostfix() {
         if (repeatContextStack == null || repeatContextStack.size() == 0)
             return "";
         else
-            return (repeatContextStack.peek()).getIdPostifx();
+            return (repeatContextStack.peek()).getIdPostfix();
     }
 
     public boolean isTemplate() {
@@ -277,13 +286,6 @@ public class HandlerContext {
             return (repeatContextStack.peek()).isRepeatSelected();
     }
 
-    public boolean isTopLevelRepeat() {
-        if (repeatContextStack == null || repeatContextStack.size() == 0)
-            return false;
-        else
-            return (repeatContextStack.peek()).isTopLevelRepeat();
-    }
-
     public int getCurrentIteration() {
         if (repeatContextStack == null || repeatContextStack.size() == 0)
             return 0;
@@ -295,7 +297,7 @@ public class HandlerContext {
         return (repeatContextStack == null) ? 0 : repeatContextStack.size();
     }
 
-    public void pushRepeatContext(boolean generateTemplate, int iteration, boolean topLevelRepeat, boolean repeatSelected) {
+    public void pushRepeatContext(boolean generateTemplate, int iteration, boolean repeatSelected) {
 
         final String currentIdPostfix = getIdPostfix();
         final String newIdPostfix;
@@ -311,7 +313,7 @@ public class HandlerContext {
 
         if (repeatContextStack == null)
             repeatContextStack = new Stack<RepeatContext>();
-        repeatContextStack.push(new RepeatContext(generateTemplate, iteration, newIdPostfix, topLevelRepeat, repeatSelected));
+        repeatContextStack.push(new RepeatContext(generateTemplate, iteration, newIdPostfix, repeatSelected));
     }
 
     public void popRepeatContext() {
@@ -321,15 +323,13 @@ public class HandlerContext {
     private static class RepeatContext {
         private boolean generateTemplate;
         private int iteration;
-        private String idPostifx;
-        private boolean topLevelRepeat;
+        private String idPostfix;
         private boolean repeatSelected;
 
-        public RepeatContext(boolean generateTemplate, int iteration, String idPostifx, boolean topLevelRepeat, boolean repeatSelected) {
+        public RepeatContext(boolean generateTemplate, int iteration, String idPostfix, boolean repeatSelected) {
             this.generateTemplate = generateTemplate;
             this.iteration = iteration;
-            this.idPostifx = idPostifx;
-            this.topLevelRepeat = topLevelRepeat;
+            this.idPostfix = idPostfix;
             this.repeatSelected = repeatSelected;
         }
 
@@ -341,16 +341,53 @@ public class HandlerContext {
             return iteration;
         }
 
-        public String getIdPostifx() {
-            return idPostifx;
+        public String getIdPostfix() {
+            return idPostfix;
         }
 
         public boolean isRepeatSelected() {
             return repeatSelected;
         }
+    }
 
-        public boolean isTopLevelRepeat() {
-            return topLevelRepeat;
+    /**
+     * Restore the handler state up to (but excluding) the given control.
+     *
+     * Used if the context is not used from the root of the control tree.
+     *
+     * This restores repeats and components state.
+     *
+     * @param control   control
+     */
+    public void restoreContext(XFormsControl control) {
+
+        // Get ancestor controls
+        final List<XFormsControl> controls = new ArrayList<XFormsControl>();
+        {
+            XFormsControl currentControl = control.getParent();
+            while (currentControl != null) {
+                controls.add(currentControl);
+                currentControl = currentControl.getParent();
+            }
+            Collections.reverse(controls);
+        }
+
+        // Iterate from root to leaf
+        for (final XFormsControl currentControl: controls) {
+            if (currentControl instanceof XFormsRepeatIterationControl) {
+                // Handle repeat
+                final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl) currentControl;
+                final XFormsRepeatControl repeatControl = (XFormsRepeatControl) repeatIterationControl.getParent();
+
+                final boolean isTopLevelRepeat = countParentRepeats() == 0;
+                final boolean isRepeatSelected = isRepeatSelected() || isTopLevelRepeat;
+                final int currentRepeatIteration = repeatIterationControl.getIterationIndex();
+
+                pushRepeatContext(false, currentRepeatIteration, isRepeatSelected || currentRepeatIteration == repeatControl.getIndex());
+            } else if (currentControl instanceof XFormsComponentControl) {
+                // Handle component
+                pushComponentContext(currentControl.getPrefixedId());
+            }
         }
     }
 }

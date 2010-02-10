@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -21,6 +21,7 @@ import org.orbeon.oxf.portlet.PortletExternalContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.saxrewrite.DocumentRootState;
@@ -850,10 +851,12 @@ abstract class AbstractRewrite extends ProcessorImpl {
         return processorOutput;
     }
 
-    public ContentHandler getRewriteContentHandler(final PipelineContext pipelineContext, final ContentHandler contentHandler, final boolean fragment) {
-        // Get ExternalContext
-        final ExternalContext externalContext
-                = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+    public ContentHandler getRewriteContentHandler(final PropertyContext propertyContext, final ContentHandler contentHandler, final boolean fragment) {
+        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        return getRewriteContentHandler(externalContext, contentHandler, fragment);
+    }
+
+    public ContentHandler getRewriteContentHandler(final ExternalContext externalContext, final ContentHandler contentHandler, final boolean fragment) {
 
         final boolean isPortlet = externalContext instanceof PortletExternalContext;
 

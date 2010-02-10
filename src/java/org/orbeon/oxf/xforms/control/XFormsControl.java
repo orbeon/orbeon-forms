@@ -641,11 +641,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     /**
      * Rewrite an HTML value which may contain URLs, for example in @src or @href attributes.
      *
-     * @param pipelineContext   current PipelineContext
+     * @param propertyContext   current context
      * @param rawValue          value to rewrite
      * @return                  rewritten value
      */
-    public String getEscapedHTMLValue(final PipelineContext pipelineContext, String rawValue) {
+    public String getEscapedHTMLValue(final PropertyContext propertyContext, String rawValue) {
 
         if (rawValue == null)
             return null;
@@ -657,7 +657,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             // Rewrite URLs
             final StringBuilder sb = new StringBuilder(rawValue.length() * 2);// just an approx of the size it may take
             // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
-            XFormsUtils.streamHTMLFragment(new XHTMLRewrite().getRewriteContentHandler(pipelineContext, new ForwardingContentHandler() {
+            XFormsUtils.streamHTMLFragment(new XHTMLRewrite().getRewriteContentHandler(propertyContext, new ForwardingContentHandler() {
 
                 private boolean isStartElement;
 

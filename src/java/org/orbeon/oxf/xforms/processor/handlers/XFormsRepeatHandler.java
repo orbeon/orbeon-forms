@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -99,7 +99,7 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
                     outputInterceptor.setAddedClasses(addedClasses.toString());
 
                 // Apply the content of the body for this iteration
-                handlerContext.pushRepeatContext(false, i, false, isCurrentIterationSelected);
+                handlerContext.pushRepeatContext(false, i, isCurrentIterationSelected);
                 try {
                     handlerContext.getController().repeatBody();
                 } catch (Exception e) {
@@ -130,7 +130,7 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
                 outputInterceptor.setAddedClasses(addedClasses.toString());
 
             // Apply the content of the body for this iteration
-            handlerContext.pushRepeatContext(true, 0, false, false);
+            handlerContext.pushRepeatContext(true, 0, false);
             handlerContext.getController().repeatBody();
             if (outputInterceptor != null)
                 outputInterceptor.flushCharacters(true, true);
@@ -142,7 +142,7 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
 
             outputInterceptor.setForward(false); // prevent interceptor to output anything
 
-            handlerContext.pushRepeatContext(true, 0, false, false);
+            handlerContext.pushRepeatContext(true, 0, false);
             handlerContext.getController().repeatBody();
             outputInterceptor.flushCharacters(true, true);
             handlerContext.popRepeatContext();

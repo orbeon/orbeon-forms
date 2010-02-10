@@ -14,10 +14,14 @@
 package org.orbeon.oxf.xforms.processor;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.converter.XHTMLRewrite;
+import org.orbeon.oxf.util.ContentHandlerWriter;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
@@ -27,7 +31,6 @@ import org.orbeon.oxf.xml.*;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -71,31 +74,31 @@ public class ControlsComparator {
         final AttributesImpl attributesImpl = new AttributesImpl();
         final Iterator<XFormsControl> j = (state1 == null) ? null : state1.iterator();
         for (Object aState2 : state2) {
-            final XFormsControl xformsControl1 = (state1 == null) ? null : j.next();
-            final XFormsControl xformsControl2 = (XFormsControl) aState2;
+            final XFormsControl control1 = (state1 == null) ? null : j.next();
+            final XFormsControl control2 = (XFormsControl) aState2;
 
             // XXX TEST innerHTML
-            if (testInnerHTML(xformsControl1, xformsControl2, attributesImpl)) continue;
+            if (testInnerHTML(control1, control2, attributesImpl)) continue;
 
             // Whether it is necessary to output information about this control because the control was previously non-existing
             // TODO: distinction between new iteration AND control just becoming relevant
-            final boolean isNewlyVisibleSubtree = xformsControl1 == null;
+            final boolean isNewlyVisibleSubtree = control1 == null;
 
             // 1: Check current control
 
             // Don't send anything if nothing has changed, but we force a change for controls whose values changed in the request
-            final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.contains(xformsControl2.getEffectiveId());
-            if (xformsControl2.supportAjaxUpdates() && (!xformsControl2.equalsExternal(pipelineContext, xformsControl1) || isValueChangeControl)) {
+            final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.contains(control2.getEffectiveId());
+            if (control2.supportAjaxUpdates() && (!control2.equalsExternal(pipelineContext, control1) || isValueChangeControl)) {
                 // Output the diff for this control between the old state and the new state
                 attributesImpl.clear();
-                xformsControl2.outputAjaxDiff(pipelineContext, ch, xformsControl1, attributesImpl, isNewlyVisibleSubtree);
+                control2.outputAjaxDiff(pipelineContext, ch, control1, attributesImpl, isNewlyVisibleSubtree);
             }
 
             // 2: Check children if any
-            if (xformsControl2 instanceof XFormsContainerControl) {
+            if (control2 instanceof XFormsContainerControl) {
 
-                final XFormsContainerControl containerControl1 = (XFormsContainerControl) xformsControl1;
-                final XFormsContainerControl containerControl2 = (XFormsContainerControl) xformsControl2;
+                final XFormsContainerControl containerControl1 = (XFormsContainerControl) control1;
+                final XFormsContainerControl containerControl2 = (XFormsContainerControl) control2;
 
                 final List<XFormsControl> children1 = (containerControl1 == null) ? null : containerControl1.getChildren();
                 final List<XFormsControl> children2 = (containerControl2.getChildren() == null) ? Collections.<XFormsControl>emptyList() : containerControl2.getChildren();
@@ -111,9 +114,9 @@ public class ControlsComparator {
 //                }
 
                 // Repeat grouping control
-                if (xformsControl2 instanceof XFormsRepeatControl && children1 != null) {
+                if (control2 instanceof XFormsRepeatControl && children1 != null) {
 
-                    final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) xformsControl2;
+                    final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
 
                     // Special case of repeat update
 
@@ -137,15 +140,15 @@ public class ControlsComparator {
 
                     } else if (size2 < size1) {
                         // Size has shrunk
-                        outputDeleteRepeatTemplate(ch, xformsControl2, size1 - size2);
+                        outputDeleteRepeatTemplate(ch, control2, size1 - size2);
 
                         // Diff the remaining subset
                         diff(children1.subList(0, size2), children2);
                     }
 
-                } else if (xformsControl2 instanceof XFormsRepeatControl && xformsControl1 == null) {
+                } else if (control2 instanceof XFormsRepeatControl && control1 == null) {
 
-                    final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) xformsControl2;
+                    final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
 
                     // Handle new sub-xforms:repeat
 
@@ -157,15 +160,15 @@ public class ControlsComparator {
                         // NOP, the client already has the template copied
                     } else if (size2 == 0) {
                         // Delete first template
-                        outputDeleteRepeatTemplate(ch, xformsControl2, 1);
+                        outputDeleteRepeatTemplate(ch, control2, 1);
                     }
 
                     // Issue new values for the children
                     diff(null, children2);
 
-                } else if (xformsControl2 instanceof XFormsRepeatControl && children1 == null) {
+                } else if (control2 instanceof XFormsRepeatControl && children1 == null) {
 
-                    final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) xformsControl2;
+                    final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
 
                     // Handle repeat growing from size 0 (case of instance replacement, for example)
 
@@ -185,14 +188,13 @@ public class ControlsComparator {
         }
     }
 
-    private boolean testInnerHTML(XFormsControl xformsControl1, XFormsControl xformsControl2, AttributesImpl attributesImpl) {
-        if (xformsControl2 instanceof XFormsContainerControl && !(xformsControl2 instanceof XFormsPseudoControl)) {
-            final SAXStore.Mark mark = containingDocument.getStaticState().getElementMark(xformsControl2.getPrefixedId());
+    private boolean testInnerHTML(XFormsControl control1, XFormsControl control2, AttributesImpl attributesImpl) {
+        if (control2 instanceof XFormsContainerControl && !(control2 instanceof XFormsPseudoControl)) {
+            final SAXStore.Mark mark = containingDocument.getStaticState().getElementMark(control2.getPrefixedId());
             if (mark != null) {
 
                 // Recursively check for differences
-//                    final boolean hasDifferences = true;
-                final boolean hasDifferences = !xformsControl2.equalsExternalRecurse(pipelineContext, xformsControl1);
+                final boolean hasDifferences = !control2.equalsExternalRecurse(pipelineContext, control1);
 
                 // If so, compute new fragment
                 if (hasDifferences) {
@@ -201,10 +203,10 @@ public class ControlsComparator {
 
                         // Register handlers on controller
                         XHTMLBodyHandler.registerHandlers(controller, containingDocument.getStaticState());
-
                         {
                             // Register a handler for AVTs on HTML elements
-                            final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
+                            // TODO: this should be obtained per document, but we only know about this in the extractor
+                            final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs();
                             if (hostLanguageAVTs) {
                                 controller.registerHandler(XXFormsAttributeHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute");
                                 controller.registerHandler(XHTMLElementHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI);
@@ -216,25 +218,50 @@ public class ControlsComparator {
                             controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XBL_NAMESPACE_URI);
                         }
 
-                        final StringWriter sw = new StringWriter();
+                        // Create the output SAX pipeline:
+                        //
+                        // o perform URL rewriting
+                        // o serialize to String
+                        //
+                        // NOTE: we could possibly hook-up the standard epilogue here, which would:
+                        //
+                        // o perform URL rewriting
+                        // o apply the theme
+                        // o serialize
+                        //
+                        // But this would raise some issues:
+                        //
+                        // o epilogue must match on xhtml:* instead of xhtml:html
+                        // o themes must be modified to support XHTML fragments
+                        // o serialization must output here, not to the ExternalContext OutputStream
+                        //
+                        // So for now, perform simple steps here, and later this can be revisited.
+                        //
+                        final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
+                        controller.setOutput(new DeferredContentHandlerImpl(new XHTMLRewrite().getRewriteContentHandler(externalContext,
+                                new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getContentHandler())), true)));
 
-                        // Set final output
-                        controller.setOutput(new DeferredContentHandlerImpl(new HTMLFragmentSerializer(sw)));
-                        // Set handler context
-                        // TODO XXX must restore handler context state: prefixes, repeats, more?
-                        controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, null, null));
-                        controller.startDocument();
-                        controller.startPrefixMapping("xhtml", XMLConstants.XHTML_NAMESPACE_URI);// TEMP HACK
-
-                        // new SAXLoggerProcessor.DebugContentHandler()
-                        containingDocument.getStaticState().getXHTMLDocument().replay(controller, mark);
-                        controller.endDocument();
+                        // Create handler context
+                        final HandlerContext handlerContext = new HandlerContext(controller, pipelineContext, containingDocument, null, externalContext) {
+                            @Override
+                            public String findXHTMLPrefix() {
+                                // We know we serialize to plain HTML so unlike during initial page show, we don't need a particular prefix
+                                return "";
+                            }
+                        };
+                        handlerContext.restoreContext(control2);
+                        controller.setElementHandlerContext(handlerContext);
 
                         attributesImpl.clear();
-                        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsControl2.getEffectiveId());
+                        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, control2.getEffectiveId());
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "inner-html", attributesImpl);
-                        ch.text(sw.toString());// TODO: StringWriter uses StringBuffer instead of StringBuilder...
-//                            System.out.println(sw);
+                        {
+                            // Replay into SAX pipeline
+                            controller.startDocument();
+                            // new SAXLoggerProcessor.DebugContentHandler()
+                            containingDocument.getStaticState().getXHTMLDocument().replay(controller, mark);
+                            controller.endDocument();
+                        }
                         ch.endElement();
 
                     } catch (SAXException e) {

@@ -282,6 +282,10 @@ public class XFormsStaticState {
                 // Otherwise there is no need to keep XHTML
                 this.xhtmlDocument = null;
             }
+
+            if (this.xhtmlDocument != null && indentedLogger.isDebugEnabled()) {
+                indentedLogger.logDebug("", "keeping XHTML tree", "approximate size (bytes)", Long.toString(this.xhtmlDocument.getApproximateSize()));
+            }
         }
 
         // Extract versioned paths matchers if present

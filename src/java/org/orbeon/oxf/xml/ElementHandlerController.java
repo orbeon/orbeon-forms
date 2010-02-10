@@ -37,23 +37,23 @@ import java.util.*;
  * o calls handlers when needed
  * o handles repeated content
  *
- * TODO: Should use pools of handlers to reduce memory consumption.
+ * TODO: Should use pools of handlers to reduce memory consumption?
  */
 public class ElementHandlerController implements ElementHandlerContext, ContentHandler {
 
     private Object elementHandlerContext;
     private DeferredContentHandler output;
 
-    private Map<String, List<HandlerMatcher>> matcherHandlers = new HashMap<String, List<HandlerMatcher>>();
-    private Map<String, String> uriHandlers = new HashMap<String, String>();
+    private final Map<String, List<HandlerMatcher>> handlerMatchers = new HashMap<String, List<HandlerMatcher>>();
+    private final Map<String, String> uriHandlers = new HashMap<String, String>();
 
-    private Stack<HandlerInfo> handlerInfos = new Stack<HandlerInfo>();
+    private final Stack<HandlerInfo> handlerInfos = new Stack<HandlerInfo>();
     private HandlerInfo currentHandlerInfo;
     private boolean isFillingUpSAXStore;
 
-    private Stack<String> elementNames = new Stack<String>();
+    private final Stack<String> elementNames = new Stack<String>();
 
-    private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
+    private final NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
     private XIncludeProcessor.OutputLocator locator;
 
@@ -96,10 +96,10 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
         if (localname != null) {
             // Match on URI + localname and optionally custom matcher
             final String key = XMLUtils.buildExplodedQName(uri, localname);
-            List<HandlerMatcher> handlerMatchers = matcherHandlers.get(key);
+            List<HandlerMatcher> handlerMatchers = this.handlerMatchers.get(key);
             if (handlerMatchers == null) {
                 handlerMatchers = new ArrayList<HandlerMatcher>();
-                matcherHandlers.put(key, handlerMatchers);
+                this.handlerMatchers.put(key, handlerMatchers);
             }
             handlerMatchers.add(new HandlerMatcher(handlerClassName, matcher != null ? matcher : ALL_MATCHER));
         } else {
@@ -408,7 +408,7 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
 
     private ElementHandler getHandler(String uri, String explodedQName, Attributes attributes) {
         // 1: Try full matchers
-        final List<HandlerMatcher> handlerMatchers = matcherHandlers.get(explodedQName);
+        final List<HandlerMatcher> handlerMatchers = this.handlerMatchers.get(explodedQName);
         if (handlerMatchers != null) {
             // Try matchers in order
             for (HandlerMatcher handlerMatcher: handlerMatchers) {

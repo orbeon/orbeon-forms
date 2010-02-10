@@ -2,7 +2,7 @@
   <copyright>
     <option name="notice" value="Copyright (C) &amp;#36;today.year Orbeon, Inc.&#10;&#10;This program is free software; you can redistribute it and/or modify it under the terms of the&#10;GNU Lesser General Public License as published by the Free Software Foundation; either version&#10;2.1 of the License, or (at your option) any later version.&#10;&#10;This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;&#10;without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.&#10;See the GNU Lesser General Public License for more details.&#10;&#10;The full text of the license is available at http://www.gnu.org/copyleft/lesser.html" />
     <option name="keyword" value="Copyright" />
-    <option name="allowReplaceKeyword" value="" />
+    <option name="allowReplaceKeyword" value="Orbeon" />
     <option name="myName" value="Orbeon LGPL" />
     <option name="myLocal" value="true" />
   </copyright>

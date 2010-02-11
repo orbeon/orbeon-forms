@@ -54,6 +54,15 @@
         </layout>
     </appender>
 
+    <!-- Legacy Orbeon Forms Studio monitor to keep around as long as people are using it -->
+    <appender name="OPSMonitor" class="org.apache.log4j.net.SocketHubAppender">
+        <param name="Port" value="4446"/>
+        <param name="LocationInfo" value="true"/>
+        <filter class="org.apache.log4j.varia.LevelRangeFilter">
+            <param name="LevelMin" value="debug" />
+        </filter>
+    </appender>
+
     <!-- XForms engine activity, see http://wiki.orbeon.com/forms/doc/developer-guide/xforms-logging -->
     <!--
     <category name="org.orbeon.oxf.xforms.processor.XFormsServer">

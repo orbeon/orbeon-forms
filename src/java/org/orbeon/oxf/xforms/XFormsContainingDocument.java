@@ -582,11 +582,12 @@ public class XFormsContainingDocument extends XBLContainer {
 
     public void addScriptToRun(String scriptId, XFormsEvent event, XFormsEventObserver eventObserver) {
 
-//        if (activeSubmission != null && StringUtils.isBlank(activeSubmission.getResolvedXXForms Target())) {
-//            // Scripts occurring after a submission without a target takes place should not run
-//            indentedLogger.logWarning("", "xxforms:script will be ignored because two-pass submission started", "script id", scriptId);
-//            return;
-//        }
+        if (activeSubmission != null && StringUtils.isBlank(activeSubmission.getResolvedXXFormsTarget())) {
+            // Scripts occurring after a submission without a target takes place should not run
+            // TODO: Should we allow scripts anyway? Don't we allow value changes updates on the client anyway?
+            indentedLogger.logWarning("", "xxforms:script will be ignored because two-pass submission started", "script id", scriptId);
+            return;
+        }
 
         // Warn that scripts won't run in noscript mode (duh)
         if (XFormsProperties.isNoscript(this))

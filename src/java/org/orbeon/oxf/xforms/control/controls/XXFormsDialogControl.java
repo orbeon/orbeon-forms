@@ -116,13 +116,13 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
     @Override
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
-        if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.getEventName())) {
+        if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.getName())) {
             // Close the dialog
 
             final XXFormsDialogControlLocal localForUpdate = (XXFormsDialogControlLocal) getLocalForUpdate();
             localForUpdate.visible = false;
             containingDocument.getControls().markDirtySinceLastRequest(false);
-        } else if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.getEventName())) {
+        } else if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.getName())) {
             // Open the dialog
 
             final XXFormsDialogOpenEvent dialogOpenEvent = (XXFormsDialogOpenEvent) event;

@@ -22,8 +22,8 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -154,11 +154,11 @@ public class XFormsActionInterpreter {
      * Execute an XForms action.
      *
      * @param propertyContext       current context
-     * @param eventTarget           event target
+     * @param event                 event causing the action
      * @param eventObserver         event observer
      * @param actionElement         Element specifying the action to execute
      */
-    public void runAction(final PropertyContext propertyContext, XFormsEventTarget eventTarget, XFormsEventObserver eventObserver, Element actionElement) {
+    public void runAction(final PropertyContext propertyContext, XFormsEvent event, XFormsEventObserver eventObserver, Element actionElement) {
 
         // Check that we understand the action element
         final String actionNamespaceURI = actionElement.getNamespaceURI();
@@ -233,7 +233,7 @@ public class XFormsActionInterpreter {
                         actionBlockContextStack.pushBinding(propertyContext, refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceContext, getSourceEffectiveId(actionElement), actionScope);
 
                         final Item overriddenContextNodeInfo = actionBlockContextStack.getCurrentSingleItem();
-                        runSingleIteration(propertyContext, eventTarget, eventObserver, actionElement, actionNamespaceURI,
+                        runSingleIteration(propertyContext, event, eventObserver, actionElement, actionNamespaceURI,
                                 actionName, actionScope, ifConditionAttribute, whileIterationAttribute, true, overriddenContextNodeInfo);
 
                         // Restore context
@@ -248,7 +248,7 @@ public class XFormsActionInterpreter {
             } else {
                 // Do a single iteration run (but this may repeat over the @while condition!)
 
-                runSingleIteration(propertyContext, eventTarget, eventObserver, actionElement, actionNamespaceURI,
+                runSingleIteration(propertyContext, event, eventObserver, actionElement, actionNamespaceURI,
                         actionName, actionScope, ifConditionAttribute, whileIterationAttribute, actionBlockContextStack.hasOverriddenContext(), actionBlockContextStack.getContextItem());
             }
         } catch (Exception e) {
@@ -257,7 +257,7 @@ public class XFormsActionInterpreter {
         }
     }
 
-    private void runSingleIteration(PropertyContext propertyContext, XFormsEventTarget eventTarget, XFormsEventObserver eventObserver,
+    private void runSingleIteration(PropertyContext propertyContext, XFormsEvent event, XFormsEventObserver eventObserver,
                                     Element actionElement, String actionNamespaceURI, String actionName, XBLBindings.Scope actionScope,
                                     String ifConditionAttribute, String whileIterationAttribute, boolean hasOverriddenContext, Item contextItem) {
 
@@ -287,7 +287,7 @@ public class XFormsActionInterpreter {
 
             // Get action and execute it
             final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
-            xformsAction.execute(this, propertyContext, eventTarget, eventObserver, actionElement, actionScope, hasOverriddenContext, contextItem);
+            xformsAction.execute(this, propertyContext, event, eventObserver, actionElement, actionScope, hasOverriddenContext, contextItem);
 
             if (indentedLogger.isDebugEnabled()) {
                 if (whileIterationAttribute == null)

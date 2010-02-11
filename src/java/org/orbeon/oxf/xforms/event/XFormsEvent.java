@@ -61,7 +61,7 @@ public abstract class XFormsEvent implements Cloneable {
     private XFormsEvent originalEvent;  // original event (for retargeted event)
 
     private final XBLContainer targetXBLContainer;
-    private final String eventName;
+    private final String name;
     private XFormsEventTarget targetObject;
     private final boolean bubbles;
     private final boolean cancelable;
@@ -75,9 +75,9 @@ public abstract class XFormsEvent implements Cloneable {
     // TODO: Assign for debugging
     private LocationData locationData;
 
-    protected XFormsEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
+    protected XFormsEvent(XFormsContainingDocument containingDocument, String name, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
         this.targetXBLContainer = targetObject.getXBLContainer(containingDocument);
-        this.eventName = eventName;
+        this.name = name;
         this.targetObject = targetObject;
         this.bubbles = bubbles;
         this.cancelable = cancelable;
@@ -103,8 +103,8 @@ public abstract class XFormsEvent implements Cloneable {
         return getContainingDocument().getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
     }
 
-    public String getEventName() {
-        return eventName;
+    public String getName() {
+        return name;
     }
 
     public XFormsEventTarget getTargetObject() {
@@ -145,7 +145,7 @@ public abstract class XFormsEvent implements Cloneable {
                 getIndentedLogger().logWarning("", "event('event') is deprecated. Use event('xxforms:type') instead.");
             }
 
-            return SingletonIterator.makeIterator(StringValue.makeStringValue(eventName));
+            return SingletonIterator.makeIterator(StringValue.makeStringValue(this.name));
         } else if (XXFORMS_BUBBLES_ATTRIBUTE.equals(name)) {
             // Return whether the event bubbles
             return SingletonIterator.makeIterator(BooleanValue.get(bubbles));

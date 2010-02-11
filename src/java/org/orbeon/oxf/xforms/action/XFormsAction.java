@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -34,7 +33,7 @@ import org.orbeon.saxon.value.SequenceExtent;
  */
 public abstract class XFormsAction {
     public abstract void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext,
-                                 XFormsEventTarget eventTarget, XFormsEventObserver eventObserver, Element actionElement,
+                                 XFormsEvent event, XFormsEventObserver eventObserver, Element actionElement,
                                  XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext);
 
     /**

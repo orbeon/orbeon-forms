@@ -509,7 +509,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     }
 
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
-        final String eventName = event.getEventName();
+        final String eventName = event.getName();
         if (XFormsEvents.XXFORMS_INSTANCE_INVALIDATE.equals(eventName)) {
             final IndentedLogger indentedLogger = event.getTargetXBLContainer().getContainingDocument().getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
             // Invalidate instance if it is cached
@@ -529,7 +529,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      * @param event                 event being dispatched
      */
     public void performTargetAction(final PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {
-        final String eventName = event.getEventName();
+        final String eventName = event.getName();
         if (XFormsEvents.XFORMS_INSERT.equals(eventName)) {
             // New nodes were just inserted
             final XFormsInsertEvent insertEvent = (XFormsInsertEvent) event;

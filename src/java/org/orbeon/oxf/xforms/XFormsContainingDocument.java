@@ -580,13 +580,13 @@ public class XFormsContainingDocument extends XBLContainer {
         }
     }
 
-    public void addScriptToRun(String scriptId, XFormsEventTarget eventTarget, XFormsEventObserver eventObserver) {
+    public void addScriptToRun(String scriptId, XFormsEvent event, XFormsEventObserver eventObserver) {
 
-        if (activeSubmission != null) {
-            // Scripts occurring after the submission takes place should not run
-            indentedLogger.logWarning("", "xxforms:script will be ignored because two-pass submission started", "script id", scriptId);
-            return;
-        }
+//        if (activeSubmission != null && StringUtils.isBlank(activeSubmission.getResolvedXXForms Target())) {
+//            // Scripts occurring after a submission without a target takes place should not run
+//            indentedLogger.logWarning("", "xxforms:script will be ignored because two-pass submission started", "script id", scriptId);
+//            return;
+//        }
 
         // Warn that scripts won't run in noscript mode (duh)
         if (XFormsProperties.isNoscript(this))
@@ -594,17 +594,17 @@ public class XFormsContainingDocument extends XBLContainer {
 
         if (scriptsToRun == null)
             scriptsToRun = new ArrayList<Script>();
-        scriptsToRun.add(new Script(XFormsUtils.scriptIdToScriptName(scriptId), eventTarget, eventObserver));
+        scriptsToRun.add(new Script(XFormsUtils.scriptIdToScriptName(scriptId), event, eventObserver));
     }
 
     public static class Script {
         private String functionName;
-        private final XFormsEventTarget eventTarget;
+        private final XFormsEvent event;
         private final XFormsEventObserver eventObserver;
 
-        public Script(String functionName, XFormsEventTarget eventTarget, XFormsEventObserver eventObserver) {
+        public Script(String functionName, XFormsEvent event, XFormsEventObserver eventObserver) {
             this.functionName = functionName;
-            this.eventTarget = eventTarget;
+            this.event = event;
             this.eventObserver = eventObserver;
         }
 
@@ -612,8 +612,8 @@ public class XFormsContainingDocument extends XBLContainer {
             return functionName;
         }
 
-        public XFormsEventTarget getEventTarget() {
-            return eventTarget;
+        public XFormsEvent getEvent() {
+            return event;
         }
 
         public XFormsEventObserver getEventObserver() {
@@ -628,19 +628,25 @@ public class XFormsContainingDocument extends XBLContainer {
         if (scriptsToRun != null && scriptsToRun.size() > 0) {
             for (final Iterator<Script> i = scriptsToRun.iterator(); i.hasNext();) {
                 final Script script = i.next();
-                final XFormsEventTarget scriptEventTarget = script.getEventTarget();
-                final Object currentEventTarget = getObjectByEffectiveId(scriptEventTarget.getEffectiveId());
-                if (scriptEventTarget != currentEventTarget
-                        || (currentEventTarget instanceof XFormsControl && !((XFormsControl) currentEventTarget).isRelevant())) {
-                    i.remove();
-                    continue;
-                }
-                
-                final XFormsEventObserver scriptEventObserver = script.getEventObserver();
-                final Object currentEventObserver = getObjectByEffectiveId(scriptEventObserver.getEffectiveId());
-                if (scriptEventObserver != currentEventObserver
-                        || (currentEventObserver instanceof XFormsControl && !((XFormsControl) currentEventObserver).isRelevant())) {
-                    i.remove();
+
+                if (!script.getEvent().getName().equals(XFormsEvents.XFORMS_DISABLED)) { // allow xforms-disabled on removed controls
+
+                    // Check target
+                    final XFormsEventTarget scriptEventTarget = script.getEvent().getTargetObject();
+                    final Object currentEventTarget = getObjectByEffectiveId(scriptEventTarget.getEffectiveId());
+                    if (scriptEventTarget != currentEventTarget
+                            || (currentEventTarget instanceof XFormsControl && !((XFormsControl) currentEventTarget).isRelevant())) {
+                        i.remove();
+                        continue;
+                    }
+
+                    // Check observer
+                    final XFormsEventObserver scriptEventObserver = script.getEventObserver();
+                    final Object currentEventObserver = getObjectByEffectiveId(scriptEventObserver.getEffectiveId());
+                    if (scriptEventObserver != currentEventObserver
+                            || (currentEventObserver instanceof XFormsControl && !((XFormsControl) currentEventObserver).isRelevant())) {
+                        i.remove();
+                    }
                 }
             }
         }
@@ -794,7 +800,7 @@ public class XFormsContainingDocument extends XBLContainer {
 
         final XFormsEventTarget eventTarget = event.getTargetObject();
         final String eventTargetEffectiveId = eventTarget.getEffectiveId();
-        final String eventName = event.getEventName();
+        final String eventName = event.getName();
 
         try {
 
@@ -966,7 +972,7 @@ public class XFormsContainingDocument extends XBLContainer {
 
             if (indentedLogger.isDebugEnabled()) {
                 indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on ghost target",
-                        "control id", eventTarget.getEffectiveId(), "event name", event.getEventName());
+                        "control id", eventTarget.getEffectiveId(), "event name", event.getName());
             }
             return false;
         }
@@ -977,7 +983,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 // Controls accept event only if they are relevant
                 if (indentedLogger.isDebugEnabled()) {
                     indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on non-relevant control",
-                            "control id", eventTarget.getEffectiveId(), "event name", event.getEventName());
+                            "control id", eventTarget.getEffectiveId(), "event name", event.getName());
                 }
                 return false;
             }
@@ -987,7 +993,7 @@ public class XFormsContainingDocument extends XBLContainer {
                     // Controls accept event only if they are not readonly, except for xforms:output which may be readonly
                     if (indentedLogger.isDebugEnabled()) {
                         indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on read-only control",
-                                "control id", eventTarget.getEffectiveId(), "event name", event.getEventName());
+                                "control id", eventTarget.getEffectiveId(), "event name", event.getName());
                     }
                     return false;
                 }
@@ -1073,7 +1079,7 @@ public class XFormsContainingDocument extends XBLContainer {
 
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
 
-        final String eventName = event.getEventName();
+        final String eventName = event.getName();
         if (XFormsEvents.XXFORMS_LOAD.equals(eventName)) {
             // Internal load event
             final XXFormsLoadEvent xxformsLoadEvent = (XXFormsLoadEvent) event;

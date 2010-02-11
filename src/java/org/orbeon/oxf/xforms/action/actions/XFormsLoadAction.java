@@ -23,8 +23,8 @@ import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.Item;
@@ -33,7 +33,7 @@ import org.orbeon.saxon.om.Item;
  * 10.1.8 The load Element
  */
 public class XFormsLoadAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventTarget eventTarget,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 

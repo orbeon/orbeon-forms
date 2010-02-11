@@ -202,7 +202,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
 
         // Create a new top-level action interpreter to handle this event
         new XFormsActionInterpreter(propertyContext, contextContainer, eventObserver, eventHandlerElement, ancestorObserverStaticId, isXBLHandler)
-                    .runAction(propertyContext, event.getTargetObject(), eventObserver, eventHandlerElement);
+                    .runAction(propertyContext, event, eventObserver, eventHandlerElement);
     }
 
     public String[] getObserversStaticIds() {
@@ -239,7 +239,7 @@ public class XFormsEventHandlerImpl implements XFormsEventHandler {
     }
 
     public boolean isMatch(XFormsEvent event) {
-        return isMatchEventName(event.getEventName()) && isMatchTarget(event.getTargetObject().getId()) && event.matches(this);
+        return isMatchEventName(event.getName()) && isMatchTarget(event.getTargetObject().getId()) && event.matches(this);
     }
 
     public boolean isAllEvents() {

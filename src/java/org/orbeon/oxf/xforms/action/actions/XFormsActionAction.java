@@ -20,8 +20,8 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 
@@ -33,7 +33,7 @@ import java.util.List;
  * 10.1.1 The action Element
  */
 public class XFormsActionAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventTarget eventTarget,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
@@ -63,7 +63,7 @@ public class XFormsActionAction extends XFormsAction {
                 contextStack.pushBinding(propertyContext, currentActionElement, actionInterpreter.getSourceEffectiveId(actionElement), currentActionScope);
 
                 // Run action
-                actionInterpreter.runAction(propertyContext, eventTarget, eventObserver, currentActionElement);
+                actionInterpreter.runAction(propertyContext, event, eventObserver, currentActionElement);
 
                 // Restore context
                 contextStack.popBinding();

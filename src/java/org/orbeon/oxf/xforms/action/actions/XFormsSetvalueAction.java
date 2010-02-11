@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XXFormsValueChanged;
@@ -36,7 +37,7 @@ import java.util.List;
  * 10.1.9 The setvalue Element
  */
 public class XFormsSetvalueAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventTarget eventTarget,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 

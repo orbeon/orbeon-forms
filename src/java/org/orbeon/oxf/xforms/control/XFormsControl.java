@@ -694,8 +694,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
-        if (XFormsEvents.XXFORMS_REPEAT_FOCUS.equals(event.getEventName())
-                || XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
+        if (XFormsEvents.XXFORMS_REPEAT_FOCUS.equals(event.getName())
+                || XFormsEvents.XFORMS_FOCUS.equals(event.getName())) {
 
             // Try to update xforms:repeat indexes based on this
             {
@@ -740,12 +740,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                     }
                 }
 
-                if (XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
+                if (XFormsEvents.XFORMS_FOCUS.equals(event.getName())) {
                     // Focus on current control if possible
                     setFocus();
                 }
             }
-        } else if (XFormsEvents.XFORMS_HELP.equals(event.getEventName())) {
+        } else if (XFormsEvents.XFORMS_HELP.equals(event.getName())) {
             containingDocument.setClientHelpEffectiveControlId(getEffectiveId());
         }
     }

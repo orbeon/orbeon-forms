@@ -17,13 +17,13 @@ import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 
 public class XXFormsOfflineSaveAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventTarget eventTarget,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
         // NOP

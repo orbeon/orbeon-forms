@@ -660,10 +660,10 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-currency$currency-input" class="xbl-fr-currency-xforms-input fr-hidden">12.34</xxf:control>
-                        <xxf:control id="my-currency$xf-11" class="xbl-fr-currency-prefix"/>
-                        <xxf:attribute id="my-currency$xf-11" for="my-currency$xf-11" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency$xf-13" class="xbl-fr-currency-digits-after-decimal"/>
-                        <xxf:attribute id="my-currency$xf-13" for="my-currency$xf-13" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency$xf-12" class="xbl-fr-currency-prefix"/>
+                        <xxf:attribute id="my-currency$xf-12" for="my-currency$xf-12" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency$xf-14" class="xbl-fr-currency-digits-after-decimal"/>
+                        <xxf:attribute id="my-currency$xf-14" for="my-currency$xf-14" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
                     <xxf:script name="my_currency_xf_6_xforms_function" target-id="my-currency$xf-5" observer-id="my-currency$xf-5"/>
                     <xxf:script name="my_currency_xf_sf_xforms_function" target-id="my-currency" observer-id="my-currency"/>

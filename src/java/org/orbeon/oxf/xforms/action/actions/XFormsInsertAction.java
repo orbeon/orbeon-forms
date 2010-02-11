@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -44,7 +43,7 @@ public class XFormsInsertAction extends XFormsAction {
 
     public static final String CANNOT_INSERT_READONLY_MESSAGE = "Cannot perform insertion into read-only instance.";
 
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventTarget eventTarget,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 

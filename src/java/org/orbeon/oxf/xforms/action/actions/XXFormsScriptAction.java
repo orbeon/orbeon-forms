@@ -18,8 +18,8 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.om.Item;
 
@@ -27,16 +27,15 @@ import org.orbeon.saxon.om.Item;
  * Extension xxforms:script action.
  */
 public class XXFormsScriptAction extends XFormsAction {
-    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventTarget eventTarget,
+    public void execute(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEvent event,
                         XFormsEventObserver eventObserver, Element actionElement,
                         XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final String eventObserverEffectiveId = eventObserver.getEffectiveId();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Get prefixed id of the xxforms:script element based on its location 
         final String actionPrefixedId = actionInterpreter.getXBLContainer().getFullPrefix() + actionElement.attributeValue("id");
 
-        containingDocument.addScriptToRun(actionPrefixedId, eventTarget, eventObserver);
+        containingDocument.addScriptToRun(actionPrefixedId, event, eventObserver);
     }
 }

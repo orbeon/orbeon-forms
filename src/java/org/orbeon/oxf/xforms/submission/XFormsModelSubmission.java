@@ -279,7 +279,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     }
 
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
-        final String eventName = event.getEventName();
+        final String eventName = event.getName();
 
         if (XFormsEvents.XXFORMS_SUBMIT_REPLACE.equals(eventName)) {
             // Custom event to process the response of asynchronous submissions
@@ -314,7 +314,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         try {
             try {
                 // Big bag of initial runtime parameters
-                p = new SubmissionParameters(propertyContext, event.getEventName());
+                p = new SubmissionParameters(propertyContext, event.getName());
 
                 if (indentedLogger.isDebugEnabled()) {
                     final String message = p.isDeferredSubmissionFirstPass ? "submission first pass" : p.isDeferredSubmissionSecondPass ? "submission second pass" : "submission";
@@ -490,7 +490,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final XXFormsSubmitReplaceEvent replaceEvent = (XXFormsSubmitReplaceEvent) event;
 
         // Big bag of initial runtime parameters
-        final SubmissionParameters p = new SubmissionParameters(propertyContext, event.getEventName());
+        final SubmissionParameters p = new SubmissionParameters(propertyContext, event.getName());
         final SecondPassParameters p2 = new SecondPassParameters(propertyContext, p);
         final SubmissionResult submissionResult = replaceEvent.getSubmissionResult();
 

@@ -759,7 +759,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         // NOTE: This event must be dispatched to elements that support bindings, but at the moment XFormsContextStack
         // doesn't know how to perform such dispatches so it dispatches to the container. This is of minor consequence
         // since the event is fatal, but this should be fixed in the future.
-        final String eventName = event.getEventName();
+        final String eventName = event.getName();
         if (XFormsEvents.XFORMS_BINDING_EXCEPTION.equals(eventName)) {
             // The default action for this event results in the following: Fatal error.
             throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(), event.getTargetObject().getLocationData());
@@ -789,14 +789,14 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
 
         if (indentedLogger.isDebugEnabled()) {
-            indentedLogger.startHandleOperation("dispatchEvent", "dispatching", "name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
+            indentedLogger.startHandleOperation("dispatchEvent", "dispatching", "name", originalEvent.getName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
                     originalEvent.getLocationData() != null ? originalEvent.getLocationData().toString() : null);
         }
 
         final XFormsEventTarget targetObject = originalEvent.getTargetObject();
         try {
             if (targetObject == null)
-                throw new ValidationException("Target object null for event: " + originalEvent.getEventName(), getLocationData());
+                throw new ValidationException("Target object null for event: " + originalEvent.getName(), getLocationData());
 
             // Find all event handler containers
             final List<XFormsEventObserver> boundaries = new ArrayList<XFormsEventObserver>();
@@ -902,7 +902,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
                     if (indentedLogger.isDebugEnabled()) {
                         indentedLogger.logDebug("dispatchEvent", "retargeting",
-                                "name", originalEvent.getEventName(),
+                                "name", originalEvent.getName(),
                                 "original id", originalEvent.getTargetObject().getEffectiveId(),
                                 "new id", retargetedEvent.getTargetObject().getEffectiveId()
                         );
@@ -938,7 +938,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
                         if (indentedLogger.isDebugEnabled()) {
                             indentedLogger.logDebug("dispatchEvent", "retargeting",
-                                    "name", originalEvent.getEventName(),
+                                    "name", originalEvent.getName(),
                                     "original id", originalEvent.getTargetObject().getEffectiveId(),
                                     "new id", retargetedEvent.getTargetObject().getEffectiveId()
                             );
@@ -999,11 +999,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     : null;
 
             throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "dispatching XForms event",
-                    "event", originalEvent.getEventName(), "target id", targetObject.getEffectiveId()));
+                    "event", originalEvent.getName(), "target id", targetObject.getEffectiveId()));
         }
 
         if (indentedLogger.isDebugEnabled()) {
-            indentedLogger.endHandleOperation("name", originalEvent.getEventName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
+            indentedLogger.endHandleOperation("name", originalEvent.getName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
                     originalEvent.getLocationData() != null ? originalEvent.getLocationData().toString() : null);
         }
     }

@@ -202,7 +202,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
     @Override
     public void performDefaultAction(PropertyContext propertyContext, XFormsEvent event) {
-        if (XFormsEvents.XXFORMS_DND.equals(event.getEventName())) {
+        if (XFormsEvents.XXFORMS_DND.equals(event.getName())) {
             doDnD(propertyContext, event);
         }
         super.performDefaultAction(propertyContext, event);

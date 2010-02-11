@@ -232,7 +232,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                     handleReadOnlyAttribute(containerAttributes, containingDocument, xformsSelect1Control);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, containerAttributes);
-                    {
+                    if (itemset != null) { // can be null if the control is non-relevant
                         // Create xhtml:div with initial menu entries
                         {
                             itemset.visit(contentHandler, new ItemsetListener() {

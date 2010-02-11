@@ -3741,10 +3741,17 @@ ORBEON.xforms.XBL = {
         xblClass.instance = function(target) {
             var hasInit = ! YAHOO.lang.isUndefined(xblClass.prototype.init);
 
+            // Get the top-level element in the HTML DOM corresponding to this control
+            var container = target == null || ! YAHOO.util.Dom.inDocument(target, document)
+                ? null
+                : (YAHOO.util.Dom.hasClass(target, cssClass) ? target
+                    : YAHOO.util.Dom.getAncestorByClassName(target, cssClass));
+
             // The first time instance() is called for this class, override init() on the class object
             // to make sure that the init method is not called more than once
             if (! instanceAlreadyCalled) {
                 instanceAlreadyCalled = true;
+                // Inject init
                 if (hasInit) {
                     var originalInit = this.prototype.init;
                     this.prototype.init = function() {
@@ -3754,9 +3761,17 @@ ORBEON.xforms.XBL = {
                         }
                     }
                 }
+                // Inject destroy
+                var originalDestroy = this.prototype.destroy;
+                this.prototype.destroy = function() {
+                    if (! YAHOO.lang.isUndefined(originalDestroy))
+                        originalDestroy.call(this);
+                    if (! YAHOO.lang.isUndefined(this._instances))
+                        this._instances[container.id] = null;
+                }
             }
 
-            if (target == null || ! YAHOO.util.Dom.inDocument(target, document)) {
+            if (container == null) {
                 // If we get an event for a target which is not in the document, return a mock object
                 // that won't do anything when its methods are called
                 if (doNothingSingleton == null) {
@@ -3766,15 +3781,12 @@ ORBEON.xforms.XBL = {
                 }
                 return doNothingSingleton;
             } else {
-                // Get the top-level element in the HTML DOM corresponding to this control
-                var container = YAHOO.util.Dom.hasClass(target, cssClass) ? target
-                    : YAHOO.util.Dom.getAncestorByClassName(target, cssClass);
                 // Create object holding instances
                 if (YAHOO.lang.isUndefined(this._instances))
                     this._instances = {};
                 // Get or create instance
                 var instance = this._instances[container.id];
-                if (YAHOO.lang.isUndefined(instance) || instance.container != container) {
+                if (YAHOO.lang.isUndefined(instance) || YAHOO.lang.isNull(instance) || instance.container != container) {
                     instance = new xblClass(container);
                     instance.container = container;
                     if (hasInit) {

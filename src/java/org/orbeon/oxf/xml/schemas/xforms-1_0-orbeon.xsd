@@ -826,7 +826,7 @@
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
             <xsd:attribute name="value" type="xsd:string" use="optional"/>
-            <xsd:attribute name="level" use="required">
+            <xsd:attribute name="level" use="optional">
                 <xsd:simpleType>
                     <xsd:union memberTypes="xforms:QNameButNotNCNAME">
                     <xsd:simpleType>

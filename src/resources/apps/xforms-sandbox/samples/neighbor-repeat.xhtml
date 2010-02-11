@@ -26,8 +26,19 @@
             </xforms:instance>
         </xforms:model>
         <xhtml:style type="text/css">
-            .yui-skin-sam tr.xforms-repeat-selected-item-1 td { background-color: transparent; color: inherit }
-            .xforms-repeat-selected-item-1{ background-color: transparent }
+
+            /* Don't highlight the current row */
+            .yui-skin-sam tr.yui-dt-selected td { background-color: #FFF; color: black }
+            .yui-skin-sam tr.yui-dt-odd td { background-color: #EDF5FF; color: black }
+            .xforms-repeat-selected-item-1 { background-color: transparent }
+
+            /* Change positioning for relative to static, so absolute positioning of the menu is relative
+               to the page and is allowed to get out of the datatable. */
+            .xforms-form .yui-dt-scrollable .yui-dt-hd { position: static }
+            /* Override a CSS property set only on the menulabel by YUI for IE which if there causes the
+               label to initially positioned outside of the datatable (IE bug). */
+            .yui-skin-sam .yuimenubaritemlabel { position: static }
+
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
@@ -47,8 +58,9 @@
         <fr:datatable>
             <xhtml:tr>
                 <xhtml:th/>
-                <xhtml:th>Name</xhtml:th>
+                <xhtml:th/>
                 <xhtml:th>Abbreviation</xhtml:th>
+                <xhtml:th>Name</xhtml:th>
             </xhtml:tr>
             <xforms:repeat nodeset="instance('employees')/employee" id="employee-repeat">
                 <xhtml:tr>
@@ -57,6 +69,14 @@
                             <xforms:label>Select state</xforms:label>
                             <xxforms:show ev:event="DOMActivate" dialog="select-state-dialog" neighbor="select-state-trigger"/>
                         </xforms:trigger>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:select1 ref="@state" appearance="xxforms:menu">
+                            <xforms:itemset nodeset="instance('state-itemset')/(.,*)">
+                                <xforms:label ref="@label"/>
+                                <xforms:value ref="@value"/>
+                            </xforms:itemset>
+                        </xforms:select1>
                     </xhtml:td>
                     <xhtml:td>
                         <xforms:output value="@state"></xforms:output>

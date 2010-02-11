@@ -1,0 +1,71 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>XForms Load with Target Attribute</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="employees">
+                <employees>
+                    <employee state="ca"/>
+                    <employee state=""/>
+                    <employee state=""/>
+                </employees>
+            </xforms:instance>
+            <xforms:instance id="state-itemset">
+                <states label="Select state" value="">
+                    <state value="ca" label="California"/>
+                    <state value="md" label="Maryland"/>
+                    <state value="va" label="Virginia"/>
+                </states>
+            </xforms:instance>
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .yui-skin-sam tr.xforms-repeat-selected-item-1 td { background-color: transparent; color: inherit }
+            .xforms-repeat-selected-item-1{ background-color: transparent }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <xxforms:dialog id="select-state-dialog" appearance="minimal">
+            <xforms:repeat nodeset="instance('state-itemset')/state">
+                <xhtml:div>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label ref="@label"/>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:setvalue ref="instance('employees')/employee[index('employee-repeat')]/@state" value="context()/@value"/>
+                            <xxforms:hide dialog="select-state-dialog"/>
+                        </xforms:action>
+                    </xforms:trigger>
+                </xhtml:div>                
+            </xforms:repeat>
+        </xxforms:dialog>
+        <fr:datatable>
+            <xhtml:tr>
+                <xhtml:th/>
+                <xhtml:th>Name</xhtml:th>
+                <xhtml:th>Abbreviation</xhtml:th>
+            </xhtml:tr>
+            <xforms:repeat nodeset="instance('employees')/employee" id="employee-repeat">
+                <xhtml:tr>
+                    <xhtml:td>
+                        <xforms:trigger appearance="minimal" id="select-state-trigger">
+                            <xforms:label>Select state</xforms:label>
+                            <xxforms:show ev:event="DOMActivate" dialog="select-state-dialog" neighbor="select-state-trigger"/>
+                        </xforms:trigger>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:output value="@state"></xforms:output>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:output value="instance('state-itemset')/state[@value = context()/@state]/@label"/>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xforms:repeat>
+        </fr:datatable>
+    </xhtml:body>
+</xhtml:html>

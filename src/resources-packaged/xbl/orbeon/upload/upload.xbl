@@ -33,16 +33,17 @@
         <xbl:resources>
             <xbl:style src="/ops/yui/button/assets/skins/sam/button.css"/>
             <xbl:style>
-                .xbl-fr-upload {
-                	position: relative;
-                }
-
                 .xbl-fr-upload-fakefile {
                     white-space: nowrap;
                 	position: absolute;
                 	top: 0px;
                 	left: 0px;
                 	z-index: 1;
+                }
+
+                .xbl-fr-upload-field-container {
+                    position: relative; /* So the absolute positioned "fakefile" positions relative to this div */
+                    display: inline;    /* If the label is floated, show field next to it (not below) */
                 }
 
                 .xbl-fr-upload .xforms-upload, .xbl-fr-upload .xforms-upload-select {
@@ -60,18 +61,23 @@
             </xbl:style>
         </xbl:resources>
         <xbl:template>
-            <xforms:upload xbl:attr="model context ref bind" xxbl:scope="outer">
-                <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Upload.instance(this).init();</xxforms:script>
-                <xbl:content includes="xforms|label, xforms|help, xforms|hint, xforms:filename, xforms:mediatype, xxforms:size"/>
-            </xforms:upload>
-        	<xhtml:div class="xbl-fr-upload-fakefile">
-        		<xhtml:input class="xbl-fr-upload-visible-input"/>
-        		<xhtml:span class="yui-button">
-        		    <xhtml:span class="first-child">
-                		<xhtml:button type="button">Select file</xhtml:button>
-        		    </xhtml:span>
-        		</xhtml:span>
-        	</xhtml:div>
+            <xforms:group>
+                <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
+                <xhtml:div class="xbl-fr-upload-field-container">
+                    <xforms:upload xbl:attr="model context ref bind" xxbl:scope="outer">
+                        <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Upload.instance(this).init();</xxforms:script>
+                        <xbl:content includes="xforms:filename, xforms:mediatype, xxforms:size"/>
+                    </xforms:upload>
+                	<xhtml:div class="xbl-fr-upload-fakefile">
+                		<xhtml:input class="xbl-fr-upload-visible-input"/>
+                		<xhtml:span class="yui-button">
+                		    <xhtml:span class="first-child">
+                        		<xhtml:button type="button">Select file</xhtml:button>
+                		    </xhtml:span>
+                		</xhtml:span>
+                	</xhtml:div>
+            	</xhtml:div>
+            </xforms:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

@@ -34,8 +34,9 @@ YAHOO.xbl.fr.Upload.prototype = {
         // Init YUI button
         this.yuiButton = new YAHOO.widget.Button(buttonContainer);
         // Size the file upload field to be of the same size of the visible content
-        this.inputFileContainer.style.height = fakeFileContainer.clientHeight + "px";
-        this.inputFileContainer.style.width = fakeFileContainer.clientWidth + "px";
+        var inputTypeFile = ORBEON.util.Dom.getElementByTagName(this.inputFileContainer, "input");
+        inputTypeFile.style.height = fakeFileContainer.clientHeight + "px";
+        inputTypeFile.style.width = fakeFileContainer.clientWidth + "px";
         // Register listener on mouse events
         YAHOO.util.Event.addListener(this.inputFileContainer, "mouseover", this.fileMouseOver, this, true);
         YAHOO.util.Event.addListener(this.inputFileContainer, "mouseout", this.fileMouseOut, this, true);

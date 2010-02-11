@@ -5218,18 +5218,8 @@ ORBEON.xforms.Init = {
 
     _menu: function (menu) {
         // Find the divs for the YUI menu and for the values inside the control
-        var yuiMenuDiv;
-        var valuesDiv;
-        for (var j = 0; j < menu.childNodes.length; j++) {
-            var childNode = menu.childNodes[j];
-            if (childNode.nodeType == ELEMENT_TYPE) {
-                if (ORBEON.util.Dom.hasClass(childNode, "yuimenubar")) {
-                    yuiMenuDiv = childNode;
-                } else if (ORBEON.util.Dom.hasClass(childNode, "xforms-initially-hidden")) {
-                    valuesDiv = childNode;
-                }
-            }
-        }
+        var yuiMenuDiv = YAHOO.util.Dom.getElementsByClassName("yuimenubar", null, menu)[0];
+        var valuesDiv = YAHOO.util.Dom.getElementsByClassName("xforms-initially-hidden", null, menu)[0];
 
         // Extract menu hierarchy from HTML
         var menuString = ORBEON.util.Dom.getStringValue(valuesDiv);

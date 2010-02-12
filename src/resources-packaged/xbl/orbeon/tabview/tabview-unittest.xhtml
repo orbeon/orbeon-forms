@@ -25,13 +25,16 @@
         <xforms:model id="my-model">
             <xforms:instance id="instance">
                 <instance>
-                    <tab relevant="false"/>
-                    <tab relevant="true"/>
-                    <tab relevant="true"/>
-                    <tab relevant="true"/>
+                    <tab relevant="false" readonly="false" mip=""/>
+                    <tab relevant="true" readonly="false" mip=""/>
+                    <tab relevant="true" readonly="false" mip=""/>
+                    <tab relevant="true" readonly="true" mip=""/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="tab/@relevant" relevant=". = 'true'"/>
+            <xforms:bind nodeset="tab">
+                <xforms:bind nodeset="@mip" relevant="../@relevant = 'true'" readonly="../@readonly = 'true'"/>
+                <xforms:bind nodeset="@relevant | @readonly" type="xs:boolean"/>
+            </xforms:bind>
             <xforms:submission id="sleep-5-seconds" method="post"
                 action="/xforms-sandbox/service/sleep-5-seconds" serialization="none" replace="none"/>
         </xforms:model>
@@ -43,11 +46,17 @@
         <xhtml:fieldset>
             <xhtml:legend>Set values in instance to define which tabs are relevant</xhtml:legend>
             <xforms:repeat nodeset="tab">
-                <xxforms:variable name="position" select="position()"/>
-                <fr:button>
-                    <xforms:label>Toggle tab <xforms:output value="$position"/></xforms:label>
-                    <xforms:setvalue ev:event="DOMActivate" ref="@relevant" value="if (. = 'true') then 'false' else 'true'"/>
-                </fr:button>
+                <xhtml:div>
+                    <xforms:output value="position()">
+                        <xforms:label>Tab </xforms:label>
+                    </xforms:output>:
+                    <xforms:input ref="@relevant">
+                        <xforms:label>Relevant</xforms:label>
+                    </xforms:input>
+                    <xforms:input ref="@readonly">
+                        <xforms:label>Read-only</xforms:label>
+                    </xforms:input>
+                </xhtml:div>
             </xforms:repeat>
         </xhtml:fieldset>
 
@@ -63,15 +72,15 @@
         </xhtml:fieldset>
 
         <fr:tabview>
-            <fr:tab ref="tab[1]/@relevant" id="tab-1">
+            <fr:tab ref="tab[1]/@mip" id="tab-1">
                 <fr:label>First</fr:label>
                 Content of first tab.
             </fr:tab>
-            <fr:tab ref="tab[2]/@relevant" id="tab-2">
+            <fr:tab ref="tab[2]/@mip" id="tab-2">
                 <fr:label>Second</fr:label>
                 Content of second tab.
             </fr:tab>
-            <fr:tab ref="tab[3]/@relevant" id="tab-3">
+            <fr:tab ref="tab[3]/@mip" id="tab-3">
                 <fr:label>Third</fr:label>
                 <xforms:action ev:event="fr-select">
                     <xforms:send submission="sleep-5-seconds"/>
@@ -88,7 +97,7 @@
                     </xforms:case>
                 </xforms:switch>
             </fr:tab>
-            <fr:tab ref="tab[4]/@relevant" id="tab-4">
+            <fr:tab ref="tab[4]/@mip" id="tab-4">
                 <fr:label>Fourth</fr:label>
                 Content of fourth tab.
             </fr:tab>

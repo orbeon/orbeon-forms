@@ -40,19 +40,30 @@ YAHOO.xbl.fr.TabView.prototype = {
     },
 
     /**
+     * Find position of this elements amongts its sibling elements
+     */
+    getElementIndex: function(element) {
+        var children = YAHOO.util.Dom.getChildren(element.parentNode);
+        for (var childIndex = 0; childIndex < children.length; childIndex++)
+            if (children[childIndex] == element) return childIndex;
+        return -1;
+    },
+
+    /**
      * Respond to fr-toggle event.
      */
     toggle: function(groupElement) {
-        // div around the group to which the event is dispatched
-        var tabContainer = groupElement.parentNode;
-        // All the divs corresponding to tab content
-        var candidateTabContainers = YAHOO.util.Dom.getChildren(tabContainer.parentNode);
-        // Find index of the tab to which the event was dispatched
-        for (var candidateTabContainerIndex = 0; candidateTabContainerIndex < candidateTabContainers.length; candidateTabContainerIndex++) {
-            var candidateTabContainer = candidateTabContainers[candidateTabContainerIndex];
-            if (candidateTabContainer == tabContainer) break;
-        }
-        // Make that tab active
-        this.yuiTabView.set("activeTab", this.yuiTabView.getTab(candidateTabContainerIndex), false);
+        var tabIndex = this.getElementIndex(groupElement.parentNode);
+        this.yuiTabView.set("activeTab", this.yuiTabView.getTab(tabIndex), false);
+    },
+
+    readonly: function(groupElement) {
+        var tabIndex = this.getElementIndex(groupElement.parentNode);
+        this.yuiTabView.getTab(tabIndex).set("disabled", true);
+    },
+
+    readwrite: function(groupElement) {
+        var tabIndex = this.getElementIndex(groupElement.parentNode);
+        this.yuiTabView.getTab(tabIndex).set("disabled", false);
     }
 };

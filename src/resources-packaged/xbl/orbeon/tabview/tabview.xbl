@@ -35,6 +35,7 @@
     <xbl:binding id="fr-tabview" element="fr|tabview">
         <xbl:resources>
             <xbl:style src="/ops/yui/tabview/assets/skins/sam/tabview.css"/>
+            <xbl:style src="/xbl/orbeon/tabview/tabview.css"/>
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="xforms-focus" phase="target" defaultAction="cancel">
@@ -47,7 +48,7 @@
             <xforms:model id="tabview-model">
                 <xforms:instance id="tabview-instance">
                     <tabview-instance>
-                        <index-of-first-relevant-tab/>
+                        <active-tab-position/>
                     </tabview-instance>
                 </xforms:instance>
             </xforms:model>
@@ -67,7 +68,7 @@
                         <xsl:copy-of select="@class"/>
 
                         <!-- Initialization event -->
-                        <xxforms:script id="xf-en" ev:event="xforms-enabled" ev:target="fr-tabview-group">YAHOO.xbl.fr.TabView.instance(this).init();</xxforms:script>
+                        <xxforms:script id="xf-en" ev:event="xforms-enabled" ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).init();</xxforms:script>
 
                         <!-- Builds relevance-related variables for each tab -->
                         <xsl:for-each select="fr:tab">
@@ -80,20 +81,23 @@
                             <!--  Is this tab relevant -->
                             <xxforms:variable name="fr-tab-relevance-{position()}"
                                 select="exists($fr-tab-binding-{position()}) and exf:relevant($fr-tab-binding-{position()})"/>
+                            <xxforms:variable name="fr-tab-relevance-{position()}"
+                                select="exists($fr-tab-binding-{position()}) and exf:relevant($fr-tab-binding-{position()})"/>
                         </xsl:for-each>
 
                         <!-- Contains the relevance for all the tabs as a sequence of boolean values -->
                         <xxforms:variable name="fr-tab-relevances" select="({string-join(
                                 for $tab-index in 1 to count(fr:tab) return concat('$fr-tab-relevance-', $tab-index), ',')})"/>
                         <!-- Store index of the first tab which is relevant -->
-                        <xforms:setvalue ev:event="xforms-enabled" ref="index-of-first-relevant-tab" value="index-of($fr-tab-relevances, true())[1]"/>
+                        <xforms:setvalue ev:event="xforms-enabled" ev:target="#observer" ref="active-tab-position" value="index-of($fr-tab-relevances, true())[1]"/>
 
                         <xhtml:div class="yui-navset">
                             <xhtml:ul class="yui-nav">
                                 <xsl:for-each select="fr:tab">
                                     <xsl:variable name="label" as="element(fr:label)" select="fr:label[1]"/>
                                     <xhtml:li style="{{if ($fr-tab-relevance-{position()}) then '' else 'display: none'}}"
-                                            class="{{if (index-of-first-relevant-tab = '{position()}') then 'selected' else ''}}">
+                                            class="{{if (active-tab-position = '{position()}') then 'selected' else ''}}{{
+                                                if (exf:readonly($fr-tab-binding-{position()})) then ' disabled' else ''}}">
                                         <!-- Transform xforms:label into xforms:output -->
                                         <xhtml:a href="#tab{position()}"><xhtml:em>
                                             <xsl:choose>
@@ -118,13 +122,20 @@
                                 <xforms:group id="fr-tabview-content" appearance="xxforms:internal">
                                     <xsl:for-each select="fr:tab">
                                         <xsl:variable name="case-id" as="xs:string?" select="@id"/>
+                                        <!-- Listen on xforms-readonly -->
                                         <xhtml:div>
+                                            <!-- Listen on xforms-readonly and xforms-readwrite for this fr:tab -->
+                                            <xforms:group xxbl:scope="outer">
+                                                <xsl:copy-of select="@model | @context | @ref | @bind"/>
+                                                <xxforms:script ev:event="xforms-readonly">YAHOO.xbl.fr.TabView.instance(this).readonly(this);</xxforms:script>
+                                                <xxforms:script ev:event="xforms-readwrite">YAHOO.xbl.fr.TabView.instance(this).readwrite(this);</xxforms:script>
+                                            </xforms:group>
                                             <!-- Tab content has outer scope -->
                                             <xforms:group xxbl:scope="outer">
                                                 <xsl:if test="$case-id">
                                                     <xsl:attribute name="id" select="$case-id"/>
                                                     <!-- Custom events -->
-                                                    <xxforms:script ev:event="fr-toggle" ev:target="{$case-id}">YAHOO.xbl.fr.TabView.instance(this).toggle(this);</xxforms:script>
+                                                    <xxforms:script ev:event="fr-toggle" ev:target="#observer">YAHOO.xbl.fr.TabView.instance(this).toggle(this);</xxforms:script>
                                                 </xsl:if>
 
                                                 <xsl:apply-templates select="node() except fr:label"/>
@@ -133,7 +144,12 @@
                                                 <!-- NOTE: Put them after the content so that xforms:setfocus works -->
                                                 <xforms:trigger id="fr-tabview-select-{position()}" class="fr-tabview-select-{position()}" style="display: none" xxbl:scope="inner">
                                                     <xforms:label/>
-                                                    <xforms:dispatch ev:event="DOMActivate" name="fr-select" target="fr-tabview-select-{position()}"/>
+                                                    <xforms:action ev:event="DOMActivate">
+                                                        <xforms:dispatch name="fr-select" target="fr-tabview-select-{position()}"/>
+                                                        <xforms:setvalue xxbl:scope="inner" ref="active-tab-position">
+                                                            <xsl:value-of select="position()"/>
+                                                        </xforms:setvalue>
+                                                    </xforms:action>
                                                 </xforms:trigger>
                                                 <xforms:trigger id="fr-tabview-deselect-{position()}" class="fr-tabview-deselect-{position()}" style="display: none" xxbl:scope="inner">
                                                     <xforms:label/>

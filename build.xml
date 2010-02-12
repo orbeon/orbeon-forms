@@ -98,9 +98,9 @@
         <include name="exist-xmlrpc-common-3_1_1.jar"/>
         <include name="exist-xmlrpc-server-3_1_1.jar"/>
 
-        <include name="flying-saucer-r8-core-renderer.jar"/>
-        <include name="flying-saucer-r8-core-renderer-minimal.jar"/>
-        <include name="flying-saucer-r8-itext-2_0_8.jar"/>
+        <include name="flyingsaucer-20100212-core-renderer.jar"/>
+        <include name="flyingsaucer-20100212-core-renderer-minimal.jar"/>
+        <include name="flyingsaucer-20100212-itext-2_1_7.jar"/>
         <include name="itext-bcmail-jdk14-138.jar"/>
         <include name="itext-bcprov-jdk14-138.jar"/>
 

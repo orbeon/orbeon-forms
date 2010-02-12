@@ -35,25 +35,43 @@
             <xforms:submission id="sleep-5-seconds" method="post"
                 action="/xforms-sandbox/service/sleep-5-seconds" serialization="none" replace="none"/>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-repeat-selected-item-1 { background-color: transparent }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="tab">
-            <fr:button>
-                <xforms:label>Toggle tab <xforms:output value="position()"/></xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="@relevant" value="if (. = 'true') then 'false' else 'true'"/>
-            </fr:button>
-        </xforms:repeat>
+        <xhtml:fieldset>
+            <xhtml:legend>Set values in instance to define which tabs are relevant</xhtml:legend>
+            <xforms:repeat nodeset="tab">
+                <xxforms:variable name="position" select="position()"/>
+                <fr:button>
+                    <xforms:label>Toggle tab <xforms:output value="$position"/></xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="@relevant" value="if (. = 'true') then 'false' else 'true'"/>
+                </fr:button>
+            </xforms:repeat>
+        </xhtml:fieldset>
+
+        <xhtml:fieldset>
+            <xhtml:legend>Switch to a tab by dispatching an event</xhtml:legend>
+            <xforms:repeat nodeset="tab">
+                <xxforms:variable name="position" select="position()"/>
+                <fr:button>
+                    <xforms:label>Toggle tab <xforms:output value="$position"/></xforms:label>
+                    <xforms:dispatch ev:event="DOMActivate" target="tab-{$position}" name="fr-toggle"/>
+                </fr:button>
+            </xforms:repeat>
+        </xhtml:fieldset>
 
         <fr:tabview>
-            <fr:tab ref="tab[1]/@relevant">
+            <fr:tab ref="tab[1]/@relevant" id="tab-1">
                 <fr:label>First</fr:label>
                 Content of first tab.
             </fr:tab>
-            <fr:tab ref="tab[2]/@relevant">
+            <fr:tab ref="tab[2]/@relevant" id="tab-2">
                 <fr:label>Second</fr:label>
                 Content of second tab.
             </fr:tab>
-            <fr:tab ref="tab[3]/@relevant">
+            <fr:tab ref="tab[3]/@relevant" id="tab-3">
                 <fr:label>Third</fr:label>
                 <xforms:action ev:event="fr-select">
                     <xforms:send submission="sleep-5-seconds"/>
@@ -70,7 +88,7 @@
                     </xforms:case>
                 </xforms:switch>
             </fr:tab>
-            <fr:tab ref="tab[4]/@relevant">
+            <fr:tab ref="tab[4]/@relevant" id="tab-4">
                 <fr:label>Fourth</fr:label>
                 Content of fourth tab.
             </fr:tab>

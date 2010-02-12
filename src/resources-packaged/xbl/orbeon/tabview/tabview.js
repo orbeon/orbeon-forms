@@ -27,15 +27,32 @@ YAHOO.xbl.fr.TabView.prototype = {
     },
 
     activeTabChange: function(event) {
-
         function getTrigger(selectDeselect, index) {
-            return YAHOO.util.Dom.getElementsByClassName("fr-tabview-" + selectDeselect + "-" + (index + 1), 
-                null, this.container)[0];
+            var trigger = YAHOO.util.Dom.getElementsByClassName
+                ("fr-tabview-" + selectDeselect + "-" + (index + 1), null, this.container)[0];
+            return ORBEON.util.Dom.getElementByTagName(trigger, "button");
         }
 
         // Deselect other tabs
         getTrigger("deselect", this.yuiTabView.getTabIndex(event.prevValue)).click();
         // Select new tab
         getTrigger("select", this.yuiTabView.getTabIndex(event.newValue)).click();
+    },
+
+    /**
+     * Respond to fr-toggle event.
+     */
+    toggle: function(groupElement) {
+        // div around the group to which the event is dispatched
+        var tabContainer = groupElement.parentNode;
+        // All the divs corresponding to tab content
+        var candidateTabContainers = YAHOO.util.Dom.getChildren(tabContainer.parentNode);
+        // Find index of the tab to which the event was dispatched
+        for (var candidateTabContainerIndex = 0; candidateTabContainerIndex < candidateTabContainers.length; candidateTabContainerIndex++) {
+            var candidateTabContainer = candidateTabContainers[candidateTabContainerIndex];
+            if (candidateTabContainer == tabContainer) break;
+        }
+        // Make that tab active
+        this.yuiTabView.set("activeTab", this.yuiTabView.getTab(candidateTabContainerIndex), false);
     }
 };

@@ -124,10 +124,7 @@
                                                 <xsl:if test="$case-id">
                                                     <xsl:attribute name="id" select="$case-id"/>
                                                     <!-- Custom events -->
-                                                    <!-- TODO: implement switching -->
-                                                    <!--<xforms:setvalue ev:event="fr-toggle" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">toggle</xforms:setvalue>-->
-                                                    <!--<xforms:setvalue ev:event="fr-show" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">show</xforms:setvalue>-->
-                                                    <!--<xforms:setvalue ev:event="fr-hide" ev:target="{$case-id}" ref="operation" xxbl:scope="inner">hide</xforms:setvalue>-->
+                                                    <xxforms:script ev:event="fr-toggle" ev:target="{$case-id}">YAHOO.xbl.fr.TabView.instance(this).toggle(this);</xxforms:script>
                                                 </xsl:if>
 
                                                 <xsl:apply-templates select="node() except fr:label"/>

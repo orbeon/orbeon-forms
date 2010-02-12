@@ -3766,8 +3766,7 @@ ORBEON.xforms.XBL = {
                 this.prototype.destroy = function() {
                     if (! YAHOO.lang.isUndefined(originalDestroy))
                         originalDestroy.call(this);
-                    if (! YAHOO.lang.isUndefined(this._instances))
-                        this._instances[container.id] = null;
+                    xblClass._instances[this.container.id] = null;
                 }
             }
 

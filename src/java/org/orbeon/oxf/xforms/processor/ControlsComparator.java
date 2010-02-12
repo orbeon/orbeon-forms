@@ -39,12 +39,19 @@ import java.util.Set;
 public class ControlsComparator {
 
     private final PipelineContext pipelineContext;
-    private final ContentHandlerHelper ch;
     private final XFormsContainingDocument containingDocument;
     private final Set<String> valueChangeControlIds;
     private final boolean isTestMode;
 
     public final boolean isSpanHTMLLayout;
+
+    private final AttributesImpl attributesImpl = new AttributesImpl();
+
+    private ContentHandlerHelper ch;
+    private ContentHandlerHelper tempCH;
+
+    // Experimental: how many bytes trigger xxforms:update="full"
+    private static final int FULL_UPDATE_THRESHOLD = 2000;
 
     public ControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
                               Set<String> valueChangeControlIds, boolean isTestMode) {
@@ -58,7 +65,7 @@ public class ControlsComparator {
         this.isSpanHTMLLayout = XFormsProperties.isSpanHTMLLayout(containingDocument);
     }
 
-    public void diff(List<XFormsControl> state1, List<XFormsControl> state2) {
+    public boolean diff(List<XFormsControl> state1, List<XFormsControl> state2) {
 
         // Normalize
         if (state1 != null && state1.size() == 0)
@@ -68,24 +75,33 @@ public class ControlsComparator {
 
         // Trivial case
         if (state1 == null && state2 == null)
-            return;
+            return true;
 
         // Both lists must have the same size if present; state1 can be null
         if ((state1 != null && state2 != null && state1.size() != state2.size()) || (state2 == null)) {
             throw new IllegalStateException("Illegal state when comparing controls.");
         }
 
-        final AttributesImpl attributesImpl = new AttributesImpl();
-        final Iterator<XFormsControl> j = (state1 == null) ? null : state1.iterator();
-        for (Object aState2 : state2) {
-            final XFormsControl control1 = (state1 == null) ? null : j.next();
-            final XFormsControl control2 = (XFormsControl) aState2;
+        final Iterator<XFormsControl> leftIterator = (state1 == null) ? null : state1.iterator();
+        final Iterator<XFormsControl> rightIterator = (state2 == null) ? null : state2.iterator();
+        final Iterator<XFormsControl> leadingIterator = (rightIterator != null) ? rightIterator : leftIterator;
 
-            // XXX TEST innerHTML
-            if (testInnerHTML(control1, control2, attributesImpl)) continue;
+        while (leadingIterator.hasNext()) {
+
+            final XFormsControl control1 = (leftIterator == null) ? null : leftIterator.next();
+            final XFormsControl control2 = (rightIterator == null) ? null : rightIterator.next();
+
+            // Handle xxforms:update="full"
+            final SAXStore.Mark mark = getUpdateFullMark(control2);
+            final boolean isFullUpdateLevel = mark != null;
+            if (isFullUpdateLevel) {
+                // Start buffering
+                tempCH = ch;
+                ch = new ContentHandlerHelper(new SAXStore());
+            }
 
             // Whether it is necessary to output information about this control because the control was previously non-existing
-            // TODO: distinction between new iteration AND control just becoming relevant
+            // TODO: distinction between new iteration AND control just becoming relevant?
             final boolean isNewlyVisibleSubtree = control1 == null;
 
             // 1: Check current control
@@ -98,202 +114,304 @@ public class ControlsComparator {
                 control2.outputAjaxDiff(pipelineContext, ch, control1, attributesImpl, isNewlyVisibleSubtree);
             }
 
+            // Whether at this point we must do a full update
+            boolean mustDoFullUpdate = mustDoFullUpdate();
+
             // 2: Check children if any
-            if (control2 instanceof XFormsContainerControl) {
-
-                final XFormsContainerControl containerControl1 = (XFormsContainerControl) control1;
-                final XFormsContainerControl containerControl2 = (XFormsContainerControl) control2;
-
-                final List<XFormsControl> children1 = (containerControl1 == null) ? null : containerControl1.getChildren();
-                final List<XFormsControl> children2 = (containerControl2.getChildren() == null) ? Collections.<XFormsControl>emptyList() : containerControl2.getChildren();
-
-//                if (leadingControl instanceof XFormsContainerControl) {
-//                    // Repeat update
+//            if (false) {
+//                // NOTE: Attempt at using code from NewControlsComparator, doesn't work because repeat template updates are incorrect
+//                if (control2 instanceof XFormsContainerControl) {
 //
-//                    TODO: diff repeat nodesets
+//                    final boolean isRepeatControl = control2 instanceof XFormsRepeatControl;
 //
-//                } else {
-//                    // Other grouping controls
-//                    diff(children1, children2);
+//                    final XFormsContainerControl containerControl1 = (XFormsContainerControl) control1;
+//                    final XFormsContainerControl containerControl2 = (XFormsContainerControl) control2;
+//
+//                    final List<XFormsControl> children1 = (containerControl1 == null) ? null : (containerControl1.getChildren() != null && containerControl1.getChildren().size() == 0) ? null : containerControl1.getChildren();
+//                    final List<XFormsControl> children2 = (containerControl2 == null) ? null : (containerControl2.getChildren() != null && containerControl2.getChildren().size() == 0) ? null : containerControl2.getChildren();
+//
+//                    if (isRepeatControl) {
+//
+//                        // Repeat update
+//
+//                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
+//
+//                        final int size1 = (children1 == null) ? 0 : children1.size();
+//                        final int size2 = (children2 == null) ? 0 : children2.size();
+//
+//                        if (size1 == size2) {
+//                            // No add or remove of children
+//
+//                            // Delete first template if needed
+//                            if (size2 == 0 && control1 == null) {
+//                                outputDeleteRepeatTemplate(ch, control2, 1);
+//                            }
+//
+//                            // Diff children
+//                            diff(children1, children2);//, isWithinNewRepeatIteration
+//                        } else if (size2 > size1) {
+//                            // Size has grown
+//
+//                            // Copy template instructions
+//                            outputCopyRepeatTemplate(ch, repeatControlInfo, size1 + 1, size2);
+//
+//                            // Diff the common subset
+//                            diff(children1, children2.subList(0, size1));//, isWithinNewRepeatIteration
+//
+//                            // Issue new values for new iterations
+//                            diff(null, children2.subList(size1, size2));//, true
+//
+//                        } else if (size2 < size1) {
+//                            // Size has shrunk
+//
+//                            outputDeleteRepeatTemplate(ch, control2, size1 - size2);
+//
+//                            // Diff the remaining subset
+//                            diff(children1.subList(0, size2), children2);//, isWithinNewRepeatIteration
+//                        }
+//                    } else {
+//                        // Other grouping controls
+//                        diff(children1, children2);//, isWithinNewRepeatIteration
+//                    }
 //                }
+//            } else {
 
-                // Repeat grouping control
-                if (control2 instanceof XFormsRepeatControl && children1 != null) {
+            if (!mustDoFullUpdate) { // don't check children if we know we must do a full update
+                foobar: if (control2 instanceof XFormsContainerControl) {
 
-                    final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
+                    final XFormsContainerControl containerControl1 = (XFormsContainerControl) control1;
+                    final XFormsContainerControl containerControl2 = (XFormsContainerControl) control2;
 
-                    // Special case of repeat update
+                    final List<XFormsControl> children1 = (containerControl1 == null) ? null : containerControl1.getChildren();
+                    final List<XFormsControl> children2 = (containerControl2.getChildren() == null) ? Collections.<XFormsControl>emptyList() : containerControl2.getChildren();
 
-                    final int size1 = children1.size();
-                    final int size2 = children2.size();
+    //                if (leadingControl instanceof XFormsContainerControl) {
+    //                    // Repeat update
+    //
+    //                    TODO: diff repeat nodesets
+    //
+    //                } else {
+    //                    // Other grouping controls
+    //                    diff(children1, children2);
+    //                }
 
-                    if (size1 == size2) {
-                        // No add or remove of children
-                        diff(children1, children2);
-                    } else if (size2 > size1) {
-                        // Size has grown
+                    // Repeat grouping control
+                    if (control2 instanceof XFormsRepeatControl && children1 != null) {
+
+                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
+
+                        // Special case of repeat update
+
+                        final int size1 = children1.size();
+                        final int size2 = children2.size();
+
+                        if (size1 == size2) {
+                            // No add or remove of children
+                            if (!diff(children1, children2)) {
+                                mustDoFullUpdate = true;
+                                break foobar;
+                            }
+                        } else if (size2 > size1) {
+                            // Size has grown
+
+                            // Copy template instructions
+                            outputCopyRepeatTemplate(ch, repeatControlInfo, size1 + 1, size2);
+
+                            // Diff the common subset
+                            if (!diff(children1, children2.subList(0, size1))) {
+                                mustDoFullUpdate = true;
+                                break foobar;
+                            }
+
+                            // Issue new values for new iterations
+                            if (!diff(null, children2.subList(size1, size2))) {
+                                mustDoFullUpdate = true;
+                                break foobar;
+                            }
+
+                        } else if (size2 < size1) {
+                            // Size has shrunk
+                            outputDeleteRepeatTemplate(ch, control2, size1 - size2);
+
+                            // Diff the remaining subset
+                            if (!diff(children1.subList(0, size2), children2)) {
+                                mustDoFullUpdate = true;
+                                break foobar;
+                            }
+                        }
+
+                    } else if (control2 instanceof XFormsRepeatControl && control1 == null) {
+
+                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
+
+                        // Handle new sub-xforms:repeat
 
                         // Copy template instructions
-                        outputCopyRepeatTemplate(ch, repeatControlInfo, size1 + 1, size2);
-
-                        // Diff the common subset
-                        diff(children1, children2.subList(0, size1));
-
-                        // Issue new values for new iterations
-                        diff(null, children2.subList(size1, size2));
-
-                    } else if (size2 < size1) {
-                        // Size has shrunk
-                        outputDeleteRepeatTemplate(ch, control2, size1 - size2);
-
-                        // Diff the remaining subset
-                        diff(children1.subList(0, size2), children2);
-                    }
-
-                } else if (control2 instanceof XFormsRepeatControl && control1 == null) {
-
-                    final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
-
-                    // Handle new sub-xforms:repeat
-
-                    // Copy template instructions
-                    final int size2 = children2.size();
-                    if (size2 > 1) {
-                        outputCopyRepeatTemplate(ch, repeatControlInfo, 2, size2);// don't copy the first template, which is already copied when the parent is copied
-                    } else if (size2 == 1) {
-                        // NOP, the client already has the template copied
-                    } else if (size2 == 0) {
-                        // Delete first template
-                        outputDeleteRepeatTemplate(ch, control2, 1);
-                    }
-
-                    // Issue new values for the children
-                    diff(null, children2);
-
-                } else if (control2 instanceof XFormsRepeatControl && children1 == null) {
-
-                    final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
-
-                    // Handle repeat growing from size 0 (case of instance replacement, for example)
-
-                    // Copy template instructions
-                    final int size2 = children2.size();
-                    if (size2 > 0) {
-                        outputCopyRepeatTemplate(ch, repeatControlInfo, 1, size2);
+                        final int size2 = children2.size();
+                        if (size2 > 1) {
+                            outputCopyRepeatTemplate(ch, repeatControlInfo, 2, size2);// don't copy the first template, which is already copied when the parent is copied
+                        } else if (size2 == 1) {
+                            // NOP, the client already has the template copied
+                        } else if (size2 == 0) {
+                            // Delete first template
+                            outputDeleteRepeatTemplate(ch, control2, 1);
+                        }
 
                         // Issue new values for the children
-                        diff(null, children2);
+                        if (!diff(null, children2)) {
+                            mustDoFullUpdate = true;
+                            break foobar;
+                        }
+
+                    } else if (control2 instanceof XFormsRepeatControl && children1 == null) {
+
+                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
+
+                        // Handle repeat growing from size 0 (case of instance replacement, for example)
+
+                        // Copy template instructions
+                        final int size2 = children2.size();
+                        if (size2 > 0) {
+                            outputCopyRepeatTemplate(ch, repeatControlInfo, 1, size2);
+
+                            // Issue new values for the children
+                            if (!diff(null, children2)) {
+                                mustDoFullUpdate = true;
+                                break foobar;
+                            }
+                        }
+                    } else {
+                        // Other grouping controls
+                        if (!diff(children1, children2)) {
+                            mustDoFullUpdate = true;
+                            break foobar;
+                        }
                     }
-                } else {
-                    // Other grouping controls
-                    diff(children1, children2);
                 }
             }
+
+            // Handle xxforms:update="full"
+            if (mustDoFullUpdate) {
+                if (isFullUpdateLevel) {
+                    // Restore output
+                    ch = tempCH;
+                    tempCH = null;
+
+                    // Process update
+                    processFullUpdate(mark, control1, control2);
+
+                    return true;
+                } else {
+                    // Return to parent for processing
+                    return false;
+                }
+            }
+
+//            }
+        }
+        return true;
+    }
+
+    private boolean mustDoFullUpdate() {
+        return tempCH != null && ((SAXStore) ch.getContentHandler()).getApproximateSize() > FULL_UPDATE_THRESHOLD;
+    }
+
+    private SAXStore.Mark getUpdateFullMark(XFormsControl control) {
+        // Conditions:
+        //
+        // o there is not already a full update in progress
+        // o we are in span layout
+        // o the control is a container control (group, switch, repeat, dialog, XBL components)
+        // o there is xxforms:update="full"
+        //
+        if (tempCH == null && isSpanHTMLLayout && control instanceof XFormsContainerControl && !(control instanceof XFormsPseudoControl)) {
+            return containingDocument.getStaticState().getElementMark(control.getPrefixedId());
+        } else {
+            return null;
         }
     }
 
-    private boolean testInnerHTML(XFormsControl control1, XFormsControl control2, AttributesImpl attributesImpl) {
+    private void processFullUpdate(SAXStore.Mark mark, XFormsControl control1, XFormsControl control2) {
+        try {
 
-        // Only support innerHTML updates on:
-        //
-        // o span HTML layout
-        // o for container controls (group, switch, repeat, dialog, XBL components)
-        //
-        if (isSpanHTMLLayout && control2 instanceof XFormsContainerControl && !(control2 instanceof XFormsPseudoControl)) {
-            final SAXStore.Mark mark = containingDocument.getStaticState().getElementMark(control2.getPrefixedId());
-            if (mark != null) {
-
-                // Recursively check for differences
-                final boolean hasDifferences = !control2.equalsExternalRecurse(pipelineContext, control1);
-
-                // If so, compute new fragment
-                if (hasDifferences) {
-                    try {
-
-                        // 1: Send differences for just this control if needed
-                        if (!control2.equalsExternal(pipelineContext, control1)) {
-                            final boolean isNewlyVisibleSubtree = control1 == null;
-                            attributesImpl.clear();
-                            control2.outputAjaxDiff(pipelineContext, ch, control1, attributesImpl, isNewlyVisibleSubtree);
-                        }
-
-                        // 2: Send difference for content of this control
-
-                        final ElementHandlerController controller = new ElementHandlerController();
-
-                        // Register handlers on controller
-                        XHTMLBodyHandler.registerHandlers(controller, containingDocument.getStaticState());
-                        {
-                            // Register a handler for AVTs on HTML elements
-                            // TODO: this should be obtained per document, but we only know about this in the extractor
-                            final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs();
-                            if (hostLanguageAVTs) {
-                                controller.registerHandler(XXFormsAttributeHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute");
-                                controller.registerHandler(XHTMLElementHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI);
-                            }
-
-                            // Swallow XForms elements that are unknown
-                            controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
-                            controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
-                            controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XBL_NAMESPACE_URI);
-                        }
-
-                        // Create the output SAX pipeline:
-                        //
-                        // o perform URL rewriting
-                        // o serialize to String
-                        //
-                        // NOTE: we could possibly hook-up the standard epilogue here, which would:
-                        //
-                        // o perform URL rewriting
-                        // o apply the theme
-                        // o serialize
-                        //
-                        // But this would raise some issues:
-                        //
-                        // o epilogue must match on xhtml:* instead of xhtml:html
-                        // o themes must be modified to support XHTML fragments
-                        // o serialization must output here, not to the ExternalContext OutputStream
-                        //
-                        // So for now, perform simple steps here, and later this can be revisited.
-                        //
-                        final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
-                        final boolean skipRootElement = !(control2 instanceof XFormsRepeatControl); // a little hacky to do this here, knowledge should be in control itself
-                        controller.setOutput(new DeferredContentHandlerImpl(new XHTMLRewrite().getRewriteContentHandler(externalContext,
-                                new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getContentHandler()), skipRootElement), true)));
-
-                        // Create handler context
-                        final HandlerContext handlerContext = new HandlerContext(controller, pipelineContext, containingDocument, null, externalContext) {
-                            @Override
-                            public String findXHTMLPrefix() {
-                                // We know we serialize to plain HTML so unlike during initial page show, we don't need a particular prefix
-                                return "";
-                            }
-                        };
-                        handlerContext.restoreContext(control2);
-                        controller.setElementHandlerContext(handlerContext);
-
-                        attributesImpl.clear();
-                        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, control2.getEffectiveId());
-                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "inner-html", attributesImpl);
-                        {
-                            // Replay into SAX pipeline
-                            controller.startDocument();
-                            // new SAXLoggerProcessor.DebugContentHandler()
-                            containingDocument.getStaticState().getXHTMLDocument().replay(controller, mark);
-                            controller.endDocument();
-                        }
-                        ch.endElement();
-
-                    } catch (SAXException e) {
-                        throw new OXFException(e);
-                    }
-                    // Skip regular updates
-                    return true;
-                }
+            // 1: Send differences for just this control if needed
+            if (!control2.equalsExternal(pipelineContext, control1)) {
+                final boolean isNewlyVisibleSubtree = control1 == null;
+                attributesImpl.clear();
+                control2.outputAjaxDiff(pipelineContext, ch, control1, attributesImpl, isNewlyVisibleSubtree);
             }
+
+            // 2: Send difference for content of this control
+
+            final ElementHandlerController controller = new ElementHandlerController();
+
+            // Register handlers on controller
+            XHTMLBodyHandler.registerHandlers(controller, containingDocument.getStaticState());
+            {
+                // Register a handler for AVTs on HTML elements
+                // TODO: this should be obtained per document, but we only know about this in the extractor
+                final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs();
+                if (hostLanguageAVTs) {
+                    controller.registerHandler(XXFormsAttributeHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute");
+                    controller.registerHandler(XHTMLElementHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI);
+                }
+
+                // Swallow XForms elements that are unknown
+                controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+                controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
+                controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XBL_NAMESPACE_URI);
+            }
+
+            // Create the output SAX pipeline:
+            //
+            // o perform URL rewriting
+            // o serialize to String
+            //
+            // NOTE: we could possibly hook-up the standard epilogue here, which would:
+            //
+            // o perform URL rewriting
+            // o apply the theme
+            // o serialize
+            //
+            // But this would raise some issues:
+            //
+            // o epilogue must match on xhtml:* instead of xhtml:html
+            // o themes must be modified to support XHTML fragments
+            // o serialization must output here, not to the ExternalContext OutputStream
+            //
+            // So for now, perform simple steps here, and later this can be revisited.
+            //
+            final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
+            final boolean skipRootElement = !(control2 instanceof XFormsRepeatControl); // a little hacky to do this here, knowledge should be in control itself
+            controller.setOutput(new DeferredContentHandlerImpl(new XHTMLRewrite().getRewriteContentHandler(externalContext,
+                    new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getContentHandler()), skipRootElement), true)));
+
+            // Create handler context
+            final HandlerContext handlerContext = new HandlerContext(controller, pipelineContext, containingDocument, null, externalContext) {
+                @Override
+                public String findXHTMLPrefix() {
+                    // We know we serialize to plain HTML so unlike during initial page show, we don't need a particular prefix
+                    return "";
+                }
+            };
+            handlerContext.restoreContext(control2);
+            controller.setElementHandlerContext(handlerContext);
+
+            attributesImpl.clear();
+            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, control2.getEffectiveId());
+            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "inner-html", attributesImpl);
+            {
+                // Replay into SAX pipeline
+                controller.startDocument();
+                // new SAXLoggerProcessor.DebugContentHandler()
+                containingDocument.getStaticState().getXHTMLDocument().replay(controller, mark);
+                controller.endDocument();
+            }
+            ch.endElement();
+
+        } catch (SAXException e) {
+            throw new OXFException(e);
         }
-        return false;
     }
 
     protected void outputDeleteRepeatTemplate(ContentHandlerHelper ch, XFormsControl xformsControl2, int count) {

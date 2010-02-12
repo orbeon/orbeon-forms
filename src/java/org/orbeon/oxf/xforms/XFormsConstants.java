@@ -279,6 +279,8 @@ public class XFormsConstants {
     public static final QName XXFORMS_DND_QNAME = new QName("dnd", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_UPDATE_QNAME = new QName("update", XXFORMS_NAMESPACE);
+    public static final String XFORMS_FULL_UPDATE = "full";
+    public static final String XFORMS_INCREMENTAL_UPDATE = "incremental";
 
     public static final QName CLASS_QNAME = new QName("class", Namespace.NO_NAMESPACE);
     public static final QName STYLE_QNAME = new QName("style", Namespace.NO_NAMESPACE);

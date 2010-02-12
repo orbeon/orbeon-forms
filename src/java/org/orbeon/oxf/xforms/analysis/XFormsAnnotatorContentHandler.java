@@ -194,8 +194,9 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
             attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
 
             if (saxStore != null) {
+                // Remember mark if xxforms:update="full"
                 final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
-                if ("inner".equals(xxformsUpdate))
+                if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate))
                     metadata.marks.put(reusableStringArray[0], saxStore.getElementMark());
             }
 

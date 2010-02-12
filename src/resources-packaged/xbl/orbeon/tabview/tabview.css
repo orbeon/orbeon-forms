@@ -1,0 +1,8 @@
+/* Style disabled tab headers, as YUI doesn't apply any particular style on its own */
+
+/* Grey out text */
+.yui-skin-sam .xbl-fr-tabview .yui-nav .disabled a { color: #A3A3A3 }
+/* Don't highlight background */
+.yui-skin-sam .xbl-fr-tabview .yui-nav .disabled a:hover { 
+    background:url("../../../ops/yui/assets/skins/sam/sprite.png") repeat-x scroll 0 0 #D8D8D8;
+}

@@ -342,6 +342,9 @@ public class XFormsSelect1Control extends XFormsValueControl {
             if (XFormsSingleNodeControl.isRelevant(otherSelect1Control) != XFormsSingleNodeControl.isRelevant(this)) {
                 // If relevance changed, then we need to send an itemset update
                 return true;
+            } else if (!XFormsSingleNodeControl.isRelevant(this)) {
+                // We were and are non-relevant, no update
+                return false;
             } else {
                 // If the itemsets changed, then we need to send an update
                 // NOTE: This also covers the case where the control was and is non-relevant

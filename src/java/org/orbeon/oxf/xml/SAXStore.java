@@ -70,6 +70,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
 
     private int[] attributeCountBuffer;
     private int attributeCountBufferPosition;
+    private int attributeCount;
 
     private List<String> stringBuffer = new ArrayList<String>();
 
@@ -141,6 +142,10 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         }
 
         return size;
+    }
+
+    public int getAttributesCount() {
+        return attributeCount;
     }
 
     public SAXStore() {
@@ -633,7 +638,9 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
             System.arraycopy(old, 0, attributeCountBuffer, 0, attributeCountBufferPosition);
             addToAttributeBuffer(attributes);
         } else {
-            attributeCountBuffer[attributeCountBufferPosition++] = attributes.getLength();
+            final int count = attributes.getLength();
+            attributeCountBuffer[attributeCountBufferPosition++] = count;
+            attributeCount += count;
             for (int i = 0; i < attributes.getLength(); i++) {
                 stringBuffer.add(attributes.getURI(i));
                 stringBuffer.add(attributes.getLocalName(i));
@@ -717,8 +724,11 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
 
         attributeCountBufferPosition = in.readInt();
         attributeCountBuffer = new int[attributeCountBufferPosition];
-        for (int i = 0; i < attributeCountBufferPosition; i++)
-            attributeCountBuffer[i] = in.readInt();
+        for (int i = 0; i < attributeCountBufferPosition; i++) {
+            final int count = in.readInt();
+            attributeCountBuffer[i] = count;
+            attributeCount += count;
+        }
 
         final int stringBufferSize = in.readInt();
         for (int i = 0; i < stringBufferSize; i++)

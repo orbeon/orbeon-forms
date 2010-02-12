@@ -50,8 +50,8 @@ public class ControlsComparator {
     private ContentHandlerHelper ch;
     private ContentHandlerHelper tempCH;
 
-    // Experimental: how many bytes trigger xxforms:update="full"
-    private static final int FULL_UPDATE_THRESHOLD = 2000;
+    // Experimental: how many updates (here counted in number of attributes) trigger xxforms:update="full"
+    private static final int FULL_UPDATE_THRESHOLD = 20;
 
     public ControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
                               Set<String> valueChangeControlIds, boolean isTestMode) {
@@ -291,29 +291,41 @@ public class ControlsComparator {
             }
 
             // Handle xxforms:update="full"
-            if (mustDoFullUpdate) {
-                if (isFullUpdateLevel) {
-                    // Restore output
+            if (mustDoFullUpdate && !isFullUpdateLevel) {
+                // Ancestor will process full update
+                return false;
+            } else if (isFullUpdateLevel) {
+                if (mustDoFullUpdate) {
+                    // Incremental updates did trigger full updates
+
+                    // Restore output and discard incremental updates
                     ch = tempCH;
                     tempCH = null;
 
-                    // Process update
+                    // Process full update
                     processFullUpdate(mark, control1, control2);
-
-                    return true;
                 } else {
-                    // Return to parent for processing
-                    return false;
+                    // Incremental updates did not trigger full updates
+
+                    // Write out incremental updates
+                    try {
+                        ((SAXStore) ch.getContentHandler()).replay(tempCH.getContentHandler());
+                    } catch (SAXException e) {
+                        throw new OXFException(e);
+                    }
+
+                    // Restore output
+                    ch = tempCH;
+                    tempCH = null;
                 }
             }
-
-//            }
         }
+
         return true;
     }
 
     private boolean mustDoFullUpdate() {
-        return tempCH != null && ((SAXStore) ch.getContentHandler()).getApproximateSize() > FULL_UPDATE_THRESHOLD;
+        return tempCH != null && ((SAXStore) ch.getContentHandler()).getAttributesCount() > FULL_UPDATE_THRESHOLD;
     }
 
     private SAXStore.Mark getUpdateFullMark(XFormsControl control) {

@@ -358,7 +358,7 @@
                             </instance>
                             <instance id="tabview-instance" model-id="my-tabview$tabview-model">
                                 <tabview-instance>
-                                    <index-of-first-relevant-tab>1</index-of-first-relevant-tab>
+                                    <active-tab-position>1</active-tab-position>
                                 </tabview-instance>
                             </instance>
                         </instances>
@@ -366,25 +366,25 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="my-tabview$xf-27" for="my-tabview$xf-26" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-28" for="my-tabview$xf-26" name="class">selected</xxf:attribute>
-                        <xxf:attribute id="my-tabview$xf-30" for="my-tabview$xf-29" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-31" for="my-tabview$xf-29" name="class"/>
-                        <xxf:attribute id="my-tabview$xf-33" for="my-tabview$xf-32" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-34" for="my-tabview$xf-32" name="class"/>
-                        <xxf:control id="my-tabview$xf-35">My label 3</xxf:control>
+                        <xxf:attribute id="my-tabview$xf-34" for="my-tabview$xf-33" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-35" for="my-tabview$xf-33" name="class">selected</xxf:attribute>
                         <xxf:attribute id="my-tabview$xf-37" for="my-tabview$xf-36" name="style"/>
                         <xxf:attribute id="my-tabview$xf-38" for="my-tabview$xf-36" name="class"/>
-                        <xxf:control id="my-tabview$xf-39">My label 4</xxf:control>
-                        <xxf:attribute id="my-tabview$xf-41" for="my-tabview$xf-40" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-42" for="my-tabview$xf-40" name="class"/>
-                        <xxf:control id="my-tabview$xf-43">My label 5</xxf:control>
-                        <xxf:attribute id="my-tabview$xf-45" for="my-tabview$xf-44" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-46" for="my-tabview$xf-44" name="class"/>
-                        <xxf:control id="my-tabview$xf-47">My label 6</xxf:control>
-                        <xxf:attribute id="my-tabview$xf-49" for="my-tabview$xf-48" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-50" for="my-tabview$xf-48" name="class"/>
-                        <xxf:control id="my-tabview$xf-51">My label 7</xxf:control>
+                        <xxf:attribute id="my-tabview$xf-40" for="my-tabview$xf-39" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-41" for="my-tabview$xf-39" name="class"/>
+                        <xxf:control id="my-tabview$xf-42">My label 3</xxf:control>
+                        <xxf:attribute id="my-tabview$xf-44" for="my-tabview$xf-43" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-45" for="my-tabview$xf-43" name="class"/>
+                        <xxf:control id="my-tabview$xf-46">My label 4</xxf:control>
+                        <xxf:attribute id="my-tabview$xf-48" for="my-tabview$xf-47" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-49" for="my-tabview$xf-47" name="class"/>
+                        <xxf:control id="my-tabview$xf-50">My label 5</xxf:control>
+                        <xxf:attribute id="my-tabview$xf-52" for="my-tabview$xf-51" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-53" for="my-tabview$xf-51" name="class"/>
+                        <xxf:control id="my-tabview$xf-54">My label 6</xxf:control>
+                        <xxf:attribute id="my-tabview$xf-56" for="my-tabview$xf-55" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-57" for="my-tabview$xf-55" name="class"/>
+                        <xxf:control id="my-tabview$xf-58">My label 7</xxf:control>
                         <xxf:control id="my-tabview$fr-tabview-select-1" class="fr-tabview-select-1"/>
                         <xxf:attribute id="my-tabview$fr-tabview-select-1" for="my-tabview$fr-tabview-select-1" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-tabview$fr-tabview-deselect-1" class="fr-tabview-deselect-1"/>

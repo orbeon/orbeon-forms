@@ -253,7 +253,7 @@
                             </instance>
                             <instance id="tabview-instance" model-id="my-tabview$tabview-model">
                                 <tabview-instance>
-                                    <index-of-first-relevant-tab>1</index-of-first-relevant-tab>
+                                    <active-tab-position>1</active-tab-position>
                                 </tabview-instance>
                             </instance>
                         </instances>
@@ -261,10 +261,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="my-tabview$xf-18" for="my-tabview$xf-17" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-19" for="my-tabview$xf-17" name="class">selected</xxf:attribute>
-                        <xxf:attribute id="my-tabview$xf-21" for="my-tabview$xf-20" name="style"/>
-                        <xxf:attribute id="my-tabview$xf-22" for="my-tabview$xf-20" name="class"/>
+                        <xxf:attribute id="my-tabview$xf-20" for="my-tabview$xf-19" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-21" for="my-tabview$xf-19" name="class">selected</xxf:attribute>
+                        <xxf:attribute id="my-tabview$xf-23" for="my-tabview$xf-22" name="style"/>
+                        <xxf:attribute id="my-tabview$xf-24" for="my-tabview$xf-22" name="class"/>
                         <xxf:control id="my-tabview$output1">42</xxf:control>
                         <xxf:control id="my-tabview$output2">42</xxf:control>
                         <xxf:control id="my-tabview$fr-tabview-select-1" class="fr-tabview-select-1"/>

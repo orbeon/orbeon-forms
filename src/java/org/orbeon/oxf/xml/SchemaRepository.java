@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xml;
 
@@ -57,7 +57,7 @@ public class SchemaRepository {
     private static final String PROCESSORS_SCHEMA_PATH = BASE_PATH + "processor/";
     private static final String PORTLET_PROCESSORS_SCHEMA_PATH = BASE_PATH + "portlet/processor/";
 
-    private static final Map SCHEMAS = new HashMap();
+    private static final Map<String, String> SCHEMAS = new HashMap<String, String>();
 
     private static SchemaRepository instance;
 
@@ -181,7 +181,7 @@ public class SchemaRepository {
         }
 
         // Not defined in properties: try predefined Orbeon Forms schemas
-        final String schemaFile = (String) SCHEMAS.get(publicId);
+        final String schemaFile = SCHEMAS.get(publicId);
         if (schemaFile != null) {
             if (schemaFile.startsWith("/"))
                 return "oxf:" + schemaFile;

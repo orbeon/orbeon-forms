@@ -313,6 +313,8 @@ ORBEON.util.Dom = {
      * that getElementById() may return elements that are no longer in the main document.
      */
     getElementById: function(controlId) {
+        return YAHOO.util.Dom.get(controlId);
+        /*
         var result = ORBEON.xforms.Globals.idToElement[controlId];
         if (result == null || result.id != controlId) {
             result = ORBEON.util.Dom.getElementByIdNoCache(controlId);
@@ -320,9 +322,12 @@ ORBEON.util.Dom = {
                 ORBEON.xforms.Globals.idToElement[controlId] = result;
         }
         return result;
+        */
     },
 
     getElementByIdNoCache: function(controlId) {
+        return YAHOO.util.Dom.get(controlId);
+        /*
         var result = document.getElementById(controlId);
         if (result && (result.id != controlId) && document.all) {
             result = null;
@@ -341,6 +346,7 @@ ORBEON.util.Dom = {
             }
         }
         return result;
+        */
     },
 
     /**

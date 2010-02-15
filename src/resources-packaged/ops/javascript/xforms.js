@@ -493,11 +493,6 @@ ORBEON.util.Dom = {
         newInputElement.setAttribute("size", inputElement.size);
         newInputElement.setAttribute("unselectable", "on");// the server sets this, so we have to set it again
         parentElement.replaceChild(newInputElement, inputElement);
-        // For non-W3C compliant browsers we must re-register a listener on the new element we just created
-        if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
-            ORBEON.xforms.Init.registerChangeListenerOnFormElement(newInputElement);
-        }
-
         return null;
     },
 
@@ -2859,9 +2854,20 @@ ORBEON.xforms.Events = {
     },
 
     focus: function(event) {
+        var eventTarget = YAHOO.util.Event.getTarget(event);
+        // If the browser does not support capture, register listener for change on capture
+        if (YAHOO.lang.isUndefined(document.addEventListener)) {
+            YAHOO.util.Dom.generateId(eventTarget);
+            var changeListenerElement = ORBEON.xforms.Globals.changeListeners[eventTarget.id];
+            var needToRegisterChangeListener = YAHOO.lang.isUndefined(changeListenerElement) || changeListenerElement != eventTarget;
+            if (needToRegisterChangeListener) {
+                YAHOO.util.Event.addListener(eventTarget, "change", ORBEON.xforms.Events.change);
+                ORBEON.xforms.Globals.changeListeners[eventTarget.id] = eventTarget;
+            }
+        }
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             // Control elements
-            var targetControlElement = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+            var targetControlElement = ORBEON.xforms.Events._findParentXFormsControl(eventTarget);
             // NOTE: Below we use getElementByIdNoCache() because it may happen that the element has been removed from
             // a repeat iteration. The id cache should be improved to handle this better so we don't have to do this.
             var currentFocusControlElement = ORBEON.xforms.Globals.currentFocusControlId != null ? ORBEON.util.Dom.getElementByIdNoCache(ORBEON.xforms.Globals.currentFocusControlId) : null;
@@ -4462,47 +4468,6 @@ ORBEON.xforms.Init = {
         return ORBEON.xforms.Init._specialControlsInitFunctions;
     },
 
-    registerChangeListenerOnFormElements: function() {
-        for (var i = 0; i < document.forms.length; i++) {
-            var form = document.forms[i];
-            if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
-                var elementCount = form.elements.length;
-                for (var j = 0; j < elementCount; j++) {
-                    var element = form.elements[j];
-                    if (element.id != null && element.id != "") {// No need to handle listeners on elements which don't have an id
-                        ORBEON.xforms.Init.registerChangeListenerOnFormElement(element);
-                    }
-                }
-            }
-        }
-    },
-
-    removeChangeListenerOnFormElements: function() {
-        for (var i = 0; i < document.forms.length; i++) {
-            var form = document.forms[i];
-            if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
-                var elementCount = form.elements.length;
-                for (var j = 0; j < elementCount; j++) {
-                    var element = form.elements[j];
-                    if (element.id != null && element.id != "") {// No need to handle listeners on elements which don't have an id
-                        ORBEON.xforms.Init.removeChangeListenerOnFormElement(element);
-                    }
-                }
-            }
-        }
-    },
-
-    /**
-     * For IE, since we haven't found a way to have one listener on the whole document the "change" event.
-     */
-    registerChangeListenerOnFormElement: function(element) {
-        YAHOO.util.Event.addListener(element, "change", ORBEON.xforms.Events.change);
-    },
-
-    removeChangeListenerOnFormElement: function(element) {
-        YAHOO.util.Event.removeListener(element, "change", ORBEON.xforms.Events.change);
-    },
-
     registerDraggableListenersOnRepeatElements: function(form) {
         return;
         var dndElements = YAHOO.util.Dom.getElementsByClassName("xforms-dnd", null, form);
@@ -4600,6 +4565,7 @@ ORBEON.xforms.Init = {
             formServerEvents: {},                // Server events information
             formClientState: {},                 // Store for information we want to keep when the page is reloaded
             modalProgressPanel: null,            // Overlay modal panel for displaying progress bar
+            changeListeners: {},                 // Maps control id to DOM element for which we have registered a change listener
             topLevelListenerRegistered:          // Have we already registered the listeners on the top-level elements, which never change
                 ORBEON.xforms.Globals.topLevelListenerRegistered == null ? false : ORBEON.xforms.Globals.topLevelListenerRegistered
         };
@@ -4620,18 +4586,15 @@ ORBEON.xforms.Init = {
         if (ORBEON.util.Utils.getProperty(OFFLINE_SUPPORT_PROPERTY))
             ORBEON.xforms.Offline.pageLoad();
 
-        // Register event handlers using capture phase for W3C-compliant browsers
-        if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
-            ORBEON.xforms.Init.registerChangeListenerOnFormElements();
-            if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
-                // Use YUI
+        if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
+            if (YAHOO.lang.isUndefined(document.addEventListener)) {
+                // For browsers that don't support the capture mode (IE) register listener for the non-standard
+                // focusin and focusout events (which do bubble), and we'll register the listener for change on the
+                // element on focus
                 YAHOO.util.Event.addListener(document, "focusin", ORBEON.xforms.Events.focus);
                 YAHOO.util.Event.addListener(document, "focusout", ORBEON.xforms.Events.blur);
-                YAHOO.util.Event.addListener(document, "change", ORBEON.xforms.Events.change);
-            }
-        } else {
-            if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
-                // Use DOM API
+            } else {
+                // Register event handlers using capture phase for W3C-compliant browsers
                 document.addEventListener("focus", ORBEON.xforms.Events.focus, true);
                 document.addEventListener("blur", ORBEON.xforms.Events.blur, true);
                 document.addEventListener("change", ORBEON.xforms.Events.change, true);
@@ -6171,11 +6134,6 @@ ORBEON.xforms.Server = {
                                                 ORBEON.xforms.Init.insertedElement(newTemplateNode);
                                             }
                                         }
-                                        // Initialize newly added form elements. We don't need to do this for IE, because with
-                                        // IE when an element is cloned, the clone has the same event listeners as the original.
-                                        if (ORBEON.xforms.Globals.isRenderingEngineWebCore13) {
-                                            ORBEON.xforms.Init.registerChangeListenerOnFormElements();
-                                        }
                                         ORBEON.xforms.Init.registerDraggableListenersOnRepeatElements();
                                     }
 
@@ -6384,8 +6342,6 @@ ORBEON.xforms.Server = {
                                                     select = documentElement.getElementsByTagName("select")[0];
                                                 // Must now update the cache
                                                 ORBEON.xforms.Globals.idToElement[controlId] = select;
-                                                // For non-W3C compliant browsers we must re-register a listener on the new element we just created
-                                                ORBEON.xforms.Init.registerChangeListenerOnFormElement(select);
                                             } else {
                                                 // Version for compliant browsers
                                                 select.innerHTML = sb.join("");
@@ -6621,20 +6577,11 @@ ORBEON.xforms.Server = {
                                                     return newInputElement;
                                                 }
 
-                                                function insertInputs(inputs) {
-                                                    insertIntoDocument(inputs);
-                                                    // For non-W3C compliant browsers we must re-register a listener on the new element we just created
-                                                    if (ORBEON.xforms.Globals.isRenderingEngineTrident) {
-                                                        for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++)
-                                                            ORBEON.xforms.Init.registerChangeListenerOnFormElement(inputs[inputIndex]);
-                                                    }
-                                                }
-
                                                 if (isStringType) {
-                                                    insertInputs([createInput("xforms-type-string", 1)]);
+                                                    insertIntoDocument([createInput("xforms-type-string", 1)]);
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-string");
                                                 } else if (isDateType && !isMinimal) {
-                                                    insertInputs([createInput("xforms-type-date", 1)]);
+                                                    insertIntoDocument([createInput("xforms-type-date", 1)]);
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
                                                 } else if (isDateType && isMinimal) {
                                                     // Create image element
@@ -6644,10 +6591,10 @@ ORBEON.xforms.Server = {
                                                     insertIntoDocument([image]);
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
                                                 } else if (isTimeType) {
-                                                    insertInputs([createInput("xforms-type-time", 1)]);
+                                                    insertIntoDocument([createInput("xforms-type-time", 1)]);
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-time");
                                                 } else if (isDateTimeType) {
-                                                    insertInputs([createInput("xforms-type-date", 1), createInput("xforms-type-time", 2)]);
+                                                    insertIntoDocument([createInput("xforms-type-date", 1), createInput("xforms-type-time", 2)]);
                                                     ORBEON.util.Dom.addClass(documentElement, "xforms-type-dateTime");
                                                 } else if (isBooleanType) {
 

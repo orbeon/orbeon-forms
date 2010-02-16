@@ -323,11 +323,11 @@ public class XPathCache {
 
                     if (prefixToURIMap != null) {
                         final Map<String, String> sortedMap = (prefixToURIMap instanceof TreeMap) ? prefixToURIMap : new TreeMap<String, String>(prefixToURIMap);// this should make sure we always get the keys in the same order
-                        for (Map.Entry currentEntry: sortedMap.entrySet()) {
+                        for (Map.Entry<String,String> currentEntry: sortedMap.entrySet()) {
                             cacheKeyString.append('|');
-                            cacheKeyString.append((String) currentEntry.getKey());
+                            cacheKeyString.append(currentEntry.getKey());
                             cacheKeyString.append('=');
-                            cacheKeyString.append((String) currentEntry.getValue());
+                            cacheKeyString.append(currentEntry.getValue());
                         }
                     }
 
@@ -389,7 +389,7 @@ public class XPathCache {
 
     private static ValidationException handleXPathException(Exception e, String xpathString, String description, LocationData locationData) {
         final ValidationException validationException = ValidationException.wrapException(e, new ExtendedLocationData(locationData, description,
-                    new String[] { "expression", xpathString } ));
+                "expression", xpathString));
 
         // Details of ExtendedLocationData passed are discarded by the constructor for ExtendedLocationData above,
         // so we need to explicitly add them.

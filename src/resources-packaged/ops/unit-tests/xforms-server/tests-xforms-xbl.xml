@@ -3401,4 +3401,15 @@
         </output>
     </test>
 
+    <!--
+
+    TODO: more XLB ids tests:
+
+    * test that LHHA with @for resolve ids in proper context
+    * test scoping with ev:observer and repeats/XBL scope
+    * test change of scope in inner action, e.g.:
+    * test xxforms:repeat-indexes resolution on actions, y.c. from within XBL component within repeat, and to tested repeat controls
+
+    -->
+
 </group>

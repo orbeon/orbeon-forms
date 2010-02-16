@@ -2645,4 +2645,17 @@
         </output>
     </test>
 
+    <!--
+
+    TODO:
+
+    * test xforms-enabled events upon new repeat iteration
+    * test same but with changes between new repeat iteration and next refresh
+    * test xforms-disabled events upon removed repeat iteration
+    * test init events
+    * index() on capture vs. bubbling (old vs. new index)
+    * index() in xf:label/xf:output
+
+    -->
+
 </group>

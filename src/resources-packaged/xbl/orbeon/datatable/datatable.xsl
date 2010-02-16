@@ -610,7 +610,8 @@
                     <xhtml:div class="yui-dt yui-dt-scrollable {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''}"
                         style="{$height} {$width}">
                         <xsl:variable name="table">
-                            <xhtml:table id="{$id}-table" class="{@class} datatable datatable-{$id} yui-dt-table " style="{$height} {$width}">
+                            <xhtml:table id="{$id}-table" class="{@class} datatable datatable-{$id} yui-dt-table "
+                                style="{if ($scrollV) then $height else ''} {if ($scrollH) then $width else ''}">
                                 <!-- Copy attributes that are not parameters! -->
                                 <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id', 'class'))]" mode="dynamic"/>
                                 <xhtml:thead id="{$id}-thead">
@@ -624,7 +625,7 @@
                         <xsl:choose>
                             <xsl:when test="$scrollH or $scrollV">
                                 <!-- The table needs to be split -->
-                                <xhtml:div class="fr-datatable-offscreen yui-dt-hd" style="{$width}">
+                                <xhtml:div class="fr-datatable-collapsed yui-dt-hd" style="{$width}">
                                     <xsl:variable name="tHead">
                                         <xsl:apply-templates select="$table" mode="headerIsolation"/>
                                     </xsl:variable>
@@ -641,7 +642,7 @@
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </xhtml:div>
-                                <xhtml:div class="fr-datatable-offscreen" style="overflow: scroll {$width}">
+                                <xhtml:div class="yui-dt-hd" style="overflow: scroll; {$width} {$height}">
                                     <xsl:apply-templates select="$table" mode="bodyFiltering"/>
                                 </xhtml:div>
                             </xsl:when>

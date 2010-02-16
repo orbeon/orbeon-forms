@@ -119,24 +119,24 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
     // See how big the table would be without its size restriction  (for scrollable tables)
     // To do so, temporarily remove the yui-dt-bd class to the table container so that its header is shown
 
-    if (this.headBodySplit) {
-        YAHOO.util.Dom.addClass(this.table.parentNode, 'fr-datatable-offscreen');
-        YAHOO.util.Dom.removeClass(this.table.parentNode, 'yui-dt-bd');
-    }
+    //if (this.headBodySplit) {
+    //    YAHOO.util.Dom.addClass(this.table.parentNode, 'fr-datatable-offscreen');
+    //    YAHOO.util.Dom.removeClass(this.table.parentNode, 'yui-dt-bd');
+    //}
 
     // Remove width restrictions if needed
-    if (this.scrollH) {
-        if (this.innerTableWidth != null) {
-            YAHOO.util.Dom.setStyle(this.table, 'width', this.innerTableWidth);
-        } else {
-            YAHOO.util.Dom.setStyle(this.table, 'width', 'auto');
-        }
-    }
+    //if (this.scrollH) {
+    //    if (this.innerTableWidth != null) {
+    //        YAHOO.util.Dom.setStyle(this.table, 'width', this.innerTableWidth);
+    //    } else {
+    //        YAHOO.util.Dom.setStyle(this.table, 'width', 'auto');
+    //    }
+    //}
 
     // Remove height restrictions if needed
-    if (this.scrollV) {
-        YAHOO.util.Dom.setStyle(this.table, 'height', 'auto');
-    }
+    //if (this.scrollV) {
+    //    YAHOO.util.Dom.setStyle(this.table, 'height', 'auto');
+    //}
 
     // Measure the table width
     this.tableWidth = this.table.clientWidth;
@@ -145,8 +145,9 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
     }
 
     // Measure the table and header heights
-    this.tableHeight = this.table.clientHeight;
+    //this.tableHeight = this.table.clientHeight;
     this.headerHeight = this.table.tHead.rows[0].clientHeight;
+    this.tableHeight = this.table.clientHeight;
 
     // Do some magic adjustments
     if (this.scrollH) {
@@ -238,8 +239,8 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
         }
 
         YAHOO.util.Dom.addClass(this.table.parentNode, 'yui-dt-bd');
-        YAHOO.util.Dom.removeClass(this.headerContainer, 'fr-datatable-offscreen');
-        YAHOO.util.Dom.removeClass(this.table.parentNode, 'fr-datatable-offscreen');
+        YAHOO.util.Dom.removeClass(this.table.parentNode, 'yui-dt-hd');
+        YAHOO.util.Dom.removeClass(this.headerContainer, 'fr-datatable-collapsed');
     }
 
 
@@ -320,7 +321,7 @@ ORBEON.widgets.datatable.prototype.initColumns = function () {
 ORBEON.widgets.datatable.prototype.getActualOriginalWidth = function () {
 
     var pxWidth;
-    if (this.originalWidth.indexOf('%') != - 1) {
+    if (this.originalWidth.indexOf('%') != - 1 && false) {
         // the following block is required to calculate the width in a way that works for IE 6.0 :(
         this.headerContainer.style.overflow = "hidden";
         this.headerContainer.style.width = this.originalWidth;
@@ -330,7 +331,7 @@ ORBEON.widgets.datatable.prototype.getActualOriginalWidth = function () {
         this.headerContainer.style.overflow = "";
         this.headerContainer.style.width = "";
     } else {
-        pxWidth = this.table.clientWidth;
+        pxWidth = this.container.clientWidth;
     }
     return pxWidth;
 

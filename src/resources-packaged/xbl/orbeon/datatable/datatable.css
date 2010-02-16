@@ -45,3 +45,11 @@
     position: absolute;
     top: -5000px;
 }
+
+.fr-datatable-hidden {
+    visibility: hidden;
+}
+
+.fr-datatable-collapsed {
+    visibility: collapse;
+}

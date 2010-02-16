@@ -26,22 +26,37 @@
  *            {integer} Index (position) of the table in the document. Currently
  *            not used, but might be useful to generate IDs.
  */
-ORBEON.widgets.datatable = function (element, index, innerTableWidth) {
+ORBEON.widgets.datatable = function (container, index, innerTableWidth) {
 
     YAHOO.log("Creating datatable index " + index, "info");
     // Store useful stuff as properties
-    this.initProperties(element, index, innerTableWidth);
+    this.initProperties(container, index, innerTableWidth);
 
     this.finish();
 }
 
-ORBEON.widgets.datatable.prototype.initProperties = function (element, index, innerTableWidth) {
-    this.table = element;
-    YAHOO.util.Dom.addClass(this.table, 'fr-dt-initialized');
+ORBEON.widgets.datatable.prototype.initProperties = function (container, index, innerTableWidth) {
     this.index = index;
     this.innerTableWidth = innerTableWidth;
-    this.header = this.table;
-    this.thead = YAHOO.util.Selector.query('thead', this.table, true);
+    this.container = YAHOO.util.Selector.query('div.yui-dt', this.container, false)[0];
+    YAHOO.util.Dom.addClass(this.container, 'fr-dt-initialized');
+
+    this.scrollV = YAHOO.util.Dom.hasClass(this.container, 'fr-scrollV');
+    this.scrollH = YAHOO.util.Dom.hasClass(this.container, 'fr-scrollH');
+    this.scroll = this.scrollV || this.scrollH;
+    this.headBodySplit = this.scroll;
+
+    var tables = YAHOO.util.Selector.query('table', this.container, false);
+    this.header = tables[0];
+    this.header.style.height = "";
+
+    if (this.headBodySplit) {
+        this.table = tables[1];
+    } else {
+        this.table = tables[0];
+    }
+
+    this.thead = YAHOO.util.Selector.query('thead', this.header, true);
     this.tbody = YAHOO.util.Selector.query('tbody', this.table, true);
     this.getAndSetColumns();
     var plainId = this.table.getAttribute('id');
@@ -52,36 +67,64 @@ ORBEON.widgets.datatable.prototype.initProperties = function (element, index, in
     this.originalWidth = ORBEON.widgets.datatable.utils.getStyle(this.table, 'width', 'auto');
     this.originalHeight = ORBEON.widgets.datatable.utils.getStyle(this.table, 'height', 'auto');
     this.height = ORBEON.widgets.datatable.utils.getStyle(this.table, 'height', 'auto');
-    this.scrollV = YAHOO.util.Dom.hasClass(this.table, 'fr-scrollV');
-    this.scrollH = YAHOO.util.Dom.hasClass(this.table, 'fr-scrollH');
-    this.scroll = this.scrollV || this.scrollH;
-    this.headBodySplit = this.scroll;
     this.hasFixedWidthContainer = this.originalWidth != 'auto';
     this.hasFixedWidthTable = this.hasFixedWidthContainer && ! this.scrollH;
     this.adjustHeightForIE = false;
-    this.headerContainer = this.table.parentNode;
-    this.container = this.headerContainer.parentNode
+    if (this.scrollV) {
+        this.headerScrollContainer = this.header.parentNode;
+        this.headerContainer = this.headerScrollContainer.parentNode;
+    } else {
+        this.headerContainer = this.header.parentNode;        
+    }
+    this.bodyContainer = this.table.parentNode;
+
 }
 
 ORBEON.widgets.datatable.prototype.finish = function () {
 
-    var width = this.originalWidth;
-    var pxWidth;
+    this.setSizes();
 
-    if (width.indexOf('%') != - 1) {
-        // the following block is required to calculate the width in a way that works for IE 6.0 :(
-        this.headerContainer.style.overflow = "hidden";
-        this.headerContainer.style.width = this.originalWidth;
-        var pxWidth = this.headerContainer.clientWidth;
-        // Convert % into px...
-        width = pxWidth + 'px';
-        this.headerContainer.style.overflow = "";
-        this.headerContainer.style.width = "";
+    if (this.scrollH) {
+        YAHOO.util.Event.addListener(this.bodyContainer, 'scroll', ORBEON.widgets.datatable.scrollHandler, this, true);
+        this.width = this.container.clientWidth;
+        if (this.tableWidth > this.width) {
+            this.bodyContainer.style.overflowX = "scroll";
+        }
     } else {
-        pxWidth = this.table.clientWidth;
+        this.width = this.tableWidth;
     }
 
-    // See how big the table would be without its size restriction
+    this.initColumns();
+    
+    // Now that the table has been properly sized, reconsider its
+    // "resizeability"
+
+    if (this.hasFixedWidthContainer && this.hasFixedWidthTable) {
+        // These are fixed width tables without horizontal scroll bars
+        // and as we don't know how to resize their columns properly,
+        // we'd better consider that as variable width
+        this.hasFixedWidthContainer = false;
+        this.hasFixedWidthTable = false;
+    }
+    YAHOO.log("Datatable index " + this.index + 'created with width: ' + this.width + ', table width: ' + this.tableWidth, "info")
+
+}
+
+ORBEON.widgets.datatable.prototype.setSizes = function () {
+
+    var width = this.originalWidth;
+    var pxWidth = this.getActualOriginalWidth();
+
+
+    // See how big the table would be without its size restriction  (for scrollable tables)
+    // To do so, temporarily remove the yui-dt-bd class to the table container so that its header is shown
+
+    if (this.headBodySplit) {
+        YAHOO.util.Dom.addClass(this.table.parentNode, 'fr-datatable-offscreen');
+        YAHOO.util.Dom.removeClass(this.table.parentNode, 'yui-dt-bd');
+    }
+
+    // Remove width restrictions if needed
     if (this.scrollH) {
         if (this.innerTableWidth != null) {
             YAHOO.util.Dom.setStyle(this.table, 'width', this.innerTableWidth);
@@ -89,16 +132,23 @@ ORBEON.widgets.datatable.prototype.finish = function () {
             YAHOO.util.Dom.setStyle(this.table, 'width', 'auto');
         }
     }
+
+    // Remove height restrictions if needed
     if (this.scrollV) {
         YAHOO.util.Dom.setStyle(this.table, 'height', 'auto');
     }
 
+    // Measure the table width
     this.tableWidth = this.table.clientWidth;
     if (this.tableWidth < pxWidth) {
         this.tableWidth = pxWidth;
     }
+
+    // Measure the table and header heights
     this.tableHeight = this.table.clientHeight;
-    this.headerHeight = this.thead.rows[0].clientHeight;
+    this.headerHeight = this.table.tHead.rows[0].clientHeight;
+
+    // Do some magic adjustments
     if (this.scrollH) {
         if (pxWidth > this.tableWidth) {
             // Can be the case if table width was expressed as %
@@ -111,10 +161,10 @@ ORBEON.widgets.datatable.prototype.finish = function () {
             if (this.scrollV) {
                 minWidth = this.tableWidth - 19;
             } else {
-                if (YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8)       {
-                    minWidth = this.tableWidth -1;
+                if (YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8) {
+                    minWidth = this.tableWidth - 1;
                 } else {
-                    minWidth = this.tableWidth; 
+                    minWidth = this.tableWidth;
                 }
 
             }
@@ -130,6 +180,9 @@ ORBEON.widgets.datatable.prototype.finish = function () {
     } else {
         width = (this.tableWidth + 2) + 'px';
     }
+
+    // At last, we know how the table will be sized, it's time to set these sizes
+
     YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
 
     this.adjustHeightForIE = this.adjustHeightForIE || (this.scrollH && ! this.scrollV && this.height == 'auto' && YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8);
@@ -152,73 +205,47 @@ ORBEON.widgets.datatable.prototype.finish = function () {
         //	YAHOO.util.Dom.setStyle(this.headerContainer, 'border', '1px solid #7F7F7F')
     }
 
-    // Store the column widths before any split
-
-    var columnWidths = [];
-    for (var j = 0; j < this.headerColumns.length; j++) {
-        columnWidths[j] = this.headerColumns[j].clientWidth;
+    // Store the column widths while the headers are still visible on the body table
+    this.columnWidths = [];
+    var j=0;
+    for (var i = 0; i < this.table.tHead.rows[0].cells.length; i++) {
+        var cell = this.table.tHead.rows[0].cells[i];
+        if (ORBEON.widgets.datatable.isSignificant(cell)) {
+            this.columnWidths[j] = cell.clientWidth;
+            j += 1;
+        }
     }
 
-    // Split when needed
+    // Do more resizing
+    if (this.height != 'auto') {
+        YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.container.clientHeight - this.headerHeight - 5) + 'px');
+    }
 
-    this.headerScrollWidth = this.tableWidth;
+    
+    // Reset the yui-dt-bd class if we've removed it earlier on
     if (this.headBodySplit) {
+
+        // Final set of size settings
+
         YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
-        // Create a container for the body
-        this.bodyContainer = document.createElement('div');
         YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', width);
-        YAHOO.util.Dom.addClass(this.bodyContainer, 'yui-dt-bd');
-
-        // Duplicate the table to populate the body
-
-        this.table = this.header.cloneNode(true);
-        ORBEON.widgets.datatable.removeIdAttributes(this.table);
-
-        // Move the tbody elements to keep event handler bindings in the visible
-        // tbody
-        var tBody = YAHOO.util.Selector.query('tbody', this.header, true);
-        this.header.removeChild(tBody);
-        this.table.replaceChild(tBody, YAHOO.util.Selector.query('tbody', this.table, true));
-        this.table.removeChild(this.table.tHead);
-
-        // Add an intermediary div to the header to compensate the scroll bar width when needed
-        // also force the scrollbars when scrolling in both directions.
 
         if (this.scrollV) {
-            if (this.headerScrollContainer == undefined) {
-                this.headerScrollContainer = document.createElement('div');
-                this.headerContainer.appendChild(this.headerScrollContainer);
-                this.headerContainer.removeChild(this.header);
-                this.headerScrollContainer.appendChild(this.header);
-            }
             this.headerScrollWidth = this.tableWidth + 20;
             this.headerScrollContainer.style.width = this.headerScrollWidth + 'px';
             this.bodyContainer.style.overflow = "auto";
             this.bodyContainer.style.overflowY = "scroll";
         }
 
-
-        // Do more resizing
-        if (this.height != 'auto') {
-            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.container.clientHeight - this.headerHeight - 5) + 'px');
-        }
-
-        // And more assembly
-        this.container.appendChild(this.bodyContainer);
-        this.bodyContainer.appendChild(this.table);
-
+        YAHOO.util.Dom.addClass(this.table.parentNode, 'yui-dt-bd');
+        YAHOO.util.Dom.removeClass(this.headerContainer, 'fr-datatable-offscreen');
+        YAHOO.util.Dom.removeClass(this.table.parentNode, 'fr-datatable-offscreen');
     }
 
 
-    if (this.scrollH) {
-        YAHOO.util.Event.addListener(this.bodyContainer, 'scroll', ORBEON.widgets.datatable.scrollHandler, this, true);
-        this.width = this.container.clientWidth;
-        if (this.tableWidth > this.width) {
-            this.bodyContainer.style.overflowX = "scroll";
-        }   
-    } else {
-        this.width = this.tableWidth;
-    }
+}
+
+ORBEON.widgets.datatable.prototype.initColumns = function () {
 
     this.colResizers = [];
     this.colSorters = [];
@@ -231,7 +258,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
             this.colResizers[j] = colResizer;
         }
 
-        var width = (columnWidths[j] - 20) + 'px';
+        var width = (this.columnWidths[j] - 20) + 'px';
         var rule;
         // See _setColumnWidth in YUI datatable.js...
         if (YAHOO.env.ua.ie == 0) {
@@ -286,19 +313,29 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 
     }
 
-    // Now that the table has been properly sized, reconsider its
-    // "resizeability"
-
-    if (this.hasFixedWidthContainer && this.hasFixedWidthTable) {
-        // These are fixed width tables without horizontal scroll bars
-        // and as we don't know how to resize their columns properly,
-        // we'd better consider that as variable width
-        this.hasFixedWidthContainer = false;
-        this.hasFixedWidthTable = false;
-    }
-    YAHOO.log("Datatable index " + this.index + 'created with width: ' + this.width + ', table width: ' + this.tableWidth, "info")
 
 }
+
+
+ORBEON.widgets.datatable.prototype.getActualOriginalWidth = function () {
+
+    var pxWidth;
+    if (this.originalWidth.indexOf('%') != - 1) {
+        // the following block is required to calculate the width in a way that works for IE 6.0 :(
+        this.headerContainer.style.overflow = "hidden";
+        this.headerContainer.style.width = this.originalWidth;
+        var pxWidth = this.headerContainer.clientWidth;
+        // Convert % into px...
+        width = pxWidth + 'px';
+        this.headerContainer.style.overflow = "";
+        this.headerContainer.style.width = "";
+    } else {
+        pxWidth = this.table.clientWidth;
+    }
+    return pxWidth;
+
+}
+
 
 ORBEON.widgets.datatable.prototype.reset = function () {
     // undo the split so that the size can be computed accurately
@@ -345,10 +382,10 @@ ORBEON.widgets.datatable.prototype.reset = function () {
         }
     }
     // Remove the containers widths and heights
-    this.container.style.height='';
-    this.headerContainer.style.height='';
-    this.container.style.width='';
-    this.headerContainer.style.width='';
+    this.container.style.height = '';
+    this.headerContainer.style.height = '';
+    this.container.style.width = '';
+    this.headerContainer.style.width = '';
 
     // remove the dynamic style sheet if it exists
     if (this.styleElt != undefined) {
@@ -705,17 +742,17 @@ ORBEON.widgets.datatable.initLoadingIndicator = function(target, scrollV, scroll
     var div = YAHOO.util.Dom.getFirstChild(target);
     var subDiv = YAHOO.util.Dom.getFirstChild(div);
     var table = YAHOO.util.Dom.getFirstChild(subDiv);
-    var region =    YAHOO.util.Dom.getRegion(table);
+    var region = YAHOO.util.Dom.getRegion(table);
     var curTableWidth = region.right - region.left;
     if (curTableWidth < 50) {
-        YAHOO.util.Dom.setStyle(table, 'width', '50px');    
+        YAHOO.util.Dom.setStyle(table, 'width', '50px');
     }
     if (scrollV) {
-        if (YAHOO.env.ua.ie == 6 && target.hasBeenAdjusted == undefined ) {
+        if (YAHOO.env.ua.ie == 6 && target.hasBeenAdjusted == undefined) {
             // This is a hack to adjust the indicator height in IE6 :(
-            region =    YAHOO.util.Dom.getRegion(div);
+            region = YAHOO.util.Dom.getRegion(div);
             var curHeight = region.bottom - region.top;
-            var heightProp =   (curHeight - 4) + 'px'    ;
+            var heightProp = (curHeight - 4) + 'px'    ;
             YAHOO.util.Dom.setStyle(div, 'height', heightProp);
             YAHOO.util.Dom.setStyle(subDiv, 'height', heightProp);
             target.hasBeenAdjusted = true;
@@ -737,12 +774,12 @@ ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
     var id = container.id;
     if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled')) {
         if (ORBEON.widgets.datatable.datatables[id] == undefined || container.fr_dt_initialized == undefined) {
-            var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
-            var region = YAHOO.util.Region.getRegion(table);
+            //var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
+            var region = YAHOO.util.Region.getRegion(container);
             if ((region.left >= 0 && region.top >= 0)
-                && (region.left < region.right) 
-                && (region.top < region.bottom) ) {
-                ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id, innerTableWidth);
+                    && (region.left < region.right)
+                    && (region.top < region.bottom)) {
+                ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(container, id, innerTableWidth);
                 container.fr_dt_initialized = true;
             } else {
                 // Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...

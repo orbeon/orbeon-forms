@@ -40,3 +40,8 @@
 .yui-pg-page input {
     width: 20px;
 }
+
+.fr-datatable-offscreen {
+    position: absolute;
+    top: -5000px;
+}

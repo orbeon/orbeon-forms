@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -70,7 +70,7 @@
         </menu>
         <menu label="Transforming XML">
             <menu-item label="Converters" href="processors-converters"/>
-            <menu-item label="XSLT and TrAX" href="processors-xslt"/>
+            <menu-item label="XSLT and TrAX" href="http://wiki.orbeon.com/forms/doc/xslt-jaxp-processors"/>
             <menu-item label="XInclude" href="processors-xinclude"/>
             <menu-item label="XUpdate" href="processors-xupdate"/>
         </menu>

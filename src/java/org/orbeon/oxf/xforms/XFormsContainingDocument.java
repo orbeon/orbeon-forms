@@ -632,6 +632,8 @@ public class XFormsContainingDocument extends XBLContainer {
 
                 if (!script.getEvent().getName().equals(XFormsEvents.XFORMS_DISABLED)) { // allow xforms-disabled on removed controls
 
+                    // TODO: don't filter
+
                     // Check target
                     final XFormsEventTarget scriptEventTarget = script.getEvent().getTargetObject();
                     final Object currentEventTarget = getObjectByEffectiveId(scriptEventTarget.getEffectiveId());
@@ -815,7 +817,7 @@ public class XFormsContainingDocument extends XBLContainer {
 
                 // Mark the control as dirty, because we may have done a rebuild/recalculate earlier, and this means
                 // the MIPs need to be re-evaluated before being checked below
-                getControls().cloneInitialStateIfNeeded();
+                getControls().cloneInitialStateIfNeeded(pipelineContext);
                 xformsControl.markDirty();
             }
 

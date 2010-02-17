@@ -38,6 +38,8 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
     private boolean isValueEvaluated;
     private String value;
+
+    // External value (evaluated lazily)
     private boolean isExternalValueEvaluated;
     private String externalValue;
 
@@ -58,19 +60,20 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         if (isRelevant()) {
             // Control is relevant
             getValue(propertyContext);
-            getExternalValue(propertyContext);
         } else {
             // Control is not relevant
             isValueEvaluated = true;
             isExternalValueEvaluated = true;
             value = null;
-            externalValue = null;
         }
+
+        // NOTE: We no longer evaluate the external value here, instead we do lazy evaluation. This is good in particular when there
+        // are multiple refreshes during an Ajax request, and LHHA values are only needed in the end.
 
         if (!isRefresh) {
             // Sync values
             previousValue = value;
-            // TODO: what about external value?
+            // Don't need to set external value because not used in isValueChanged()
         }
     }
 
@@ -80,7 +83,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         // Keep previous values
         previousValue = value;
-        // TODO: what about external value?
+        // Don't need to set external value because not used in isValueChanged()
 
         isValueEvaluated = false;
         isExternalValueEvaluated = false;
@@ -174,8 +177,16 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
      * @param propertyContext   current context
      */
     public final String getExternalValue(PropertyContext propertyContext) {
+
+        assert isValueEvaluated : "control value must be evaluated before external value is evaluated";
+
         if (!isExternalValueEvaluated) {
-            evaluateExternalValue(propertyContext);
+            if (isRelevant()) {
+                evaluateExternalValue(propertyContext);
+            } else {
+                // NOTE: if the control is not relevant, nobody should ask about this in the first place
+                setExternalValue(null);
+            }
             isExternalValueEvaluated = true;
         }
         return externalValue;
@@ -200,6 +211,15 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     @Override
+    public Object getBackCopy(PropertyContext propertyContext) {
+
+        // Evaluate lazy values
+        getExternalValue(propertyContext);
+
+        return super.getBackCopy(propertyContext);
+    }
+
+    @Override
     public boolean equalsExternal(PipelineContext pipelineContext, XFormsControl obj) {
 
         if (obj == null || !(obj instanceof XFormsValueControl))
@@ -210,6 +230,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         final XFormsValueControl other = (XFormsValueControl) obj;
 
+        // Compare on external value, not internal value
         if (!XFormsUtils.compareStrings(getExternalValue(pipelineContext), other.getExternalValue(pipelineContext)))
             return false;
 

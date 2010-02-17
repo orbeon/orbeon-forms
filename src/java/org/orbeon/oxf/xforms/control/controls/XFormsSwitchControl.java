@@ -138,7 +138,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     @Override
-    public Object clone() {
+    public Object getBackCopy(PropertyContext propertyContext) {
 
         final XFormsSwitchControl cloned;
 
@@ -149,7 +149,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         final int selectedCaseIndex =  getChildren().indexOf(local.selectedCaseControl);
 
         // Clone this and children
-        cloned = (XFormsSwitchControl) super.clone();
+        cloned = (XFormsSwitchControl) super.getBackCopy(propertyContext);
 
         // Update clone's selected case control to point to one of the cloned children
         final XFormsSwitchControlLocal clonedLocal = (XFormsSwitchControlLocal) cloned.getInitialLocal();

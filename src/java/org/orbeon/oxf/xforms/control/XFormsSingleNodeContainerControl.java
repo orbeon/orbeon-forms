@@ -61,16 +61,16 @@ public abstract class XFormsSingleNodeContainerControl extends XFormsSingleNodeC
     }
 
     @Override
-    public Object clone() {
+    public Object getBackCopy(PropertyContext propertyContext) {
 
         // Clone this
-        final XFormsSingleNodeContainerControl cloned = (XFormsSingleNodeContainerControl) super.clone();
+        final XFormsSingleNodeContainerControl cloned = (XFormsSingleNodeContainerControl) super.getBackCopy(propertyContext);
 
         // Clone children if any
         if (children != null) {
             cloned.children = new ArrayList<XFormsControl>(children.size());
             for (final XFormsControl currentChildControl: children) {
-                final XFormsControl currentChildClone = (XFormsControl) currentChildControl.clone();
+                final XFormsControl currentChildClone = (XFormsControl) currentChildControl.getBackCopy(propertyContext);
                 currentChildClone.setParent(cloned);
                 cloned.children.add(currentChildClone);
             }

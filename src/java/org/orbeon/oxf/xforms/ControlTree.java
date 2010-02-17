@@ -14,12 +14,10 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsControlFactory;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
@@ -32,7 +30,7 @@ import java.util.*;
 /**
  * Represents a tree of XForms controls.
  */
-public class ControlTree implements Cloneable {
+public class ControlTree implements ExternalCopyable {
 
     private final boolean isAllowSendingValueChangedEvents;
     private final boolean isAllowSendingRequiredEvents;
@@ -362,16 +360,21 @@ public class ControlTree implements Cloneable {
         }
     }
 
-    public Object clone() throws CloneNotSupportedException {
+    public Object getBackCopy(PropertyContext propertyContext) {
 
         // Clone this
-        final ControlTree cloned = (ControlTree) super.clone();
+        final ControlTree cloned;
+        try {
+            cloned = (ControlTree) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new OXFException(e);
+        }
 
         // Clone children if any
         if (children != null) {
             cloned.children = new ArrayList<XFormsControl>(children.size());
             for (XFormsControl currentControl: children) {
-                final XFormsControl currentClone = (XFormsControl) currentControl.clone();
+                final XFormsControl currentClone = (XFormsControl) currentControl.getBackCopy(propertyContext);
                 cloned.children.add(currentClone);
             }
         }

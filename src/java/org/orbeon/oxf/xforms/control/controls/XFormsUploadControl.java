@@ -345,8 +345,9 @@ public class XFormsUploadControl extends XFormsValueControl {
         return added;
     }
 
-    public Object clone() {
-        final XFormsUploadControl cloned = (XFormsUploadControl) super.clone();
+    @Override
+    public Object getBackCopy(PropertyContext propertyContext) {
+        final XFormsUploadControl cloned = (XFormsUploadControl) super.getBackCopy(propertyContext);
         // NOTE: this keeps old refs to control/contextStack, is it ok?
         cloned.fileInfo = (FileInfo) fileInfo.clone();
         return cloned;
@@ -478,6 +479,7 @@ class FileInfo implements Cloneable {
         }
     }
 
+    @Override
     public Object clone() {
         try {
             return super.clone();

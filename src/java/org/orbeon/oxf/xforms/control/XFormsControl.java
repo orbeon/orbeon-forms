@@ -49,7 +49,7 @@ import java.util.*;
 /**
  * Represents an XForms control.
  */
-public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObserver, Cloneable {
+public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObserver, ExternalCopyable {
 
     // List of standard extension attributes
     private static final QName[] STANDARD_EXTENSION_ATTRIBUTES = {
@@ -88,21 +88,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     // Optional extension attributes supported by the control
     private Map<QName, String> extensionAttributesValues;
 
-    private String label;
-    private boolean isLabelEvaluated;
-    private boolean isHTMLLabel;
-
-    private String help;
-    private boolean isHelpEvaluated;
-    private boolean isHTMLHelp;
-
-    private String hint;
-    private boolean isHintEvaluated;
-    private boolean isHTMLHint;
-
-    private String alert;
-    private boolean isAlertEvaluated;
-    private boolean isHTMLAlert;
+    // Label, help, hint and alert (evaluated lazily)
+    private LHHA label, help, hint, alert;
 
     final boolean[] tempContainsHTML = new boolean[1];// temporary holder
 
@@ -229,172 +216,80 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return control != null && control.supportsRefreshEvents();
     }
 
-    public String getAlert(PropertyContext propertyContext) {
-        if (!isAlertEvaluated) {
-            if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
-                final Element lhhaElement = containingDocument.getStaticState().getAlertElement(getPrefixedId());
-                alert = getLabelHelpHintAlertValue(propertyContext, lhhaElement, true, tempContainsHTML);
-                isHTMLAlert = alert != null && tempContainsHTML[0];
-            }
-            isAlertEvaluated = true;
-        }
-        return alert;
-    }
-
-    public String getEscapedAlert(PipelineContext pipelineContext) {
-        getAlert(pipelineContext);
-        return isHTMLAlert ? getEscapedHTMLValue(pipelineContext, alert) : XMLUtils.escapeXMLMinimal(alert);
-    }
-
-    public boolean isHTMLAlert(PipelineContext pipelineContext) {
-        getAlert(pipelineContext);
-        return isHTMLAlert;
-    }
-
-    public String getHelp(PropertyContext propertyContext) {
-        if (!isHelpEvaluated) {
-            if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
-                final Element lhhaElement = containingDocument.getStaticState().getHelpElement(getPrefixedId());
-                help = getLabelHelpHintAlertValue(propertyContext, lhhaElement, true, tempContainsHTML);
-                isHTMLHelp = help != null && tempContainsHTML[0];
-            }
-            isHelpEvaluated = true;
-        }
-        return help;
-    }
-
-    public String getEscapedHelp(PipelineContext pipelineContext) {
-        getHelp(pipelineContext);
-        return isHTMLHelp ? getEscapedHTMLValue(pipelineContext, help) : XMLUtils.escapeXMLMinimal(help);
-    }
-
-    public boolean isHTMLHelp(PipelineContext pipelineContext) {
-        getHelp(pipelineContext);
-        return isHTMLHelp;
-    }
-
-    public String getHint(PropertyContext propertyContext) {
-        if (!isHintEvaluated) {
-            if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
-                final Element lhhaElement = containingDocument.getStaticState().getHintElement(getPrefixedId());
-                hint = getLabelHelpHintAlertValue(propertyContext, lhhaElement, isSupportHTMLHints(), tempContainsHTML);
-
-                isHTMLHint = hint != null && tempContainsHTML[0];
-            }
-            isHintEvaluated = true;
-        }
-        return hint;
-    }
-
-    public String getEscapedHint(PipelineContext pipelineContext) {
-        getHint(pipelineContext);
-        return isHTMLHint ? getEscapedHTMLValue(pipelineContext, hint) : XMLUtils.escapeXMLMinimal(hint);
-    }
-
-    public boolean isHTMLHint(PipelineContext pipelineContext) {
-        getHint(pipelineContext);
-        return isHTMLHint;
-    }
-
     public String getLabel(PropertyContext propertyContext) {
-        if (!isLabelEvaluated) {
-            if (!(this instanceof XFormsPseudoControl)) {// protection for RepeatIterationControl
-                final Element lhhaElement = containingDocument.getStaticState().getLabelElement(getPrefixedId());
-                label = getLabelHelpHintAlertValue(propertyContext, lhhaElement, isSupportHTMLLabels(), tempContainsHTML);
-
-                isHTMLLabel = label != null && tempContainsHTML[0];
-            }
-            isLabelEvaluated = true;
+        if (label == null) {
+            final Element lhhaElement = containingDocument.getStaticState().getLabelElement(getPrefixedId());
+            label = (lhhaElement == null) ? NULL_LHHA : new ConcreteLHHA(this, lhhaElement, isSupportHTMLLabels());
         }
-        return label;
+
+        return label.getValue(propertyContext);
     }
 
     public String getEscapedLabel(PipelineContext pipelineContext) {
         getLabel(pipelineContext);
-        return isHTMLLabel ? getEscapedHTMLValue(pipelineContext, label) : XMLUtils.escapeXMLMinimal(label);
+        return label.getEscapedValue(pipelineContext);
     }
 
     public boolean isHTMLLabel(PipelineContext pipelineContext) {
         getLabel(pipelineContext);
-        return isHTMLLabel;
+        return label.isHTML(pipelineContext);
     }
 
-    /**
-     * Get the value of a label, help, hint or alert related to this control.
-     *
-     * @param propertyContext       current context
-     * @param lhhaElement           element associated to the control (either as child or using @for)
-     * @param acceptHTML            whether the result may contain HTML
-     * @param containsHTML          whether the result actually contains HTML (null allowed)
-     * @return                      string containing the result of the evaluation, null if evaluation failed
-     */
-    private String getLabelHelpHintAlertValue(PropertyContext propertyContext, Element lhhaElement, boolean acceptHTML, boolean[] containsHTML) {
-
-        final XFormsContextStack contextStack = getContextStack();
-        final String value;
-        if (lhhaElement == null) {
-            // No LHHA at all
-            value = null;
-        } else if (lhhaElement.getParent() == getControlElement()) {
-            // LHHA is direct child of control, evaluate within context
-            contextStack.setBinding(this);
-            contextStack.pushBinding(propertyContext, lhhaElement, getEffectiveId(), getChildElementScope(lhhaElement));
-            value = XFormsUtils.getElementValue(propertyContext, container, contextStack, getEffectiveId(), lhhaElement, acceptHTML, containsHTML);
-            contextStack.popBinding();
-        } else {
-            // LHHA is somewhere else, assumed as a child of xforms:* or xxforms:*
-
-            // Find context object for XPath evaluation
-            final Element contextElement = lhhaElement.getParent();
-            final String contextStaticId = contextElement.attributeValue("id");
-            final String contextEffectiveId;
-            if (contextStaticId == null) {
-                // Assume we are at the top-level
-                contextStack.resetBindingContext(propertyContext);
-                contextEffectiveId = container.getFirstControlEffectiveId();
-            } else {
-                // Not at top-level, find containing object
-                final XFormsControl ancestorContextControl = findAncestorContextControl(contextStaticId, lhhaElement.attributeValue("id"));
-                if (ancestorContextControl != null) {
-                    contextStack.setBinding(ancestorContextControl);
-                    contextEffectiveId = ancestorContextControl.getEffectiveId();
-                } else {
-                    contextEffectiveId = null;
-                }
-            }
-
-            if (contextEffectiveId != null) {
-                // Push binding relative to context established above and evaluate
-                contextStack.pushBinding(propertyContext, lhhaElement, contextEffectiveId, getResolutionScope());
-                value = XFormsUtils.getElementValue(propertyContext, container, contextStack, getEffectiveId(), lhhaElement, acceptHTML, containsHTML);
-                contextStack.popBinding();
-            } else {
-                // Do as if there was no LHHA
-                value = null;
-            }
+    public String getHelp(PropertyContext propertyContext) {
+        if (help == null) {
+            final Element lhhaElement = containingDocument.getStaticState().getHelpElement(getPrefixedId());
+            help = (lhhaElement == null) ? NULL_LHHA : new ConcreteLHHA(this, lhhaElement, true);
         }
-        return value;
+
+        return help.getValue(propertyContext);
     }
 
-    private XFormsControl findAncestorContextControl(String contextStaticId, String lhhaStaticId) {
-        // NOTE: LHHA element must be in the same resolution scope as the current control (since @for refers to @id)
-        final XBLBindings.Scope lhhaScope = getResolutionScope();
-        final String lhhaPrefixedId = lhhaScope.getPrefixedIdForStaticId(lhhaStaticId);
+    public String getEscapedHelp(PipelineContext pipelineContext) {
+        getHelp(pipelineContext);
+        return help.getEscapedValue(pipelineContext);
+    }
 
-        // Assume that LHHA element is within same repeat iteration as its related control
-        final String contextPrefixedId = XFormsUtils.getRelatedEffectiveId(lhhaPrefixedId, contextStaticId);
-        final String contextEffectiveId = contextPrefixedId + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
-        
-        Object ancestorObject = container.getContainingDocument().getObjectByEffectiveId(contextEffectiveId);
-        while (ancestorObject instanceof XFormsControl) {
-            final XFormsControl ancestorControl = (XFormsControl) ancestorObject;
-            if (ancestorControl.getResolutionScope() == lhhaScope) {
-                // Found ancestor in right scope
-                return ancestorControl;
-            }
-            ancestorObject = ancestorControl.getParent();
+    public boolean isHTMLHelp(PipelineContext pipelineContext) {
+        getHelp(pipelineContext);
+        return help.isHTML(pipelineContext);
+    }
+
+    public String getHint(PropertyContext propertyContext) {
+        if (hint == null) {
+            final Element lhhaElement = containingDocument.getStaticState().getHintElement(getPrefixedId());
+            hint = (lhhaElement == null) ? NULL_LHHA : new ConcreteLHHA(this, lhhaElement, isSupportHTMLHints());
         }
-        return null;
+
+        return hint.getValue(propertyContext);
+    }
+
+    public String getEscapedHint(PipelineContext pipelineContext) {
+        getHint(pipelineContext);
+        return hint.getEscapedValue(pipelineContext);
+    }
+
+    public boolean isHTMLHint(PipelineContext pipelineContext) {
+        getHint(pipelineContext);
+        return hint.isHTML(pipelineContext);
+    }
+
+    public String getAlert(PropertyContext propertyContext) {
+        if (alert == null) {
+            final Element lhhaElement = containingDocument.getStaticState().getAlertElement(getPrefixedId());
+            alert = (lhhaElement == null) ? NULL_LHHA : new ConcreteLHHA(this, lhhaElement, true);
+        }
+
+        return alert.getValue(propertyContext);
+    }
+
+    public String getEscapedAlert(PipelineContext pipelineContext) {
+        getAlert(pipelineContext);
+        return alert.getEscapedValue(pipelineContext);
+    }
+
+    public boolean isHTMLAlert(PipelineContext pipelineContext) {
+        getAlert(pipelineContext);
+        return alert.isHTML(pipelineContext);
     }
 
     /**
@@ -623,10 +518,14 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         // Clear everything
         isEvaluated = false;
-        isLabelEvaluated = false;
-        isHelpEvaluated = false;
-        isHintEvaluated = false;
-        isAlertEvaluated = false;
+        if (label != null)
+            label.markDirty();
+        if (hint != null)
+            hint.markDirty();
+        if (help != null)
+            help.markDirty();
+        if (alert != null)
+            alert.markDirty();
         if (extensionAttributesValues != null)
             extensionAttributesValues.clear();
     }
@@ -639,34 +538,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      */
     protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
 
+        // Relevance is a property of all controls
         setRelevant(computeRelevant());
 
-        if (isRelevant()) {
-            // Control is relevant
-            getLabel(propertyContext);
-            getHint(propertyContext);
-            getHelp(propertyContext);
-            getAlert(propertyContext);
-        } else {
-            // Control is not relevant
-
-            // TODO: if the control is not relevant, nobody should ask about the label
-            label = null;
-            isLabelEvaluated = true;
-            isHTMLLabel = false;
-
-            help = null;
-            isHelpEvaluated= true;
-            isHTMLHelp = false;
-
-            hint = null;
-            isHintEvaluated= true;
-            isHTMLHint = false;
-
-            alert = null;
-            isAlertEvaluated= true;
-            isHTMLAlert = false;
-        }
+        // NOTE: We no longer evaluate LHHA here, instead we do lazy evaluation. This is good in particular when there
+        // are multiple refreshes during an Ajax request, and LHHA values are only needed in the end.
 
         if (!isRefresh) {
             // Sync values
@@ -1103,13 +979,34 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      *
      * @return  new XFormsControl
      */
-    public Object clone() {
+    public Object getBackCopy(PropertyContext propertyContext) {
+        
+        // Evaluate lazy values
+        getLabel(propertyContext);
+        getHelp(propertyContext);
+        getHint(propertyContext);
+        getAlert(propertyContext);
+        
         // NOTE: this.parent is handled by subclasses
         final XFormsControl cloned;
         try {
             cloned = (XFormsControl) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new OXFException(e);
+        }
+
+        // Clone LHHA if not null and not constant
+        if (label != null && label != NULL_LHHA) {
+            cloned.label = (LHHA) label.clone();
+        }
+        if (help != null && help != NULL_LHHA) {
+            cloned.help = (LHHA) help.clone();
+        }
+        if (hint != null && hint != NULL_LHHA) {
+            cloned.hint = (LHHA) hint.clone();
+        }
+        if (alert != null && alert != NULL_LHHA) {
+            cloned.alert = (LHHA) alert.clone();
         }
 
         if (this.currentLocal != null) {
@@ -1227,5 +1124,164 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     protected Set<String> getAllowedExternalEvents() {
         return Collections.emptySet();
+    }
+
+    // Empty LHHA
+    protected static final LHHA NULL_LHHA = new LHHA();
+
+    protected static class LHHA implements Cloneable {
+        public String getValue(PropertyContext propertyContext) {
+            return null;
+        }
+
+        public String getEscapedValue(PipelineContext pipelineContext) {
+            return null;
+        }
+
+        public boolean isHTML(PropertyContext propertyContext) {
+            return false;
+        }
+
+        public void markDirty() {}
+
+        @Override
+        public Object clone() {
+            try {
+                return super.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new OXFException(e);
+            }
+        }
+    }
+
+    // LHHA corresponding to an existing xforms:label, etc. element
+    private static class ConcreteLHHA extends LHHA {
+
+        private final XFormsControl control;
+        private final Element lhhaElement;
+        private final boolean supportsHTML;
+
+        private String value;
+        private boolean isEvaluated;
+        private boolean isHTML;
+
+        public ConcreteLHHA(XFormsControl control, Element lhhaElement, boolean supportsHTML) {
+
+            assert lhhaElement != null : "LHHA element can't be null";
+
+            this.control = control;
+            this.lhhaElement = lhhaElement;
+            this.supportsHTML = supportsHTML;
+        }
+
+        @Override
+        public String getValue(PropertyContext propertyContext) {
+
+            assert control.isEvaluated : "control must be evaluated before LHHA value is evaluated";
+
+            if (!isEvaluated) {
+                if (control.isRelevant()) {
+                    value = getLabelHelpHintAlertValue(propertyContext);
+                    isHTML = value != null && control.tempContainsHTML[0];
+                } else {
+                    // NOTE: if the control is not relevant, nobody should ask about this in the first place
+                    value = null;
+                    isHTML = false;
+                }
+                isEvaluated = true;
+            }
+            return value;
+        }
+
+        @Override
+        public String getEscapedValue(PipelineContext pipelineContext) {
+            getValue(pipelineContext);
+            return isHTML ? control.getEscapedHTMLValue(pipelineContext, value) : XMLUtils.escapeXMLMinimal(value);
+        }
+
+        @Override
+        public boolean isHTML(PropertyContext propertyContext) {
+            getValue(propertyContext);
+            return isHTML;
+        }
+
+        @Override
+        public void markDirty() {
+            value = null;
+            isEvaluated = false;
+            isHTML = false;
+        }
+
+        /**
+         * Get the value of a LHHA related to this control.
+         *
+         * @param propertyContext       current context
+         * @return                      string containing the result of the evaluation, null if evaluation failed
+         */
+        private String getLabelHelpHintAlertValue(PropertyContext propertyContext) {
+
+            final XFormsContextStack contextStack = control.getContextStack();
+            final String value;
+            if (lhhaElement.getParent() == control.getControlElement()) {
+                // LHHA is direct child of control, evaluate within context
+                contextStack.setBinding(control);
+                contextStack.pushBinding(propertyContext, lhhaElement, control.effectiveId, control.getChildElementScope(lhhaElement));
+                value = XFormsUtils.getElementValue(propertyContext, control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, control.tempContainsHTML);
+                contextStack.popBinding();
+            } else {
+                // LHHA is somewhere else, assumed as a child of xforms:* or xxforms:*
+
+                // Find context object for XPath evaluation
+                final Element contextElement = lhhaElement.getParent();
+                final String contextStaticId = contextElement.attributeValue("id");
+                final String contextEffectiveId;
+                if (contextStaticId == null) {
+                    // Assume we are at the top-level
+                    contextStack.resetBindingContext(propertyContext);
+                    contextEffectiveId = control.container.getFirstControlEffectiveId();
+                } else {
+                    // Not at top-level, find containing object
+                    final XFormsControl ancestorContextControl = findAncestorContextControl(contextStaticId, lhhaElement.attributeValue("id"));
+                    if (ancestorContextControl != null) {
+                        contextStack.setBinding(ancestorContextControl);
+                        contextEffectiveId = ancestorContextControl.effectiveId;
+                    } else {
+                        contextEffectiveId = null;
+                    }
+                }
+
+                if (contextEffectiveId != null) {
+                    // Push binding relative to context established above and evaluate
+                    contextStack.pushBinding(propertyContext, lhhaElement, contextEffectiveId, control.getResolutionScope());
+                    value = XFormsUtils.getElementValue(propertyContext, control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, control.tempContainsHTML);
+                    contextStack.popBinding();
+                } else {
+                    // Do as if there was no LHHA
+                    value = null;
+                }
+            }
+            return value;
+        }
+
+        private XFormsControl findAncestorContextControl(String contextStaticId, String lhhaStaticId) {
+            // NOTE: LHHA element must be in the same resolution scope as the current control (since @for refers to @id)
+            final XBLBindings.Scope lhhaScope = control.getResolutionScope();
+            final String lhhaPrefixedId = lhhaScope.getPrefixedIdForStaticId(lhhaStaticId);
+
+            // Assume that LHHA element is within same repeat iteration as its related control
+            final String contextPrefixedId = XFormsUtils.getRelatedEffectiveId(lhhaPrefixedId, contextStaticId);
+            final String contextEffectiveId = contextPrefixedId + XFormsUtils.getEffectiveIdSuffixWithSeparator(control.effectiveId);
+
+            Object ancestorObject = control.container.getContainingDocument().getObjectByEffectiveId(contextEffectiveId);
+            while (ancestorObject instanceof XFormsControl) {
+                final XFormsControl ancestorControl = (XFormsControl) ancestorObject;
+                if (ancestorControl.getResolutionScope() == lhhaScope) {
+                    // Found ancestor in right scope
+                    return ancestorControl;
+                }
+                ancestorObject = ancestorControl.getParent();
+            }
+            return null;
+        }
     }
 }

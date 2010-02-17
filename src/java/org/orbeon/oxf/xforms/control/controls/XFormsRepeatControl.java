@@ -362,7 +362,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         // NOTE: The following assumes the nodesets have changed
 
         final XFormsControls controls = containingDocument.getControls();
-        controls.cloneInitialStateIfNeeded();
+        controls.cloneInitialStateIfNeeded(propertyContext);
 
         final boolean isInsert = insertedNodeInfos != null;
 
@@ -501,6 +501,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             movedIterationsOldPositions = new ArrayList<Integer>();
             movedIterationsNewPositions = new ArrayList<Integer>();
             final XFormsContextStack contextStack = getXBLContainer().getContextStack();
+            contextStack.setBinding(this); // ensure we start with the correct binding
             for (int repeatIndex = 1; repeatIndex <= newSize; repeatIndex++) {// 1-based index
 
                 final int currentOldIndex = oldIndexes[repeatIndex - 1];

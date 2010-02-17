@@ -256,7 +256,6 @@ public class XFormsControls implements XFormsObjectResolver {
      * in XFormsServer.
      *
      * @param propertyContext   current context
-     * @param isRefresh
      */
     private void evaluateControlValuesIfNeeded(PropertyContext propertyContext) {
 
@@ -297,17 +296,13 @@ public class XFormsControls implements XFormsObjectResolver {
      * The rationale for #2 is that there is no controls comparison needed during initialization. Only during further
      * client requests do the controls need to be compared.
      */
-    public void cloneInitialStateIfNeeded() {
+    public void cloneInitialStateIfNeeded(PropertyContext propertyContext) {
         if (initialControlTree == currentControlTree && containingDocument.isHandleDifferences()) {
             indentedLogger.startHandleOperation("controls", "cloning");
             {
-                try {
-                    // NOTE: We clone "back", that is the new tree is used as the "initial" tree. This is done so that
-                    // if we started working with controls in the initial tree, we can keep using those references safely.
-                    initialControlTree = (ControlTree) currentControlTree.clone();
-                } catch (CloneNotSupportedException e) {
-                    throw new OXFException(e);
-                }
+                // NOTE: We clone "back", that is the new tree is used as the "initial" tree. This is done so that
+                // if we started working with controls in the initial tree, we can keep using those references safely.
+                initialControlTree = (ControlTree) currentControlTree.getBackCopy(propertyContext);
             }
             indentedLogger.endHandleOperation();
         }
@@ -331,7 +326,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 return false;
 
             // Clone if needed
-            cloneInitialStateIfNeeded();
+            cloneInitialStateIfNeeded(propertyContext);
 
             indentedLogger.startHandleOperation("controls", "updating bindings");
             final ControlTree.UpdateBindingsListener listener = new ControlTree.UpdateBindingsListener(propertyContext, currentControlTree.getEffectiveIdsToControls());

@@ -402,10 +402,6 @@ public class XFormsProperties {
         return getStateHandling(containingDocument).equals(STATE_HANDLING_CLIENT_VALUE);
     }
 
-    public static boolean isLegacySessionStateHandling(XFormsContainingDocument containingDocument) {
-        return getStateHandling(containingDocument).equals(STATE_HANDLING_SESSION_VALUE);
-    }
-
     public static boolean isNoscript(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, NOSCRIPT_PROPERTY);
     }

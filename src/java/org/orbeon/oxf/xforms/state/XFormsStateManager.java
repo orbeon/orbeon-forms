@@ -28,7 +28,6 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 /**
  * Centralize XForms state management.
  *
- * TODO: Get rid of the old "session" store code as it is replaced by the new persistent store.
  */
 public class XFormsStateManager {
     
@@ -38,11 +37,10 @@ public class XFormsStateManager {
     private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
 
     // All these must have the same length
-    public static final String SESSION_STATE_PREFIX = "sess:";
     public static final String APPLICATION_STATE_PREFIX = "appl:";
     public static final String PERSISTENT_STATE_PREFIX = "pers:";
 
-    private static final int PREFIX_COLON_POSITION = SESSION_STATE_PREFIX.length() - 1;
+    private static final int PREFIX_COLON_POSITION = APPLICATION_STATE_PREFIX.length() - 1;
 
     // Ideally we wouldn't want to force session creation, but it's hard to implement the more elaborate expiration
     // strategy without session. See https://wiki.objectweb.org/ops/Wiki.jsp?page=XFormsStateStoreImprovements
@@ -70,29 +68,13 @@ public class XFormsStateManager {
         final String staticStateString;
         {
             if (!XFormsProperties.isClientStateHandling(containingDocument)) {
-                if (XFormsProperties.isLegacySessionStateHandling(containingDocument)) {
-                    // Legacy session server handling
-
-                    // Produce UUID
-                    if (staticStateUUID == null) {
-                        currentPageGenerationId = UUIDUtils.createPseudoUUID();
-                        staticStateString = SESSION_STATE_PREFIX + currentPageGenerationId;
-                    } else {
-                        // In this case, we first store in the application scope, so that multiple requests can use the
-                        // same cached state.
-                        currentPageGenerationId = staticStateUUID;
-                        staticStateString = APPLICATION_STATE_PREFIX + currentPageGenerationId;
-                    }
+                // Server state handling with persistent store
+                if (staticStateUUID == null) {
+                    currentPageGenerationId = UUIDUtils.createPseudoUUID();
                 } else {
-                    // New server state handling with persistent store
-
-                    if (staticStateUUID == null) {
-                        currentPageGenerationId = UUIDUtils.createPseudoUUID();
-                    } else {
-                        currentPageGenerationId = staticStateUUID;
-                    }
-                    staticStateString = PERSISTENT_STATE_PREFIX + currentPageGenerationId;
+                    currentPageGenerationId = staticStateUUID;
                 }
+                staticStateString = PERSISTENT_STATE_PREFIX + currentPageGenerationId;
             } else {
                 // Encoded static state is just serialized form
                 staticStateString = xformsState.getStaticState();
@@ -103,41 +85,21 @@ public class XFormsStateManager {
         final String dynamicStateString;
         {
             if (!XFormsProperties.isClientStateHandling(containingDocument)) {
-                if (XFormsProperties.isLegacySessionStateHandling(containingDocument)) {
-                    // Legacy session server handling
+                // Server state handling with persistent store
 
-                    if (dynamicStateUUID == null) {
-                        // In this case, we use session scope since not much sharing will occur, if at all.
+                // Get session id if needed
+                final ExternalContext.Session session = externalContext.getSession(FORCE_SESSION_CREATION);
+                final String sessionId = (session != null) ? session.getId() : null;
 
-                        // Produce dynamic state key
-                        final String newRequestId = UUIDUtils.createPseudoUUID();
-                        final XFormsStateStore stateStore = XFormsSessionStateStore.instance(externalContext, true);
-                        stateStore.add(currentPageGenerationId, null, newRequestId, xformsState, null, true);
-                        dynamicStateString = SESSION_STATE_PREFIX + newRequestId;
-                    } else {
-                        // In this case, we first store in the application scope, so that multiple requests can use the
-                        // same cached state.
-                        dynamicStateString = APPLICATION_STATE_PREFIX + dynamicStateUUID;
-                        final XFormsStateStore applicationStateStore = XFormsApplicationStateStore.instance(externalContext);
-                        applicationStateStore.add(currentPageGenerationId, null, dynamicStateUUID, xformsState, null, true);
-                    }
+                final XFormsStateStore stateStore = XFormsPersistentApplicationStateStore.instance(externalContext);
+                if (dynamicStateUUID == null) {
+                    // Produce dynamic state key
+                    final String newRequestId = UUIDUtils.createPseudoUUID();
+                    stateStore.add(currentPageGenerationId, null, newRequestId, xformsState, sessionId, true);
+                    dynamicStateString = PERSISTENT_STATE_PREFIX + newRequestId;
                 } else {
-                    // New server state handling with persistent store
-
-                    // Get session id if needed
-                    final ExternalContext.Session session = externalContext.getSession(FORCE_SESSION_CREATION);
-                    final String sessionId = (session != null) ? session.getId() : null;
-
-                    final XFormsStateStore stateStore = XFormsPersistentApplicationStateStore.instance(externalContext);
-                    if (dynamicStateUUID == null) {
-                        // Produce dynamic state key
-                        final String newRequestId = UUIDUtils.createPseudoUUID();
-                        stateStore.add(currentPageGenerationId, null, newRequestId, xformsState, sessionId, true);
-                        dynamicStateString = PERSISTENT_STATE_PREFIX + newRequestId;
-                    } else {
-                        dynamicStateString = PERSISTENT_STATE_PREFIX + dynamicStateUUID;
-                        stateStore.add(currentPageGenerationId, null, dynamicStateUUID, xformsState, sessionId, true);
-                    }
+                    dynamicStateString = PERSISTENT_STATE_PREFIX + dynamicStateUUID;
+                    stateStore.add(currentPageGenerationId, null, dynamicStateUUID, xformsState, sessionId, true);
                 }
             } else {
                 // Encoded dynamic state is just serialized form
@@ -173,7 +135,7 @@ public class XFormsStateManager {
     public static boolean isSessionDependentState(String staticStateString, String dynamicStateString) {
         if (staticStateString.length() > PREFIX_COLON_POSITION && staticStateString.charAt(PREFIX_COLON_POSITION) == ':') {
             final String staticStatePrefix = staticStateString.substring(0, PREFIX_COLON_POSITION + 1);
-            return staticStatePrefix.equals(PERSISTENT_STATE_PREFIX) || staticStatePrefix.equals(SESSION_STATE_PREFIX) || staticStatePrefix.equals(APPLICATION_STATE_PREFIX);
+            return staticStatePrefix.equals(PERSISTENT_STATE_PREFIX) || staticStatePrefix.equals(APPLICATION_STATE_PREFIX);
         } else {
             return false;
         }
@@ -213,9 +175,6 @@ public class XFormsStateManager {
             final XFormsStateStore stateStore;
             if (staticStatePrefix.equals(PERSISTENT_STATE_PREFIX)) {
                 stateStore = XFormsPersistentApplicationStateStore.instance(externalContext);
-            } else if (staticStatePrefix.equals(SESSION_STATE_PREFIX)) {
-                // NOTE: Don't create session at this time if it is not found
-                stateStore = XFormsSessionStateStore.instance(externalContext, false);
             } else if (staticStatePrefix.equals(APPLICATION_STATE_PREFIX))  {
                 stateStore = XFormsApplicationStateStore.instance(externalContext);
             } else {
@@ -358,17 +317,10 @@ public class XFormsStateManager {
                     // Produce dynamic state key (keep the same when allEvents!)
                     final String newRequestId = isAllEvents ? requestId : UUIDUtils.createPseudoUUID();
 
-                    if (XFormsProperties.isLegacySessionStateHandling(containingDocument)) {
-                        // Legacy session server handling
-                        final XFormsStateStore stateStore = XFormsSessionStateStore.instance(externalContext, true);
-                        stateStore.add(currentPageGenerationId, requestId, newRequestId, newXFormsState, sessionId, false);
-                        dynamicStateString = SESSION_STATE_PREFIX + newRequestId;
-                    } else {
-                        // New server state handling with persistent store
-                        final XFormsStateStore stateStore = XFormsPersistentApplicationStateStore.instance(externalContext);
-                        stateStore.add(currentPageGenerationId, requestId, newRequestId, newXFormsState, sessionId, false);
-                        dynamicStateString = PERSISTENT_STATE_PREFIX + newRequestId;
-                    }
+                    // New server state handling with persistent store
+                    final XFormsStateStore stateStore = XFormsPersistentApplicationStateStore.instance(externalContext);
+                    stateStore.add(currentPageGenerationId, requestId, newRequestId, newXFormsState, sessionId, false);
+                    dynamicStateString = PERSISTENT_STATE_PREFIX + newRequestId;
                 } else {
                     // Send state directly to the client
                     dynamicStateString = newEncodedDynamicState;
@@ -451,11 +403,7 @@ public class XFormsStateManager {
                     indentedLogger.logDebug(LOG_TYPE, message);
                     throw new OXFException(message);
                 }
-                if (XFormsProperties.isLegacySessionStateHandling(containingDocument)) {
-                    return SESSION_STATE_PREFIX + newStaticStateUUID;
-                } else {
-                    return PERSISTENT_STATE_PREFIX + newStaticStateUUID;
-                }
+                return PERSISTENT_STATE_PREFIX + newStaticStateUUID;
             } else {
                 return getXFormsState().getStaticState();
             }
@@ -472,11 +420,7 @@ public class XFormsStateManager {
                     indentedLogger.logDebug(LOG_TYPE, message);
                     throw new OXFException(message);
                 }
-                if (XFormsProperties.isLegacySessionStateHandling(containingDocument)) {
-                    return SESSION_STATE_PREFIX + newDynamicStateUUID;
-                } else {
-                    return PERSISTENT_STATE_PREFIX + newDynamicStateUUID;
-                }
+                return PERSISTENT_STATE_PREFIX + newDynamicStateUUID;
             } else {
                 return getXFormsState().getDynamicState();
             }

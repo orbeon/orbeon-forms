@@ -815,17 +815,22 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 final XFormsContextStack contextStack = getContextStack();
                 contextStack.setBinding(this);
 
-                // Get function context
-                final XFormsFunction.Context functionContext = getFunctionContext();
-
                 // Evaluate
-                final String result = XPathCache.evaluateAsAvt(propertyContext, contextNodeset, bindingContext.getPosition(), attributeValue, getNamespaceMappings(),
-                        bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData());
+                try {
+                    return XPathCache.evaluateAsAvt(propertyContext, contextNodeset, bindingContext.getPosition(), attributeValue, getNamespaceMappings(),
+                        bindingContext.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(), getFunctionContext(), null, getLocationData());
+                } catch (Exception e) {
+                    // Don't consider this as fatal
+                    // TODO: must dispatch xforms-compute-error? Check if safe to do so.
+                    final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
+                    if (indentedLogger.isInfoEnabled())
+                        indentedLogger.logInfo("", "exception while evaluating XPath expression", e);
 
-                // Restore function context to prevent leaks caused by context pointing to removed controls
-                returnFunctionContext();
-
-                return result;
+                    return null;
+                } finally {
+                    // Restore function context to prevent leaks caused by context pointing to removed controls
+                    returnFunctionContext();
+                }
             }
         }
     }
@@ -850,16 +855,23 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             final XFormsContextStack contextStack = getContextStack();
             contextStack.setBinding(this);
 
-            // Get function context
-            final String result = XPathCache.evaluateAsString(propertyContext, contextNodeset, bindingContext.getPosition(),
-                                xpathString, getNamespaceMappings(), bindingContext.getInScopeVariables(),
-                                XFormsContainingDocument.getFunctionLibrary(),
-                                getFunctionContext(), null, getLocationData());
+            try {
+                return XPathCache.evaluateAsString(propertyContext, contextNodeset, bindingContext.getPosition(),
+                                    xpathString, getNamespaceMappings(), bindingContext.getInScopeVariables(),
+                                    XFormsContainingDocument.getFunctionLibrary(),
+                                    getFunctionContext(), null, getLocationData());
+            } catch (Exception e) {
+                // Don't consider this as fatal
+                // TODO: must dispatch xforms-compute-error? Check if safe to do so.
+                final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
+                if (indentedLogger.isInfoEnabled())
+                    indentedLogger.logInfo("", "exception while evaluating XPath expression", e);
 
-            // Restore function context to prevent leaks caused by context pointing to removed controls
-            returnFunctionContext();
-
-            return result;
+                return null;
+            } finally {
+                // Restore function context to prevent leaks caused by context pointing to removed controls
+                returnFunctionContext();
+            }
         }
     }
 
@@ -886,15 +898,23 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             contextStack.setBinding(this);
 
             // Evaluate
-            final String result = XPathCache.evaluateAsString(propertyContext, contextItem,
+            try {
+                return XPathCache.evaluateAsString(propertyContext, contextItem,
                                 xpathString, prefixToURIMap, variableToValueMap,
                                 XFormsContainingDocument.getFunctionLibrary(),
                                 getFunctionContext(), null, getLocationData());
+            } catch (Exception e) {
+                // Don't consider this as fatal
+                // TODO: must dispatch xforms-compute-error? Check if safe to do so.
+                final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
+                if (indentedLogger.isInfoEnabled())
+                    indentedLogger.logInfo("", "exception while evaluating XPath expression", e);
 
-            // Restore function context to prevent leaks caused by context pointing to removed controls
-            returnFunctionContext();
-
-            return result;
+                return null;
+            } finally {
+                // Restore function context to prevent leaks caused by context pointing to removed controls
+                returnFunctionContext();
+            }
         }
     }
 

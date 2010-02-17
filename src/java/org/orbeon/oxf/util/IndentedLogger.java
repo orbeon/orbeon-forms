@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -75,6 +75,10 @@ public class IndentedLogger {
         return isDebugEnabled;
     }
 
+    public final boolean isInfoEnabled() {
+        return logger.isInfoEnabled();
+    }
+
     public void startHandleOperation(String type, String message) {
         if (isDebugEnabled) {
             stack.push(new Operation(type, message));
@@ -136,6 +140,10 @@ public class IndentedLogger {
         log(Level.DEBUG, indentation.indentation, type, message, parameters);
     }
 
+    public void logDebug(String type, String message, Throwable throwable) {
+        log(Level.DEBUG, indentation.indentation, type, message, "throwable", throwableToString(throwable));
+    }
+
     public static void logWarningStatic(Logger logger, String prefix, String type, String message, String... parameters) {
         log(logger, Level.WARN, 0, prefix, type, message, parameters);
     }
@@ -150,6 +158,10 @@ public class IndentedLogger {
 
     public void logInfo(String type, String message, String... parameters) {
         log(Level.INFO, indentation.indentation, type, message, parameters);
+    }
+
+    public void logInfo(String type, String message, Throwable throwable) {
+        log(Level.INFO, indentation.indentation, type, message, "throwable", throwableToString(throwable));
     }
 
     public void logWarning(String type, String message, Throwable throwable) {
@@ -217,9 +229,10 @@ public class IndentedLogger {
     }
 
     private static String throwableToString(Throwable throwable) {
-        final PrintWriter writer = new PrintWriter(new StringWriter());
+        final StringWriter sb = new StringWriter();
+        final PrintWriter writer = new PrintWriter(sb);
         throwable.printStackTrace(writer);
-        return writer.toString();
+        return sb.toString();
     }
 
     private class Operation {

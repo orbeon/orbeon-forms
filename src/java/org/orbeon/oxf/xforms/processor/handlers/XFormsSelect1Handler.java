@@ -49,6 +49,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     private boolean isOpenSelection;
     private boolean isAutocomplete;
     private boolean isAutocompleteNoFilter;
+
+    private QName effectiveAppearance;
     private boolean isFull;
     private boolean isCompact;
     private boolean isTree;
@@ -64,27 +66,40 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     public void init(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         super.init(uri, localname, qName, attributes);
 
-        this.isMultiple = localname.equals("select");
-        this.isOpenSelection = "open".equals(attributes.getValue("selection"));
-        
-        QName appearance = getAppearance(attributes); // this uses isMultiple
+        isMultiple = localname.equals("select");
+        isOpenSelection = "open".equals(attributes.getValue("selection"));
 
-        this.isAutocomplete = isOpenSelection
-                && XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME.equals(appearance);
-
-        // NOTE: We don't support autocompletion with xforms:select for now, only with xforms:select1
-        if (isAutocomplete && isMultiple) {
-            appearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;
-            isOpenSelection = false;
-            isAutocomplete = false;
+        // Compute effective appearance
+        {
+            final QName plainAppearance = super.getAppearance(attributes);
+            final QName effectiveAppearance;
+            if (plainAppearance != null) {
+                if (isMultiple && XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(plainAppearance)) {
+                    // For now, a select with minimal appearance is handled as a compact appearance
+                    effectiveAppearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;
+                } else if (isMultiple && XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME.equals(plainAppearance)) {
+                    // We don't support autocompletion with xforms:select for now, only with xforms:select1
+                    effectiveAppearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;// default for xforms:select
+                    isOpenSelection = false;
+                } else if (isOpenSelection && XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME.equals(plainAppearance)) {
+                    effectiveAppearance = plainAppearance;
+                    isAutocomplete = true;
+                    isAutocompleteNoFilter = isAutocomplete && "false".equals(attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "filter"));
+                } else {
+                    effectiveAppearance = plainAppearance;
+                }
+            } else if (isMultiple) {
+                effectiveAppearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;// default for xforms:select
+            } else {
+                effectiveAppearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME;// default for xforms:select1
+            }
+            this.effectiveAppearance = effectiveAppearance;
         }
 
-        this.isAutocompleteNoFilter = isAutocomplete && "false".equals(attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "filter"));
-
-        this.isFull = XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME.equals(appearance);
-        this.isCompact = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME.equals(appearance);
-        this.isTree = XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME.equals(appearance);
-        this.isMenu = XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME.equals(appearance);
+        isFull = XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME.equals(effectiveAppearance);
+        isCompact = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME.equals(effectiveAppearance);
+        isTree = XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME.equals(effectiveAppearance);
+        isMenu = XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME.equals(effectiveAppearance);
     }
 
     @Override
@@ -105,17 +120,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
     @Override
     protected QName getAppearance(Attributes attributes) {
-        final QName tempAppearance = super.getAppearance(attributes);
-
-        final QName appearance;
-        if (tempAppearance != null)
-            appearance = tempAppearance;
-        else if (isMultiple)
-            appearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;// default for xforms:select
-        else
-            appearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME;// default for xforms:select1
-
-        return appearance;
+        return effectiveAppearance;
     }
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {

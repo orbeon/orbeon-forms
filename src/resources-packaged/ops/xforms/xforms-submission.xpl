@@ -56,7 +56,7 @@
                         <xxforms:static-state>
                             <xsl:variable name="static-state" as="document-node()">
                                 <xsl:document>
-                                    <static-state>
+                                    <static-state last-id="10000">
                                         <xforms:trigger id="trigger">
                                             <xforms:send id="send" submission="default-submission" ev:event="DOMActivate"/>
                                         </xforms:trigger>

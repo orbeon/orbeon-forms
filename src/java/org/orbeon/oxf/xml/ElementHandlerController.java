@@ -243,9 +243,13 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
      */
     public void repeatBody() throws SAXException {
         // Replay content of current SAXStore
+
+        final int beforeLocatorCount = (this.locator != null) ? this.locator.getSize() : 0;
         currentHandlerInfo.saxStore.replay(this);
-        if (this.locator != null) {
-            // This means that the SAXStore sent out setDocumentLocator() as well
+        final int afterLocatorCount = (this.locator != null) ? this.locator.getSize() : 0;
+        if (beforeLocatorCount != afterLocatorCount) {
+            // This means that the SAXStore replay called setDocumentLocator()
+            assert afterLocatorCount == beforeLocatorCount + 1 : "incorrect locator stack state";
             this.locator.popLocator();
         }
     }
@@ -372,6 +376,10 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
     }
 
     public void setDocumentLocator(Locator locator) {
+        // NOTE: This is called by the outer caller. Then it can be called by repeat or component body replay, which
+        // recursively hit this controller. The outer caller may or may not call setDocumentLocator() once. If there is
+        // one, repeat body replay recursively calls setDocumentLocator(), which is pushed on the stack, and then popped
+        // after the repeat body has been entirely replayed.
         if (locator != null) {
             if (this.locator == null) {
                 // This is likely the source's initial setDocumentLocator() call
@@ -381,8 +389,7 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
                 this.locator.pushLocator(locator);
                 // We don't forward this (anyway nobody is listening initially)
             } else {
-                // This is likely during a SAXStore replay
-
+                // This is a repeat or component body replay (otherwise it's a bug)
                 // Push the SAXStore's locator
                 this.locator.pushLocator(locator);
                 // But don't forward this! SAX prevents calls to setDocumentLocator() mid-course. Our own locator will do the job.
@@ -464,17 +471,19 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
     }
 
     private static class HandlerInfo {
-        public int level;
-        public String explodedQName;
-        public ElementHandler elementHandler;
-        public Attributes attributes;
+        public final int level;
+        public final String explodedQName;
+        public final ElementHandler elementHandler;
+        public final Attributes attributes;
 
-        public SAXStore saxStore;
+        public final SAXStore saxStore;
 
         public HandlerInfo(int level, String explodedQName, ElementHandler elementHandler) {
             this.level = level;
             this.explodedQName = explodedQName;
             this.elementHandler = elementHandler;
+            this.attributes = null;
+            this.saxStore = null;
         }
 
         public HandlerInfo(int level, String explodedQName, ElementHandler elementHandler, Attributes attributes, Locator locator) {

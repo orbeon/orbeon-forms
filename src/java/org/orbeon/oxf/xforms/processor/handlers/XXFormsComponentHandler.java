@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 /**
@@ -77,6 +78,11 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
 
                     if (level != 0)
                         super.endElement(uri, localname, qName);
+                }
+
+                @Override
+                public void setDocumentLocator(Locator locator) {
+                    // NOP for now. In the future, we should push/pop the locator on ElementHandlerController
                 }
             });
 

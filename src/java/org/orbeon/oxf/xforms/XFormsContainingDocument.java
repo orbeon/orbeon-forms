@@ -623,36 +623,6 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     public List<Script> getScriptsToRun() {
-        // Only keep script with:
-        // o still existing target/observer
-        // o relevant target/observer
-        if (scriptsToRun != null && scriptsToRun.size() > 0) {
-            for (final Iterator<Script> i = scriptsToRun.iterator(); i.hasNext();) {
-                final Script script = i.next();
-
-                if (!script.getEvent().getName().equals(XFormsEvents.XFORMS_DISABLED)) { // allow xforms-disabled on removed controls
-
-                    // TODO: don't filter
-
-                    // Check target
-                    final XFormsEventTarget scriptEventTarget = script.getEvent().getTargetObject();
-                    final Object currentEventTarget = getObjectByEffectiveId(scriptEventTarget.getEffectiveId());
-                    if (scriptEventTarget != currentEventTarget
-                            || (currentEventTarget instanceof XFormsControl && !((XFormsControl) currentEventTarget).isRelevant())) {
-                        i.remove();
-                        continue;
-                    }
-
-                    // Check observer
-                    final XFormsEventObserver scriptEventObserver = script.getEventObserver();
-                    final Object currentEventObserver = getObjectByEffectiveId(scriptEventObserver.getEffectiveId());
-                    if (scriptEventObserver != currentEventObserver
-                            || (currentEventObserver instanceof XFormsControl && !((XFormsControl) currentEventObserver).isRelevant())) {
-                        i.remove();
-                    }
-                }
-            }
-        }
         return scriptsToRun;
     }
 

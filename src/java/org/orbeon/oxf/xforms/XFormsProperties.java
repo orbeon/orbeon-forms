@@ -59,6 +59,7 @@ public class XFormsProperties {
     private static final String INITIAL_REFRESH_EVENTS_PROPERTY = "server.events.initial-refresh-events";
     private static final String AJAX_SHOW_LOADING_ICON_PROPERTY = "ajax.show-loading-icon";
     private static final String AJAX_SHOW_ERRORS_PROPERTY = "ajax.show-errors";
+    private static final String AJAX_UPDATE_FULL_THRESHOLD = "ajax.update.full.threshold";
 
     private static final String MINIMAL_RESOURCES_PROPERTY = "minimal-resources";
     private static final String COMBINE_RESOURCES_PROPERTY = "combine-resources";
@@ -211,6 +212,7 @@ public class XFormsProperties {
             new PropertyDefinition(OFFLINE_REPEAT_COUNT_PROPERTY, 4, false),
             new PropertyDefinition(FORWARD_SUBMISSION_HEADERS, DEFAULT_FORWARD_SUBMISSION_HEADERS, false),
             new PropertyDefinition(ASYNC_SUBMISSION_POLL_DELAY, 10 * 1000, false), // 10 seconds
+            new PropertyDefinition(AJAX_UPDATE_FULL_THRESHOLD, 20, false),
 
             // Properties to propagate to the client
             new PropertyDefinition(NEW_XHTML_LAYOUT, false, true),
@@ -573,6 +575,10 @@ public class XFormsProperties {
 
     public static int getSubmissionPollDelay(XFormsContainingDocument containingDocument) {
         return getIntegerProperty(containingDocument, ASYNC_SUBMISSION_POLL_DELAY);
+    }
+
+    public static int getAjaxFullUpdateThreshold(XFormsContainingDocument containingDocument) {
+        return getIntegerProperty(containingDocument, AJAX_UPDATE_FULL_THRESHOLD);
     }
 
     public static String getDatePicker(XFormsContainingDocument containingDocument) {

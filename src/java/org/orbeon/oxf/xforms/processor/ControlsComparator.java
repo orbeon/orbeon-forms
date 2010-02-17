@@ -50,8 +50,7 @@ public class ControlsComparator {
     private ContentHandlerHelper ch;
     private ContentHandlerHelper tempCH;
 
-    // Experimental: how many updates (here counted in number of attributes) trigger xxforms:update="full"
-    private static final int FULL_UPDATE_THRESHOLD = 20;
+    private final int fullUpdateThreshold;
 
     public ControlsComparator(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
                               Set<String> valueChangeControlIds, boolean isTestMode) {
@@ -63,6 +62,7 @@ public class ControlsComparator {
         this.isTestMode = isTestMode;
 
         this.isSpanHTMLLayout = XFormsProperties.isSpanHTMLLayout(containingDocument);
+        this.fullUpdateThreshold = XFormsProperties.getAjaxFullUpdateThreshold(containingDocument);
     }
 
     public boolean diff(List<XFormsControl> state1, List<XFormsControl> state2) {
@@ -117,66 +117,8 @@ public class ControlsComparator {
             // Whether at this point we must do a full update
             boolean mustDoFullUpdate = mustDoFullUpdate();
 
-            // 2: Check children if any
-//            if (false) {
-//                // NOTE: Attempt at using code from NewControlsComparator, doesn't work because repeat template updates are incorrect
-//                if (control2 instanceof XFormsContainerControl) {
-//
-//                    final boolean isRepeatControl = control2 instanceof XFormsRepeatControl;
-//
-//                    final XFormsContainerControl containerControl1 = (XFormsContainerControl) control1;
-//                    final XFormsContainerControl containerControl2 = (XFormsContainerControl) control2;
-//
-//                    final List<XFormsControl> children1 = (containerControl1 == null) ? null : (containerControl1.getChildren() != null && containerControl1.getChildren().size() == 0) ? null : containerControl1.getChildren();
-//                    final List<XFormsControl> children2 = (containerControl2 == null) ? null : (containerControl2.getChildren() != null && containerControl2.getChildren().size() == 0) ? null : containerControl2.getChildren();
-//
-//                    if (isRepeatControl) {
-//
-//                        // Repeat update
-//
-//                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
-//
-//                        final int size1 = (children1 == null) ? 0 : children1.size();
-//                        final int size2 = (children2 == null) ? 0 : children2.size();
-//
-//                        if (size1 == size2) {
-//                            // No add or remove of children
-//
-//                            // Delete first template if needed
-//                            if (size2 == 0 && control1 == null) {
-//                                outputDeleteRepeatTemplate(ch, control2, 1);
-//                            }
-//
-//                            // Diff children
-//                            diff(children1, children2);//, isWithinNewRepeatIteration
-//                        } else if (size2 > size1) {
-//                            // Size has grown
-//
-//                            // Copy template instructions
-//                            outputCopyRepeatTemplate(ch, repeatControlInfo, size1 + 1, size2);
-//
-//                            // Diff the common subset
-//                            diff(children1, children2.subList(0, size1));//, isWithinNewRepeatIteration
-//
-//                            // Issue new values for new iterations
-//                            diff(null, children2.subList(size1, size2));//, true
-//
-//                        } else if (size2 < size1) {
-//                            // Size has shrunk
-//
-//                            outputDeleteRepeatTemplate(ch, control2, size1 - size2);
-//
-//                            // Diff the remaining subset
-//                            diff(children1.subList(0, size2), children2);//, isWithinNewRepeatIteration
-//                        }
-//                    } else {
-//                        // Other grouping controls
-//                        diff(children1, children2);//, isWithinNewRepeatIteration
-//                    }
-//                }
-//            } else {
-
-            if (!mustDoFullUpdate) { // don't check children if we know we must do a full update
+            // 2: Check children unless we already know we must do a full update
+            if (!mustDoFullUpdate) {
                 foobar: if (control2 instanceof XFormsContainerControl) {
 
                     final XFormsContainerControl containerControl1 = (XFormsContainerControl) control1;
@@ -325,7 +267,7 @@ public class ControlsComparator {
     }
 
     private boolean mustDoFullUpdate() {
-        return tempCH != null && ((SAXStore) ch.getContentHandler()).getAttributesCount() > FULL_UPDATE_THRESHOLD;
+        return tempCH != null && ((SAXStore) ch.getContentHandler()).getAttributesCount() > fullUpdateThreshold;
     }
 
     private SAXStore.Mark getUpdateFullMark(XFormsControl control) {

@@ -555,9 +555,10 @@ ORBEON.widgets.datatable.utils.freezeWidth = function (elt) {
 ORBEON.widgets.datatable.colSorter = function (th) {
     var liner = YAHOO.util.Selector.query('div.yui-dt-liner', th, true);
     YAHOO.util.Event.addListener(liner, "click", function (ev) {
-        var a = YAHOO.util.Selector.query('a.xforms-trigger:not(.xforms-disabled)', liner, true);
+        var triggerControl = YAHOO.util.Selector.query('.xforms-trigger:not(.xforms-disabled)', liner, true);
+        var a = ORBEON.util.Dom.getElementByTagName(triggerControl, "a");
         if (YAHOO.util.Event.getTarget(ev) != a) {
-            ORBEON.xforms.Document.dispatchEvent(a.id, "DOMActivate");
+            ORBEON.xforms.Document.dispatchEvent(triggerControl.id, "DOMActivate");
         }
     });
 }

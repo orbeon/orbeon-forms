@@ -600,8 +600,21 @@
                 <xxforms:sequence select=".{if ($hasLoadingFeature) then '[not($fr-dt-loading = true())]' else ''}" xxbl:scope="outer"/>
             </xxforms:variable>
 
-            <xxforms:script ev:event="xforms-enabled" ev:target="fr-dt-group" xxbl:scope="inner"> YAHOO.log("Enabling datatable id <xsl:value-of
-                    select="$id"/>","info"); ORBEON.widgets.datatable.init(this, <xsl:value-of select="$innerTableWidth"/>); </xxforms:script>
+            <xxforms:script ev:event="xforms-enabled" ev:target="fr-dt-group" xxbl:scope="inner">
+                YAHOO.log("Enabling datatable id <xsl:value-of select="$id"/>","info"); 
+                <xsl:choose>
+                    <xsl:when test="$scrollH or $scrollV">
+                        var target= this; 
+                        setTimeout(function() {
+                            ORBEON.widgets.datatable.init(target, <xsl:value-of select="$innerTableWidth"/>);  
+                            }, 10);
+                    </xsl:when>
+                    <xsl:otherwise>
+                        ORBEON.widgets.datatable.init(this, <xsl:value-of select="$innerTableWidth"/>);  
+                    </xsl:otherwise>
+                </xsl:choose>
+                
+</xxforms:script>
 
             <xforms:group ref="$group-ref" id="fr-dt-group" xxbl:scope="inner">
 
@@ -611,7 +624,7 @@
                         style="{$height} {$width}">
                         <xsl:variable name="table">
                             <xhtml:table id="{$id}-table" class="{@class} datatable datatable-{$id} yui-dt-table "
-                                style="{if ($scrollV) then $height else ''} {if ($scrollH) then $width else ''}">
+                                style="{if ($scrollV) then $height else ''} {$width}">
                                 <!-- Copy attributes that are not parameters! -->
                                 <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id', 'class'))]" mode="dynamic"/>
                                 <xhtml:thead id="{$id}-thead">

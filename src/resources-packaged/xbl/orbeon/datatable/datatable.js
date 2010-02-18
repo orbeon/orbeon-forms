@@ -38,7 +38,7 @@ ORBEON.widgets.datatable = function (container, index, innerTableWidth) {
 ORBEON.widgets.datatable.prototype.initProperties = function (container, index, innerTableWidth) {
     this.index = index;
     this.innerTableWidth = innerTableWidth;
-    this.container = YAHOO.util.Selector.query('div.yui-dt', this.container, false)[0];
+    this.container = YAHOO.util.Selector.query('div.yui-dt', container, false)[0];
     YAHOO.util.Dom.addClass(this.container, 'fr-dt-initialized');
 
     this.scrollV = YAHOO.util.Dom.hasClass(this.container, 'fr-scrollV');
@@ -113,7 +113,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 ORBEON.widgets.datatable.prototype.setSizes = function () {
 
     var width = this.originalWidth;
-    var pxWidth = this.getActualOriginalWidth();
+    var pxWidth = this.getActualOriginalTableWidth();
 
 
     // See how big the table would be without its size restriction  (for scrollable tables)
@@ -179,7 +179,7 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
             width = (this.tableWidth + 19) + 'px';
         }
     } else {
-        width = (this.tableWidth + 2) + 'px';
+        width = (this.tableWidth + 0) + 'px';
     }
 
     // At last, we know how the table will be sized, it's time to set these sizes
@@ -192,19 +192,26 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
         this.adjustHeightForIE = true;
     }
 
-    // Resize the container
-    YAHOO.util.Dom.setStyle(this.container, 'width', width);
-    if (this.height != 'auto') {
-        YAHOO.util.Dom.setStyle(this.container, 'height', this.height);
+    // Resize the containers if not already done
+
+    if (this.originalWidth == 'auto') {
+        this.container.style.width = width;
+    } else  if (this.originalWidth.indexOf('%') != - 1) {
+        this.container.style.width = this.container.clientWidth + 'px';
     }
+
+    //YAHOO.util.Dom.setStyle(this.container, 'width', width);
+    //if (this.height != 'auto') {
+    //    YAHOO.util.Dom.setStyle(this.container, 'height', this.height);
+    //}
 
     // Resize the header container
     //YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
-    if (this.height != 'auto' && this.headBodySplit) {
-        YAHOO.util.Dom.setStyle(this.headerContainer, 'height', this.headerHeight + 'px');
-    } else if (! this.headBodySplit && this.height == 'auto') {
+    //if (this.height != 'auto' && this.headBodySplit) {
+    //    YAHOO.util.Dom.setStyle(this.headerContainer, 'height', this.headerHeight + 'px');
+    //} else if (! this.headBodySplit && this.height == 'auto') {
         //	YAHOO.util.Dom.setStyle(this.headerContainer, 'border', '1px solid #7F7F7F')
-    }
+    //}
 
     // Store the column widths while the headers are still visible on the body table
     this.columnWidths = [];
@@ -236,6 +243,7 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
             this.headerScrollContainer.style.width = this.headerScrollWidth + 'px';
             this.bodyContainer.style.overflow = "auto";
             this.bodyContainer.style.overflowY = "scroll";
+            this.header.style.width = this.tableWidth + 'px';      
         }
 
         YAHOO.util.Dom.addClass(this.table.parentNode, 'yui-dt-bd');
@@ -318,20 +326,27 @@ ORBEON.widgets.datatable.prototype.initColumns = function () {
 }
 
 
-ORBEON.widgets.datatable.prototype.getActualOriginalWidth = function () {
+ORBEON.widgets.datatable.prototype.getActualOriginalTableWidth = function () {
 
     var pxWidth;
-    if (this.originalWidth.indexOf('%') != - 1 && false) {
+    if (this.originalWidth.indexOf('%') != - 1) {
+        if (this.scrollH) {
+            this.container.clientWidth - 21;
+        }  else {
+           pxWidth =  this.container.clientWidth - 2;
+        }
         // the following block is required to calculate the width in a way that works for IE 6.0 :(
-        this.headerContainer.style.overflow = "hidden";
-        this.headerContainer.style.width = this.originalWidth;
-        var pxWidth = this.headerContainer.clientWidth;
+        //this.headerContainer.style.overflow = "hidden";
+        //this.headerContainer.style.width = this.originalWidth;
+        //var pxWidth = this.headerContainer.clientWidth;
         // Convert % into px...
-        width = pxWidth + 'px';
-        this.headerContainer.style.overflow = "";
-        this.headerContainer.style.width = "";
+        //width = pxWidth + 'px';
+        //this.headerContainer.style.overflow = "";
+        //this.headerContainer.style.width = "";
+    } else if (this.originalWidth == 'auto') {
+        pxWidth = this.table.clientWidth;
     } else {
-        pxWidth = this.container.clientWidth;
+        pxWidth = this.container.clientWidth - 2;
     }
     return pxWidth;
 

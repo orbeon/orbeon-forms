@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.test;
 
@@ -49,12 +49,17 @@ public class DateTimeTest extends TestCase {
             assertEquals("03:00:00", XFormsInputControl.testParseTime("3 " + amSuffix));
             assertEquals("00:00:00", XFormsInputControl.testParseTime("0 " + amSuffix));
         }
-
-        // TODO
-//        assertEquals(XFormsInputControl.testTimeParse("123456"), "xxx");
     }
 
     public void testDateParsing() {
-        // TODO
+        assertEquals("2010-02-19", XFormsInputControl.testParseDate("2/19/2010"));
+        assertEquals("2010-02-19", XFormsInputControl.testParseDate("02/19/2010"));
+        assertEquals("2010-02-19", XFormsInputControl.testParseDate("19.2.2010"));
+        assertEquals("2010-02-19", XFormsInputControl.testParseDate("19.02.2010"));
+
+        assertEquals("2010-02-19", XFormsInputControl.testParseDate("2010-02-19-08:00"));
+        assertEquals("2010-02-19", XFormsInputControl.testParseDate("2010-02-19+08:00"));
+        assertEquals("2010-02-19", XFormsInputControl.testParseDate("2010-02-19Z"));
+        assertEquals("2010-02-19", XFormsInputControl.testParseDate("2010-02-19"));
     }
 }

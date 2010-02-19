@@ -940,7 +940,7 @@ ORBEON.util.DateTime = {
             }
         },
         // yyyy-mm-dd (ISO style)
-        {   re: /(^\d{2,4})-(\d{1,2})-(\d{1,2})$/,
+        {   re: /(^\d{2,4})-(\d{1,2})-(\d{1,2})(Z|([+-]\d{2}:\d{2}))?$/, // allow for optional trailing timezone
             handler: function(bits) {
                 return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[1]), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10));
             }

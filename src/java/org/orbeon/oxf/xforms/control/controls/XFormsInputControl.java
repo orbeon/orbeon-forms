@@ -256,7 +256,7 @@ public class XFormsInputControl extends XFormsValueControl {
             // yyyy-mm-dd (ISO style)
             new ParsePattern() {
                 public String getRe() {
-                    return "(\\d{2,4})-(\\d{1,2})-(\\d{1,2})";
+                    return "(\\d{2,4})-(\\d{1,2})-(\\d{1,2})(Z|([+-]\\d{2}:\\d{2}))?";
                 }
                 public String handle(MatchProcessor.Result result) {
 

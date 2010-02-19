@@ -1557,6 +1557,101 @@
         </output>
     </test>
 
+    <test description="xxforms:show produces client requests to show dialogs" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+                                    <xxforms:show ev:event="xforms-ready" dialog="default-dialog"/>
+                                    <xxforms:show ev:event="xforms-ready" dialog="minimal-dialog"/>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xxforms:dialog id="minimal-dialog" appearance="minimal" neighbor="show-minimal-dialog">
+                                    Body of the dialog.
+                                </xxforms:dialog>
+                                <xxforms:dialog id="default-dialog">
+                                    Body of the dialog.
+                                </xxforms:dialog>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                        <controls>
+                            <control effective-id="minimal-dialog" visible="true" constrain="true"/>
+                            <control effective-id="default-dialog" visible="true" constrain="true"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:div id="minimal-dialog" visibility="visible" neighbor="show-minimal-dialog" constrain="true"/>
+                        <xxf:div id="default-dialog" visibility="visible" constrain="true"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xxforms:toggle produces client requests to show case" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+                                    <xforms:toggle ev:event="xforms-ready" case="second-case"/>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:switch id="switch">
+                                    <xforms:case id="first-case"/>
+                                    <xforms:case id="second-case"/>
+                                </xforms:switch>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                        <controls>
+                            <control effective-id="switch" case-id="second-case"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:div id="second-case" visibility="visible"/>
+                        <xxf:div id="first-case" visibility="hidden"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 
     <!--
 

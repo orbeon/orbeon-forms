@@ -189,8 +189,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         if (other == null || !(other instanceof XFormsSwitchControl))
             return false;
 
-        if (this == other)
-            return true;
+        // NOTE: don't give up on "this == other" because there can be a difference just in XFormsControlLocal
 
         final XFormsSwitchControl otherSwitchControl = (XFormsSwitchControl) other;
 

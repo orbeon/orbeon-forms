@@ -203,10 +203,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         if (other == null)
             return false;
 
-        if (this == other)
-            return true;
-
-        // Compare only what matters
+        // NOTE: don't give up on "this == other" because there can be a difference just in XFormsControlLocal
 
         // NOTE: We only compare on isVisible as we don't support just changing other attributes for now
         final XXFormsDialogControl dialogControl1 = (XXFormsDialogControl) other;
@@ -219,7 +216,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     @Override
     public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other,
                                AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree
-    ) {
+) {
 
         final String neighbor = getNeighborControlId();
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[] {

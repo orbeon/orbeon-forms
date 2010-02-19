@@ -655,7 +655,7 @@
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </xhtml:div>
-                                <xhtml:div class="yui-dt-hd" style="overflow: scroll; {$width} {$height}">
+                                <xhtml:div class="yui-dt-hd" style="overflow: auto; {$width} {$height}">
                                     <xsl:apply-templates select="$table" mode="bodyFiltering"/>
                                 </xhtml:div>
                             </xsl:when>

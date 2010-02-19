@@ -1,0 +1,74 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:lm="http://www.lockheedmartin.com/">
+
+    <xhtml:head>
+        <xhtml:title>Out of bound</xhtml:title>
+        <xforms:model>
+            
+            <!-- Instance with state selected by user -->
+            <xforms:instance id="state">
+                <state/>
+            </xforms:instance>
+            
+            <!-- Selected state is only valid if it is in the itemset -->
+            <xforms:bind nodeset="instance('state')" constraint=". = (instance('states')/state/@value, '')"/>
+            
+            <!-- List of possible states -->
+            <xforms:instance id="states">
+                <states>
+                    <state value="ma">Maryland</state>
+                    <state value="ca">California</state>
+                    <state value="co">Colorado</state>
+                </states>
+            </xforms:instance>
+        </xforms:model>
+
+        <xhtml:style type="text/css">
+            p { margin-top: 2em }
+            .previous-state { font-weight: bold }
+            .xbl-fr-error-summary { margin-top: 1em; }
+            .fr-error-summary-body { background-color: #F2D6C6; padding: .5em 0 .5em 0; width: 40em; }
+            .xbl-fr-error-summary .fr-error-alert { color: black; }
+            .xforms-repeat-selected-item-1 { background-color: transparent; }
+        </xhtml:style>
+        
+    </xhtml:head>
+    <xhtml:body>
+
+        <xhtml:p>1. Select California</xhtml:p>
+
+        <xforms:select1 ref="instance('state')" appearance="minimal" id="state-selector">
+            <xforms:item>
+                <xforms:label>--- Select a state ---</xforms:label>
+                <xforms:value/>
+            </xforms:item>
+            <xforms:itemset nodeset="instance('states')/state">
+                <xforms:value ref="@value"/>
+                <xforms:label ref="."/>
+            </xforms:itemset>
+            <xforms:alert>The following value has been selected previously: <xforms:output class="previous-state" value="."/>.
+                This value is not valid anymore, please select another state.</xforms:alert>
+        </xforms:select1>
+
+        <xhtml:p>2. Remove California from the list of possible values</xhtml:p>
+
+        <fr:button>
+            <xforms:label>Remove California</xforms:label>
+            <xforms:delete ev:event="DOMActivate" nodeset="instance('states')/state[@value = 'ca']"/>
+        </fr:button>
+        
+        <xhtml:p>3. The form is marked as invalid, and the alert tells the user about the previous value.</xhtml:p>
+
+        <fr:error-summary id="error-summary" observer="state-selector">
+            <fr:label>Error in this form</fr:label>
+        </fr:error-summary>
+        
+    </xhtml:body>
+</xhtml:html>

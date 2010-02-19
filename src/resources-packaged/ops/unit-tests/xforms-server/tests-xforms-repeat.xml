@@ -1935,7 +1935,7 @@
             </xxf:event-response>
         </output>
     </test>
-    
+
     <test description="xxforms:index() function" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
@@ -1969,7 +1969,7 @@
                 <xhtml:body>
                     <!-- Top-level variable with model change tests that source id for resolution doesn't break -->
                     <xxforms:variable name="top-level-1" model="model2" select="." as="element()"/>
-                    
+
                     <xforms:repeat id="department-repeat" nodeset="department" startindex="4">
                         <xxforms:variable name="department-index-1" select="xxforms:index()" as="element*"/>
                         <xxforms:variable name="department-index-2" select="xxforms:index('department-repeat')" as="element*"/>
@@ -2639,6 +2639,86 @@
                         <xxf:control id="my-value·1">111</xxf:control>
                         <xxf:control id="my-name·2">CA</xxf:control>
                         <xxf:control id="my-value·2">222</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="index() function resolves nested repeats as per XForms 1.1" name="oxf:pipeline">
+        <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=313774&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance xmlns="">
+                                <department>
+                                    <employee/>
+                                    <employee/>
+                                </department>
+                                <department>
+                                    <employee/>
+                                    <employee/>
+                                    <employee/>
+                                </department>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:setindex repeat="repeat-department" index="1"/>
+                            <xforms:setindex repeat="repeat-employee" index="2"/>
+                            <xforms:setindex repeat="repeat-department" index="2"/>
+                            <xforms:setindex repeat="repeat-employee" index="3"/>
+                        </xforms:action>
+                    </xforms:model>
+                </head>
+                <body>
+                    <xforms:repeat nodeset="department" id="repeat-department">
+                        <xxforms:variable name="department-position" select="position()"/>
+                        <xforms:repeat nodeset="employee" id="repeat-employee">
+                            <xxforms:variable name="employee-position" select="position()"/>
+                            <xforms:output id="my-output"
+                                           value="string-join(for $v in ($department-position, $employee-position,
+                                                    index('repeat-department'), index('repeat-employee')) return xs:string($v), ' ')"/>
+                        </xforms:repeat>
+                    </xforms:repeat>
+                </body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <department>
+                                        <employee/>
+                                        <employee/>
+                                    </department>
+                                    <department>
+                                        <employee/>
+                                        <employee/>
+                                        <employee/>
+                                    </department>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="repeat-department" index="2"/>
+                            <control effective-id="repeat-employee·1" index="2"/>
+                            <control effective-id="repeat-employee·2" index="3"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-output·1-1">1 1 2 2</xxf:control>
+                        <xxf:control id="my-output·1-2">1 2 2 2</xxf:control>
+                        <xxf:control id="my-output·2-1">2 1 2 3</xxf:control>
+                        <xxf:control id="my-output·2-2">2 2 2 3</xxf:control>
+                        <xxf:control id="my-output·2-3">2 3 2 3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

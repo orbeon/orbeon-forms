@@ -47,15 +47,13 @@
         <xhtml:html>
             <xsl:apply-templates select="/xhtml:html/@*"/>
             <xhtml:head>
+                <!-- Add meta as early as possible -->
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:meta"/>
                 <xhtml:title>Orbeon Forms Example Applications - <xsl:value-of select="$title"/></xhtml:title>
                 <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->
                 <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css" media="all"/>
                 <!-- Handle head elements except scripts -->
-                <xsl:for-each select="/xhtml:html/xhtml:head/(xhtml:meta | xhtml:link | xhtml:style)">
-                    <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
-                        <xsl:apply-templates select="@*|node()"/>
-                    </xsl:element>
-                </xsl:for-each>
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/(xhtml:link | xhtml:style)"/>
                 <!-- Orbeon Forms version -->
                 <xhtml:meta name="generator" content="Orbeon Forms {$orbeon-forms-version}"/>
                 <!-- Favicon -->

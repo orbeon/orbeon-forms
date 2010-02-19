@@ -29,13 +29,10 @@
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <xhtml:head>
-                <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->
+                <!-- Add meta as early as possible -->
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:meta"/>
                 <!-- Handle head elements except scripts -->
-                <xsl:for-each select="/xhtml:html/xhtml:head/(xhtml:meta | xhtml:link | xhtml:style)">
-                    <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
-                        <xsl:apply-templates select="@*|node()"/>
-                    </xsl:element>
-                </xsl:for-each>
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/(xhtml:link | xhtml:style)"/>
                 <!-- Title -->
                 <xhtml:title>
                     <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:title/@*"/>

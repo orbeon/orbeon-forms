@@ -69,9 +69,14 @@ ORBEON.widgets.datatable.prototype.finish = function () {
     var pxWidth;
 
     if (width.indexOf('%') != - 1) {
+        YAHOO.util.Dom.addClass(this.table, 'fr-datatable-collapsed');
+        var pxWidth = this.headerContainer.clientWidth;
+        YAHOO.util.Dom.removeClass(this.table, 'fr-datatable-collapsed');
+
         // the following block is required to calculate the width in a way that works for IE 6.0 :(
-        this.headerContainer.style.overflow = "hidden";
-        this.headerContainer.style.width = this.originalWidth;
+        //this.headerContainer.style.overflow = "hidden";
+        //this.headerContainer.style.width = this.originalWidth;
+        
         var pxWidth = this.headerContainer.clientWidth;
         // Convert % into px...
         width = pxWidth + 'px';
@@ -557,7 +562,7 @@ ORBEON.widgets.datatable.colSorter = function (th) {
     YAHOO.util.Event.addListener(liner, "click", function (ev) {
         var triggerControl = YAHOO.util.Selector.query('.xforms-trigger:not(.xforms-disabled)', liner, true);
         var a = ORBEON.util.Dom.getElementByTagName(triggerControl, "a");
-        if (YAHOO.util.Event.getTarget(ev) != a) {
+        if (a != undefined && YAHOO.util.Event.getTarget(ev) != a) {
             ORBEON.xforms.Document.dispatchEvent(triggerControl.id, "DOMActivate");
         }
     });

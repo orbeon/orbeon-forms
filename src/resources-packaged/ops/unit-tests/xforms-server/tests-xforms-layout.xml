@@ -1544,4 +1544,180 @@
         </output>
     </test>
 
+    <test description="Layout: non-relevant xforms:output with image mediatype outputs link to default image" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <image>/ops/images/xforms/help.png</image>
+                                <show>true</show>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:bind nodeset="image" relevant="../show = 'true'"/>
+                        <xforms:setvalue ev:event="xforms-ready" ref="show">false</xforms:setvalue>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="my-output" mediatype="image/*" ref="image"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:span id="my-output" class="xforms-control xforms-output xforms-mediatype-image xforms-disabled">
+                    <xhtml:img src="/ops/images/xforms/spacer.gif"/>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
+    <test description="Ajax: non-relevant xforms:output with image mediatype outputs link to default image" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-server.xpl"/>
+        <input name="action">
+            <xxforms:action xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" >
+                <xxforms:event name="DOMActivate" source-control-id="my-trigger"/>
+            </xxforms:action>
+        </input>
+        <input name="controls">
+            <controls xmlns:xforms="http://www.w3.org/2002/xforms"
+                      xmlns:ev="http://www.w3.org/2001/xml-events">
+                <xforms:output id="my-output" mediatype="image/*" ref="image"/>
+                <xforms:trigger id="my-trigger">
+                    <xforms:setvalue ev:event="DOMActivate" ref="show" id="setvalue1">false</xforms:setvalue>
+                </xforms:trigger>
+            </controls>
+        </input>
+        <input name="models">
+            <models xmlns:xforms="http://www.w3.org/2002/xforms"
+                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:ev="http://www.w3.org/2001/xml-events">
+                <xforms:model id="model">
+                    <xforms:instance id="instance"/>
+                    <xforms:bind id="bind1" nodeset="image" relevant="../show = 'true'"/>
+                </xforms:model>
+            </models>
+        </input>
+        <input name="instances">
+            <instances>
+                <instance id="instance" model-id="model">
+                    <instance>
+                        <image>/ops/images/xforms/help.png</image>
+                        <show>true</show>
+                    </instance>
+                </instance>
+            </instances>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <image>/ops/images/xforms/help.png</image>
+                                    <show>false</show>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-output" relevant="false">/orbeon/ops/images/xforms/spacer.gif</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Layout: blank img/@src AVT links to default image" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance" model-id="model">
+                            <instance>
+                                <image>/ops/images/xforms/help.png</image>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:bind id="bind1" nodeset="image" relevant="../show = 'true'"/>
+                        <xforms:setvalue ev:event="xforms-ready" ref="image">    </xforms:setvalue>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="my-group">
+                        <xhtml:img src="{image}" alt="" id="my-image"/>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:span id="my-group" class="xforms-group">
+                    <xhtml:img src="/ops/images/xforms/spacer.gif" alt="" id="my-image"/>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
+    <test description="Ajax: blank img/@src AVT links to default image" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-server.xpl"/>
+        <input name="action">
+            <xxforms:action xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" >
+                <xxforms:event name="DOMActivate" source-control-id="my-trigger"/>
+            </xxforms:action>
+        </input>
+        <input name="controls">
+            <controls xmlns:xforms="http://www.w3.org/2002/xforms"
+                      xmlns:ev="http://www.w3.org/2001/xml-events">
+                <xxforms:attribute id="my-src-avt" for="my-image" name="src" value="{image}"/>
+                <xforms:trigger id="my-trigger">
+                    <xforms:setvalue ev:event="DOMActivate" ref="image" id="setvalue1">    </xforms:setvalue>
+                </xforms:trigger>
+            </controls>
+        </input>
+        <input name="models">
+            <models xmlns:xforms="http://www.w3.org/2002/xforms"
+                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:ev="http://www.w3.org/2001/xml-events">
+                <xforms:model id="model">
+                    <xforms:instance id="instance"/>
+                </xforms:model>
+            </models>
+        </input>
+        <input name="instances">
+            <instances>
+                <instance id="instance" model-id="model">
+                    <instance>
+                        <image>/ops/images/xforms/help.png</image>
+                    </instance>
+                </instance>
+            </instances>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <image>    </image>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:attribute id="my-src-avt" for="my-image" name="src">/orbeon/ops/images/xforms/spacer.gif</xxf:attribute>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

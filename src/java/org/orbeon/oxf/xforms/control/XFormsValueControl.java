@@ -210,6 +210,10 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         this.externalValue = externalValue;
     }
 
+    public String getNonRelevantEscapedExternalValue(PropertyContext propertyContext) {
+        return "";
+    }
+
     @Override
     public Object getBackCopy(PropertyContext propertyContext) {
 

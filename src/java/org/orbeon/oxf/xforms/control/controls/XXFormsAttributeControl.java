@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.xforms.control.controls;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -85,12 +87,12 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         return XFormsUtils.getRelatedEffectiveId(getEffectiveId(), forAttribute);
     }
 
-    private static String getExternalValueHandleSrc(String controlValue, String forAttribute) {
+    private static String getExternalValueHandleSrc(String controlValue, String attributeName) {
         String externalValue;
-        if ("src".equals(forAttribute)) {
+        if ("src".equals(attributeName)) {
             // TODO: make sure this is on xhtml:img!
             // Special case of xhtml:img/@src
-            if (controlValue != null && controlValue.trim().length() > 0)
+            if (StringUtils.isNotBlank(controlValue))
                 externalValue = controlValue;
             else
                 externalValue = XFormsConstants.DUMMY_IMAGE_URI;
@@ -104,13 +106,25 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         return externalValue;
     }
 
-    public static String getExternalValue(PipelineContext pipelineContext, XXFormsAttributeControl attributeControl, String forAttribute) {
+    @Override
+    public String getNonRelevantEscapedExternalValue(PropertyContext propertyContext) {
+        if ("src".equals(nameAttribute)) {
+            // TODO: make sure this is on xhtml:img!
+            // Return rewritten URL of dummy image URL
+            return XFormsUtils.resolveResourceURL(propertyContext, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
+                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
+        } else {
+            return super.getNonRelevantEscapedExternalValue(propertyContext);
+        }
+    }
+
+    public static String getExternalValue(PipelineContext pipelineContext, XXFormsAttributeControl attributeControl, String attributeName) {
         if (attributeControl != null) {
             // Get control value
-            return getExternalValueHandleSrc(attributeControl.getValue(pipelineContext), forAttribute);
+            return getExternalValueHandleSrc(attributeControl.getValue(pipelineContext), attributeName);
         } else {
             // Provide default
-            return getExternalValueHandleSrc(null, forAttribute);
+            return getExternalValueHandleSrc(null, attributeName);
         }
     }
 

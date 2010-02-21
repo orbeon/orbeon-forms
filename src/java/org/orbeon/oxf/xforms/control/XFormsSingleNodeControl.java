@@ -541,7 +541,8 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
             final String tempValue = xformsValueControl.getEscapedExternalValue(pipelineContext);
             value = (tempValue == null) ? "" : tempValue;
         } else {
-            value = "";
+            // Some controls don't have "" as non-relevant value
+            value = xformsValueControl.getNonRelevantEscapedExternalValue(pipelineContext);
         }
         if (doOutputElement || !isNewlyVisibleSubtree || !value.equals("")) {
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, elementName, attributesImpl);

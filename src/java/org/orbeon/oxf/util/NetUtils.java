@@ -884,20 +884,20 @@ public class NetUtils {
      * Transform an URI accessible from the server into a URI accessible from the client. The mapping expires with the
      * session.
      *
-     * @param pipelineContext   PipelineContext to obtain session
+     * @param propertyContext   context to obtain session
      * @param uri               server URI to transform
      * @param filename          file name
      * @param contentType       type of the content referred to by the URI, or null if unknown
      * @param lastModified      last modification timestamp
      * @return                  client URI
      */
-    public static String proxyURI(PipelineContext pipelineContext, String uri, String filename, String contentType, long lastModified) {
+    public static String proxyURI(PropertyContext propertyContext, String uri, String filename, String contentType, long lastModified) {
 
         // Create a digest, so that for a given URI we always get the same key
         final String digest = SecureUtils.digestString(uri, "MD5", "hex");
 
         // Get session
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         final ExternalContext.Session session = externalContext.getSession(true);// NOTE: We force session creation here. Should we? What's the alternative?
 
         if (session != null) {

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -117,13 +118,11 @@ public class XFormsOutputControl extends XFormsValueControl {
             // Download appearance
             final String dynamicMediatype = fileInfo.getFileMediatype(propertyContext);
             // NOTE: Never put timestamp for downloads otherwise browsers may cache the file to download which is not
-            // TODO: cast to PipelineContext
-            updatedValue = proxyValueIfNeeded((PipelineContext) propertyContext, internalValue, "", (dynamicMediatype != null) ? dynamicMediatype : mediatypeAttribute);
+            updatedValue = proxyValueIfNeeded(propertyContext, internalValue, "", (dynamicMediatype != null) ? dynamicMediatype : mediatypeAttribute);
         } else if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             // Image mediatype
             // Use dummy image as default value so that client always has something to load
-            // TODO: cast to PipelineContext
-            updatedValue = proxyValueIfNeeded((PipelineContext) propertyContext, internalValue, XFormsConstants.DUMMY_IMAGE_URI, mediatypeAttribute);
+            updatedValue = proxyValueIfNeeded(propertyContext, internalValue, XFormsConstants.DUMMY_IMAGE_URI, mediatypeAttribute);
         } else if (mediatypeAttribute != null && mediatypeAttribute.equals("text/html")) {
             // HTML mediatype
             updatedValue = internalValue;
@@ -142,7 +141,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         setExternalValue(updatedValue);
     }
 
-    private String proxyValueIfNeeded(PipelineContext pipelineContext, String internalValue, String defaultValue, String mediatype) {
+    private String proxyValueIfNeeded(PropertyContext propertyContext, String internalValue, String defaultValue, String mediatype) {
         String updatedValue;
         final String typeName = getBuiltinTypeName();
         if (internalValue != null && internalValue.length() > 0 && internalValue.trim().length() > 0) {
@@ -150,18 +149,19 @@ public class XFormsOutputControl extends XFormsValueControl {
                 // xs:anyURI type
                 if (!urlNorewrite) {
                     // Resolve xml:base and try to obtain a path which is an absolute path without the context
-                    final String resolvedURI = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+                    final String resolvedURI = XFormsUtils.resolveResourceURL(propertyContext, getControlElement(), internalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
                     final long lastModified = NetUtils.getLastModifiedIfFast(resolvedURI);
-                    updatedValue = NetUtils.proxyURI(pipelineContext, resolvedURI, fileInfo.getFileName(pipelineContext), mediatype, lastModified);
+                    updatedValue = NetUtils.proxyURI(propertyContext, resolvedURI, fileInfo.getFileName(propertyContext), mediatype, lastModified);
                 } else {
                     // Otherwise we leave the value as is
                     updatedValue = internalValue;
                 }
             } else if ("base64Binary".equals(typeName)) {
                 // xs:base64Binary type
-                final String uri = NetUtils.base64BinaryToAnyURI(pipelineContext, internalValue, NetUtils.SESSION_SCOPE);
+                // TODO: avoid cast to PipelineContext
+                final String uri = NetUtils.base64BinaryToAnyURI((PipelineContext) propertyContext, internalValue, NetUtils.SESSION_SCOPE);
                 // Value of -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now".
-                updatedValue = NetUtils.proxyURI(pipelineContext, uri, fileInfo.getFileName(pipelineContext), mediatype, -1);
+                updatedValue = NetUtils.proxyURI(propertyContext, uri, fileInfo.getFileName(propertyContext), mediatype, -1);
 
             } else {
                 // Return dummy image
@@ -178,7 +178,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     public String getEscapedExternalValue(PipelineContext pipelineContext) {
         if (DOWNLOAD_APPEARANCE.equals(getAppearance()) || mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             final String externalValue = getExternalValue(pipelineContext);
-            if (externalValue != null && !externalValue.trim().equals("")) {
+            if (StringUtils.isNotBlank(externalValue)) {
                 // External value is not blank, rewrite as absolute path. Two cases:
                 // o URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
                 // o URL is default value:  /ops/images/xforms/spacer.gif   => [/context][/version]/ops/images/xforms/spacer.gif
@@ -193,6 +193,17 @@ public class XFormsOutputControl extends XFormsValueControl {
         } else {
             // Return external value as is
             return getExternalValue(pipelineContext);
+        }
+    }
+
+    @Override
+    public String getNonRelevantEscapedExternalValue(PropertyContext propertyContext) {
+        if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
+            // Return rewritten URL of dummy image URL
+            return XFormsUtils.resolveResourceURL(propertyContext, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
+                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
+        } else {
+            return super.getNonRelevantEscapedExternalValue(propertyContext);
         }
     }
 

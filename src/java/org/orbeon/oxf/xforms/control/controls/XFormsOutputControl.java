@@ -287,8 +287,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     @Override
     public Object getBackCopy(PropertyContext propertyContext) {
         final XFormsOutputControl cloned = (XFormsOutputControl) super.getBackCopy(propertyContext);
-        // NOTE: this keeps old refs to control/contextStack, is it ok?
-        cloned.fileInfo = (FileInfo) fileInfo.clone();
+        cloned.fileInfo = (FileInfo) fileInfo.getBackCopy(propertyContext);
         return cloned;
     }
 

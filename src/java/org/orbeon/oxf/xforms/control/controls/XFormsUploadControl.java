@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
+import org.orbeon.oxf.xforms.control.ExternalCopyable;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -348,8 +349,7 @@ public class XFormsUploadControl extends XFormsValueControl {
     @Override
     public Object getBackCopy(PropertyContext propertyContext) {
         final XFormsUploadControl cloned = (XFormsUploadControl) super.getBackCopy(propertyContext);
-        // NOTE: this keeps old refs to control/contextStack, is it ok?
-        cloned.fileInfo = (FileInfo) fileInfo.clone();
+        cloned.fileInfo = (FileInfo) fileInfo.getBackCopy(propertyContext);
         return cloned;
     }
 
@@ -371,7 +371,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 /*
  * File information used e.g. by upload and output controls.
  */
-class FileInfo implements Cloneable {
+class FileInfo implements ExternalCopyable {
 
     private XFormsValueControl control;
     private XFormsContextStack contextStack;
@@ -479,10 +479,24 @@ class FileInfo implements Cloneable {
         }
     }
 
-    @Override
-    public Object clone() {
+    public Object getBackCopy(PropertyContext propertyContext) {
         try {
-            return super.clone();
+            final FileInfo cloned = (FileInfo) super.clone();
+
+            // Remove unneeded references
+            cloned.control = null;
+            cloned.contextStack = null;
+            cloned.mediatypeElement = null;
+            cloned.filenameElement = null;
+            cloned.sizeElement = null;
+
+            // Mark everything as evaluated because comparing must not cause reevaluation
+            cloned.isStateEvaluated = true;
+            cloned.isMediatypeEvaluated = true;
+            cloned.isSizeEvaluated = true;
+            cloned.isFilenameEvaluated = true;
+
+            return cloned;
         } catch (CloneNotSupportedException e) {
             throw new OXFException(e);
         }

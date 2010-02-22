@@ -51,6 +51,9 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
 
     @Override
     protected void addCustomClasses(StringBuilder classes, XFormsSingleNodeControl xformsControl) {
+        // Ask super first
+        super.addCustomClasses(classes, xformsControl);
+
         if (handlerContext.isSpanHTMLLayout() && xformsControl != null && xformsControl.isReadonly()) {
             // Add a special class to facilitate styling of readonly links with IE 6
             classes.append(" xforms-trigger-readonly");

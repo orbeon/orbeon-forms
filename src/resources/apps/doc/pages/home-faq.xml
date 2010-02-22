@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -280,20 +280,16 @@
             <a name="mailing-list-archives"/>
             <section>
                 <title>Where are the Orbeon Forms mailing list have archives?</title>
-                <p>
-                    At least in two places:
-                </p>
                 <ul>
                     <li>
                         <p>
-                            At <a href="http://www.ow2.org/wws/arc/ops-users">OW2</a>.
-                            This is the primary archive.
+                            At <a href="http://n4.nabble.com/Orbeon-Forms-ops-users-f24843.html">Nabble</a>.
                         </p>
                     </li>
                     <li>
                         <p>
-                            At <a href="http://www.nabble.com/ObjectWeb-OPS-f2535.html">Nabble</a>. This is an external
-                            archive powered by excellent software.
+                            At <a href="http://mail.ow2.org/wws/arc/ops-users">OW2</a>.
+                            This is the primary archive but has an older user interface.
                         </p>
                     </li>
                 </ul>

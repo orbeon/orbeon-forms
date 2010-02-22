@@ -6222,6 +6222,7 @@ ORBEON.xforms.Server = {
                                     if (ORBEON.util.Utils.getLocalName(itemsetsElement.childNodes[j]) == "itemset") {
                                         var itemsetElement = itemsetsElement.childNodes[j];
                                         var itemsetTree = ORBEON.util.String.eval(ORBEON.util.Dom.getStringValue(itemsetElement));
+                                        if (itemsetTree == null) itemsetTree = [];
                                         var controlId = ORBEON.util.Dom.getAttribute(itemsetElement, "id");
                                         var documentElement = ORBEON.util.Dom.getElementById(controlId);
                                         var documentElementClasses = documentElement.className.split(" ");

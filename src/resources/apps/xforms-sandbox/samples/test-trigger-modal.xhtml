@@ -39,23 +39,30 @@
 
                     name: "Modal trigger",
 
-                    testDoubleClick: function() {
-                        var control = document.getElementById("modal-trigger");
+                    clickWorker: function(control, start) {
                         var countControl = document.getElementById("click-count");
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                             YAHOO.util.UserAction.click(control);
                             YAHOO.util.UserAction.click(control);
                         }, function() {
                             var count = ORBEON.xforms.Controls.getCurrentValue(countControl);
-                            YAHOO.util.Assert.areEqual(1, count);
+                            YAHOO.util.Assert.areEqual(start + 1, count);
                             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                                 YAHOO.util.UserAction.click(control);
                                 YAHOO.util.UserAction.click(control);
                             }, function() {
                                 var count = ORBEON.xforms.Controls.getCurrentValue(countControl);
-                                YAHOO.util.Assert.areEqual(2, count);
+                                YAHOO.util.Assert.areEqual(start + 2, count);
                             });
                         });
+                    },
+
+                    testDoubleClickOnButton: function() {
+                        this.clickWorker(document.getElementById("modal-trigger-button"), 0);
+                    },
+
+                    testDoubleClickOnLink: function() {
+                        this.clickWorker(document.getElementById("modal-trigger-link"), 2);
                     }
                 }));
                 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
@@ -81,13 +88,18 @@
             </xforms:input>
         </xhtml:p>
         <xhtml:p>
-            <xforms:trigger id="modal-trigger" xxforms:modal="true">
-                <xforms:label>Do long operation</xforms:label>
+            <xforms:group>
                 <xforms:action ev:event="DOMActivate">
                     <xforms:setvalue ref="count" value="number(.) + 1"/>
                     <xforms:send submission="sleep-5-seconds"/>
                 </xforms:action>
-            </xforms:trigger>
+                <xforms:trigger id="modal-trigger-button" xxforms:modal="true">
+                    <xforms:label>Do long operation</xforms:label>
+                </xforms:trigger>
+                <xforms:trigger id="modal-trigger-link" xxforms:modal="true" appearance="minimal">
+                    <xforms:label>Do long operation</xforms:label>
+                </xforms:trigger>
+            </xforms:group>
         </xhtml:p>
     </xhtml:body>
 </xhtml:html>

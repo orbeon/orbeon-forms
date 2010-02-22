@@ -709,13 +709,15 @@ public class XFormsContextStack {
      * @return          the single item
      */
     public Item getRepeatCurrentSingleNode(String repeatId) {
-        for (int i = contextStack.size() - 1; i >= 0; i--) {
-            final BindingContext currentBindingContext = contextStack.get(i);
+        BindingContext currentBindingContext = getCurrentBindingContext();
+        do {
             if (isRepeatIterationBindingContext(currentBindingContext) && (repeatId == null || currentBindingContext.parent.elementId.equals(repeatId))) {
                 // Found binding context for relevant repeat iteration
                 return currentBindingContext.getSingleItem();
             }
-        }
+            currentBindingContext = currentBindingContext.parent;
+        } while (currentBindingContext != null);
+
         // It is required that there is a relevant enclosing xforms:repeat
         if (repeatId == null)
             throw new ValidationException("No enclosing xforms:repeat found.", getCurrentBindingContext().getLocationData());

@@ -493,6 +493,9 @@
                                             <pear>yellow</pear>
                                         </fruits>
                                     </xforms:instance>
+                                    <xforms:instance id="result">
+                                        <result/>
+                                    </xforms:instance>
                                     <xforms:action ev:event="xforms-ready">
                                         <xforms:setindex repeat="my-repeat" index="5"/>
                                     </xforms:action>
@@ -501,7 +504,21 @@
                             <xhtml:body>
 
                                 <xforms:repeat id="my-repeat" nodeset="*">
+                                    <xxforms:variable name="position" select="position()" as="xs:integer"/>
                                     <xforms:group id="my-group" ref="..">
+                                        <xforms:action ev:event="xforms-enabled">
+                                            <!-- Test use in actions -->
+                                            <xforms:insert context="instance('result')" nodeset="*"
+                                                           origin="xxforms:element('repeat-current', (xxforms:attribute('position', $position),
+                                                                                                      xxforms:attribute('repeat-current-1', xxforms:repeat-current()),
+                                                                                                      xxforms:attribute('repeat-current-2', xxforms:repeat-current('my-repeat')),
+                                                                                                      xxforms:attribute('repeat-index-1', xxforms:index()),
+                                                                                                      xxforms:attribute('repeat-index-2', index('my-repeat')),
+                                                                                                      xxforms:attribute('repeat-context-1', name(xxforms:context('my-group'))),
+                                                                                                      xxforms:attribute('repeat-context-2', xxforms:context('my-repeat'))
+                                                                                                      ))"/>
+                                        </xforms:action>
+                                        <!-- Test use in control values -->
                                         <xforms:output id="repeat-current-output-1" value="xxforms:repeat-current()"/>
                                         <xforms:output id="repeat-current-output-2" value="xxforms:repeat-current('my-repeat')"/>
                                         <xforms:output id="repeat-index-1" value="index('my-repeat')"/>
@@ -523,7 +540,68 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances/>
+                        <instances>
+                            <instance id="result" model-id="xf-2">
+                                <result>
+                                    <repeat-current position="1" repeat-current-1="bloody" repeat-current-2="bloody" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="bloody"/>
+                                    <repeat-current position="1" repeat-current-1="bloody" repeat-current-2="bloody" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="bloody"/>
+                                    <repeat-current position="1" repeat-current-1="bloody" repeat-current-2="bloody" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="bloody"/>
+                                    <repeat-current position="1" repeat-current-1="bloody" repeat-current-2="bloody" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="bloody"/>
+                                    <repeat-current position="1" repeat-current-1="bloody" repeat-current-2="bloody" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="bloody"/>
+                                    <repeat-current position="1" repeat-current-1="bloody" repeat-current-2="bloody" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="bloody"/>
+                                    <repeat-current position="1" repeat-current-1="bloody" repeat-current-2="bloody" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="bloody"/>
+                                    <repeat-current position="2" repeat-current-1="valencia" repeat-current-2="valencia" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="valencia"/>
+                                    <repeat-current position="2" repeat-current-1="valencia" repeat-current-2="valencia" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="valencia"/>
+                                    <repeat-current position="2" repeat-current-1="valencia" repeat-current-2="valencia" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="valencia"/>
+                                    <repeat-current position="2" repeat-current-1="valencia" repeat-current-2="valencia" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="valencia"/>
+                                    <repeat-current position="2" repeat-current-1="valencia" repeat-current-2="valencia" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="valencia"/>
+                                    <repeat-current position="2" repeat-current-1="valencia" repeat-current-2="valencia" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="valencia"/>
+                                    <repeat-current position="2" repeat-current-1="valencia" repeat-current-2="valencia" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="valencia"/>
+                                    <repeat-current position="3" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="3" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="3" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="3" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="3" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="3" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="3" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="4" repeat-current-1="red" repeat-current-2="red" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="red"/>
+                                    <repeat-current position="4" repeat-current-1="red" repeat-current-2="red" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="red"/>
+                                    <repeat-current position="4" repeat-current-1="red" repeat-current-2="red" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="red"/>
+                                    <repeat-current position="4" repeat-current-1="red" repeat-current-2="red" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="red"/>
+                                    <repeat-current position="4" repeat-current-1="red" repeat-current-2="red" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="red"/>
+                                    <repeat-current position="4" repeat-current-1="red" repeat-current-2="red" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="red"/>
+                                    <repeat-current position="4" repeat-current-1="red" repeat-current-2="red" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="red"/>
+                                    <repeat-current position="5" repeat-current-1="iPod" repeat-current-2="iPod" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="iPod"/>
+                                    <repeat-current position="5" repeat-current-1="iPod" repeat-current-2="iPod" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="iPod"/>
+                                    <repeat-current position="5" repeat-current-1="iPod" repeat-current-2="iPod" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="iPod"/>
+                                    <repeat-current position="5" repeat-current-1="iPod" repeat-current-2="iPod" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="iPod"/>
+                                    <repeat-current position="5" repeat-current-1="iPod" repeat-current-2="iPod" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="iPod"/>
+                                    <repeat-current position="5" repeat-current-1="iPod" repeat-current-2="iPod" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="iPod"/>
+                                    <repeat-current position="5" repeat-current-1="iPod" repeat-current-2="iPod" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="iPod"/>
+                                    <repeat-current position="6" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="6" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="6" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="6" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="6" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="6" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="6" repeat-current-1="green" repeat-current-2="green" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="green"/>
+                                    <repeat-current position="7" repeat-current-1="williams" repeat-current-2="williams" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="williams"/>
+                                    <repeat-current position="7" repeat-current-1="williams" repeat-current-2="williams" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="williams"/>
+                                    <repeat-current position="7" repeat-current-1="williams" repeat-current-2="williams" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="williams"/>
+                                    <repeat-current position="7" repeat-current-1="williams" repeat-current-2="williams" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="williams"/>
+                                    <repeat-current position="7" repeat-current-1="williams" repeat-current-2="williams" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="williams"/>
+                                    <repeat-current position="7" repeat-current-1="williams" repeat-current-2="williams" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="williams"/>
+                                    <repeat-current position="7" repeat-current-1="williams" repeat-current-2="williams" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="williams"/>
+                                    <repeat-current position="8" repeat-current-1="yellow" repeat-current-2="yellow" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="yellow"/>
+                                    <repeat-current position="8" repeat-current-1="yellow" repeat-current-2="yellow" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="yellow"/>
+                                    <repeat-current position="8" repeat-current-1="yellow" repeat-current-2="yellow" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="yellow"/>
+                                    <repeat-current position="8" repeat-current-1="yellow" repeat-current-2="yellow" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="yellow"/>
+                                    <repeat-current position="8" repeat-current-1="yellow" repeat-current-2="yellow" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="yellow"/>
+                                    <repeat-current position="8" repeat-current-1="yellow" repeat-current-2="yellow" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="yellow"/>
+                                    <repeat-current position="8" repeat-current-1="yellow" repeat-current-2="yellow" repeat-index-1="1" repeat-index-2="1" repeat-context-1="fruits" repeat-context-2="yellow"/>
+                                </result>
+                            </instance>
+                        </instances>
                         <controls>
                             <control effective-id="my-repeat" index="5"/>
                         </controls>

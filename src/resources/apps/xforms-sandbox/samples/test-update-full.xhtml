@@ -59,7 +59,7 @@
         <xhtml:div>
             <xhtml:table>
                 <xforms:repeat nodeset="instance('numbers')/number">
-                    <xforms:group ref=".[@value != 2 or instance('ui')/show-two = 'true']" xxforms:update="full">
+                    <xforms:group ref=".[@value != 2 or instance('ui')/show-two = 'true']" xxforms:update="full" id="group-update-full">
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:output value="." id="number"/>
@@ -93,7 +93,7 @@
             </xforms:trigger>
         </xhtml:div>
         <xhtml:div>
-            <xforms:repeat nodeset="instance('numbers')/number[if (instance('ui')/show-one = 'false') then @value != 1 else true()]"  xxforms:update="full">
+            <xforms:repeat nodeset="instance('numbers')/number[if (instance('ui')/show-one = 'false') then @value != 1 else true()]"  xxforms:update="full" id="repeat-update-full">
                 <xforms:output value="." id="repeat-value"/>
             </xforms:repeat>
         </xhtml:div>

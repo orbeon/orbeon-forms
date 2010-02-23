@@ -78,6 +78,23 @@ ORBEON.widgets.datatable.prototype.initProperties = function (container, index, 
     }
     this.bodyContainer = this.table.parentNode;
 
+    // Save original styles
+
+    this.significantNodes = [this.container, this.table, this.thead, this.tbody];
+    if (this.headBodySplit) {
+        this.significantNodes.push(this.header);
+        this.significantNodes.push(this.headerContainer);
+        if (this.scrollV) {
+            this.significantNodes.push(this.headerScrollContainer);
+        }
+    }
+
+    for (var i = 0; i < this.significantNodes.length; i++) {
+        var node=this.significantNodes[i];
+        node.savedWidth = node.style.width;
+        node.savedHeight = node.style.height;
+    }
+
 }
 
 ORBEON.widgets.datatable.prototype.finish = function () {
@@ -355,23 +372,15 @@ ORBEON.widgets.datatable.prototype.getActualOriginalTableWidth = function () {
 
 
 ORBEON.widgets.datatable.prototype.reset = function () {
-    // undo the split so that the size can be computed accurately
-    if (this.headBodySplit) {
-        var body = this.table.tBodies[0];
-        this.container.removeChild(this.bodyContainer);
-        this.header.appendChild(body);
-        this.table = this.header;
-    }
-    if (!YAHOO.util.Dom.hasClass(this.table.parentNode, 'yui-dt-hd')) {
-        var div1 = this.table.parentNode;
-        var div2 = div1.parentNode;
-        div1.removeChild(this.table);
-        div2.removeChild(div1);
-        div2.appendChild(this.table);
-    }
+
     // Restore styles rules to the table
-    this.table.style.width = this.originalWidth;
-    this.table.style.height = this.originalHeight;
+
+    for (var i = 0; i < this.significantNodes.length; i++) {
+        var node=this.significantNodes[i];
+        node.style.width = node.savedWidth;
+        node.style.height = node.savedHeight;
+    }
+
     // Restore column headers
     for (var icol = 0; icol < this.headerColumns.length; icol++) {
         var th = this.headerColumns[icol];
@@ -398,11 +407,6 @@ ORBEON.widgets.datatable.prototype.reset = function () {
             }
         }
     }
-    // Remove the containers widths and heights
-    this.container.style.height = '';
-    this.headerContainer.style.height = '';
-    this.container.style.width = '';
-    this.headerContainer.style.width = '';
 
     // remove the dynamic style sheet if it exists
     if (this.styleElt != undefined) {

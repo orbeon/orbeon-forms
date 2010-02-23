@@ -341,7 +341,7 @@ public class ControlsComparator {
                     new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getContentHandler()), skipRootElement), true)));
 
             // Create handler context
-            final HandlerContext handlerContext = new HandlerContext(controller, pipelineContext, containingDocument, null, externalContext) {
+            final HandlerContext handlerContext = new HandlerContext(controller, pipelineContext, containingDocument, null, externalContext, control2.getEffectiveId()) {
                 @Override
                 public String findXHTMLPrefix() {
                     // We know we serialize to plain HTML so unlike during initial page show, we don't need a particular prefix

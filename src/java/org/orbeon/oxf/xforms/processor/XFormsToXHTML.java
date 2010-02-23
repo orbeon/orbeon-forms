@@ -395,7 +395,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Set final output
             controller.setOutput(new DeferredContentHandlerImpl(contentHandler));
             // Set handler context
-            controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, encodedClientState, externalContext));
+            controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, encodedClientState, externalContext, null));
             // Process the entire input
             annotatedDocument.replay(new ExceptionWrapperContentHandler(controller, "converting XHTML+XForms document to XHTML"));
 

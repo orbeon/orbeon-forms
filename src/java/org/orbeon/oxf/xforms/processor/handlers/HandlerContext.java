@@ -49,6 +49,7 @@ public class HandlerContext {
     private final XFormsContainingDocument containingDocument;
     private final XFormsState encodedClientState;
     private final ExternalContext externalContext;
+    private final String topLevelControlEffectiveId;
 
     // Computed during construction
     private final String[] documentOrder;
@@ -73,12 +74,15 @@ public class HandlerContext {
 //    private int currentTabIndex = 0;
 
     public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext,
-                          XFormsContainingDocument containingDocument, XFormsState encodedClientState, ExternalContext externalContext) {
+                          XFormsContainingDocument containingDocument, XFormsState encodedClientState,
+                          ExternalContext externalContext, String topLevelControlEffectiveId) {
+
         this.controller = controller;
         this.pipelineContext = pipelineContext;
         this.containingDocument = containingDocument;
         this.encodedClientState = encodedClientState;
         this.externalContext = externalContext;
+        this.topLevelControlEffectiveId = topLevelControlEffectiveId;
 
         this.documentOrder = StringUtils.split(XFormsProperties.getOrder(containingDocument));
         this.labelElementName = XFormsProperties.getLabelElementName(containingDocument);
@@ -236,6 +240,18 @@ public class HandlerContext {
 
     public String getEffectiveId(Attributes controlElementAttributes) {
         return getIdPrefix() + controlElementAttributes.getValue("id") + getIdPostfix();
+    }
+
+    /**
+     * Return true iif the given control effective id is the same as the top-level control passed during construction.
+     *
+     * NOTE: This is used by the repeat handler to not output delimiters during full updates.
+     *
+     * @param effectiveId   control effective id
+     * @return              true iif id matches the id passed during construction
+     */
+    public boolean isFullUpdateTopLevelControl(String effectiveId) {
+        return effectiveId.equals(topLevelControlEffectiveId);
     }
 
     /**

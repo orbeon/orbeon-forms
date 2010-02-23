@@ -41,6 +41,8 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
         final boolean isTopLevelRepeat = handlerContext.countParentRepeats() == 0;
         final boolean isRepeatSelected = handlerContext.isRepeatSelected() || isTopLevelRepeat;
         final boolean isMustGenerateTemplate = handlerContext.isTemplate() || isTopLevelRepeat;
+        final boolean isMustGenerateDelimiters = !handlerContext.isNoScript() && !handlerContext.isFullUpdateTopLevelControl(effectiveId);
+        
         final int currentIteration = handlerContext.getCurrentIteration();
 
         final XFormsRepeatControl repeatControl = handlerContext.isTemplate() ? null : (XFormsRepeatControl) containingDocument.getObjectByEffectiveId(effectiveId);
@@ -51,7 +53,7 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
 
         // Place interceptor on output
         final DeferredContentHandler savedOutput = handlerContext.getController().getOutput();
-        final OutputInterceptor outputInterceptor = handlerContext.isNoScript() ? null : new OutputInterceptor(savedOutput, spanQName, new OutputInterceptor.Listener() {
+        final OutputInterceptor outputInterceptor = !isMustGenerateDelimiters ? null : new OutputInterceptor(savedOutput, spanQName, new OutputInterceptor.Listener() {
             public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
                 // Delimiter: begin repeat
                 outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),

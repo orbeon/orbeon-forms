@@ -36,7 +36,7 @@
         <p:output name="data" id="request-info"/>
     </p:processor>
 
-    <p:choose href="#request-info">
+    <p:choose href="#request-info" debug="request-info">
         <!-- Check for noscript mode form post OR script form post for replace="all" -->
         <!-- NOTE: In portlet mode, the method is not available, so just assume checking for the content type is enough -->
         <p:when test="(lower-case(/*/method) = ('post') or /*/container-type = 'portlet')
@@ -57,8 +57,12 @@
         </p:when>
         <!-- Check for XML post -->
         <!-- NOTE: In portlet mode, the method is not available, so just assume checking for the content type is enough -->
+        <!-- We check the content-type for application/xml and text/xml using a starts-with to handle the
+             case where a charset specified as part of the content-type  -->
         <p:when test="(lower-case(/*/method) = ('post', 'put') or /*/container-type = 'portlet')
-                        and (/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
+                        and (starts-with(/*/content-type, 'application/xml')
+                             or starts-with(/*/content-type, 'text/xml')
+                             or ends-with(/*/content-type, '+xml'))">
 
             <!-- Extract request body -->
             <p:processor name="oxf:request">

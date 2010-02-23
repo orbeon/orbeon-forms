@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -184,6 +184,11 @@ p, fieldset, table { margin-bottom: 1em }
 /* Make button appear the same color as a link */
 .xforms-trigger-appearance-xxforms-minimal, .xforms-trigger-appearance-xxforms-minimal button {
     color: #6E6E6E;
+}
+
+/* But force minimal buttons color within heading */
+h1 .xforms-trigger-appearance-xxforms-minimal, h2 .xforms-trigger-appearance-xxforms-minimal, h3 .xforms-trigger-appearance-xxforms-minimal {
+    color: #004B92;
 }
 
 /* Set input/textarea controls background */

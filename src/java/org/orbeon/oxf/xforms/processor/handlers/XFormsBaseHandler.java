@@ -582,6 +582,6 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     }
 
     protected QName getAppearance(Attributes controlAttributes) {
-        return handlerContext.getController().getAttributeQNameValue(controlAttributes.getValue("appearance"));
+        return handlerContext.getController().getAttributeQNameValue(controlAttributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName()));
     }
 }

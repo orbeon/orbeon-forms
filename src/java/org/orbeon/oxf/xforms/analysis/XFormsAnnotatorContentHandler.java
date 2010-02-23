@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
@@ -26,9 +27,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * ContentHandler that:
@@ -63,6 +62,16 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
     private final boolean isGenerateIds;
 
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
+    private final List<String> xhtmlElementLocalnames = new ArrayList<String>();
+
+    private static final Set<String> TABLE_CONTAINERS  = new HashSet<String>();
+    static {
+        TABLE_CONTAINERS.add("table");
+        TABLE_CONTAINERS.add("tbody");
+        TABLE_CONTAINERS.add("thead");
+        TABLE_CONTAINERS.add("tfoot");
+        TABLE_CONTAINERS.add("tr");
+    }
 
     private final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
     private final AttributesImpl reusableAttributes = new AttributesImpl();
@@ -145,6 +154,9 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
 
         namespaceSupport.startElement();
 
+        if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri))
+            xhtmlElementLocalnames.add(localname);
+
         // Check for XForms or extension namespaces
         final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
         final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
@@ -205,6 +217,10 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "for", htmlTitleElementId);
                 super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
                 super.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxforms:text", attributes);
+            } else if ("group".equals(localname) && isClosestXHTMLAncestorTableContainer()) {
+                // Closest xhtml:* ancestor is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
+                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(), XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
+                super.startElement(uri, localname, qName, attributes);
             } else {
                 // Leave element untouched (except for the id attribute)
                 super.startElement(uri, localname, qName, attributes);
@@ -346,6 +362,14 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
         level++;
     }
 
+    private boolean isClosestXHTMLAncestorTableContainer() {
+        if (xhtmlElementLocalnames.size() > 0) {
+            final String closestXHTMLElementLocalname = xhtmlElementLocalnames.get(xhtmlElementLocalnames.size() - 1);
+            return TABLE_CONTAINERS.contains(closestXHTMLElementLocalname);
+        }
+        return false;
+    }
+
     private boolean hasAVT(Attributes attributes) {
         final int attributesCount = attributes.getLength();
         if (attributesCount > 0) {
@@ -442,6 +466,9 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
             // Leave element untouched
             super.endElement(uri, localname, qName);
         }
+
+        if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri))
+            xhtmlElementLocalnames.remove(xhtmlElementLocalnames.size() - 1);
 
         namespaceSupport.endElement();
     }

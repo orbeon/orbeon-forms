@@ -18,6 +18,7 @@ import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -50,8 +51,6 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
     private final Stack<HandlerInfo> handlerInfos = new Stack<HandlerInfo>();
     private HandlerInfo currentHandlerInfo;
     private boolean isFillingUpSAXStore;
-
-    private final Stack<String> elementNames = new Stack<String>();
 
     private final NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
@@ -124,11 +123,6 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
         return namespaceSupport;
     }
 
-
-    public Stack<String> getElementNames() {
-        return elementNames;
-    }
-
     public void startDocument() throws SAXException {
         try {
             output.startDocument();
@@ -151,7 +145,6 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
             level++;
 
             namespaceSupport.startElement();
-            elementNames.add(XMLUtils.buildExplodedQName(uri, localname));
 
             if (isFillingUpSAXStore) {
                 // Fill-up SAXStore
@@ -226,7 +219,6 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
                 output.endElement(uri, localname, qName);
             }
 
-            elementNames.pop();
             namespaceSupport.endElement();
 
             level--;
@@ -503,7 +495,7 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
         public abstract boolean match(Attributes attributes);
 
         protected QName getAppearance(Attributes attributes) {
-            return getAttributeQNameValue(attributes.getValue("appearance"));
+            return getAttributeQNameValue(attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName()));
         }
     }
 

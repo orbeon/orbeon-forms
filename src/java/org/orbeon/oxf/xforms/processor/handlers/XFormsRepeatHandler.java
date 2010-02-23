@@ -157,9 +157,10 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
         handlerContext.getController().setOutput(savedOutput);
 
         // Delimiter: end repeat
-        if (outputInterceptor != null && isMustGenerateBeginEndDelimiters)
+        if (outputInterceptor != null && isMustGenerateBeginEndDelimiters) {
             outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
                 outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-begin-end", "repeat-end-" + effectiveId);
+        }
     }
 
     private static void addRepeatClasses(StringBuilder sb, Attributes attributes) {

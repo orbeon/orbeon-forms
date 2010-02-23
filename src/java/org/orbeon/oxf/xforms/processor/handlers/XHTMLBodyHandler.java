@@ -205,7 +205,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         // xforms:output
         controller.registerHandler(XFormsOutputTextHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
             public boolean match(Attributes attributes) {
-                return XFormsConstants.XXFORMS_TEXT_APPEARANCE_QNAME.equals(controller.getAttributeQNameValue(attributes.getValue("appearance")));
+                return XFormsConstants.XXFORMS_TEXT_APPEARANCE_QNAME.equals(controller.getAttributeQNameValue(attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName())));
             }
         });
         controller.registerHandler(XFormsOutputDownloadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", controller.new Matcher() {
@@ -252,6 +252,16 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         controller.registerHandler(XFormsGroupFieldsetHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", controller.new Matcher() {
             public boolean match(Attributes attributes) {
                 return XFormsConstants.XXFORMS_FIELDSET_APPEARANCE_QNAME.equals(getAppearance(attributes));
+            }
+        });
+        controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", controller.new Matcher() {
+            public boolean match(Attributes attributes) {
+                // XFormsAnnotatorContentHandler adds this appearance if needed
+
+                // NOTE: we just check on the attribute value instead of resolving the QName, so that XFormsAnnotatorContentHandler
+                // doesn't have to declare the xxforms:* prefix.
+                final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName());
+                return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue);
             }
         });
         controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group");

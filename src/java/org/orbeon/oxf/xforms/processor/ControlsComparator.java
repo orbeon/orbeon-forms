@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.processor.handlers.*;
 import org.orbeon.oxf.xml.*;
@@ -335,7 +336,9 @@ public class ControlsComparator {
             // So for now, perform simple steps here, and later this can be revisited.
             //
             final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
-            final boolean skipRootElement = !(control2 instanceof XFormsRepeatControl); // a little hacky to do this here, knowledge should be in control itself
+            final boolean skipRootElement = !(control2 instanceof XFormsRepeatControl
+                    || (control2 instanceof XFormsGroupControl
+                        && XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(control2.getAppearancePlain()))); // a little hacky to do this here, knowledge should be in control itself
             controller.setOutput(new DeferredContentHandlerImpl(new XHTMLRewrite().getRewriteContentHandler(externalContext,
                     new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getContentHandler()), skipRootElement), true)));
 

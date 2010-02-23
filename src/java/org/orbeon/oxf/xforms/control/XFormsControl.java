@@ -383,8 +383,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      */
     public String getAppearance() {
         if (appearance == null)
-            appearance = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(controlElement, "appearance"));
+            appearance = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(controlElement, XFormsConstants.APPEARANCE_QNAME.getName()));
         return appearance;
+    }
+
+    public String getAppearancePlain() {
+        return controlElement.attributeValue(XFormsConstants.APPEARANCE_QNAME);
     }
 
     /**

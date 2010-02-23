@@ -26,13 +26,16 @@
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <!-- <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-xforms-controls.js"/> -->
-        <xforms:model xxforms:xhtml-layout="span" xxforms:ajax.update.full.threshold="1">
+        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-update-full.js"/>
+        <xforms:model xxforms:xhtml-layout="span" xxforms:ajax.update.full.threshold="0">
             <xforms:instance id="ui">
                 <ui>
                     <show-one>true</show-one>
                     <show-two>true</show-two>
                     <case-value>1</case-value>
+                    <first-input>First</first-input>
+                    <second-input>Second</second-input>
+                    <focus-value>1</focus-value>
                 </ui>
             </xforms:instance>
             <xforms:instance id="numbers">
@@ -59,10 +62,16 @@
         <xhtml:div>
             <xhtml:table>
                 <xforms:repeat nodeset="instance('numbers')/number">
+                    <xxforms:variable name="position" select="position()"/>
                     <xforms:group ref=".[@value != 2 or instance('ui')/show-two = 'true']" xxforms:update="full" id="group-update-full">
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:output value="." id="number"/>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input id="field" ref=".">
+                                    <xforms:setvalue ev:event="DOMFocusIn" ref="instance('ui')/show-two" value="if (. = 'true') then 'false' else 'true'"/>
+                                </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>
                     </xforms:group>
@@ -97,6 +106,14 @@
                 <xforms:output value="." id="repeat-value"/>
             </xforms:repeat>
         </xhtml:div>
+
+        <xhtml:h2>Restoring the focus</xhtml:h2>
+        <xforms:group xxforms:update="full">
+            <xforms:setvalue ev:event="DOMFocusIn" ref="focus-value" value=". + 1"/>
+            <xforms:output value="focus-value"/>
+            <xforms:input id="first-input" ref="first-input"/>
+            <xforms:input id="second-input" ref="second-input[../focus-value != 3]"/>
+        </xforms:group>
 
     </xhtml:body>
 </xhtml:html>

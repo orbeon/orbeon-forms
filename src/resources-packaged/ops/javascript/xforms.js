@@ -6837,7 +6837,8 @@ ORBEON.xforms.Server = {
                                             }
                                             // First try inserting between group delimiters, and if it doesn't work between repeat delimiters
                                             if (! insertBetweenDelimiters("group"))
-                                                insertBetweenDelimiters("repeat");
+                                                if (! insertBetweenDelimiters("repeat"))
+                                                    insertBetweenDelimiters("xforms-case");
                                         }
                                     }
 

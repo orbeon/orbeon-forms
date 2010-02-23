@@ -267,7 +267,7 @@ public class ControlsComparator {
     }
 
     private boolean mustDoFullUpdate() {
-        return tempCH != null && ((SAXStore) ch.getContentHandler()).getAttributesCount() > fullUpdateThreshold;
+        return tempCH != null && ((SAXStore) ch.getContentHandler()).getAttributesCount() >= fullUpdateThreshold;
     }
 
     private SAXStore.Mark getUpdateFullMark(XFormsControl control) {

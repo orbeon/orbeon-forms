@@ -6797,9 +6797,50 @@ ORBEON.xforms.Server = {
                                         var innerElement = innerElements[j];
                                         var innerHTML = ORBEON.util.Dom.getStringValue(innerElement);
                                         var controlId = ORBEON.util.Dom.getAttribute(innerElement, "id");
-
-                                        var documentElement = ORBEON.util.Dom.getElementById(controlId);
-                                        documentElement.innerHTML = innerHTML;
+                                        var documentElement = document.getElementById(controlId);
+                                        if (documentElement != null) {
+                                            // Found container
+                                            documentElement.innerHTML = innerHTML;
+                                        } else {
+                                            // Insertion between delimiters
+                                            function insertBetweenDelimiters(prefix) {
+                                                // Some elements don't support innerHTML on IE (table, tr...). So for those, we create a div, and
+                                                // complete the table with the missing parent elements.
+                                                var SPECIAL_ELEMENTS = {
+                                                    "table": { opening: "<table>", closing: "</table>", level: 1 },
+                                                    "thead": { opening: "<table><thead>", closing: "</thead></table>", level: 2 },
+                                                    "tbody": { opening: "<table><tbody>", closing: "</tbody></table>", level: 2 },
+                                                    "tr":    { opening: "<table><tr>", closing: "</tr></table>", level: 2 }
+                                                };
+                                                var delimiterBegin = document.getElementById(prefix + "-begin-" + controlId);
+                                                if (delimiterBegin != null) {
+                                                    // Remove content between begin and end marker
+                                                    while (delimiterBegin.nextSibling.nodeType != ELEMENT_TYPE || delimiterBegin.nextSibling.id != prefix + "-end-" + controlId)
+                                                        delimiterBegin.parentNode.removeChild(delimiterBegin.nextSibling);
+                                                    // Insert content
+                                                    var delimiterEnd = delimiterBegin.nextSibling;
+                                                    var specialElementSpec = SPECIAL_ELEMENTS[delimiterBegin.parentNode.tagName.toLowerCase()];
+                                                    var dummyElement = document.createElement(specialElementSpec == null ? delimiterBegin.parentNode.tagName : "div");
+                                                    dummyElement.innerHTML = specialElementSpec == null ? innerHTML : specialElementSpec.opening + innerHTML + specialElementSpec.closing;
+                                                    // For special elements, the parent is nested inside the dummyElement
+                                                    var dummyParent = specialElementSpec == null ? dummyElement
+                                                        : specialElementSpec.level == 1 ? YAHOO.util.Dom.getFirstChild(dummyElement)
+                                                        : specialElementSpec.level == 2 ? YAHOO.util.Dom.getFirstChild(YAHOO.util.Dom.getFirstChild(dummyElement))
+                                                        : null;
+                                                    // Move nodes to the real DOM
+                                                    while (dummyParent.firstChild != null) {
+                                                        console.log("   Inserting", dummyParent.firstChild);
+                                                        YAHOO.util.Dom.insertBefore(dummyParent.firstChild, delimiterEnd);
+                                                    }
+                                                    return true;
+                                                } else {
+                                                    return false;
+                                                }
+                                            }
+                                            // First try inserting between group delimiters, and if it doesn't work between repeat delimiters
+                                            if (! insertBetweenDelimiters("group"))
+                                                insertBetweenDelimiters("repeat");
+                                        }
                                     }
 
                                     // Handle updates to HTML attributes

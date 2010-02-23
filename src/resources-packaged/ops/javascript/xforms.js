@@ -6828,10 +6828,8 @@ ORBEON.xforms.Server = {
                                                         : specialElementSpec.level == 2 ? YAHOO.util.Dom.getFirstChild(YAHOO.util.Dom.getFirstChild(dummyElement))
                                                         : null;
                                                     // Move nodes to the real DOM
-                                                    while (dummyParent.firstChild != null) {
-                                                        console.log("   Inserting", dummyParent.firstChild);
+                                                    while (dummyParent.firstChild != null)
                                                         YAHOO.util.Dom.insertBefore(dummyParent.firstChild, delimiterEnd);
-                                                    }
                                                     return true;
                                                 } else {
                                                     return false;

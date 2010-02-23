@@ -2483,6 +2483,9 @@ ORBEON.xforms.Controls = {
      */
     setFocus: function(controlId) {
         var control = ORBEON.util.Dom.getElementById(controlId);
+        // Keep track of the id of the last known control which has focus
+        ORBEON.xforms.Globals.currentFocusControlId = controlId;
+        ORBEON.xforms.Globals.currentFocusControlElement = control;
         ORBEON.xforms.Globals.maskFocusEvents = true;
         if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")
@@ -2937,6 +2940,7 @@ ORBEON.xforms.Events = {
 
                 // Keep track of the id of the last known control which has focus
                 ORBEON.xforms.Globals.currentFocusControlId = targetControlElement.id;
+                ORBEON.xforms.Globals.currentFocusControlElement = targetControlElement;
 
                 // Fire events
                 ORBEON.xforms.Server.fireEvents(events, true);
@@ -2965,6 +2969,7 @@ ORBEON.xforms.Events = {
 
                     // Keep track of the id of the last known control which has focus
                     ORBEON.xforms.Globals.currentFocusControlId = targetControlElement.id;
+                    ORBEON.xforms.Globals.currentFocusControlElement = targetControlElement;
                 }
 
                 if (ORBEON.widgets.YUICalendar.appliesToControl(targetControlElement)) {
@@ -3531,6 +3536,7 @@ ORBEON.xforms.Events = {
         // Preemptively store current control in previousDOMFocusOut, so when another control gets
         // the focus it will send the value of this control to the server
         ORBEON.xforms.Globals.currentFocusControlId = control.id;
+        ORBEON.xforms.Globals.currentFocusControlElement = control;
     },
 
     treeClickValueUpdated: function(control) {
@@ -4525,7 +4531,8 @@ ORBEON.xforms.Init = {
             executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
             maskFocusEvents: false,              // Avoid catching focus event when we do call setfocus upon server request
             maskDialogCloseEvents: false,        // Avoid catching a dialog close event received from the server, so we don't sent it back to the server
-            currentFocusControlId: null,         // Track which control has focus
+            currentFocusControlId: null,         // Id of the control that got the focus last
+            currentFocusControlElement: null,    // Element for the control that got the focus last
             htmlAreaNames: [],                   // Names of the FCK editors, which we need to reenable them on Firefox
             repeatTreeChildToParent: {},         // Describes the repeat hierarchy
             repeatIndexes: {},                   // The current index for each repeat
@@ -6839,6 +6846,12 @@ ORBEON.xforms.Server = {
                                             if (! insertBetweenDelimiters("group"))
                                                 if (! insertBetweenDelimiters("repeat"))
                                                     insertBetweenDelimiters("xforms-case");
+                                        }
+                                        // If the element that had the focus is not in the document anymore, it might have been replaced by
+                                        // setting the innerHTML, so set focus it again
+                                        if (! YAHOO.util.Dom.inDocument(ORBEON.xforms.Globals.currentFocusControlElement, document)) {
+                                            var focusControl = document.getElementById(ORBEON.xforms.Globals.currentFocusControlId);
+                                            if (focusControl != null) ORBEON.xforms.Controls.setFocus(focusControl);
                                         }
                                     }
 

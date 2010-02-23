@@ -69,19 +69,10 @@ ORBEON.widgets.datatable.prototype.finish = function () {
     var pxWidth;
 
     if (width.indexOf('%') != - 1) {
-        YAHOO.util.Dom.addClass(this.table, 'fr-datatable-collapsed');
-        var pxWidth = this.headerContainer.clientWidth;
-        YAHOO.util.Dom.removeClass(this.table, 'fr-datatable-collapsed');
 
-        // the following block is required to calculate the width in a way that works for IE 6.0 :(
-        //this.headerContainer.style.overflow = "hidden";
-        //this.headerContainer.style.width = this.originalWidth;
-        
         var pxWidth = this.headerContainer.clientWidth;
-        // Convert % into px...
         width = pxWidth + 'px';
-        this.headerContainer.style.overflow = "";
-        this.headerContainer.style.width = "";
+
     } else {
         pxWidth = this.table.clientWidth;
     }

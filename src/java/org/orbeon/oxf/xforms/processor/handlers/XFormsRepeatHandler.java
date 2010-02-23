@@ -41,7 +41,8 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
         final boolean isTopLevelRepeat = handlerContext.countParentRepeats() == 0;
         final boolean isRepeatSelected = handlerContext.isRepeatSelected() || isTopLevelRepeat;
         final boolean isMustGenerateTemplate = handlerContext.isTemplate() || isTopLevelRepeat;
-        final boolean isMustGenerateDelimiters = !handlerContext.isNoScript() && !handlerContext.isFullUpdateTopLevelControl(effectiveId);
+        final boolean isMustGenerateDelimiters = !handlerContext.isNoScript();
+        final boolean isMustGenerateBeginEndDelimiters = !handlerContext.isFullUpdateTopLevelControl(effectiveId);
         
         final int currentIteration = handlerContext.getCurrentIteration();
 
@@ -56,10 +57,12 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
         final OutputInterceptor outputInterceptor = !isMustGenerateDelimiters ? null : new OutputInterceptor(savedOutput, spanQName, new OutputInterceptor.Listener() {
             public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
                 // Delimiter: begin repeat
-                outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                        outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-begin-end", "repeat-begin-" + effectiveId);
-                outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                        outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-delimiter", null);
+                if (isMustGenerateBeginEndDelimiters) {
+                    outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
+                            outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-begin-end", "repeat-begin-" + effectiveId);
+                    outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
+                            outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-delimiter", null);
+                }
             }
         });
         // TODO: is the use of XFormsElementFilterContentHandler necessary now?
@@ -154,7 +157,7 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
         handlerContext.getController().setOutput(savedOutput);
 
         // Delimiter: end repeat
-        if (outputInterceptor != null)
+        if (outputInterceptor != null && isMustGenerateBeginEndDelimiters)
             outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI(),
                 outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-begin-end", "repeat-end-" + effectiveId);
     }

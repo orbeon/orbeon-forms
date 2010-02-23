@@ -185,4 +185,9 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
 
         // NOTE: in this case, don't do the regular Ajax output (maybe in the future we should to be more consistent?)
     }
+
+    @Override
+    public boolean supportFullAjaxUpdates() {
+        return false;
+    }
 }

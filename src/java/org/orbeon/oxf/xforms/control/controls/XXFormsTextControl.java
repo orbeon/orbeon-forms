@@ -69,4 +69,9 @@ public class XXFormsTextControl extends XFormsOutputControl implements XFormsPse
         // Output element
         outputElement(pipelineContext, ch, textControlInfo2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "text");
     }
+
+    @Override
+    public boolean supportFullAjaxUpdates() {
+        return false;
+    }
 }

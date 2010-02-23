@@ -164,4 +164,9 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         // Output element
         outputElement(pipelineContext, ch, attributeControlInfo2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "attribute");
     }
+
+    @Override
+    public boolean supportFullAjaxUpdates() {
+        return false;
+    }
 }

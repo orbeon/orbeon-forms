@@ -1323,6 +1323,15 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return true;
     }
 
+    /**
+     * Whether the control support full Ajax updates.
+     *
+     * @return true iif it does
+     */
+    public boolean supportFullAjaxUpdates() {
+        return true;
+    }
+
     public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other,
                                AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
         // NOP

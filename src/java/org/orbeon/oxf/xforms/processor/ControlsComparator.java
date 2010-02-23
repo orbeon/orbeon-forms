@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.processor.handlers.*;
 import org.orbeon.oxf.xml.*;
@@ -275,10 +274,10 @@ public class ControlsComparator {
         //
         // o there is not already a full update in progress
         // o we are in span layout
-        // o the control is a container control (group, switch, repeat, dialog, XBL components)
+        // o the control supports full Ajax updates
         // o there is xxforms:update="full"
         //
-        if (tempCH == null && isSpanHTMLLayout && control instanceof XFormsContainerControl && !(control instanceof XFormsPseudoControl)) {
+        if (tempCH == null && isSpanHTMLLayout && control.supportFullAjaxUpdates()) {
             return containingDocument.getStaticState().getElementMark(control.getPrefixedId());
         } else {
             return null;

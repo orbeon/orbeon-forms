@@ -11,21 +11,22 @@
     <xhtml:head>
         <xhtml:title>Out of bound</xhtml:title>
         <xforms:model>
-            
+
             <!-- Instance with state selected by user -->
             <xforms:instance id="state">
                 <state/>
             </xforms:instance>
-            
+
             <!-- Selected state is only valid if it is in the itemset -->
             <xforms:bind nodeset="instance('state')" constraint=". = (instance('states')/state/@value, '')"/>
-            
+
             <!-- List of possible states -->
             <xforms:instance id="states">
                 <states>
                     <state value="ma">Maryland</state>
                     <state value="ca">California</state>
                     <state value="co">Colorado</state>
+                    <state value="nv">Nevada</state>
                 </states>
             </xforms:instance>
         </xforms:model>
@@ -38,7 +39,7 @@
             .xbl-fr-error-summary .fr-error-alert { color: black; }
             .xforms-repeat-selected-item-1 { background-color: transparent; }
         </xhtml:style>
-        
+
     </xhtml:head>
     <xhtml:body>
 
@@ -63,12 +64,12 @@
             <xforms:label>Remove California</xforms:label>
             <xforms:delete ev:event="DOMActivate" nodeset="instance('states')/state[@value = 'ca']"/>
         </fr:button>
-        
+
         <xhtml:p>3. The form is marked as invalid, and the alert tells the user about the previous value.</xhtml:p>
 
         <fr:error-summary id="error-summary" observer="state-selector">
             <fr:label>Error in this form</fr:label>
         </fr:error-summary>
-        
+
     </xhtml:body>
 </xhtml:html>

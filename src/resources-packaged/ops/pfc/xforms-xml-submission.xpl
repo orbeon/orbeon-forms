@@ -36,7 +36,7 @@
         <p:output name="data" id="request-info"/>
     </p:processor>
 
-    <p:choose href="#request-info" debug="request-info">
+    <p:choose href="#request-info">
         <!-- Check for noscript mode form post OR script form post for replace="all" -->
         <!-- NOTE: In portlet mode, the method is not available, so just assume checking for the content type is enough -->
         <p:when test="(lower-case(/*/method) = ('post') or /*/container-type = 'portlet')

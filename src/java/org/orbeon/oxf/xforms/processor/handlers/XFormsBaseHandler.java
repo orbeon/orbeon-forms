@@ -92,11 +92,11 @@ public abstract class XFormsBaseHandler extends ElementHandler {
      * o control is not null and is non-relevant
      * o control is null and is not in a repeat template
      *
-     * @param xformsControl control to check or null if no concrete control available
-     * @return              whether the control is to be marked as disabled
+     * @param control   control to check or null if no concrete control available
+     * @return          whether the control is to be marked as disabled
      */
-    protected boolean isDisabled(XFormsSingleNodeControl xformsControl) {
-        return xformsControl != null && !xformsControl.isRelevant() || xformsControl == null && !handlerContext.isTemplate();
+    protected boolean isDisabled(XFormsControl control) {
+        return control != null && !control.isRelevant() || control == null && !handlerContext.isTemplate();
     }
 
     public static void  handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsContainingDocument containingDocument, XFormsSingleNodeControl xformsControl) {
@@ -108,60 +108,64 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
     }
 
-    public void handleMIPClasses(StringBuilder sb, String controlPrefixedId, XFormsSingleNodeControl xformsControl) {
+    public void handleMIPClasses(StringBuilder sb, String controlPrefixedId, XFormsControl control) {
 
         // Output MIP classes only having a binding
         final boolean hasBinding = containingDocument.getStaticState().hasNodeBinding(controlPrefixedId);
         if (hasBinding) {
-            if (xformsControl != null) {
+            if (control != null) {
                 // The case of a concrete control
 
                 // Output standard MIP classes
-                if (!xformsControl.isRelevant()) {
+                if (!control.isRelevant()) {
                     if (sb.length() > 0)
                         sb.append(' ');
                     sb.append("xforms-disabled");
                 }
-                if (!xformsControl.isValid()) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append("xforms-invalid");
-                }
-                if (xformsControl.isReadonly()) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append("xforms-readonly");
-                }
-                if (xformsControl.isRequired()) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append("xforms-required");
-                    if (xformsControl instanceof XFormsValueControl) {
-                        // NOTE: Test above excludes xforms:group
-                        if (isEmpty(xformsControl))
-                            sb.append(" xforms-required-empty");
-                        else
-                            sb.append(" xforms-required-filled");
+                if (control instanceof XFormsSingleNodeControl) {
+                    // TODO: inherit from this method instead rather than using instanceof
+                    final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
+                    if (!singleNodeControl.isValid()) {
+                        if (sb.length() > 0)
+                            sb.append(' ');
+                        sb.append("xforms-invalid");
                     }
-                }
+                    if (singleNodeControl.isReadonly()) {
+                        if (sb.length() > 0)
+                            sb.append(' ');
+                        sb.append("xforms-readonly");
+                    }
+                    if (singleNodeControl.isRequired()) {
+                        if (sb.length() > 0)
+                            sb.append(' ');
+                        sb.append("xforms-required");
+                        if (control instanceof XFormsValueControl) {
+                            // NOTE: Test above excludes xforms:group
+                            if (isEmpty(control))
+                                sb.append(" xforms-required-empty");
+                            else
+                                sb.append(" xforms-required-filled");
+                        }
+                    }
 
-                // Output custom MIPs classes
-                final String customMIPs = xformsControl.getCustomMIPsClasses();
-                if (customMIPs != null) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append(customMIPs);
-                }
+                    // Output custom MIPs classes
+                    final String customMIPs = singleNodeControl.getCustomMIPsClasses();
+                    if (customMIPs != null) {
+                        if (sb.length() > 0)
+                            sb.append(' ');
+                        sb.append(customMIPs);
+                    }
 
-                // Output type class
-                final String typeName = xformsControl.getBuiltinTypeName();
-                if (typeName != null) {
-                    // Control is bound to built-in schema type
-                    if (sb.length() > 0)
-                        sb.append(' ');
+                    // Output type class
+                    final String typeName = singleNodeControl.getBuiltinTypeName();
+                    if (typeName != null) {
+                        // Control is bound to built-in schema type
+                        if (sb.length() > 0)
+                            sb.append(' ');
 
-                    sb.append("xforms-type-");
-                    sb.append(typeName);
+                        sb.append("xforms-type-");
+                        sb.append(typeName);
+                    }
                 }
             } else if (!handlerContext.isTemplate()) {
                 // Case of a non-concrete control - simply mark the control as disabled
@@ -172,9 +176,8 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
     }
 
-    private boolean isEmpty(XFormsControl xformsControl) {
-        // TODO: Configure meaning of "empty" through property (trimming vs. no strict) 
-        return xformsControl instanceof XFormsValueControl && "".equals(((XFormsValueControl) xformsControl).getValue(pipelineContext));
+    private boolean isEmpty(XFormsControl control) {
+        return control instanceof XFormsValueControl && XFormsModelBinds.isEmptyValue(((XFormsValueControl) control).getValue(pipelineContext));
     }
 
     protected static void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {
@@ -232,11 +235,11 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return reusableAttributes;
     }
 
-    protected StringBuilder getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl xformsControl) {
-        return getInitialClasses(controlURI, controlName, controlAttributes, xformsControl, null, false);
+    protected StringBuilder getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl control) {
+        return getInitialClasses(controlURI, controlName, controlAttributes, control, null, false);
     }
 
-    protected StringBuilder getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl xformsControl, QName appearance, boolean incrementalDefault) {
+    protected StringBuilder getInitialClasses(String controlURI, String controlName, Attributes controlAttributes, XFormsControl control, QName appearance, boolean incrementalDefault) {
 
         final StringBuilder sb = new StringBuilder(50);
         // User-defined classes go first
@@ -251,9 +254,9 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                         value = attributeValue;
                     } else {
                         // Possible AVT
-                        if (xformsControl != null) {
+                        if (control != null) {
                             // Ask the control if possible
-                            value = xformsControl.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME);
+                            value = control.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME);
                         } else {
                             // Otherwise we can't compute it
                             value = null;
@@ -348,17 +351,17 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
 
         // Static read-only
-        if (isStaticReadonly(xformsControl))
+        if (isStaticReadonly(control))
             sb.append(" xforms-static");
 
         return sb;
     }
 
-    protected boolean isStaticReadonly(XFormsControl xformsControl) {
-        return xformsControl != null && xformsControl.isStaticReadonly();
+    protected boolean isStaticReadonly(XFormsControl control) {
+        return control != null && control.isStaticReadonly();
     }
 
-    protected void handleLabelHintHelpAlert(String controlEffectiveId, String forEffectiveId, LHHAC lhhaType, XFormsSingleNodeControl control, boolean isTemplate, boolean addIds) throws SAXException {
+    protected void handleLabelHintHelpAlert(String controlEffectiveId, String forEffectiveId, LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean addIds) throws SAXException {
 
         final boolean isHint = lhhaType == LHHAC.HINT;
         final boolean isAlert = lhhaType == LHHAC.ALERT;
@@ -441,10 +444,11 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             if (isAlert) {
                 if (classes.length() > 0)
                     classes.append(' ');
-                if (control != null && (!control.isValid() || control.isRequired() && isEmpty(control)))
+                if (control instanceof XFormsSingleNodeControl && !((XFormsSingleNodeControl) control).isValid()) {
                     classes.append("xforms-alert-active");
-                else
+                } else {
                     classes.append("xforms-alert-inactive");
+                }
             }
 
             // Handle visibility

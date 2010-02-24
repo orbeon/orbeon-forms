@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -29,10 +29,10 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsOutputImageHandler extends XFormsOutputHandler {
     @Override
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
         // Case of image media type with URI
 
-        final XFormsOutputControl outputControl = (XFormsOutputControl) xformsControl;
+        final XFormsOutputControl outputControl = (XFormsOutputControl) control;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String mediatypeValue = attributes.getValue("mediatype");

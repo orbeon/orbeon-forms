@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,7 +15,8 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -32,14 +33,15 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsTriggerFullHandler extends XFormsTriggerHandler {
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 
+        final XFormsTriggerControl triggerControl = (XFormsTriggerControl) control;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
-        final String labelValue = getTriggerLabel(xformsControl);
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
+        final String labelValue = getTriggerLabel(triggerControl);
+        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, triggerControl, true);
 
-        final boolean mustOutputHTMLFragment = xformsControl != null && xformsControl.isHTMLLabel(pipelineContext);
+        final boolean mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel(pipelineContext);
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
         final String elementName;
@@ -77,7 +79,7 @@ public class XFormsTriggerFullHandler extends XFormsTriggerHandler {
                         public void characters(char ch[], int start, int length) throws SAXException {
                             sb.append(ch, start, length);
                         }
-                    }, labelValue, xformsControl.getLocationData(), xhtmlPrefix);
+                    }, labelValue, triggerControl.getLocationData(), xhtmlPrefix);
 
                     final String sbString = sb.toString();
                     if (imageInfo[0] != null && sbString.trim().equals("")) {
@@ -119,12 +121,12 @@ public class XFormsTriggerFullHandler extends XFormsTriggerHandler {
 
         // xhtml:button or xhtml:input
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
-        handleReadOnlyAttribute(containerAttributes, containingDocument, xformsControl);
+        handleReadOnlyAttribute(containerAttributes, containingDocument, triggerControl);
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, spanQName, containerAttributes);
         {
             if ("button".equals(elementName)) {
                 // Output content of <button> element
-                outputLabelText(contentHandler, xformsControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
+                outputLabelText(contentHandler, triggerControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
             }
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, spanQName);

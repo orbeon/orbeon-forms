@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.xml.sax.Attributes;
 
 public class XFormsGroupInternalHandler extends XFormsGroupHandler {
 
     @Override
-    protected boolean isMustOutputControl(XFormsSingleNodeControl xformsControl) {
+    protected boolean isMustOutputControl(XFormsControl control) {
         // Do not output start, end, or LHHA
         return false;
     }
 
     @Override
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) {
         // NOP
     }
 }

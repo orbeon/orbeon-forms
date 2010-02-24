@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTextareaControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -36,13 +36,13 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
         super(false);
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 
-        final XFormsTextareaControl textareaControl = (XFormsTextareaControl) xformsControl;
+        final XFormsTextareaControl textareaControl = (XFormsTextareaControl) control;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final boolean isConcreteControl = textareaControl != null;
 
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
+        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, control, true);
 
         // Create xhtml:textarea
         {

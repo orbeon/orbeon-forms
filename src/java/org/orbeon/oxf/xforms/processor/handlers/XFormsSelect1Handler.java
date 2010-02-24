@@ -19,7 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.itemset.Item;
@@ -103,7 +103,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    protected void addCustomClasses(StringBuilder classes, XFormsSingleNodeControl xformsControl) {
+    protected void addCustomClasses(StringBuilder classes, XFormsControl control) {
         if (isOpenSelection)
             classes.append(" xforms-select1-open");
         if (isAutocompleteNoFilter)
@@ -123,9 +123,9 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         return effectiveAppearance;
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
         // Get items, dynamic or static, if possible
-        final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) xformsControl;
+        final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) control;
 
         // Get items if:
         // 1. The itemset is static
@@ -634,7 +634,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
     @Override
     protected void handleLabel() throws SAXException {
-        if (isStaticReadonly(getXFormsControl()) || !isFull || !handlerContext.isNoScript()) {
+        if (isStaticReadonly(getControl()) || !isFull || !handlerContext.isNoScript()) {
             // In noscript mode for full items, this is handled by fieldset/legend
             super.handleLabel();
         }

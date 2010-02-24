@@ -44,9 +44,9 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
     }
 
     @Override
-    protected boolean isMustOutputControl(XFormsSingleNodeControl xformsControl) {
+    protected boolean isMustOutputControl(XFormsControl control) {
         // Don't output anything in static readonly mode
-        return !isStaticReadonly(xformsControl);
+        return !isStaticReadonly(control);
     }
 
     @Override
@@ -73,7 +73,7 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
     }
 
     @Override
-    protected void addCustomClasses(StringBuilder classes, XFormsSingleNodeControl xformsControl) {
+    protected void addCustomClasses(StringBuilder classes, XFormsControl control) {
         // Set modal class
         // TODO: xf:trigger/@xxforms:modal; do this in static state?
         if (isModal)
@@ -91,13 +91,13 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
     }
 
     @Override
-    protected AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsSingleNodeControl xformsControl, boolean addId) {
+    protected AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsControl control, boolean addId) {
         // Get standard attributes
-        final AttributesImpl containerAttributes = super.getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, addId);
+        final AttributesImpl containerAttributes = super.getContainerAttributes(uri, localname, attributes, effectiveId, control, addId);
 
         // Add title attribute if not yet present and there is a hint
         if (containerAttributes.getValue("title") == null) {
-            final String hintValue = xformsControl != null ? xformsControl.getHint(pipelineContext) : null;
+            final String hintValue = control != null ? control.getHint(pipelineContext) : null;
             if (hintValue != null)
                 containerAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, hintValue);
         }

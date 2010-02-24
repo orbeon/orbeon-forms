@@ -18,7 +18,6 @@ import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -47,7 +46,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
     private String prefixedId;
     private String effectiveId;
 
-    private XFormsSingleNodeControl xformsControl;
+    private XFormsControl xformsControl;
     private Attributes attributes;
     private String[] endConfig;
     private String containingElementQName;
@@ -68,7 +67,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         return effectiveId;
     }
 
-    public XFormsSingleNodeControl getXFormsControl() {
+    public XFormsControl getControl() {
         return xformsControl;
     }
 
@@ -95,11 +94,11 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         effectiveId = handlerContext.getEffectiveId(attributes);
 
         xformsControl = handlerContext.isTemplate()
-                ? null : (XFormsSingleNodeControl) containingDocument.getObjectByEffectiveId(effectiveId);
+                ? null : (XFormsControl) containingDocument.getObjectByEffectiveId(effectiveId);
     }
 
     @Override
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+    public final void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         if (isMustOutputControl(xformsControl)) {
 
             final ContentHandler contentHandler = handlerContext.getController().getOutput();
@@ -169,7 +168,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
     }
 
     @Override
-    public void end(String uri, String localname, String qName) throws SAXException {
+    public final void end(String uri, String localname, String qName) throws SAXException {
         if (isMustOutputControl(xformsControl)) {
             // Process everything after the control has been shown
             if (endConfig != null) {
@@ -234,7 +233,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         return lhhaElement.getParent() == controlElement;
     }
 
-    protected boolean isMustOutputControl(XFormsSingleNodeControl xformsControl) {
+    protected boolean isMustOutputControl(XFormsControl control) {
         // May be overridden by subclasses
         return true;
     }
@@ -244,7 +243,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
         return true;
     }
 
-    protected void addCustomClasses(StringBuilder classes, XFormsSingleNodeControl xformsControl) {
+    protected void addCustomClasses(StringBuilder classes, XFormsControl control) {
         // May be overridden by subclasses
     }
 
@@ -274,13 +273,13 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
     }
 
     // Must be overridden by subclasses
-    protected abstract void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException;
+    protected abstract void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException;
 
-    protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
         // May be overridden by subclasses
     }
 
-    protected AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsSingleNodeControl xformsControl, boolean addId) {
+    protected AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsControl control, boolean addId) {
         final AttributesImpl containerAttributes;
         if (handlerContext.isSpanHTMLLayout()) {
             reusableAttributes.clear();
@@ -300,7 +299,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
         final String prefixedId = getPrefixedId();
         final String effectiveId = getEffectiveId();
-        final XFormsSingleNodeControl xformsControl = getXFormsControl();
+        final XFormsControl xformsControl = getControl();
 
         // Get classes
         final StringBuilder classes;

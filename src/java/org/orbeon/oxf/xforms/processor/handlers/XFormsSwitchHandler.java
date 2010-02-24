@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -28,17 +28,17 @@ public class XFormsSwitchHandler extends XFormsControlLifecyleHandler {
         super(false, true);
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 
         if (!handlerContext.isSpanHTMLLayout()) {
             // Start xhtml:span
-            final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
+            final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, control, true);
             handlerContext.getController().getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
         }
     }
 
     @Override
-    protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
         if (!handlerContext.isSpanHTMLLayout()) {
             // Close xhtml:span
             handlerContext.getController().getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());

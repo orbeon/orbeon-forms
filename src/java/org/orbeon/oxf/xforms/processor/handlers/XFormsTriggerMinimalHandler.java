@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -29,10 +30,12 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
 
     protected static final String ENCLOSING_ELEMENT_NAME = "a";
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+
+        final XFormsTriggerControl triggerControl = (XFormsTriggerControl) control;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
+        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, triggerControl, true);
 
         // TODO: needs f:url-norewrite="true"?
         containerAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
@@ -42,21 +45,24 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         final String aQName = XMLUtils.buildQName(xhtmlPrefix, ENCLOSING_ELEMENT_NAME);
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName, containerAttributes);
         {
-            final String labelValue = getTriggerLabel(xformsControl);
-            final boolean mustOutputHTMLFragment = xformsControl != null && xformsControl.isHTMLLabel(pipelineContext);
-            outputLabelText(contentHandler, xformsControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
+            final String labelValue = getTriggerLabel(triggerControl);
+            final boolean mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel(pipelineContext);
+            outputLabelText(contentHandler, triggerControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName);
     }
 
     @Override
-    protected void addCustomClasses(StringBuilder classes, XFormsSingleNodeControl xformsControl) {
+    protected void addCustomClasses(StringBuilder classes, XFormsControl control) {
         // Ask super first
-        super.addCustomClasses(classes, xformsControl);
+        super.addCustomClasses(classes, control);
 
-        if (handlerContext.isSpanHTMLLayout() && xformsControl != null && xformsControl.isReadonly()) {
-            // Add a special class to facilitate styling of readonly links with IE 6
-            classes.append(" xforms-trigger-readonly");
+        if (handlerContext.isSpanHTMLLayout() && control != null) {
+            final XFormsTriggerControl triggerControl = (XFormsTriggerControl) control;
+            if (triggerControl.isReadonly()) {
+                // Add a special class to facilitate styling of readonly links with IE 6
+                classes.append(" xforms-trigger-readonly");
+            }
         }
     }
 

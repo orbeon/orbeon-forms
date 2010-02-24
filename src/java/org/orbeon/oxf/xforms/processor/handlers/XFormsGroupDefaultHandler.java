@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -26,7 +27,7 @@ import org.xml.sax.SAXException;
  */
 public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
 
-    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, final String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, final String effectiveId, XFormsControl control) throws SAXException {
         if (!handlerContext.isSpanHTMLLayout()) {
             // Start xhtml:span
             final String groupElementName = getContainingElementName();
@@ -36,12 +37,12 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
             final ElementHandlerController controller = handlerContext.getController();
 
             controller.getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName,
-                    getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, false));
+                    getContainerAttributes(uri, localname, attributes, effectiveId, control, false));
         }
     }
 
     @Override
-    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
         if (!handlerContext.isSpanHTMLLayout()) {
             // Close xhtml:span
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -58,12 +59,12 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
     protected void handleLabel() throws SAXException {
         // TODO: check why we output our own label here
 
-        final XFormsSingleNodeControl xformsControl = getXFormsControl();
+        final XFormsGroupControl groupControl = (XFormsGroupControl) getControl();
         final String effectiveId = getEffectiveId();
 
         reusableAttributes.clear();
-        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, getLabelClasses(xformsControl));
+        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, getLabelClasses(groupControl));
         outputLabelFor(handlerContext, reusableAttributes, effectiveId, effectiveId, LHHAC.LABEL, handlerContext.getLabelElementName(),
-                getLabelValue(xformsControl), xformsControl != null && xformsControl.isHTMLLabel(pipelineContext), !handlerContext.isSpanHTMLLayout());
+                getLabelValue(groupControl), groupControl != null && groupControl.isHTMLLabel(pipelineContext), !handlerContext.isSpanHTMLLayout());
     }
 }

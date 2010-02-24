@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -35,9 +35,9 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
     }
 
     @Override
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 
-        final XFormsOutputControl outputControl = (XFormsOutputControl) xformsControl;
+        final XFormsOutputControl outputControl = (XFormsOutputControl) control;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
@@ -54,9 +54,9 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
             final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, aAttributes);
             {
-                final String labelValue = (xformsControl != null) ? xformsControl.getLabel(pipelineContext) : null;
-                final boolean mustOutputHTMLFragment = xformsControl != null && xformsControl.isHTMLLabel(pipelineContext);
-                outputLabelText(contentHandler, xformsControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
+                final String labelValue = (control != null) ? control.getLabel(pipelineContext) : null;
+                final boolean mustOutputHTMLFragment = control != null && control.isHTMLLabel(pipelineContext);
+                outputLabelText(contentHandler, control, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
             }
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
         }

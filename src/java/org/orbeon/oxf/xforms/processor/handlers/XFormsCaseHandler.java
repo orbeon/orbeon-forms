@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
@@ -22,7 +23,7 @@ import org.xml.sax.helpers.AttributesImpl;
 /**
  * Handle xforms:case.
  */
-public class XFormsCaseHandler extends XFormsBaseHandler {
+public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
 
     private DeferredContentHandler currentSavedOutput;
     private OutputInterceptor currentOutputInterceptor;
@@ -33,7 +34,14 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
         super(false, true);
     }
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+    @Override
+    protected boolean isMustOutputContainerElement() {
+        // Don't output a container element unless in full update
+        return handlerContext.isFullUpdate();
+    }
+
+    @Override
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
         currentCaseEffectiveId = handlerContext.getEffectiveId(attributes);
 
         // Determine whether this case is visible
@@ -49,6 +57,9 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
 
         // Place interceptor if needed
         if (!handlerContext.isNoScript()) {
+
+            final boolean isMustGenerateBeginEndDelimiters = !handlerContext.isFullUpdateTopLevelControl(effectiveId);
+
             // Find classes to add
             final StringBuilder classes = getInitialClasses(uri, localname, attributes, null);
 
@@ -60,9 +71,11 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
 
             currentOutputInterceptor = new OutputInterceptor(currentSavedOutput, spanQName, new OutputInterceptor.Listener() {
                 public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
-                    // Output begin delimiter
-                    outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                            outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end", "xforms-case-begin-" + currentCaseEffectiveId);
+                    if (isMustGenerateBeginEndDelimiters) {
+                        // Output begin delimiter
+                        outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
+                                outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end", "xforms-case-begin-" + currentCaseEffectiveId);
+                    }
                 }
             });
 
@@ -76,28 +89,52 @@ public class XFormsCaseHandler extends XFormsBaseHandler {
         }
     }
 
-    public void end(String uri, String localname, String qName) throws SAXException {
+    @Override
+    protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
         if (!handlerContext.isNoScript()) {
             currentOutputInterceptor.flushCharacters(true, true);
 
             // Restore output
             handlerContext.getController().setOutput(currentSavedOutput);
 
-            if (currentOutputInterceptor.getDelimiterNamespaceURI() != null) {
-                // Output end delimiter
-                currentOutputInterceptor.outputDelimiter(currentSavedOutput, currentOutputInterceptor.getDelimiterNamespaceURI(),
-                    currentOutputInterceptor.getDelimiterPrefix(), currentOutputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
-            } else {
-                // Output start and end delimiter using xhtml:span
-                final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-                currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
-                    xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-begin-" + currentCaseEffectiveId);
-                currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
-                    xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
+            final boolean isMustGenerateBeginEndDelimiters = !handlerContext.isFullUpdateTopLevelControl(effectiveId);
+            if (isMustGenerateBeginEndDelimiters) {
+                if (currentOutputInterceptor.getDelimiterNamespaceURI() != null) {
+                    // Output end delimiter
+                    currentOutputInterceptor.outputDelimiter(currentSavedOutput, currentOutputInterceptor.getDelimiterNamespaceURI(),
+                        currentOutputInterceptor.getDelimiterPrefix(), currentOutputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
+                } else {
+                    // Output start and end delimiter using xhtml:span
+                    final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+                    currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
+                        xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-begin-" + currentCaseEffectiveId);
+                    currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
+                        xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
+                }
             }
         } else if (!isVisible) {
             // Case not visible, restore output
             handlerContext.getController().setOutput(currentSavedOutput);
         }
+    }
+
+    @Override
+    protected void handleLabel() throws SAXException {
+        // Don't output
+    }
+
+    @Override
+    protected void handleHint() throws SAXException {
+        // Don't output
+    }
+
+    @Override
+    protected void handleAlert() throws SAXException {
+        // Don't output
+    }
+
+    @Override
+    protected void handleHelp() throws SAXException {
+        // Don't output
     }
 }

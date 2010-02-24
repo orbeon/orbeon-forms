@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -33,10 +33,10 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
         super(false);
     }
 
-    protected void addCustomClasses(StringBuilder classes, XFormsSingleNodeControl xformsControl) {
+    protected void addCustomClasses(StringBuilder classes, XFormsControl control) {
 
         // Control value
-        final XFormsUploadControl uploadControl = (XFormsUploadControl) xformsControl;
+        final XFormsUploadControl uploadControl = (XFormsUploadControl) control;
         final String value = handlerContext.isTemplate() || uploadControl == null || uploadControl.getExternalValue(pipelineContext) == null ? "" : uploadControl.getExternalValue(pipelineContext);
 
         if (value.equals(""))
@@ -45,12 +45,12 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
             classes.append(" xforms-upload-state-file");
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 
-        final XFormsUploadControl uploadControl = (XFormsUploadControl) xformsControl;
+        final XFormsUploadControl uploadControl = (XFormsUploadControl) control;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
+        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, control, true);
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         {
@@ -58,7 +58,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
             {
-                if (!isStaticReadonly(xformsControl)) {
+                if (!isStaticReadonly(control)) {
                     // Create xhtml:input unless static readonly
                     final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
 

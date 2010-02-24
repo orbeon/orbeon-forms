@@ -1006,7 +1006,7 @@ public class XFormsModelBinds {
             if (nodeValue == null)
                 nodeValue = XFormsInstance.getValueForNodeInfo(currentNodeInfo);
 
-            if ("".equals(nodeValue)) {// TODO: configurable notion of "empty"
+            if (isEmptyValue(nodeValue)) {
                 // ...and empty
                 isValid = false;
                 InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
@@ -1032,6 +1032,11 @@ public class XFormsModelBinds {
             final XFormsInstance instanceForNodeInfo = containingDocument.getInstanceForNode(currentNodeInfo);
             invalidInstances.add(instanceForNodeInfo.getEffectiveId());
         }
+    }
+
+    public static boolean isEmptyValue(String value) {
+        // TODO: configurable notion of "empty" through property (trimming vs. strict)
+        return "".equals(value);
     }
 
     private Boolean handleConstraintMIP(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position, NodeInfo currentNodeInfo) {

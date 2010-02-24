@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -25,11 +25,11 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
 
     @Override
     protected boolean isMustOutputContainerElement() {
-        // Don't output a container element
-        return false;
+        // Don't output a container element unless in full update
+        return handlerContext.isFullUpdate();
     }
 
-    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, final String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, final String effectiveId, XFormsControl control) throws SAXException {
 
         final String groupElementName = getContainingElementName();
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -51,7 +51,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
                 // Get classes
                 // As of August 2009, actually only need the marker class as well as xforms-disabled if the group is non-relevant
                 final StringBuilder classes = new StringBuilder();
-                handleMIPClasses(classes, getPrefixedId(), xformsControl);
+                handleMIPClasses(classes, getPrefixedId(), control);
                 elementClasses = classes.toString();
             }
 
@@ -79,7 +79,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
 
             // Set control classes
             outputInterceptor.setAddedClasses(elementClasses);
-        } else if (isDisabled(xformsControl)) {
+        } else if (isDisabled(control)) {
             // In noscript, if the group not visible, set output to a black hole
             handlerContext.getController().setOutput(new DeferredContentHandlerAdapter());
         }
@@ -88,7 +88,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
     }
 
     @Override
-    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 
         final ElementHandlerController controller = handlerContext.getController();
         if (!handlerContext.isNoScript()) {
@@ -103,7 +103,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
                 outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
                         outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end", "group-end-" + effectiveId);
             }
-        } else if (isDisabled(xformsControl)) {
+        } else if (isDisabled(control)) {
             // In noscript, group was not visible, restore output
             handlerContext.getController().setOutput(currentSavedOutput);
         }

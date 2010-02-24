@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 import org.orbeon.oxf.xforms.itemset.Item;
 import org.orbeon.oxf.xforms.itemset.Itemset;
@@ -49,7 +49,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
         // Handle appearance
         if (!handlerContext.isTemplate()) {
-            final XFormsSingleNodeControl control = getXFormsControl();
+            final XFormsInputControl control = (XFormsInputControl) getControl();
             if (control != null) {
 
                 appearance = control.getAppearance();
@@ -72,9 +72,9 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
         }
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 
-        final XFormsInputControl inputControl = (XFormsInputControl) xformsControl;
+        final XFormsInputControl inputControl = (XFormsInputControl) control;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final boolean isConcreteControl = inputControl != null;
 
@@ -105,8 +105,8 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                         return XFormsInputHandler.this.getEffectiveId();
                     }
                     @Override
-                    public XFormsSingleNodeControl getXFormsControl() {
-                        return XFormsInputHandler.this.getXFormsControl();
+                    public XFormsControl getControl() {
+                        return XFormsInputHandler.this.getControl();
                     }
                 };
                 select1Handler.setContext(getContext());

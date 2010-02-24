@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRangeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.Attributes;
@@ -40,7 +41,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    protected void addCustomClasses(StringBuilder classes, XFormsSingleNodeControl xformsControl) {
+    protected void addCustomClasses(StringBuilder classes, XFormsControl control) {
         if (!handlerContext.isSpanHTMLLayout()) {
             if (classes.length() > 0)
                 classes.append(' ');
@@ -48,8 +49,9 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
         }
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 
+        final XFormsRangeControl rangeControl = (XFormsRangeControl) control;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
         // Create nested xhtml:div elements
@@ -57,7 +59,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
             final String divName = getContainingElementName();
             final String divQName = getContainingElementQName();
 
-            final AttributesImpl backgroundAttributes = getBackgroundAttributes(uri, localname, attributes, effectiveId, xformsControl);
+            final AttributesImpl backgroundAttributes = getBackgroundAttributes(uri, localname, attributes, effectiveId, rangeControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName, backgroundAttributes);
             {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, divName, divQName, getThumbAttributes());
@@ -74,7 +76,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
         return reusableAttributes;
     }
 
-    protected AttributesImpl getBackgroundAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsSingleNodeControl xformsControl) {
+    protected AttributesImpl getBackgroundAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsRangeControl xformsControl) {
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
         if (handlerContext.isSpanHTMLLayout()) {
             // Add custom class (added in addCustomClasses() for old layout)

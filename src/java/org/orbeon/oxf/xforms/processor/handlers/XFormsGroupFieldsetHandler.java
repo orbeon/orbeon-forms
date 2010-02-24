@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -34,7 +34,9 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
     }
 
     @Override
-    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, final String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, final String effectiveId, XFormsControl control) throws SAXException {
+
+        final XFormsGroupControl groupControl = (XFormsGroupControl) control;
 
         final String groupElementName = getContainingElementName();
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -47,7 +49,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
         // Start xhtml:fieldset element if needed
         if (!handlerContext.isSpanHTMLLayout())
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName,
-                    getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, false));
+                    getContainerAttributes(uri, localname, attributes, effectiveId, groupControl, false));
 
         // Output an xhtml:legend element if and only if there is an xforms:label element. This help with
         // styling in particular.
@@ -56,7 +58,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
 
             // Handle label classes
             reusableAttributes.clear();
-            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, getLabelClasses(xformsControl));
+            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, getLabelClasses(groupControl));
             // The id should never be need on <legend>
 //            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(effectiveId, LHHAC_CODES.get(LHHAC.LABEL)));
 
@@ -64,7 +66,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
             final String legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName, reusableAttributes);
             {
-                final String labelValue = getLabelValue(xformsControl);
+                final String labelValue = getLabelValue(groupControl);
                 if (StringUtils.isNotEmpty(labelValue))
                     contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
             }
@@ -73,7 +75,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
     }
 
     @Override
-    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsSingleNodeControl xformsControl) throws SAXException {
+    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 
         final ElementHandlerController controller = handlerContext.getController();
 

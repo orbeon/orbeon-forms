@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xml.DeferredContentHandler;
@@ -27,16 +28,22 @@ import org.xml.sax.SAXException;
 /**
  * Handle xforms:repeat.
  */
-public class XFormsRepeatHandler extends XFormsBaseHandler {
+public class XFormsRepeatHandler extends XFormsControlLifecyleHandler {
 
     public XFormsRepeatHandler() {
         // This is a repeating element
         super(true, true);
     }
 
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+    @Override
+    protected boolean isMustOutputContainerElement() {
+        // Don't output a container element unless in full update
+        return handlerContext.isFullUpdate();
+    }
 
-        final String effectiveId = handlerContext.getEffectiveId(attributes);
+    @Override
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId,
+                                      final String effectiveId, XFormsControl control) throws SAXException {
 
         final boolean isTopLevelRepeat = handlerContext.countParentRepeats() == 0;
         final boolean isRepeatSelected = handlerContext.isRepeatSelected() || isTopLevelRepeat;
@@ -178,5 +185,25 @@ public class XFormsRepeatHandler extends XFormsBaseHandler {
             if (attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "dnd-over") != null)
                 sb.append(" xforms-dnd-over");
         }
+    }
+
+    @Override
+    protected void handleLabel() throws SAXException {
+        // Don't output
+    }
+
+    @Override
+    protected void handleHint() throws SAXException {
+        // Don't output
+    }
+
+    @Override
+    protected void handleAlert() throws SAXException {
+        // Don't output
+    }
+
+    @Override
+    protected void handleHelp() throws SAXException {
+        // Don't output
     }
 }

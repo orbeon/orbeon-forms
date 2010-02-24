@@ -731,24 +731,26 @@ ORBEON.widgets.datatable.initLoadingIndicator = function(target, scrollV, scroll
 ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
     // Initializes a datatable (called by xforms-enabled events)
     var container = YAHOO.util.Dom.getAncestorByClassName(target, 'xbl-fr-datatable');
-    var id = container.id;
-    if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled')) {
-        if (ORBEON.widgets.datatable.datatables[id] == undefined || container.fr_dt_initialized == undefined) {
-            var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
-            var region = YAHOO.util.Region.getRegion(table);
-            if ((region.left >= 0 && region.top >= 0)
-                && (region.left < region.right) 
-                && (region.top < region.bottom) ) {
-                ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id, innerTableWidth);
-                container.fr_dt_initialized = true;
+    if (container != undefined && container.id != undefined) {
+        var id = container.id;
+        if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled')) {
+            if (ORBEON.widgets.datatable.datatables[id] == undefined || container.fr_dt_initialized == undefined) {
+                var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
+                var region = YAHOO.util.Region.getRegion(table);
+                if ((region.left >= 0 && region.top >= 0)
+                        && (region.left < region.right)
+                        && (region.top < region.bottom)) {
+                    ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(table, id, innerTableWidth);
+                    container.fr_dt_initialized = true;
+                } else {
+                    // Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
+                    setTimeout(function() {
+                        ORBEON.widgets.datatable.init(target, innerTableWidth);
+                    }, 100);
+                }
             } else {
-                // Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
-                setTimeout(function() {
-                    ORBEON.widgets.datatable.init(target, innerTableWidth);
-                }, 100);
+                ORBEON.widgets.datatable.datatables[id].update();
             }
-        } else {
-            ORBEON.widgets.datatable.datatables[id].update();
         }
     }
 

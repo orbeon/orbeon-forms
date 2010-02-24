@@ -2725,6 +2725,57 @@
         </output>
     </test>
 
+    <test description="Delete action deletes detached node upon xforms-disabled" name="oxf:pipeline">
+        <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=314760&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <company>
+                                    <employee>Mary</employee>
+                                </company>
+                            </instance>
+                        </xforms:instance>
+                        <!-- Delete company element -->
+                        <xforms:delete ev:event="xforms-ready" nodeset="company"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+
+                    <xforms:repeat id="my-repeat" nodeset="company">
+                        <xforms:input id="my-input" ref="employee">
+                            <!-- Attempt to re-delete company element when we disappear -->
+                            <xforms:delete ev:event="xforms-disabled" nodeset=".."/>
+                        </xforms:input>
+                    </xforms:repeat>
+
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance> </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="0"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO:

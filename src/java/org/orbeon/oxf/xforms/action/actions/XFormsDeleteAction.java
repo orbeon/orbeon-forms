@@ -17,7 +17,6 @@ import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
@@ -185,7 +184,7 @@ public class XFormsDeleteAction extends XFormsAction {
                 parentContent = parentElement.content();
             }
             actualIndexInParentContentCollection = parentContent.indexOf(nodeToRemove);
-        } else if (nodeToRemove == nodeToRemove.getDocument().getRootElement()) {
+        } else if (nodeToRemove.getDocument() != null && nodeToRemove == nodeToRemove.getDocument().getRootElement()) {
             // Case of root element where parent is Document
             parentContent = nodeToRemove.getDocument().content();
             actualIndexInParentContentCollection = parentContent.indexOf(nodeToRemove);
@@ -200,7 +199,9 @@ public class XFormsDeleteAction extends XFormsAction {
 
             return null;
         } else {
-            throw new OXFException("Node to delete doesn't have a parent.");
+            // Node to remove doesn't have a parent so we can't delete it
+            // This can happen for nodes already detached, or nodes newly created with e.g. xxforms:element()
+            return null;
         }
 
         // Actually perform the deletion

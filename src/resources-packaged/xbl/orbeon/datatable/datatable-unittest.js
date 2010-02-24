@@ -59,13 +59,15 @@ var testCase = {
         thiss.openAccordionCase(thiss, '_314466', function() {
 
             var table = YAHOO.util.Dom.get('my-accordion$_314466-table$_314466-table-table');
-            YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(table, 'fr-dt-initialized'), "The datatable sshouldn't be initialized at that point");
+            var container = table.parentNode.parentNode;
+            YAHOO.util.Assert.isFalse(YAHOO.util.Dom.hasClass(container, 'fr-dt-initialized'), "The datatable shouldn't be initialized at that point");
             ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                 YAHOO.util.UserAction.click(YAHOO.util.Dom.get('my-accordion$show-314466'), {clientX: 1});
             }, function() {
                 thiss.wait(function() {
                     table = YAHOO.util.Dom.get('my-accordion$_314466-table$_314466-table-table');
-                    YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(table, 'fr-dt-initialized'),  "The datatable sshould be initialized at that point");
+                    var container = table.parentNode.parentNode;
+                    YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(container, 'fr-dt-initialized'),  "The datatable should be initialized at that point");
 
                     YAHOO.util.UserAction.click(YAHOO.util.Dom.get('my-accordion$hide-314466'), {clientX: 1});
                     thiss.closeAccordionCase(thiss, '_314466')

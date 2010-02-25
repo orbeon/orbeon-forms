@@ -51,5 +51,5 @@
 }
 
 .fr-datatable-collapsed {
-    visibility: collapse;
+    display: none;
 }

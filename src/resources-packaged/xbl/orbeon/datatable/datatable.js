@@ -245,7 +245,7 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
 
     // Do more resizing
     if (this.height != 'auto') {
-        YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.container.clientHeight - this.headerHeight - 5) + 'px');
+        YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.container.clientHeight - this.headerHeight) + 'px');
     }
 
     
@@ -262,7 +262,8 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
             this.headerScrollContainer.style.width = this.headerScrollWidth + 'px';
             this.bodyContainer.style.overflow = "auto";
             this.bodyContainer.style.overflowY = "scroll";
-            this.header.style.width = this.tableWidth + 'px';      
+            this.header.style.width = this.tableWidth + 'px';
+            this.table.style.height = "auto";
         }
 
         YAHOO.util.Dom.addClass(this.table.parentNode, 'yui-dt-bd');

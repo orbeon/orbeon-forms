@@ -4,7 +4,7 @@
 
 =====================================================
 
-Last updated for Orbeon Forms 3.7.1 (Developer Release), May 2009
+Last updated for Orbeon Forms 3.7.2 (Developer Release), February 2010
 
 This README.TXT file covers the following topics:
 
@@ -22,22 +22,22 @@ This README.TXT file covers the following topics:
 1. About Orbeon Forms
 ****************************************
 
-Orbeon Forms is an open source forms solution that handles the
-complexity of forms typical of the enterprise or government. It is
-delivered to standard web browsers (including Internet Explorer,
-Firefox, Safari and Opera) thanks to XForms and Ajax technology, with
-no need for client-side software or plugins.
-
-Orbeon Forms allows you to build fully interactive forms with features
-that include as-you-type validation, optional and repeated sections,
-always up-to-date error summaries, PDF output, full
-internationalization, and controls like auto-completion, tabs, dialogs,
-trees and menus.
+Orbeon Forms is an open source, standard-based web forms solution, which
+includes Form Builder, a WYSIWYG browser-based authoring tool, and Form
+Runner, a runtime environment which facilitates the deployment and
+integration of a large number of complex forms. Orbeon Forms implements
+different technologies, such as XForms and Ajax, with no need for
+client-side software or plug-ins.
 
 For more information about Orbeon Forms, please visit:
 
   http://www.orbeon.com/
-  http://www.orbeon.com/ops/doc/home-faq
+  http://www.orbeon.com/orbeon/doc/
+  http://wiki.orbeon.com/forms/
+
+Also please check the Orbeon Forms Frequently Asked Questions (FAQ):
+
+  http://wiki.orbeon.com/forms/orbeon-forms-faq
 
 
 ****************************************
@@ -60,17 +60,6 @@ distribution of a particular file.
 This software is OSI Certified Open Source Software. OSI Certified is
 a certification mark of the Open Source Initiative.
 
-The documentation is subject to the following terms:
-
-    * Conversion to other formats is allowed, but the actual content
-      may not be altered or edited in any way.
-
-    * You may create printed copies for your own personal use.
-
-    * For all other uses, such as selling printed copies or using (parts
-      of) the manual in another publication, prior written agreement
-      from Orbeon, Inc. is required.
-
 See section 8 for more details about the licenses of included
 third-party software.
 
@@ -81,7 +70,7 @@ third-party software.
 
 A complete list of changes can be found online at:
 
-  http://www.orbeon.com/ops/doc/home-changes-372
+  http://www.orbeon.com/orbeon/doc/home-changes-372
 
 or in this distribution under:
 
@@ -95,7 +84,7 @@ or in this distribution under:
 The system requirements and installation procedure are detailed online
 at:
 
-  http://www.orbeon.com/ops/doc/intro-install
+  http://www.orbeon.com/orbeon/doc/intro-install
 
 or in this distribution under:
 
@@ -104,7 +93,7 @@ or in this distribution under:
 In addition, the Orbeon Forms tutorial also tackles installation. Online
 version:
 
-  http://www.orbeon.com/ops/doc/intro-tutorial
+  http://www.orbeon.com/orbeon/doc/intro-tutorial
 
 or in this distribution under:
 

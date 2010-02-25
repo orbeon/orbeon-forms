@@ -18,12 +18,12 @@
                 <xsl:value-of select="$version-number"/>
             </display-name>
             <description>
-                Orbeon Forms is an open source forms solution that handles the complexity of forms typical of the
-                enterprise or government. It is delivered to standard web browsers (including Internet Explorer,
-                Firefox, Safari and Opera) thanks to XForms and Ajax technology, with no need for client-side software
-                or plugins. Orbeon Forms allows you to build fully interactive forms with features that include
-                as-you-type validation, optional and repeated sections, always up-to-date error summaries, PDF output,
-                full internationalization, and controls like auto-completion, tabs, dialogs, trees and menus.
+                Orbeon Forms is an open source, standard-based web forms solution, which
+                includes Form Builder, a WYSIWYG browser-based authoring tool, and Form
+                Runner, a runtime environment which facilitates the deployment and
+                integration of a large number of complex forms. Orbeon Forms implements
+                different technologies, such as XForms and Ajax, with no need for
+                client-side software or plug-ins.
             </description>
             <xsl:comment>Initialize main resource manager</xsl:comment>
             <context-param>

@@ -217,20 +217,29 @@ ORBEON.widgets.datatable.unittests_lib = {
 
     },
 
+    getHeaderTable: function(table, isSplit) {
+        if (isSplit) {
+            var container = YAHOO.util.Dom.getAncestorByClassName(table, 'yui-dt');
+            return container.getElementsByTagName('table')[0];
+        } else {
+            return table;
+        }
+
+    },
+
     checkTableStructure: function(table, nbcols, isSplit) {
-        YAHOO.util.Assert.isObject(table.tHead, 'The table header is missing');
-        YAHOO.util.Assert.areEqual(1, table.tHead.rows.length, 'There should be exactly one header row (not ' + table.tHead.rows.length + ')');
-        var nbcolsActual = this.getNumberVisibleCells(table.tHead.rows[0].cells);
+        var headerTable = this.getHeaderTable(table, isSplit);
+        YAHOO.util.Assert.isObject(headerTable.tHead, 'The table header is missing');
+        YAHOO.util.Assert.areEqual(1, headerTable.tHead.rows.length, 'There should be exactly one header row (not ' + headerTable.tHead.rows.length + ')');
+        var nbcolsActual = this.getNumberVisibleCells(headerTable.tHead.rows[0].cells);
         YAHOO.util.Assert.areEqual(nbcols, nbcolsActual, nbcolsActual + ' header columns found instead of ' + nbcols);
-        var bodyTable = this.getBodyTable(table, isSplit);
-        YAHOO.util.Assert.areEqual(1, bodyTable.tBodies.length, 'There should be exactly one body (not ' + bodyTable.tBodies.length + ')');
-        nbcolsActual = this.getNumberVisibleCells(bodyTable.tBodies[0].rows[2].cells);
+        YAHOO.util.Assert.areEqual(1, table.tBodies.length, 'There should be exactly one body (not ' + table.tBodies.length + ')');
+        nbcolsActual = this.getNumberVisibleCells(table.tBodies[0].rows[2].cells);
         YAHOO.util.Assert.areEqual(nbcols, nbcolsActual, nbcolsActual + ' columns found on the first body row instead of ' + nbcols);
     },
 
     checkNumberRows: function(table, nbRows, isSplit) {
-        var bodyTable = this.getBodyTable(table, isSplit);
-        var rows = bodyTable.tBodies[0].rows;
+        var rows = table.tBodies[0].rows;
         var nbRowsActual = 0;
         for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
@@ -324,10 +333,10 @@ ORBEON.widgets.datatable.unittests_lib = {
         if (YAHOO.env.ua.ie != 0) {
             return;
         }
+        var headerTable = this.getHeaderTable(table, isSplit);
         var classPrefix = 'dt-' + table.id.replace('\$', '-', 'g') + '-col-';
-        this.checkCellClassesInARow(table.tHead.rows[0], classPrefix);
-        var bodyTable = this.getBodyTable(table, isSplit);
-        var rows = bodyTable.tBodies[0].rows;
+        this.checkCellClassesInARow(headerTable.tHead.rows[0], classPrefix);
+        var rows = tabvle.tBodies[0].rows;
         for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
             if (this.isSignificant(row)) {
@@ -340,8 +349,9 @@ ORBEON.widgets.datatable.unittests_lib = {
         if (YAHOO.env.ua.ie == 0) {
             return;
         }
+        var headerTable = this.getHeaderTable(table, isSplit);
         var colWidths = [];
-        var headerCells = table.tHead.rows[0].cells;
+        var headerCells = headerTable.tHead.rows[0].cells;
         for (var i = 0; i < headerCells.length; i++) {
             var cell = headerCells[i];
             if (this.isSignificant(cell)) {
@@ -351,8 +361,7 @@ ORBEON.widgets.datatable.unittests_lib = {
                 YAHOO.util.Assert.areNotEqual('auto', liner.style.width, 'Header cell for column ' + colWidths.length + ' should have a style width property in IE');
             }
         }
-        var bodyTable = this.getBodyTable(table, isSplit);
-        var rows = bodyTable.tBodies[0].rows;
+        var rows = table.tBodies[0].rows;
         var iActual = 0;
         for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
@@ -374,9 +383,10 @@ ORBEON.widgets.datatable.unittests_lib = {
     },
 
     checkIsSplit: function(table, isSplit) {
-        YAHOO.util.Assert.areEqual(isSplit, table.tBodies.length == 0, "Header table's body doesn't match split status");
-        var bodyTable = this.getBodyTable(table, isSplit);
-        YAHOO.util.Assert.areEqual(isSplit, bodyTable.tHead == undefined, "Body table's header  doesn't match split status");
+        //YAHOO.util.Assert.areEqual(isSplit, table.tBodies.length == 0, "Header table's body doesn't match split status");
+        var headerTable = this.getHeaderTable(table, isSplit);
+        YAHOO.util.Assert.areEqual(isSplit, headerTable.tBodies.length == 0, "Header table's body doesn't match split status");
+        //YAHOO.util.Assert.areEqual(isSplit, bodyTable.tHead == undefined, "Body table's header  doesn't match split status");
     },
 
     getSignificantElementByIndex: function(elements, index) {

@@ -84,6 +84,7 @@ ORBEON.widgets.datatable.prototype.initProperties = function (container, index, 
     if (this.headBodySplit) {
         this.significantNodes.push(this.header);
         this.significantNodes.push(this.headerContainer);
+        this.significantNodes.push(this.bodyContainer);
         if (this.scrollV) {
             this.significantNodes.push(this.headerScrollContainer);
         }
@@ -93,6 +94,7 @@ ORBEON.widgets.datatable.prototype.initProperties = function (container, index, 
         var node=this.significantNodes[i];
         node.savedWidth = node.style.width;
         node.savedHeight = node.style.height;
+        node.savedClassName = node.className;
     }
 
 }
@@ -379,6 +381,7 @@ ORBEON.widgets.datatable.prototype.reset = function () {
         var node=this.significantNodes[i];
         node.style.width = node.savedWidth;
         node.style.height = node.savedHeight;
+        node.className = node.savedClassName;
     }
 
     // Restore column headers
@@ -395,7 +398,7 @@ ORBEON.widgets.datatable.prototype.reset = function () {
             th.removeChild(resizerliner);
             th.appendChild(liner);
         }
-    }
+    }        
     // Remove column widths
     for (var icol = 0; icol < this.bodyColumns.length; icol++) {
         var col = this.bodyColumns[icol];

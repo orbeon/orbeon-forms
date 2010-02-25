@@ -80,11 +80,10 @@ ORBEON.widgets.datatable.prototype.initProperties = function (container, index, 
 
     // Save original styles
 
-    this.significantNodes = [this.container, this.table, this.thead, this.tbody];
+    this.significantNodes = [this.container, this.bodyContainer, this.table, this.thead, this.tbody];
     if (this.headBodySplit) {
         this.significantNodes.push(this.header);
         this.significantNodes.push(this.headerContainer);
-        this.significantNodes.push(this.bodyContainer);
         if (this.scrollV) {
             this.significantNodes.push(this.headerScrollContainer);
         }

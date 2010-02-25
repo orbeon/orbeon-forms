@@ -49,9 +49,6 @@
                     padding-top: .5em; padding-bottom: 1em;
                 }
 
-                /* YUI sets this to a color, but it is hindering more than anything else */
-                .ygtvfocus { background-color: transparent }
-
                 /* Itemset editor */
                 #fb-itemset-editor-dialog .xbl-fr-link-select1 { margin-bottom: .5em }
                 #fb-itemset-editor-dialog .xbl-fr-link-select1 .xforms-label { display: none }

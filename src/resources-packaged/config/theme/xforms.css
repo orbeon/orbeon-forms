@@ -377,3 +377,6 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 
 /* In the tree, because we don't have an href, we use this CSS so the cursor is a pointer when over the link */
 a.ygtvlabel { cursor: pointer; }
+
+/* YUI sets this to a color, but it is hindering more than anything else */
+.ygtvfocus { background-color: transparent }

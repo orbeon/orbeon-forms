@@ -32,7 +32,7 @@
             <menu-item label="XForms Guide" href="reference-xforms-guide"/>
             <menu-item label="XForms Extensions" href="reference-xforms-extensions"/>
             <menu-item label="XForms Engine Configuration" href="reference-xforms-configuration"/>
-            <menu-item label="XPath Functions" href="reference-xforms-functions"/>
+            <menu-item label="XPath Functions" href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-xpath-functions"/>
         </menu>
         <menu label="Page Flow">
             <menu-item label="Page Flow Controller" href="reference-page-flow"/>

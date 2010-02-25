@@ -40,6 +40,21 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     },
 
     /**
+     * Test full update of a case.
+     */
+    testCase: function() {
+        var caseBegin = document.getElementById("xforms-case-begin-case-1");
+        var button = ORBEON.util.Dom.getElementByTagName(document.getElementById("increment-case-value"), "button");
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            button.click();
+        }, function() {
+            var span = YAHOO.util.Dom.getNextSibling(caseBegin);
+            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(span, "xforms-control"));
+            YAHOO.util.Assert.areEqual("2", ORBEON.xforms.Controls.getCurrentValue(span));
+        });
+    },
+
+    /**
      * Test that after doing the innerHTML, we restore the focus to the control that previously had the focus.
      */
     testRestoreFocus: function() {

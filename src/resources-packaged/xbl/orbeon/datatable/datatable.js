@@ -199,7 +199,7 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
             width = (this.tableWidth + 19) + 'px';
         }
     } else {
-        width = (this.tableWidth + 0) + 'px';
+        width = (this.tableWidth + 2) + 'px';
     }
 
     // At last, we know how the table will be sized, it's time to set these sizes

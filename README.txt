@@ -70,11 +70,7 @@ third-party software.
 
 A complete list of changes can be found online at:
 
-  http://www.orbeon.com/orbeon/doc/home-changes-372
-
-or in this distribution under:
-
-  doc/home-changes-372.html
+  http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-372
 
 
 ****************************************

@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -212,7 +213,7 @@ public class OptimizedSubmission extends BaseSubmission {
         final String effectiveAction;
         if (!isNorewrite) {
             // Must rewrite
-            if (!containingDocument.getStaticState().isSeparateDeployment()) {
+            if (containingDocument.getStaticState().getDeploymentType() != XFormsConstants.DeploymentType.separate) {
                 // We are not in separate deployment, so keep path relative to the current servlet context
                 isContextRelative = true;
                 effectiveAction = resource;

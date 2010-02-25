@@ -179,8 +179,9 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:get-session-attribute()
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-session-attribute", XXFormsGetSessionAttribute.class, 0, 1, 1, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-session-attribute", XXFormsGetSessionAttribute.class, 0, 1, 2, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:set-session-attribute()
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}set-session-attribute", XXFormsSetSessionAttribute.class, 0, 2, 2, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO);
@@ -188,8 +189,9 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 1, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 
         // xxforms:get-request-attribute()
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-request-attribute", XXFormsGetRequestAttribute.class, 0, 1, 1, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}get-request-attribute", XXFormsGetRequestAttribute.class, 0, 1, 2, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:set-request-attribute()
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}set-request-attribute", XXFormsSetRequestAttribute.class, 0, 2, 2, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO);

@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -43,7 +43,6 @@
                 <include>/request/headers/header[name = 'accept']</include>
                 <!-- Return all parameters so they are made available to the theme -->
                 <include>/request/parameters/parameter</include>
-                <include>/request/attributes/attribute[name = 'javax.servlet.forward.context_path']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -56,15 +55,7 @@
 
             <!-- Pick theme -->
             <p:choose href="#request">
-                <!--
-                    Special case for plain theme (not sure if this is the best way):
-                    o If output is produced by renderer
-                    o If we are forwarded to (also catches noscript mode in separate deployment)
-                    o The theme is explicitly specified
-                -->
-                <p:when test="starts-with(/request/request-path, '/xforms-renderer')
-                              or /request/attributes/attribute[name = 'javax.servlet.forward.context_path']
-                              or /request/parameters/parameter[name = 'orbeon-theme']/value = 'plain'">
+                <p:when test="/request/parameters/parameter[name = 'orbeon-theme']/value = 'plain'">
                     <!-- Plain theme -->
                     <p:processor name="oxf:identity">
                         <p:input name="data">
@@ -73,18 +64,22 @@
                         <p:output name="data" id="theme-config"/>
                     </p:processor>
                 </p:when>
-                <!-- Get regular or embeddable theme from file on disk or from property -->
+                <!-- Get regular, embeddable or renderer theme -->
                 <p:otherwise>
                     <p:processor name="oxf:identity">
                         <p:input name="data"
                                  href="aggregate('config', #request#xpointer(for $app in tokenize(/request/request-path, '/')[2] return
                                             for $is-embeddable in
                                                 p:property('oxf.epilogue.embeddable')
-                                                or /request/parameters/parameter[name = ('orbeon-embeddable', 'orbeon-portlet')]/value = 'true' return
-                                            for $app-style in concat('oxf:/apps/', $app, if ($is-embeddable) then '/theme-embeddable.xsl' else '/theme.xsl') return
+                                                    or /request/parameters/parameter[name = ('orbeon-embeddable', 'orbeon-portlet')]/value = 'true' return
+                                            for $is-renderer in
+                                                p:get-request-attribute('oxf.xforms.renderer.deployment', 'text/plain') = ('separate', 'integrated') return
+                                            for $app-style in concat('oxf:/apps/', $app, if ($is-embeddable) then '/theme-embeddable.xsl' else if ($is-renderer) then '/theme-renderer.xsl' else '/theme.xsl') return
                                             if (doc-available($app-style))
                                                 then $app-style
-                                                else if ($is-embeddable) then p:property('oxf.epilogue.theme.embeddable') else p:property('oxf.epilogue.theme')))"/>
+                                                else if ($is-embeddable) then p:property('oxf.epilogue.theme.embeddable')
+                                                     else if ($is-renderer) then p:property('oxf.epilogue.theme.renderer')
+                                                     else p:property('oxf.epilogue.theme')))"/>
                         <p:output name="data" id="theme-config"/>
                     </p:processor>
                 </p:otherwise>

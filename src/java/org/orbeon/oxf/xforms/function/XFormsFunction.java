@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -88,7 +88,8 @@ abstract public class XFormsFunction extends SystemFunction {
     }
 
     protected XFormsContainingDocument getContainingDocument(XPathContext xpathContext) {
-        return getContext(xpathContext).getXBLContainer().getContainingDocument();
+        final Context context = getContext(xpathContext);
+        return (context != null) ? context.getXBLContainer().getContainingDocument() : null;
     }
 
     protected XFormsContextStack getContextStack(XPathContext xpathContext) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -95,7 +95,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private final boolean ignoreRootElement;
 
     private Stack<URI> xmlBaseStack = new Stack<URI>();
-    private boolean isSeparateDeployment;
+    private XFormsConstants.DeploymentType deploymentType;
     private String requestContextPath;
 
     private boolean inXFormsOrExtension;       // whether we are in a model
@@ -118,7 +118,10 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         final ExternalContext.Request request = externalContext.getRequest();
 
         // Remember if filter provided separate deployment information
-        isSeparateDeployment = "separate".equals(request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME));
+        final String rendererDeploymentType = (String) request.getAttributesMap().get(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME);
+        deploymentType = "separate".equals(rendererDeploymentType) ? XFormsConstants.DeploymentType.separate
+                    : "integrated".equals(rendererDeploymentType) ? XFormsConstants.DeploymentType.integrated
+                    : XFormsConstants.DeploymentType.plain;
 
         // Try to get request context path
         requestContextPath = request.getClientContextPath("/");
@@ -173,7 +176,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                 // Add xml:base attribute
                 attributesImpl.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteRenderURL((xmlBaseStack.get(0)).toString()));
                 // Add deployment attribute
-                attributesImpl.addAttribute(XMLConstants.XML_URI, "deployment", "deployment", ContentHandlerHelper.CDATA, isSeparateDeployment ? "separate" : "integrated");
+                attributesImpl.addAttribute(XMLConstants.XML_URI, "deployment", "deployment", ContentHandlerHelper.CDATA, deploymentType.name());
                 // Add context path attribute
                 attributesImpl.addAttribute(XMLConstants.XML_URI, "context-path", "context-path", ContentHandlerHelper.CDATA, requestContextPath);
                 // Add container-type attribute

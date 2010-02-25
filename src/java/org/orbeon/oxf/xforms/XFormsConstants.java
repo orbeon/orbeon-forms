@@ -136,6 +136,7 @@ public class XFormsConstants {
     public static final QName XXBL_SCOPE_QNAME = new QName("scope", XXBL_NAMESPACE);
 
     public enum XXBLScope { inner, outer }
+    public enum DeploymentType { separate, integrated, plain }
     
     // Variables
     public static final String XXFORMS_VARIABLE_NAME = "variable"; // don't use QName so we can support exforms/xxforms/xforms

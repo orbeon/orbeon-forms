@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.scope;
 
@@ -36,8 +36,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 
@@ -118,7 +116,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                                     mapping = readMapping(pipelineContext);
                                 }
 
-                                state.saxStore = getSAXStore(value, mapping, config);
+                                state.saxStore = getSAXStore(value, mapping, config.getContentType(), config.getKey());
                             }
                         } else {
                             // Store empty document
@@ -145,14 +143,14 @@ public class ScopeGenerator extends ScopeProcessorBase {
         return output;
     }
 
-    public static SAXStore getSAXStore(Object value, Mapping mapping, ContextConfig config) throws SAXException, TransformerException, IOException, MappingException {
-        if (config.getContentType() == ScopeProcessorBase.TEXT_PLAIN) {
+    public static SAXStore getSAXStore(Object value, Mapping mapping, String contentType, String key) throws SAXException, TransformerException, IOException, MappingException {
+        if (ScopeProcessorBase.TEXT_PLAIN.equals(contentType)) {
             final SAXStore result = new SAXStore();
             if (value instanceof String) {
                 // Creating a stream from the String! Better to extend the ProcessorUtils class to support String or StringReader or something...
-                ProcessorUtils.readText((String) value, result, config.getContentType(), ISODateUtils.getCurrentTimeMillis());
+                ProcessorUtils.readText((String) value, result, contentType, ISODateUtils.getCurrentTimeMillis());
             } else {
-                logger.error("Content-type: " + ScopeProcessorBase.TEXT_PLAIN + " not applicable for key: " + config.getKey());
+                logger.error("Content-type: " + ScopeProcessorBase.TEXT_PLAIN + " not applicable for key: " + key);
                 XMLUtils.streamNullDocument(result);
             }
             return result;

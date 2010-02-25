@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.pipeline.choose;
 
@@ -22,12 +22,12 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.ContentHandler;
 
 import java.util.*;
@@ -43,21 +43,21 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
     private List branchProcessors;
     private Set outputsById;
     private Set outputsByParamRef;
-    private List branchInputs = new ArrayList();  // List [Map: (String inputName) -> (ProcessorInput)]
-    private List branchOutputs = new ArrayList(); // List [Map: (String outputName) -> (ProcessorOutput)]
+    private List<Map<String, ProcessorInput>> branchInputs = new ArrayList<Map<String, ProcessorInput>>();  // List [Map: (String inputName) -> (ProcessorInput)]
+    private List<Map<Object, ProcessorOutput>> branchOutputs = new ArrayList<Map<Object, ProcessorOutput>>(); // List [Map: (String outputName) -> (ProcessorOutput)]
 
     /**
-     * @param branchConditions    List of Strings: XPath expression for each branch
-     *                            (except the optimal last <otherwise>)
-     * @param branchNamespaces    List of NamespaceContext objects: namespaces declared in
-     *                            the context of the given XPath expression
-     * @param branchProcessors    List of Processor objects: one for each branch
-     * @param inputs              Set of Strings: all the ids possibly referenced by
-     *                            a processor in any branch
-     * @param outputsById         Set of Strings: outputs of the choose referenced
-     *                            by and other processor
-     * @param outputsByParamRef   Set of Strings: outputs of the choose referencing
-     *                            pipeline outputs
+     * @param branchConditions  List of Strings: XPath expression for each branch
+     *                          (except the optimal last <otherwise>)
+     * @param branchNamespaces  List of NamespaceContext objects: namespaces declared in
+     *                          the context of the given XPath expression
+     * @param branchProcessors  List of Processor objects: one for each branch
+     * @param inputs            Set of Strings: all the ids possibly referenced by
+     *                          a processor in any branch
+     * @param outputsById       Set of Strings: outputs of the choose referenced
+     *                          by and other processor
+     * @param outputsByParamRef Set of Strings: outputs of the choose referencing
+     *                          pipeline outputs
      */
     public ConcreteChooseProcessor(String id, LocationData locationData,
                                    List branchConditions, List branchNamespaces, List branchProcessors,
@@ -87,7 +87,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             Processor processor = (Processor) i.next();
 
             // Create ProcessorInput for each branch
-            Map currentBranchInputs = new HashMap();
+            Map<String, ProcessorInput> currentBranchInputs = new HashMap<String, ProcessorInput>();
             branchInputs.add(currentBranchInputs);
             for (Iterator j = inputs.iterator(); j.hasNext();) {
                 String inputName = (String) j.next();
@@ -95,7 +95,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             }
 
             // Create ProcessorOutput for each branch
-            Map currentBranchOutputs = new HashMap();
+            Map<Object, ProcessorOutput> currentBranchOutputs = new HashMap<Object, ProcessorOutput>();
             branchOutputs.add(currentBranchOutputs);
             for (Iterator j = CollectionUtils.union(outputsById, outputsByParamRef).iterator(); j.hasNext();) {
                 String outputName = (String) j.next();
@@ -122,7 +122,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                 State state = (State) getState(context);
                 if (!state.started)
                     start(context);
-                ProcessorOutput branchOutput = (ProcessorOutput) state.selectedBranchOutputs.get(_name);
+                ProcessorOutput branchOutput = state.selectedBranchOutputs.get(_name);
                 branchOutput.read(context, contentHandler);
             }
 
@@ -131,7 +131,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                     State state = (State) getState(context);
                     if (!state.started)
                         start(context);
-                    ProcessorOutput branchOutput = (ProcessorOutput) state.selectedBranchOutputs.get(_name);
+                    ProcessorOutput branchOutput = state.selectedBranchOutputs.get(_name);
                     if (branchOutput instanceof Cacheable)
                         return ((Cacheable) branchOutput).getKey(context);
                     else
@@ -145,7 +145,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                     State state = (State) getState(context);
                     if (!state.started)
                         start(context);
-                    ProcessorOutput branchOutput = (ProcessorOutput) state.selectedBranchOutputs.get(_name);
+                    ProcessorOutput branchOutput = state.selectedBranchOutputs.get(_name);
                     if (branchOutput instanceof Cacheable)
                         return ((Cacheable) branchOutput).getValidity(context);
                     else
@@ -187,11 +187,11 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             // Lazily read input in case there is only a p:otherwise
             if (hrefDocumentInfo == null)
                 hrefDocumentInfo = readCacheInputAsTinyTree(context, AbstractChooseProcessor.CHOOSE_DATA_INPUT);
-            PooledXPathExpression expr = null;
+            PooledXPathExpression expression = null;
             final Map namespaces = (Map) branchNamespaces.get(branchIndex);
             try {
-                expr = XPathCache.getXPathExpression(context, hrefDocumentInfo, "boolean(" + condition + ")", namespaces, null, PipelineFunctionLibrary.instance(), null, locationData);// TODO: location should be that of branch
-                if( ((Boolean)expr.evaluateSingle()).booleanValue()) {
+                expression = XPathCache.getXPathExpression(context, hrefDocumentInfo, "boolean(" + condition + ")", namespaces, null, PipelineFunctionLibrary.instance(), null, locationData);// TODO: location should be that of branch
+                if (((Boolean) expression.evaluateSingle()).booleanValue()) {
                     selectedBranch = branchIndex;
                     break;
                 }
@@ -199,9 +199,9 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                 if (logger.isDebugEnabled())
                     logger.debug("Choose: condition evaluation failed for condition: " + condition + " at " + branchProcessors.get(branchIndex));// TODO: location should be that of branch
                 throw new ValidationException("Choose: condition evaluation failed for condition: " + condition, e, locationData);// TODO: location should be that of branch
-            } finally{
+            } finally {
                 try {
-                    if(expr != null) expr.returnToPool();
+                    if (expression != null) expression.returnToPool();
                 } catch (Exception e) {
                     throw new OXFException(e);
                 }
@@ -220,13 +220,13 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
 
             // Initialize variables depending on selected branch
             final Processor selectedBranchProcessor = (Processor) branchProcessors.get(selectedBranch);
-            final Map selectedBranchInputs = (Map) branchInputs.get(selectedBranch);
-            state.selectedBranchOutputs = (Map) branchOutputs.get(selectedBranch);
+            final Map<String, ProcessorInput> selectedBranchInputs = branchInputs.get(selectedBranch);
+            state.selectedBranchOutputs = branchOutputs.get(selectedBranch);
 
             // Connect branch inputs
-            for (Iterator i = selectedBranchInputs.keySet().iterator(); i.hasNext();) {
-                final String branchInputName = (String) i.next();
-                final ProcessorInput branchInput = (ProcessorInput) selectedBranchInputs.get(branchInputName);
+            for (Iterator<String> i = selectedBranchInputs.keySet().iterator(); i.hasNext();) {
+                final String branchInputName = i.next();
+                final ProcessorInput branchInput = selectedBranchInputs.get(branchInputName);
                 final ProcessorInput chooseInput = getInputByName(branchInputName);
                 branchInput.setOutput(chooseInput.getOutput());
             }
@@ -254,6 +254,6 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
 
     private static class State {
         public boolean started = false;
-        public Map selectedBranchOutputs;
+        public Map<Object, ProcessorOutput> selectedBranchOutputs;
     }
 }

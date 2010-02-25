@@ -1,30 +1,27 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.pipeline;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.pipeline.functions.RewriteResourceURI;
 import org.orbeon.oxf.processor.pipeline.functions.RewriteServiceURI;
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsGetRequestAttribute;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsPropertiesStartsWith;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsProperty;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticProperty;
-import org.orbeon.saxon.functions.FormatDate;
-import org.orbeon.saxon.functions.FormatNumber2;
-import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.functions.StandardFunction;
-import org.orbeon.saxon.functions.SystemFunction;
+import org.orbeon.saxon.functions.*;
 import org.orbeon.saxon.om.NamespaceConstant;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.ItemType;
@@ -88,19 +85,24 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
     static {
         StandardFunction.Entry e;
 
-        // property() function
+        // p:property() function
         e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}property", XXFormsProperty.class, 0, 1, 1, Type.ANY_ATOMIC_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
-        // rewrite-resource-uri() function
+        // p:rewrite-resource-uri() function
         e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}rewrite-resource-uri", RewriteResourceURI.class, 0, 1, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
 
-        // rewrite-service-uri() function
+        // p:rewrite-service-uri() function
         e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}rewrite-service-uri", RewriteServiceURI.class, 0, 1, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+
+        // p:get-request-attribute()
+        e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}get-request-attribute", XXFormsGetRequestAttribute.class, 0, 1, 2, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // Useful XSLT function
         e = register("format-date", FormatDate.class, Type.DATE, 2, 5, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);

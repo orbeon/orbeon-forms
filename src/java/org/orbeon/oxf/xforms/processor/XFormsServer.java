@@ -25,6 +25,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
+import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -248,6 +249,9 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Set URL rewriter resource path information based on information in static state
                 pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, containingDocument.getStaticState().getVersionedPathMatchers());
+
+                // Set deployment mode into request (useful for epilogue)
+                externalContext.getRequest().getAttributesMap().put(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME, containingDocument.getStaticState().getDeploymentType().name());
 
                 final boolean allEvents;
                 final Set<String> valueChangeControlIds = new HashSet<String>();

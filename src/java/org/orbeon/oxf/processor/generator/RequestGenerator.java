@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -198,13 +198,13 @@ public class RequestGenerator extends ProcessorImpl {
             }
 
             protected boolean fillOutState(PipelineContext pipelineContext, DigestState digestState) {
-                State state = (State) digestState;
+                final State state = (State) digestState;
                 if (state.requestDocument == null) {
                     // Read config document
-                    Document config = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
+                    final Document config = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
 
                     // Try to find stream-type attribute
-                    QName streamTypeQName = Dom4jUtils.extractAttributeValueQName(config.getRootElement(), "stream-type");
+                    final QName streamTypeQName = Dom4jUtils.extractAttributeValueQName(config.getRootElement(), "stream-type");
                     if (streamTypeQName != null && !(streamTypeQName.equals(XMLConstants.XS_BASE64BINARY_QNAME) || streamTypeQName.equals(XMLConstants.XS_ANYURI_QNAME)))
                         throw new OXFException("Invalid value for stream-type attribute: " + streamTypeQName.getQualifiedName());
                     state.requestedStreamType = streamTypeQName;
@@ -212,18 +212,18 @@ public class RequestGenerator extends ProcessorImpl {
                     // Read and store request
                     state.requestDocument = readRequestAsDOM4J(pipelineContext, config);
 
-                    // Check if the body was requestd
+                    // Check if the body was requested
                     state.bodyRequested = XPathUtils.selectSingleNode(state.requestDocument, "/*/body") != null;
                 }
-                Context context = getContext(pipelineContext);
+                final Context context = getContext(pipelineContext);
                 return !context.hasUpload && !state.bodyRequested;
             }
 
             protected byte[] computeDigest(PipelineContext pipelineContext, DigestState digestState) {
-                State state = (State) digestState;
+                final State state = (State) digestState;
                 XMLUtils.DigestContentHandler dch = new XMLUtils.DigestContentHandler("MD5");
                 try {
-                    Transformer identityTransformer = TransformerUtils.getIdentityTransformer();
+                    final Transformer identityTransformer = TransformerUtils.getIdentityTransformer();
                     identityTransformer.transform(new DocumentSource(state.requestDocument), new SAXResult(dch));
                 } catch (TransformerException e) {
                     throw new OXFException(e);
@@ -288,10 +288,10 @@ public class RequestGenerator extends ProcessorImpl {
 
     private Document readRequestAsDOM4J(PipelineContext pipelineContext, Node config) {
         // Get complete request document from pipeline context, or create it if not there
-        Context context = getContext(pipelineContext);
+        final Context context = getContext(pipelineContext);
         if (context.wholeRequest == null)
             context.wholeRequest = readWholeRequestAsDOM4J(pipelineContext);
-        Document result = (Document) context.wholeRequest.clone();
+        final Document result = (Document) context.wholeRequest.clone();
 
         // Filter the request based on the config input
         filterRequestDocument(result, config);

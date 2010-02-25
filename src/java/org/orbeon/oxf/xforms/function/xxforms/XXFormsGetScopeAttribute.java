@@ -34,7 +34,7 @@ import java.io.StringReader;
  */
 public abstract class XXFormsGetScopeAttribute extends XFormsFunction {
 
-    protected SequenceIterator convertAttributeValue(Object attributeObject) throws XPathException {
+    protected SequenceIterator convertAttributeValue(Object attributeObject, String contentType, String key) throws XPathException {
         if (attributeObject instanceof AtomicValue) {
             // Found atomic value
             return SingletonIterator.makeIterator((AtomicValue) attributeObject);
@@ -46,7 +46,7 @@ public abstract class XXFormsGetScopeAttribute extends XFormsFunction {
                 final Mapping mapping = new Mapping();
                 mapping.loadMapping(new InputSource(new StringReader("<mapping/>")));
 
-                saxStore = ScopeGenerator.getSAXStore(attributeObject, mapping);
+                saxStore = ScopeGenerator.getSAXStore(attributeObject, mapping, contentType, key);
             } catch (Exception e) {
                 throw new OXFException(e);
             }

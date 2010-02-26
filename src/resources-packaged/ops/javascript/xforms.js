@@ -7102,7 +7102,9 @@ ORBEON.xforms.Server = {
                                             // Display loading indicator unless the server tells us not to display it
                                             newDynamicStateTriggersReplace = true;
                                         }
-                                        // We now always use the action set by the client so we don't set requestForm.action
+                                        // Set the action to the URL of the current page, so the URL seen by the client is always the URL
+                                        // of a page to which we didn't do a submission replace="all"
+                                        requestForm.action = window.location.href;
                                         if (target == null) {
                                             // Reset as this may have been changed before by asyncRequest
                                             requestForm.removeAttribute("target");

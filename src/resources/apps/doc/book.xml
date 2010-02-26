@@ -15,7 +15,7 @@
     <menu label="Getting Started">
         <menu-item label="Welcome" href="index"/>
         <menu label="Changes">
-            <menu-item label="Version 3.7.2" href="home-changes-372"/>
+            <menu-item label="Version 3.7.2" href="http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-372"/>
             <menu-item label="Version 3.7.1" href="home-changes-371" printed-book="false"/>
             
             <menu-item label="Version 3.6" href="home-changes-36" printed-book="false"/>
@@ -25,7 +25,7 @@
         <menu-item label="Installing" href="http://wiki.orbeon.com/forms/doc/developer-guide/admin-installing"/>
         <menu-item label="Orbeon Forms Tutorial" href="intro-tutorial"/>
         <menu-item label="Orbeon Forms Wiki" href="http://wiki.orbeon.com/forms"/>
-        <menu-item label="Frequently Asked Questions" href="home-faq"/>
+        <menu-item label="Frequently Asked Questions" href="http://wiki.orbeon.com/forms/orbeon-forms-faq"/>
     </menu>
     <menu label="Core Technologies Reference">
         <menu label="XForms">

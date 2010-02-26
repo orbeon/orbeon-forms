@@ -41,3 +41,8 @@
     width: 20px;
 }
 
+fr-datatable-collapsed {
+    top: -10000px ! important; /* this so that no space is visible on the page */
+    left: -10000px ! important; /* this so that no space is visible on the page */
+    position: absolute ! important;}
+

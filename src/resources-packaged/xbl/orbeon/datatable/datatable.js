@@ -69,8 +69,19 @@ ORBEON.widgets.datatable.prototype.finish = function () {
     var pxWidth;
 
     if (width.indexOf('%') != - 1) {
-
+        if (YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
+            // This dirty hack is needed when IE works in quirks mode
+            YAHOO.util.Dom.addClass(this.table, 'xforms-disabled');
+            var dummy = document.createElement('div');
+            dummy.innerHTML = "foo";
+            this.headerContainer.appendChild(dummy);
+        }
         var pxWidth = this.headerContainer.clientWidth;
+        if (YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
+            // This dirty hack is needed when IE works in quirks mode
+            this.headerContainer.removeChild(dummy);
+            YAHOO.util.Dom.removeClass(this.table, 'xforms-disabled');
+        }
         width = pxWidth + 'px';
 
     } else {
@@ -107,10 +118,10 @@ ORBEON.widgets.datatable.prototype.finish = function () {
             if (this.scrollV) {
                 minWidth = this.tableWidth - 19;
             } else {
-                if (YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8)       {
-                    minWidth = this.tableWidth -1;
+                if (YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8) {
+                    minWidth = this.tableWidth - 1;
                 } else {
-                    minWidth = this.tableWidth; 
+                    minWidth = this.tableWidth;
                 }
 
             }
@@ -128,8 +139,11 @@ ORBEON.widgets.datatable.prototype.finish = function () {
     }
     YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
 
-    this.adjustHeightForIE = this.adjustHeightForIE || (this.scrollH && ! this.scrollV && this.height == 'auto' && YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8);
+    this.adjustHeightForIE = this.adjustHeightForIE || (this.scrollH && ! this.scrollV && this.height == 'auto' && YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8  );
     if (this.adjustHeightForIE) {
+        if (document.compatMode == "BackCompat") {
+            this.tableHeight += 1;
+        }
         this.height = (this.tableHeight + 22) + 'px';
         this.adjustHeightForIE = true;
     }
@@ -151,8 +165,16 @@ ORBEON.widgets.datatable.prototype.finish = function () {
     // Store the column widths before any split
 
     var columnWidths = [];
+    if (YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
+        // This dirty hack is needed when IE works in quirks mode
+        YAHOO.util.Dom.addClass(this.table, 'xforms-disabled');
+    }
     for (var j = 0; j < this.headerColumns.length; j++) {
         columnWidths[j] = this.headerColumns[j].clientWidth;
+    }
+    if (YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
+        // This dirty hack is needed when IE works in quirks mode
+        YAHOO.util.Dom.removeClass(this.table, 'xforms-disabled');
     }
 
     // Split when needed
@@ -211,7 +233,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
         this.width = this.container.clientWidth;
         if (this.tableWidth > this.width) {
             this.bodyContainer.style.overflowX = "scroll";
-        }   
+        }
     } else {
         this.width = this.tableWidth;
     }
@@ -292,6 +314,19 @@ ORBEON.widgets.datatable.prototype.finish = function () {
         this.hasFixedWidthContainer = false;
         this.hasFixedWidthTable = false;
     }
+
+    // Sometimes, in IE / quirks mode, the height is miscalculated and that forces an horizontal scroll bar...
+
+    if (this.scrollH && ! this.scrollV && document.compatMode == "BackCompat") {
+        var limit=500;
+        while (limit > 0 && this.table.parentNode.clientWidth < pxWidth - 2) {
+            this.tableHeight += 1;
+            this.height = this.tableHeight + "px";
+            this.bodyContainer.style.height = this.height;
+            limit -= 1;
+        }
+    }
+
     YAHOO.log("Datatable index " + this.index + 'created with width: ' + this.width + ', table width: ' + this.tableWidth, "info")
 
 }
@@ -341,10 +376,10 @@ ORBEON.widgets.datatable.prototype.reset = function () {
         }
     }
     // Remove the containers widths and heights
-    this.container.style.height='';
-    this.headerContainer.style.height='';
-    this.container.style.width='';
-    this.headerContainer.style.width='';
+    this.container.style.height = '';
+    this.headerContainer.style.height = '';
+    this.container.style.width = '';
+    this.headerContainer.style.width = '';
 
     // remove the dynamic style sheet if it exists
     if (this.styleElt != undefined) {
@@ -364,7 +399,7 @@ ORBEON.widgets.datatable.prototype.optimizeWidth = function (minWidth) {
     var savedWidth = this.table.style.width;
     this.table.style.width = "auto";
     var width = this.table.clientWidth;
-    this.tableHeight = this.table.clientHeight;
+    this.tableHeight = this.table.clientHeight + 5;
     this.headerContainer.style.position = "";
     this.headerContainer.style.width = "";
     this.table.style.width = savedWidth;
@@ -702,17 +737,17 @@ ORBEON.widgets.datatable.initLoadingIndicator = function(target, scrollV, scroll
     var div = YAHOO.util.Dom.getFirstChild(target);
     var subDiv = YAHOO.util.Dom.getFirstChild(div);
     var table = YAHOO.util.Dom.getFirstChild(subDiv);
-    var region =    YAHOO.util.Dom.getRegion(table);
+    var region = YAHOO.util.Dom.getRegion(table);
     var curTableWidth = region.right - region.left;
     if (curTableWidth < 50) {
-        YAHOO.util.Dom.setStyle(table, 'width', '50px');    
+        YAHOO.util.Dom.setStyle(table, 'width', '50px');
     }
     if (scrollV) {
-        if (YAHOO.env.ua.ie == 6 && target.hasBeenAdjusted == undefined ) {
+        if (YAHOO.env.ua.ie == 6 && target.hasBeenAdjusted == undefined) {
             // This is a hack to adjust the indicator height in IE6 :(
-            region =    YAHOO.util.Dom.getRegion(div);
+            region = YAHOO.util.Dom.getRegion(div);
             var curHeight = region.bottom - region.top;
-            var heightProp =   (curHeight - 4) + 'px'    ;
+            var heightProp = (curHeight - 4) + 'px'    ;
             YAHOO.util.Dom.setStyle(div, 'height', heightProp);
             YAHOO.util.Dom.setStyle(subDiv, 'height', heightProp);
             target.hasBeenAdjusted = true;

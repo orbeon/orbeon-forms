@@ -38,7 +38,11 @@ ORBEON.widgets.datatable = function (container, index, innerTableWidth) {
 ORBEON.widgets.datatable.prototype.initProperties = function (container, index, innerTableWidth) {
     this.index = index;
     this.innerTableWidth = innerTableWidth;
-    this.container = YAHOO.util.Selector.query('div.yui-dt', container, false)[0];
+    // This doesn't work in IE 8 :(
+    // this.container = YAHOO.util.Selector.query('div.yui-dt', container, false)[0];
+    // use the following (less robust) instead:
+    this.container = YAHOO.util.Dom.getElementsByClassName('yui-dt', 'div', container)[0];
+
     YAHOO.util.Dom.addClass(this.container, 'fr-dt-initialized');
 
     this.scrollV = YAHOO.util.Dom.hasClass(this.container, 'fr-scrollV');

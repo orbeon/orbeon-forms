@@ -4,7 +4,7 @@
 
 =====================================================
 
-Last updated for Orbeon Forms 3.7.2 (Developer Release), February 2010
+Last updated for Orbeon Forms 3.8, February 2010
 
 This README.TXT file covers the following topics:
 
@@ -70,7 +70,7 @@ third-party software.
 
 A complete list of changes can be found online at:
 
-  http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-372
+      http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-38
 
 
 ****************************************

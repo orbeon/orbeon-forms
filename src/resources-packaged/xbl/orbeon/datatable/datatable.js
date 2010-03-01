@@ -136,7 +136,25 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
 
     var width = this.originalWidth;
     var pxWidth = this.getActualOriginalTableWidth();
+
+
+    /*var hackNeeded = YAHOO.env.ua.ie > 0 && (YAHOO.env.ua.ie < 8 || document.compatMode == "BackCompat")
+    if (this.originalWidth.indexOf('%') != - 1 && hackNeeded) {
+        var dummy = document.createElement('div');
+        dummy.innerHTML = "foo";
+        this.container.replaceChild(dummy, this.bodyContainer);
+        this.container.removeChild(this.headerContainer);
+    } */
+
     var containerWidth =this.container.clientWidth;
+
+    /*
+    if (this.originalWidth.indexOf('%') != - 1 && hackNeeded) {
+        this.container.replaceChild(this.headerContainer, dummy);
+        this.container.appendChild(this.bodyContainer);
+    }
+    */
+
 
 
     // See how big the table would be without its size restriction  (for scrollable tables)
@@ -258,8 +276,16 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
 
         // Final set of size settings
 
-        YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
-        YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', width);
+        if (YAHOO.env.ua.ie > 0 && (YAHOO.env.ua.ie < 8 || document.compatMode == "BackCompat")) {
+            // Old versions of IE and quirks mode do not like at all widths expressed as % here
+
+            this.headerContainer.style.width = (containerWidth - 2) + 'px';
+            this.bodyContainer.style.width = (containerWidth - 2) + 'px';
+
+        } else {
+            YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
+            YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', width);            
+        }
 
         if (this.scrollV) {
             this.headerScrollWidth = this.tableWidth + 20;
@@ -353,20 +379,14 @@ ORBEON.widgets.datatable.prototype.initColumns = function () {
 ORBEON.widgets.datatable.prototype.getActualOriginalTableWidth = function () {
 
     var pxWidth;
+    
     if (this.originalWidth.indexOf('%') != - 1) {
+
         if (this.scrollH) {
            pxWidth = this.container.clientWidth - 21;
         }  else {
            pxWidth =  this.container.clientWidth - 2;
         }
-        // the following block is required to calculate the width in a way that works for IE 6.0 :(
-        //this.headerContainer.style.overflow = "hidden";
-        //this.headerContainer.style.width = this.originalWidth;
-        //var pxWidth = this.headerContainer.clientWidth;
-        // Convert % into px...
-        //width = pxWidth + 'px';
-        //this.headerContainer.style.overflow = "";
-        //this.headerContainer.style.width = "";
     } else if (this.originalWidth == 'auto') {
         pxWidth = this.table.clientWidth;
     } else {
@@ -620,8 +640,9 @@ ORBEON.widgets.datatable.utils.freezeWidth = function (elt) {
 ORBEON.widgets.datatable.colSorter = function (th) {
     var liner = YAHOO.util.Selector.query('div.yui-dt-liner', th, true);
     YAHOO.util.Event.addListener(liner, "click", function (ev) {
-        var a = YAHOO.util.Selector.query('a.xforms-trigger:not(.xforms-disabled)', liner, true);
-        if (YAHOO.util.Event.getTarget(ev) != a) {
+        var triggerControl = YAHOO.util.Selector.query('.xforms-trigger:not(.xforms-disabled)', liner, true);
+        var a = ORBEON.util.Dom.getElementByTagName(triggerControl, "a");
+        if (a != undefined && YAHOO.util.Event.getTarget(ev) != a) {
             ORBEON.xforms.Document.dispatchEvent(a.id, "DOMActivate");
         }
     });

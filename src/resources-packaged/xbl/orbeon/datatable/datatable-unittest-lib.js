@@ -386,7 +386,7 @@ ORBEON.widgets.datatable.unittests_lib = {
     checkIsSplit: function(table, isSplit) {
         //YAHOO.util.Assert.areEqual(isSplit, table.tBodies.length == 0, "Header table's body doesn't match split status");
         var headerTable = this.getHeaderTable(table, isSplit);
-        YAHOO.util.Assert.areEqual(isSplit, headerTable.tBodies.length == 0, "Header table's body doesn't match split status");
+        YAHOO.util.Assert.areEqual(isSplit, headerTable.tBodies.length == 0 || (headerTable.tBodies.length == 1 && headerTable.tBodies[0].rows.length == 0), "Header table's body doesn't match split status");
         //YAHOO.util.Assert.areEqual(isSplit, bodyTable.tHead == undefined, "Body table's header  doesn't match split status");
     },
 

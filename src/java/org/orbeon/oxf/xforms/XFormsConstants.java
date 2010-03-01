@@ -214,6 +214,8 @@ public class XFormsConstants {
     public static final QName XFORMS_VALUE_QNAME = new QName("value", XFORMS_NAMESPACE);
     public static final QName XFORMS_COPY_QNAME = new QName("copy", XFORMS_NAMESPACE);
     public static final QName XFORMS_ITEMSET_QNAME = new QName("itemset", XFORMS_NAMESPACE);
+    public static final QName XFORMS_ITEM_QNAME = new QName("item", XFORMS_NAMESPACE);
+    public static final QName XFORMS_CHOICES_QNAME = new QName("choices", XFORMS_NAMESPACE);
     public static final QName XFORMS_OUTPUT_QNAME = new QName("output", XFORMS_NAMESPACE);
     public static final QName XFORMS_LOAD_QNAME = new QName("load", XFORMS_NAMESPACE);
 

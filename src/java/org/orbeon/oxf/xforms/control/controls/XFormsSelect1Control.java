@@ -376,6 +376,11 @@ public class XFormsSelect1Control extends XFormsValueControl {
         }
     }
 
+    @Override
+    public boolean supportAjaxUpdates() {
+        return !XFormsGroupControl.INTERNAL_APPEARANCE.equals(getAppearance());
+    }
+
     // Work in progress for in-bounds/out-of-bounds
 //    protected void evaluateValue(PipelineContext pipelineContext) {
 //        super.evaluateValue(pipelineContext);

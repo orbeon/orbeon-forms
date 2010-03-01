@@ -282,9 +282,21 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
 
         // Other controls
         controller.registerHandler(XFormsTextareaHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
+        controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog");
+
+        // xforms:select and xforms:select1
+        controller.registerHandler(XFormsSelect1InternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select", controller.new Matcher() {
+            public boolean match(Attributes attributes) {
+                return XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
+            }
+        });
+        controller.registerHandler(XFormsSelect1InternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1", controller.new Matcher() {
+            public boolean match(Attributes attributes) {
+                return XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
+            }
+        });
         controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
         controller.registerHandler(XFormsSelect1Handler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
-        controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog");
 
         // Add handlers for LHHA elements
         // TODO: check w/ XFStaticState if there are any standalone LHHA elements

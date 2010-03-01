@@ -13,13 +13,19 @@
  */
 package org.orbeon.oxf.xforms.itemset;
 
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
 
 /**
@@ -83,10 +89,10 @@ public class Itemset implements ItemContainer {
      * Return the list of items as a JSON tree.
      *
      * @param controlValue  current value of the control (to determine selected item) or null (valued used only during initialization)
-     * @param many          whether multiple selection is allowed (to determine selected item)
+     * @param isMultiple    whether multiple selection is allowed (to determine selected item)
      * @return              String representing a JSON tree
      */
-    public String getJSONTreeInfo(final PropertyContext context, final String controlValue, final boolean many, LocationData locationData) {
+    public String getJSONTreeInfo(final PropertyContext context, final String controlValue, final boolean isMultiple, LocationData locationData) {
         // Produce a JSON fragment with hierarchical information
         if (getChildren().size() > 0) {
             final StringBuilder sb = new StringBuilder(100);
@@ -98,20 +104,19 @@ public class Itemset implements ItemContainer {
                     public void endLevel(ContentHandler contentHandler) throws SAXException {}
 
                     public void startItem(ContentHandler contentHandler, Item item, boolean first) throws SAXException {
-                        final String value = item.getValue();
 
                         if (!first)
                             sb.append(',');
                         sb.append("[");
 
-                        // Label and value
+                        // Item label and value
                         sb.append('"');
                         sb.append(item.getExternalJSLabel());
                         sb.append("\",\"");
                         sb.append(item.getExternalJSValue(context));
                         sb.append('\"');
 
-                        // Attributes if any
+                        // Item attributes if any
                         final Map<String, String> attributes = item.getAttributes();
                         if (attributes != null && attributes.size() > 0) {
                             final int size = attributes.size();
@@ -131,11 +136,16 @@ public class Itemset implements ItemContainer {
                             sb.append('}');
                         }
 
-                        // NOTE: This is used for tree/menu initialization only
-                        if (controlValue != null) {
-                            // We allow the value to be null when this method is used just to produce the structure of the tree without selection
-                            sb.append(',');
-                            sb.append(Boolean.toString((value != null) && XFormsItemUtils.isSelected(many, controlValue, value)));
+                        // Handle selection
+                        {
+                            final String itemValue = (item.getValue() != null) ? item.getValue() : "";
+                            final boolean itemSelected = (itemValue != null) && XFormsItemUtils.isSelected(isMultiple, controlValue, itemValue);
+
+                            // NOTE: This is useful e.g. for tree/menu initialization
+                            if (itemSelected) {
+                                sb.append(',');
+                                sb.append(Boolean.toString(itemSelected));
+                            }
                         }
                     }
 
@@ -154,6 +164,102 @@ public class Itemset implements ItemContainer {
             // Safer to return an empty array rather than en empty string
             return "[]";
         }
+    }
+
+    /**
+     * Return the list of items as an XML tree.
+     *
+     * @param controlValue  current value of the control (to determine selected item) or null (valued used only during initialization)
+     * @param isMultiple    whether multiple selection is allowed (to determine selected item)
+     * @return              XML document
+     */
+    public DocumentInfo getXMLTreeInfo(final PropertyContext context, final String controlValue, final boolean isMultiple, LocationData locationData) {
+        // Produce a JSON fragment with hierarchical information
+
+        final TinyBuilder treeBuilder = new TinyBuilder();
+
+        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        identity.setResult(treeBuilder);
+        final ContentHandlerHelper ch = new ContentHandlerHelper(identity);
+
+        try {
+            ch.startDocument();
+            ch.startElement("itemset");
+
+            if (getChildren().size() > 0) {
+
+                visit(null, new ItemsetListener() {
+
+                    public void startLevel(ContentHandler contentHandler, Item item) throws SAXException {
+                        ch.startElement("choices");
+                    }
+                    public void endLevel(ContentHandler contentHandler) throws SAXException {
+                        ch.endElement();
+                    }
+
+                    public void startItem(ContentHandler contentHandler, Item item, boolean first) throws SAXException {
+
+                        // Handle selected attribute
+                        final String itemValue = (item.getValue() != null) ? item.getValue() : "";
+                        final boolean itemSelected = (itemValue != null) && XFormsItemUtils.isSelected(isMultiple, controlValue, itemValue);
+
+                        final String[] itemAttributes;
+                        if (itemSelected) {
+                            itemAttributes = new String[] { "selected",  "true"};
+                        } else {
+                            itemAttributes = null;
+                        }
+
+                        // Item attributes if any
+//                            final Map<String, String> attributes = item.getAttributes();
+//                            if (attributes != null && attributes.size() > 0) {
+//                                final int size = attributes.size();
+//                                int count = 0;
+//                                sb.append(",{");// start map attribute name/value
+//                                for (final Map.Entry<String, String> entry: attributes.entrySet()) {
+//                                    sb.append('"');
+//                                    sb.append(XFormsUtils.escapeJavaScript(entry.getKey()));
+//                                    sb.append('"');
+//                                    sb.append(':');
+//                                    sb.append('"');
+//                                    sb.append(XFormsUtils.escapeJavaScript(entry.getValue()));
+//                                    sb.append('"');
+//                                    if (++count != size)
+//                                        sb.append(',');
+//                                }
+//                                sb.append('}');
+//                            }
+
+                        ch.startElement("item", itemAttributes);
+                        {
+                            // Label and value
+                            final String itemLabel = (item.getLabel() != null) ? item.getLabel() : "";
+                            {
+                                ch.startElement("label");
+                                ch.text(itemLabel);
+                                ch.endElement();
+                            }
+                            {
+                                ch.startElement("value");
+                                ch.text(itemValue);
+                                ch.endElement();
+                            }
+                        }
+                    }
+
+                    public void endItem(ContentHandler contentHandler) throws SAXException {
+                        ch.endElement();
+                    }
+                });
+            }
+
+            ch.endElement();
+            ch.endDocument();
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+
+        return (DocumentInfo) treeBuilder.getCurrentRoot();
     }
 
     /**

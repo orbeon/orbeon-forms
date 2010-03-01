@@ -1,0 +1,60 @@
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+package org.orbeon.oxf.xforms.function.xxforms;
+
+import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
+import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
+import org.orbeon.oxf.xforms.function.XFormsFunction;
+import org.orbeon.oxf.xforms.itemset.Itemset;
+import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.StringValue;
+
+public class XXFormsItemset extends XFormsFunction {
+
+    @Override
+    public Item evaluateItem(XPathContext xpathContext) throws XPathException {
+        // Get control
+        final Expression controlStaticIdExpression = argument[0];
+        final String controlStaticId = (controlStaticIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), controlStaticIdExpression.evaluateAsString(xpathContext));
+        final Object object = getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), controlStaticId, null);
+
+        if (object instanceof XFormsSelect1Control) {
+            final XFormsSelect1Control select1Control = (XFormsSelect1Control) object;
+
+            // Get format
+            final String format = argument[1].evaluateAsString(xpathContext);
+
+            // Obtain itemset
+            final PropertyContext pipelineContext = getOrCreatePipelineContext();
+            final Itemset itemset = select1Control.getItemset(pipelineContext, true);
+
+            final String controlValue = select1Control.getValue(pipelineContext);
+            final boolean isMultiple = select1Control instanceof XFormsSelectControl;
+
+            if ("json".equalsIgnoreCase(format)) {
+                final String json = itemset.getJSONTreeInfo(pipelineContext, controlValue, isMultiple, null);// TODO: pass LocationData
+                return StringValue.makeStringValue(json);
+            } else {
+                return itemset.getXMLTreeInfo(pipelineContext, controlValue, isMultiple, null);// TODO: pass LocationData
+            }
+        } else {
+            return null;
+        }
+    }
+}

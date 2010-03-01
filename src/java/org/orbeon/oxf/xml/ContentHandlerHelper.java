@@ -193,11 +193,13 @@ public class ContentHandlerHelper {
     }
 
     public static void populateAttributes(AttributesImpl attributesImpl, String[] attributes) {
-        for (int i = 0; i < attributes.length / 2; i++) {
-            final String attributeName = attributes[i * 2];
-            final String attributeValue = attributes[i * 2 + 1];
-            if (attributeName != null && attributeValue != null)
-                attributesImpl.addAttribute("", attributeName, attributeName, CDATA, attributeValue);
+        if (attributes != null) {
+            for (int i = 0; i < attributes.length / 2; i++) {
+                final String attributeName = attributes[i * 2];
+                final String attributeValue = attributes[i * 2 + 1];
+                if (attributeName != null && attributeValue != null)
+                    attributesImpl.addAttribute("", attributeName, attributeName, CDATA, attributeValue);
+            }
         }
     }
 }

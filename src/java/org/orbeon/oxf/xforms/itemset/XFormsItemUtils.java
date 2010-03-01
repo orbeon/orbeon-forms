@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -55,24 +55,26 @@ public class XFormsItemUtils {
      */
     public static boolean isSelected(boolean isMultiple, String controlValue, String itemValue) {
         boolean selected = false;
-        if (isMultiple) {
-            if ("".equals(controlValue)) {
-                // Special case of empty string: check the item that has empty string if any
-                if ("".equals(itemValue)) {
-                    selected = true;
-                }
-            } else {
-                // Case of multiple tokens
-                for (final StringTokenizer st = new StringTokenizer(controlValue); st.hasMoreTokens();) {
-                    final String token = st.nextToken();
-                    if (token.equals(itemValue)) {
+        if (controlValue != null) {
+            if (isMultiple) {
+                if ("".equals(controlValue)) {
+                    // Special case of empty string: check the item that has empty string if any
+                    if ("".equals(itemValue)) {
                         selected = true;
-                        break;
+                    }
+                } else {
+                    // Case of multiple tokens
+                    for (final StringTokenizer st = new StringTokenizer(controlValue); st.hasMoreTokens();) {
+                        final String token = st.nextToken();
+                        if (token.equals(itemValue)) {
+                            selected = true;
+                            break;
+                        }
                     }
                 }
+            } else {
+                selected = controlValue.equals(itemValue);
             }
-        } else {
-            selected = controlValue.equals(itemValue);
         }
         return selected;
     }
@@ -123,7 +125,7 @@ public class XFormsItemUtils {
 
             public void startElement(Element element) {
                 final String localname = element.getName();
-                if ("item".equals(localname)) {
+                if (XFormsConstants.XFORMS_ITEM_QNAME.getName().equals(localname)) {
                     // xforms:item
 
 //                    mayReuse[0] = false;
@@ -133,7 +135,7 @@ public class XFormsItemUtils {
                     final Map<String, String> attributes = getAttributes(element);
                     currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label != null ? label : "", value != null ? value : ""));
 
-                } else if ("itemset".equals(localname)) {
+                } else if (XFormsConstants.XFORMS_ITEMSET_QNAME.getName().equals(localname)) {
                     // xforms:itemset
                     contextStack.pushBinding(propertyContext, element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
                     {
@@ -198,7 +200,7 @@ public class XFormsItemUtils {
                                         }
 
                                         // Handle new item
-                                        if (valueCopyElement.getName().equals("value")) {
+                                        if (valueCopyElement.getName().equals(XFormsConstants.XFORMS_VALUE_QNAME.getName())) {
                                             // Handle xforms:value
                                             // TODO: This could be optimized for xforms:value/@ref|@value as we could get the expression from the cache only once
                                             final String value = getValueValue(valueCopyElement);
@@ -225,7 +227,7 @@ public class XFormsItemUtils {
                     }
                     contextStack.popBinding();
 
-                } else if ("choices".equals(localname)) {
+                } else if (XFormsConstants.XFORMS_CHOICES_QNAME.getName().equals(localname)) {
                     // xforms:choices
 
                     final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
@@ -293,7 +295,7 @@ public class XFormsItemUtils {
 
             public void endElement(Element element) {
                 final String localname = element.getName();
-                if ("choices".equals(localname)) {
+                if (XFormsConstants.XFORMS_CHOICES_QNAME.getName().equals(localname)) {
                     // xforms:choices
 
                     final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
@@ -370,7 +372,7 @@ public class XFormsItemUtils {
 
             public void startElement(Element element) {
                 final String localname = element.getName();
-                if ("item".equals(localname)) {
+                if (XFormsConstants.XFORMS_ITEM_QNAME.getName().equals(localname)) {
                     // xforms:item
 
                     final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
@@ -386,12 +388,12 @@ public class XFormsItemUtils {
                     final Map<String, String> attributes = getAttributes(element);
                     currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label != null ? label : "", value != null ? value : ""));
 
-                } else if ("itemset".equals(localname)) {
+                } else if (XFormsConstants.XFORMS_ITEMSET_QNAME.getName().equals(localname)) {
                     // xforms:itemset
 
                     throw new ValidationException("xforms:itemset must not appear in static itemset.", (LocationData) controlElement.getData());
 
-                } else if ("choices".equals(localname)) {
+                } else if (XFormsConstants.XFORMS_CHOICES_QNAME.getName().equals(localname)) {
                     // xforms:choices
 
                     final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
@@ -408,7 +410,7 @@ public class XFormsItemUtils {
 
             public void endElement(Element element) {
                 final String localname = element.getName();
-                 if ("choices".equals(localname)) {
+                 if (XFormsConstants.XFORMS_CHOICES_QNAME.getName().equals(localname)) {
                     // xforms:choices
 
                     final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);

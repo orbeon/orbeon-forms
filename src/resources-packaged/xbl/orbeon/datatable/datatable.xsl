@@ -638,7 +638,7 @@
                         <xsl:choose>
                             <xsl:when test="$scrollH or $scrollV">
                                 <!-- The table needs to be split -->
-                                <xhtml:div class="fr-datatable-collapsed yui-dt-hd" style="{$width}">
+                                <xhtml:div class="yui-dt-hd fr-datatable-hidden" style="{$width}">
                                     <xsl:variable name="tHead">
                                         <xsl:apply-templates select="$table" mode="headerIsolation"/>
                                     </xsl:variable>

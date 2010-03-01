@@ -17,6 +17,8 @@
     border-bottom:  #7f7f7f 1px solid;
 }
 
+
+
 .xforms-data {
     display: none
 }
@@ -24,7 +26,7 @@
 .datatable-cell-content {
     overflow:hidden;
 }
-
+                                                           
 .fr-datatable-is-loading { 
     background-image:
     url(../../../ops/images/xforms/processing.gif); 
@@ -41,16 +43,9 @@
     width: 20px;
 }
 
-.fr-datatable-offscreen {
-    position: absolute;
-    top: -5000px;
-}
-
 .fr-datatable-hidden {
-    visibility: hidden;
+    position: absolute !important;
+    top: -10000px;
+    left: -1000px;
 }
 
-.fr-datatable-collapsed {
-    position: absolute;
-    top: -5000px;
- }

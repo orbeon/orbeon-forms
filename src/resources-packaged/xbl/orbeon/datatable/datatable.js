@@ -28,6 +28,7 @@
  */
 ORBEON.widgets.datatable = function (container, index, innerTableWidth) {
 
+
     YAHOO.log("Creating datatable index " + index, "info");
     // Store useful stuff as properties
     this.initProperties(container, index, innerTableWidth);
@@ -298,7 +299,7 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
 
         YAHOO.util.Dom.addClass(this.table.parentNode, 'yui-dt-bd');
         YAHOO.util.Dom.removeClass(this.table.parentNode, 'yui-dt-hd');
-        YAHOO.util.Dom.removeClass(this.headerContainer, 'fr-datatable-collapsed');
+        YAHOO.util.Dom.removeClass(this.headerContainer, 'fr-datatable-hidden');
     }
 
 

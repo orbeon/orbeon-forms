@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XBL - Databound Switch</xhtml:title>
+        <xforms:model id="main-model">
+            <xforms:instance id="main-instance">
+                <ui>
+                    <section>search</section>
+                </ui>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <fr:databound-switch ref="section">
+            <xforms:case id="search">
+                <xforms:trigger appearance="minimal">
+                    <xforms:label>Search</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref=".">results</xforms:setvalue>
+                </xforms:trigger>
+            </xforms:case>
+            <xforms:case id="results">
+                <xforms:trigger appearance="minimal">
+                    <xforms:label>Back to search</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref=".">search</xforms:setvalue>
+                </xforms:trigger>
+            </xforms:case>
+        </fr:databound-switch>
+    </xhtml:body>
+</xhtml:html>

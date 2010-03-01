@@ -266,7 +266,7 @@ ORBEON.widgets.datatable.unittests_lib = {
         var bodyTable = this.getBodyTable(table, isSplit);
         var rows = bodyTable.tBodies[0].rows;
         var iActual = 0;
-        for (var i = 0; i < rows.length; i++) {
+        for (var i=0; i< rows.length; i++) {
             var row = rows[i];
             if (this.isSignificant(row)) {
                 var cell = this.getSignificantElementByIndex(row.cells, colId);
@@ -314,7 +314,8 @@ ORBEON.widgets.datatable.unittests_lib = {
     },
 
     checkCellClassesInARow: function(row, classPrefix) {
-        var iActual = 0;                                                                                                                                                      f
+        var iActual = 0;
+        // ???
         for (var i = 0; i < row.cells.length; i++)
         {
             var cell = row.cells[i];
@@ -336,7 +337,7 @@ ORBEON.widgets.datatable.unittests_lib = {
         var headerTable = this.getHeaderTable(table, isSplit);
         var classPrefix = 'dt-' + table.id.replace('\$', '-', 'g') + '-col-';
         this.checkCellClassesInARow(headerTable.tHead.rows[0], classPrefix);
-        var rows = tabvle.tBodies[0].rows;
+        var rows = table.tBodies[0].rows;
         for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
             if (this.isSignificant(row)) {

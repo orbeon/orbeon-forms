@@ -26,6 +26,10 @@ YAHOO.xbl.fr.TabView.prototype = {
         this.yuiTabView.addListener("activeTabChange", this.activeTabChange, this, true);
     },
 
+    /**
+     * Listener on a change to the active tab, either because users have clicked on another tab or because
+     * a tab received the fr-toggle event.
+     */
     activeTabChange: function(event) {
         function getTrigger(selectDeselect, index) {
             var trigger = YAHOO.util.Dom.getElementsByClassName

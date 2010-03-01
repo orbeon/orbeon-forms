@@ -40,10 +40,8 @@
         </xforms:group>
     </xsl:template>
 
-    <xsl:template match="fr:back-button">
-        <!-- NOTE: There is a "back" button and a "close" button. "Back" takes to the summary page, "close" just closes the window. -->
+    <xsl:template match="fr:close-button">
 
-        <!-- Display a "close" button as it's clearer for users -->
         <xforms:group>
             <fr:button id="fr-back-button">
                 <xforms:label>
@@ -198,25 +196,6 @@
                     <!--<xhtml:span>→ </xhtml:span>-->
                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-send"/></xhtml:span>
                 </xforms:label>
-            </fr:button>
-        </xforms:group>
-    </xsl:template>
-
-    <xsl:template match="fr:close-button">
-
-        <!-- NOTE: There is a "back" button and a "close" button. "Back" takes to the summary page, "close" just
-             closes the window. "Close" is used for the print view. -->
-
-        <!-- Don't show this button in noscript mode -->
-        <xforms:group ref=".[not(property('xxforms:noscript'))]">
-            <fr:button>
-                <xforms:label>
-                    <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
-                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/close"/></xhtml:span>
-                </xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xxforms:script>window.close();</xxforms:script>
-                </xforms:action>
             </fr:button>
         </xforms:group>
     </xsl:template>

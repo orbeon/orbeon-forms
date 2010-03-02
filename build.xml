@@ -446,9 +446,6 @@
         <copy file="${resources-packaged.dir}/ops/css-templates/error.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/error.css">
             <filterset refid="css-filter-set"/>
         </copy>
-        <copy file="${resources-packaged.dir}/ops/css-templates/xforms-widgets.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/xforms-widgets.css">
-            <filterset refid="css-filter-set"/>
-        </copy>
     </target>
 
     <target name="war-copy-descriptors" depends="prepare">
@@ -522,9 +519,6 @@
             <filterset refid="css-filter-set"/>
         </copy>
         <copy file="${resources-packaged.dir}/ops/css-templates/error.css.template" toFile="${build.temp.dir}/theme/error.css">
-            <filterset refid="css-filter-set"/>
-        </copy>
-        <copy file="${resources-packaged.dir}/ops/css-templates/xforms-widgets.css.template" toFile="${build.temp.dir}/theme/xforms-widgets.css">
             <filterset refid="css-filter-set"/>
         </copy>
     </target>

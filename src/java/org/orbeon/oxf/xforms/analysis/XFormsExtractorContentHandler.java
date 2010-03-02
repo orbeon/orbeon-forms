@@ -90,8 +90,9 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
     private boolean mustOutputFirstElement = true;
 
+    private final boolean isTopLevel;
     private final ExternalContext externalContext;
-    private final IdGenerator idGenerator;
+    private final XFormsAnnotatorContentHandler.Metadata metadata;
     private final boolean ignoreRootElement;
 
     private Stack<URI> xmlBaseStack = new Stack<URI>();
@@ -108,11 +109,15 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
      *
      * @param externalContext   external context to obtain request path, properties, etc.
      * @param contentHandler    resulting static state document
+     * @param metadata          metadata
      */
-    public XFormsExtractorContentHandler(ExternalContext externalContext, ContentHandler contentHandler, IdGenerator idGenerator) {
+    public XFormsExtractorContentHandler(ExternalContext externalContext, ContentHandler contentHandler,
+                                         XFormsAnnotatorContentHandler.Metadata metadata) {
         super(contentHandler);
+
+        this.isTopLevel = true;
         this.externalContext = externalContext;
-        this.idGenerator = idGenerator;
+        this.metadata = metadata;
         this.ignoreRootElement = false;
 
         final ExternalContext.Request request = externalContext.getRequest();
@@ -147,13 +152,17 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
      * Constructor for nested document (XBL templates).
      *
      * @param contentHandler    resulting static state document
+     * @param metadata          metadata
      * @param ignoreRootElement whether root element must just be skipped
      * @param baseURI           base URI
      */
-    public XFormsExtractorContentHandler(ContentHandler contentHandler, boolean ignoreRootElement, String baseURI) {
+    public XFormsExtractorContentHandler(ContentHandler contentHandler, XFormsAnnotatorContentHandler.Metadata metadata,
+                                         boolean ignoreRootElement, String baseURI) {
         super(contentHandler, contentHandler != null);
+
+        this.isTopLevel = false;
         this.externalContext = null;
-        this.idGenerator = null;
+        this.metadata = metadata;
         this.ignoreRootElement = ignoreRootElement;
 
         try {
@@ -215,10 +224,10 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             super.endPrefixMapping("xxforms");
         }
 
-        if (idGenerator != null) {
+        if (isTopLevel) {
             // Remember the last id used for id generation. During state restoration, XBL components must start with this id.
             final AttributesImpl newAttributes = new AttributesImpl();
-            newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, Integer.toString(idGenerator.getCurrentId()));
+            newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, Integer.toString(metadata.idGenerator.getCurrentId()));
             final String lastIdName = LAST_ID_QNAME.getName();
             super.startElement("", lastIdName, lastIdName, newAttributes);
             super.endElement("", lastIdName, lastIdName);
@@ -245,18 +254,10 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
         final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
         final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
-        final boolean isXHTML = XMLConstants.XHTML_NAMESPACE_URI.equals(uri);
 
-        // TODO: how else can we handle components?
-        // NOTE: Here we have an issue identifying which elements must have content preserved. For example, an element
-        // to which an XBL binding is applied should be preserved, because XBL template processing take place during
-        // static state analysis. In XFormsAnnotatorContentHandler, we detect XBL bindings. Should we do the
-        // same here again? It is wasteful to do it twice. Possibly, XFACH could pass this information here since
-        // it already does all the work to detect content preservation. E.g. custom attribute.
+        final boolean isExtension = metadata.isXBLBinding(uri, localname);
+        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL || isExtension;
 
-//        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL;
-        final boolean isXFormsOrExtension = !isXHTML && !"".equals(uri); // see NOTE above
-        final boolean isExtension = isXFormsOrExtension && !isXForms && !isXXForms && !isEXForms && !isXBL; // see NOTE above
 
         // Handle xml:base
         if (!inXFormsOrExtension) {
@@ -379,13 +380,14 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
         level--;
 
         // Check for XForms or extension namespaces
-//        final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
-//        final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
-//        final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
-//        final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
-        final boolean isXHTML = XMLConstants.XHTML_NAMESPACE_URI.equals(uri);
-//        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL;
-        final boolean isXFormsOrExtension = !isXHTML && !"".equals(uri);// TODO: how else can we handle components?
+        // TODO: use stack and avoid redoing all the tests on endElement()
+        final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
+        final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
+        final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
+        final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
+
+        final boolean isExtension = metadata.isXBLBinding(uri, localname);
+        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL || isExtension;
 
         if (level > 0 || !ignoreRootElement) {
             // We are within preserved content or we output regular XForms content

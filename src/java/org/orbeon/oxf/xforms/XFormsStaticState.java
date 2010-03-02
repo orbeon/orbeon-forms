@@ -163,6 +163,10 @@ public class XFormsStaticState {
         initialize(pipelineContext, staticStateDocument, null, null, encodedStaticState);
     }
 
+    public XFormsAnnotatorContentHandler.Metadata getMetadata() {
+        return metadata;
+    }
+
     public IndentedLogger getIndentedLogger() {
         return indentedLogger;
     }
@@ -262,7 +266,7 @@ public class XFormsStaticState {
         }
 
         // Extract controls, models and components documents
-        extractControlsModelsComponents(propertyContext, staticStateElement, this.metadata.idGenerator);
+        extractControlsModelsComponents(propertyContext, staticStateElement);
 
         // Extract properties information
         extractProperties(staticStateElement);
@@ -411,7 +415,7 @@ public class XFormsStaticState {
         }
     }
 
-    private void extractControlsModelsComponents(PropertyContext pipelineContext, Element staticStateElement, IdGenerator idGenerator) {
+    private void extractControlsModelsComponents(PropertyContext pipelineContext, Element staticStateElement) {
 
         final Configuration xpathConfiguration = new Configuration();
 
@@ -471,7 +475,7 @@ public class XFormsStaticState {
         }
 
         // Extract components
-        xblBindings = new XBLBindings(indentedLogger, this, idGenerator, metadata.namespaceMappings, staticStateElement);
+        xblBindings = new XBLBindings(indentedLogger, this, metadata, staticStateElement);
     }
 
     /**

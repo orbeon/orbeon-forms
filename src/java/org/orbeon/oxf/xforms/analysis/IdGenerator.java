@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -21,6 +21,7 @@ public class IdGenerator {
 
     private static final String AUTOMATIC_ID_PREFIX = "xf-";
 
+    private boolean isCheckDuplicates = true;
     private int currentId = 1;
     private final Set<String> ids;
 
@@ -38,7 +39,7 @@ public class IdGenerator {
     }
 
     public boolean isDuplicate(String id) {
-        return ids.contains(id);
+        return isCheckDuplicates && ids.contains(id);
     }
 
     public void add(String id) {
@@ -66,5 +67,9 @@ public class IdGenerator {
 
     public int getCurrentId() {
         return currentId;
+    }
+
+    public void setCheckDuplicates(boolean check) {
+        this.isCheckDuplicates = check;
     }
 }

@@ -128,19 +128,14 @@
     <property as="xs:string"  name="oxf.xforms.xbl.fr.fusion-charts.uri-to-swf"             value=""/>
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.accordion.open-closes-others"         value="false"/>
 
+    <!-- Automatically search for XBL components in fr:* namespace -->
+    <property as="xs:string"  name="oxf.xforms.xbl.mapping.orbeon"                          value="http://orbeon.org/oxf/xml/form-runner"/>
+
     <property as="xs:boolean" name="oxf.epilogue.xforms.preprocessing"                      value="false"/>
     <property as="xs:anyURI"  name="oxf.epilogue.xforms.preprocessing.uri"                  value=""/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.widgets"                            value="true"/>
     <property as="xs:anyURI"  name="oxf.epilogue.xforms.widgets.uri"                        value="oxf:/config/xforms-widgets.xsl"/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.widgets.auto-include-fr-widgets"    value="true"/>
-    <!-- Some of those elements are used by XBL components. We won't need to list those here anymore when xi:fallback is implemented.
-         See: http://forge.ow2.org/tracker/index.php?func=detail&aid=313798&group_id=168&atid=350207 -->
-    <property as="xs:string"  name="oxf.epilogue.xforms.widgets.fr-elements-to-skip"        value="fr:back-button fr:body fr:buttons fr:component fr:dateTime fr:foobar fr:grid fr:metadata
-                                                                                               fr:repeat fr:save-button fr:section fr:super-control fr:td fr:tr fr:view fr:dialogs
-                                                                                               fr:max-results-displayed fr:mindate fr:prefix fr:digits-after-decimal fr:case fr:label
-                                                                                               fr:mindate fr:maxdate fr:pagedate fr:tab fr:dependency
-                                                                                               fr:title fr:message fr:positive-choice fr:negative-choice fr:neutral-choice
-                                                                                               fr:public-key fr:private-key fr:theme fr:lang fr:header fr:footer fr:errors fr:alert"/>
     <property as="xs:boolean" name="oxf.epilogue.xforms.inspector"                          value="false"/>
 
 </properties>

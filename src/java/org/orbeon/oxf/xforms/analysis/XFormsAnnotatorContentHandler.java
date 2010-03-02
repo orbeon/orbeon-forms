@@ -15,8 +15,11 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.properties.PropertySet;
+import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -86,22 +89,101 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
     private boolean inLHHA;         // whether we are in LHHA (meaningful only if inPreserve == true)
     private boolean inXBL;          // whether we are in xbl:xbl (meaningful only if inPreserve == true)
 
-
-    private Map<String, Map<String, String>> xblBindings;   // Map<String uri, Map<String localname, "">>
-
     public static class Metadata {
         public final IdGenerator idGenerator;
         public final Map<String, Map<String, String>> namespaceMappings;
         public final Map<String, SAXStore.Mark> marks = new HashMap<String, SAXStore.Mark>();
 
+        private Map<String, Set<String>> xblBindings;       // Map<String uri, <String localname>>
+        private Map<String, String> automaticMappings;      // ns URI -> directory name
+        private List<String> bindingIncludes;    // list of paths
+
+        // Initial
+        public Metadata() {
+            this.idGenerator = new IdGenerator();
+            this.namespaceMappings = new HashMap<String, Map<String, String>>();
+        }
+
+        // When restoring state
         public Metadata(IdGenerator idGenerator, Map<String, Map<String, String>> namespaceMappings) {
             this.idGenerator = idGenerator;
             this.namespaceMappings = namespaceMappings;
         }
 
-        public Metadata() {
-            this.idGenerator = new IdGenerator();
-            this.namespaceMappings = new HashMap<String, Map<String, String>>();
+        private void readAutomaticXBLMappingsIfNeeded() {
+            if (automaticMappings == null) {
+
+                final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
+                final List<String> propertyNames = propertySet.getPropertiesStartsWith(XBLBindings.XBL_MAPPING_PROPERTY_PREFIX);
+                automaticMappings = propertyNames.size() > 0 ? new HashMap<String, String>() : Collections.<String, String>emptyMap();
+
+                for (final String propertyName: propertyNames) {
+                    final String prefix = propertyName.substring(XBLBindings.XBL_MAPPING_PROPERTY_PREFIX.length());
+                    automaticMappings.put(propertySet.getString(propertyName), prefix);
+                }
+            }
+        }
+
+        private String getAutomaticXBLMappingPath(String uri, String localname) {
+            if (automaticMappings == null) {
+                readAutomaticXBLMappingsIfNeeded();
+            }
+
+            final String prefix = automaticMappings.get(uri);
+            if (prefix != null) {
+                // E.g. fr:tabview -> oxf:/xbl/orbeon/tabview/tabview.xbl
+                final String path = "/xbl/" + prefix + '/' + localname + '/' + localname + ".xbl";
+                return (ResourceManagerWrapper.instance().exists(path)) ? path : null;
+            } else {
+                return null;
+            }
+        }
+
+        private boolean isXBLBindingCheckAutomaticBindings(String uri, String localname) {
+            // Is this already registered?
+            if (this.isXBLBinding(uri, localname))
+                return true;
+
+            // If not, check if it exists as automatic binding
+            final String path = getAutomaticXBLMappingPath(uri, localname);
+            if (path != null) {
+                // Remember as binding
+                storeXBLBinding(uri, localname);
+
+                // Remember to include later
+                if (bindingIncludes == null)
+                    bindingIncludes = new ArrayList<String>();
+                bindingIncludes.add(path);
+
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public boolean isXBLBinding(String uri, String localname) {
+            if (xblBindings == null)
+                return false;
+
+            final Set<String> localnamesMap = xblBindings.get(uri);
+            return localnamesMap != null && localnamesMap.contains(localname);
+        }
+
+        private void storeXBLBinding(String bindingURI, String localname) {
+            if (xblBindings == null)
+                xblBindings = new HashMap<String, Set<String>>();
+
+            Set<String> localnamesSet = xblBindings.get(bindingURI);
+            if (localnamesSet == null) {
+                localnamesSet = new HashSet<String>();
+                xblBindings.put(bindingURI, localnamesSet);
+            }
+
+            localnamesSet.add(localname);
+        }
+
+        public List<String> getBindingsIncludes() {
+            return bindingIncludes;
         }
     }
 
@@ -225,7 +307,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
                 // Leave element untouched (except for the id attribute)
                 super.startElement(uri, localname, qName, attributes);
             }
-        } else if (!isXBL && isXBLBinding(uri, localname)) {
+        } else if (!isXBL && metadata.isXBLBindingCheckAutomaticBindings(uri, localname)) {
             // Element with a binding
 
             // Create a new id and update the attributes if needed
@@ -409,27 +491,9 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
             final String bindingURI = namespaceSupport.getURI(bindingPrefix);
             if (bindingURI != null) {
                 // Found URI
-
-                if (xblBindings == null)
-                    xblBindings = new HashMap<String, Map<String, String>>();
-
-                Map<String, String> localnamesMap = xblBindings.get(bindingURI);
-                if (localnamesMap == null) {
-                    localnamesMap = new HashMap<String, String>();
-                    xblBindings.put(bindingURI, localnamesMap);
-                }
-
-                localnamesMap.put(XMLUtils.localNameFromQName(elementAttribute), "");
+                metadata.storeXBLBinding(bindingURI, XMLUtils.localNameFromQName(elementAttribute));
             }
         }
-    }
-
-    protected boolean isXBLBinding(String uri, String localname) {
-        if (xblBindings == null)
-            return false;
-
-        final Map localnamesMap = xblBindings.get(uri);
-        return localnamesMap != null && localnamesMap.get(localname) != null;
     }
 
     public void endElement(String uri, String localname, String qName) throws SAXException {

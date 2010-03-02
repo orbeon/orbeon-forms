@@ -141,7 +141,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 //                        annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, new SAXLoggerProcessor.DebugContentHandler(identity)));
 
                         final XFormsAnnotatorContentHandler.Metadata metadata = new XFormsAnnotatorContentHandler.Metadata();
-                        annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity, metadata.idGenerator));
+                        annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity, metadata));
 
                         // Read the input through the annotator and gather namespace mappings
                         readInputAsSAX(pipelineContext, processorInput, new XFormsAnnotatorContentHandler(annotatedSAXStore, externalContext, metadata));
@@ -320,6 +320,17 @@ public class XFormsToXHTML extends ProcessorImpl {
             }
 
             // TODO: Add @src attributes from controls?
+        }
+
+        // Set caching dependencies for XBL inclusions
+        {
+            final XFormsAnnotatorContentHandler.Metadata metadata = containingDocument.getStaticState().getMetadata();
+            final List<String> includes = metadata.getBindingsIncludes();
+            if (includes != null) {
+                for (final String include: includes) {
+                    inputDependencies.addReference(null, "oxf:" + include, null, null, null);
+                }
+            }
         }
     }
 

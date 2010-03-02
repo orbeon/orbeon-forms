@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -224,7 +224,7 @@
         <instantiation name="oxf:generic-xslt-1.0">
             <input name="transformer">
                 <config>
-                    <class>orbeon.apache.xalan.processor.TransformerFactoryImpl</class>
+                    <class>org.apache.xalan.processor.TransformerFactoryImpl</class>
                 </config>
             </input>
             <input name="attributes">
@@ -239,7 +239,7 @@
         <instantiation name="oxf:generic-xslt-1.0">
             <input name="transformer">
                 <config>
-                    <class>orbeon.apache.xalan.xsltc.trax.TransformerFactoryImpl</class>
+                    <class>org.apache.xalan.xsltc.trax.TransformerFactoryImpl</class>
                 </config>
             </input>
         </instantiation>

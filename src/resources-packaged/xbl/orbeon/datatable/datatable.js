@@ -253,7 +253,7 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
             this.tableWidth = this.optimizeWidth(minWidth);
         }
     } else if (this.scrollV) {
-        if (this.hasFixedWidthTable) {
+        if (this.hasFixedWidthTable && this.originalWidth.indexOf('%') == - 1) {
             width = this.tableWidth + 'px';
             this.tableWidth = this.tableWidth - 19;
         } else {

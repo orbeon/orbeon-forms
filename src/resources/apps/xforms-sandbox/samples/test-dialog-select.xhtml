@@ -1,0 +1,75 @@
+<!--
+    Copyright (C) 2009 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XBL</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="instance">
+                <instance>
+                    <value1/>
+                    <value2>1 2 4 8</value2>
+                </instance>
+            </xforms:instance>
+            <xforms:instance id="items">
+                <items>
+                    <item label="One" value="1"/>
+                    <item label="Two" value="2"/>
+                    <item label="Three" value="3"/>
+                    <item label="Four" value="4"/>
+                    <item label="Five" value="5"/>
+                    <item label="Six" value="6"/>
+                    <item label="Seven" value="7"/>
+                    <item label="Eight" value="8"/>
+                </items>
+            </xforms:instance>
+        </xforms:model>
+        <!--<xhtml:style type="text/css">-->
+            <!--#dialog-select-2 ul, #dialog-select-2 li { display: inline; padding: 0 }-->
+        <!--</xhtml:style>-->
+    </xhtml:head>
+    <xhtml:body>
+
+        <fr:dialog-select ref="value1" id="dialog-select-1">
+            <xforms:label>Selection 1:</xforms:label>
+            <xforms:itemset nodeset="instance('items')/item">
+                <xforms:label ref="@label"/>
+                <xforms:value ref="@value"/>
+            </xforms:itemset>
+        </fr:dialog-select>
+
+        <fr:dialog-select ref="value2" id="dialog-select-2">
+            <xforms:label>Selection 2:</xforms:label>
+            <xforms:itemset nodeset="instance('items')/item">
+                <xforms:label ref="@label"/>
+                <xforms:value ref="@value"/>
+            </xforms:itemset>
+        </fr:dialog-select>
+
+        <fr:button>
+            <xforms:label>TEMP</xforms:label>
+        </fr:button>
+
+        <fr:xforms-inspector/>
+    </xhtml:body>
+</xhtml:html>

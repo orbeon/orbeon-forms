@@ -132,7 +132,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
 
     // Sometimes, in IE / quirks mode, the height or width is miscalculated and that forces an horizontal scroll bar...
 
-    if (document.compatMode == "BackCompat") {
+    if (YAHOO.env.ua.ie > 0 && (YAHOO.env.ua.ie < 8 || document.compatMode == "BackCompat")) {
 
         // Make sure we don't have a vertical bar if not required
         if (this.scrollH && ! this.scrollV) {
@@ -266,6 +266,7 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
     // At last, we know how the table will be sized, it's time to set these sizes
 
     YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
+    YAHOO.util.Dom.setStyle(this.header, 'width', this.tableWidth + 'px');
 
     this.adjustHeightForIE = this.adjustHeightForIE || (this.scrollH && ! this.scrollV && this.height == 'auto' && YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8);
     if (this.adjustHeightForIE) {
@@ -297,6 +298,11 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
     // Store the column widths while the headers are still visible on the body table
     this.columnWidths = [];
     var j = 0;
+
+//    if (YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
+//        // This dirty hack is needed when IE works in quirks mode
+//        YAHOO.util.Dom.addClass(this.table, 'fr-datatable-hidden');
+//    }
     for (var i = 0; i < this.table.tHead.rows[0].cells.length; i++) {
         var cell = this.table.tHead.rows[0].cells[i];
         if (ORBEON.widgets.datatable.isSignificant(cell)) {
@@ -304,6 +310,10 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
             j += 1;
         }
     }
+//    if (YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
+//        // This dirty hack is needed when IE works in quirks mode
+//        YAHOO.util.Dom.removeClass(this.table, 'fr-datatable-hidden');
+//    }
 
     // Do more resizing
     if (this.height != 'auto') {

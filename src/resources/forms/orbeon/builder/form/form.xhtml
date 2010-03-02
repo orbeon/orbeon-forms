@@ -195,14 +195,37 @@
                         <fr:close-button/>
 
                         <!-- Test form -->
-                        <xforms:group model="fr-error-summary-model" ref="instance('fr-error-summary-instance')/trigger">
+                        <xforms:group model="fr-error-summary-model" ref="instance('fr-error-summary-instance')/trigger" id="fb-test-button-group">
                             <fr:button id="fb-test-button">
                                 <xforms:label>
                                     <xhtml:img src="/apps/fr/style/images/pixelmixer/gear_16.png" alt=""/>
                                     <xhtml:span><xforms:output value="$fr-resources/detail/labels/test"/></xhtml:span>
                                 </xforms:label>
-                                <xforms:send ev:event="DOMActivate" submission="fb-test-form-submission"/>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xxforms:script>
+                                        <!-- Dialog set to 90% of the viewport width/height -->
+                                        var dialogWidth = YAHOO.util.Dom.getViewportWidth() * .9;
+                                        var dialogHeight = YAHOO.util.Dom.getViewportHeight() * .9;
+                                        <!-- Get references to elements in the dialog -->
+                                        var testDialog = YAHOO.util.Dom.get("fb-test-dialog");
+                                        var testDialogBody = YAHOO.util.Dom.getElementsByClassName("bd", null, testDialog)[0];
+                                        var closeButton = YAHOO.util.Dom.getElementsByClassName("xbl-fr-button", null, testDialogBody)[0];
+                                        var iframe = YAHOO.util.Dom.get("fb-test-iframe");
+                                        <!-- Set width/height of dialog -->
+                                        testDialog.style.width = dialogWidth + "px";
+                                        testDialogBody.style.height = dialogHeight + "px";
+                                        <!-- Height of iframe set to leave enough space to the close button -->
+                                        iframe.style.height = (dialogHeight - 35) + "px";
+                                        <!-- Reset the displayed page as the iframe might show the result from a previous test -->
+                                        iframe.contentWindow.location.href = "about:blank";
+                                        ORBEON.xforms.Document.dispatchEvent("fb-test-button-group", "show-fb-test-dialog");
+                                    </xxforms:script>
+                                </xforms:action>
                             </fr:button>
+                            <xforms:action ev:event="show-fb-test-dialog">
+                                <xxforms:show dialog="fb-test-dialog"/>
+                                <xforms:send submission="fb-test-form-submission"/>
+                            </xforms:action>
                         </xforms:group>
 
                         <!-- Publish form -->
@@ -339,9 +362,11 @@
                         </xforms:group>
                     </fr:top>
                     <fr:bottom>
-                        <xhtml:div class="fb-buttons-placeholder">
-                            <xhtml:div>
-                                <xforms:output value="$form-resources/messages/form-buttons"/>
+                        <xhtml:div class="fr-buttons">
+                            <xhtml:div class="fr-buttons-placeholder">
+                                <xhtml:div>
+                                    <xforms:output value="$fr-resources/detail/messages/buttons-placeholder"/>
+                                </xhtml:div>
                             </xhtml:div>
                         </xhtml:div>
                     </fr:bottom>
@@ -979,6 +1004,9 @@
 
             <!-- Generic confirmation dialog -->
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-confirmation.xml" xxi:omit-xml-base="true"/>
+
+            <!-- Generic confirmation dialog -->
+            <xi:include href="oxf:/forms/orbeon/builder/form/dialog-test.xml" xxi:omit-xml-base="true"/>
         </fr:dialogs>
     </xhtml:body>
 </xhtml:html>

@@ -193,6 +193,10 @@ h1.fr-form-title {
     padding: .5em;
 }
 
+/* Test dialog */
+.fb-test-dialog .fb-test-iframe { width: 100%; border: 1px solid #666; }
+.fb-test-dialog .xbl-fr-button { float: right; padding-top: .5em }
+
 /* ***** In-Place Editing ******************************************************************************************* */
 
 /* Title and description */
@@ -258,9 +262,6 @@ h1.fr-form-title {
 
 /* ***** Misc ******************************************************************************************************* */
 
-/* Show placeholder frame for buttons */
-.fb-buttons-placeholder { width: 100%; background: white; display: block; border: 2px dashed #004B92; text-align: center }
-.fb-buttons-placeholder div { margin: .5em }
 /* Give height to footer so it shows up even if empty */
 .fr-footer div { height: 1em }
 

@@ -25,7 +25,7 @@
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:xbl="http://www.w3.org/ns/xbl"
 
-      xxforms:external-events="show-fb-editor-create-dialog"
+      xxforms:external-events="show-fb-editor-create-dialog show-fb-test-dialog"
       id="fr-form-model">
 
     <!-- Variable pointing to the current language -->
@@ -269,7 +269,7 @@
     <!-- Submission to test the form -->
     <xforms:submission id="fb-test-form-submission"
             ref="instance('fr-form-to-test-instance')" method="post" replace="all"
-            resource="/fr/orbeon/builder/test/" xxforms:target="_blank" xxforms:show-progress="false">
+            resource="/fr/orbeon/builder/test/" xxforms:target="fb-test-iframe" xxforms:show-progress="false">
             <!-- TODO: Will want to change target to: fb-test-iframe -->
 
         <!-- Prepare submission -->

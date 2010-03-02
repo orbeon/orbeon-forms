@@ -536,15 +536,11 @@
                 </xsl:when>
                 <!-- Test mode -->
                 <xsl:when test="$mode = ('test')">
-                    <!-- List of buttons we include based on property -->
-                    <xsl:variable name="default-buttons" as="element(fr:buttons)">
-                        <fr:buttons>
-                            <xsl:for-each select="$test-buttons">
-                                <xsl:element name="fr:{.}-button"/>
-                            </xsl:for-each>
-                        </fr:buttons>
-                    </xsl:variable>
-                    <xsl:apply-templates select="$default-buttons/*"/>
+                    <xhtml:div class="fr-buttons-placeholder">
+                        <xhtml:div>
+                            <xforms:output value="$fr-resources/detail/messages/buttons-placeholder"/>
+                        </xhtml:div>
+                    </xhtml:div>
                 </xsl:when>
                 <!-- In view mode  -->
                 <xsl:when test="$mode = ('view')">

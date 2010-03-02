@@ -696,6 +696,9 @@
                 <label>Test</label>
             </test>
         </dialog-actions>
+        <dialog-test>
+            <dialog-title>Form Preview</dialog-title>
+        </dialog-test>
         <!-- Messages -->
         <messages>
             <delete-section>Are you sure you want to delete the current section?</delete-section>
@@ -714,7 +717,6 @@
             <metadata-title>Form Metadata</metadata-title>
             <new-metadata-output>Provide an application and form name, which will be used to identify your form (you can also change those later):</new-metadata-output>
             <edit-metadata-output>Edit the application name and form name, or click Cancel to return to the builder:</edit-metadata-output>
-            <form-buttons>Your form's buttons will be placed here</form-buttons>
         </messages>
         <template>
             <untitled-form>Untitled Form</untitled-form>
@@ -1421,7 +1423,6 @@
             <metadata-title>Métadonnées</metadata-title>
             <new-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire (vous pouvez les changer plus tard):</new-metadata-output>
             <edit-metadata-output>Modifiez le nom d'application et/ou le nom du formulaire, ou cliquer Annuler pour revenir à l'éditeur:</edit-metadata-output>
-            <form-buttons>Les boutons de votre formulaire seront placés ici</form-buttons>
         </messages>
         <template>
             <untitled-form>Formulaire sans titre</untitled-form>

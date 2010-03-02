@@ -105,6 +105,7 @@
                 <submit-dialog-message>Your information has been submitted, thank you.</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Click here to open the document. The information you entered will be displayed on the tool as it was in the moment you saved your work.</saved-locally-open>
+                <buttons-placeholder>Your form's buttons will be placed here</buttons-placeholder>
             </messages>
             <labels>
                 <save-document>Save</save-document>
@@ -260,6 +261,7 @@
                 <buttons-message/>
                 <!-- TODO: check translation -->
                 <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été sauvegardées.</saved-locally-open>
+                <buttons-placeholder>Les boutons de votre formulaire seront placés ici</buttons-placeholder>
             </messages>
             <labels>
                 <save-document>Enregistrer</save-document>
@@ -415,6 +417,7 @@
                 <submit-dialog-message>Su información ha sido enviada. Gracias</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Haga clic aquí para abrir el documento. La herramienta recuperará automáticamente la información que usted ingresó al momento de guardar su documento.</saved-locally-open>
+                <buttons-placeholder>Botones del formulario será colocado aquí</buttons-placeholder>
             </messages>
             <labels>
                 <save-document>Guardar Documento</save-document>

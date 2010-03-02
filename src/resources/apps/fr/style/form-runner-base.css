@@ -458,6 +458,10 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 #doc4 .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-date,
     #doc4 .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-time { *width: 7.3em }
 
+/* Show placeholder frame for buttons */
+.fr-buttons-placeholder { width: 100%; background: white; display: block; border: 2px dashed #004B92; text-align: center }
+.fr-buttons-placeholder div { margin: .5em }
+
 /* ***** Print and PDF ********************************************************************************************** */
 
 /* Textarea in output mode can contain line breaks so keep them (works w/ IE 6, Firefox) */

@@ -624,7 +624,7 @@
                         style="{$height} {$width}">
                         <xsl:variable name="table">
                             <xhtml:table id="{$id}-table" class="{@class} datatable datatable-{$id} yui-dt-table "
-                                style="{if ($scrollV) then $height else ''} {$width}">
+                                style="{if ($scrollV) then $height else ''} {if (not($scrollH)) then $width else ''}">
                                 <!-- Copy attributes that are not parameters! -->
                                 <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id', 'class'))]" mode="dynamic"/>
                                 <xhtml:thead id="{$id}-thead">

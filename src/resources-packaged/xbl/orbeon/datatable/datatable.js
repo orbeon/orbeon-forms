@@ -69,7 +69,7 @@ ORBEON.widgets.datatable.prototype.initProperties = function (container, index, 
     //this.id = plainId.substring(0, plainId.length - '-table'.length);
     //Let's take something safer at least in the short term...
     this.id = plainId;
-    this.originalWidth = ORBEON.widgets.datatable.utils.getStyle(this.table, 'width', 'auto');
+    this.originalWidth = ORBEON.widgets.datatable.utils.getStyle(this.table.parentNode, 'width', 'auto');
     this.originalHeight = ORBEON.widgets.datatable.utils.getStyle(this.table, 'height', 'auto');
     this.height = ORBEON.widgets.datatable.utils.getStyle(this.table, 'height', 'auto');
     this.hasFixedWidthContainer = this.originalWidth != 'auto';
@@ -79,7 +79,7 @@ ORBEON.widgets.datatable.prototype.initProperties = function (container, index, 
         this.headerScrollContainer = this.header.parentNode;
         this.headerContainer = this.headerScrollContainer.parentNode;
     } else {
-        this.headerContainer = this.header.parentNode;        
+        this.headerContainer = this.header.parentNode;
     }
     this.bodyContainer = this.table.parentNode;
 
@@ -95,7 +95,7 @@ ORBEON.widgets.datatable.prototype.initProperties = function (container, index, 
     }
 
     for (var i = 0; i < this.significantNodes.length; i++) {
-        var node=this.significantNodes[i];
+        var node = this.significantNodes[i];
         node.savedWidth = node.style.width;
         node.savedHeight = node.style.height;
         node.savedClassName = node.className;
@@ -118,7 +118,7 @@ ORBEON.widgets.datatable.prototype.finish = function () {
     }
 
     this.initColumns();
-    
+
     // Now that the table has been properly sized, reconsider its
     // "resizeability"
 
@@ -129,6 +129,35 @@ ORBEON.widgets.datatable.prototype.finish = function () {
         this.hasFixedWidthContainer = false;
         this.hasFixedWidthTable = false;
     }
+
+    // Sometimes, in IE / quirks mode, the height or width is miscalculated and that forces an horizontal scroll bar...
+
+    if (document.compatMode == "BackCompat") {
+
+        // Make sure we don't have a vertical bar if not required
+        if (this.scrollH && ! this.scrollV) {
+            var limit = 1000;
+            while (limit > 0 && this.table.parentNode.clientWidth < this.pxWidth - 2) {
+                this.tableHeight += 1;
+                this.height = this.tableHeight + "px";
+                this.bodyContainer.style.height = this.height;
+                limit -= 1;
+            }
+        }
+
+        // Make sure we don't have an horizontal bar if not required
+        if (this.scrollV && ! this.scrollH) {
+            var limit = 50;
+            while (limit > 0 && this.table.clientWidth > this.table.parentNode.clientWidth) {
+                this.tableWidth -= 1;
+                var w = this.tableWidth + "px";
+                this.table.style.width = w;
+                this.header.style.width = w;
+                limit -= 1;
+            }
+        }
+    }
+
     YAHOO.log("Datatable index " + this.index + 'created with width: ' + this.width + ', table width: ' + this.tableWidth, "info")
 
 }
@@ -140,21 +169,21 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
 
 
     /*var hackNeeded = YAHOO.env.ua.ie > 0 && (YAHOO.env.ua.ie < 8 || document.compatMode == "BackCompat")
-    if (this.originalWidth.indexOf('%') != - 1 && hackNeeded) {
-        var dummy = document.createElement('div');
-        dummy.innerHTML = "foo";
-        this.container.replaceChild(dummy, this.bodyContainer);
-        this.container.removeChild(this.headerContainer);
-    } */
+     if (this.originalWidth.indexOf('%') != - 1 && hackNeeded) {
+     var dummy = document.createElement('div');
+     dummy.innerHTML = "foo";
+     this.container.replaceChild(dummy, this.bodyContainer);
+     this.container.removeChild(this.headerContainer);
+     } */
 
-    var containerWidth =this.container.clientWidth;
+    var containerWidth = this.container.clientWidth;
 
     /*
-    if (this.originalWidth.indexOf('%') != - 1 && hackNeeded) {
-        this.container.replaceChild(this.headerContainer, dummy);
-        this.container.appendChild(this.bodyContainer);
-    }
-    */
+     if (this.originalWidth.indexOf('%') != - 1 && hackNeeded) {
+     this.container.replaceChild(this.headerContainer, dummy);
+     this.container.appendChild(this.bodyContainer);
+     }
+     */
 
 
 
@@ -181,10 +210,20 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
     //}
 
     // Measure the table width
+    // This is enough in most cases:
     this.tableWidth = this.table.clientWidth;
-    if (this.tableWidth < pxWidth) {
-        this.tableWidth = pxWidth;
-    }
+
+    // Except for IE in quirks mode for horizontally scrollable tables!
+
+    //    if (this.scrollH && YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
+    //        YAHOO.util.Dom.addClass(this.table, 'fr-datatable-hidden');
+    //        this.tableWidth = this.table.clientWidth;
+    //        YAHOO.util.Dom.removeClass(this.table, 'fr-datatable-hidden');
+    //    }
+    //
+    //    if (this.tableWidth < pxWidth) {
+    //        this.tableWidth = pxWidth;
+    //    }
 
     // Measure the table and header heights
     //this.tableHeight = this.table.clientHeight;
@@ -252,12 +291,12 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
     //if (this.height != 'auto' && this.headBodySplit) {
     //    YAHOO.util.Dom.setStyle(this.headerContainer, 'height', this.headerHeight + 'px');
     //} else if (! this.headBodySplit && this.height == 'auto') {
-        //	YAHOO.util.Dom.setStyle(this.headerContainer, 'border', '1px solid #7F7F7F')
+    //	YAHOO.util.Dom.setStyle(this.headerContainer, 'border', '1px solid #7F7F7F')
     //}
 
     // Store the column widths while the headers are still visible on the body table
     this.columnWidths = [];
-    var j=0;
+    var j = 0;
     for (var i = 0; i < this.table.tHead.rows[0].cells.length; i++) {
         var cell = this.table.tHead.rows[0].cells[i];
         if (ORBEON.widgets.datatable.isSignificant(cell)) {
@@ -271,7 +310,7 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
         YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.container.clientHeight - this.headerHeight) + 'px');
     }
 
-    
+
     // Reset the yui-dt-bd class if we've removed it earlier on
     if (this.headBodySplit) {
 
@@ -285,7 +324,7 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
 
         } else {
             YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
-            YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', width);            
+            YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', width);
         }
 
         if (this.scrollV) {
@@ -302,6 +341,7 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
         YAHOO.util.Dom.removeClass(this.headerContainer, 'fr-datatable-hidden');
     }
 
+    this.pxWidth = pxWidth;
 
 }
 
@@ -380,13 +420,13 @@ ORBEON.widgets.datatable.prototype.initColumns = function () {
 ORBEON.widgets.datatable.prototype.getActualOriginalTableWidth = function () {
 
     var pxWidth;
-    
+
     if (this.originalWidth.indexOf('%') != - 1) {
 
         if (this.scrollH) {
-           pxWidth = this.container.clientWidth - 21;
-        }  else {
-           pxWidth =  this.container.clientWidth - 2;
+            pxWidth = this.container.clientWidth - 21;
+        } else {
+            pxWidth = this.container.clientWidth - 2;
         }
     } else if (this.originalWidth == 'auto') {
         pxWidth = this.table.clientWidth;
@@ -403,7 +443,7 @@ ORBEON.widgets.datatable.prototype.reset = function () {
     // Restore styles rules to the table
 
     for (var i = 0; i < this.significantNodes.length; i++) {
-        var node=this.significantNodes[i];
+        var node = this.significantNodes[i];
         node.style.width = node.savedWidth;
         node.style.height = node.savedHeight;
         node.className = node.savedClassName;
@@ -423,7 +463,7 @@ ORBEON.widgets.datatable.prototype.reset = function () {
             th.removeChild(resizerliner);
             th.appendChild(liner);
         }
-    }        
+    }
     // Remove column widths
     for (var icol = 0; icol < this.bodyColumns.length; icol++) {
         var col = this.bodyColumns[icol];

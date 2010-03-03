@@ -44,9 +44,6 @@
                 </items>
             </xforms:instance>
         </xforms:model>
-        <!--<xhtml:style type="text/css">-->
-            <!--#dialog-select-2 ul, #dialog-select-2 li { display: inline; padding: 0 }-->
-        <!--</xhtml:style>-->
     </xhtml:head>
     <xhtml:body>
 
@@ -58,17 +55,13 @@
             </xforms:itemset>
         </fr:dialog-select>
 
-        <fr:dialog-select ref="value2" id="dialog-select-2">
+        <fr:dialog-select ref="value2" id="dialog-select-2" separator=", ">
             <xforms:label>Selection 2:</xforms:label>
             <xforms:itemset nodeset="instance('items')/item">
                 <xforms:label ref="@label"/>
                 <xforms:value ref="@value"/>
             </xforms:itemset>
         </fr:dialog-select>
-
-        <fr:button>
-            <xforms:label>TEMP</xforms:label>
-        </fr:button>
 
         <fr:xforms-inspector/>
     </xhtml:body>

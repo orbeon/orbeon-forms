@@ -53,19 +53,8 @@
         
         <xbl:resources>
             <xbl:style>
-                <!--.xbl-fr-dialog-select ul {-->
-                    <!--list-style-type: none;-->
-                    <!--padding: .1em;-->
-                    <!--margin: 0;-->
-                    <!--border: 1px solid black;-->
-                    <!--height: 6em;-->
-                    <!--width: 15em;-->
-                    <!--overflow-y: scroll;-->
-                    <!--background-color: white;-->
-                <!--}-->
                 .xbl-fr-dialog-select ul .xforms-repeat-selected-item-1 { background-color: transparent}
                 .xbl-fr-dialog-select .fr-component-group { display: inline-block; display: -moz-inline-block }
-                <!--.xbl-fr-dialog-select ul li { list-style-type: none; margin-left: .2em; margin-top: .2em }-->
 
                 #doc .fr-grid .xbl-fr-dialog-select .xforms-select-appearance-full span label,
                         #doc4 .fr-grid .xbl-fr-dialog-select .xforms-select-appearance-full span label {
@@ -128,138 +117,144 @@
                         <xforms:choices xxbl:scope="outer">
                             <xbl:content includes="fr|dialog-select > xforms|itemset, fr|dialog-select > xforms|item, fr|dialog-select > xforms|choices"/>
                         </xforms:choices>
-                        <!-- Stop propagation of all UI events -->
-                        <!-- TODO: CHECK if we need to do this here-->
-                        <!--<xforms:action ev:event="#all" ev:propagate="stop"/>-->
                     </xforms:select>
-                    <xxforms:variable name="items" select="xxforms:itemset('hidden-select', 'xml')//item" as="element(item)*"/>
 
-                    <!-- Represent selected value -->
-                    <xhtml:ul>
+                    <!-- Stuff within this group doesn't contribute events to the outside -->
+                    <xforms:group appearance="xxforms:internal">
+                        <xforms:action ev:event="#all" ev:propagate="stop"/>
+
+                        <!-- All the items in the itemset specified by the user -->
+                        <xxforms:variable name="items" select="xxforms:itemset('hidden-select', 'xml')//item" as="element(item)*"/>
+
+                        <!-- Represent selected value -->
                         <xxforms:variable name="selected" select="tokenize($binding, '\s+')" as="xs:string*"/>
-                        <!-- TODO: avoid repeat nodeset recalculation -->
-                        <xforms:repeat nodeset="$items[value = $selected]">
-                            <xhtml:li>
-                                <xforms:output value="label"/>
-                            </xhtml:li>
-                        </xforms:repeat>
-                    </xhtml:ul>
 
-                    <fr:button id="select" ref="$binding">
-                        <xforms:label value="$resources/select"/>
-                        <xxforms:show ev:event="DOMActivate" dialog="dialog"/>
-                    </fr:button>
+                        <!-- If a separator is specified, output a string, otherwise output ul/li -->
+                        <xxforms:variable name="separator" xbl:attr="xbl:text=separator" as="xs:string">ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8</xxforms:variable>
+                        <xforms:group ref=".[$separator != 'ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8']">
+                            <xforms:output value="string-join($items[value = $selected]/label, $separator)"/>
+                        </xforms:group>
+                        <xforms:group ref=".[$separator = 'ED9A0AC4-F526-ECCD-869A-D59A3AEDE4A8']">
+                            <xhtml:ul>
+                                <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
+                                     repeat nodeset recalculations -->
+                                <xforms:repeat nodeset="$items[value = $selected]/value/string()">
+                                    <xhtml:li>
+                                        <xforms:output value="$items[value = context()]/label"/>
+                                    </xhtml:li>
+                                </xforms:repeat>
+                            </xhtml:ul>
+                        </xforms:group>
 
-                    <!-- TODO: CHECK if we need to do this here-->
-                    <xforms:action ev:event="#all" ev:propagate="stop"/>
+                        <!-- Select button -->
+                        <fr:button id="select" ref="$binding">
+                            <xforms:label value="$resources/select"/>
+                            <xxforms:show ev:event="DOMActivate" dialog="dialog"/>
+                        </fr:button>
 
-                    <xxforms:dialog id="dialog" close="true" neighbor="select" appearance="full" level="modal">
-                        <xforms:label value="$resources/title"/>
+                        <xxforms:dialog id="dialog" close="true" neighbor="select" appearance="full" level="modal">
+                            <xforms:label value="$resources/title"/>
 
-                        <xforms:action ev:event="xxforms-dialog-open">
-                            <!-- When dialog open, get list of available and selected items -->
-                            <xforms:setvalue ref="available-itemset"
-                                             value="string-join($items/value/string()[not(. = tokenize($binding, '\s+'))], ' ')"/>
-                            <xforms:setvalue ref="selected-itemset"
-                                             value="string-join($items/value/string()[. = tokenize($binding, '\s+')], ' ')"/>
-                            <xforms:setvalue ref="available"/>
-                            <xforms:setvalue ref="selected"/>
-                            <xforms:setfocus control="dialog"/>
-                        </xforms:action>
+                            <xforms:action ev:event="xxforms-dialog-open">
+                                <!-- When dialog open, get list of available and selected items -->
+                                <xforms:setvalue ref="available-itemset"
+                                                 value="string-join($items/value/string()[not(. = tokenize($binding, '\s+'))], ' ')"/>
+                                <xforms:setvalue ref="selected-itemset"
+                                                 value="string-join($items/value/string()[. = tokenize($binding, '\s+')], ' ')"/>
+                                <xforms:setvalue ref="available"/>
+                                <xforms:setvalue ref="selected"/>
+                                <xforms:setfocus control="dialog"/>
+                            </xforms:action>
 
-                        <!--xxx available <xforms:output value="available"/>-->
-                        <!--xxx selected <xforms:output value="selected"/>-->
-                        <!--xxx available-itemset <xforms:output value="available-itemset"/>-->
-                        <!--xxx selected-itemset <xforms:output value="selected-itemset"/>-->
+                            <xxforms:variable name="available-values" select="tokenize(available-itemset, '\s+')" as="xs:string*"/>
+                            <xxforms:variable name="selected-values" select="tokenize(selected-itemset, '\s+')" as="xs:string*"/>
 
-                        <xxforms:variable name="available-values" select="tokenize(available-itemset, '\s+')" as="xs:string*"/>
-                        <xxforms:variable name="selected-values" select="tokenize(selected-itemset, '\s+')" as="xs:string*"/>
+                            <xhtml:table>
+                                <xhtml:tr>
+                                    <xhtml:td>
+                                        <!-- List of available items -->
+                                        <xforms:select ref="available" id="available-list">
+                                            <xforms:label value="$resources/available"/>
+                                            <xforms:itemset nodeset="$items[value = $available-values]">
+                                                <xforms:label ref="label"/>
+                                                <xforms:value ref="value"/>
+                                            </xforms:itemset>
+                                        </xforms:select>
+                                    </xhtml:td>
+                                    <xhtml:td>
+                                        <fr:button ref="add-trigger">
+                                            <xforms:label>
+                                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt=""/>
+                                            </xforms:label>
+                                            <xforms:action ev:event="DOMActivate" >
+                                                <xxforms:variable name="selection" select="tokenize(available, '\s+')" as="xs:string*"/>
+                                                <xforms:setvalue ref="selected-itemset"
+                                                                 value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
+                                                <xforms:setvalue ref="available-itemset"
+                                                                 value="string-join(tokenize(., '\s+')[not(. = $selection)], ' ')"/>
+                                                <xforms:setvalue ref="available"/>
+                                                <xforms:setvalue ref="selected"/>
+                                            </xforms:action>
+                                        </fr:button>
 
-                        <xhtml:table>
-                            <xhtml:tr>
-                                <xhtml:td>
-                                    <!-- List of available items -->
-                                    <xforms:select ref="available" id="available-list">
-                                        <xforms:label value="$resources/available"/>
-                                        <xforms:itemset nodeset="$items[value = $available-values]">
-                                            <xforms:label ref="label"/>
-                                            <xforms:value ref="value"/>
-                                        </xforms:itemset>
-                                    </xforms:select>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <fr:button ref="add-trigger">
-                                        <xforms:label>
-                                            <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt=""/>
-                                        </xforms:label>
-                                        <xforms:action ev:event="DOMActivate" >
-                                            <xxforms:variable name="selection" select="tokenize(available, '\s+')" as="xs:string*"/>
-                                            <xforms:setvalue ref="selected-itemset"
-                                                             value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
-                                            <xforms:setvalue ref="available-itemset"
-                                                             value="string-join(tokenize(., '\s+')[not(. = $selection)], ' ')"/>
-                                            <xforms:setvalue ref="available"/>
-                                            <xforms:setvalue ref="selected"/>
-                                        </xforms:action>
-                                    </fr:button>
+                                        <fr:button ref="remove-trigger">
+                                            <xforms:label>
+                                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/left_16.png" alt=""/>
+                                            </xforms:label>
+                                            <xforms:action ev:event="DOMActivate" >
+                                                <xxforms:variable name="selection" select="tokenize(selected, '\s+')" as="xs:string*"/>
+                                                <xforms:setvalue ref="available-itemset"
+                                                                 value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
+                                                <xforms:setvalue ref="selected-itemset"
+                                                                 value="string-join(tokenize(., '\s+')[not(. = $selection)], ' ')"/>
+                                                <xforms:setvalue ref="available"/>
+                                                <xforms:setvalue ref="selected"/>
+                                            </xforms:action>
+                                        </fr:button>
+                                    </xhtml:td>
+                                    <xhtml:td>
+                                        <!-- List of selected items -->
+                                        <xforms:select ref="selected" id="selected-list">
+                                            <xforms:label value="$resources/selected"/>
+                                            <xforms:itemset nodeset="$items[value = $selected-values]">
+                                                <xforms:label ref="label"/>
+                                                <xforms:value ref="value"/>
+                                            </xforms:itemset>
+                                        </xforms:select>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </xhtml:table>
 
-                                    <fr:button ref="remove-trigger">
-                                        <xforms:label>
-                                            <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/left_16.png" alt=""/>
-                                        </xforms:label>
-                                        <xforms:action ev:event="DOMActivate" >
-                                            <xxforms:variable name="selection" select="tokenize(selected, '\s+')" as="xs:string*"/>
-                                            <xforms:setvalue ref="available-itemset"
-                                                             value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
-                                            <xforms:setvalue ref="selected-itemset"
-                                                             value="string-join(tokenize(., '\s+')[not(. = $selection)], ' ')"/>
-                                            <xforms:setvalue ref="available"/>
-                                            <xforms:setvalue ref="selected"/>
-                                        </xforms:action>
-                                    </fr:button>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <!-- List of selected items -->
-                                    <xforms:select ref="selected" id="selected-list">
-                                        <xforms:label value="$resources/selected"/>
-                                        <xforms:itemset nodeset="$items[value = $selected-values]">
-                                            <xforms:label ref="label"/>
-                                            <xforms:value ref="value"/>
-                                        </xforms:itemset>
-                                    </xforms:select>
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </xhtml:table>
+                            <xhtml:div class="fr-dialog-buttons">
+                                <!-- Cancel button -->
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
+                                        <xhtml:span><xforms:output value="$resources/cancel"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <!-- Just close -->
+                                        <xxforms:hide dialog="dialog"/>
+                                    </xforms:action>
+                                </fr:button>
+                                <!-- Confirm button -->
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img width="11" height="16" src="/apps/fr/style/images/pixelmixer/tick_16.png" alt=""/>
+                                        <xhtml:span><xforms:output value="$resources/confirm"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <!-- Store values in itemset order -->
+                                        <xforms:setvalue ref="$binding"
+                                                         value="for $selected-itemset in instance()/selected-itemset
+                                                                return string-join($items/value/string()[. = tokenize($selected-itemset, '\s+')], ' ')"/>
+                                        <xxforms:hide dialog="dialog"/>
+                                    </xforms:action>
+                                </fr:button>
+                            </xhtml:div>
 
-                        <xhtml:div class="fr-dialog-buttons">
-                            <!-- Cancel button -->
-                            <fr:button>
-                                <xforms:label>
-                                    <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
-                                    <xhtml:span><xforms:output value="$resources/cancel"/></xhtml:span>
-                                </xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <!-- Just close -->
-                                    <xxforms:hide dialog="dialog"/>
-                                </xforms:action>
-                            </fr:button>
-                            <!-- Confirm button -->
-                            <fr:button>
-                                <xforms:label>
-                                    <xhtml:img width="11" height="16" src="/apps/fr/style/images/pixelmixer/tick_16.png" alt=""/>
-                                    <xhtml:span><xforms:output value="$resources/confirm"/></xhtml:span>
-                                </xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <!-- Store values in itemset order -->
-                                    <xforms:setvalue ref="$binding"
-                                                     value="for $selected-itemset in instance()/selected-itemset
-                                                            return string-join($items/value/string()[. = tokenize($selected-itemset, '\s+')], ' ')"/>
-                                    <xxforms:hide dialog="dialog"/>
-                                </xforms:action>
-                            </fr:button>
-                        </xhtml:div>
-
-                    </xxforms:dialog>
+                        </xxforms:dialog>
+                    </xforms:group>
 
                 </xforms:group>
             </xforms:group>

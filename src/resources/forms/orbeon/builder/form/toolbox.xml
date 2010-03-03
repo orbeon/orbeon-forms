@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -353,65 +353,66 @@
                 <xhtml:div class="bd">
                     <!-- Actions toolbox -->
                     <xhtml:div class="fb-tools">
-
-                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.schema')]" class="fb-tool">
-                            <!-- Upload XML Schema -->
-                            <fr:button>
-                                <xforms:label>
-                                    <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt=""/>
-                                    <xhtml:span>
-                                        <xforms:output value="if (exists($model/xs:schema)) then $form-resources/change-schema/label else $form-resources/upload-schema/label"/>
-                                    </xhtml:span>
-                                </xforms:label>
-                                <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
-                            </fr:button>
-                        </xforms:group>
-                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.css')]" class="fb-tool">
-                            <!--<xhtml:div class="fb-tool">-->
-                                <!-- Upload CSS -->
+                        <xhtml:div class="fb-tool">
+                            <xforms:group ref=".[xxforms:property('oxf.fb.menu.schema')]">
+                                <!-- Upload XML Schema -->
                                 <fr:button>
                                     <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/images/silk/css.png" alt=""/>
+                                        <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt=""/>
                                         <xhtml:span>
-                                            <xforms:output value="if (xxforms:bind('css-attachment-bind') = '') then $form-resources/upload-css/label else $form-resources/change-css/label"/>
+                                            <xforms:output value="if (exists($model/xs:schema)) then $form-resources/change-schema/label else $form-resources/upload-schema/label"/>
                                         </xhtml:span>
                                     </xforms:label>
-                                    <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
+                                    <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
                                 </fr:button>
-                            <!--</xhtml:div>-->
-                        </xforms:group>
-                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.pdf')]" class="fb-tool">
-                            <!-- Upload PDF Template -->
-                            <fr:button>
-                                <xforms:label>
-                                    <xhtml:img src="/apps/fr/style/pdf.png" alt=""/>
-                                    <xhtml:span>
-                                        <xforms:output value="if (xxforms:bind('pdf-attachment-bind') = '') then $form-resources/upload-pdf/label else $form-resources/change-pdf/label"/>
-                                    </xhtml:span>
-                                </xforms:label>
-                                <xxforms:show ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
-                            </fr:button>
-                        </xforms:group>
-                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.view-source')]" class="fb-tool">
-                            <!-- Show XML -->
-                            <fr:button>
-                                <xforms:label>
-                                    <xhtml:img src="/apps/fr/style/view-xml.gif" alt=""/>
-                                    <xhtml:span><xforms:output ref="$form-resources/show-source/label"/></xhtml:span>
-                                </xforms:label>
-                                <xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>
-                            </fr:button>
-                        </xforms:group>
-                        <xforms:group ref=".[xxforms:property('oxf.fb.menu.edit-source')]" class="fb-tool">
-                            <!-- Edit Source -->
-                            <fr:button>
-                                <xforms:label>
-                                    <xhtml:img src="/apps/fr/style/images/silk/xhtml.png" alt=""/>
-                                    <xhtml:span><xforms:output ref="$form-resources/edit-source/label"/></xhtml:span>
-                                </xforms:label>
-                                <xxforms:show ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
-                            </fr:button>
-                        </xforms:group>
+                            </xforms:group>
+                            <xforms:group ref=".[xxforms:property('oxf.fb.menu.css')]">
+                                <!--<xhtml:div class="fb-tool">-->
+                                    <!-- Upload CSS -->
+                                    <fr:button>
+                                        <xforms:label>
+                                            <xhtml:img src="/apps/fr/style/images/silk/css.png" alt=""/>
+                                            <xhtml:span>
+                                                <xforms:output value="if (xxforms:bind('css-attachment-bind') = '') then $form-resources/upload-css/label else $form-resources/change-css/label"/>
+                                            </xhtml:span>
+                                        </xforms:label>
+                                        <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
+                                    </fr:button>
+                                <!--</xhtml:div>-->
+                            </xforms:group>
+                            <xforms:group ref=".[xxforms:property('oxf.fb.menu.pdf')]">
+                                <!-- Upload PDF Template -->
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/pdf.png" alt=""/>
+                                        <xhtml:span>
+                                            <xforms:output value="if (xxforms:bind('pdf-attachment-bind') = '') then $form-resources/upload-pdf/label else $form-resources/change-pdf/label"/>
+                                        </xhtml:span>
+                                    </xforms:label>
+                                    <xxforms:show ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
+                                </fr:button>
+                            </xforms:group>
+                            <xforms:group ref=".[xxforms:property('oxf.fb.menu.view-source')]">
+                                <!-- Show XML -->
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/view-xml.gif" alt=""/>
+                                        <xhtml:span><xforms:output ref="$form-resources/show-source/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>
+                                </fr:button>
+                            </xforms:group>
+                            <xforms:group ref=".[xxforms:property('oxf.fb.menu.edit-source')]">
+                                <!-- Edit Source -->
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/xhtml.png" alt=""/>
+                                        <xhtml:span><xforms:output ref="$form-resources/edit-source/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xxforms:show ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
+                                </fr:button>
+                            </xforms:group>
+                        </xhtml:div>
                     </xhtml:div>
                 </xhtml:div>
             </xhtml:dd>

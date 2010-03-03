@@ -166,24 +166,26 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
 
     var width = this.originalWidth;
     var pxWidth = this.getActualOriginalTableWidth();
-
-
-    /*var hackNeeded = YAHOO.env.ua.ie > 0 && (YAHOO.env.ua.ie < 8 || document.compatMode == "BackCompat")
-     if (this.originalWidth.indexOf('%') != - 1 && hackNeeded) {
-     var dummy = document.createElement('div');
-     dummy.innerHTML = "foo";
-     this.container.replaceChild(dummy, this.bodyContainer);
-     this.container.removeChild(this.headerContainer);
-     } */
-
     var containerWidth = this.container.clientWidth;
 
-    /*
-     if (this.originalWidth.indexOf('%') != - 1 && hackNeeded) {
-     this.container.replaceChild(this.headerContainer, dummy);
-     this.container.appendChild(this.bodyContainer);
-     }
-     */
+
+    if (this.scrollH && width.indexOf('%') != - 1) {
+        // This is needed to measure the container width when expressed as %
+        // since in some cases browsers choose to increase the page width instead
+        // of scrolling
+        YAHOO.util.Dom.addClass(this.table, 'xforms-disabled');
+        var dummy = document.createElement('div');
+        dummy.innerHTML = "foo";
+        this.bodyContainer.appendChild(dummy);
+
+        containerWidth = this.container.clientWidth;
+        width = containerWidth + 'px';
+
+        this.bodyContainer.removeChild(dummy);
+        YAHOO.util.Dom.removeClass(this.table, 'xforms-disabled');
+    } else {
+        width = pxWidth + 'px';
+    }
 
 
 
@@ -299,10 +301,10 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
     this.columnWidths = [];
     var j = 0;
 
-//    if (YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
-//        // This dirty hack is needed when IE works in quirks mode
-//        YAHOO.util.Dom.addClass(this.table, 'fr-datatable-hidden');
-//    }
+    //    if (YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
+    //        // This dirty hack is needed when IE works in quirks mode
+    //        YAHOO.util.Dom.addClass(this.table, 'fr-datatable-hidden');
+    //    }
     for (var i = 0; i < this.table.tHead.rows[0].cells.length; i++) {
         var cell = this.table.tHead.rows[0].cells[i];
         if (ORBEON.widgets.datatable.isSignificant(cell)) {
@@ -310,10 +312,10 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
             j += 1;
         }
     }
-//    if (YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
-//        // This dirty hack is needed when IE works in quirks mode
-//        YAHOO.util.Dom.removeClass(this.table, 'fr-datatable-hidden');
-//    }
+    //    if (YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
+    //        // This dirty hack is needed when IE works in quirks mode
+    //        YAHOO.util.Dom.removeClass(this.table, 'fr-datatable-hidden');
+    //    }
 
     // Do more resizing
     if (this.height != 'auto') {

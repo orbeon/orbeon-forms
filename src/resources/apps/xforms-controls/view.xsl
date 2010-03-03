@@ -50,7 +50,9 @@
                 }
 
                 /* Itemset editor */
-                #fb-itemset-editor-dialog .xbl-fr-link-select1 { margin-bottom: .5em }
+                #fb-itemset-editor-dialog { width: 35em }
+                #fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input { width: 13em }
+                #fb-itemset-editor-dialog .xbl-fr-link-select1 { margin-bottom: .5em; float: right }
                 #fb-itemset-editor-dialog .xbl-fr-link-select1 .xforms-label { display: none }
 
                 /* Edit Items trigger */

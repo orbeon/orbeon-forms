@@ -47,6 +47,7 @@ public class XIncludeProcessor extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    @Override
     public ProcessorOutput createOutput(final String name) {
         final ProcessorOutput output = new URIProcessorOutputImpl(XIncludeProcessor.this, name, INPUT_CONFIG) {
             public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {

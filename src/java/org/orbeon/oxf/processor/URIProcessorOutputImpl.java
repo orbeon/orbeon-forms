@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -56,6 +56,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
 //            logger.info("URIProcessorOutputImpl (" + getClass().getName() + ") " + message);
 //        }
 
+    @Override
     protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
         final URIReferences uriReferences = getCachedURIReferences(pipelineContext);
 //            log("uriReferences: " + uriReferences);
@@ -102,6 +103,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         return new CompoundOutputCacheKey(getProcessorClass(), getName(), outKeys);
     }
 
+    @Override
     protected Object getValidityImpl(PipelineContext pipelineContext) {
         final URIReferences uriReferences = getCachedURIReferences(pipelineContext);
 //            log("uriReferences: " + uriReferences);
@@ -265,6 +267,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         public String password;
         public String headersToForward;
 
+        @Override
         public String toString() {
             return "[" + context + ", " + spec + ", " + username + ", " + headersToForward + "]";
         }

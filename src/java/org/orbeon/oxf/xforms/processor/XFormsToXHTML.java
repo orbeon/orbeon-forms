@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
-import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -50,8 +49,6 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private static final boolean TEST_BYPASS_INPUT = false;// TODO: for testing only
 
-    private static final boolean ALLOW_CACHING_OUTPUT = false;
-
     public static final String LOGGING_CATEGORY = "html";
     private static final Logger logger = LoggerFactory.createLogger(XFormsToXHTML.class);
 
@@ -59,9 +56,6 @@ public class XFormsToXHTML extends ProcessorImpl {
     private static final String OUTPUT_DOCUMENT = "document";
 
     private static final String OUTPUT_CACHE_KEY = "dynamicState";
-
-    private static final String NAMESPACE_CACHE_KEY = "containerNamespace";
-    private static final Long CONSTANT_VALIDITY = (long) 0;
 
     private static InputDependencies testCachingStaticStateInputDependencies;
 
@@ -74,34 +68,64 @@ public class XFormsToXHTML extends ProcessorImpl {
     /**
      * Case where an XML response must be generated.
      */
+    @Override
     public ProcessorOutput createOutput(final String outputName) {
         final ProcessorOutput output = new URIProcessorOutputImpl(XFormsToXHTML.this, outputName, INPUT_ANNOTATED_DOCUMENT) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
                 doIt(pipelineContext, contentHandler, this, outputName);
             }
 
+            @Override
             protected boolean supportsLocalKeyValidity() {
                 return true;
             }
 
+            @Override
             public KeyValidity getLocalKeyValidity(PipelineContext pipelineContext, URIReferences uriReferences) {
-                if (ALLOW_CACHING_OUTPUT) {
-                    // Use the container namespace as a dependency
-                    final String containerNamespace = XFormsUtils.getExternalContext(pipelineContext).getRequest().getContainerNamespace();
-
-                    return new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, NAMESPACE_CACHE_KEY, containerNamespace), CONSTANT_VALIDITY);
-                } else {
-                    // Disable caching of the output
-                    return null;
-                }
+                // Disable caching of the output
+                return null;
             }
         };
         addOutput(outputName, output);
         return output;
     }
 
+    @Override
+    public ProcessorInput createInput(final String inputName) {
+        if (inputName.equals(INPUT_ANNOTATED_DOCUMENT)) {
+            // Insert processor on the fly to handle dependencies. This is a bit tricky: we used to have an
+            // XSLT/XInclude before XFormsToXHTML. This step handled XBL dependencies. Now that it is removed, we
+            // need a mechanism to detect dependencies. So we insert a step here.
+
+            // Return input which handles dependencies
+            final ProcessorInput originalInput = super.createInput(inputName);
+            return new DependenciesProcessorInput(inputName, originalInput) {
+                @Override
+                protected URIProcessorOutputImpl.URIReferences getURIReferences(PipelineContext pipelineContext) {
+                    // Return dependencies object, set by XFormsToXHTML before reading its input
+                    return ((XFormsToXHTMLProcessorState) XFormsToXHTML.this.getState(pipelineContext)).getInputDependencies();
+                }
+            };
+        } else {
+            return super.createInput(inputName);
+        }
+    }
+
+    @Override
     public void reset(PipelineContext context) {
-        setState(context, new URIProcessorOutputImpl.URIReferencesState());
+        setState(context, new XFormsToXHTMLProcessorState());
+    }
+
+    private class XFormsToXHTMLProcessorState extends URIProcessorOutputImpl.URIReferencesState {
+        private InputDependencies inputDependencies;
+
+        public InputDependencies getInputDependencies() {
+            return inputDependencies;
+        }
+
+        public void setInputDependencies(InputDependencies inputDependencies) {
+            this.inputDependencies = inputDependencies;
+        }
     }
 
     private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler, final URIProcessorOutputImpl processorOutput, String outputName) {
@@ -125,7 +149,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                     final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
 
                     // Compute annotated XForms document + static state document
-                    final SAXStore annotatedSAXStore;
+                    final InputDependencies inputDependencies;
                     final XFormsStaticState xformsStaticState;
                     {
                         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
@@ -133,39 +157,39 @@ public class XFormsToXHTML extends ProcessorImpl {
                         final LocationDocumentResult documentResult = new LocationDocumentResult();
                         identity.setResult(documentResult);
 
-//                        annotatedSAXStore = new SAXStore(new TeeContentHandler(new ContentHandler[] {
-//                                new XFormsExtractorContentHandler(externalContext, identity)
-//    //                            ,new SAXLoggerProcessor.DebugContentHandler()
-//                        }));
-
-//                        annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, new SAXLoggerProcessor.DebugContentHandler(identity)));
-
                         final XFormsAnnotatorContentHandler.Metadata metadata = new XFormsAnnotatorContentHandler.Metadata();
-                        annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity, metadata));
+                        final SAXStore annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity, metadata));
+
+                        // Create object here and set in state before reading
+                        inputDependencies = new InputDependencies(annotatedSAXStore);
+                        ((XFormsToXHTMLProcessorState) XFormsToXHTML.this.getState(pipelineContext)).setInputDependencies(inputDependencies);
 
                         // Read the input through the annotator and gather namespace mappings
                         readInputAsSAX(pipelineContext, processorInput, new XFormsAnnotatorContentHandler(annotatedSAXStore, externalContext, metadata));
 
                         // Get static state document and create static state object
                         final Document staticStateDocument = documentResult.getDocument();
-//                        XFormsContainingDocument.logDebugStatic("XForms to XHTML", "static state", new String[] { "document", Dom4jUtils.domToString(staticStateDocument) });
                         xformsStaticState = new XFormsStaticState(pipelineContext, staticStateDocument, metadata, annotatedSAXStore);
+
+                        // Update input dependencies object
+                        inputDependencies.setXFormsStaticState(xformsStaticState);
                     }
 
                     // Create document here so we can do appropriate analysis of caching dependencies
                     createCacheContainingDocument(pipelineContext, uriResolver, xformsStaticState, containingDocument, xformsState);
 
-                    // Set caching dependencies
-                    final InputDependencies inputDependencies = new InputDependencies(annotatedSAXStore, xformsStaticState);
-                    setCachingDependencies(containingDocument[0], indentedLogger, inputDependencies);
+                    // Gather set caching dependencies
+                    gatherInputDependencies(containingDocument[0], indentedLogger, inputDependencies);
 
                     return inputDependencies;
                 }
 
+                @Override
                 public void foundInCache() {
                     cachedInput[0] = true;
                 }
 
+                @Override
                 public void storedInCache() {
                     cachedInput[0] = true;
                 }
@@ -208,10 +232,12 @@ public class XFormsToXHTML extends ProcessorImpl {
                     return UUIDUtils.createPseudoUUID();
                 }
 
+                @Override
                 public void foundInCache() {
                     indentedLogger.logDebug("", "found cached dynamic state UUID for resulting document.");
                 }
 
+                @Override
                 public void unableToCache() {
                     indentedLogger.logDebug("", "cannot cache dynamic state UUID for resulting document.");
                 }
@@ -255,10 +281,13 @@ public class XFormsToXHTML extends ProcessorImpl {
     private static class InputDependencies extends URIProcessorOutputImpl.URIReferences {
 
         private final SAXStore annotatedSAXStore;
-        private final XFormsStaticState xformsStaticState;
+        private XFormsStaticState xformsStaticState;
 
-        public InputDependencies(SAXStore annotatedSAXStore, XFormsStaticState xformsStaticState) {
+        public InputDependencies(SAXStore annotatedSAXStore) {
             this.annotatedSAXStore = annotatedSAXStore;
+        }
+
+        public void setXFormsStaticState(XFormsStaticState xformsStaticState) {
             this.xformsStaticState = xformsStaticState;
         }
 
@@ -271,19 +300,10 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private void setCachingDependencies(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, InputDependencies inputDependencies) {
-
-        // If a submission took place during XForms initialization, we currently don't cache
-        // TODO: Some cases could be easily handled, like GET
-        if (containingDocument.isGotSubmission()) {
-            if (indentedLogger.isDebugEnabled())
-                indentedLogger.logDebug("", "submission occurred during XForms initialization, disabling caching of output.");
-            inputDependencies.setNoCache();
-            return;
-        }
+    private void gatherInputDependencies(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, InputDependencies inputDependencies) {
 
         // Set caching dependencies if the input was actually read
-        // WIP INSTANCE INSPECTOR: for (Iterator i = containingDocument.getAllModels().iterator(); i.hasNext();) {
+        // WIP: check all models/instances: for (Iterator i = containingDocument.getAllModels().iterator(); i.hasNext();) {
         for (final XFormsModel currentModel: containingDocument.getModels()) {
             // Add schema dependencies
             final String[] schemaURIs = currentModel.getSchemaURIs();
@@ -319,7 +339,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 }
             }
 
-            // TODO: Add @src attributes from controls?
+            // TODO: Add @src attributes from controls? Not used often.
         }
 
         // Set caching dependencies for XBL inclusions

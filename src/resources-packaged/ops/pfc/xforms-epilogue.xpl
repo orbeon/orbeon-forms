@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -100,19 +100,13 @@
                         <!--<p:input name="data" href="#data2"/>-->
                         <p:input name="data" href="#preprocessed-view"/>
                         <p:input name="config" href="#aggregate"/>
-                        <p:output name="data" id="widgeted-view-no-xbl"/>
+                        <p:output name="data" id="widgeted-view"/>
                         <!-- This is here just so that we can reload the form when the properties or the resources change -->
                         <p:input name="properties-local" href="oxf:/config/properties-local.xml"/>
                     </p:processor>
-
-                    <!-- XInclude processing to include XBL if any -->
-                    <p:processor name="oxf:xinclude">
-                        <p:input name="config" href="#widgeted-view-no-xbl"/>
-                        <p:output name="data" id="widgeted-view"/>
-                    </p:processor>
                 </p:when>
                 <p:otherwise>
-                    <!-- No theme -->
+                    <!-- No widgets -->
                     <p:processor name="oxf:identity">
                         <p:input name="data" href="#preprocessed-view"/>
                         <p:output name="data" id="widgeted-view"/>
@@ -133,6 +127,7 @@
             <!-- Native XForms Initialization -->
             <p:processor name="oxf:xforms-to-xhtml">
                 <p:input name="annotated-document" href="#widgeted-view"/>
+                <!--<p:input name="annotated-document" href="#widgeted-view" schema-href="oxf:/ops/xforms/schema/orbeon.rng"/>-->
                 <p:input name="data" href="#model-data"/>
                 <!-- This input adds a dependency on the container namespace. Keep it for portlets. -->
                 <p:input name="namespace" href="#namespace"/>

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -59,7 +59,6 @@ public abstract class ProcessorImpl implements Processor {
     public static final String USER_VALIDATION_FLAG = "oxf.validation.user";
     public static final String SAX_INSPECTION_FLAG = "oxf.sax.inspection";
 
-    public static final char KEY_SEPARATOR = '?';
     private static final List<ProcessorInput> EMPTY_INPUT_LIST = Collections.emptyList();
 
     private String id;
@@ -126,85 +125,179 @@ public abstract class ProcessorImpl implements Processor {
         // rare places where this should be tested on. By default, enable validation so the
         // properties can be validated!
         final PropertySet propertySet = Properties.instance().getPropertySet();
-        final Boolean valEnabled = (propertySet == null) ? new Boolean(true) : propertySet.getBoolean(PROCESSOR_VALIDATION_FLAG, true);
-        if (valEnabled.booleanValue() && inputInfo != null && inputInfo.getSchemaURI() != null) {
+        final boolean inputValidationEnabled = (propertySet == null) ? true : propertySet.getBoolean(PROCESSOR_VALIDATION_FLAG, true);
+        final ProcessorInput input;
+        if (inputValidationEnabled && inputInfo != null && inputInfo.getSchemaURI() != null) {
 
             if (logger.isDebugEnabled())
                 logger.debug("Creating validator for input name '" + name
                         + "' and schema-uri '" + inputInfo.getSchemaURI() + "'");
 
             // Create and hook-up input validation processor if needed
-            final Processor inputValidator = new MSVValidationProcessor(inputInfo.getSchemaURI());
+            final Processor validatorProcessor = new MSVValidationProcessor(inputInfo.getSchemaURI());
 
             // Connect schema to validator
-            final Processor schema = PipelineUtils.createURLGenerator(SchemaRepository.instance().getSchemaLocation(inputInfo.getSchemaURI()));
-            PipelineUtils.connect(schema, OUTPUT_DATA, inputValidator, MSVValidationProcessor.INPUT_SCHEMA);
-            PipelineUtils.connect(MSVValidationProcessor.NO_DECORATION_CONFIG, OUTPUT_DATA, inputValidator, INPUT_CONFIG);
+            final Processor schemaURLGenerator = PipelineUtils.createURLGenerator(SchemaRepository.instance().getSchemaLocation(inputInfo.getSchemaURI()));
+            PipelineUtils.connect(schemaURLGenerator, OUTPUT_DATA, validatorProcessor, MSVValidationProcessor.INPUT_SCHEMA);
+            PipelineUtils.connect(MSVValidationProcessor.NO_DECORATION_CONFIG, OUTPUT_DATA, validatorProcessor, INPUT_CONFIG);
 
             // Create data input and output
-            final ProcessorInput inputValData = inputValidator.createInput(INPUT_DATA);
-            final ProcessorOutput outputValData = inputValidator.createOutput(OUTPUT_DATA);
+            final ProcessorInput inputValData = validatorProcessor.createInput(INPUT_DATA);
+            final ProcessorOutput outputValData = validatorProcessor.createOutput(OUTPUT_DATA);
 
-            ProcessorInput fakeInput = new ProcessorInput() {
-                public String getDebugMessage() {
-                    return inputValData.getDebugMessage();
-                }
-
-                public LocationData getLocationData() {
-                    return inputValData.getLocationData();
-                }
-
-                public String getName() {
-                    return name;
-                }
-
-                public ProcessorOutput getOutput() {
-                    return outputValData;
-                }
-
-                public Class getProcessorClass() {
-                    return ProcessorImpl.this.getClass();
-                }
-
-                public String getSchema() {
-                    return inputValData.getSchema();
-                }
-
-                public void setDebug(String debugMessage) {
-                    inputValData.setDebug(debugMessage);
-                }
-
-                public void setLocationData(LocationData locationData) {
-                    inputValData.setLocationData(locationData);
-                }
-
-                public void setBreakpointKey(BreakpointKey breakpointKey) {
-                    inputValData.setBreakpointKey(breakpointKey);
-                }
-
-                public void setOutput(ProcessorOutput output) {
-                    inputValData.setOutput(output);
-                }
-
-                public void setSchema(String schema) {
-                    inputValData.setSchema(schema);
-                }
-            };
-
-            addInput(name, fakeInput);
-            return fakeInput;
+            input = new DelegatingProcessorInput(name, inputValData, outputValData);
         } else {
-            final ProcessorInput input = new ProcessorInputImpl(ProcessorImpl.this.getClass(), name);
-            addInput(name, input);
-            return input;
+            input = new ProcessorInputImpl(ProcessorImpl.this.getClass(), name);
         }
+
+        addInput(name, input);
+        return input;
     }
 
-    public void addInput(String name, ProcessorInput input) {
-        List<ProcessorInput> inputs = inputMap.get(name);
+    public class DelegatingProcessorInput implements ProcessorInput {
+
+        private final String originalName;
+        private ProcessorInput delegateInput;
+        private ProcessorOutput delegateOutput;
+
+        public DelegatingProcessorInput(String originalName, ProcessorInput delegateInput, ProcessorOutput delegateOutput) {
+            this.originalName = originalName;
+            this.delegateInput = delegateInput;
+            this.delegateOutput = delegateOutput;
+        }
+
+        protected DelegatingProcessorInput(String originalName) {
+            this.originalName = originalName;
+        }
+
+        public void setDelegateInput(ProcessorInput delegateInput) {
+            this.delegateInput = delegateInput;
+        }
+
+        public void setDelegateOutput(ProcessorOutput delegateOutput) {
+            this.delegateOutput = delegateOutput;
+        }
+
+        public void setOutput(ProcessorOutput output) {
+            delegateInput.setOutput(output);
+        }
+
+        public ProcessorOutput getOutput() {
+            // Not sure why the input validation stuff expects another output here. For now, allow caller to specify
+            // which output is returned. Once we are confident, switch to delegateInput.getOutput().
+            return delegateOutput;
+//            return delegateInput.getOutput();
+        }
+
+        public String getSchema() {
+            return delegateInput.getSchema();
+        }
+
+        public void setSchema(String schema) {
+            delegateInput.setSchema(schema);
+        }
+
+        public Class getProcessorClass() {
+            return ProcessorImpl.this.getClass();
+        }
+
+        public String getName() {
+            return originalName;
+        }
+
+        public void setDebug(String debugMessage) {
+            delegateInput.setDebug(debugMessage);
+        }
+
+        public void setLocationData(LocationData locationData) {
+            delegateInput.setLocationData(locationData);
+        }
+
+        public String getDebugMessage() {
+            return delegateInput.getDebugMessage();
+        }
+
+        public LocationData getLocationData() {
+            return delegateInput.getLocationData();
+        }
+
+        public void setBreakpointKey(BreakpointKey breakpointKey) {
+            delegateInput.setBreakpointKey(breakpointKey);
+        }
+    };
+
+    /**
+     * This special input is able to handle dependencies on URLs.
+     */
+    protected abstract class DependenciesProcessorInput extends DelegatingProcessorInput {
+
+        // Custom processor handling input dependencies
+        private final ProcessorImpl dependencyProcessor = new ProcessorImpl() {
+            @Override
+            public ProcessorOutput createOutput(String outputName) {
+                final ProcessorOutput output = new URIProcessorOutputImpl(this, outputName, INPUT_CONFIG) {
+                    @Override
+                    protected void readImpl(PipelineContext pipelineContext, final ContentHandler contentHandler) {
+                        final boolean[] foundInCache = new boolean[] { false };
+                        readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+                            @Override
+                            public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
+                                // Read the input directly into the output
+                                readInputAsSAX(pipelineContext, processorInput, contentHandler);
+
+                                // Return dependencies object
+                                return getURIReferences(pipelineContext);
+                            }
+
+                            @Override
+                            public void foundInCache() {
+                                foundInCache[0] = true;
+                            }
+                        });
+
+                        // Finding the dependencies in cache doesn't mean we don't read to the output: after all,
+                        // we were asked to.
+                        if (foundInCache[0]) {
+                            readInputAsSAX(pipelineContext, getInputByName(INPUT_CONFIG), contentHandler);
+                        }
+                    }
+                };
+                addOutput(outputName, output);
+                return output;
+            }
+        };
+
+        public DependenciesProcessorInput(String originalName, ProcessorInput originalInput) {
+            super(originalName);
+
+            // Create data input and output
+            final ProcessorInput dependencyInput = dependencyProcessor.createInput(INPUT_CONFIG);
+            final ProcessorOutput dependencyOutput = dependencyProcessor.createOutput(OUTPUT_DATA);
+
+            setDelegateInput(dependencyInput);
+            setDelegateOutput(dependencyOutput);
+
+            // Connect output of dependency processor to original input
+            {
+                dependencyOutput.setInput(originalInput);
+                originalInput.setOutput(dependencyOutput);
+            }
+        }
+
+        /**
+         * Get URI references on which this input depends. This is called right after the original input has been read.
+         *
+         * @param pipelineContext   current context
+         * @return                  URI references
+         */
+        protected abstract URIProcessorOutputImpl.URIReferences getURIReferences(PipelineContext pipelineContext);
+    }
+
+    public void addInput(String inputName, ProcessorInput input) {
+        List<ProcessorInput> inputs = inputMap.get(inputName);
         if (inputs == null) {
             inputs = new ArrayList<ProcessorInput>();
-            inputMap.put(name, inputs);
+            inputMap.put(inputName, inputs);
         }
 //        if (inputs.size() > 0)
 //            logger.info("Processor " + getClass().getName() + " has more than 1 input called " + name);
@@ -215,14 +308,14 @@ public abstract class ProcessorImpl implements Processor {
         deleteFromListMap(inputMap, input);
     }
 
-    public ProcessorOutput getOutputByName(String name) {
-        ProcessorOutput ret = (ProcessorOutput) outputMap.get(name);
+    public ProcessorOutput getOutputByName(String outputName) {
+        ProcessorOutput ret = (ProcessorOutput) outputMap.get(outputName);
         if (ret == null )
-            throw new ValidationException("Exactly one output " + name + " is required", getLocationData());
+            throw new ValidationException("Exactly one output " + outputName + " is required", getLocationData());
         return ret;
     }
 
-    public ProcessorOutput createOutput(String name) {
+    public ProcessorOutput createOutput(String outputName) {
         throw new ValidationException("Outputs are not supported", getLocationData());
     }
 
@@ -562,11 +655,11 @@ public abstract class ProcessorImpl implements Processor {
      *
      * This method may be called from start() and ProcessorOutput.readImpl().
      *
-     * @param context current PipelineContext object
-     * @return        state object set by the caller of setState()
+     * @param   pipelineContext current context
+     * @return  state object set by the caller of setState()
      */
-    public Object getState(PipelineContext context) {
-        final Object state = context.getAttribute(getProcessorKey(context));
+    public Object getState(PipelineContext pipelineContext) {
+        final Object state = pipelineContext.getAttribute(getProcessorKey(pipelineContext));
         if (state == null) {
             throw new OXFException("No state in context");
         }
@@ -723,10 +816,11 @@ public abstract class ProcessorImpl implements Processor {
      */
     public static class ProcessorInputImpl implements ProcessorInput {
 
+        private final Class clazz;
+        private final String name;
+
         private ProcessorOutput output;
         private String id;
-        private Class clazz;
-        private String name;
         private String schema;
         private String debugMessage;
         private LocationData locationData;
@@ -804,10 +898,11 @@ public abstract class ProcessorImpl implements Processor {
      */
     public abstract static class ProcessorOutputImpl implements ProcessorOutput, Cacheable {
 
+        private final Class clazz;
+        private final String name;
+
         private ProcessorInput input;
         private String id;
-        private Class clazz;
-        private String name;
         private String schema;
         private String debugMessage;
         private LocationData locationData;
@@ -1103,43 +1198,6 @@ public abstract class ProcessorImpl implements Processor {
                 };
             }
 
-            // Hookup inspector
-//            if (useInspector) {
-//                InspectorProcessor inspectorProcessor = new InspectorProcessor();
-//                inspectorProcessor.createInput(INPUT_DATA);
-//                inspectorProcessor.createOutput(OUTPUT_DATA);
-//                inspectorProcessor.setJndiName("inspector");
-//                inspectorProcessor.setProcessorInput(_input);
-//                inspectorProcessor.setProcessorOutput(_output);
-//                filter = new ConcreteProcessorFilter(inspectorProcessor.getInputByName(INPUT_DATA),
-//                        inspectorProcessor.getOutputByName(OUTPUT_DATA),
-//                        filter);
-//            }
-
-            // Hookup profiler
-//            if (useProfiler) {
-//                ProfilerProcessor profilerProcessor = new ProfilerProcessor();
-//                profilerProcessor.createInput(INPUT_DATA);
-//                profilerProcessor.createOutput(OUTPUT_DATA);
-//                profilerProcessor.setJndiName("profiler");
-//                profilerProcessor.setProcessorInput(_input);
-//                profilerProcessor.setProcessorOutput(_output);
-//                filter = new ConcreteProcessorFilter(profilerProcessor.getInputByName(INPUT_DATA),
-//                        profilerProcessor.getOutputByName(OUTPUT_DATA),
-//                        filter);
-//            }
-
-            // Handle breakpoints
-//            if (get) {
-//
-//            }
-
-            // Disable inspector for the filter chain. Its state will be restored at the end
-            // of the chain before calling readImp().
-//            if (useInspector) {
-//                inspectorRun.setEnabled(false);
-//            }
-
             return filter;
         }
 
@@ -1188,10 +1246,6 @@ public abstract class ProcessorImpl implements Processor {
 
         public final OutputCacheKey getKey(PipelineContext context) {
             return getFilter().getKey(context);
-//            if (result == null) {
-//                System.out.print(".");
-//            }
-//            return result;
         }
 
         public final Object getValidity(PipelineContext context) {

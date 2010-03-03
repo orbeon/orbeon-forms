@@ -600,18 +600,31 @@
                 <xxforms:sequence select=".{if ($hasLoadingFeature) then '[not($fr-dt-loading = true())]' else ''}" xxbl:scope="outer"/>
             </xxforms:variable>
 
-            <xxforms:script ev:event="xforms-enabled" ev:target="fr-dt-group" xxbl:scope="inner"> YAHOO.log("Enabling datatable id <xsl:value-of
-                    select="$id"/>","info"); ORBEON.widgets.datatable.init(this, <xsl:value-of select="$innerTableWidth"/>); </xxforms:script>
+            <xxforms:script ev:event="xforms-enabled" ev:target="fr-dt-group" xxbl:scope="inner">
+                YAHOO.log("Enabling datatable id <xsl:value-of select="$id"/>","info"); 
+                <xsl:choose>
+                    <xsl:when test="$scrollH or $scrollV">
+                        var target= this; 
+                        setTimeout(function() {
+                            ORBEON.widgets.datatable.init(target, <xsl:value-of select="$innerTableWidth"/>);  
+                            }, 10);
+                    </xsl:when>
+                    <xsl:otherwise>
+                        ORBEON.widgets.datatable.init(this, <xsl:value-of select="$innerTableWidth"/>);  
+                    </xsl:otherwise>
+                </xsl:choose>
+                
+</xxforms:script>
 
             <xforms:group ref="$group-ref" id="fr-dt-group" xxbl:scope="inner">
 
                 <!--  <xforms:group appearance="xxforms:internal" xxbl:scope="outer"> would be better but doesn't work! -->
                 <xforms:group xxbl:scope="outer">
-                    <xhtml:div class="yui-dt yui-dt-scrollable">
-                        <xhtml:div class="yui-dt-hd">
-                            <xhtml:table id="{$id}-table"
-                                class="{@class} datatable datatable-{$id} yui-dt-table {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''} "
-                                style="{$height} {$width}">
+                    <xhtml:div class="yui-dt yui-dt-scrollable {if ($scrollV) then 'fr-scrollV' else ''}  {if ($scrollH) then 'fr-scrollH' else ''}"
+                        style="{$height} {$width}">
+                        <xsl:variable name="table">
+                            <xhtml:table id="{$id}-table" class="{@class} datatable datatable-{$id} yui-dt-table "
+                                style="{if ($scrollV) then $height else ''} {if (not($scrollH)) then $width else ''}">
                                 <!-- Copy attributes that are not parameters! -->
                                 <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id', 'class'))]" mode="dynamic"/>
                                 <xhtml:thead id="{$id}-thead">
@@ -621,7 +634,38 @@
                                 </xhtml:thead>
                                 <xsl:apply-templates select="xhtml:tbody" mode="dynamic"/>
                             </xhtml:table>
-                        </xhtml:div>
+                        </xsl:variable>
+                        <xsl:choose>
+                            <xsl:when test="$scrollH or $scrollV">
+                                <!-- The table needs to be split -->
+                                <xhtml:div class="yui-dt-hd fr-datatable-hidden" style="{$width}">
+                                    <xsl:variable name="tHead">
+                                        <xsl:apply-templates select="$table" mode="headerIsolation"/>
+                                    </xsl:variable>
+                                    <xsl:choose>
+                                        <xsl:when test="$scrollV">
+                                            <!-- Add an intermediary div to the header to compensate the scroll bar width when needed -->
+                                            <xhtml:div>
+                                                <xsl:copy-of select="$tHead"/>
+                                            </xhtml:div>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <!-- Add the header without an intermediary div -->
+                                            <xsl:copy-of select="$tHead"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xhtml:div>
+                                <xhtml:div class="yui-dt-hd" style="overflow: auto; {$width} {$height}">
+                                    <xsl:apply-templates select="$table" mode="bodyFiltering"/>
+                                </xhtml:div>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <!-- The table can be left alone -->
+                                <xhtml:div class="yui-dt-hd">
+                                    <xsl:copy-of select="$table"/>
+                                </xhtml:div>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xhtml:div>
                 </xforms:group>
 
@@ -1124,6 +1168,14 @@
     <xsl:template match="columnSet" mode="dyn-loadingIndicator">
         <xsl:apply-templates select="$fakeColumn/header/xhtml:th"/>
     </xsl:template>
+
+    <!-- Header isolation mode: remove table body and @id attributes -->
+    <xsl:template match="xhtml:table/@id" mode="headerIsolation"/>
+
+    <xsl:template match="xhtml:tbody" mode="headerIsolation"/>
+
+    <!-- Body filtering mode: remove @id attributes in the table header -->
+    <xsl:template match="xhtml:thead//@id" mode="bodyFiltering"/>
 
 
 

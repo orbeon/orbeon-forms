@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 Orbeon, Inc.
+    Copyright (C) 2009-2010 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -17,6 +17,8 @@
     border-bottom:  #7f7f7f 1px solid;
 }
 
+
+
 .xforms-data {
     display: none
 }
@@ -24,7 +26,7 @@
 .datatable-cell-content {
     overflow:hidden;
 }
-
+                                                           
 .fr-datatable-is-loading { 
     background-image:
     url(../../../ops/images/xforms/processing.gif); 
@@ -40,3 +42,10 @@
 .yui-pg-page input {
     width: 20px;
 }
+
+.fr-datatable-hidden {
+    position: absolute !important;
+    top: -10000px;
+    left: -1000px;
+}
+

@@ -11,11 +11,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <head>
         <title>Using YUI's datatable</title>
@@ -49,9 +47,8 @@
                     </record>
                     <record>
                         <AAA>1000</AAA>
-                        <BBB>A looooong, looooong, looooong, looooong, looooong, looooong, looooong,
-                            looooong, looooong, looooong, looooong, looooong, looooong, looooong,
-                            looooong, looooong, looooong, looooong, looooong, looooong, line</BBB>
+                        <BBB>A looooong, looooong, looooong, looooong, looooong, looooong, looooong, looooong, looooong, looooong, looooong, looooong,
+                            looooong, looooong, looooong, looooong, looooong, looooong, looooong, looooong, line</BBB>
                         <CCC>ccc</CCC>
                     </record>
                     <record>
@@ -160,6 +157,207 @@
                 </tr>
             </xforms:repeat>
         </fr:datatable>
+
+       <!-- <p>100%, with an horizontal scrollbar, many columns and only one row</p>
+        <fr:datatable width="100%" scrollable="horizontal">
+            <xforms:repeat nodeset="record[position() = 1]">
+                <tr>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="AAA">
+                            <xforms:label>AAA (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="BBB">
+                            <xforms:label>BBB (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="CCC">
+                            <xforms:label>CCC (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="AAA">
+                            <xforms:label>AAA (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="BBB">
+                            <xforms:label>BBB (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="CCC">
+                            <xforms:label>CCC (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="AAA">
+                            <xforms:label>AAA (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="BBB">
+                            <xforms:label>BBB (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="CCC">
+                            <xforms:label>CCC (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="AAA">
+                            <xforms:label>AAA (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="BBB">
+                            <xforms:label>BBB (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="CCC">
+                            <xforms:label>CCC (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="AAA">
+                            <xforms:label>AAA (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="BBB">
+                            <xforms:label>BBB (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="CCC">
+                            <xforms:label>CCC (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="AAA">
+                            <xforms:label>AAA (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="BBB">
+                            <xforms:label>BBB (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                    <td fr:sortable="true" fr:resizeable="true">
+                        <xforms:output ref="CCC">
+                            <xforms:label>CCC (imp)</xforms:label>
+                        </xforms:output>
+                    </td>
+                </tr>
+            </xforms:repeat>
+            </fr:datatable>-->
+        
+       <!-- <div style="overflow: scroll; width:100%">
+            <table>
+                <tr>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                    <th>foo</th>
+                </tr>
+            </table>
+        </div>-->
 
     </body>
 </html>

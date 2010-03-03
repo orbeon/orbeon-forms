@@ -255,7 +255,7 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
             this.tableWidth = this.optimizeWidth(minWidth);
         }
     } else if (this.scrollV) {
-        if (this.hasFixedWidthTable && this.originalWidth.indexOf('%') == - 1) {
+        if (this.hasFixedWidthTable && (this.originalWidth.indexOf('%') == - 1 ||(YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8) )) {
             width = this.tableWidth + 'px';
             this.tableWidth = this.tableWidth - 19;
         } else {
@@ -270,7 +270,7 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
     YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
     YAHOO.util.Dom.setStyle(this.header, 'width', this.tableWidth + 'px');
 
-    this.adjustHeightForIE = this.adjustHeightForIE || (this.scrollH && ! this.scrollV && this.height == 'auto' && YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8);
+    this.adjustHeightForIE = this.adjustHeightForIE || (this.scrollH && ! this.scrollV && this.height == 'auto' && YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 7);
     if (this.adjustHeightForIE) {
         this.height = (this.tableHeight + 22) + 'px';
         this.adjustHeightForIE = true;

@@ -328,7 +328,7 @@ ORBEON.widgets.datatable.prototype.setSizes = function () {
 
         // Final set of size settings
 
-        if (YAHOO.env.ua.ie > 0 && (YAHOO.env.ua.ie < 8 || document.compatMode == "BackCompat")) {
+        if (width.indexOf('%') != - 1 && YAHOO.env.ua.ie > 0 && (YAHOO.env.ua.ie < 8 || document.compatMode == "BackCompat")) {
             // Old versions of IE and quirks mode do not like at all widths expressed as % here
 
             this.headerContainer.style.width = (containerWidth - 2) + 'px';

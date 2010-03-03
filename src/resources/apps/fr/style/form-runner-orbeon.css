@@ -210,11 +210,8 @@ h1 .xforms-trigger-appearance-xxforms-minimal, h2 .xforms-trigger-appearance-xxf
 
 /* Metadata */
 .fr-top {
-    background-color: #146EB4;
-    background-image: none;
-    /*background-image: url(/orbeon/apps/fr/style/images/top-gradient.png);*/
-    /*background-repeat: repeat-x;*/
-    padding: 1em;
+    background: url("../../../ops/yui/assets/skins/sam/sprite.png") repeat-x scroll left -1400px;
+    padding: .5em;
 }
 .fr-separator {
     /*background-color: #004B92;*/

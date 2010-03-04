@@ -82,42 +82,46 @@
         <xsl:apply-templates select="$pass3" mode="pass4"/>
     </xsl:variable>
 
+    <xsl:variable name="pass5">
+        <xsl:apply-templates select="$pass4" mode="pass5"/>
+    </xsl:variable>
+
     <!-- Set some variables that will dictate the geometry of the widget -->
-    <xsl:variable name="scrollH" select="$pass4/fr:datatable/@scrollable = ('horizontal', 'both') and $pass4/fr:datatable/@width"/>
-    <xsl:variable name="scrollV" select="$pass4/fr:datatable/@scrollable = ('vertical', 'both') and $pass4/fr:datatable/@height"/>
+    <xsl:variable name="scrollH" select="$pass5/fr:datatable/@scrollable = ('horizontal', 'both') and $pass5/fr:datatable/@width"/>
+    <xsl:variable name="scrollV" select="$pass5/fr:datatable/@scrollable = ('vertical', 'both') and $pass5/fr:datatable/@height"/>
     <xsl:variable name="scrollable" select="$scrollH or $scrollV"/>
-    <xsl:variable name="height" select="if ($scrollV) then concat('height: ', $pass4/fr:datatable/@height, ';') else ''"/>
-    <xsl:variable name="width" select="if ($pass4/fr:datatable/@width) then concat('width: ', $pass4/fr:datatable/@width, ';') else ''"/>
+    <xsl:variable name="height" select="if ($scrollV) then concat('height: ', $pass5/fr:datatable/@height, ';') else ''"/>
+    <xsl:variable name="width" select="if ($pass5/fr:datatable/@width) then concat('width: ', $pass5/fr:datatable/@width, ';') else ''"/>
     <xsl:variable name="id">
         <xsl:choose>
-            <xsl:when test="$pass4/fr:datatable/@id">
+            <xsl:when test="$pass5/fr:datatable/@id">
                 <id xxbl:scope="outer">
-                    <xsl:value-of select="$pass4/fr:datatable/@id"/>
+                    <xsl:value-of select="$pass5/fr:datatable/@id"/>
                 </id>
             </xsl:when>
             <xsl:otherwise>
                 <id xxbl:scope="inner">
-                    <xsl:value-of select="generate-id($pass4/fr:datatable)"/>
+                    <xsl:value-of select="generate-id($pass5/fr:datatable)"/>
                 </id>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:variable>
-    <xsl:variable name="paginated" select="$pass4/fr:datatable/@paginated = 'true'"/>
+    <xsl:variable name="paginated" select="$pass5/fr:datatable/@paginated = 'true'"/>
     <xsl:variable name="rowsPerPage"
-        select="if ($pass4/fr:datatable/@rowsPerPage castable as xs:integer) then $pass4/fr:datatable/@rowsPerPage cast as xs:integer else 10"/>
+        select="if ($pass5/fr:datatable/@rowsPerPage castable as xs:integer) then $pass5/fr:datatable/@rowsPerPage cast as xs:integer else 10"/>
     <xsl:variable name="maxNbPagesToDisplay"
-        select="if ($pass4/fr:datatable/@maxNbPagesToDisplay castable as xs:integer) then $pass4/fr:datatable/@maxNbPagesToDisplay cast as xs:integer else -1"/>
-    <xsl:variable name="sortAndPaginationMode" select="$pass4/fr:datatable/@sortAndPaginationMode"/>
+        select="if ($pass5/fr:datatable/@maxNbPagesToDisplay castable as xs:integer) then $pass5/fr:datatable/@maxNbPagesToDisplay cast as xs:integer else -1"/>
+    <xsl:variable name="sortAndPaginationMode" select="$pass5/fr:datatable/@sortAndPaginationMode"/>
     <xsl:variable name="isExternallySortedAndPaginated" select="$sortAndPaginationMode = 'external'"/>
     <xsl:variable name="isInternallySortedAndPaginated" select="not($isExternallySortedAndPaginated)"/>
     <xsl:variable name="innerTableWidth"
-        select="if ($pass4/fr:datatable/@innerTableWidth) then concat(&quot;'&quot;, $pass4/fr:datatable/@innerTableWidth, &quot;'&quot;) else 'null'"/>
-    <xsl:variable name="hasLoadingFeature" select="count($pass4/fr:datatable/@loading) = 1"/>
-    <xsl:variable name="debug" select="$pass4/fr:datatable/@debug = 'true'"/>
+        select="if ($pass5/fr:datatable/@innerTableWidth) then concat(&quot;'&quot;, $pass5/fr:datatable/@innerTableWidth, &quot;'&quot;) else 'null'"/>
+    <xsl:variable name="hasLoadingFeature" select="count($pass5/fr:datatable/@loading) = 1"/>
+    <xsl:variable name="debug" select="$pass5/fr:datatable/@debug = 'true'"/>
 
     <!-- And some more -->
 
-    <xsl:variable name="repeatNodeset" select="$pass4/fr:datatable/xhtml:tbody/xforms:repeat/@nodeset"/>
+    <xsl:variable name="repeatNodeset" select="$pass5/fr:datatable/xhtml:tbody/xforms:repeat/@nodeset"/>
 
     <xsl:template match="@*|node()" mode="#all" priority="-100" name="identity">
         <!-- Default template == identity -->
@@ -151,7 +155,7 @@
 
     <xsl:template match="/">
 
-        <xsl:apply-templates select="$pass4/fr:datatable" mode="dynamic"/>
+        <xsl:apply-templates select="$pass5/fr:datatable" mode="dynamic"/>
 
     </xsl:template>
 
@@ -288,12 +292,20 @@
     </xsl:template>
 
     <!-- 
-        ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        
-        Below this point, the templates belong to the new implementation that supports dynamic columns
     
-        ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        Pass 5: add a @fr:master="true" attribute to the last header row if there is none elsewhere
+    
     -->
+
+    <xsl:template match="/fr:datatable/xhtml:thead[not(xhtml:tr/@fr:master='true')]/xhtml:tr[last()]" mode="pass5">
+        <xsl:copy>
+            <xsl:attribute name="fr:master">true</xsl:attribute>
+            <xsl:apply-templates select="@*|node()" mode="pass5"/>
+        </xsl:copy>
+    </xsl:template>
+
+
+    <!-- Now do the "real" work! -->
 
     <xsl:template match="/fr:datatable" mode="dynamic">
         <!-- Matches the bound element -->
@@ -306,7 +318,7 @@
         </xsl:if>
 
         <xsl:variable name="columns">
-            <xsl:apply-templates select="xhtml:thead/xhtml:tr[1]/*" mode="dyn-columns"/>
+            <xsl:apply-templates select="xhtml:thead/xhtml:tr[@fr:master = 'true']/*" mode="dyn-columns"/>
         </xsl:variable>
 
         <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer" id="{$id}-container">
@@ -600,21 +612,13 @@
                 <xxforms:sequence select=".{if ($hasLoadingFeature) then '[not($fr-dt-loading = true())]' else ''}" xxbl:scope="outer"/>
             </xxforms:variable>
 
-            <xxforms:script ev:event="xforms-enabled" ev:target="fr-dt-group" xxbl:scope="inner">
-                YAHOO.log("Enabling datatable id <xsl:value-of select="$id"/>","info"); 
-                <xsl:choose>
-                    <xsl:when test="$scrollH or $scrollV">
-                        var instance = YAHOO.xbl.fr.Datatable.instance(this); 
-                        setTimeout(function() {
-                        instance.draw(<xsl:value-of select="$innerTableWidth"/>);  
-                            }, 10);
-                    </xsl:when>
-                    <xsl:otherwise>
-                        YAHOO.xbl.fr.Datatable.instance(this).draw(<xsl:value-of select="$innerTableWidth"/>);  
-                    </xsl:otherwise>
+            <xxforms:script ev:event="xforms-enabled" ev:target="fr-dt-group" xxbl:scope="inner"> YAHOO.log("Enabling datatable id <xsl:value-of
+                    select="$id"/>","info"); <xsl:choose>
+                    <xsl:when test="$scrollH or $scrollV"> var instance = YAHOO.xbl.fr.Datatable.instance(this); setTimeout(function() {
+                            instance.draw(<xsl:value-of select="$innerTableWidth"/>); }, 10); </xsl:when>
+                    <xsl:otherwise> YAHOO.xbl.fr.Datatable.instance(this).draw(<xsl:value-of select="$innerTableWidth"/>); </xsl:otherwise>
                 </xsl:choose>
-                
-</xxforms:script>
+            </xxforms:script>
 
             <xforms:group ref="$group-ref" id="fr-dt-group" xxbl:scope="inner">
 
@@ -628,9 +632,9 @@
                                 <!-- Copy attributes that are not parameters! -->
                                 <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id', 'class'))]" mode="dynamic"/>
                                 <xhtml:thead id="{$id}-thead">
-                                    <xhtml:tr class="yui-dt-first yui-dt-last {@class}" id="{$id}-thead-tr">
-                                        <xsl:apply-templates select="$columns/*" mode="dynamic"/>
-                                    </xhtml:tr>
+                                    <xsl:apply-templates select="xhtml:thead/xhtml:tr" mode="dynamic">
+                                        <xsl:with-param name="columns" select="$columns"/>
+                                    </xsl:apply-templates>
                                 </xhtml:thead>
                                 <xsl:apply-templates select="xhtml:tbody" mode="dynamic"/>
                             </xhtml:table>
@@ -677,8 +681,8 @@
                     scrollbar takes all the page in IE 6 if not explicitely set...-->
                 <xforms:group ref="xxforms:component-context()[$fr-dt-loading = true()]">
                     <xforms:action ev:event="xforms-enabled">
-                        <xxforms:script> YAHOO.xbl.fr.Datatable.instance(this).initLoadingIndicator(this, <xsl:value-of select="$scrollV"/>, <xsl:value-of
-                                select="$scrollH"/>); </xxforms:script>
+                        <xxforms:script> YAHOO.xbl.fr.Datatable.instance(this).initLoadingIndicator(this, <xsl:value-of select="$scrollV"/>,
+                                <xsl:value-of select="$scrollH"/>); </xxforms:script>
                     </xforms:action>
                     <xsl:variable name="tableContent">
                         <xhtml:thead>
@@ -734,6 +738,15 @@
     </xsl:template>
 
 
+    <xsl:template match="/fr:datatable/xhtml:thead/xhtml:tr[@fr:master='true']" mode="dynamic">
+        <xsl:param name="columns"/>
+        <xhtml:tr class="{@class} fr-dt-master-row">
+            <xsl:apply-templates
+                select="@*[name() != 'class' and (local-name() != 'master' or namespace-uri() != 'http://orbeon.org/oxf/xml/form-runner')]"
+                mode="dynamic"/>
+            <xsl:apply-templates select="$columns" mode="dynamic"/>
+        </xhtml:tr>
+    </xsl:template>
 
     <xsl:template name="header-cell">
 

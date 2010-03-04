@@ -129,6 +129,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
     innerTableWidth: null,
     colResizers: [],
     colSorters: [],
+    masterRow: null,                                            // Header "master" row
     headerColumns: [],
 
     /**
@@ -360,8 +361,10 @@ YAHOO.xbl.fr.Datatable.prototype = {
         YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
         YAHOO.util.Dom.setStyle(this.headerTable, 'width', this.tableWidth + 'px');
 
-        this.headerHeight = this.table.tHead.rows[0].clientHeight;
-        
+        // In IE7, tHead elements have a clientWidth set to 0.
+        var region = YAHOO.util.Dom.getRegion(this.table.tHead);
+        this.headerHeight = region.bottom - region.top;
+
 
         this.adjustHeightForIE = this.adjustHeightForIE || (this.scrollH && ! this.scrollV && this.height == 'auto' && YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 7);
         if (this.adjustHeightForIE) {
@@ -380,8 +383,8 @@ YAHOO.xbl.fr.Datatable.prototype = {
         this.columnWidths = [];
         var j = 0;
 
-        for (var i = 0; i < this.table.tHead.rows[0].cells.length; i++) {
-            var cell = this.table.tHead.rows[0].cells[i];
+        for (var i = 0; i < this.masterRow.cells.length; i++) {
+            var cell = this.masterRow.cells[i];
             if (YAHOO.xbl.fr.Datatable.utils.isSignificant(cell)) {
                 this.columnWidths[j] = cell.clientWidth;
                 j += 1;
@@ -643,7 +646,8 @@ YAHOO.xbl.fr.Datatable.prototype = {
 
         this.headerColumns = [];
         this.bodyColumns = [];
-        var headerCells = this.thead.rows[0].cells;
+        this.masterRow = YAHOO.util.Dom.getElementsByClassName('fr-dt-master-row', 'tr', this.thead)[0];
+        var headerCells = this.masterRow.cells;
         for (var icol = 0; icol < headerCells.length; icol++) {
             var cell = headerCells[icol];
             if (YAHOO.xbl.fr.Datatable.utils.isSignificant(cell)) {
@@ -774,7 +778,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
     initLoadingIndicator: function(target, scrollV, scrollH) {
         var div = YAHOO.util.Dom.getFirstChild(target);
         var subDiv = YAHOO.util.Dom.getFirstChild(div);
-        var table =  YAHOO.util.Dom.getFirstChild(subDiv);
+        var table = YAHOO.util.Dom.getFirstChild(subDiv);
         var region = YAHOO.util.Dom.getRegion(table);
         var curTableWidth = region.right - region.left;
         if (curTableWidth < 50) {

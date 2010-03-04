@@ -49,3 +49,8 @@
     left: -1000px;
 }
 
+/* Needed for IE7 to display correctly multi header rows scrollable datatables */ 
+.yui-dt-scrollable .yui-dt-bd thead tr {
+    display: none;
+}
+

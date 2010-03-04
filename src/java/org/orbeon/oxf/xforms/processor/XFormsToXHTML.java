@@ -302,6 +302,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 for (final String currentSchemaURI: schemaURIs) {
                     if (indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("", "adding document cache dependency for schema", "schema URI", currentSchemaURI);
+
                     stage1CacheableState.addReference(null, currentSchemaURI, null, null,
                             XFormsProperties.getForwardSubmissionHeaders(containingDocument));// TODO: support username / password on schema refs
                 }
@@ -317,6 +318,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                             // Add dependency only for instances that are not globally shared
                             if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", "adding document cache dependency for non-cacheable instance", "instance URI", instanceSourceURI);
+
                             stage1CacheableState.addReference(null, instanceSourceURI, currentInstance.getUsername(), currentInstance.getPassword(),
                                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
                         } else {

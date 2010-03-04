@@ -19,7 +19,7 @@ YAHOO.xbl.fr.Currency.prototype = {
     xformsInputElement: null,
     groupElement: null,
     visibleInputElement: null,
-    symbolElement: null,
+    prefixElement: null,
     prefix: null,
     digitsAfterDecimalElement: null,
     digitsAfterDecimal: null,
@@ -30,8 +30,8 @@ YAHOO.xbl.fr.Currency.prototype = {
         this.xformsInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-xforms-input", null, this.container)[0];
         this.groupElement = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, this.container)[0];
         this.visibleInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-visible-input", null, this.container)[0];
-        this.symbolElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-prefix", null, this.container)[0];
-        this.prefix = ORBEON.xforms.Document.getValue(this.symbolElement.id);
+        this.prefixElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-prefix", null, this.container)[0];
+        this.prefix = ORBEON.xforms.Document.getValue(this.prefixElement.id);
         this.digitsAfterDecimalElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-currency-digits-after-decimal", null, this.container)[0];
         this.digitsAfterDecimal = ORBEON.xforms.Document.getValue(this.digitsAfterDecimalElement.id);
         this.hasFocus = false;
@@ -139,7 +139,7 @@ YAHOO.xbl.fr.Currency.prototype = {
     },
 
     parameterPrefixChanged: function() {
-        this.prefix = ORBEON.xforms.Document.getValue(this.symbolElement.id);
+        this.prefix = ORBEON.xforms.Document.getValue(this.prefixElement.id);
         this.xformsToVisible();
     },
 

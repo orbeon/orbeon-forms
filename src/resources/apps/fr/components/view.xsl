@@ -430,11 +430,11 @@
     <xsl:template name="fr-error-summary">
         <xsl:param name="position" as="xs:string"/>
 
-        <!-- Handle "control visited" events on #fr-form-group and #fb-metadata-group -->
+        <!-- Handle "control visited" events on #fr-form-group -->
         <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this
-             doesn't work with "section templates" -->
+             doesn't work with "section templates". We now use the observer mechanism of fr:error-summary -->
         <fr:error-summary id="error-summary-control-{$position}"
-                          observer="fr-form-group fb-metadata-group" model="fr-error-summary-model"
+                          observer="fr-form-group" model="fr-error-summary-model"
                           errors-count-ref="errors-count" visible-errors-count-ref="visible-errors-count" valid-ref="valid">
             <fr:label><xforms:output value="$fr-resources/errors/summary-title"/></fr:label>
             <xsl:if test="$position = 'bottom'">

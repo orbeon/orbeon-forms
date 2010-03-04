@@ -315,8 +315,8 @@ var testCase = {
 
 
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-    for (var property in ORBEON.widgets.datatable.unittests_lib) {
-        testCase[property] = ORBEON.widgets.datatable.unittests_lib[property];
+    for (var property in YAHOO.xbl.fr.Datatable.unittests_lib) {
+        testCase[property] = YAHOO.xbl.fr.Datatable.unittests_lib[property];
     }
     YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase(testCase));
     AccordionMenu.setting('my-accordion$dl', {animation: true, seconds: 0.001, openedIds: [], dependent: false, easeOut: false});

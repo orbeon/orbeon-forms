@@ -12,685 +12,852 @@
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 /*
- *  JavaScript implementation for the datatable component (new generation)
+ *  JavaScript implementation for the datatable component
  *
  */
+
+YAHOO.namespace("xbl.fr");
+
+YAHOO.xbl.fr.Datatable = function() {
+};
 
 /**
- * Implementation of datatable constructor. Creates column resizers.
- *
- * @method ORBEON.widgets.datatable
- * @param element
- *            {DOM Element} The DOM element that contains the table.
- * @param index
- *            {integer} Index (position) of the table in the document. Currently
- *            not used, but might be useful to generate IDs.
+ * Used to manage the datatables that are located in a page
  */
-ORBEON.widgets.datatable = function (container, index, innerTableWidth) {
+YAHOO.xbl.fr.DatatableManager = {
 
+    waitingToResize: false,                                      //  Are we waiting that the page width is stabilized to resize the datatables?
+    previousBodyWidth: YAHOO.util.Dom.getViewportWidth(),        //  Previous value of the page width
+    bodyWidthWhenResized: YAHOO.util.Dom.getViewportWidth(),     //  Value of the page width when the datatables have been last resized
 
-    YAHOO.log("Creating datatable index " + index, "info");
-    // Store useful stuff as properties
-    this.initProperties(container, index, innerTableWidth);
+    /**
+     * Event handler for window resizing events
+     */
+    resize: function () {
+        if (YAHOO.xbl.fr.DatatableManager.waitingToResize) {
+            return;
+        }
+        YAHOO.xbl.fr.DatatableManager.waitingToResize = true;
+        setTimeout("YAHOO.xbl.fr.DatatableManager.resizeWhenStabilized()", 200);
+    },
 
-    this.finish();
+    /**
+     * Test if the windows size is stabilized (needed for IE)
+     * and resize all the datatables that are in the page
+     */
+    resizeWhenStabilized: function () {
+
+        var width = YAHOO.util.Dom.getViewportWidth();
+
+        if (YAHOO.xbl.fr.DatatableManager.previousBodyWidth != width) {
+            // The window width is still changing, wait till it get stabilized
+            YAHOO.xbl.fr.DatatableManager.previousBodyWidth = width;
+            setTimeout("YAHOO.xbl.fr.DatatableManager.resizeWhenStabilized()", 200);
+            return;
+        }
+
+        // The window size seems to be stable, resize the datatables
+
+        YAHOO.xbl.fr.DatatableManager.waitingToResize = false;
+
+        if (YAHOO.xbl.fr.DatatableManager.bodyWidthWhenResized == width) {
+            // The datatables have already been resized for that window width, nothing to do...
+            return;
+        }
+
+        // To restore the original look and feel, we need to undo the changes done to all the datatables first
+        // and then to reinit them.
+
+        YAHOO.xbl.fr.DatatableManager.bodyWidthWhenResized = width;
+
+        // Reset
+        for (var id in YAHOO.xbl.fr.Datatable._instances) {
+            var datatable = YAHOO.xbl.fr.Datatable._instances[id];
+            datatable.reset();
+        }
+        // And draw again
+        for (var id in YAHOO.xbl.fr.Datatable._instances) {
+            var datatable = YAHOO.xbl.fr.Datatable._instances[id];
+            datatable.isInitialized = false;
+            datatable.draw(datatable.innerTableWidth);
+        }
+
+    }  ,
+
+    EOO: ''                                                     // End Of Object!
 }
 
-ORBEON.widgets.datatable.prototype.initProperties = function (container, index, innerTableWidth) {
-    this.index = index;
-    this.innerTableWidth = innerTableWidth;
-    // This doesn't work in IE 8 :(
-    // this.container = YAHOO.util.Selector.query('div.yui-dt', container, false)[0];
-    // use the following (less robust) instead:
-    this.container = YAHOO.util.Dom.getElementsByClassName('yui-dt', 'div', container)[0];
-
-    YAHOO.util.Dom.addClass(this.container, 'fr-dt-initialized');
-
-    this.scrollV = YAHOO.util.Dom.hasClass(this.container, 'fr-scrollV');
-    this.scrollH = YAHOO.util.Dom.hasClass(this.container, 'fr-scrollH');
-    this.scroll = this.scrollV || this.scrollH;
-    this.headBodySplit = this.scroll;
-
-    var tables = YAHOO.util.Selector.query('table', this.container, false);
-    this.header = tables[0];
-    this.header.style.height = "";
-
-    if (this.headBodySplit) {
-        this.table = tables[1];
-    } else {
-        this.table = tables[0];
-    }
-
-    this.thead = YAHOO.util.Selector.query('thead', this.header, true);
-    this.tbody = YAHOO.util.Selector.query('tbody', this.table, true);
-    this.getAndSetColumns();
-    var plainId = this.table.getAttribute('id');
-    //the following doesn't work in all the cases!
-    //this.id = plainId.substring(0, plainId.length - '-table'.length);
-    //Let's take something safer at least in the short term...
-    this.id = plainId;
-    this.originalWidth = ORBEON.widgets.datatable.utils.getStyle(this.table.parentNode, 'width', 'auto');
-    this.originalHeight = ORBEON.widgets.datatable.utils.getStyle(this.table, 'height', 'auto');
-    this.height = ORBEON.widgets.datatable.utils.getStyle(this.table, 'height', 'auto');
-    this.hasFixedWidthContainer = this.originalWidth != 'auto';
-    this.hasFixedWidthTable = this.hasFixedWidthContainer && ! this.scrollH;
-    this.adjustHeightForIE = false;
-    if (this.scrollV) {
-        this.headerScrollContainer = this.header.parentNode;
-        this.headerContainer = this.headerScrollContainer.parentNode;
-    } else {
-        this.headerContainer = this.header.parentNode;
-    }
-    this.bodyContainer = this.table.parentNode;
-
-    // Save original styles
-
-    this.significantNodes = [this.container, this.bodyContainer, this.table, this.thead, this.tbody];
-    if (this.headBodySplit) {
-        this.significantNodes.push(this.header);
-        this.significantNodes.push(this.headerContainer);
-        if (this.scrollV) {
-            this.significantNodes.push(this.headerScrollContainer);
-        }
-    }
-
-    for (var i = 0; i < this.significantNodes.length; i++) {
-        var node = this.significantNodes[i];
-        node.savedWidth = node.style.width;
-        node.savedHeight = node.style.height;
-        node.savedClassName = node.className;
-    }
-
-}
-
-ORBEON.widgets.datatable.prototype.finish = function () {
-
-    this.setSizes();
-
-    if (this.scrollH) {
-        YAHOO.util.Event.addListener(this.bodyContainer, 'scroll', ORBEON.widgets.datatable.scrollHandler, this, true);
-        this.width = this.container.clientWidth;
-        if (this.tableWidth > this.width) {
-            this.bodyContainer.style.overflowX = "scroll";
-        }
-    } else {
-        this.width = this.tableWidth;
-    }
-
-    this.initColumns();
-
-    // Now that the table has been properly sized, reconsider its
-    // "resizeability"
-
-    if (this.hasFixedWidthContainer && this.hasFixedWidthTable) {
-        // These are fixed width tables without horizontal scroll bars
-        // and as we don't know how to resize their columns properly,
-        // we'd better consider that as variable width
-        this.hasFixedWidthContainer = false;
-        this.hasFixedWidthTable = false;
-    }
-
-    // Sometimes, in IE / quirks mode, the height or width is miscalculated and that forces an horizontal scroll bar...
-
-    if (YAHOO.env.ua.ie > 0 && (YAHOO.env.ua.ie < 8 || document.compatMode == "BackCompat")) {
-
-        // Make sure we don't have a vertical bar if not required
-        if (this.scrollH && ! this.scrollV) {
-            var limit = 1000;
-            while (limit > 0 && this.table.parentNode.clientWidth < this.pxWidth - 2) {
-                this.tableHeight += 1;
-                this.height = this.tableHeight + "px";
-                this.bodyContainer.style.height = this.height;
-                limit -= 1;
-            }
-        }
-
-        // Make sure we don't have an horizontal bar if not required
-        if (this.scrollV && ! this.scrollH) {
-            var limit = 50;
-            while (limit > 0 && this.table.clientWidth > this.table.parentNode.clientWidth) {
-                this.tableWidth -= 1;
-                var w = this.tableWidth + "px";
-                this.table.style.width = w;
-                this.header.style.width = w;
-                limit -= 1;
-            }
-        }
-    }
-
-    YAHOO.log("Datatable index " + this.index + 'created with width: ' + this.width + ', table width: ' + this.tableWidth, "info")
-
-}
-
-ORBEON.widgets.datatable.prototype.setSizes = function () {
-
-    var width = this.originalWidth;
-    var pxWidth = this.getActualOriginalTableWidth();
-    var containerWidth = this.container.clientWidth;
+// Set the event listener for window resize events
+YAHOO.util.Event.addListener(window, "resize", YAHOO.xbl.fr.DatatableManager.resize);
 
 
-    if (this.scrollH && width.indexOf('%') != - 1) {
-        // This is needed to measure the container width when expressed as %
-        // since in some cases browsers choose to increase the page width instead
-        // of scrolling
-        YAHOO.util.Dom.addClass(this.table, 'xforms-disabled');
-        var dummy = document.createElement('div');
-        dummy.innerHTML = "foo";
-        this.bodyContainer.appendChild(dummy);
-
-        containerWidth = this.container.clientWidth;
-        width = containerWidth + 'px';
-
-        this.bodyContainer.removeChild(dummy);
-        YAHOO.util.Dom.removeClass(this.table, 'xforms-disabled');
-    } else {
-        width = pxWidth + 'px';
-    }
+ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Datatable, "xbl-fr-datatable");
 
 
+/*
+ * Datatable class
+ */
+YAHOO.xbl.fr.Datatable.prototype = {
 
-    // See how big the table would be without its size restriction  (for scrollable tables)
-    // To do so, temporarily remove the yui-dt-bd class to the table container so that its header is shown
+    container: null,                                            // Set by xforms.js
+    isInitialized: false,                                       // Has the datatable been initialized?
+    divContainer: null,                                         // Main div container around the datatable
+    innerTableWidth: null,                                       // Inner table width, parameter from the XSL/XBL layer
+    scrollH:null,                                               // Is the table horizontally scrollable?
+    scrollV:null,                                               // Is the table vertically scrollable?
+    scroll:null,                                                // Is the table scrollable?
+    headBodySplit: null,                                        // Is the table split?
+    headerTable: null,                                          // Table used for the header
+    table: null,                                                // Table (table used by the body if split)
+    thead: null,                                                // Table head
+    tbody: null,                                                // Table body
+    id:null,                                                    // Table's id
+    originalWidth: null,                                        // Original width style value
+    originalHeight: null,                                       // Original height style value
+    height: null,                                               // Height
+    hasFixedWidthTable: null,                                   // Has the table a fixed width?
+    hasFixedWidthContainer: null,                               // Has the container a fixed width?
+    adjustHeightForIE:null,                                     // Do we need to adjust the height for IE
+    headerContainer: null,                                      // Table header div container
+    headerScrollContainer: null,                                // Table header scroll container
+    bodyContainer: null,                                        // Body container
+    significantNodes: [],                                       // List of significant nodes which style needs to be saved
+    width: null,
+    tableWidth: null,
+    tableHeight: null,
+    headerHeight: null,
+    innerTableWidth: null,
+    colResizers: [],
+    colSorters: [],
+    headerColumns: [],
 
-    //if (this.headBodySplit) {
-    //    YAHOO.util.Dom.addClass(this.table.parentNode, 'fr-datatable-offscreen');
-    //    YAHOO.util.Dom.removeClass(this.table.parentNode, 'yui-dt-bd');
-    //}
+    /**
+     * Initialize a datatable
+     * @param innerTableWidth
+     */
+    draw: function (innerTableWidth) {
+        // Initializes a datatable (called by xforms-enabled events)
+        this.innerTableWidth = innerTableWidth;
 
-    // Remove width restrictions if needed
-    //if (this.scrollH) {
-    //    if (this.innerTableWidth != null) {
-    //        YAHOO.util.Dom.setStyle(this.table, 'width', this.innerTableWidth);
-    //    } else {
-    //        YAHOO.util.Dom.setStyle(this.table, 'width', 'auto');
-    //    }
-    //}
-
-    // Remove height restrictions if needed
-    //if (this.scrollV) {
-    //    YAHOO.util.Dom.setStyle(this.table, 'height', 'auto');
-    //}
-
-    // Measure the table width
-    // This is enough in most cases:
-    this.tableWidth = this.table.clientWidth;
-
-    // Except for IE in quirks mode for horizontally scrollable tables!
-
-    //    if (this.scrollH && YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
-    //        YAHOO.util.Dom.addClass(this.table, 'fr-datatable-hidden');
-    //        this.tableWidth = this.table.clientWidth;
-    //        YAHOO.util.Dom.removeClass(this.table, 'fr-datatable-hidden');
-    //    }
-    //
-    //    if (this.tableWidth < pxWidth) {
-    //        this.tableWidth = pxWidth;
-    //    }
-
-    // Measure the table and header heights
-    //this.tableHeight = this.table.clientHeight;
-    this.headerHeight = this.table.tHead.rows[0].clientHeight;
-    this.tableHeight = this.table.clientHeight;
-
-    // Do some magic adjustments
-    if (this.scrollH) {
-        if (pxWidth > this.tableWidth) {
-            // Can be the case if table width was expressed as %
-            this.tableWidth = pxWidth;
-        }
-        if (this.innerTableWidth != null) {
-            this.tableWidth = this.table.clientWidth;
-        } else {
-            var minWidth;
-            if (this.scrollV) {
-                minWidth = this.tableWidth - 19;
-            } else {
-                if (YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8) {
-                    minWidth = this.tableWidth - 1;
+        // We don't care about datatable that are disabled (we'll receive a new event when they'll be enabled again)
+        // TODO: check if this test is still neeeded
+        if (! YAHOO.util.Dom.hasClass(this.container, 'xforms-disabled')) {
+            if (!this.isInitialized) {
+                // We need to postpone the initialization of datatables that are hidden by an xforms:switch
+                //var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
+                var region = YAHOO.util.Region.getRegion(this.container);
+                if ((region.left >= 0 && region.top >= 0)
+                        && (region.left < region.right)
+                        && (region.top < region.bottom)) {
+                    this.initProperties();
+                    this.finish();
+                    this.isInitialized = true;
+                    this.container.fr_dt_initialized = true;
                 } else {
-                    minWidth = this.tableWidth;
+                    // Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
+                    thiss = this;
+                    setTimeout(function() {
+                        thiss.draw(innerTableWidth);
+                    }, 100);
                 }
-
+            } else {
+                this.update();
             }
-            this.tableWidth = this.optimizeWidth(minWidth);
         }
-    } else if (this.scrollV) {
-        if (this.hasFixedWidthTable && (this.originalWidth.indexOf('%') == - 1 ||(YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8) )) {
-            width = this.tableWidth + 'px';
-            this.tableWidth = this.tableWidth - 19;
+
+    },
+
+    /**
+     * Initialize a buch of datatable's properties
+     */
+    initProperties: function () {
+
+        this.divContainer = YAHOO.util.Dom.getElementsByClassName('yui-dt', 'div', this.container)[0];
+
+        YAHOO.util.Dom.addClass(this.divContainer, 'fr-dt-initialized');
+
+        this.scrollV = YAHOO.util.Dom.hasClass(this.divContainer, 'fr-scrollV');
+        this.scrollH = YAHOO.util.Dom.hasClass(this.divContainer, 'fr-scrollH');
+        this.scroll = this.scrollV || this.scrollH;
+        this.headBodySplit = this.scroll;
+
+        var tables = YAHOO.util.Selector.query('table', this.divContainer, false);
+        this.headerTable = tables[0];
+        this.headerTable.style.height = "";
+
+        if (this.headBodySplit) {
+            this.table = tables[1];
         } else {
-            width = (this.tableWidth + 19) + 'px';
-        }
-    } else {
-        width = (this.tableWidth + 2) + 'px';
-    }
-
-    // At last, we know how the table will be sized, it's time to set these sizes
-
-    YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
-    YAHOO.util.Dom.setStyle(this.header, 'width', this.tableWidth + 'px');
-
-    this.adjustHeightForIE = this.adjustHeightForIE || (this.scrollH && ! this.scrollV && this.height == 'auto' && YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 7);
-    if (this.adjustHeightForIE) {
-        this.height = (this.tableHeight + 22) + 'px';
-        this.adjustHeightForIE = true;
-    }
-
-    // Resize the containers if not already done
-
-    if (this.originalWidth == 'auto') {
-        this.container.style.width = width;
-    } else  if (this.originalWidth.indexOf('%') != - 1) {
-        this.container.style.width = containerWidth + 'px';
-    }
-
-    //YAHOO.util.Dom.setStyle(this.container, 'width', width);
-    //if (this.height != 'auto') {
-    //    YAHOO.util.Dom.setStyle(this.container, 'height', this.height);
-    //}
-
-    // Resize the header container
-    //YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
-    //if (this.height != 'auto' && this.headBodySplit) {
-    //    YAHOO.util.Dom.setStyle(this.headerContainer, 'height', this.headerHeight + 'px');
-    //} else if (! this.headBodySplit && this.height == 'auto') {
-    //	YAHOO.util.Dom.setStyle(this.headerContainer, 'border', '1px solid #7F7F7F')
-    //}
-
-    // Store the column widths while the headers are still visible on the body table
-    this.columnWidths = [];
-    var j = 0;
-
-    //    if (YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
-    //        // This dirty hack is needed when IE works in quirks mode
-    //        YAHOO.util.Dom.addClass(this.table, 'fr-datatable-hidden');
-    //    }
-    for (var i = 0; i < this.table.tHead.rows[0].cells.length; i++) {
-        var cell = this.table.tHead.rows[0].cells[i];
-        if (ORBEON.widgets.datatable.isSignificant(cell)) {
-            this.columnWidths[j] = cell.clientWidth;
-            j += 1;
-        }
-    }
-    //    if (YAHOO.env.ua.ie > 0 && document.compatMode == "BackCompat") {
-    //        // This dirty hack is needed when IE works in quirks mode
-    //        YAHOO.util.Dom.removeClass(this.table, 'fr-datatable-hidden');
-    //    }
-
-    // Do more resizing
-    if (this.height != 'auto') {
-        YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.container.clientHeight - this.headerHeight) + 'px');
-    }
-
-
-    // Reset the yui-dt-bd class if we've removed it earlier on
-    if (this.headBodySplit) {
-
-        // Final set of size settings
-
-        if (width.indexOf('%') != - 1 && YAHOO.env.ua.ie > 0 && (YAHOO.env.ua.ie < 8 || document.compatMode == "BackCompat")) {
-            // Old versions of IE and quirks mode do not like at all widths expressed as % here
-
-            this.headerContainer.style.width = (containerWidth - 2) + 'px';
-            this.bodyContainer.style.width = (containerWidth - 2) + 'px';
-
-        } else {
-            YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
-            YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', width);
+            this.table = tables[0];
         }
 
+        this.thead = YAHOO.util.Selector.query('thead', this.headerTable, true);
+        this.tbody = YAHOO.util.Selector.query('tbody', this.table, true);
+        this.getAndSetColumns();
+        this.id = this.table.getAttribute('id');
+        this.originalWidth = YAHOO.xbl.fr.Datatable.utils.getStyle(this.table.parentNode, 'width', 'auto');
+        this.originalHeight = YAHOO.xbl.fr.Datatable.utils.getStyle(this.table, 'height', 'auto');
+        this.height = YAHOO.xbl.fr.Datatable.utils.getStyle(this.table, 'height', 'auto');
+        this.hasFixedWidthContainer = this.originalWidth != 'auto';
+        this.hasFixedWidthTable = this.hasFixedWidthContainer && ! this.scrollH;
+        this.adjustHeightForIE = false;
         if (this.scrollV) {
-            this.headerScrollWidth = this.tableWidth + 20;
-            this.headerScrollContainer.style.width = this.headerScrollWidth + 'px';
-            this.bodyContainer.style.overflow = "auto";
-            this.bodyContainer.style.overflowY = "scroll";
-            this.header.style.width = this.tableWidth + 'px';
-            this.table.style.height = "auto";
+            this.headerScrollContainer = this.headerTable.parentNode;
+            this.headerContainer = this.headerScrollContainer.parentNode;
+        } else {
+            this.headerContainer = this.headerTable.parentNode;
         }
+        this.bodyContainer = this.table.parentNode;
 
-        YAHOO.util.Dom.addClass(this.table.parentNode, 'yui-dt-bd');
-        YAHOO.util.Dom.removeClass(this.table.parentNode, 'yui-dt-hd');
-        YAHOO.util.Dom.removeClass(this.headerContainer, 'fr-datatable-hidden');
-    }
+        // Save original styles
 
-    this.pxWidth = pxWidth;
-
-}
-
-ORBEON.widgets.datatable.prototype.initColumns = function () {
-
-    this.colResizers = [];
-    this.colSorters = [];
-    for (var j = 0; j < this.headerColumns.length; j++) {
-        var headerColumn = this.headerColumns[j];
-        var childDiv = YAHOO.util.Selector.query('div', headerColumn, true);
-        var colResizer = null;
-        if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
-            colResizer = new ORBEON.widgets.datatable.colResizer(j, this.headerColumns[j], this)
-            this.colResizers[j] = colResizer;
-        }
-
-        var width = (this.columnWidths[j] - 20) + 'px';
-        var rule;
-        // See _setColumnWidth in YUI datatable.js...
-        if (YAHOO.env.ua.ie == 0) {
-            var className = 'dt-' + this.id + '-col-' + (j + 1);
-            className = className.replace('\$', '-', 'g');
-            YAHOO.util.Dom.addClass(childDiv, className);
-            for (var k = 0; k < this.bodyColumns[j].length; k++) {
-                var cell = this.bodyColumns[j][k];
-                var liner = YAHOO.util.Selector.query('div', cell, true);
-                YAHOO.util.Dom.addClass(liner, className);
-
-            }
-            if (! this.styleElt) {
-                this.styleElt = document.createElement('style');
-                this.styleElt.type = 'text/css';
-                document.getElementsByTagName('head').item(0).appendChild(this.styleElt);
-            }
-            if (this.styleElt) {
-                if (this.styleElt.styleSheet && this.styleElt.styleSheet.addRule) {
-                    this.styleElt.styleSheet.addRule('.' + className, 'width:' + width);
-                    rule = this.styleElt.styleSheet.rules[ this.styleElt.styleSheet.rules.length - 1];
-                } else if (this.styleElt.sheet && this.styleElt.sheet.insertRule) {
-                    this.styleElt.sheet.insertRule('.' + className + ' {width:' + width + ';}', this.styleElt.sheet.cssRules.length);
-                    rule = this.styleElt.sheet.cssRules[ this.styleElt.sheet.cssRules.length - 1];
-                }
-            }
-            if (rule && YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
-                colResizer.setRule(rule);
-            }
-        }
-        if (! rule) {
-            var style = childDiv.style;
-            style.width = width;
-            var styles = [style];
-            for (var k = 0; k < this.bodyColumns[j].length; k++) {
-                var cell = this.bodyColumns[j][k];
-                var div = YAHOO.util.Selector.query('div', cell, true);
-                if (div != undefined) {
-                    style = div.style;
-                    style.width = width;
-                    styles[styles.length] = style;
-                }
-            }
-            if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
-                colResizer.setStyleArray(styles);
+        this.significantNodes = [this.divContainer, this.bodyContainer, this.table, this.thead, this.tbody];
+        if (this.headBodySplit) {
+            this.significantNodes.push(this.headerTable);
+            this.significantNodes.push(this.headerContainer);
+            if (this.scrollV) {
+                this.significantNodes.push(this.headerScrollContainer);
             }
         }
 
-        if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-sortable')) {
-            this.colSorters[ this.colSorters.length] = new ORBEON.widgets.datatable.colSorter(this.headerColumns[j]);
+        for (var i = 0; i < this.significantNodes.length; i++) {
+            var node = this.significantNodes[i];
+            node.savedWidth = node.style.width;
+            node.savedHeight = node.style.height;
+            node.savedClassName = node.className;
         }
 
-    }
+    }                                      ,
 
+    /**
+     * Finish the datatable initialization
+     */
+    finish: function () {
 
-}
-
-
-ORBEON.widgets.datatable.prototype.getActualOriginalTableWidth = function () {
-
-    var pxWidth;
-
-    if (this.originalWidth.indexOf('%') != - 1) {
+        this.setSizes();
 
         if (this.scrollH) {
-            pxWidth = this.container.clientWidth - 21;
-        } else {
-            pxWidth = this.container.clientWidth - 2;
-        }
-    } else if (this.originalWidth == 'auto') {
-        pxWidth = this.table.clientWidth;
-    } else {
-        pxWidth = this.container.clientWidth - 2;
-    }
-    return pxWidth;
-
-}
-
-
-ORBEON.widgets.datatable.prototype.reset = function () {
-
-    // Restore styles rules to the table
-
-    for (var i = 0; i < this.significantNodes.length; i++) {
-        var node = this.significantNodes[i];
-        node.style.width = node.savedWidth;
-        node.style.height = node.savedHeight;
-        node.className = node.savedClassName;
-    }
-
-    // Restore column headers
-    for (var icol = 0; icol < this.headerColumns.length; icol++) {
-        var th = this.headerColumns[icol];
-        var resizerliner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(th, 'div', 'yui-dt-resizerliner');
-        if (resizerliner != null) {
-            var resizer = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-resizer');
-            if (resizer != null) {
-                resizerliner.removeChild(resizer);
+            YAHOO.util.Event.addListener(this.bodyContainer, 'scroll', YAHOO.xbl.fr.Datatable.prototype.scrollHandler, this, true);
+            this.width = this.divContainer.clientWidth;
+            if (this.tableWidth > this.width) {
+                this.bodyContainer.style.overflowX = "scroll";
             }
-            var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagName(resizerliner, 'div');
-            liner.style.width = "";
-            th.removeChild(resizerliner);
-            th.appendChild(liner);
-        }
-    }
-    // Remove column widths
-    for (var icol = 0; icol < this.bodyColumns.length; icol++) {
-        var col = this.bodyColumns[icol];
-        for (var irow = 0; irow < col.length; irow++) {
-            var cell = col[irow];
-            var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
-            if (liner != null) {
-                liner.style.width = "";
-            }
-        }
-    }
-
-    // remove the dynamic style sheet if it exists
-    if (this.styleElt != undefined) {
-        this.styleElt.parentNode.removeChild(this.styleElt);
-        this.styleElt = undefined;
-    }
-}
-
-ORBEON.widgets.datatable.prototype.getTableHeightForWidth = function (width) {
-    this.table.style.width = width + 'px';
-    return this.table.clientHeight;
-}
-
-ORBEON.widgets.datatable.prototype.optimizeWidth = function (minWidth) {
-    this.bodyContainer.style.position = "absolute";
-    this.bodyContainer.style.width = "2500px";
-    var savedWidth = this.table.style.width;
-    this.table.style.width = "auto";
-    var width = this.table.clientWidth;
-    this.tableHeight = this.table.clientHeight;
-    this.bodyContainer.style.position = "";
-    this.bodyContainer.style.width = "";
-    this.table.style.width = savedWidth;
-    if (minWidth > width) {
-        return minWidth;
-    }
-    return width;
-}
-
-ORBEON.widgets.datatable.prototype.adjustWidth = function (deltaX, index) {
-    //alert('Before-> this.width: ' + this.width +', this.tableWidth: ' + this.tableWidth);
-    if (! this.hasFixedWidthContainer) {
-        this.width += deltaX;
-        if (this.headBodySplit) {
-            YAHOO.util.Dom.setStyle(this.container, 'width', this.width + 'px');
-            YAHOO.util.Dom.setStyle(this.headerContainer, 'width', this.width + 'px');
-            YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', this.width + 'px');
         } else {
-            YAHOO.util.Dom.setStyle(this.container, 'width', (this.width + 2) + 'px');
-            //YAHOO.util.Dom.setStyle(this.headerContainer, 'width', this.width + 'px');
-            YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', this.width + 'px');
-
+            this.width = this.tableWidth;
         }
-    }
-    if (! this.hasFixedWidthTable) {
-        this.tableWidth += deltaX;
-        YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
-        this.headerScrollWidth += deltaX;
-        if (this.headBodySplit) {
-            YAHOO.util.Dom.setStyle(this.headerScrollContainer, 'width', this.headerScrollWidth + 'px');
-            YAHOO.util.Dom.setStyle(this.header, 'width', this.tableWidth + 'px');
-        }
-    }
-    //alert('After-> this.width: ' + this.width +', this.tableWidth: ' + this.tableWidth);
-}
 
-ORBEON.widgets.datatable.prototype.getAndSetColumns = function () {
+        this.initColumns();
 
-    this.headerColumns = [];
-    this.bodyColumns = [];
-    var headerCells = this.thead.rows[0].cells;
-    for (var icol = 0; icol < headerCells.length; icol++) {
-        var cell = headerCells[icol];
-        if (ORBEON.widgets.datatable.isSignificant(cell)) {
-            this.headerColumns.push(cell);
-            this.bodyColumns.push([]);
+        // Now that the table has been properly sized, reconsider its
+        // "resizeability"
+
+        if (this.hasFixedWidthContainer && this.hasFixedWidthTable) {
+            // These are fixed width tables without horizontal scroll bars
+            // and as we don't know how to resize their columns properly,
+            // we'd better consider that as variable width
+            this.hasFixedWidthContainer = false;
+            this.hasFixedWidthTable = false;
         }
-    }
-    var bodyRows = YAHOO.util.Dom.getChildren(this.tbody);  //    bodyRows.length blows up IE 6/7 in some cases here :(
-    for (var irow = 0; irow < bodyRows.length; irow++) {
-        var row = bodyRows[irow];
-        if (ORBEON.widgets.datatable.isSignificant(row)) {
-            var iActualCol = 0;
-            var cells = YAHOO.util.Dom.getChildren(row);
-            for (var icol = 0; icol < cells.length; icol++) {
-                var cell = cells[icol];
-                if (ORBEON.widgets.datatable.isSignificant(cell)) {
-                    this.bodyColumns[iActualCol].push(cell);
-                    iActualCol += 1;
+
+        // Sometimes, in IE / quirks mode, the height or width is miscalculated and that forces an horizontal scroll bar...
+
+        if (YAHOO.env.ua.ie > 0 && (YAHOO.env.ua.ie < 8 || document.compatMode == "BackCompat")) {
+
+            // Make sure we don't have a vertical bar if not required
+            if (this.scrollH && ! this.scrollV) {
+                var limit = 1000;
+                while (limit > 0 && this.table.parentNode.clientWidth < this.pxWidth - 2) {
+                    this.tableHeight += 1;
+                    this.height = this.tableHeight + "px";
+                    this.bodyContainer.style.height = this.height;
+                    limit -= 1;
+                }
+            }
+
+            // Make sure we don't have an horizontal bar if not required
+            if (this.scrollV && ! this.scrollH) {
+                var limit = 50;
+                while (limit > 0 && this.table.clientWidth > this.table.parentNode.clientWidth) {
+                    this.tableWidth -= 1;
+                    var w = this.tableWidth + "px";
+                    this.table.style.width = w;
+                    this.headerTable.style.width = w;
+                    limit -= 1;
                 }
             }
         }
-    }
-    this.nbColumns = this.headerColumns.length;
-    if (this.bodyColumns.length > 0) {
-        this.nbRows = this.bodyColumns[0].length;
-    } else {
-        this.nbRows = 0;
-    }
-}
+
+    },
+
+    /**
+     * Set the datable various sizes
+     */
+    setSizes: function () {
+
+        var width = this.originalWidth;
+        var pxWidth = this.getActualOriginalTableWidth();
+        var containerWidth = this.divContainer.clientWidth;
 
 
-ORBEON.widgets.datatable.prototype.update = function () {
-    // This method is called when the xforms:repeat nodeset has been changed
-    // this.totalNbRows is the number of rows memorized during the last run of this method...
-    if (this.totalNbRows == undefined) {
-        this.totalNbRows = -1;
-    }
-    var totalNbRows = YAHOO.util.Dom.getChildren(this.tbody).length; // this.tbody.rows.length blows up IE 6/7 in some cases here!
-    if (totalNbRows != this.totalNbRows) {
-        // If the number of rows has changed, we need to reset our cell arrays
-        this.getAndSetColumns();
-    }
-    if (totalNbRows > this.totalNbRows) {
-        // If we have new rows, we need to (re)write their cells width
-        for (var icol = 0; icol < this.headerColumns.length; icol++) {
-            var headerColumn = this.headerColumns[icol];
-            var divs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', headerColumn);
-            if (divs.length > 0) {
-                var div = divs[0];
-                if (div != undefined) {
-                    if (div.style.width != "") {
-                        // Resizing is supported through width style properties
-                        var width = div.style.width;
-                        var styles = [div.style];
-                        for (var irow = 0; irow < this.bodyColumns[icol].length; irow++) {
-                            var cell = this.bodyColumns[icol][irow];
-                            var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
-                            if (cellDivs.length > 0) {
-                                var cellDiv = cellDivs[0];
-                                if (cellDiv != undefined) {
-                                    cellDiv.style.width = width;
-                                    styles[styles.length] = cellDiv.style;
-                                }
-                            }
-                        }
-                        var colResizer = this.colResizers[icol];
-                        if (colResizer != undefined) {
-                            colResizer.setStyleArray(styles);
-                        }
+        if (this.scrollH && width.indexOf('%') != - 1) {
+            // This is needed to measure the container width when expressed as %
+            // since in some cases browsers choose to increase the page width instead
+            // of scrolling
+            YAHOO.util.Dom.addClass(this.table, 'xforms-disabled');
+            var dummy = document.createElement('div');
+            dummy.innerHTML = "foo";
+            this.bodyContainer.appendChild(dummy);
+
+            containerWidth = this.divContainer.clientWidth;
+            width = containerWidth + 'px';
+
+            this.bodyContainer.removeChild(dummy);
+            YAHOO.util.Dom.removeClass(this.table, 'xforms-disabled');
+        } else {
+            width = pxWidth + 'px';
+        }
+
+
+        this.tableWidth = this.table.clientWidth;
+
+        this.tableHeight = this.table.clientHeight;
+
+        // Do some magic adjustments
+        if (this.scrollH) {
+            if (pxWidth > this.tableWidth) {
+                // Can be the case if table width was expressed as %
+                this.tableWidth = pxWidth;
+            }
+            if (this.innerTableWidth != null) {
+                this.tableWidth = this.table.clientWidth;
+            } else {
+                var minWidth;
+                if (this.scrollV) {
+                    minWidth = this.tableWidth - 19;
+                } else {
+                    if (YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8) {
+                        minWidth = this.tableWidth - 1;
                     } else {
-                        // Resizing is supported through dynamic styles
-                        var className = 'dt-' + this.id + '-col-' + (icol + 1);
-                        className = className.replace('\$', '-', 'g');
-                        for (var irow = 0; irow < this.bodyColumns[icol].length; irow++) {
-                            var cell = this.bodyColumns[icol][irow];
-                            var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
-                            if (cellDivs.length > 0) {
-                                var cellDiv = cellDivs[0];
-                                if (cellDiv != undefined) {
-                                    YAHOO.util.Dom.addClass(cellDiv, className);
-                                }
-                            }
-                        }
+                        minWidth = this.tableWidth;
+                    }
 
+                }
+                this.tableWidth = this.optimizeWidth(minWidth);
+            }
+        } else if (this.scrollV) {
+            if (this.hasFixedWidthTable && (this.originalWidth.indexOf('%') == - 1 || (YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8) )) {
+                width = this.tableWidth + 'px';
+                this.tableWidth = this.tableWidth - 19;
+            } else {
+                width = (this.tableWidth + 19) + 'px';
+            }
+        } else {
+            width = (this.tableWidth + 2) + 'px';
+        }
+
+        // At last, we know how the table will be sized, it's time to set these sizes
+
+        YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
+        YAHOO.util.Dom.setStyle(this.headerTable, 'width', this.tableWidth + 'px');
+
+        this.headerHeight = this.table.tHead.rows[0].clientHeight;
+        
+
+        this.adjustHeightForIE = this.adjustHeightForIE || (this.scrollH && ! this.scrollV && this.height == 'auto' && YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 7);
+        if (this.adjustHeightForIE) {
+            this.height = (this.tableHeight + 22) + 'px';
+            this.adjustHeightForIE = true;
+        }
+
+        // Resize the containers if not already done
+
+        if (this.originalWidth == 'auto') {
+            this.divContainer.style.width = width;
+        } else  if (this.originalWidth.indexOf('%') != - 1) {
+            this.divContainer.style.width = containerWidth + 'px';
+        }
+
+        this.columnWidths = [];
+        var j = 0;
+
+        for (var i = 0; i < this.table.tHead.rows[0].cells.length; i++) {
+            var cell = this.table.tHead.rows[0].cells[i];
+            if (YAHOO.xbl.fr.Datatable.utils.isSignificant(cell)) {
+                this.columnWidths[j] = cell.clientWidth;
+                j += 1;
+            }
+        }
+
+        // Do more resizing
+        //this.headerHeight = this.table.tHead.clientHeight; // might have changed when we redimensioned the table
+        if (this.height != 'auto') {
+            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.divContainer.clientHeight - this.headerHeight) + 'px');
+        }
+
+
+        // Reset the yui-dt-bd class if we've removed it earlier on
+        if (this.headBodySplit) {
+
+            // Final set of size settings
+
+            if (width.indexOf('%') != - 1 && YAHOO.env.ua.ie > 0 && (YAHOO.env.ua.ie < 8 || document.compatMode == "BackCompat")) {
+                // Old versions of IE and quirks mode do not like at all widths expressed as % here
+
+                this.headerContainer.style.width = (containerWidth - 2) + 'px';
+                this.bodyContainer.style.width = (containerWidth - 2) + 'px';
+
+            } else {
+                YAHOO.util.Dom.setStyle(this.headerContainer, 'width', width);
+                YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', width);
+            }
+
+            if (this.scrollV) {
+                this.headerScrollWidth = this.tableWidth + 20;
+                this.headerScrollContainer.style.width = this.headerScrollWidth + 'px';
+                this.bodyContainer.style.overflow = "auto";
+                this.bodyContainer.style.overflowY = "scroll";
+                this.headerTable.style.width = this.tableWidth + 'px';
+                this.table.style.height = "auto";
+            }
+
+            YAHOO.util.Dom.addClass(this.table.parentNode, 'yui-dt-bd');
+            YAHOO.util.Dom.removeClass(this.table.parentNode, 'yui-dt-hd');
+            YAHOO.util.Dom.removeClass(this.headerContainer, 'fr-datatable-hidden');
+        }
+
+        this.pxWidth = pxWidth;
+
+    },
+
+    /**
+     * Sets the layout of the table columns
+     */
+    initColumns: function () {
+
+        this.colResizers = [];
+        this.colSorters = [];
+        for (var j = 0; j < this.headerColumns.length; j++) {
+            var headerColumn = this.headerColumns[j];
+            var childDiv = YAHOO.util.Selector.query('div', headerColumn, true);
+            var colResizer = null;
+            if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
+                colResizer = new YAHOO.xbl.fr.Datatable.colResizer(j, this.headerColumns[j], this)
+                this.colResizers[j] = colResizer;
+            }
+
+            var width = (this.columnWidths[j] - 20) + 'px';
+            var rule;
+            // See _setColumnWidth in YUI datatable.js...
+            if (YAHOO.env.ua.ie == 0) {
+                var className = 'dt-' + this.id + '-col-' + (j + 1);
+                className = className.replace('\$', '-', 'g');
+                YAHOO.util.Dom.addClass(childDiv, className);
+                for (var k = 0; k < this.bodyColumns[j].length; k++) {
+                    var cell = this.bodyColumns[j][k];
+                    var liner = YAHOO.util.Selector.query('div', cell, true);
+                    YAHOO.util.Dom.addClass(liner, className);
+
+                }
+                if (! this.styleElt) {
+                    this.styleElt = document.createElement('style');
+                    this.styleElt.type = 'text/css';
+                    document.getElementsByTagName('head').item(0).appendChild(this.styleElt);
+                }
+                if (this.styleElt) {
+                    if (this.styleElt.styleSheet && this.styleElt.styleSheet.addRule) {
+                        this.styleElt.styleSheet.addRule('.' + className, 'width:' + width);
+                        rule = this.styleElt.styleSheet.rules[ this.styleElt.styleSheet.rules.length - 1];
+                    } else if (this.styleElt.sheet && this.styleElt.sheet.insertRule) {
+                        this.styleElt.sheet.insertRule('.' + className + ' {width:' + width + ';}', this.styleElt.sheet.cssRules.length);
+                        rule = this.styleElt.sheet.cssRules[ this.styleElt.sheet.cssRules.length - 1];
+                    }
+                }
+                if (rule && YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
+                    colResizer.setRule(rule);
+                }
+            }
+            if (! rule) {
+                var style = childDiv.style;
+                style.width = width;
+                var styles = [style];
+                for (var k = 0; k < this.bodyColumns[j].length; k++) {
+                    var cell = this.bodyColumns[j][k];
+                    var div = YAHOO.util.Selector.query('div', cell, true);
+                    if (div != undefined) {
+                        style = div.style;
+                        style.width = width;
+                        styles[styles.length] = style;
+                    }
+                }
+                if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
+                    colResizer.setStyleArray(styles);
+                }
+            }
+
+            if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-sortable')) {
+                this.colSorters[ this.colSorters.length] = new YAHOO.xbl.fr.Datatable.colSorter(this.headerColumns[j]);
+            }
+
+        }
+
+
+    },
+
+    /**
+     * Get the actual table width
+     */
+    getActualOriginalTableWidth: function () {
+
+        var pxWidth;
+
+        if (this.originalWidth.indexOf('%') != - 1) {
+
+            if (this.scrollH) {
+                pxWidth = this.divContainer.clientWidth - 21;
+            } else {
+                pxWidth = this.divContainer.clientWidth - 2;
+            }
+        } else if (this.originalWidth == 'auto') {
+            pxWidth = this.table.clientWidth;
+        } else {
+            pxWidth = this.divContainer.clientWidth - 2;
+        }
+        return pxWidth;
+
+    },
+
+    /**
+     * Reset the datatable as it was when we got it (undo all the changes we've done)
+     */
+    reset: function () {
+
+        // Restore styles rules to the table
+
+        for (var i = 0; i < this.significantNodes.length; i++) {
+            var node = this.significantNodes[i];
+            node.style.width = node.savedWidth;
+            node.style.height = node.savedHeight;
+            node.className = node.savedClassName;
+        }
+
+        // Restore column headers
+        for (var icol = 0; icol < this.headerColumns.length; icol++) {
+            var th = this.headerColumns[icol];
+            var resizerliner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(th, 'div', 'yui-dt-resizerliner');
+            if (resizerliner != null) {
+                var resizer = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-resizer');
+                if (resizer != null) {
+                    resizerliner.removeChild(resizer);
+                }
+                var liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(resizerliner, 'div');
+                liner.style.width = "";
+                th.removeChild(resizerliner);
+                th.appendChild(liner);
+            }
+        }
+        // Remove column widths
+        for (var icol = 0; icol < this.bodyColumns.length; icol++) {
+            var col = this.bodyColumns[icol];
+            for (var irow = 0; irow < col.length; irow++) {
+                var cell = col[irow];
+                var liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
+                if (liner != null) {
+                    liner.style.width = "";
+                }
+            }
+        }
+
+        // remove the dynamic style sheet if it exists
+        if (this.styleElt != undefined) {
+            this.styleElt.parentNode.removeChild(this.styleElt);
+            this.styleElt = undefined;
+        }
+    },
+
+    /**
+     * Get the table height for a given width
+     * @param width
+     */
+    getTableHeightForWidth: function (width) {
+        this.table.style.width = width + 'px';
+        return this.table.clientHeight;
+    },
+
+    /**
+     * Find the optimal width for the inner table
+     * @param minWidth
+     */
+    optimizeWidth:function (minWidth) {
+        this.bodyContainer.style.position = "absolute";
+        this.bodyContainer.style.width = "2500px";
+        var savedWidth = this.table.style.width;
+        this.table.style.width = "auto";
+        var width = this.table.clientWidth;
+        this.tableHeight = this.table.clientHeight;
+        this.bodyContainer.style.position = "";
+        this.bodyContainer.style.width = "";
+        this.table.style.width = savedWidth;
+        if (minWidth > width) {
+            return minWidth;
+        }
+        return width;
+    },
+
+    /**
+     * Adjust the table width after a column has been resized
+     * @param deltaX
+     * @param index
+     */
+    adjustWidth: function (deltaX, index) {
+        //alert('Before-> this.width: ' + this.width +', this.tableWidth: ' + this.tableWidth);
+        if (! this.hasFixedWidthContainer) {
+            this.width += deltaX;
+            if (this.headBodySplit) {
+                YAHOO.util.Dom.setStyle(this.divContainer, 'width', this.width + 'px');
+                YAHOO.util.Dom.setStyle(this.headerContainer, 'width', this.width + 'px');
+                YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', this.width + 'px');
+            } else {
+                YAHOO.util.Dom.setStyle(this.divContainer, 'width', (this.width + 2) + 'px');
+                //YAHOO.util.Dom.setStyle(this.headerContainer, 'width', this.width + 'px');
+                YAHOO.util.Dom.setStyle(this.bodyContainer, 'width', this.width + 'px');
+
+            }
+        }
+        if (! this.hasFixedWidthTable) {
+            this.tableWidth += deltaX;
+            YAHOO.util.Dom.setStyle(this.table, 'width', this.tableWidth + 'px');
+            this.headerScrollWidth += deltaX;
+            if (this.headBodySplit) {
+                YAHOO.util.Dom.setStyle(this.headerScrollContainer, 'width', this.headerScrollWidth + 'px');
+                YAHOO.util.Dom.setStyle(this.headerTable, 'width', this.tableWidth + 'px');
+            }
+        }
+        //alert('After-> this.width: ' + this.width +', this.tableWidth: ' + this.tableWidth);
+    },
+
+
+    /**
+     * Set column sizes (IE) or classes (FF)
+     */
+    getAndSetColumns: function () {
+
+        this.headerColumns = [];
+        this.bodyColumns = [];
+        var headerCells = this.thead.rows[0].cells;
+        for (var icol = 0; icol < headerCells.length; icol++) {
+            var cell = headerCells[icol];
+            if (YAHOO.xbl.fr.Datatable.utils.isSignificant(cell)) {
+                this.headerColumns.push(cell);
+                this.bodyColumns.push([]);
+            }
+        }
+        var bodyRows = YAHOO.util.Dom.getChildren(this.tbody);  //    bodyRows.length blows up IE 6/7 in some cases here :(
+        for (var irow = 0; irow < bodyRows.length; irow++) {
+            var row = bodyRows[irow];
+            if (YAHOO.xbl.fr.Datatable.utils.isSignificant(row)) {
+                var iActualCol = 0;
+                var cells = YAHOO.util.Dom.getChildren(row);
+                for (var icol = 0; icol < cells.length; icol++) {
+                    var cell = cells[icol];
+                    if (YAHOO.xbl.fr.Datatable.utils.isSignificant(cell)) {
+                        this.bodyColumns[iActualCol].push(cell);
+                        iActualCol += 1;
                     }
                 }
             }
         }
-    }
+        this.nbColumns = this.headerColumns.length;
+        if (this.bodyColumns.length > 0) {
+            this.nbRows = this.bodyColumns[0].length;
+        } else {
+            this.nbRows = 0;
+        }
+    },
 
-    this.totalNbRows = totalNbRows;
+    /**
+     * Update the datatable when the repeat nodeset has been changed
+     */
+    update: function () {
+        if (!this.isInitialized) {
+            // If the datatable isn't initialized yet, we don't want to update it!
+            return;
+        }
+        // This method is called when the xforms:repeat nodeset has been changed
+        // this.totalNbRows is the number of rows memorized during the last run of this method...
+        if (this.totalNbRows == undefined) {
+            this.totalNbRows = -1;
+        }
+        var totalNbRows = YAHOO.util.Dom.getChildren(this.tbody).length; // this.tbody.rows.length blows up IE 6/7 in some cases here!
+        if (totalNbRows != this.totalNbRows) {
+            // If the number of rows has changed, we need to reset our cell arrays
+            this.getAndSetColumns();
+        }
+        if (totalNbRows > this.totalNbRows) {
+            // If we have new rows, we need to (re)write their cells width
+            for (var icol = 0; icol < this.headerColumns.length; icol++) {
+                var headerColumn = this.headerColumns[icol];
+                var divs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', headerColumn);
+                if (divs.length > 0) {
+                    var div = divs[0];
+                    if (div != undefined) {
+                        if (div.style.width != "") {
+                            // Resizing is supported through width style properties
+                            var width = div.style.width;
+                            var styles = [div.style];
+                            for (var irow = 0; irow < this.bodyColumns[icol].length; irow++) {
+                                var cell = this.bodyColumns[icol][irow];
+                                var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
+                                if (cellDivs.length > 0) {
+                                    var cellDiv = cellDivs[0];
+                                    if (cellDiv != undefined) {
+                                        cellDiv.style.width = width;
+                                        styles[styles.length] = cellDiv.style;
+                                    }
+                                }
+                            }
+                            var colResizer = this.colResizers[icol];
+                            if (colResizer != undefined) {
+                                colResizer.setStyleArray(styles);
+                            }
+                        } else {
+                            // Resizing is supported through dynamic styles
+                            var className = 'dt-' + this.id + '-col-' + (icol + 1);
+                            className = className.replace('\$', '-', 'g');
+                            for (var irow = 0; irow < this.bodyColumns[icol].length; irow++) {
+                                var cell = this.bodyColumns[icol][irow];
+                                var cellDivs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', cell);
+                                if (cellDivs.length > 0) {
+                                    var cellDiv = cellDivs[0];
+                                    if (cellDiv != undefined) {
+                                        YAHOO.util.Dom.addClass(cellDiv, className);
+                                    }
+                                }
+                            }
 
-    if (this.adjustHeightForIE) {
-        // We need to update the container height for old broken versions of IE :( ...
-        this.tableHeight = this.table.clientHeight;
-        var bodyHeight = this.tableHeight + 22;
-        this.height = bodyHeight + 'px';
-        this.bodyContainer.style.height = this.height;
-        var height = bodyHeight + this.headerContainer.clientHeight;
-        this.container.style.height = height + 'px';
-    }
+                        }
+                    }
+                }
+            }
+        }
+
+        this.totalNbRows = totalNbRows;
+
+        if (this.adjustHeightForIE) {
+            // We need to update the container height for old broken versions of IE :( ...
+            this.tableHeight = this.table.clientHeight;
+            var bodyHeight = this.tableHeight + 22;
+            this.height = bodyHeight + 'px';
+            this.bodyContainer.style.height = this.height;
+            var height = bodyHeight + this.headerContainer.clientHeight;
+            this.divContainer.style.height = height + 'px';
+        }
+    },
+
+    /**
+     * Scroll handler (for split tables)
+     * @param e
+     */
+    scrollHandler: function (e) {
+        // alert('scrolling');
+        this.headerContainer.scrollLeft = this.bodyContainer.scrollLeft;
+    },
+
+    /**
+     * Initialize the loading indicator
+     * This method is special because it works on datatables
+     * that may not have been initialized yet!
+     *
+     * @param target
+     * @param scrollV
+     * @param scrollH
+     */
+    initLoadingIndicator: function(target, scrollV, scrollH) {
+        var div = YAHOO.util.Dom.getFirstChild(target);
+        var subDiv = YAHOO.util.Dom.getFirstChild(div);
+        var table =  YAHOO.util.Dom.getFirstChild(subDiv);
+        var region = YAHOO.util.Dom.getRegion(table);
+        var curTableWidth = region.right - region.left;
+        if (curTableWidth < 50) {
+            YAHOO.util.Dom.setStyle(table, 'width', '50px');
+        }
+        if (scrollV) {
+            if (YAHOO.env.ua.ie == 6 && target.hasBeenAdjusted == undefined) {
+                // This is a hack to adjust the indicator height in IE6 :(
+                region = YAHOO.util.Dom.getRegion(div);
+                var curHeight = region.bottom - region.top;
+                var heightProp = (curHeight - 4) + 'px'    ;
+                YAHOO.util.Dom.setStyle(div, 'height', heightProp);
+                YAHOO.util.Dom.setStyle(subDiv, 'height', heightProp);
+                target.hasBeenAdjusted = true;
+            }
+            var cell = table.tBodies[0].rows[0].cells[0];
+            var cellDiv = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(cell, 'div');
+            if (scrollH) {
+                YAHOO.util.Dom.setStyle(cellDiv, 'height', (div.clientHeight - 41) + 'px');
+            } else {
+                YAHOO.util.Dom.setStyle(cellDiv, 'height', (div.clientHeight - 21) + 'px');
+                YAHOO.util.Dom.setStyle(div, 'width', (table.clientWidth + 22) + 'px');
+            }
+        }
+    },
+
+
+
+    EOO: ''                                                     // End Of Object!
+
+
 }
 
-ORBEON.widgets.datatable.scrollHandler = function (e) {
-    //alert('scrolling');
-    this.headerContainer.scrollLeft = this.bodyContainer.scrollLeft;
+
+/**
+ *
+ * Utilities
+ */
+YAHOO.xbl.fr.Datatable.utils = {
+
+
+    getFirstChildByTagName: function (root, tagName) {
+        tagName = tagName.toLowerCase();
+        return YAHOO.util.Dom.getFirstChildBy(root, function(element) {
+            return element.tagName.toLowerCase() == tagName;
+        });
+    },
+
+    getFirstChildByTagAndClassName: function (root, tagName, className) {
+        tagName = tagName.toLowerCase();
+        return YAHOO.util.Dom.getFirstChildBy(root, function(element) {
+            return element.tagName.toLowerCase() == tagName && YAHOO.util.Dom.hasClass(element, className);
+        });
+    },
+
+    getFirstChildByClassName: function (root, className) {
+        return YAHOO.util.Dom.getFirstChildBy(root, function(element) {
+            return YAHOO.util.Dom.hasClass(element, className)
+        });
+    },
+
+    getStyle: function (elt, property, defolt) {
+        if (elt.style[property] == '') {
+            return defolt;
+        }
+        return elt.style[property];
+    },
+
+    freezeWidth: function (elt) {
+        YAHOO.util.Dom.setStyle(elt, 'width', elt.clientWidth + 'px');
+    },
+
+    isSignificant: function (element) {
+        return !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-begin-end')
+                && !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-delimiter')
+                && !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-template');
+    },
+
+    EOO: ''                                                     // End Of Object!
+
 }
 
-ORBEON.widgets.datatable.utils = [];
-
-
-ORBEON.widgets.datatable.utils.getFirstChildByTagName = function (root, tagName) {
-    tagName = tagName.toLowerCase();
-    return YAHOO.util.Dom.getFirstChildBy(root, function(element) {
-        return element.tagName.toLowerCase() == tagName;
-    });
-}
-
-ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName = function (root, tagName, className) {
-    tagName = tagName.toLowerCase();
-    return YAHOO.util.Dom.getFirstChildBy(root, function(element) {
-        return element.tagName.toLowerCase() == tagName && YAHOO.util.Dom.hasClass(element, className);
-    });
-}
-
-ORBEON.widgets.datatable.utils.getFirstChildByClassName = function (root, className) {
-    return YAHOO.util.Dom.getFirstChildBy(root, function(element) {
-        return YAHOO.util.Dom.hasClass(element, className)
-    });
-}
-
-ORBEON.widgets.datatable.utils.getStyle = function (elt, property, defolt) {
-    if (elt.style[property] == '') {
-        return defolt;
-    }
-    return elt.style[property];
-}
-
-ORBEON.widgets.datatable.utils.freezeWidth = function (elt) {
-    YAHOO.util.Dom.setStyle(elt, 'width', elt.clientWidth + 'px');
-}
-
-ORBEON.widgets.datatable.colSorter = function (th) {
+YAHOO.xbl.fr.Datatable.colSorter = function (th) {
     var liner = YAHOO.util.Selector.query('div.yui-dt-liner', th, true);
     YAHOO.util.Event.addListener(liner, "click", function (ev) {
         var triggerControl = YAHOO.util.Selector.query('.xforms-trigger:not(.xforms-disabled)', liner, true);
@@ -704,10 +871,10 @@ ORBEON.widgets.datatable.colSorter = function (th) {
 /**
  * Implementation of datatable.colResizer constructor. Creates the YAHOO.util.DD object.
  *
- * @method ORBEON.widgets.datatable.colResizer
+ * @method YAHOO.xbl.fr.Datatable.colResizer
  * @param col {DOM Element} The th DOM element.
  */
-ORBEON.widgets.datatable.colResizer = function (index, th, datatable) {
+YAHOO.xbl.fr.Datatable.colResizer = function (index, th, datatable) {
     this.index = index;
     this.th = th;
     this.datatable = datatable;
@@ -717,7 +884,7 @@ ORBEON.widgets.datatable.colResizer = function (index, th, datatable) {
     this.resizerliner = document.createElement('div');
     YAHOO.util.Dom.addClass(this.resizerliner, 'yui-dt-resizerliner');
 
-    this.liner = ORBEON.widgets.datatable.utils.getFirstChildByTagName(th, 'div');
+    this.liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(th, 'div');
 
     this.th.replaceChild(this.resizerliner, this.liner);
 
@@ -743,7 +910,7 @@ ORBEON.widgets.datatable.colResizer = function (index, th, datatable) {
 }
 
 
-YAHOO.extend(ORBEON.widgets.datatable.colResizer, YAHOO.util.DDProxy, {
+YAHOO.extend(YAHOO.xbl.fr.Datatable.colResizer, YAHOO.util.DDProxy, {
     /////////////////////////////////////////////////////////////////////////////
     //
     // Public methods
@@ -821,146 +988,5 @@ YAHOO.extend(ORBEON.widgets.datatable.colResizer, YAHOO.util.DDProxy, {
     }
 });
 
-ORBEON.widgets.datatable.isSignificant = function (element) {
-    return !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-begin-end')
-            && !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-delimiter')
-            && !YAHOO.util.Dom.hasClass(element, 'xforms-repeat-template');
-}
 
-ORBEON.widgets.datatable.removeIdAttributes = function (element, skipSelf) {
-    if (! skipSelf) {
-        element.removeAttribute('id');
-    }
-    for (var i = 0; i < element.childNodes.length; i++) {
-        var node = element.childNodes[i];
-        if (node.nodeType == 1) {
-            ORBEON.widgets.datatable.removeIdAttributes(node);
-        }
-    }
-}
-
-
-ORBEON.widgets.datatable.initLoadingIndicator = function(target, scrollV, scrollH) {
-    var div = YAHOO.util.Dom.getFirstChild(target);
-    var subDiv = YAHOO.util.Dom.getFirstChild(div);
-    var table = YAHOO.util.Dom.getFirstChild(subDiv);
-    var region = YAHOO.util.Dom.getRegion(table);
-    var curTableWidth = region.right - region.left;
-    if (curTableWidth < 50) {
-        YAHOO.util.Dom.setStyle(table, 'width', '50px');
-    }
-    if (scrollV) {
-        if (YAHOO.env.ua.ie == 6 && target.hasBeenAdjusted == undefined) {
-            // This is a hack to adjust the indicator height in IE6 :(
-            region = YAHOO.util.Dom.getRegion(div);
-            var curHeight = region.bottom - region.top;
-            var heightProp = (curHeight - 4) + 'px'    ;
-            YAHOO.util.Dom.setStyle(div, 'height', heightProp);
-            YAHOO.util.Dom.setStyle(subDiv, 'height', heightProp);
-            target.hasBeenAdjusted = true;
-        }
-        var cell = table.tBodies[0].rows[0].cells[0];
-        var cellDiv = ORBEON.widgets.datatable.utils.getFirstChildByTagName(cell, 'div');
-        if (scrollH) {
-            YAHOO.util.Dom.setStyle(cellDiv, 'height', (div.clientHeight - 41) + 'px');
-        } else {
-            YAHOO.util.Dom.setStyle(cellDiv, 'height', (div.clientHeight - 21) + 'px');
-            YAHOO.util.Dom.setStyle(div, 'width', (table.clientWidth + 22) + 'px');
-        }
-    }
-}
-
-ORBEON.widgets.datatable.init = function (target, innerTableWidth) {
-    // Initializes a datatable (called by xforms-enabled events)
-    var container = YAHOO.util.Dom.getAncestorByClassName(target, 'xbl-fr-datatable');
-    if (container != undefined && container.id != undefined) {
-        var id = container.id;
-        if (! YAHOO.util.Dom.hasClass(target, 'xforms-disabled')) {
-            if (ORBEON.widgets.datatable.datatables[id] == undefined || container.fr_dt_initialized == undefined) {
-                //var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
-                var region = YAHOO.util.Region.getRegion(container);
-                if ((region.left >= 0 && region.top >= 0)
-                        && (region.left < region.right)
-                        && (region.top < region.bottom)) {
-                    ORBEON.widgets.datatable.datatables[id] = new ORBEON.widgets.datatable(container, id, innerTableWidth);
-                    container.fr_dt_initialized = true;
-                } else {
-                    // Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
-                    setTimeout(function() {
-                        ORBEON.widgets.datatable.init(target, innerTableWidth);
-                    }, 100);
-                }
-            } else {
-                ORBEON.widgets.datatable.datatables[id].update();
-            }
-        }
-    }
-
-}
-
-ORBEON.widgets.datatable.update = function (target) {
-    // Updates a datatable when the xforms:repeat nodeset has been changed
-    var container = YAHOO.util.Dom.getAncestorByClassName(target, 'xbl-fr-datatable');
-    var id = container.id;
-    YAHOO.log("Updating datatable " + id, "info");
-    if (! YAHOO.util.Dom.hasClass(target.parentNode, 'xforms-disabled')) {
-        if (ORBEON.widgets.datatable.datatables[id] != undefined) {
-            ORBEON.widgets.datatable.datatables[id].update();
-        }
-    }
-
-}
-
-ORBEON.widgets.datatable.resize = function () {
-    if (ORBEON.widgets.datatable.waitingToResize) {
-        return;
-    }
-    ORBEON.widgets.datatable.waitingToResize = true;
-    setTimeout("ORBEON.widgets.datatable.resizeWhenStabilized()", 200);
-}
-
-ORBEON.widgets.datatable.resizeWhenStabilized = function () {
-
-
-    var width = YAHOO.util.Dom.getViewportWidth();
-
-    if (ORBEON.widgets.datatable.previousBodyWidth != width) {
-        // The window width is still changing, wait till it get stabilized
-        ORBEON.widgets.datatable.previousBodyWidth = width;
-        setTimeout("ORBEON.widgets.datatable.resizeWhenStabilized()", 200);
-        return;
-    }
-
-    ORBEON.widgets.datatable.waitingToResize = false;
-    if (ORBEON.widgets.datatable.bodyWidthWhenResized == width) {
-        // The datatables have already been resized for that window width, nothing to do...
-        return;
-    }
-
-    var oldDatatables = [];
-    ORBEON.widgets.datatable.bodyWidthWhenResized = width;
-    for (var tableId in ORBEON.widgets.datatable.datatables) {
-        var datatable = ORBEON.widgets.datatable.datatables[tableId];
-        oldDatatables.push(datatable);
-        datatable.reset();
-    }
-    ORBEON.widgets.datatable.datatables = {};
-    for (var itable = 0; itable < oldDatatables.length; itable ++) {
-        var datatable = oldDatatables[itable];
-        ORBEON.widgets.datatable.init(datatable.table.parentNode, datatable.innerTableWidth);
-    }
-}
-
-
-YAHOO.util.Event.addListener(window, "resize", ORBEON.widgets.datatable.resize);
-
-// Comment/uncomment in normal/debug mode...
-//var myLogReader = new YAHOO.widget.LogReader();
-
-ORBEON.widgets.datatable.datatables = {
-};
-
-ORBEON.widgets.datatable.waitingToResize = false;
-ORBEON.widgets.datatable.previousBodyWidth = YAHOO.util.Dom.getViewportWidth();
-ORBEON.widgets.datatable.bodyWidthWhenResized = ORBEON.widgets.datatable.previousBodyWidth;
 

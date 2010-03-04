@@ -17,44 +17,73 @@ var testCase = {
 
     name: "datatable",
 
-    test314679: function() {
-       var thiss = this;
-       thiss.openAccordionCase(thiss, '_314679', function() {
+    testRepeatRefresh: function() {
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'repeat-refresh', function() {
 
-           var table = YAHOO.util.Dom.get('my-accordion$table-314679$table-314679-table');
-           thiss.clickAndCheckSortOrder(table, 1, 'descending', ['three', 'two', 'one'], function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                // Setting maxLength to 0 deletes all the rows from the tables
+                ORBEON.xforms.Document.setValue("maxLength", "0");
+            }, function() {
+                ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
+                    // Setting maxLength to 100 adds new rows in the tables
+                    ORBEON.xforms.Document.setValue("maxLength", "100");
+                }, function() {
+                    // If the tables have been correctly updated, their cells styles (IE) or classes (FF) should be set 
+                    var table1 = YAHOO.util.Dom.get('my-accordion$repeat-refresh-table$repeat-refresh-table-table·1');
+                    var table2 = YAHOO.util.Dom.get('my-accordion$repeat-refresh-table$repeat-refresh-table-table·2');
+                    thiss.checkCellClasses(table1, true);
+                    thiss.checkCellStyles(table1, true);
+                    thiss.checkCellClasses(table2, true);
+                    thiss.checkCellStyles(table2, true);
+
+                });
+            });
+
+        });
+    }
+    ,
+
+
+
+    test314679: function() {
+        var thiss = this;
+        thiss.openAccordionCase(thiss, '_314679', function() {
+
+            var table = YAHOO.util.Dom.get('my-accordion$table-314679$table-314679-table');
+            thiss.clickAndCheckSortOrder(table, 1, 'descending', ['three', 'two', 'one'], function() {
 
                 thiss.closeAccordionCase(thiss, '_314679');
 
             });
 
-       });
-   },
-    
+        });
+    },
+
 
     testOptionalScrollhV: function() {
-         var thiss = this;
-         thiss.openAccordionCase(thiss, 'optional-scrollh-v', function() {
-             var tbody = YAHOO.util.Dom.get('my-accordion$optional-scrollh-v-table$optional-scrollh-v-table-tbody');
-             var bodyContainer = tbody.parentNode.parentNode;
-             thiss.checkHorizontalScrollbar(bodyContainer, false);
-             thiss.closeAccordionCase(thiss, 'optional-scrollh-v');
-         });
-     }
-     ,
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'optional-scrollh-v', function() {
+            var tbody = YAHOO.util.Dom.get('my-accordion$optional-scrollh-v-table$optional-scrollh-v-table-tbody');
+            var bodyContainer = tbody.parentNode.parentNode;
+            thiss.checkHorizontalScrollbar(bodyContainer, false);
+            thiss.closeAccordionCase(thiss, 'optional-scrollh-v');
+        });
+    }
+    ,
 
     testOptionalScrollh: function() {
-         var thiss = this;
-         thiss.openAccordionCase(thiss, 'optional-scrollh', function() {
-             var tbody = YAHOO.util.Dom.get('my-accordion$optional-scrollh-table$optional-scrollh-table-tbody');
-             var bodyContainer = tbody.parentNode.parentNode;
-             thiss.checkHorizontalScrollbar(bodyContainer, false);
-             thiss.closeAccordionCase(thiss, 'optional-scrollh');
-         });
-     }
-     ,
+        var thiss = this;
+        thiss.openAccordionCase(thiss, 'optional-scrollh', function() {
+            var tbody = YAHOO.util.Dom.get('my-accordion$optional-scrollh-table$optional-scrollh-table-tbody');
+            var bodyContainer = tbody.parentNode.parentNode;
+            thiss.checkHorizontalScrollbar(bodyContainer, false);
+            thiss.closeAccordionCase(thiss, 'optional-scrollh');
+        });
+    }
+    ,
 
-     test314466: function() {
+    test314466: function() {
         var thiss = this;
         thiss.openAccordionCase(thiss, '_314466', function() {
 
@@ -67,7 +96,7 @@ var testCase = {
                 thiss.wait(function() {
                     table = YAHOO.util.Dom.get('my-accordion$_314466-table$_314466-table-table');
                     var container = table.parentNode.parentNode;
-                    YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(container, 'fr-dt-initialized'),  "The datatable should be initialized at that point");
+                    YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(container, 'fr-dt-initialized'), "The datatable should be initialized at that point");
 
                     YAHOO.util.UserAction.click(YAHOO.util.Dom.get('my-accordion$hide-314466'), {clientX: 1});
                     thiss.closeAccordionCase(thiss, '_314466')
@@ -298,9 +327,9 @@ var testCase = {
         var thiss = this;
         thiss.openAccordionCase(thiss, '_314216', function() {
             var th = YAHOO.util.Dom.get('my-accordion$table-314216$th-314216-2');
-            var resizerliner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(th, 'div', 'yui-dt-resizerliner');
-            var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-liner');
-            var resizer = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-resizer');
+            var resizerliner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(th, 'div', 'yui-dt-resizerliner');
+            var liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-liner');
+            var resizer = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-resizer');
             thiss.resizeColumn(th, -100, 5);
             YAHOO.util.Assert.isTrue(th.clientWidth > 0, 'The column width should be greater than 0, not ' + th.clientWidth);
             thiss.checkTableAndContainerWidths(YAHOO.util.Dom.get('my-accordion$table-314216$table-314216-table'));
@@ -381,8 +410,8 @@ var testCase = {
 
 
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
-    for (var property in ORBEON.widgets.datatable.unittests_lib) {
-        testCase[property] = ORBEON.widgets.datatable.unittests_lib[property];
+    for (var property in YAHOO.xbl.fr.Datatable.unittests_lib) {
+        testCase[property] = YAHOO.xbl.fr.Datatable.unittests_lib[property];
     }
     YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase(testCase));
     AccordionMenu.setting('my-accordion$dl', {animation: true, seconds: 0.001, openedIds: [], dependent: false, easeOut: false});

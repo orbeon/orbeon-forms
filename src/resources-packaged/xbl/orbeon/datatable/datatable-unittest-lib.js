@@ -12,7 +12,7 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
-ORBEON.widgets.datatable.unittests_lib = {
+YAHOO.xbl.fr.Datatable.unittests_lib = {
 
 
     accordionAccessMethod: "api",
@@ -101,12 +101,12 @@ ORBEON.widgets.datatable.unittests_lib = {
     },
 
     checkCellWidth: function(cell) {
-        var resizerliner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-resizerliner');
+        var resizerliner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-resizerliner');
         var liner;
         if (resizerliner == null) {
-            var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
+            var liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
         } else {
-            var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-liner');
+            var liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-liner');
         }
         var cssWidth = YAHOO.util.Dom.getStyle(liner, 'width');
         var actualWidth = (liner.clientWidth - 20) + "px";
@@ -321,7 +321,7 @@ ORBEON.widgets.datatable.unittests_lib = {
             var cell = row.cells[i];
             if (this.isSignificant(cell)) {
                 iActual += 1;
-                var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
+                var liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
                 if (liner != undefined) {
                     var className = classPrefix + iActual;
                     YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(liner, className), 'Cell column ' + iActual + ' should have a class ' + className + '. Its current class attribute is: ' + liner.className);
@@ -372,7 +372,7 @@ ORBEON.widgets.datatable.unittests_lib = {
                 for (var j = 0; j < row.cells.length; j++) {
                     var cell = row.cells[j];
                     if (this.isSignificant(cell)) {
-                        var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
+                        var liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
                         if (liner != undefined) {
                             YAHOO.util.Assert.areEqual(colWidths[jActual], liner.style.width, 'Body cell for row ' + iActual + ' and column ' + (jActual + 1) + ' should have a style width property equal to ' + colWidths[jActual]);
                             jActual += 1;
@@ -423,13 +423,13 @@ ORBEON.widgets.datatable.unittests_lib = {
     },
 
     checkPaginationLinks: function(container, links) {
-        var paginator = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(container, 'div', 'yui-dt-paginator');
+        var paginator = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(container, 'div', 'yui-dt-paginator');
         var actualLinks = this.getPaginationLinks(paginator);
         YAHOO.util.Assert.areEqual(links.length, actualLinks.length, "Found " + actualLinks.length + ' instead of ' + links.length);
         for (var i = 0; i < links.length; i++) {
             var link = links[i];
             var actualLink = this.trim(this.textContent(actualLinks[i]));
-            if (actualLinks[i].nodeName == 'A' || ORBEON.widgets.datatable.utils.getFirstChildByTagName(actualLinks[i], 'a') != undefined) {
+            if (actualLinks[i].nodeName == 'A' || YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(actualLinks[i], 'a') != undefined) {
                 actualLink = '+' + actualLink;
             } else {
                 actualLink = '-' + actualLink;
@@ -440,7 +440,7 @@ ORBEON.widgets.datatable.unittests_lib = {
     },
 
     getPaginateLink: function(container, target) {
-        var paginator = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(container, 'div', 'yui-dt-paginator');
+        var paginator = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(container, 'div', 'yui-dt-paginator');
         var links = this.getPaginationLinks(paginator);
         for (var i = 0; i < links.length; i++) {
             var link = links[i];
@@ -454,8 +454,8 @@ ORBEON.widgets.datatable.unittests_lib = {
 
     getLoadingIndicator: function(table) {
         var container = YAHOO.util.Dom.getAncestorByClassName(table, 'xbl-fr-datatable');
-        var mainGroup = ORBEON.widgets.datatable.utils.getFirstChildByTagName(container, 'span');
-        var tableGroup = ORBEON.widgets.datatable.utils.getFirstChildByTagName(mainGroup, 'span');
+        var mainGroup = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(container, 'span');
+        var tableGroup = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(mainGroup, 'span');
         return YAHOO.util.Dom.getNextSibling(tableGroup);
     },
 
@@ -497,7 +497,7 @@ ORBEON.widgets.datatable.unittests_lib = {
         if (msgIntro == undefined) {
             msgIntro = '';
         }
-        var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
+        var liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
         var a = liner.getElementsByTagName('a')[0];
         YAHOO.util.Assert.areEqual(expectedHint, a.title, msgIntro + 'Hint should be ' + expectedHint + ' not ' + a.title);
     },
@@ -524,7 +524,7 @@ ORBEON.widgets.datatable.unittests_lib = {
         this.checkHint(table, columnIndex, expectedHintBefore, 'Before click: ');
 
         var headerCell = this.getSignificantElementByIndex(table.tHead.rows[0].cells, columnIndex);
-        var liner = ORBEON.widgets.datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
+        var liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(headerCell, 'div', 'yui-dt-liner');
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             YAHOO.util.UserAction.click(liner, {clientX: 1});
         }, function() {

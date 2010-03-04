@@ -604,13 +604,13 @@
                 YAHOO.log("Enabling datatable id <xsl:value-of select="$id"/>","info"); 
                 <xsl:choose>
                     <xsl:when test="$scrollH or $scrollV">
-                        var target= this; 
+                        var instance = YAHOO.xbl.fr.Datatable.instance(this); 
                         setTimeout(function() {
-                            ORBEON.widgets.datatable.init(target, <xsl:value-of select="$innerTableWidth"/>);  
+                        instance.draw(<xsl:value-of select="$innerTableWidth"/>);  
                             }, 10);
                     </xsl:when>
                     <xsl:otherwise>
-                        ORBEON.widgets.datatable.init(this, <xsl:value-of select="$innerTableWidth"/>);  
+                        YAHOO.xbl.fr.Datatable.instance(this).draw(<xsl:value-of select="$innerTableWidth"/>);  
                     </xsl:otherwise>
                 </xsl:choose>
                 
@@ -677,7 +677,7 @@
                     scrollbar takes all the page in IE 6 if not explicitely set...-->
                 <xforms:group ref="xxforms:component-context()[$fr-dt-loading = true()]">
                     <xforms:action ev:event="xforms-enabled">
-                        <xxforms:script> ORBEON.widgets.datatable.initLoadingIndicator(this, <xsl:value-of select="$scrollV"/>, <xsl:value-of
+                        <xxforms:script> YAHOO.xbl.fr.Datatable.instance(this).initLoadingIndicator(this, <xsl:value-of select="$scrollV"/>, <xsl:value-of
                                 select="$scrollH"/>); </xxforms:script>
                     </xforms:action>
                     <xsl:variable name="tableContent">
@@ -969,7 +969,7 @@
             <xsl:apply-templates select="@*[not(name()='nodeset')]" mode="dynamic"/>
 
             <xforms:action ev:event="xxforms-nodeset-changed">
-                <xxforms:script> ORBEON.widgets.datatable.update(this); </xxforms:script>
+                <xxforms:script> YAHOO.xbl.fr.Datatable.instance(this).update(); </xxforms:script>
                 <xsl:if test="$paginated and not($sortAndPaginationMode='external')">
                     <!-- Workaround, see https://forge.ow2.org/tracker/index.php?func=detail&aid=314429&group_id=168&atid=350207 -->
                     <xforms:setvalue model="datatable-model" ref="instance('page')/@nbPages" value="$nbPages" xxbl:scope="inner"/>

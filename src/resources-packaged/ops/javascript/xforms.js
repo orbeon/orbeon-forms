@@ -2536,12 +2536,16 @@ ORBEON.xforms.Controls = {
      * xforms-invalid-visited. The code also tried to find the label for this control and add the class
      * xforms-alert-active-visited when necessary.
      */
-    updateInvalidVisited: function(control) {
-        if (ORBEON.util.Dom.hasClass(control, "xforms-invalid"))
-            ORBEON.util.Dom.addClass(control, "xforms-invalid-visited");
-        var alertElement = ORBEON.xforms.Controls._getControlLHHA(control, "alert");
-        if (alertElement != null && ORBEON.util.Dom.hasClass(alertElement, "xforms-alert-active"))
-            ORBEON.util.Dom.addClass(alertElement, "xforms-alert-active-visited");
+    updateInvalidVisitedOnNextAjaxResponse: function(control) {
+        if (! ORBEON.util.Dom.hasClass(control, "xforms-visited")) {
+            ORBEON.xforms.Events.runOnNext(ORBEON.xforms.Events.ajaxResponseProcessedEvent, function() {
+                if (ORBEON.util.Dom.hasClass(control, "xforms-invalid"))
+                    ORBEON.util.Dom.addClass(control, "xforms-invalid-visited");
+                var alertElement = ORBEON.xforms.Controls._getControlLHHA(control, "alert");
+                if (alertElement != null && ORBEON.util.Dom.hasClass(alertElement, "xforms-alert-active"))
+                    ORBEON.util.Dom.addClass(alertElement, "xforms-alert-active-visited");
+            });
+        }
     },
 
     /**
@@ -2955,10 +2959,7 @@ ORBEON.xforms.Events = {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             var targetControlElement = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (targetControlElement != null) {
-                // Update class xforms-invalid-visited on the control when we get the next Ajax response
-                if (! ORBEON.util.Dom.hasClass(targetControlElement, "xforms-visited"))
-                    ORBEON.xforms.Events.runOnNext(ORBEON.xforms.Events.ajaxResponseProcessedEvent,
-                        function() { ORBEON.xforms.Controls.updateInvalidVisited(targetControlElement); });
+                ORBEON.xforms.Controls.updateInvalidVisitedOnNextAjaxResponse(targetControlElement);
 
                 if (!ORBEON.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
                     // This is an event for an XForms control which is not a dialog
@@ -2982,6 +2983,7 @@ ORBEON.xforms.Events = {
     change: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
+            ORBEON.xforms.Controls.updateInvalidVisitedOnNextAjaxResponse(target);
             if (ORBEON.util.Dom.hasClass(target, "xforms-upload")) {
                 // For upload controls, generate an xforms-select event when a file is selected
                 var event = new ORBEON.xforms.Server.Event(null, target.id, null, null, "xforms-select");

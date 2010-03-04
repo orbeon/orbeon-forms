@@ -1,0 +1,170 @@
+<!--
+    Copyright (C) 2010 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Using YUI's datatable</xhtml:title>
+        <xforms:model id="model">
+            <xforms:instance id="instance">
+                <instance xmlns="">
+                    <record>
+                        <AAA>1</AAA>
+                        <BBB>foo foo foo foo</BBB>
+                        <CCC>bar</CCC>
+                    </record>
+                    <record>
+                        <AAA>100</AAA>
+                        <BBB>bat</BBB>
+                        <CCC>baz baz baz baz</CCC>
+                    </record>
+                    <record>
+                        <AAA>2</AAA>
+                        <BBB>bbb bbb bbb bbb bbb bbb</BBB>
+                        <CCC>ccc</CCC>
+                    </record>
+                    <record>
+                        <AAA>1000</AAA>
+                        <BBB>bbb bbb bbb bbb bbb bbb</BBB>
+                        <CCC>ccc</CCC>
+                    </record>
+                    <record>
+                        <AAA>5</AAA>
+                        <BBB>bbb bbb bbb bbb bbb bbb</BBB>
+                        <CCC>ccc</CCC>
+                    </record>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xhtml:h1>Datatable widgets with multiple header rows</xhtml:h1>
+
+        <xhtml:p>Simple datatable with multiple header rows: by default, the master row is the last one.</xhtml:p>
+        <fr:datatable>
+            <xhtml:thead>
+                <xhtml:tr>
+                    <xhtml:th colspan="3">3 columns</xhtml:th>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th colspan="2">2 columns</xhtml:th>
+                    <xhtml:th rowspan="2">2 rows</xhtml:th>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th>1 col</xhtml:th>
+                    <xhtml:th>1 col</xhtml:th>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th fr:sortable="true" fr:resizeable="true">AAA (s)</xhtml:th>
+                    <xhtml:th fr:sortable="true" fr:resizeable="true">BBB (s)</xhtml:th>
+                    <xhtml:th>CCC</xhtml:th>
+                </xhtml:tr>
+            </xhtml:thead>
+            <xhtml:tbody>
+                <xforms:repeat nodeset="record">
+                    <xhtml:tr>
+                        <xhtml:td>
+                            <xforms:output ref="AAA"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:output ref="BBB"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:output ref="CCC"/>
+                        </xhtml:td>
+                    </xhtml:tr>
+                </xforms:repeat>
+            </xhtml:tbody>
+        </fr:datatable>
+
+        <xhtml:p>Simple datatable with multiple header rows: the second row has been marked as the master row.</xhtml:p>
+        <fr:datatable>
+            <xhtml:thead>
+                <xhtml:tr>
+                    <xhtml:th colspan="3">3 columns</xhtml:th>
+                </xhtml:tr>
+                <xhtml:tr fr:master="true">
+                    <xhtml:th fr:sortable="true" fr:resizeable="true">AAA (s)</xhtml:th>
+                    <xhtml:th fr:sortable="true" fr:resizeable="true">BBB (s)</xhtml:th>
+                    <xhtml:th>CCC</xhtml:th>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th colspan="2">2 columns</xhtml:th>
+                    <xhtml:th rowspan="2">2 rows</xhtml:th>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th>1 col</xhtml:th>
+                    <xhtml:th>1 col</xhtml:th>
+                </xhtml:tr>
+
+            </xhtml:thead>
+            <xhtml:tbody>
+                <xforms:repeat nodeset="record">
+                    <xhtml:tr>
+                        <xhtml:td>
+                            <xforms:output ref="AAA"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:output ref="BBB"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:output ref="CCC"/>
+                        </xhtml:td>
+                    </xhtml:tr>
+                </xforms:repeat>
+            </xhtml:tbody>
+        </fr:datatable>
+
+        <xhtml:p>Srollable datatable with multiple header rows: by default, the master row is the last one.</xhtml:p>
+        <fr:datatable scrollable="both" width="300px" height="150px">
+            <xhtml:thead>
+                <xhtml:tr>
+                    <xhtml:th colspan="3">3 columns</xhtml:th>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th colspan="2">2 columns</xhtml:th>
+                    <xhtml:th rowspan="2">2 rows</xhtml:th>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th>1 col</xhtml:th>
+                    <xhtml:th>1 col</xhtml:th>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th fr:sortable="true" fr:resizeable="true">AAA (s)</xhtml:th>
+                    <xhtml:th fr:sortable="true" fr:resizeable="true">BBB (s)</xhtml:th>
+                    <xhtml:th>CCC</xhtml:th>
+                </xhtml:tr>
+            </xhtml:thead>
+            <xhtml:tbody>
+                <xforms:repeat nodeset="record">
+                    <xhtml:tr>
+                        <xhtml:td>
+                            <xforms:output ref="AAA"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:output ref="BBB"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:output ref="CCC"/>
+                        </xhtml:td>
+                    </xhtml:tr>
+                </xforms:repeat>
+            </xhtml:tbody>
+        </fr:datatable>
+
+    </xhtml:body>
+</xhtml:html>

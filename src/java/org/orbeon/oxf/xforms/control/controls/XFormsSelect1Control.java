@@ -70,6 +70,16 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
+        super.setBindingContext(propertyContext, bindingContext, isCreate);
+
+        // Evaluate itemsets only if restoring dynamic state
+        // NOTE: This doesn't sound like it is the right place to do this, does it?
+        if (containingDocument.isRestoringDynamicState(propertyContext))
+            getItemset(propertyContext, false);
+    }
+
+    @Override
     protected QName[] getExtensionAttributes() {
         if (!(this instanceof XFormsSelectControl) && isFullAppearance())
             return EXTENSION_ATTRIBUTES_SELECT1_APPEARANCE_FULL;

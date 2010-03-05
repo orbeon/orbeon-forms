@@ -25,7 +25,6 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
-import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -122,7 +121,7 @@ public class XFormsControls implements XFormsObjectResolver {
      * @param propertyContext   current context
      */
     public void initialize(PropertyContext propertyContext) {
-        initializeState(propertyContext, false);
+        initializeState(propertyContext);
     }
 
     /**
@@ -130,9 +129,8 @@ public class XFormsControls implements XFormsObjectResolver {
      * needs to be built or rebuilt.
      *
      * @param propertyContext   current context
-     * @param isRestoringState  whether we are restoring the state
      */
-    public void initializeState(PropertyContext propertyContext, boolean isRestoringState) {
+    public void initializeState(PropertyContext propertyContext) {
 
         final XFormsStaticState staticState = containingDocument.getStaticState();
         if (staticState.getControlsDocument() != null) {
@@ -161,7 +159,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 currentControlTree = initialControlTree = new ControlTree(containingDocument, indentedLogger);
 
                 // Initialize new control tree
-                currentControlTree.initialize(propertyContext, containingDocument, rootContainer, isRestoringState);
+                currentControlTree.initialize(propertyContext, containingDocument, rootContainer);
             }
         }
 
@@ -488,13 +486,13 @@ public class XFormsControls implements XFormsObjectResolver {
                     // this.
                     // && (!controlName.equals("case") || isCaseSelectedByControlElement(controlElement, effectiveControlId, idPostfix))
 
-                    if (ControlTree.TESTING_DIALOG_OPTIMIZATION && newContainerControl instanceof XXFormsDialogControl) {// TODO: FOR TESTING DIALOG OPTIMIZATION
-                        // Visit dialog children only if dialog is visible
-                        if (((XXFormsDialogControl) newContainerControl).isVisible()) {
-                            visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                                    staticState, currentXBLContainer, newContainerControl, currentControlElement, idPrefix, idPostfix);
-                        }
-                    } else {
+//                    if (ControlTree.TESTING_DIALOG_OPTIMIZATION && newContainerControl instanceof XXFormsDialogControl) {// TODO: FOR TESTING DIALOG OPTIMIZATION
+//                        // Visit dialog children only if dialog is visible
+//                        if (((XXFormsDialogControl) newContainerControl).isVisible()) {
+//                            visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
+//                                    staticState, currentXBLContainer, newContainerControl, currentControlElement, idPrefix, idPostfix);
+//                        }
+//                    } else {
                         // TODO: relevance logic here is wrong, see correct logic in XFormsSingleNodeControl
                         if (!isOptimizeRelevance
                                 || (!currentBindingContext.isNewBind()
@@ -503,7 +501,7 @@ public class XFormsControls implements XFormsObjectResolver {
                             visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                                     staticState, currentXBLContainer, newContainerControl, currentControlElement, idPrefix, idPostfix);
                         }
-                    }
+//                    }
                 }
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlEffectiveId);
                 currentContextStack.popBinding();
@@ -621,39 +619,38 @@ public class XFormsControls implements XFormsObjectResolver {
             indentedLogger.logDebug("model", "not performing refresh because no controls are available");
             // Don't forget to clear the flag or we risk infinite recursion
             refreshDone();
-            return;
-        }
+        } else {
+            indentedLogger.startHandleOperation("model", "performing refresh", "container id", container.getEffectiveId());
+            {
+                // Update control bindings
+                updateControlBindingsIfNeeded(propertyContext);
+                // Update control values
+                evaluateControlValuesIfNeeded(propertyContext);
 
-        indentedLogger.startHandleOperation("model", "performing refresh", "container id", container.getEffectiveId());
-        {
-            // Update control bindings
-            updateControlBindingsIfNeeded(propertyContext);
-            // Update control values
-            evaluateControlValuesIfNeeded(propertyContext);
+                if (currentControlTree.isAllowSendingRefreshEvents()) {
+                    // There are potentially event handlers for UI events, so do the whole processing
 
-            if (currentControlTree.isAllowSendingRefreshEvents()) {
-                // There are potentially event handlers for UI events, so do the whole processing
+                    // Gather controls to which to dispatch refresh events
+                    final List<String> eventsToDispatch = gatherControlsForRefresh();
 
-                // Gather controls to which to dispatch refresh events
-                final List<String> eventsToDispatch = gatherControlsForRefresh();
+                    // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
+                    // effect, and clear the corresponding flag."
+                    refreshDone();
 
-                // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
-                // effect, and clear the corresponding flag."
-                refreshDone();
+                    // Dispatch events
+                    dispatchRefreshEvents(propertyContext, eventsToDispatch);
 
-                // Dispatch events
-                dispatchRefreshEvents(propertyContext, eventsToDispatch);
+                } else {
+                    // No UI events to send because there is no event handlers for any of them
+                    indentedLogger.logDebug("model", "refresh skipping sending of UI events because no listener was found", "container id", container.getEffectiveId());
 
-            } else {
-                // No UI events to send because there is no event handlers for any of them
-                indentedLogger.logDebug("model", "refresh skipping sending of UI events because no listener was found", "container id", container.getEffectiveId());
-
-                // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
-                // effect, and clear the corresponding flag."
-                refreshDone();
+                    // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
+                    // effect, and clear the corresponding flag."
+                    refreshDone();
+                }
             }
+            indentedLogger.endHandleOperation();
         }
-        indentedLogger.endHandleOperation();
     }
 
     private List<String> gatherControlsForRefresh() {

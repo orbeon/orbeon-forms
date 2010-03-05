@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.ControlTree;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
@@ -34,6 +35,8 @@ import java.util.*;
  * Represents an extension xxforms:dialog control.
  */
 public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
+
+    private static final boolean TESTING_DIALOG_OPTIMIZATION = false;
 
     private String level;
     private boolean close;
@@ -75,6 +78,15 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
         // Initial local state
         setLocal(new XXFormsDialogControlLocal(initiallyVisible));
+    }
+
+    @Override
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
+        super.setBindingContext(propertyContext, bindingContext, isCreate);
+
+        // TODO
+        if (TESTING_DIALOG_OPTIMIZATION)
+            updateContent(propertyContext, isVisible());
     }
 
     @Override

@@ -85,7 +85,7 @@ public class XFormsContainingDocument extends XBLContainer {
         if (XFormsServer.USE_SEPARATE_LOGGERS) {
             loggersMap.put(category, new IndentedLogger(localLogger, indentation, category));
         } else {
-            loggersMap.put(category, new IndentedLogger(globalLogger, debugConfig.contains(category), indentation, category));
+            loggersMap.put(category, new IndentedLogger(globalLogger, globalLogger.isDebugEnabled() && debugConfig.contains(category), indentation, category));
         }
     }
 
@@ -1206,7 +1206,7 @@ public class XFormsContainingDocument extends XBLContainer {
             final Map serializedControlStateMap = xformsControls.getSerializedControlStateMap(dynamicStateDocument.getRootElement());
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, serializedControlStateMap);
 
-            xformsControls.initializeState(pipelineContext, true);
+            xformsControls.initializeState(pipelineContext);
 
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, null);
         }
@@ -1360,7 +1360,7 @@ public class XFormsContainingDocument extends XBLContainer {
             isDebugEnabled = logger.isDebugEnabled();
         } else {
             logger = globalLogger;
-            isDebugEnabled = XFormsProperties.getDebugLogging().contains(category);
+            isDebugEnabled = logger.isDebugEnabled() && XFormsProperties.getDebugLogging().contains(category);
         }
         indentedLogger = new IndentedLogger(logger, isDebugEnabled, category);
 

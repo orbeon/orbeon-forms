@@ -1484,6 +1484,111 @@
         </output>
     </test>
 
+    <test description="No dispatch of xxforms-nodeset-changed upon control becoming relevant" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+                                    <xforms:instance xmlns="" id="instance">
+                                        <values show="false">
+                                            <value>1</value>
+                                            <value>2</value>
+                                            <value>3</value>
+                                            <value>4</value>
+                                        </values>
+                                    </xforms:instance>
+                                    <xforms:instance xmlns="" id="changes">
+                                        <changes/>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready">
+                                        <xforms:insert context="instance('changes')" nodeset="*" origin="xxforms:element('before-refresh')"/>
+                                        <xforms:refresh/>
+                                        <xforms:insert context="instance('changes')" nodeset="*" origin="xxforms:element('after-refresh')"/>
+                                        <!-- Cause the group and its content to become relevant upon next refresh -->
+                                        <xforms:setvalue ref="@show">true</xforms:setvalue>
+                                        <xforms:insert context="instance('changes')" nodeset="*" origin="xxforms:element('before-refresh')"/>
+                                        <xforms:refresh/>
+                                        <xforms:insert context="instance('changes')" nodeset="*" origin="xxforms:element('after-refresh')"/>
+                                        <!-- Cause the group and its content to become non-relevant upon next refresh -->
+                                        <xforms:setvalue ref="@show">false</xforms:setvalue>
+                                        <xforms:insert context="instance('changes')" nodeset="*" origin="xxforms:element('before-refresh')"/>
+                                        <xforms:refresh/>
+                                        <xforms:insert context="instance('changes')" nodeset="*" origin="xxforms:element('after-refresh')"/>
+                                    </xforms:action>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <xforms:action ev:event="xforms-enabled xforms-disabled xxforms-nodeset-changed xxforms-index-changed">
+                                    <xforms:insert context="instance('changes')" nodeset="*"
+                                                   origin="xxforms:element(event('xxforms:type'), xxforms:attribute('id', event('xxforms:target')))"/>
+                                </xforms:action>
+
+                                <xforms:group id="my-group" ref=".[@show = 'true']">
+                                    <xforms:repeat nodeset="value" id="my-repeat"/>
+                                </xforms:group>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values show="false">
+                                    <value>1</value>
+                                    <value>2</value>
+                                    <value>3</value>
+                                    <value>4</value>
+                                </values>
+                            </instance>
+                            <instance id="changes" model-id="model">
+                                <changes>
+                                    <before-refresh/>
+                                    <after-refresh/>
+                                    <before-refresh/>
+                                    <xforms-enabled id="my-group"/>
+                                    <xforms-enabled id="my-repeat"/>
+                                    <after-refresh/>
+                                    <before-refresh/>
+                                    <!-- NOTE: We get these 2 events when the control is about to become non-relevant.
+                                         We might want to change this behavior in the future. -->
+                                    <xxforms-nodeset-changed id="my-repeat"/>
+                                    <xxforms-index-changed id="my-repeat"/>
+                                    <xforms-disabled id="my-group"/>
+                                    <xforms-disabled id="my-repeat"/>
+                                    <after-refresh/>
+                                </changes>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="0"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-group" relevant="false"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <test description="Simple event dispatch to nested repeats following correct id resolution" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">

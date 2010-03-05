@@ -604,16 +604,29 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         }
 
         // NOTE: There is a question of whether it is reasonable to dispatch events here.
-        if (updated) {
-            // Dispatch custom event to xforms:repeat to notify that the nodeset has changed
-            getXBLContainer().dispatchEvent(propertyContext, new XXFormsNodesetChangedEvent(containingDocument, this,
-                    newIterations, movedIterationsOldPositions, movedIterationsNewPositions));
-        }
 
-        if (oldRepeatIndex != getIndex()) {
-            // Dispatch custom event to notify that the repeat index has changed
-            getXBLContainer().dispatchEvent(propertyContext, new XXFormsIndexChangedEvent(containingDocument, this,
-                    oldRepeatIndex, getIndex()));
+        // NOTE: use isRelevant() instead of wasRelevant() because this method is called before markDirty() is called,
+        // so we use the current relevance.
+        //
+        // o If the control is newly created, this method is not called
+        // o If the control is updated during refresh
+        //   o markDirty() hasn't been called yet
+        //   o control currently non-relevant: events must not be dispatched (non-relevant control)
+        //   o control becoming relevant: events must not be dispatched either (no change events upon xforms-enabled)
+        //   o control becoming non-relevant: events can be dispatched TODO: they should probably not be!
+        //   o control staying non-relevant: events must not be dispatched
+        if (isRelevant()) {
+            if (updated) {
+                // Dispatch custom event to xforms:repeat to notify that the nodeset has changed
+                getXBLContainer().dispatchEvent(propertyContext, new XXFormsNodesetChangedEvent(containingDocument, this,
+                        newIterations, movedIterationsOldPositions, movedIterationsNewPositions));
+            }
+
+            if (oldRepeatIndex != getIndex()) {
+                // Dispatch custom event to notify that the repeat index has changed
+                getXBLContainer().dispatchEvent(propertyContext, new XXFormsIndexChangedEvent(containingDocument, this,
+                        oldRepeatIndex, getIndex()));
+            }
         }
 
         return newIterations;

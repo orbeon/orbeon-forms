@@ -7266,15 +7266,19 @@ ORBEON.xforms.Server = {
         function getElement(id) {
             var element = YAHOO.util.Dom.get(id);
             if (element == null) {
-                // Try getting repeat delimiter
-                var separatorPosition = Math.max(id.lastIndexOf(XFORMS_SEPARATOR_1), id.lastIndexOf(XFORMS_SEPARATOR_2));
-                if (separatorPosition != -1) {
-                    var repeatID = id.substring(0, separatorPosition);
-                    var iteration = id.substring(separatorPosition + 1);
-                    element = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration);
-                    if (element == null) {
-                        // If everything else has failed, the id might be an xforms:repeat id!
-                        element = YAHOO.util.Dom.get('repeat-begin-' + id);
+                // Try to find repeat (some events xxforms-nodeset-changed can target the repeat)
+                element = YAHOO.util.Dom.get("repeat-begin-" + id);
+                if (element == null) {
+                    // Try getting repeat delimiter
+                    var separatorPosition = Math.max(id.lastIndexOf(XFORMS_SEPARATOR_1), id.lastIndexOf(XFORMS_SEPARATOR_2));
+                    if (separatorPosition != -1) {
+                        var repeatID = id.substring(0, separatorPosition);
+                        var iteration = id.substring(separatorPosition + 1);
+                        element = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration);
+                        if (element == null) {
+                            // If everything else has failed, the id might be an xforms:repeat id!
+                            element = YAHOO.util.Dom.get('repeat-begin-' + id);
+                        }
                     }
                 }
             }

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -52,6 +52,7 @@
                         <xforms:label ref="$form-resources/select/label"/>
                         <xforms:value/>
                     </xforms:item>
+                    <!-- TODO: add fr:button too? -->
                     <xforms:itemset nodeset="$body//(*[@ref or @bind or self::xforms:trigger])[ends-with(@id, '-control')]">
                         <!-- Try to build a reasonably user-friendly label -->
                         <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
@@ -235,7 +236,7 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <!-- Test button -->
-            <xforms:trigger ref="$instance/save-test-trigger[false()]">
+            <fr:button ref="$instance/save-test-trigger[false()]">
                 <xforms:label>
                     <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/dialog-actions/test/label"/></xhtml:span>
@@ -245,9 +246,9 @@
                 <xforms:action ev:event="DOMActivate">
                     <!-- TODO-->
                 </xforms:action>
-            </xforms:trigger>
+            </fr:button>
             <!-- Save button -->
-            <xforms:trigger ref="$instance/save-test-trigger">
+            <fr:button ref="$instance/save-test-trigger">
 
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt=""/>
@@ -266,15 +267,15 @@
                     <!-- Hide dialog -->
                     <xxforms:hide dialog="fb-action-dialog"/>
                 </xforms:action>
-            </xforms:trigger>
-            <xforms:trigger>
+            </fr:button>
+            <fr:button>
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
                 </xforms:label>
                 <!-- Hide dialog -->
                 <xxforms:hide ev:event="DOMActivate" dialog="fb-action-dialog"/>
-            </xforms:trigger>
+            </fr:button>
         </xforms:group>
     </xhtml:div>
 
@@ -301,7 +302,7 @@
         </xforms:action>
 
         <!-- Set focus to first input -->
-        <xforms:setfocus control="fb-binding-name-input"/>
+        <xforms:setfocus control="fb-action-dialog"/>
     </xforms:action>
 
     <!-- Model for the bindings editor -->
@@ -432,7 +433,7 @@
                     <xxforms:variable name="control-name" select="" as="xs:string"/>
                     <xxforms:variable name="response-items" select="" as="node()*"/>
                     <!-- Set itemset -->
-                    <xxforms:variable name="control-resources" select="xxforms:instance('fr-current-form-resources')/*[name() = $control-name]"/>
+                    <xxforms:variable name="control-resources" model="fr-resources-model" select="$fr-form-resources/*[name() = $control-name]"/>
                     <xforms:delete nodeset="$control-resources/item"/>
                     <xforms:action xxforms:iterate="$response-items">
                         <xxforms:variable name="item-label" select="" as="xs:string"/>

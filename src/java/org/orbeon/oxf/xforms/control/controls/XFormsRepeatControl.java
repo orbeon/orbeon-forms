@@ -332,7 +332,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     = updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, insertedNodeInfos);
             // Initialize all new iterations
             final ControlTree currentControlTree = containingDocument.getControls().getCurrentControlTree();
-            for (XFormsRepeatIterationControl newIteration: newIterations) {
+            for (final XFormsRepeatIterationControl newIteration: newIterations) {
+                // This evaluates all controls and then dispatches creation events
                 currentControlTree.initializeRepeatIterationTree(propertyContext, newIteration);
             }
         }

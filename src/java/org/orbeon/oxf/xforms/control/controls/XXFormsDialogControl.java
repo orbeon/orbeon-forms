@@ -16,10 +16,9 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.ControlTree;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -29,14 +28,17 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents an extension xxforms:dialog control.
  */
 public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
-    private static final boolean TESTING_DIALOG_OPTIMIZATION = false;
+//    private static final boolean TESTING_DIALOG_OPTIMIZATION = false;
 
     private String level;
     private boolean close;
@@ -81,12 +83,23 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
+    protected boolean computeRelevant() {
+        // If parent is not relevant then we are not relevant either
+        if (!super.computeRelevant()) {
+            return false;
+        } else {
+            // Otherwise we are relevant only if we are selected
+            return !isXForms11Switch() || isVisible();
+        }
+    }
+
+    @Override
     public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
         super.setBindingContext(propertyContext, bindingContext, isCreate);
 
         // TODO
-        if (TESTING_DIALOG_OPTIMIZATION)
-            updateContent(propertyContext, isVisible());
+//        if (TESTING_DIALOG_OPTIMIZATION)
+//            updateContent(propertyContext, isVisible());
     }
 
     @Override
@@ -138,6 +151,12 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
             final XXFormsDialogControlLocal localForUpdate = (XXFormsDialogControlLocal) getLocalForUpdate();
             localForUpdate.visible = false;
             containingDocument.getControls().markDirtySinceLastRequest(false);
+
+            if (isXForms11Switch()) {
+                // Partial refresh
+                containingDocument.getControls().doPartialRefresh(propertyContext, this);
+            }
+
         } else if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.getName())) {
             // Open the dialog
 
@@ -149,6 +168,12 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
             localForUpdate.constrainToViewport = dialogOpenEvent.isConstrainToViewport();
 
             containingDocument.getControls().markDirtySinceLastRequest(false);
+
+            // TODO: Issue here: if the dialog is non-relevant, it can't receive xxforms-dialog-open!
+            if (isXForms11Switch()) {
+                // Partial refresh
+                containingDocument.getControls().doPartialRefresh(propertyContext, this);
+            }
         }
         super.performDefaultAction(propertyContext, event);
     }
@@ -178,25 +203,25 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
                 element.attributeValue("neighbor")));
     }
 
-    public void updateContent(PropertyContext propertyContext, boolean isVisible) {
-        final XFormsControls controls = containingDocument.getControls();
-        final ControlTree currentControlTree = controls.getCurrentControlTree();
-
-        final List<XFormsControl> children = getChildren();
-
-        if (isVisible) {
-            // Became visible: create children
-            if (children == null || children.size() == 0) {
-                currentControlTree.createSubTree(propertyContext, this);
-            }
-        } else {
-            // Became invisible: remove children
-            if (children != null && children.size() > 0) {
-                currentControlTree.deindexSubtree(this, false);
-                this.setChildren(null);
-            }
-        }
-    }
+//    public void updateContent(PropertyContext propertyContext, boolean isVisible) {
+//        final XFormsControls controls = containingDocument.getControls();
+//        final ControlTree currentControlTree = controls.getCurrentControlTree();
+//
+//        final List<XFormsControl> children = getChildren();
+//
+//        if (isVisible) {
+//            // Became visible: create children
+//            if (children == null || children.size() == 0) {
+//                currentControlTree.createSubTree(propertyContext, this);
+//            }
+//        } else {
+//            // Became invisible: remove children
+//            if (children != null && children.size() > 0) {
+//                currentControlTree.deindexSubtree(this, false);
+//                this.setChildren(null);
+//            }
+//        }
+//    }
 
     // Only allow xxforms-dialog-close from client
     private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
@@ -227,9 +252,9 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
     @Override
     public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other,
-                               AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree
-) {
+                               AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
 
+        // NOTE: At this point, this uses visible/hidden. But we could also handle this with relevant="true|false".
         final String neighbor = getNeighborControlId();
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[] {
                 "id", getEffectiveId(),
@@ -237,5 +262,14 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
                 (neighbor != null && isVisible()) ? "neighbor" : null, neighbor,
                 isVisible() ? "constrain" : null, Boolean.toString(isConstrainToViewport())
         });
+    }
+
+    // NOTE: Duplicated in XFormsSwitchControl
+    public boolean isXForms11Switch() {
+        final String localXForms11Switch = getControlElement().attributeValue(XFormsConstants.XXFORMS_XFORMS11_SWITCH_QNAME);
+        if (localXForms11Switch != null)
+            return Boolean.parseBoolean(localXForms11Switch);
+        else
+            return XFormsProperties.isXForms11Switch(containingDocument);
     }
 }

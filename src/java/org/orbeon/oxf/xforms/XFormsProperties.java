@@ -124,6 +124,8 @@ public class XFormsProperties {
     public static final String NEW_XHTML_LAYOUT = "new-xhtml-layout";   // deprecated
     public static final String XHTML_LAYOUT = "xhtml-layout";
 
+    public static final String XFORMS11_SWITCH_PROPERTY = "xforms11-switch";
+
     public enum XHTMLLayout { NOSPAN, SPAN }
 
     private static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
@@ -213,6 +215,7 @@ public class XFormsProperties {
             new PropertyDefinition(FORWARD_SUBMISSION_HEADERS, DEFAULT_FORWARD_SUBMISSION_HEADERS, false),
             new PropertyDefinition(ASYNC_SUBMISSION_POLL_DELAY, 10 * 1000, false), // 10 seconds
             new PropertyDefinition(AJAX_UPDATE_FULL_THRESHOLD, 20, false),
+            new PropertyDefinition(XFORMS11_SWITCH_PROPERTY, false, false), // false for now, but default should change at some point
 
             // Properties to propagate to the client
             new PropertyDefinition(NEW_XHTML_LAYOUT, false, true),
@@ -577,6 +580,10 @@ public class XFormsProperties {
         return getIntegerProperty(containingDocument, AJAX_UPDATE_FULL_THRESHOLD);
     }
 
+    public static boolean isXForms11Switch(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, XFORMS11_SWITCH_PROPERTY);
+    }
+
     public static String getDatePicker(XFormsContainingDocument containingDocument) {
         return getStringProperty(containingDocument, DATEPICKER_PROPERTY);
     }
@@ -600,4 +607,5 @@ public class XFormsProperties {
     private static int getIntegerProperty(XFormsContainingDocument containingDocument, String propertyName) {
         return containingDocument.getStaticState().getIntegerProperty(propertyName);
     }
+
 }

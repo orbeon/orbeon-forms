@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
@@ -88,29 +89,41 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     /**
      * Set the currently selected case.
      *
-     * @param propertyContext   current context
-     * @param caseControl       case control to select
+     * @param propertyContext       current context
+     * @param caseControlToSelect   case control to select
      */
-    public void setSelectedCase(PropertyContext propertyContext, XFormsCaseControl caseControl) {
+    public void setSelectedCase(PropertyContext propertyContext, XFormsCaseControl caseControlToSelect) {
 
-        if (caseControl.getParent() != this)
+        if (caseControlToSelect.getParent() != this)
             throw new OXFException("xforms:case is not child of current xforms:switch.");
 
         final XFormsSwitchControlLocal localForUpdate = (XFormsSwitchControlLocal) getLocalForUpdate();
 
         final XFormsCaseControl previouslySelectedCaseControl = localForUpdate.selectedCaseControl;
-        final boolean isChanging = previouslySelectedCaseControl != caseControl;
-        localForUpdate.selectedCaseControl = caseControl;
+        final boolean isChanging = previouslySelectedCaseControl != caseControlToSelect;
+        localForUpdate.selectedCaseControl = caseControlToSelect;
 
-        if (isChanging && propertyContext != null) {
+        if (isChanging && propertyContext != null) { // Not sure when propertyContext could be null! It shouldn't be!
             // "This action adjusts all selected attributes on the affected cases to reflect the new state, and then
             // performs the following:"
 
             // "1. Dispatching an xforms-deselect event to the currently selected case."
-            previouslySelectedCaseControl.getXBLContainer().dispatchEvent(propertyContext, new XFormsDeselectEvent(containingDocument, previouslySelectedCaseControl));
+            previouslySelectedCaseControl.getXBLContainer().dispatchEvent(propertyContext,
+                    new XFormsDeselectEvent(containingDocument, previouslySelectedCaseControl));
+
+            if (isXForms11Switch()) {
+                // Partial refresh on the case that is being deselected
+                // Do this after xforms-deselect is dispatched
+                containingDocument.getControls().doPartialRefresh(propertyContext, previouslySelectedCaseControl);
+
+                // Partial refresh on the case that is being selected
+                // Do this before xforms-select is dispatched
+                containingDocument.getControls().doPartialRefresh(propertyContext, caseControlToSelect);
+            }
 
             // "2. Dispatching an xforms-select event to the case to be selected."
-            caseControl.getXBLContainer().dispatchEvent(propertyContext, new XFormsSelectEvent(containingDocument, caseControl));
+            caseControlToSelect.getXBLContainer().dispatchEvent(propertyContext,
+                    new XFormsSelectEvent(containingDocument, caseControlToSelect));
         }
     }
 
@@ -248,5 +261,14 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
 
     private String getOtherSelectedCaseEffectiveId(XFormsSwitchControl switchControl1) {
         return (switchControl1 != null) ? ((XFormsSwitchControlLocal) switchControl1.getInitialLocal()).getSelectedCaseControl().getEffectiveId() : null;
+    }
+
+    // NOTE: Duplicated in XXFormsDialogControl
+    public boolean isXForms11Switch() {
+        final String localXForms11Switch = getControlElement().attributeValue(XFormsConstants.XXFORMS_XFORMS11_SWITCH_QNAME);
+        if (localXForms11Switch != null)
+            return Boolean.parseBoolean(localXForms11Switch);
+        else
+            return XFormsProperties.isXForms11Switch(containingDocument);
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -37,6 +37,17 @@ public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl implem
         this.defaultSelected = "true".equals(selectedAttribute);
     }
 
+    @Override
+    protected boolean computeRelevant() {
+        if (!super.computeRelevant()) {
+            // If parent is not relevant then we are not relevant either
+            return false;
+        } else {
+            // Otherwise we are relevant only if we are selected
+            return !getSwitch().isXForms11Switch() || isSelected();
+        }
+    }
+
     /**
      * Return whether this case has selected="true".
      */
@@ -48,16 +59,14 @@ public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl implem
      * Return whether this is the currently selected case within the current switch.
      */
     public boolean isSelected() {
-        final XFormsSwitchControl switchControl = (XFormsSwitchControl) getParent();
-        return switchControl.getSelectedCase() == this;
+        return getSwitch().getSelectedCase() == this;
     }
 
     /**
      * Return whether to show this case.
      */
     public boolean isVisible() {
-        final XFormsSwitchControl switchControl = (XFormsSwitchControl) getParent();
-        return isSelected() || switchControl.isStaticReadonly();
+        return isSelected() || getSwitch().isStaticReadonly();
     }
 
     /**
@@ -66,7 +75,10 @@ public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl implem
      * @param propertyContext   current context
      */
     public void toggle(PropertyContext propertyContext) {
-        final XFormsSwitchControl switchControl = (XFormsSwitchControl) getParent();
-        switchControl.setSelectedCase(propertyContext, this);
+        getSwitch().setSelectedCase(propertyContext, this);
+    }
+
+    private XFormsSwitchControl getSwitch() {
+        return (XFormsSwitchControl) getParent();
     }
 }

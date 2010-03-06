@@ -242,7 +242,7 @@ public class ControlTree implements ExternalCopyable {
     public void dispatchDestructionEvents(PropertyContext propertyContext, XFormsRepeatIterationControl removedIteration) {
         // Gather ids of controls to handle
         final List<String> controlsEffectiveIds = new ArrayList<String>();
-        visitChildrenControls(removedIteration, true, new XFormsControls.XFormsControlVisitorAdapter() {
+        visitControls(removedIteration, true, new XFormsControls.XFormsControlVisitorAdapter() {
             @Override
             public boolean startVisitControl(XFormsControl control) {
                 // Don't handle container controls here
@@ -429,7 +429,7 @@ public class ControlTree implements ExternalCopyable {
 
         // Gather all control ids and controls
         final Map<String, XFormsControl> effectiveIdsToControls = new LinkedHashMap<String, XFormsControl>();
-        visitChildrenControls(repeatIteration, true, new XFormsControls.XFormsControlVisitorAdapter() {
+        visitControls(repeatIteration, true, new XFormsControls.XFormsControlVisitorAdapter() {
             @Override
             public boolean startVisitControl(XFormsControl control) {
                 effectiveIdsToControls.put(control.getEffectiveId(), control);
@@ -444,14 +444,13 @@ public class ControlTree implements ExternalCopyable {
         dispatchCreationEvents(propertyContext, effectiveIdsToControls.keySet());
     }
 
-    // NOTE: not used yet as of 2009-08
-    public void createSubTree(PropertyContext propertyContext, XFormsContainerControl containerControl) {
-
-        // TODO: implement in a way similar to createRepeatIterationTree()
-        final XFormsControl control = (XFormsControl) containerControl;
-        XFormsControls.visitControlElementsHandleRepeat(propertyContext, containerControl,
-                new CreateControlsListener(propertyContext, controlIndex, control, null));
-    }
+//    public void createSubTree(PropertyContext propertyContext, XFormsContainerControl containerControl) {
+//
+//        // TODO: implement in a way similar to createRepeatIterationTree()
+//        final XFormsControl control = (XFormsControl) containerControl;
+//        XFormsControls.visitControlElementsHandleRepeat(propertyContext, containerControl,
+//                new CreateControlsListener(propertyContext, controlIndex, control, null));
+//    }
 
     /**
      * Index a subtree of controls. Also handle special relevance binding events.
@@ -460,7 +459,7 @@ public class ControlTree implements ExternalCopyable {
      * @param includeCurrent    whether to index the container control itself
      */
     public void indexSubtree(XFormsContainerControl containerControl, boolean includeCurrent) {
-        visitChildrenControls(containerControl, includeCurrent, new XFormsControls.XFormsControlVisitorAdapter() {
+        visitControls(containerControl, includeCurrent, new XFormsControls.XFormsControlVisitorAdapter() {
             public boolean startVisitControl(XFormsControl control) {
                 // Index control
                 controlIndex.indexControl(control);
@@ -476,7 +475,7 @@ public class ControlTree implements ExternalCopyable {
      * @param includeCurrent    whether to index the container control itself
      */
     public void deindexSubtree(XFormsContainerControl containerControl, boolean includeCurrent) {
-        visitChildrenControls(containerControl, includeCurrent, new XFormsControls.XFormsControlVisitorAdapter() {
+        visitControls(containerControl, includeCurrent, new XFormsControls.XFormsControlVisitorAdapter() {
             public boolean startVisitControl(XFormsControl control) {
                 // Deindex control
                 controlIndex.deindexControl(control);
@@ -569,12 +568,12 @@ public class ControlTree implements ExternalCopyable {
 
     /**
      * Visit all the descendant controls of the given container control.
+     *
+     * @param containerControl              container control to start with
+     * @param includeCurrent                whether to include the container control
+     * @param xformsControlVisitorListener  listener
      */
-//    public static void visitDescendantControls(XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener, XFormsContainerControl containerControl) {
-//        handleControl(xformsControlVisitorListener, containerControl.getChildren());
-//    }
-
-    private static void visitChildrenControls(XFormsContainerControl containerControl, boolean includeCurrent, XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener) {
+    public static void visitControls(XFormsContainerControl containerControl, boolean includeCurrent, XFormsControls.XFormsControlVisitorListener xformsControlVisitorListener) {
         boolean doContinue;
         if (includeCurrent) {
             doContinue = xformsControlVisitorListener.startVisitControl((XFormsControl) containerControl);
@@ -918,7 +917,7 @@ public class ControlTree implements ExternalCopyable {
                 // o However they have not yet been evaluated. They will be evaluated at the same time the other controls are evaluated
                 for (XFormsRepeatIterationControl newIteration: newIterations) {
                     newIterationsSet.add(newIteration.getEffectiveId());
-                    // NOTE: don't call initializeRepeatIterationTree() here because refresh evaluates controls and dispatches events
+                    // NOTE: don't call ControlTree.initializeRepeatIterationTree() here because refresh evaluates controls and dispatches events
                 }
             } else {
                 // Handle all other controls

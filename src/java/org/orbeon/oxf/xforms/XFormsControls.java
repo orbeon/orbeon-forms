@@ -250,28 +250,6 @@ public class XFormsControls implements XFormsObjectResolver {
     }
 
     /**
-     * Evaluate all the controls if needed. Should be used before output initial XHTML and before computing differences
-     * in XFormsServer.
-     *
-     * @param propertyContext   current context
-     */
-    private void evaluateControlValuesIfNeeded(PropertyContext propertyContext) {
-
-        indentedLogger.startHandleOperation("controls", "evaluating");
-        {
-            final Map<String, XFormsControl> effectiveIdsToControls = getCurrentControlTree().getEffectiveIdsToControls();
-            // Evaluate all controls
-            if (effectiveIdsToControls != null) {
-                for (final Map.Entry<String, XFormsControl> currentEntry: effectiveIdsToControls.entrySet()) {
-                    final XFormsControl currentControl = currentEntry.getValue();
-                    currentControl.evaluateIfNeeded(propertyContext, true);
-                }
-            }
-        }
-        indentedLogger.endHandleOperation();
-    }
-
-    /**
      * Get the ControlTree computed in the initialize() method.
      */
     public ControlTree getInitialControlTree() {
@@ -303,45 +281,6 @@ public class XFormsControls implements XFormsObjectResolver {
                 initialControlTree = (ControlTree) currentControlTree.getBackCopy(propertyContext);
             }
             indentedLogger.endHandleOperation();
-        }
-    }
-
-    /**
-     * Rebuild the controls tree bindings if needed.
-     *
-     * @param propertyContext   current context
-     * @return                  true iif bindings were updated
-     */
-    private boolean updateControlBindingsIfNeeded(final PropertyContext propertyContext) {
-
-        if (!initialized) {
-            return false;
-        } else {
-            // This is the regular case
-
-            // Don't do anything if bindings are clean
-            if (!currentControlTree.isBindingsDirty())
-                return false;
-
-            // Clone if needed
-            cloneInitialStateIfNeeded(propertyContext);
-
-            indentedLogger.startHandleOperation("controls", "updating bindings");
-            final ControlTree.UpdateBindingsListener listener = new ControlTree.UpdateBindingsListener(propertyContext, currentControlTree.getEffectiveIdsToControls());
-            {
-                // Visit all controls and update their bindings
-                visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener);
-            }
-            indentedLogger.endHandleOperation(
-                    "controls updated", Integer.toString(listener.getUpdateCount()),
-                    "repeat iterations", Integer.toString(listener.getIterationCount())
-            );
-
-            // Controls are clean
-            initialControlTree.markBindingsClean();
-            currentControlTree.markBindingsClean();
-
-            return true;
         }
     }
 
@@ -408,15 +347,23 @@ public class XFormsControls implements XFormsObjectResolver {
         final XFormsContainingDocument containingDocument = control.getXBLContainer().getContainingDocument();
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
 
-        // Set binding context on the particular control
+        // Set binding context on the container control
         final XFormsContextStack contextStack = control.getXBLContainer().getContextStack();
         contextStack.setBinding(control);
 
-        // Start visiting children of the xforms:repeat element
-        XFormsControls.visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                containingDocument.getStaticState(), control.getXBLContainer(), control, control.getControlElement(),
-                XFormsUtils.getEffectiveIdPrefix(control.getEffectiveId()),
-                XFormsUtils.getEffectiveIdSuffix(control.getEffectiveId()));
+        final XBLContainer currentXBLContainer = control.getXBLContainer();
+
+        // Start visit container control
+        controlElementVisitorListener.startVisitControl(currentXBLContainer, control.getControlElement(), control.getEffectiveId());
+        {
+            // Start visiting children of the xforms:repeat element
+            XFormsControls.visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
+                    containingDocument.getStaticState(), currentXBLContainer, control, control.getControlElement(),
+                    XFormsUtils.getEffectiveIdPrefix(control.getEffectiveId()),
+                    XFormsUtils.getEffectiveIdSuffix(control.getEffectiveId()));
+        }
+        // End visit container control
+        controlElementVisitorListener.endVisitControl(control.getControlElement(), control.getEffectiveId());
     }
 
     private static void visitControlElementsHandleRepeat(PropertyContext propertyContext, ControlElementVisitorListener controlElementVisitorListener,
@@ -425,8 +372,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
         int variablesCount = 0;
         final XFormsContextStack currentContextStack = currentXBLContainer.getContextStack();
-        for (Object o: containerElement.elements()) {
-            final Element currentControlElement = (Element) o;
+        for (final Element currentControlElement: Dom4jUtils.elements(containerElement)) {
             final String currentControlURI = currentControlElement.getNamespaceURI();
             final String currentControlName = currentControlElement.getName();
 
@@ -568,15 +514,15 @@ public class XFormsControls implements XFormsObjectResolver {
     }
 
     public static interface ControlElementVisitorListener {
-        public XFormsControl startVisitControl(XBLContainer container, Element controlElement, String effectiveControlId);
-        public void endVisitControl(Element controlElement, String effectiveControlId);
-        public boolean startRepeatIteration(XBLContainer container, int iteration, String effectiveIterationId);
-        public void endRepeatIteration(int iteration);
+        XFormsControl startVisitControl(XBLContainer container, Element controlElement, String effectiveControlId);
+        void endVisitControl(Element controlElement, String effectiveControlId);
+        boolean startRepeatIteration(XBLContainer container, int iteration, String effectiveIterationId);
+        void endRepeatIteration(int iteration);
     }
 
     public static interface XFormsControlVisitorListener {
-        public boolean startVisitControl(XFormsControl control);
-        public boolean endVisitControl(XFormsControl control);
+        boolean startVisitControl(XFormsControl control);
+        boolean endVisitControl(XFormsControl control);
     }
 
     public static class XFormsControlVisitorAdapter implements XFormsControlVisitorListener {
@@ -623,9 +569,9 @@ public class XFormsControls implements XFormsObjectResolver {
             indentedLogger.startHandleOperation("model", "performing refresh", "container id", container.getEffectiveId());
             {
                 // Update control bindings
-                updateControlBindingsIfNeeded(propertyContext);
+                updateBindingsIfNeeded(propertyContext);
                 // Update control values
-                evaluateControlValuesIfNeeded(propertyContext);
+                evaluateValuesIfNeeded(propertyContext);
 
                 if (currentControlTree.isAllowSendingRefreshEvents()) {
                     // There are potentially event handlers for UI events, so do the whole processing
@@ -653,14 +599,74 @@ public class XFormsControls implements XFormsObjectResolver {
         }
     }
 
+    /**
+     * Rebuild the controls tree bindings if needed.
+     *
+     * @param propertyContext   current context
+     * @return                  true iif bindings were updated
+     */
+    private boolean updateBindingsIfNeeded(final PropertyContext propertyContext) {
+
+        if (!initialized) {
+            return false;
+        } else {
+            // This is the regular case
+
+            // Don't do anything if bindings are clean
+            if (!currentControlTree.isBindingsDirty())
+                return false;
+
+            // Clone if needed
+            cloneInitialStateIfNeeded(propertyContext);
+
+            indentedLogger.startHandleOperation("controls", "updating bindings");
+            final ControlTree.UpdateBindingsListener listener = new ControlTree.UpdateBindingsListener(propertyContext, currentControlTree.getEffectiveIdsToControls());
+            {
+                // Visit all controls and update their bindings
+                visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener);
+            }
+            indentedLogger.endHandleOperation(
+                    "controls updated", Integer.toString(listener.getUpdateCount()),
+                    "repeat iterations", Integer.toString(listener.getIterationCount())
+            );
+
+            // Controls are clean
+            initialControlTree.markBindingsClean();
+            currentControlTree.markBindingsClean();
+
+            return true;
+        }
+    }
+
+    /**
+     * Evaluate all the controls if needed. Should be used before output initial XHTML and before computing differences
+     * in XFormsServer.
+     *
+     * @param propertyContext   current context
+     */
+    private void evaluateValuesIfNeeded(PropertyContext propertyContext) {
+
+        indentedLogger.startHandleOperation("controls", "evaluating");
+        {
+            final Map<String, XFormsControl> effectiveIdsToControls = getCurrentControlTree().getEffectiveIdsToControls();
+            // Evaluate all controls
+            if (effectiveIdsToControls != null) {
+                for (final Map.Entry<String, XFormsControl> currentEntry: effectiveIdsToControls.entrySet()) {
+                    final XFormsControl currentControl = currentEntry.getValue();
+                    currentControl.evaluateIfNeeded(propertyContext, true);
+                }
+            }
+        }
+        indentedLogger.endHandleOperation();
+    }
+
     private List<String> gatherControlsForRefresh() {
 
         final List<String> eventsToDispatch = new ArrayList<String>();
 
-        // Iterate through controls and check the nodes they are bound to
         visitAllControls(new XFormsControlVisitorAdapter() {
             public boolean startVisitControl(XFormsControl control) {
-                if (XFormsControl.supportsRefreshEvents(control)) {// test here just to make smaller list
+                if (XFormsControl.supportsRefreshEvents(control)) {// test here to make smaller list
                     eventsToDispatch.add(control.getEffectiveId());
                 }
                 return true;
@@ -692,5 +698,74 @@ public class XFormsControls implements XFormsObjectResolver {
                 }
             }
         }
+    }
+
+    /**
+     * Do a refresh of a subtree of controls starting at the given container control.
+     *
+     * @param propertyContext   current context
+     * @param containerControl  container control
+     */
+    public void doPartialRefresh(final PropertyContext propertyContext, XFormsContainerControl containerControl) {
+
+        // Update bindings starting at the container control
+        updateSubtreeBindings(propertyContext, containerControl);
+
+        // Evaluate the controls
+        ControlTree.visitControls(containerControl, true, new XFormsControlVisitorAdapter() {
+            @Override
+            public boolean startVisitControl(XFormsControl control) {
+                control.evaluateIfNeeded(propertyContext, true);
+                return true;
+            }
+        });
+
+        if (currentControlTree.isAllowSendingRefreshEvents()) {
+            // There are potentially event handlers for UI events, so do the whole processing
+
+            // Gather controls to which to dispatch refresh events
+            final List<String> eventsToDispatch = gatherControlsForRefresh(containerControl);
+
+            // Dispatch events
+            dispatchRefreshEvents(propertyContext, eventsToDispatch);
+        }
+    }
+
+    /**
+     * Update the bindings of a container control and its descendants.
+     *
+     * @param propertyContext   current context
+     * @param containerControl  container control
+     */
+    private void updateSubtreeBindings(PropertyContext propertyContext, XFormsContainerControl containerControl) {
+        // Clone if needed
+        cloneInitialStateIfNeeded(propertyContext);
+
+        indentedLogger.startHandleOperation("controls", "updating bindings");
+        final ControlTree.UpdateBindingsListener listener = new ControlTree.UpdateBindingsListener(propertyContext, currentControlTree.getEffectiveIdsToControls());
+        {
+            // Visit all controls and update their bindings
+            visitControlElementsHandleRepeat(propertyContext, containerControl, listener);
+        }
+        indentedLogger.endHandleOperation(
+                "controls updated", Integer.toString(listener.getUpdateCount()),
+                "repeat iterations", Integer.toString(listener.getIterationCount())
+        );
+    }
+
+    private List<String> gatherControlsForRefresh(XFormsContainerControl containerControl) {
+
+        final List<String> eventsToDispatch = new ArrayList<String>();
+
+        ControlTree.visitControls(containerControl, true, new XFormsControlVisitorAdapter() {
+            public boolean startVisitControl(XFormsControl control) {
+                if (XFormsControl.supportsRefreshEvents(control)) {// test here to make smaller list
+                    eventsToDispatch.add(control.getEffectiveId());
+                }
+                return true;
+            }
+        });
+
+        return eventsToDispatch;
     }
 }

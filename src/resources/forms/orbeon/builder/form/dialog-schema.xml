@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -70,7 +70,7 @@
                 <xhtml:div class="fb-dialog-section">
 
                     <!-- Delete schema button -->
-                    <xforms:trigger ref=".[not($is-new-schema) and $model/xs:schema]">
+                    <fr:button ref=".[not($is-new-schema) and $model/xs:schema]">
                         <xforms:label ref="$form-resources/dialog-upload-schema/delete-schema/label"/>
 
                         <xforms:action ev:event="DOMActivate">
@@ -80,7 +80,7 @@
                             <!-- TODO: Check and adjust types that could be in use -->
                         </xforms:action>
 
-                    </xforms:trigger>
+                    </fr:button>
 
                     <!-- Upload a schema -->
                     <xforms:upload ref="$instance/schema-uri">
@@ -134,7 +134,7 @@
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group appearance="xxforms:internal">
-            <xforms:trigger class="fr-inplace-rename" id="fb-edit-schema-trigger">
+            <fr:button class="fr-inplace-rename" id="fb-edit-schema-trigger">
                 <xforms:label ref="$form-resources/apply/label"/>
 
                 <xforms:action ev:event="DOMActivate">
@@ -147,7 +147,7 @@
                     <xforms:insert context="$model" origin="$instance/schema/*"/>
                 </xforms:action>
 
-            </xforms:trigger>
+            </fr:button>
             <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                 <xforms:label ref="$form-resources/cancel/label"/>

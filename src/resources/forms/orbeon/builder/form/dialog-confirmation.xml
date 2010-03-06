@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -34,20 +34,20 @@
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
-            <xforms:trigger>
+            <fr:button>
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/delete/label"/></xhtml:span>
                 </xforms:label>
                 <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-yes" target="{confirmation-target}"/>
-            </xforms:trigger>
-            <xforms:trigger id="fb-confirmation-dialog-cancel-trigger">
+            </fr:button>
+            <fr:button id="fb-confirmation-dialog-cancel-trigger">
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
                 </xforms:label>
                 <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-no" target="{confirmation-target}"/>
-            </xforms:trigger>
+            </fr:button>
         </xforms:group>
     </xhtml:div>
 

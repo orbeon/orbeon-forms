@@ -52,8 +52,7 @@
                         <xforms:label ref="$form-resources/select/label"/>
                         <xforms:value/>
                     </xforms:item>
-                    <!-- TODO: add fr:button too? -->
-                    <xforms:itemset nodeset="$body//(*[@ref or @bind or self::xforms:trigger])[ends-with(@id, '-control')]">
+                    <xforms:itemset nodeset="$body//(*[@ref or @bind or self::xforms:trigger or self::fr:button])[ends-with(@id, '-control')]">
                         <!-- Try to build a reasonably user-friendly label -->
                         <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                         <xforms:value value="@id"/>

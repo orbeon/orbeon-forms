@@ -1653,6 +1653,169 @@
         </output>
     </test>
 
+    <test description="XForms 1.1 switch dispatches xforms-enabled/xforms-disabled events" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model" xxforms:xforms11-switch="true">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <value>42</value>
+                                <value>43</value>
+                            </instance>
+                        </xforms:instance>
+
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+
+                        <!-- Toggle -->
+                        <xforms:toggle ev:event="xforms-ready" case="case2"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+
+                    <xforms:insert ev:event="#all"
+                                   context="instance('events')" nodeset="*"
+                                   origin="xxforms:element('event',
+                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+
+                    <xforms:switch id="my-switch">
+                        <xforms:case id="case1">
+                            <xforms:input id="input1" ref="value[1]"/>
+                        </xforms:case>
+                        <xforms:case id="case2">
+                            <xforms:input id="input2" ref="value[2]"/>
+                        </xforms:case>
+                    </xforms:switch>
+
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value>42</value>
+                                    <value>43</value>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xforms-enabled" target="my-switch" indexes=""/>
+                                    <event type="xforms-enabled" target="input1" indexes=""/>
+                                    <event type="xforms-deselect" target="case1" indexes=""/>
+                                    <event type="xforms-disabled" target="input1" indexes=""/>
+                                    <event type="xforms-enabled" target="input2" indexes=""/>
+                                    <event type="xforms-select" target="case2" indexes=""/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-switch" case-id="case2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:div id="case2" visibility="visible"/>
+                        <xxf:div id="case1" visibility="hidden"/>
+                        <xxf:control id="input1" relevant="false"/>
+                        <xxf:control id="input2">43</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Dialog dispatches xforms-enabled/xforms-disabled events" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model" xxforms:xforms11-switch="true">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <value>42</value>
+                                <value>43</value>
+                            </instance>
+                        </xforms:instance>
+
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+
+                        <!-- Show/hide -->
+                        <xforms:action ev:event="xforms-ready">
+                            <xxforms:show dialog="my-dialog"/>
+                            <xxforms:hide dialog="my-dialog"/>
+                        </xforms:action>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+
+                    <xforms:insert ev:event="#all"
+                                   context="instance('events')" nodeset="*"
+                                   origin="xxforms:element('event',
+                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+
+                    <xxforms:dialog id="my-dialog">
+                        <xforms:input id="input1" ref="value[1]"/>
+                        <xforms:input id="input2" ref="value[2]"/>
+                    </xxforms:dialog>
+
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value>42</value>
+                                    <value>43</value>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <!-- TODO: we cannot dispatch this to my-dialog before it is enabled -->
+                                    <event type="xxforms-dialog-open" target="my-dialog" indexes=""/>
+                                    <event type="xforms-enabled" target="input1" indexes=""/>
+                                    <event type="xforms-enabled" target="input2" indexes=""/>
+                                    <event type="xxforms-dialog-close" target="my-dialog" indexes=""/>
+                                    <event type="xforms-disabled" target="input1" indexes=""/>
+                                    <event type="xforms-disabled" target="input2" indexes=""/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-dialog" visible="false"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:div id="my-dialog" visibility="hidden"/>
+                        <xxf:control id="input1" relevant="false"/>
+                        <xxf:control id="input2" relevant="false"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO:

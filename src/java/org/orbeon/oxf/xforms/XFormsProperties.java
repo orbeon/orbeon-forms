@@ -289,8 +289,6 @@ public class XFormsProperties {
     private static final boolean TEST_AJAX_DEFAULT = false;
 
     // The following global properties are deprecated in favor of the persistent application store
-    private static final String CACHE_SESSION_SIZE_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache.session.size";
-    private static final int CACHE_SESSION_SIZE_DEFAULT = 1024 * 1024;
     private static final String CACHE_APPLICATION_SIZE_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache.application.size";
     private static final int CACHE_APPLICATION_SIZE_DEFAULT = 1024 * 1024;
 
@@ -340,11 +338,6 @@ public class XFormsProperties {
     public static boolean isCacheDocument() {
         return Properties.instance().getPropertySet().getBoolean
                 (CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT);
-    }
-
-    public static int getSessionStoreSize() {
-        return Properties.instance().getPropertySet().getInteger
-                (CACHE_SESSION_SIZE_PROPERTY, CACHE_SESSION_SIZE_DEFAULT);
     }
 
     public static int getApplicationStateStoreSize() {
@@ -452,10 +445,6 @@ public class XFormsProperties {
 
     public static boolean isOptimizeRelevance(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, OPTIMIZE_RELEVANCE_PROPERTY);
-    }
-
-    public static boolean isInitialRefreshEvents(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, INITIAL_REFRESH_EVENTS_PROPERTY);
     }
 
     public static boolean isSkipSchemaValidation(XFormsContainingDocument containingDocument) {

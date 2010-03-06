@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -182,7 +182,7 @@
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
             <!-- Test button -->
-            <xforms:trigger ref="$instance/save-test-trigger">
+            <fr:button ref="$instance/save-test-trigger">
                 <xforms:label>
                     <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/dialog-http-services/test/label"/></xhtml:span>
@@ -221,9 +221,9 @@
                         <xforms:setvalue ref="error-type" value="event('error-type')"/>
                     </xforms:action>
                 </xforms:action>
-            </xforms:trigger>
+            </fr:button>
             <!-- Save button -->
-            <xforms:trigger ref="$instance/save-test-trigger">
+            <fr:button ref="$instance/save-test-trigger">
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/dialog-http-services/save/label"/></xhtml:span>
@@ -278,15 +278,15 @@
                     <!-- Hide dialog -->
                     <xxforms:hide dialog="fb-service-dialog"/>
                 </xforms:action>
-            </xforms:trigger>
-            <xforms:trigger>
+            </fr:button>
+            <fr:button>
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                     <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
                 </xforms:label>
                 <!-- Hide dialog -->
                 <xxforms:hide ev:event="DOMActivate" dialog="fb-service-dialog"/>
-            </xforms:trigger>
+            </fr:button>
         </xforms:group>
     </xhtml:div>
 

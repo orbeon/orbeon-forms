@@ -7103,7 +7103,8 @@ ORBEON.xforms.Server = {
                                         }
                                         // Set the action to the URL of the current page, so the URL seen by the client is always the URL
                                         // of a page to which we didn't do a submission replace="all"
-                                        requestForm.action = window.location.href;
+                                        if (requestForm.action.indexOf("xforms-server-submit") == -1)
+                                            requestForm.action = window.location.href;
                                         if (target == null) {
                                             // Reset as this may have been changed before by asyncRequest
                                             requestForm.removeAttribute("target");

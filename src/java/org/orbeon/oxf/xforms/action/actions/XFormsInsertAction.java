@@ -52,9 +52,11 @@ public class XFormsInsertAction extends XFormsAction {
         final XFormsContextStack contextStack = actionInterpreter.getContextStack();
 
         final String atAttribute = actionElement.attributeValue("at");
-        final String positionAttribute = actionElement.attributeValue("position");
         final String originAttribute = actionElement.attributeValue("origin");
         final String contextAttribute = actionElement.attributeValue("context");
+
+        // Extension: allow position to be an AVT
+        final String resolvedPositionAttribute = actionInterpreter.resolveAVT(propertyContext, actionElement, "position", false);
 
         // "2. The Node Set Binding node-set is determined."
         final List<Item> collectionToBeUpdated; {
@@ -155,7 +157,7 @@ public class XFormsInsertAction extends XFormsAction {
             }
         }
 
-        doInsert(propertyContext, containingDocument, indentedLogger, positionAttribute, collectionToBeUpdated,
+        doInsert(propertyContext, containingDocument, indentedLogger, resolvedPositionAttribute, collectionToBeUpdated,
                 (NodeInfo) insertContextItem, originObjects, insertionIndex, true, true);
     }
 
@@ -350,12 +352,18 @@ public class XFormsInsertAction extends XFormsAction {
 
                     // Prepare insertion of new element
                     final int actualInsertionIndex;
-                    if (positionAttribute == null || "after".equals(positionAttribute)) { // "after" is the default
-                        actualInsertionIndex = actualIndex + 1;
-                    } else if ("before".equals(positionAttribute)) {
+                    if ("before".equals(positionAttribute)) {
                         actualInsertionIndex = actualIndex;
                     } else {
-                        throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after' if present.");
+                        // Default to "after"
+                        actualInsertionIndex = actualIndex + 1;
+
+                        if (positionAttribute != null && !"after".equals(positionAttribute)) {
+                            // Attribute has a value which is different from "after"
+                            if (indentedLogger.isInfoEnabled())
+                                indentedLogger.logWarning("xforms:insert", "invalid position attribute, defaulting to \"after\"", "value", positionAttribute);
+    //                        throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after' if present.");
+                        }
                     }
 
                     // "7. The cloned node or nodes are inserted in the order they were cloned at their target

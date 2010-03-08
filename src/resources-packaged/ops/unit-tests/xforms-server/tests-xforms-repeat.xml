@@ -2881,6 +2881,58 @@
         </output>
     </test>
 
+    <test description="AVT on xforms:insert/@position" name="oxf:pipeline">
+        <!-- See http://forge.ow2.org/tracker/?func=detail&atid=350207&aid=314804&group_id=168 -->
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <values>
+                                <value>1</value>
+                                <value>3</value>
+                                <value>5</value>
+                            </values>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:insert nodeset="value[. = 3]" position="{'before'}" origin="xxforms:element('value', 2)"/>
+                            <xforms:insert nodeset="value[. = 3]" position="{'after'}" origin="xxforms:element('value', 4)"/>
+                            <!-- Invalid position defaults to "after" -->
+                            <xforms:insert nodeset="value[. = 5]" position="{''}" origin="xxforms:element('value', '6')"/>
+                        </xforms:action>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value>1</value>
+                                    <value>2</value>
+                                    <value>3</value>
+                                    <value>4</value>
+                                    <value>5</value>
+                                    <value>6</value>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO:

@@ -48,7 +48,7 @@
                 <xxforms:script>
                     <![CDATA[
                     
-                    var observersElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-error-summary-observer", null, this.container)[0];
+                    var observersElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-error-summary-observer", null, this)[0];
                     var observers = ORBEON.xforms.Document.getValue(observersElement.id).split(" ");
 
                     for (var j = 0; j < observers.length; j++) {
@@ -75,7 +75,7 @@
                 <xxforms:script>
                     <![CDATA[
 
-                    var observersElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-error-summary-observer", null, this.container)[0];
+                    var observersElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-error-summary-observer", null, this)[0];
                     var observers = ORBEON.xforms.Document.getValue(observersElement.id).split(" ");
 
                     for (var j = 0; j < observers.length; j++) {

@@ -6,19 +6,27 @@
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:lm="http://www.lockheedmartin.com/">
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:exf="http://www.exforms.org/exf/1-0"
+    xmlns:howto="http://www.orbeon.com/howto">
 
     <xhtml:head>
         <xhtml:title>Out of bound</xhtml:title>
-        <xforms:model>
+        <xforms:model xxforms:xhtml-layout="span">
 
             <!-- Instance with state selected by user -->
-            <xforms:instance id="state">
-                <state/>
+            <xforms:instance>
+                <instance>
+                    <initial-state label="" valid=""/>
+                    <removed-edit-state label="California" valid="">ca</removed-edit-state>
+                    <removed-view-state label="California" valid="">ca</removed-view-state>
+                </instance>
             </xforms:instance>
 
             <!-- Selected state is only valid if it is in the itemset -->
-            <xforms:bind nodeset="instance('state')" constraint=". = (instance('states')/state/@value, '')"/>
+            <xforms:bind nodeset="*" constraint="@valid = 'true'"/>
+            <xforms:bind nodeset="removed-view-state" readonly="true()"/>
 
             <!-- List of possible states -->
             <xforms:instance id="states">
@@ -31,45 +39,121 @@
             </xforms:instance>
         </xforms:model>
 
+        <xbl:xbl>
+            <xbl:binding id="howto-changing-itemset-select1" element="howto|changing-itemset-select1">
+                <xbl:implementation>
+                    <xforms:model>
+                        <xforms:instance>
+                            <alert/>
+                        </xforms:instance>
+                    </xforms:model>
+                </xbl:implementation>
+                <xbl:template>
+                    <xforms:group appearance="xxforms:internal" id="container">
+                        <!-- Pointers to nodes in the outside world -->
+                        <xxforms:variable name="value"><xxforms:sequence xbl:attr="select=value-ref" xxbl:scope="outer"/></xxforms:variable>
+                        <xxforms:variable name="label"><xxforms:sequence xbl:attr="select=label-ref" xxbl:scope="outer"/></xxforms:variable>
+                        <xxforms:variable name="valid"><xxforms:sequence xbl:attr="select=valid-ref" xxbl:scope="outer"/></xxforms:variable>
+                        <xxforms:variable name="alert" select="."/>
+                        <xxforms:variable name="is-readonly" select="exf:readonly($value)"/>
+                        <!-- Expose a "value" for the itemset, so we can have an event when it changes -->
+                        <xforms:group ref="xxforms:itemset('select1', 'json')" id="itemset" appearance="xxforms:internal"/>
+                        <!-- Update valid and alert when the value or the itemset changes  -->
+                        <xxforms:variable name="is-out-of-bound" select="$value != '' and not($value = xxforms:itemset('select1', 'xml')//item/value)"/>
+                        <xxforms:variable name="new-alert" select="if ($value = '') 
+                            then 'A value is required'
+                            else if ($is-out-of-bound)
+                            then concat('A value was selected (', $label, ') and this value is not available anymore.')
+                            else ''"/>
+                        <xforms:action ev:event="xforms-enabled xforms-value-changed" ev:observer="select1 itemset">
+                            <xxforms:variable name="new-label" select="xxforms:itemset('select1', 'xml')//item[value = $value]/label"/>
+                            <xforms:setvalue if="exists($new-label)" ref="$label" value="$new-label"/>
+                            <xforms:setvalue ref="$alert" value="$new-alert"/>
+                            <xforms:setvalue ref="$valid" value="$alert = ''"/>
+                        </xforms:action>
+                        <!-- If not read-only: selection control -->
+                        <xhtml:span style="{if ($is-readonly) then 'display: none' else ''}">
+                            <xforms:select1 xbl:attr="appearance" ref="$value" id="select1">
+                                <xforms:dispatch ev:event="xforms-enabled xforms-value-changed" name="itemset-or-value-changed" target="container"/>
+                                <xforms:alert ref="$alert"/>
+                                <xforms:item>
+                                    <xforms:label/>
+                                    <xforms:value/>
+                                </xforms:item>
+                                <xbl:content/>
+                            </xforms:select1>
+                            <xforms:output value="if ($is-out-of-bound) then $new-alert else ()"/>
+                        </xhtml:span>
+                        <!-- If readonly: show label -->
+                        <xhtml:span style="{if (not($is-readonly)) then 'display: none' else ''}">
+                            <xforms:output value="$label"/>
+                            <xforms:group ref=".[$is-out-of-bound]">(this value is not valid anymore)</xforms:group>
+                        </xhtml:span>
+                    </xforms:group>
+                </xbl:template>
+            </xbl:binding>
+        </xbl:xbl>
+
         <xhtml:style type="text/css">
             p { margin-top: 2em }
             .previous-state { font-weight: bold }
             .xbl-fr-error-summary { margin-top: 1em; }
             .fr-error-summary-body { background-color: #F2D6C6; padding: .5em 0 .5em 0; width: 40em; }
+            .xbl-fr-button { display: block; margin-top: 1em }
             .xbl-fr-error-summary .fr-error-alert { color: black; }
-            .xforms-repeat-selected-item-1 { background-color: transparent; }
+            .xbl-fr-error-summary .xforms-repeat-selected-item-1 { background-color: transparent }
+            .xforms-alert-active { display: none }
+            .xforms-invalid-visited .xforms-alert-active { display: inline-block }
         </xhtml:style>
 
     </xhtml:head>
     <xhtml:body>
 
-        <xhtml:p>1. Select California</xhtml:p>
+        <xhtml:fieldset>
+            <xhtml:legend>California is available</xhtml:legend>
+            <xforms:group ref="initial-state">
+                <howto:changing-itemset-select1 value-ref="." label-ref="@label" valid-ref="@valid" appearance="minimal" id="initial-state">
+                    <xforms:label>State: </xforms:label>
+                    <xforms:itemset nodeset="instance('states')/state">
+                        <xforms:value ref="@value"/>
+                        <xforms:label ref="."/>
+                    </xforms:itemset>
+                </howto:changing-itemset-select1>
+                <fr:error-summary observer="initial-state"/>
+            </xforms:group>
+        </xhtml:fieldset>
 
-        <xforms:select1 ref="instance('state')" appearance="minimal" id="state-selector">
-            <xforms:item>
-                <xforms:label>--- Select a state ---</xforms:label>
-                <xforms:value/>
-            </xforms:item>
-            <xforms:itemset nodeset="instance('states')/state">
-                <xforms:value ref="@value"/>
-                <xforms:label ref="."/>
-            </xforms:itemset>
-            <xforms:alert>The following value has been selected previously: <xforms:output class="previous-state" value="."/>.
-                This value is not valid anymore, please select another state.</xforms:alert>
-        </xforms:select1>
+        <xhtml:fieldset>
+            <xhtml:legend>California selected but not available: edit case</xhtml:legend>
+            <xforms:group ref="removed-edit-state">
+                <howto:changing-itemset-select1 value-ref="." label-ref="@label" valid-ref="@valid" appearance="minimal" id="removed-edit-state">
+                    <xforms:label>State: </xforms:label>
+                    <xforms:itemset nodeset="instance('states')/state[@value != 'ca']">
+                        <xforms:value ref="@value"/>
+                        <xforms:label ref="."/>
+                    </xforms:itemset>
+                </howto:changing-itemset-select1>
+                <fr:button>
+                    <xforms:label>Save</xforms:label>
+                    <xforms:dispatch ev:event="DOMActivate" name="fr-visit-all" targetid="removed-edit-state-error-summary"/>
+                </fr:button>
+                <fr:error-summary id="removed-edit-state-error-summary" observer="removed-edit-state"/>
+            </xforms:group>
+        </xhtml:fieldset>
 
-        <xhtml:p>2. Remove California from the list of possible values</xhtml:p>
-
-        <fr:button>
-            <xforms:label>Remove California</xforms:label>
-            <xforms:delete ev:event="DOMActivate" nodeset="instance('states')/state[@value = 'ca']"/>
-        </fr:button>
-
-        <xhtml:p>3. The form is marked as invalid, and the alert tells the user about the previous value.</xhtml:p>
-
-        <fr:error-summary id="error-summary" observer="state-selector">
-            <fr:label>Error in this form</fr:label>
-        </fr:error-summary>
+        <xhtml:fieldset>
+            <xhtml:legend>California selected but not available: view case</xhtml:legend>
+            <xforms:group ref="removed-view-state">
+                <howto:changing-itemset-select1 value-ref="." label-ref="@label" valid-ref="@valid" appearance="minimal" id="removed-view-state">
+                    <xforms:label>State: </xforms:label>
+                    <xforms:itemset nodeset="instance('states')/state[@value != 'ca']">
+                        <xforms:value ref="@value"/>
+                        <xforms:label ref="."/>
+                    </xforms:itemset>
+                </howto:changing-itemset-select1>
+                <fr:error-summary id="removed-view-state-error-summary" observer="removed-view-state"/>
+            </xforms:group>
+        </xhtml:fieldset>
 
     </xhtml:body>
 </xhtml:html>

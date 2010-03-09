@@ -101,8 +101,11 @@ YAHOO.xbl.fr.Datatable.prototype = {
 
     container: null,                                            // Set by xforms.js
     isInitialized: false,                                       // Has the datatable been initialized?
+    lastRequestUUID: 'init',                                    // UUID of the dynamic state store for future use
+    columnsUpdateUUID: null,                                    // UUID of the dynamic state when the columns have been updated
+    rowsUpdateUUID: null,                                       // UUID of the dynamic state when the rows have been updated
     divContainer: null,                                         // Main div container around the datatable
-    innerTableWidth: null,                                       // Inner table width, parameter from the XSL/XBL layer
+    innerTableWidth: null,                                      // Inner table width, parameter from the XSL/XBL layer
     scrollH:null,                                               // Is the table horizontally scrollable?
     scrollV:null,                                               // Is the table vertically scrollable?
     scroll:null,                                                // Is the table scrollable?
@@ -142,18 +145,17 @@ YAHOO.xbl.fr.Datatable.prototype = {
 
         // We don't care about datatable that are disabled (we'll receive a new event when they'll be enabled again)
         // TODO: check if this test is still neeeded
-        if (! YAHOO.util.Dom.hasClass(this.container, 'xforms-disabled')) {
+        if (this.isXformsEnabled()) {
             if (!this.isInitialized) {
                 // We need to postpone the initialization of datatables that are hidden by an xforms:switch
                 //var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
-                var region = YAHOO.util.Region.getRegion(this.container);
-                if ((region.left >= 0 && region.top >= 0)
-                        && (region.left < region.right)
-                        && (region.top < region.bottom)) {
+                if (this.isDisplayed()) {
                     this.initProperties();
                     this.finish();
                     this.isInitialized = true;
                     this.container.fr_dt_initialized = true;
+                    this.columnsUpdateUUID = this.getRequestUUID();
+                    this.rowsUpdateUUID = this.columnsUpdateUUID;
                 } else {
                     // Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
                     thiss = this;
@@ -162,10 +164,40 @@ YAHOO.xbl.fr.Datatable.prototype = {
                     }, 100);
                 }
             } else {
-                this.update();
+                this.updateColumns();
             }
         }
+        // if not xforms-enabled, we'll receive a new call when we'll become xforms-enabled
 
+    },
+
+    /**
+     *  Get the request UUID
+     */
+    getRequestUUID: function() {
+        var form = ORBEON.xforms.Controls.getForm(this.container);
+        var formDynamicState = ORBEON.xforms.Globals.formDynamicState[form.id];
+        if (formDynamicState !== undefined) {
+            this.lastRequestUUID = formDynamicState.value;
+        }
+        return this.lastRequestUUID;
+    },
+
+    /**
+     * Is the component XForms enabled
+     */
+    isXformsEnabled: function() {
+        var xformsGroup = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(this.container, 'span');
+        return ! (YAHOO.util.Dom.hasClass(xformsGroup, 'xforms-disabled') || YAHOO.util.Dom.hasClass(xformsGroup, 'xforms-disabled-subsequent'));
+    },
+
+    /**
+     *  Is the component displayed?
+     */
+    isDisplayed: function() {
+
+        var region = YAHOO.util.Region.getRegion(this.container);
+        return region.left >= 0 && region.top >= 0 && region.left < region.right && region.top < region.bottom;
     },
 
     /**
@@ -212,12 +244,15 @@ YAHOO.xbl.fr.Datatable.prototype = {
 
         // Save original styles
 
-        this.significantNodes = [this.divContainer, this.bodyContainer, this.table, this.thead, this.tbody];
+        this.significantNodes = [this.divContainer, this.bodyContainer, this.table, this.thead, this.tbody, this.table.tHead.rows[0]];
         if (this.headBodySplit) {
             this.significantNodes.push(this.headerTable);
             this.significantNodes.push(this.headerContainer);
             if (this.scrollV) {
                 this.significantNodes.push(this.headerScrollContainer);
+            }
+            for (var iRow = 0; iRow < this.table.tHead.rows.length; iRow++) {
+                this.significantNodes.push(this.table.tHead.rows[iRow]);
             }
         }
 
@@ -363,7 +398,14 @@ YAHOO.xbl.fr.Datatable.prototype = {
 
         // In IE7, tHead elements have a clientWidth set to 0.
         var region = YAHOO.util.Dom.getRegion(this.table.tHead);
-        this.headerHeight = region.bottom - region.top;
+        // Hack needed for IE7 that doesn't want to measure the header height after the table is reset!
+        if (region.bottom - region.top < 5) {
+            if (this.headerHeight == null) {
+                this.headerHeight = 10;
+            }
+        } else {
+            this.headerHeight = region.bottom - region.top;
+        }
 
 
         this.adjustHeightForIE = this.adjustHeightForIE || (this.scrollH && ! this.scrollV && this.height == 'auto' && YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 7);
@@ -383,8 +425,10 @@ YAHOO.xbl.fr.Datatable.prototype = {
         this.columnWidths = [];
         var j = 0;
 
-        for (var i = 0; i < this.masterRow.cells.length; i++) {
-            var cell = this.masterRow.cells[i];
+        // Here we can't use the master row  that is in the header table since its widths are not significant
+        var masterRowCopyInBody = YAHOO.util.Dom.getElementsByClassName('fr-dt-master-row', 'tr', this.table)[0];
+        for (var i = 0; i < masterRowCopyInBody.cells.length; i++) {
+            var cell = masterRowCopyInBody.cells[i];
             if (YAHOO.xbl.fr.Datatable.utils.isSignificant(cell)) {
                 this.columnWidths[j] = cell.clientWidth;
                 j += 1;
@@ -423,9 +467,10 @@ YAHOO.xbl.fr.Datatable.prototype = {
                 this.table.style.height = "auto";
             }
 
-            YAHOO.util.Dom.addClass(this.table.parentNode, 'yui-dt-bd');
-            YAHOO.util.Dom.removeClass(this.table.parentNode, 'yui-dt-hd');
-            YAHOO.util.Dom.removeClass(this.headerContainer, 'fr-datatable-hidden');
+            for (var iRow = 0; iRow < this.table.tHead.rows.length; iRow++) {
+                 YAHOO.util.Dom.addClass(this.table.tHead.rows[iRow], 'fr-datatable-hidden');
+             }
+             YAHOO.util.Dom.removeClass(this.headerContainer, 'fr-datatable-hidden');
         }
 
         this.pxWidth = pxWidth;
@@ -640,7 +685,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
 
 
     /**
-     * Set column sizes (IE) or classes (FF)
+     * Get the column lists
      */
     getAndSetColumns: function () {
 
@@ -679,13 +724,69 @@ YAHOO.xbl.fr.Datatable.prototype = {
     },
 
     /**
-     * Update the datatable when the repeat nodeset has been changed
+     *  The datatable needs to be redrawn when the column list has been updated
      */
-    update: function () {
-        if (!this.isInitialized) {
-            // If the datatable isn't initialized yet, we don't want to update it!
-            return;
+    needsRedraw: function() {
+        return  this.headerColumns[0].parentNode === null;
+        for (var icol = 0; icol < this.headerColumns.length; icol++) {
+            var headerColumn = this.headerColumns[icol];
+            if (headerColumn.parentNode === null) {
+                return true;
+            }
+            var divs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', headerColumn);
+            if (divs.length > 0) {
+                var div = divs[0];
+                if (div === undefined) {
+                    return true;
+                } else {
+                    var className = 'dt-' + this.id + '-col-' + (icol + 1);
+                    if (div.style.width === "" && ! YAHOO.util.Dom.hasClass(div, className)) {
+                        return true;
+                    }
+                }
+            }
         }
+        return false;
+
+    },
+
+    /**
+     *  Update the datatable when its columns sets have changed
+     */
+    updateColumns: function () {
+        if (! (this.isInitialized && this.isXformsEnabled())) {
+            return; // we'll receive a new call when/if needed
+        }
+        if (this.isDisplayed()) {
+            if (this.columnsUpdateUUID != this.getRequestUUID()) {
+                this.reset();
+                this.isInitialized = false;
+                thiss = this;
+                this.draw(this.innerTableWidth);
+            }
+            // Otherwise, we've already done an update for this dynamic state!
+        }
+        else {
+            // The datatable is hidden in a switch, we need to come back later!
+            thiss = this;
+            setTimeout(function() {
+                thiss.updateColumns();
+            }, 100);
+        }
+    },
+
+    /**
+     * Update the datatable when its rows have changed
+     */
+    updateRows: function () {
+        if (! (this.isInitialized && this.isXformsEnabled())) {
+            return; // we'll receive a new call when/if needed    
+        }
+
+        if (this.rowsUpdateUUID == this.getRequestUUID()) {
+            return; // we've already done an update for this dynamic state!
+        }
+
         // This method is called when the xforms:repeat nodeset has been changed
         // this.totalNbRows is the number of rows memorized during the last run of this method...
         if (this.totalNbRows == undefined) {
@@ -744,7 +845,9 @@ YAHOO.xbl.fr.Datatable.prototype = {
             }
         }
 
+
         this.totalNbRows = totalNbRows;
+        this.rowsUpdateUUID = this.getRequestUUID();
 
         if (this.adjustHeightForIE) {
             // We need to update the container height for old broken versions of IE :( ...
@@ -806,7 +909,6 @@ YAHOO.xbl.fr.Datatable.prototype = {
     },
 
 
-
     EOO: ''                                                     // End Of Object!
 
 
@@ -818,7 +920,6 @@ YAHOO.xbl.fr.Datatable.prototype = {
  * Utilities
  */
 YAHOO.xbl.fr.Datatable.utils = {
-
 
     getFirstChildByTagName: function (root, tagName) {
         tagName = tagName.toLowerCase();

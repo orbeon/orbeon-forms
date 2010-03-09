@@ -114,8 +114,9 @@
     <xsl:variable name="sortAndPaginationMode" select="$pass5/fr:datatable/@sortAndPaginationMode"/>
     <xsl:variable name="isExternallySortedAndPaginated" select="$sortAndPaginationMode = 'external'"/>
     <xsl:variable name="isInternallySortedAndPaginated" select="not($isExternallySortedAndPaginated)"/>
-    <xsl:variable name="innerTableWidth"
-        select="if ($pass5/fr:datatable/@innerTableWidth) then concat(&quot;'&quot;, $pass5/fr:datatable/@innerTableWidth, &quot;'&quot;) else 'null'"/>
+    <xsl:variable name="innerTableWidth" select="$pass5/fr:datatable/@innerTableWidth"/>
+    <xsl:variable name="innerTableWidthJS" select="if ($innerTableWidth) then concat(&quot;'&quot;, $innerTableWidth, &quot;'&quot;) else 'null'"/>
+    <xsl:variable name="innerTableWidthCSS" select="if ($innerTableWidth) then concat('width: ', $innerTableWidth, ';') else ''"/>
     <xsl:variable name="hasLoadingFeature" select="count($pass5/fr:datatable/@loading) = 1"/>
     <xsl:variable name="debug" select="$pass5/fr:datatable/@debug = 'true'"/>
 
@@ -615,8 +616,8 @@
             <xxforms:script ev:event="xforms-enabled" ev:target="fr-dt-group" xxbl:scope="inner"> YAHOO.log("Enabling datatable id <xsl:value-of
                     select="$id"/>","info"); <xsl:choose>
                     <xsl:when test="$scrollH or $scrollV"> var instance = YAHOO.xbl.fr.Datatable.instance(this); setTimeout(function() {
-                            instance.draw(<xsl:value-of select="$innerTableWidth"/>); }, 10); </xsl:when>
-                    <xsl:otherwise> YAHOO.xbl.fr.Datatable.instance(this).draw(<xsl:value-of select="$innerTableWidth"/>); </xsl:otherwise>
+                            instance.draw(<xsl:value-of select="$innerTableWidthJS"/>); }, 10); </xsl:when>
+                    <xsl:otherwise> YAHOO.xbl.fr.Datatable.instance(this).draw(<xsl:value-of select="$innerTableWidthJS"/>); </xsl:otherwise>
                 </xsl:choose>
             </xxforms:script>
 
@@ -628,7 +629,7 @@
                         style="{$height} {$width}">
                         <xsl:variable name="table">
                             <xhtml:table id="{$id}-table" class="{@class} datatable datatable-{$id} yui-dt-table "
-                                style="{if ($scrollV) then $height else ''} {if (not($scrollH)) then $width else ''}">
+                                style="{if ($scrollV) then $height else ''} {if ($scrollH) then $innerTableWidthCSS else $width}">
                                 <!-- Copy attributes that are not parameters! -->
                                 <xsl:apply-templates select="@*[not(name() = ($parameters/*, 'id', 'class'))]" mode="dynamic"/>
                                 <xhtml:thead id="{$id}-thead">
@@ -650,12 +651,12 @@
                                         <xsl:when test="$scrollV">
                                             <!-- Add an intermediary div to the header to compensate the scroll bar width when needed -->
                                             <xhtml:div>
-                                                <xsl:copy-of select="$tHead"/>
+                                                <xsl:apply-templates select="$tHead" mode="addListener"/>
                                             </xhtml:div>
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <!-- Add the header without an intermediary div -->
-                                            <xsl:copy-of select="$tHead"/>
+                                            <xsl:apply-templates select="$tHead" mode="addListener"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </xhtml:div>
@@ -666,7 +667,7 @@
                             <xsl:otherwise>
                                 <!-- The table can be left alone -->
                                 <xhtml:div class="yui-dt-hd">
-                                    <xsl:copy-of select="$table"/>
+                                    <xsl:apply-templates select="$table" mode="addListener"/>
                                 </xhtml:div>
                             </xsl:otherwise>
                         </xsl:choose>
@@ -822,6 +823,16 @@
             <xsl:call-template name="header-cell"/>
 
         </xhtml:th>
+    </xsl:template>
+
+    <xsl:template match="/xhtml:table/xhtml:thead/xhtml:tr/xforms:repeat" mode="addListener">
+        <xsl:copy>
+            <xsl:apply-templates select="@*" mode="dynamic"/>
+            <xforms:action ev:event="xxforms-nodeset-changed">
+                <xxforms:script> YAHOO.xbl.fr.Datatable.instance(this).updateColumns(); </xxforms:script>
+            </xforms:action>
+            <xsl:apply-templates select="node()" mode="dynamic"/>
+        </xsl:copy>
     </xsl:template>
 
     <xsl:template match="header/xforms:repeat/xhtml:th" mode="dynamic">
@@ -982,7 +993,7 @@
             <xsl:apply-templates select="@*[not(name()='nodeset')]" mode="dynamic"/>
 
             <xforms:action ev:event="xxforms-nodeset-changed">
-                <xxforms:script> YAHOO.xbl.fr.Datatable.instance(this).update(); </xxforms:script>
+                <xxforms:script> YAHOO.xbl.fr.Datatable.instance(this).updateRows(); </xxforms:script>
                 <xsl:if test="$paginated and not($sortAndPaginationMode='external')">
                     <!-- Workaround, see https://forge.ow2.org/tracker/index.php?func=detail&aid=314429&group_id=168&atid=350207 -->
                     <xforms:setvalue model="datatable-model" ref="instance('page')/@nbPages" value="$nbPages" xxbl:scope="inner"/>

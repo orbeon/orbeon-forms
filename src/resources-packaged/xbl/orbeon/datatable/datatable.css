@@ -47,10 +47,18 @@
     position: absolute !important;
     top: -10000px;
     left: -1000px;
+    visibilty: hidden;
 }
 
 /* Needed for IE7 to display correctly multi header rows scrollable datatables */ 
 .yui-dt-scrollable .yui-dt-bd thead tr {
     display: none;
+    top: -10000px;     
+    visibility: hidden;
+}
+
+.yui-dt-scrollable .yui-dt-hd thead tr {
+    visibility: visible;
+    height: auto;
 }
 

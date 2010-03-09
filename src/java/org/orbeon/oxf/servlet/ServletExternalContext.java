@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -51,7 +51,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     public static final String APPLICATION_LISTENERS = "oxf.servlet.application-listeners";
 
     private final static String REWRITING_STRATEGY_DEFAULT = "servlet";
-    private static final String DEFAULT_FORM_CHARSET = Properties.instance().getPropertySet().getString(DEFAULT_FORM_CHARSET_PROPERTY, DEFAULT_FORM_CHARSET_DEFAULT);
+    public static final String DEFAULT_FORM_CHARSET = Properties.instance().getPropertySet().getString(DEFAULT_FORM_CHARSET_PROPERTY, DEFAULT_FORM_CHARSET_DEFAULT);
 
     private class Request implements ExternalContext.Request {
 

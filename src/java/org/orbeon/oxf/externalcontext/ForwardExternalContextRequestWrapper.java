@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,14 +13,13 @@
  */
 package org.orbeon.oxf.externalcontext;
 
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -127,10 +126,31 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
 
     public Map<String, Object[]> getParameterMap() {
         if (queryParameters == null) {
-            final Map<String, String[]> query = NetUtils.decodeQueryString(getQueryString(), false);
-            queryParameters = new HashMap<String, Object[]>(query.size());
-            for (Map.Entry<String, String[]> entry : query.entrySet()) {
-                queryParameters.put(entry.getKey(), StringUtils.stringArrayToObjectArray(entry.getValue()));
+            // Handle query string
+            {
+                // SRV.4.1: "Query string data is presented before post body data."
+                final Map<String, String[]> queryParameters = NetUtils.decodeQueryString(getQueryString(), false);
+                this.queryParameters = new HashMap<String, Object[]>(queryParameters.size());
+                for (Map.Entry<String, String[]> entry: queryParameters.entrySet()) {
+                    this.queryParameters.put(entry.getKey(), StringUtils.stringArrayToObjectArray(entry.getValue()));
+                }
+            }
+            // Handle post body form parameters
+            // NOTE: Remember, the servlet container does not help us decoding the body: the "other side" will just end
+            // up here when asking for parameters.
+            if (method.equalsIgnoreCase("post") && "application/x-www-form-urlencoded".equals(mediaType) && messageBody != null && messageBody.length > 0) {
+                // There is a body possibly containing parameters
+                // SRV.4.1.1 When Parameters Are Available
+                final String bodyString;
+                try {
+                    bodyString = new String(messageBody, ServletExternalContext.DEFAULT_FORM_CHARSET);
+                } catch (UnsupportedEncodingException e) {
+                    throw new OXFException(e);
+                }
+                final Map<String, String[]> bodyParameters = NetUtils.decodeQueryString(bodyString, false);
+                for (Map.Entry<String, String[]> entry: bodyParameters.entrySet()) {
+                    queryParameters.put(entry.getKey(), StringUtils.stringArrayToObjectArray(entry.getValue()));
+                }
             }
         }
 

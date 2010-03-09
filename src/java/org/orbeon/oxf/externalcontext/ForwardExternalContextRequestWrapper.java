@@ -95,14 +95,16 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
             final Map<String, String[]> requestHeaderValuesMap = request.getHeaderValuesMap();
 
             // Handle headers to forward
-            for (final String currentHeaderName: namesOfHeadersToForward) {
-                final String v1 = requestHeaderMap.get(currentHeaderName);
-                if (v1 != null)
-                    headerMap.put(currentHeaderName, v1);
+            if (namesOfHeadersToForward != null) {
+                for (final String currentHeaderName: namesOfHeadersToForward) {
+                    final String v1 = requestHeaderMap.get(currentHeaderName);
+                    if (v1 != null)
+                        headerMap.put(currentHeaderName, v1);
 
-                final String[] v2 = requestHeaderValuesMap.get(currentHeaderName);
-                if (v2 != null)
-                    headerValuesMap.put(currentHeaderName, v2);
+                    final String[] v2 = requestHeaderValuesMap.get(currentHeaderName);
+                    if (v2 != null)
+                        headerValuesMap.put(currentHeaderName, v2);
+                }
             }
 
             // Handle custom headers. Those override existing headers if any.
@@ -149,7 +151,7 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
                 }
                 final Map<String, String[]> bodyParameters = NetUtils.decodeQueryString(bodyString, false);
                 for (Map.Entry<String, String[]> entry: bodyParameters.entrySet()) {
-                    queryParameters.put(entry.getKey(), StringUtils.stringArrayToObjectArray(entry.getValue()));
+                    StringUtils.addValuesToObjectArrayMap(queryParameters, entry.getKey(), entry.getValue());
                 }
             }
         }

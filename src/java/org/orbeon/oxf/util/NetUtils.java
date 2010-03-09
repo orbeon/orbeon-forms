@@ -27,7 +27,6 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.FastStringBuffer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -387,19 +386,10 @@ public class NetUtils {
     }
 
     /**
-     * Make sure a query string is made of valid pairs name/value.
-     */
-    public static String normalizeQuery(String query, boolean acceptAmp) {
-        if (query == null)
-            return null;
-        return encodeQueryString(decodeQueryString(query, acceptAmp));
-    }
-
-    /**
      * Encode a query string. The input Map contains names indexing Object[].
      */
     public static String encodeQueryString(Map parameters) {
-        final FastStringBuffer sb = new FastStringBuffer(100);
+        final StringBuilder sb = new StringBuilder(100);
         boolean first = true;
         try {
             for (Object o: parameters.keySet()) {
@@ -429,7 +419,7 @@ public class NetUtils {
      * Combine a path info and a parameters map to form a path info with a query string.
      */
     public static String pathInfoParametersToPathInfoQueryString(String pathInfo, Map parameters) throws IOException {
-        final FastStringBuffer redirectURL = new FastStringBuffer(pathInfo);
+        final StringBuilder redirectURL = new StringBuilder(pathInfo);
         if (parameters != null) {
             boolean first = true;
             for (Object o: parameters.keySet()) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -93,6 +93,18 @@ public class StringUtils {
             System.arraycopy(currentValue, 0, newValue, 0, currentValue.length);
             newValue[currentValue.length] = value;
             map.put(name, newValue);
+        }
+    }
+
+    public static void addValuesToObjectArrayMap(Map<String, Object[]> map, String name, Object[] values) {
+        final Object[] currentValue = map.get(name);
+        if (currentValue == null) {
+            map.put(name, values);
+        } else {
+            final Object[] newValues = new Object[currentValue.length + values.length];
+            System.arraycopy(currentValue, 0, newValues, 0, currentValue.length);
+            System.arraycopy(values, 0, newValues, currentValue.length, values.length);
+            map.put(name, newValues);
         }
     }
 

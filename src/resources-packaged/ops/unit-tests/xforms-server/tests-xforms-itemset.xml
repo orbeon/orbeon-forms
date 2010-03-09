@@ -908,4 +908,143 @@
         </output>
     </test>
 
+    <test description="xxforms:itemset() function returns blank if control is non-relevant" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:encrypt-item-values="false">
+                                    <xforms:instance id="selection">
+                                        <selection>
+                                            <relevant>3</relevant>
+                                            <non-relevant>3</non-relevant>
+                                        </selection>
+                                    </xforms:instance>
+                                    <!-- Make node non-relevant -->
+                                    <xforms:bind nodeset="non-relevant" relevant="false()"/>
+                                    <xforms:instance id="itemset" xxforms:readonly="true">
+                                        <fruits>
+                                            <fruit id="1">
+                                                <description>Apple</description>
+                                                <color>Green</color>
+                                            </fruit>
+                                            <fruit id="2">
+                                                <description>Banana</description>
+                                                <color>Yellow</color>
+                                            </fruit>
+                                            <fruit id="3">
+                                                <description>Orange</description>
+                                                <color>Orange</color>
+                                            </fruit>
+                                            <fruit id="4">
+                                                <description>Kiwi</description>
+                                                <color>Green</color>
+                                            </fruit>
+                                        </fruits>
+                                    </xforms:instance>
+                                    <xforms:instance id="xml-result-relevant">
+                                        <result/>
+                                    </xforms:instance>
+                                    <xforms:instance id="json-result-relevant">
+                                        <result/>
+                                    </xforms:instance>
+                                    <xforms:instance id="xml-result-non-relevant">
+                                        <result/>
+                                    </xforms:instance>
+                                    <xforms:instance id="json-result-non-relevant">
+                                        <result/>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready">
+                                        <xforms:refresh/>
+                                        <xforms:insert nodeset="instance('xml-result-relevant')"
+                                                       origin="xxforms:itemset('relevant-control', 'xml')"/>
+                                        <xforms:setvalue ref="instance('json-result-relevant')"
+                                                         value="xxforms:itemset('relevant-control', 'json')"/>
+
+                                        <xforms:insert nodeset="instance('xml-result-non-relevant')"
+                                                       origin="xxforms:itemset('non-relevant-control', 'xml')"/>
+                                        <xforms:setvalue ref="instance('json-result-non-relevant')"
+                                                         value="xxforms:itemset('non-relevant-control', 'json')"/>
+                                    </xforms:action>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:select1 id="relevant-control" ref="relevant" appearance="xxforms:internal">
+                                    <xforms:itemset nodeset="instance('itemset')/fruit">
+                                        <xforms:label ref="description"/>
+                                        <xforms:value ref="@id"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                                <xforms:select1 id="non-relevant-control" ref="non-relevant" appearance="xxforms:internal">
+                                    <xforms:itemset nodeset="instance('itemset')/fruit">
+                                        <xforms:label ref="description"/>
+                                        <xforms:value ref="@id"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="selection" model-id="model">
+                                <selection>
+                                    <relevant>3</relevant>
+                                    <non-relevant>3</non-relevant>
+                                </selection>
+                            </instance>
+                            <instance id="xml-result-relevant" model-id="model">
+                                <itemset>
+                                    <choices>
+                                        <item>
+                                            <label>Apple</label>
+                                            <value>1</value>
+                                        </item>
+                                        <item>
+                                            <label>Banana</label>
+                                            <value>2</value>
+                                        </item>
+                                        <item selected="true">
+                                            <label>Orange</label>
+                                            <value>3</value>
+                                        </item>
+                                        <item>
+                                            <label>Kiwi</label>
+                                            <value>4</value>
+                                        </item>
+                                    </choices>
+                                </itemset>
+                            </instance>
+                            <instance id="json-result-relevant" model-id="model">
+                                <result>[["Apple","1"],["Banana","2"],["Orange","3",true],["Kiwi","4"]]</result>
+                            </instance>
+                            <instance id="xml-result-non-relevant" model-id="model">
+                                <result/>
+                            </instance>
+                            <instance id="json-result-non-relevant" model-id="model">
+                                <result/>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

@@ -34,7 +34,7 @@ public class XXFormsItemset extends XFormsFunction {
         final String controlStaticId = (controlStaticIdExpression == null) ? null : XFormsUtils.namespaceId(getContainingDocument(xpathContext), controlStaticIdExpression.evaluateAsString(xpathContext));
         final Object object = getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), controlStaticId, null);
 
-        if (object instanceof XFormsSelect1Control) {
+        if (object instanceof XFormsSelect1Control && ((XFormsSelect1Control) object).isRelevant()) {// only try if the control is relevant
             final XFormsSelect1Control select1Control = (XFormsSelect1Control) object;
 
             // Get format
@@ -48,10 +48,10 @@ public class XXFormsItemset extends XFormsFunction {
             final boolean isMultiple = select1Control instanceof XFormsSelectControl;
 
             if ("json".equalsIgnoreCase(format)) {
-                final String json = itemset.getJSONTreeInfo(pipelineContext, controlValue, isMultiple, null);// TODO: pass LocationData
+                final String json = itemset.getJSONTreeInfo(pipelineContext, controlValue, isMultiple, select1Control.getLocationData());
                 return StringValue.makeStringValue(json);
             } else {
-                return itemset.getXMLTreeInfo(pipelineContext, controlValue, isMultiple, null);// TODO: pass LocationData
+                return itemset.getXMLTreeInfo(pipelineContext, controlValue, isMultiple, select1Control.getLocationData());
             }
         } else {
             return null;

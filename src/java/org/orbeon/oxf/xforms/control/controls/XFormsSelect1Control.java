@@ -377,7 +377,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
             {
                 final Itemset itemset = getItemset(pipelineContext, true);
                 if (itemset != null) {
-                    final String result = itemset.getJSONTreeInfo(pipelineContext, null, false, null);// TODO: pass LocationData
+                    final String result = itemset.getJSONTreeInfo(pipelineContext, null, false, getLocationData());
                     if (result.length() > 0)
                         ch.text(result);
                 }

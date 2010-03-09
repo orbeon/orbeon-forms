@@ -297,7 +297,8 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                 // Help events
                 {
-                    final boolean hasHandlerForXFormsHelp = containingDocument.getStaticState().hasHandlerForEvent(XFormsEvents.XFORMS_HELP);
+                    // TODO: Need better way to enable/disable xforms-help event support, probably better static analysis of event handlers/
+                    final boolean hasHandlerForXFormsHelp = containingDocument.getStaticState().hasHandlerForEvent(XFormsEvents.XFORMS_HELP, false);
                     if (hasHandlerForXFormsHelp) {
                         dynamicProperties.put(XFormsProperties.HELP_HANDLER_PROPERTY, Boolean.TRUE);
                     }
@@ -317,7 +318,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
                         }
                     }
                 }
-
+    
                 // Offline mode
 //                        if (containingDocument.getStaticState().isHasOfflineSupport()) {
 //                            dynamicProperties.put(XFormsProperties.OFFLINE_SUPPORT_PROPERTY, Boolean.TRUE);

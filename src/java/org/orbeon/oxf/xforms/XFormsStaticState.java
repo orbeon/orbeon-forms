@@ -1413,8 +1413,19 @@ public class XFormsStaticState {
      * @return          true if there is a handler, false otherwise
      */
     public boolean hasHandlerForEvent(String eventName) {
-        // Check for #all as well as specific event
-        return eventNames.contains(XFormsConstants.XXFORMS_ALL_EVENTS) || eventNames.contains(eventName);
+        return hasHandlerForEvent(eventName, true);
+    }
+
+    /**
+     * Returns whether there is any event handler registered anywhere in the controls for the given event name.
+     *
+     * @param eventName         event name, like xforms-value-changed
+     * @param includeAllEvents  whether to include #all
+     * @return          true if there is a handler, false otherwise
+     */
+    public boolean hasHandlerForEvent(String eventName, boolean includeAllEvents) {
+        // Check for #all as well if includeAllEvents is true
+        return (includeAllEvents && eventNames.contains(XFormsConstants.XXFORMS_ALL_EVENTS)) || eventNames.contains(eventName);
     }
 
     public List<XFormsEventHandler> getKeyHandlers() {

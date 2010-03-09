@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -28,6 +28,7 @@
     <xi:include href="xforms-server/tests-xforms-events.xml"/>
     <xi:include href="xforms-server/tests-xforms-variable.xml"/>
     <xi:include href="xforms-server/tests-xforms-functions.xml"/>
+    <xi:include href="xforms-server/tests-xforms-validation.xml"/>
 
     <xi:include href="tests-xpl.xml"/>
     <xi:include href="processor/file.xml"/>

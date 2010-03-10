@@ -1425,6 +1425,11 @@
                                         <xforms:delete nodeset="value[1]"/>
                                         <!-- Change repeat nodeset order without changing instance: this will cause change during refresh -->
                                         <xforms:setvalue ref="@order">descending</xforms:setvalue>
+                                        <xforms:refresh/>
+                                        <!-- Remove all items ("going to 0" condition) -->
+                                        <xforms:delete nodeset="value"/>
+                                        <!-- Insert a new item ("going from 0" condition) -->
+                                        <xforms:insert context="." nodeset="value" origin="xxforms:element('value', 1)"/>
                                     </xforms:action>
 
                                 </xforms:model>
@@ -1453,10 +1458,7 @@
                         <instances>
                             <instance id="instance" model-id="model">
                                 <values order="descending">
-                                    <value>2</value>
-                                    <value>3</value>
-                                    <value>4</value>
-                                    <value>5</value>
+                        <value>1</value>
                                 </values>
                             </instance>
                             <instance id="changes" model-id="model">
@@ -1464,6 +1466,8 @@
                                     <change>5</change>
                                     <change>4</change>
                                     <change>4</change>
+                                    <change>0</change>
+                                    <change>1</change>
                                 </changes>
                             </instance>
                         </instances>
@@ -1474,10 +1478,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output·1">5</xxf:control>
-                        <xxf:control id="my-output·2">4</xxf:control>
-                        <xxf:control id="my-output·3">3</xxf:control>
-                        <xxf:control id="my-output·4">2</xxf:control>
+                        <xxf:control id="my-output·1">1</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

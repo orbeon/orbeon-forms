@@ -186,6 +186,15 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                         clazz = SQLProcessorGenericDelegate.class;
                         SQLProcessor.logger.info("Could not load HSQLDB database delegate. Using generic delegate.");
                     }
+				} else if ("MySQL".equalsIgnoreCase(productName)) {
+                    // MySQL
+                    try {
+                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorMySQLDelegate");
+                        SQLProcessor.logger.info("Using MySQL delegate.");
+                    } catch (Throwable t) {
+                        clazz = SQLProcessorGenericDelegate.class;
+                        SQLProcessor.logger.info("Could not load MySQL database delegate. Using generic delegate.");
+                    }
                 } else {
                     clazz = SQLProcessorGenericDelegate.class;
                 }

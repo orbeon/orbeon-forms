@@ -27,7 +27,7 @@
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <test description="Schema validation of " name="oxf:pipeline">
+    <test description="Schema validation with type deriving from simple type" name="oxf:pipeline">
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=308399&group_id=168&atid=350207 -->
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
@@ -88,6 +88,70 @@
                         <xxf:control id="xf-2" valid="false"/>
                         <xxf:control id="xf-3">Five</xxf:control>
                         <xxf:control id="xf-4">Seven</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Schema validation with union" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <values>
+                                <value>2009</value>
+                                <value>2009-03</value>
+                                <value>2009-03-09</value>
+                                <value>2009-13</value>
+                                <value>2009-03-32</value>
+                            </values>
+                        </xforms:instance>
+
+                        <xforms:bind nodeset="value" type="uwdcdate"/>
+
+                        <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified">
+                            <xs:simpleType name="uwdcdate">
+                                <xs:union memberTypes="xs:gYear xs:gYearMonth xs:date"/>
+                            </xs:simpleType>
+                        </xs:schema>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:input ref="value[1]"/>
+                    <xforms:input ref="value[2]"/>
+                    <xforms:input ref="value[3]"/>
+                    <xforms:input ref="value[4]"/>
+                    <xforms:input ref="value[5]"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value>2009</value>
+                                    <value>2009-03</value>
+                                    <value>2009-03-09</value>
+                                    <value>2009-13</value>
+                                    <value>2009-03-32</value>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="xf-2" type="uwdcdate">2009</xxf:control>
+                        <xxf:control id="xf-3" type="uwdcdate">2009-03</xxf:control>
+                        <xxf:control id="xf-4" type="uwdcdate">2009-03-09</xxf:control>
+                        <xxf:control id="xf-5" valid="false" type="uwdcdate">2009-13</xxf:control>
+                        <xxf:control id="xf-6" valid="false" type="uwdcdate">2009-03-32</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

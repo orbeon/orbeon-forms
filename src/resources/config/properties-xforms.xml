@@ -117,6 +117,7 @@
     <property as="xs:string"  name="oxf.xforms.client.events.mode"                          value="default"/>   <!-- default | deferred -->
     <property as="xs:string"  name="oxf.xforms.client.events.filter"                        value=""/>
     <property as="xs:string"  name="oxf.xforms.xhtml-layout"                                value="nospan"/>    <!-- nospan | span -->
+    <property as="xs:boolean" name="oxf.xforms.xforms11-switch"                             value="false"/>     <!-- default will switch to true at some point -->
 
     <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                              value=""/>

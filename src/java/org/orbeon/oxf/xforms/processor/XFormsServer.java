@@ -1041,7 +1041,6 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     private static void outputSubmissionInfo(ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
-//        final String clientSubmissionURL;
         final String target;
 
         // activeSubmission submission can be null when are running as a portlet and handling an <xforms:load>, which
@@ -1052,19 +1051,10 @@ public class XFormsServer extends ProcessorImpl {
 
         if ("all".equals(activeSubmissionReplace)) {
             // Replace all
-
-            // TODO: Set action ("action", clientSubmissionURL,) to destination page for local submissions? (http://tinyurl.com/692f7r)
-            // TODO: Should we keep the default submission path for separate deployment?
-//            // The submission path is actually defined by the oxf:page-flow processor and its configuration
-//            OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.PAGE_FLOW_PROCESSOR_QNAME);
-//            final String submissionPath = propertySet.getString(PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_PROPERTY_NAME,
-//                    PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
-//
-//            clientSubmissionURL = externalContext.getResponse().rewriteResourceURL(submissionPath, false);
+            // RFE: Set action ("action", clientSubmissionURL,) to destination page for local submissions? (http://tinyurl.com/692f7r)
             target = activeSubmissionResolvedXXFormsTarget;
         } else {
             // Replace instance
-//            clientSubmissionURL = externalContext.getRequest().getRequestURL();
             target = null;
         }
 

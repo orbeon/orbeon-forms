@@ -58,7 +58,8 @@ public class AsynchronousSubmissionManager {
      */
     public void addClientDelayEventIfNeeded(PropertyContext propertyContext) {
         if (hasPendingAsynchronousSubmissions(propertyContext)) {
-        containingDocument.addDelayedEvent(XFormsEvents.XXFORMS_POLL, containingDocument.getEffectiveId(),
+            // NOTE: Could get isShowProgress() from submission, but default must be false
+            containingDocument.addDelayedEvent(XFormsEvents.XXFORMS_POLL, containingDocument.getEffectiveId(),
                         false, false, XFormsProperties.getSubmissionPollDelay(containingDocument), true, false, null);
         }
     }

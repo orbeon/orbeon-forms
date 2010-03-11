@@ -1426,9 +1426,9 @@
                                         <!-- Change repeat nodeset order without changing instance: this will cause change during refresh -->
                                         <xforms:setvalue ref="@order">descending</xforms:setvalue>
                                         <xforms:refresh/>
-                                        <!-- Remove all items ("going to 0" condition) -->
+                                        <!-- Remove all items ("going to 0" condition) must not dispatch event -->
                                         <xforms:delete nodeset="value"/>
-                                        <!-- Insert a new item ("going from 0" condition) -->
+                                        <!-- Insert a new item ("going from 0" condition) must not dispatch event  -->
                                         <xforms:insert context="." nodeset="value" origin="xxforms:element('value', 1)"/>
                                     </xforms:action>
 
@@ -1458,7 +1458,7 @@
                         <instances>
                             <instance id="instance" model-id="model">
                                 <values order="descending">
-                        <value>1</value>
+                                    <value>1</value>
                                 </values>
                             </instance>
                             <instance id="changes" model-id="model">
@@ -1466,8 +1466,6 @@
                                     <change>5</change>
                                     <change>4</change>
                                     <change>4</change>
-                                    <change>0</change>
-                                    <change>1</change>
                                 </changes>
                             </instance>
                         </instances>
@@ -1566,10 +1564,6 @@
                                     <xforms-enabled id="my-repeat"/>
                                     <after-refresh/>
                                     <before-refresh/>
-                                    <!-- NOTE: We get these 2 events when the control is about to become non-relevant.
-                                         We might want to change this behavior in the future. -->
-                                    <xxforms-nodeset-changed id="my-repeat"/>
-                                    <xxforms-index-changed id="my-repeat"/>
                                     <xforms-disabled id="my-group"/>
                                     <xforms-disabled id="my-repeat"/>
                                     <after-refresh/>
@@ -2369,7 +2363,6 @@
                                     <event type="xxforms-index-changed" target="my-repeat" old="1" new="2"/>
                                     <event type="xxforms-index-changed" target="my-repeat" old="2" new="6"/>
                                     <event type="xxforms-index-changed" target="my-repeat" old="6" new="5"/>
-                                    <event type="xxforms-index-changed" target="my-repeat" old="5" new="0"/>
                                 </events>
                             </instance>
                         </instances>

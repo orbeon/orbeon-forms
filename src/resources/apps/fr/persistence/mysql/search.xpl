@@ -66,9 +66,19 @@
     -->
     <p:param name="data" type="output"/>
 
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config stream-type="xs:anyURI">
+                <include>/request/headers/header[name = 'orbeon-datasource']</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="request"/>
+    </p:processor>
+
     <!-- Run query -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#instance"/>
+        <p:input name="request" href="#request"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:template match="/">
@@ -76,7 +86,10 @@
                         <documents>
                             <sql:connection>
                                 <sql:datasource>
-                                    <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.mysql.datasource')"/>
+                                    <xsl:variable name="datasource-header" select="doc('input:request')/request/headers/header[name = 'orbeon-datasource']"/>
+                                    <xsl:value-of select="if (exists($datasource-header))
+                                        then $datasource-header/value
+                                        else pipeline:property('oxf.fr.persistence.service.mysql.datasource')"/>
                                 </sql:datasource>
                                 <!-- Query that returns all the search results, which we will reuse in multiple palces -->
                                 <xsl:variable name="query">

@@ -34,7 +34,7 @@
                 <include>/request/request-path</include>
                 <include>/request/content-type</include>
                 <include>/request/method</include>
-                <include>/request/headers/header[name = 'orbeon-username' or name = 'orbeon-roles']</include>
+                <include>/request/headers/header[name = 'orbeon-username' or name = 'orbeon-roles' or name = 'orbeon-datasource']</include>
                 <include>/request/body</include>
             </config>
         </p:input>
@@ -47,7 +47,7 @@
     </p:processor>
 
     <!-- Build a document with a description of the request -->
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="matcher-groups" href="#matcher-groups"/>
         <p:input name="instance" href="#instance"/>
         <p:input name="request" href="#request"/>
@@ -58,24 +58,6 @@
                 <xsl:variable name="request" as="element(request)" select="doc('input:request')/request"/>
                 <content-type><xsl:value-of select="$request/content-type"/></content-type>
                 <document>
-                    <!-- See comments below -->
-                    <!--<xsl:variable name="output" as="element(xsl:output)">-->
-                        <!--<xsl:element name="output">-->
-                            <!--<xsl:attribute name="method">xml</xsl:attribute>-->
-                            <!--<xsl:attribute name="omit-xml-declaration">yes</xsl:attribute>-->
-                        <!--</xsl:element>-->
-                    <!--</xsl:variable>-->
-                    <!--<xsl:value-of select="saxon:serialize(doc('input:instance'), $output)"/>-->
-
-                    <!-- NOTE: This is not a good way because:
-
-                         o the current XSLT stylesheet has some namespaces in scope, e.g. xmlns:sql
-                         o if the form declares xmlns:sql for use in attribute values only, the resulting namespace
-                            declaration might be moved to the document's root element after extraction
-
-                         It would be better to use saxon:serialize() and then saxon:parse() in oxf:sql, but oxf:sql
-                         doesn't support saxon:parse() as of 2009-0422.
-                     -->
                     <xsl:copy-of select="doc('input:instance')"/>
                 </document>
                 <timestamp><xsl:value-of select="adjust-dateTime-to-timezone(current-dateTime(), xs:dayTimeDuration('PT0H'))"/></timestamp>
@@ -90,6 +72,13 @@
                     <document-id><xsl:value-of select="$matcher-groups[7]"/></document-id>
                 </xsl:if>
                 <filename><xsl:value-of select="if ($type = 'data') then $matcher-groups[8] else $matcher-groups[5]"/></filename>
+                <!-- For the datasource, we either use the HTTP header if present, otherwise we use the global property -->
+                <sql:datasource>
+                    <xsl:variable name="datasource-header" select="$request/headers/header[name = 'orbeon-datasource']"/>
+                    <xsl:value-of select="if (exists($datasource-header))
+                        then $datasource-header/value
+                        else pipeline:property('oxf.fr.persistence.service.mysql.datasource')"/>
+                </sql:datasource>
                 <xsl:copy-of select="$request/body"/>
             </request>
         </p:input>
@@ -111,9 +100,7 @@
                     <sql:config xsl:version="2.0">
                         <sql-out>
                             <sql:connection>
-                                <sql:datasource>
-                                    <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.mysql.datasource')"/>
-                                </sql:datasource>
+                                <xsl:copy-of select="/request/sql:datasource"/>
                                 <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
                                 <xsl:variable name="is-attachment" as="xs:boolean" select="not(ends-with(/request/filename, '.xml') or ends-with(/request/filename, '.xhtml'))"/>
                                 <xsl:variable name="table-name" as="xs:string" select="concat(
@@ -241,9 +228,7 @@
                             <sql:config xsl:version="2.0">
                                 <result>
                                     <sql:connection>
-                                        <sql:datasource>
-                                            <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.mysql.datasource')"/>
-                                        </sql:datasource>
+                                        <xsl:copy-of select="/request/sql:datasource"/>
                                         <sql:execute>
                                             <sql:update>
                                                 <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
@@ -292,9 +277,7 @@
                             <sql:config xsl:version="2.0">
                                 <result>
                                     <sql:connection>
-                                        <sql:datasource>
-                                            <xsl:value-of select="pipeline:property('oxf.fr.persistence.service.mysql.datasource')"/>
-                                        </sql:datasource>
+                                        <xsl:copy-of select="/request/sql:datasource"/>
                                         <sql:execute>
                                             <sql:update>
                                                 <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>

@@ -37,6 +37,8 @@ var testCase = {
                     thiss.checkCellClasses(table2, true);
                     thiss.checkCellStyles(table2, true);
 
+                    thiss.closeAccordionCase(thiss, 'repeat-refresh');
+
                 });
             });
 

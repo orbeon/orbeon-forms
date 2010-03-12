@@ -67,6 +67,26 @@
         <setvalue ref="/*/app" matcher-group="1"/>
     </page>
 
+    <!-- ==== Custom MySQL-based Persistence Services =========================================================== -->
+
+    <!-- Create, Read, Update and Delete operations (id provided) -->
+    <page path-info="/fr/service/mysql/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
+          model="persistence/mysql/crud.xpl"/>
+
+    <!-- Search -->
+    <page path-info="/fr/service/mysql/search/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+          view="persistence/mysql/search.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+        <setvalue ref="/*/form" matcher-group="2"/>
+    </page>
+
+    <!-- List deployed forms for a given application -->
+    <page path-info="/fr/service/mysql/list/([^/]+)" matcher="oxf:perl5-matcher"
+          default-submission="persistence/mysql/list-submission.xml"
+          view="persistence/mysql/list.xpl">
+        <setvalue ref="/*/app" matcher-group="1"/>
+    </page>
+
     <!-- ==== Built-in Resource Manager-Based Persistence Services ================================================= -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->

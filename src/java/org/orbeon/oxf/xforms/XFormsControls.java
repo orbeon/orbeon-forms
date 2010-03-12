@@ -577,14 +577,14 @@ public class XFormsControls implements XFormsObjectResolver {
                     // There are potentially event handlers for UI events, so do the whole processing
 
                     // Gather controls to which to dispatch refresh events
-                    final List<String> eventsToDispatch = gatherControlsForRefresh();
+                    final List<String> controlsEffectiveIds = gatherControlsForRefresh();
 
                     // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
                     // effect, and clear the corresponding flag."
                     refreshDone();
 
                     // Dispatch events
-                    dispatchRefreshEvents(propertyContext, eventsToDispatch);
+                    dispatchRefreshEvents(propertyContext, controlsEffectiveIds);
 
                 } else {
                     // No UI events to send because there is no event handlers for any of them
@@ -676,9 +676,9 @@ public class XFormsControls implements XFormsObjectResolver {
         return eventsToDispatch;
     }
 
-    private void dispatchRefreshEvents(PropertyContext propertyContext, List<String> eventsToDispatch) {
+    public void dispatchRefreshEvents(PropertyContext propertyContext, List<String> controlsEffectiveIds) {
 
-        for (final String controlEffectiveId: eventsToDispatch) {
+        for (final String controlEffectiveId: controlsEffectiveIds) {
             final XFormsControl control = currentControlTree.getControl(controlEffectiveId);
 
             if (XFormsControl.supportsRefreshEvents(control)) {

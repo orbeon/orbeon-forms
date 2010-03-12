@@ -90,6 +90,9 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
             local.index = ensureIndexBounds(getStartIndex());
         }
+
+        // Reset refresh information
+        refreshInfo = null;
     }
 
     public int getStartIndex() {
@@ -163,7 +166,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         // Evaluate iterations
         final List<XFormsControl> children = getChildren();
         if (children != null) {
-            for (XFormsControl child: children) {
+            for (final XFormsControl child: children) {
                 final XFormsRepeatIterationControl currentRepeatIteration = (XFormsRepeatIterationControl) child;
                 currentRepeatIteration.evaluate(propertyContext, isRefresh);
             }
@@ -304,7 +307,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         // Get old nodeset
         final List<Item> oldRepeatNodeset = getBindingContext().getNodeset();
 
-        // Get new nodeset
+        // Set binding context and get new nodeset
         final List<Item> newRepeatNodeset;
         {
             // Set new binding context on the repeat control
@@ -329,13 +332,18 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         if (!compareNodesets(oldRepeatNodeset, newRepeatNodeset)) {
             // Update iterations
             final List<XFormsRepeatIterationControl> newIterations
-                    = updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, insertedNodeInfos);
+                    = updateIterations(propertyContext, oldRepeatNodeset, insertedNodeInfos);
             // Initialize all new iterations
             final ControlTree currentControlTree = containingDocument.getControls().getCurrentControlTree();
             for (final XFormsRepeatIterationControl newIteration: newIterations) {
                 // This evaluates all controls and then dispatches creation events
                 currentControlTree.initializeRepeatIterationTree(propertyContext, newIteration);
             }
+            // Perform a very local refresh on the control
+            // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events if needed
+            markDirty();
+            evaluate(propertyContext, true);
+            containingDocument.getControls().dispatchRefreshEvents(propertyContext, Collections.singletonList(getEffectiveId()));
         }
     }
 
@@ -348,13 +356,16 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
      *
      * @param propertyContext       current context
      * @param oldRepeatNodeset      old node-set
-     * @param newRepeatNodeset      new node-set
-     * @param insertedNodeInfos     nodes just inserted by xforms:insert if any
+     * @param insertedNodeInfos     nodes just inserted by xforms:insert if any, or null
      * @return                      new iterations if any, or an empty list
      */
-    public List<XFormsRepeatIterationControl> updateIterations(PropertyContext propertyContext, List<Item> oldRepeatNodeset, List<Item> newRepeatNodeset, List<Item> insertedNodeInfos) {
+    public List<XFormsRepeatIterationControl> updateIterations(PropertyContext propertyContext, List<Item> oldRepeatNodeset,
+                                                               List<Item> insertedNodeInfos) {
 
         // NOTE: The following assumes the nodesets have changed
+
+        // Get current (new) nodeset
+        final List<Item> newRepeatNodeset = getBindingContext().getNodeset();
 
         final XFormsControls controls = containingDocument.getControls();
         controls.cloneInitialStateIfNeeded(propertyContext);
@@ -604,33 +615,50 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             movedIterationsNewPositions = Collections.emptyList();
         }
 
-        // NOTE: There is a question of whether it is reasonable to dispatch events here.
-
-        // NOTE: use isRelevant() instead of wasRelevant() because this method is called before markDirty() is called,
-        // so we use the current relevance.
-        //
-        // o If the control is newly created, this method is not called
-        // o If the control is updated during refresh
-        //   o markDirty() hasn't been called yet
-        //   o control currently non-relevant: events must not be dispatched (non-relevant control)
-        //   o control becoming relevant: events must not be dispatched either (no change events upon xforms-enabled)
-        //   o control becoming non-relevant: events can be dispatched TODO: they should probably not be!
-        //   o control staying non-relevant: events must not be dispatched
-        if (isRelevant()) {
+        if (updated || oldRepeatIndex != getIndex()) {
+            // Keep information available until refresh events are dispatched, which must happen soon after this method was called
+            refreshInfo = new RefreshInfo();
             if (updated) {
-                // Dispatch custom event to xforms:repeat to notify that the nodeset has changed
-                getXBLContainer().dispatchEvent(propertyContext, new XXFormsNodesetChangedEvent(containingDocument, this,
-                        newIterations, movedIterationsOldPositions, movedIterationsNewPositions));
+                refreshInfo.isNodesetChanged = true;
+                refreshInfo.newIterations = newIterations;
+                refreshInfo.movedIterationsOldPositions = movedIterationsOldPositions;
+                refreshInfo.movedIterationsNewPositions = movedIterationsNewPositions;
             }
 
-            if (oldRepeatIndex != getIndex()) {
-                // Dispatch custom event to notify that the repeat index has changed
-                getXBLContainer().dispatchEvent(propertyContext, new XXFormsIndexChangedEvent(containingDocument, this,
-                        oldRepeatIndex, getIndex()));
-            }
+            refreshInfo.oldRepeatIndex = oldRepeatIndex;
+        } else {
+            refreshInfo = null;
         }
 
         return newIterations;
+    }
+
+    public void dispatchRefreshEvents(PropertyContext propertyContext) {
+        if (isRelevant() && refreshInfo != null) {
+            final RefreshInfo refreshInfo = this.refreshInfo; // copy as dispatching events might clear this.refreshInfo
+            if (refreshInfo.isNodesetChanged) {
+                // Dispatch custom event to xforms:repeat to notify that the nodeset has changed
+                getXBLContainer().dispatchEvent(propertyContext, new XXFormsNodesetChangedEvent(containingDocument, this,
+                        refreshInfo.newIterations, refreshInfo.movedIterationsOldPositions, refreshInfo.movedIterationsNewPositions));
+            }
+
+            if (refreshInfo.oldRepeatIndex != getIndex()) {
+                // Dispatch custom event to notify that the repeat index has changed
+                getXBLContainer().dispatchEvent(propertyContext, new XXFormsIndexChangedEvent(containingDocument, this,
+                        refreshInfo.oldRepeatIndex, getIndex()));
+            }
+            this.refreshInfo = null;
+        }
+    }
+
+    private RefreshInfo refreshInfo;
+    private static class RefreshInfo {
+        public boolean isNodesetChanged;
+        public List<XFormsRepeatIterationControl> newIterations;
+        public List<Integer> movedIterationsOldPositions;
+        public List<Integer> movedIterationsNewPositions;
+
+        public int oldRepeatIndex;// 1-based
     }
 
     private int indexOfItem(List<Item> nodeset, Item nodeInfo) {

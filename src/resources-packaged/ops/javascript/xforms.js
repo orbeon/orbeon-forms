@@ -5404,41 +5404,45 @@ ORBEON.xforms.Server = {
                 );
             }
         } else {
-            // Only proceed handling this event if the progress panel is not displayed
-            if (ORBEON.xforms.Globals.modalProgressPanel == null) {
-                // Store the time of the first event to be sent in the queue
-                var currentTime = new Date().getTime();
-                if (ORBEON.xforms.Globals.eventQueue.length == 0)
-                    ORBEON.xforms.Globals.eventsFirstEventTime = currentTime;
+            // We do not filter events when the modal progress panel is shown.
+            //      It is tempting to filter all the events that happen when the modal progress panel is shown.
+            //      However, if we do so we would loose the delayed events that become mature when the modal
+            //      progress panel is shown. So we either need to make sure that it is not possible for the
+            //      browser to generate events while the modal progress panel is up, or we need to filter those
+            //      event before this method is called.
 
-                // Store events to fire
-                for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
-                    ORBEON.xforms.Globals.eventQueue.push(events[eventIndex]);
-                }
+            // Store the time of the first event to be sent in the queue
+            var currentTime = new Date().getTime();
+            if (ORBEON.xforms.Globals.eventQueue.length == 0)
+                ORBEON.xforms.Globals.eventsFirstEventTime = currentTime;
 
-                // Fire them with a delay to give us a change to aggregate events together
-                ORBEON.xforms.Globals.executeEventFunctionQueued++;
-                if (incremental && !(currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
-                                     ORBEON.util.Utils.getProperty(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY))) {
-                    // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
-                    // if there are no other executeNextRequest() that have been added to the queue after this
-                    // request.
-                    window.setTimeout(
-                        function() { ORBEON.xforms.Server.executeNextRequest(false); },
-                        ORBEON.util.Utils.getProperty(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY)
-                    );
-                } else {
-                    // After a very short delay (e.g. 20 ms), run executeNextRequest() and force queued events
-                    // to be sent to the server, even if there are other executeNextRequest() queued.
-                    // The small delay is here so we don't send multiple requests to the server when the
-                    // browser gives us a sequence of events (e.g. focus out, change, focus in).
-                    window.setTimeout(
-                        function() { ORBEON.xforms.Server.executeNextRequest(true); },
-                        ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY)
-                    );
-                }
-                ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime(); // Update the last event sent time
+            // Store events to fire
+            for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
+                ORBEON.xforms.Globals.eventQueue.push(events[eventIndex]);
             }
+
+            // Fire them with a delay to give us a change to aggregate events together
+            ORBEON.xforms.Globals.executeEventFunctionQueued++;
+            if (incremental && !(currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
+                                 ORBEON.util.Utils.getProperty(DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY))) {
+                // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
+                // if there are no other executeNextRequest() that have been added to the queue after this
+                // request.
+                window.setTimeout(
+                    function() { ORBEON.xforms.Server.executeNextRequest(false); },
+                    ORBEON.util.Utils.getProperty(DELAY_BEFORE_INCREMENTAL_REQUEST_PROPERTY)
+                );
+            } else {
+                // After a very short delay (e.g. 20 ms), run executeNextRequest() and force queued events
+                // to be sent to the server, even if there are other executeNextRequest() queued.
+                // The small delay is here so we don't send multiple requests to the server when the
+                // browser gives us a sequence of events (e.g. focus out, change, focus in).
+                window.setTimeout(
+                    function() { ORBEON.xforms.Server.executeNextRequest(true); },
+                    ORBEON.util.Utils.getProperty(INTERNAL_SHORT_DELAY_PROPERTY)
+                );
+            }
+            ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime(); // Update the last event sent time
         }
     },
 
@@ -5926,9 +5930,8 @@ ORBEON.xforms.Server = {
                 responseXML = ORBEON.util.Dom.stringToDom(xmlString);
             }
             var formID = ORBEON.xforms.Globals.requestForm.id;
-            var hasServerEvents = ORBEON.xforms.Server.hasReturningServerEvents(responseXML);
-            if (!hasServerEvents) {
-                // Remove modal progress panel before handling DOM response, as e.g. xxf:script may dispatch events and
+            if (! ORBEON.xforms.Server.keepModelProgressPanelDisplayed(responseXML)) {
+                // Remove modal progress panel before handling DOM response, as xxf:script may dispatch events and
                 // we don't want them to be filtered. If there are server events, we don't remove the panel until they
                 // have been processed, i.e. the request sending the server events returns.
                 ORBEON.util.Utils.hideModalProgressPanel();
@@ -5946,49 +5949,19 @@ ORBEON.xforms.Server = {
         }
     },
 
-    hasReturningServerEvents: function(responseXML) {
+    /**
+     * Keep the model progress panel if the server tells us to do a submission which isn't opened in another window.
+     * The logic here corresponds to the following XPath: exists(//xxf:submission[empty(@target)]).
+     */
+    keepModelProgressPanelDisplayed: function(responseXML) {
         if (responseXML && responseXML.documentElement
                     && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
-            var responseRoot = responseXML.documentElement;
-            // The verbose code below implements this XPath expression:
-            // exists(/*/xxf:action[xxf:server-events and (not(xxf:submission) or xxf:submission[@replace == ('instance', 'none') or (@replace == 'all' && not(@target))])])
-            for (var i = 0; i < responseRoot.childNodes.length; i++) {
-                if (ORBEON.util.Utils.getLocalName(responseRoot.childNodes[i]) == "action") {
-                    var actionElement = responseRoot.childNodes[i];
-                    var serverEventsElement = null;
-                    var submissionElement = null;
-                    for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
-                        var currentActionElement = actionElement.childNodes[actionIndex];
-                        var currentActionName = ORBEON.util.Utils.getLocalName(currentActionElement);
-                        if (currentActionName == "server-events") {
-                            serverEventsElement = currentActionElement;
-                        } else if (currentActionName == "submission") {
-                            submissionElement = currentActionElement;
-                        }
-                        // Don't look further if we got both
-                        if (serverEventsElement && submissionElement)
-                            break;
-                    }
-
-                    if (serverEventsElement && !submissionElement) {
-                        // There is no submission (should probably not happen!)
-                        return true;
-                    } else if (serverEventsElement) {
-                        // There is a submission
-                        var replaceAttribute = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
-                        if (replaceAttribute == "instance" || replaceAttribute == "none" ||
-                                (replaceAttribute == "all" && ORBEON.util.Dom.getAttribute(submissionElement, "target") == null)) {
-                            // Server events will return for sure with replace="instance | none". With replace="all", they will
-                            // return if there is no target. They could return as well with a target, but should we
-                            // take the risk?
-                            return true;
-                        }
-                    }
-
-                    // Done iterating actions
-                    break;
-                }
-            }
+            var foundSubmissionWithNoTarget = false;
+            YAHOO.util.Dom.getElementsBy(function(element) {
+                if (ORBEON.util.Utils.getLocalName(element) == "submission" && ORBEON.util.Dom.getAttribute(element, "target") == null)
+                    foundSubmissionWithNoTarget = true;
+            }, null, responseXML.documentElement);
+            return foundSubmissionWithNoTarget;
         }
         return false;
     },

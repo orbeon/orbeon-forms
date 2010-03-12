@@ -511,7 +511,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * o needs to be re-evaluated
      * o must save its current state for purposes of refresh events dispatch
      *
-     * As of 2010-02 this is called during:
+     * As of 2010-02 this is called:
      *
      * o by UpdateBindingsListener during a refresh, just before evaluation
      * o when going online, before handling each external event

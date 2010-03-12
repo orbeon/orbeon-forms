@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<group description="XForms Repeat" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xu="http://www.xmldb.org/xupdate"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <test description="Schema validation with type deriving from simple type" name="oxf:pipeline">
+        <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=308399&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <values>
+                                <value code="1">One</value>
+                                <value code="3"/>
+                                <value code="">Five</value>
+                                <value code="7">Seven</value>
+                            </values>
+                        </xforms:instance>
+                        
+                        <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified">
+                            
+                            <xs:element name="value" type="myValueType"/>
+                            
+                            <xs:complexType name="myValueType">
+                                <xs:simpleContent>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="1"/>
+                                        <xs:attribute name="code" type="xs:integer" use="required"/>
+                                    </xs:restriction>
+                                </xs:simpleContent>
+                            </xs:complexType>	
+                        </xs:schema>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:input ref="value[1]"/>
+                    <xforms:input ref="value[2]"/>
+                    <xforms:input ref="value[3]"/>
+                    <xforms:input ref="value[4]"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value code="1">One</value>
+                                    <value code="3"/>
+                                    <value code="">Five</value>
+                                    <value code="7">Seven</value>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="xf-1">One</xxf:control>
+                        <xxf:control id="xf-2" valid="false"/>
+                        <xxf:control id="xf-3">Five</xxf:control>
+                        <xxf:control id="xf-4">Seven</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Schema validation with union" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <values>
+                                <value>2009</value>
+                                <value>2009-03</value>
+                                <value>2009-03-09</value>
+                                <value>2009-13</value>
+                                <value>2009-03-32</value>
+                            </values>
+                        </xforms:instance>
+
+                        <xforms:bind nodeset="value" type="uwdcdate"/>
+
+                        <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified">
+                            <xs:simpleType name="uwdcdate">
+                                <xs:union memberTypes="xs:gYear xs:gYearMonth xs:date"/>
+                            </xs:simpleType>
+                        </xs:schema>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:input ref="value[1]"/>
+                    <xforms:input ref="value[2]"/>
+                    <xforms:input ref="value[3]"/>
+                    <xforms:input ref="value[4]"/>
+                    <xforms:input ref="value[5]"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value>2009</value>
+                                    <value>2009-03</value>
+                                    <value>2009-03-09</value>
+                                    <value>2009-13</value>
+                                    <value>2009-03-32</value>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="xf-2" type="uwdcdate">2009</xxf:control>
+                        <xxf:control id="xf-3" type="uwdcdate">2009-03</xxf:control>
+                        <xxf:control id="xf-4" type="uwdcdate">2009-03-09</xxf:control>
+                        <xxf:control id="xf-5" valid="false" type="uwdcdate">2009-13</xxf:control>
+                        <xxf:control id="xf-6" valid="false" type="uwdcdate">2009-03-32</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+</group>

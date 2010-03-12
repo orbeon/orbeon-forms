@@ -70,13 +70,17 @@ public class ControlTree implements ExternalCopyable {
         isAllowSendingReadonlyEvents = staticState.hasHandlerForEvent(XFormsEvents.XFORMS_READONLY) || staticState.hasHandlerForEvent(XFormsEvents.XFORMS_READWRITE);
         isAllowSendingValidEvents = staticState.hasHandlerForEvent(XFormsEvents.XFORMS_VALID) || staticState.hasHandlerForEvent(XFormsEvents.XFORMS_INVALID);
         isAllowSendingIterationMovedEvents = staticState.hasHandlerForEvent(XFormsEvents.XXFORMS_ITERATION_MOVED);
+        final boolean isAllowSendingNodesetChangedEvent = staticState.hasHandlerForEvent(XFormsEvents.XXFORMS_NODESET_CHANGED);
+        final boolean isAllowSendingIndexChangedEvent = staticState.hasHandlerForEvent(XFormsEvents.XXFORMS_INDEX_CHANGED);
 
         isAllowSendingRefreshEvents = isAllowSendingValueChangedEvents
                 || isAllowSendingRequiredEvents
                 || isAllowSendingRelevantEvents
                 || isAllowSendingReadonlyEvents
                 || isAllowSendingValidEvents
-                || isAllowSendingIterationMovedEvents;
+                || isAllowSendingIterationMovedEvents
+                || isAllowSendingNodesetChangedEvent
+                || isAllowSendingIndexChangedEvent;
     }
 
     /**
@@ -299,63 +303,69 @@ public class ControlTree implements ExternalCopyable {
         // iterations if they are bound.
 
         if (XFormsControl.supportsRefreshEvents(control)) {
-            if (control.isRelevant() && control instanceof XFormsSingleNodeControl) {
-                final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                final XBLContainer container = singleNodeControl.getXBLContainer();
-                final XFormsContainingDocument containingDocument = container.getContainingDocument();
+            if (control.isRelevant()) {
+                // TODO: implement dispatchRefreshEvents() on all controls instead of using if ()
+                if (control instanceof XFormsSingleNodeControl) {
 
-                // xforms-value-changed
-                if (isAllowSendingValueChangedEvents && singleNodeControl.isValueChanged()) {
-                    container.dispatchEvent(propertyContext, new XFormsValueChangeEvent(containingDocument, singleNodeControl));
-                }
+                    final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
+                    final XBLContainer container = singleNodeControl.getXBLContainer();
+                    final XFormsContainingDocument containingDocument = container.getContainingDocument();
 
-                // Dispatch moved xxforms-iteration-changed if needed
-                if (isAllowSendingIterationMovedEvents
-                        && control.getPreviousEffectiveId() != control.getEffectiveId()
-                        && staticState.observerHasHandlerForEvent(control.getPrefixedId(), XFormsEvents.XXFORMS_ITERATION_MOVED)) {
-                    container.dispatchEvent(propertyContext, new XXFormsIterationMovedEvent(containingDocument, control));
-                }
+                    // xforms-value-changed
+                    if (isAllowSendingValueChangedEvents && singleNodeControl.isValueChanged()) {
+                        container.dispatchEvent(propertyContext, new XFormsValueChangeEvent(containingDocument, singleNodeControl));
+                    }
 
-                // Dispatch events only if the MIP value is different from the previous value
+                    // Dispatch moved xxforms-iteration-changed if needed
+                    if (isAllowSendingIterationMovedEvents
+                            && control.getPreviousEffectiveId() != control.getEffectiveId()
+                            && staticState.observerHasHandlerForEvent(control.getPrefixedId(), XFormsEvents.XXFORMS_ITERATION_MOVED)) {
+                        container.dispatchEvent(propertyContext, new XXFormsIterationMovedEvent(containingDocument, control));
+                    }
 
-                // TODO: must reacquire control and test for relevance again
-                if (isAllowSendingValidEvents) {
-                    final boolean previousValidState = singleNodeControl.wasValid();
-                    final boolean newValidState = singleNodeControl.isValid();
+                    // Dispatch events only if the MIP value is different from the previous value
 
-                    if (previousValidState != newValidState) {
-                        if (newValidState) {
-                            container.dispatchEvent(propertyContext, new XFormsValidEvent(containingDocument, singleNodeControl));
-                        } else {
-                            container.dispatchEvent(propertyContext, new XFormsInvalidEvent(containingDocument, singleNodeControl));
+                    // TODO: must reacquire control and test for relevance again
+                    if (isAllowSendingValidEvents) {
+                        final boolean previousValidState = singleNodeControl.wasValid();
+                        final boolean newValidState = singleNodeControl.isValid();
+
+                        if (previousValidState != newValidState) {
+                            if (newValidState) {
+                                container.dispatchEvent(propertyContext, new XFormsValidEvent(containingDocument, singleNodeControl));
+                            } else {
+                                container.dispatchEvent(propertyContext, new XFormsInvalidEvent(containingDocument, singleNodeControl));
+                            }
                         }
                     }
-                }
-                // TODO: must reacquire control and test for relevance again
-                if (isAllowSendingRequiredEvents) {
-                    final boolean previousRequiredState = singleNodeControl.wasRequired();
-                    final boolean newRequiredState = singleNodeControl.isRequired();
+                    // TODO: must reacquire control and test for relevance again
+                    if (isAllowSendingRequiredEvents) {
+                        final boolean previousRequiredState = singleNodeControl.wasRequired();
+                        final boolean newRequiredState = singleNodeControl.isRequired();
 
-                    if (previousRequiredState != newRequiredState) {
-                        if (newRequiredState) {
-                            container.dispatchEvent(propertyContext, new XFormsRequiredEvent(containingDocument, singleNodeControl));
-                        } else {
-                            container.dispatchEvent(propertyContext, new XFormsOptionalEvent(containingDocument, singleNodeControl));
+                        if (previousRequiredState != newRequiredState) {
+                            if (newRequiredState) {
+                                container.dispatchEvent(propertyContext, new XFormsRequiredEvent(containingDocument, singleNodeControl));
+                            } else {
+                                container.dispatchEvent(propertyContext, new XFormsOptionalEvent(containingDocument, singleNodeControl));
+                            }
                         }
                     }
-                }
-                // TODO: must reacquire control and test for relevance again
-                if (isAllowSendingReadonlyEvents) {
-                    final boolean previousReadonlyState = singleNodeControl.wasReadonly();
-                    final boolean newReadonlyState = singleNodeControl.isReadonly();
+                    // TODO: must reacquire control and test for relevance again
+                    if (isAllowSendingReadonlyEvents) {
+                        final boolean previousReadonlyState = singleNodeControl.wasReadonly();
+                        final boolean newReadonlyState = singleNodeControl.isReadonly();
 
-                    if (previousReadonlyState != newReadonlyState) {
-                        if (newReadonlyState) {
-                            container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(containingDocument, singleNodeControl));
-                        } else {
-                            container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(containingDocument, singleNodeControl));
+                        if (previousReadonlyState != newReadonlyState) {
+                            if (newReadonlyState) {
+                                container.dispatchEvent(propertyContext, new XFormsReadonlyEvent(containingDocument, singleNodeControl));
+                            } else {
+                                container.dispatchEvent(propertyContext, new XFormsReadwriteEvent(containingDocument, singleNodeControl));
+                            }
                         }
                     }
+                } else if (control instanceof XFormsRepeatControl) {
+                    ((XFormsRepeatControl) control).dispatchRefreshEvents(propertyContext);
                 }
             }
         }
@@ -903,14 +913,11 @@ public class ControlTree implements ExternalCopyable {
                 final XFormsContextStack.BindingContext oldBindingContext = control.getBindingContext();
                 final List<Item> oldRepeatNodeset = oldBindingContext.getNodeset();
 
-                // Get new nodeset
-                final List<Item> newRepeatNodeset = newBindingContext.getNodeset();
-
                 // Set new current binding for control element
                 repeatControl.setBindingContext(propertyContext, newBindingContext, false);
 
                 // Update iterations
-                final List<XFormsRepeatIterationControl> newIterations = repeatControl.updateIterations(propertyContext, oldRepeatNodeset, newRepeatNodeset, null);
+                final List<XFormsRepeatIterationControl> newIterations = repeatControl.updateIterations(propertyContext, oldRepeatNodeset, null);
 
                 // Remember newly created iterations so we don't recurse into them in startRepeatIteration()
                 // o It is not needed to recurse into them because their bindings are up to date since they have just been created

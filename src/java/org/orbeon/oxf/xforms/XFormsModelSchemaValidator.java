@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -339,9 +339,8 @@ public class XFormsModelSchemaValidator {
         }
 
         // Validate children
-        final int stringCareLevel = childAcceptor.getStringCareLevel();
         final DatatypeRef datatypeRef = new DatatypeRef();
-        final boolean childrenValid = validateChildren(element, childAcceptor, startTagInfo, stringCareLevel, icc, datatypeRef, isReportErrors);
+        final boolean childrenValid = validateChildren(element, childAcceptor, startTagInfo, icc, datatypeRef, isReportErrors);
         if (!childrenValid) {
             if (isReportErrors)
                 isElementValid = false;
@@ -522,7 +521,7 @@ public class XFormsModelSchemaValidator {
      * Note that all of the attributes of element should be in startTagInfo.attributes. If they are out of sync it break
      * the ability to access the attributes by index.
      */
-    private boolean validateChildren(final Element element, final Acceptor acceptor, final StartTagInfo startTagInfo, final int stringCareLevel,
+    private boolean validateChildren(final Element element, final Acceptor acceptor, final StartTagInfo startTagInfo,
                                      final IDConstraintChecker icc, final DatatypeRef datatypeRef, final boolean isReportErrors) {
 
         boolean isElementChildrenValid = true;
@@ -566,6 +565,9 @@ public class XFormsModelSchemaValidator {
                 }
             }
         }
+
+        // Get string care level here like in MSV Verifier.java
+        final int stringCareLevel = acceptor.getStringCareLevel();
 
         // Validate children elements
         for (final Iterator iterator = element.elementIterator(); iterator.hasNext();) {

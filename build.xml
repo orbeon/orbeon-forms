@@ -61,7 +61,7 @@
 
         <include name="msv-20081113_orbeon_20081209.jar"/>
         <include name="msv-isorelax-20070407.jar"/>
-        <include name="msv-xsdlib-20070407.jar"/>
+        <include name="msv-xsdlib-20070407_orbeon_20100309.jar"/>
         <include name="msv-relaxngDatatype-20070407.jar"/>
 
         <include name="hsqldb-1_8_0_7.jar"/>

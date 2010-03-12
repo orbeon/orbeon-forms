@@ -371,8 +371,8 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 
 /* ***** Tree ******************************************************************************************************* */
 
-.xforms-tree-label-selected {
-    background-color: #ffc;
+.xforms-tree-label-selected, .xforms-tree-label-selected:hover {
+    background-color: #ff6;
 }
 
 /* In the tree, because we don't have an href, we use this CSS so the cursor is a pointer when over the link */

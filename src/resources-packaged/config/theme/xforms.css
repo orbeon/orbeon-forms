@@ -371,9 +371,12 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 
 /* ***** Tree ******************************************************************************************************* */
 
-.xforms-tree-label-selected, .xforms-tree-label-selected:hover {
-    background-color: #ff6;
-}
+/* Yellow highlight for selected item */
+.xforms-form .ygtvcontent .xforms-tree-label-selected,
+.xforms-form .ygtvcontent .xforms-tree-label-selected:hover { background-color: #ff6 }
+/* Override YUI CSS which adds a light blue green background to "currently focused" label */
+.ygtvfocus .ygtvlabel,
+.ygtvfocus .ygtvlabel:hover { background-color: transparent }
 
 /* In the tree, because we don't have an href, we use this CSS so the cursor is a pointer when over the link */
 a.ygtvlabel { cursor: pointer; }

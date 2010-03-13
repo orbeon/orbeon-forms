@@ -37,13 +37,23 @@
         <!-- <xhtml:script type="text/javascript" src="/xbl/orbeon/spell-checker/spell-checker-unittest.js"/> -->
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="text">
+        <!-- <xforms:repeat nodeset="text">
             <xhtml:div>
                 <xforms:textarea ref="."/>
                 <fr:spell-checker ref="."/>
             </xhtml:div>
-        </xforms:repeat>
-        <!-- <xforms:textarea ref="text[3]"/>
-        <fr:spell-checker ref="text[3]"/> -->
+        </xforms:repeat> -->
+        <xhtml:div>
+            <xforms:textarea ref="text[1]"/>
+            <fr:spell-checker ref="text[1]"/>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:textarea ref="text[2]"/>
+            <fr:spell-checker ref="text[2]"/>
+        </xhtml:div>
+        <xhtml:div>
+            <xforms:textarea ref="text[3]"/>
+            <fr:spell-checker ref="text[3]"/>
+        </xhtml:div>
     </xhtml:body>
 </xhtml:html>

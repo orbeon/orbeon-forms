@@ -2927,7 +2927,7 @@
     </test>
 
     <test description="Comparison of various item types in repeat nodeset change" name="oxf:pipeline">
-        <!-- See  -->
+        <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=314831&group_id=168&atid=350207 -->
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">

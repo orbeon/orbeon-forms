@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.dom4j.QName;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -38,16 +40,32 @@ public class XXFormsDialogHandler extends XFormsBaseHandler {
         final XXFormsDialogControl dialogXFormsControl = ((XXFormsDialogControl) containingDocument.getObjectByEffectiveId(effectiveDialogId));
 
         // Find classes to add
+
+        // NOTE: attributes logic duplicated in XXFormsDialogControl
+        // Get values statically so we can handle the case of the repeat template
         final StringBuilder classes = getInitialClasses(uri, localname, attributes, null);
-        classes.append(" xforms-initially-hidden");
-        classes.append(" xforms-dialog-");
-        classes.append(dialogXFormsControl.getLevel());
-        classes.append(" xforms-dialog-close-");
-        classes.append(Boolean.toString(dialogXFormsControl.isClose()));
-        classes.append(" xforms-dialog-draggable-");
-        classes.append(Boolean.toString(dialogXFormsControl.isDraggable()));
-        classes.append(" xforms-dialog-visible-");
-        classes.append(Boolean.toString(dialogXFormsControl.isInitiallyVisible()));
+        {
+            classes.append(" xforms-initially-hidden");
+            classes.append(" xforms-dialog-");
+
+            final String level; {
+                final String explicitLevel = attributes.getValue("level");
+                if (explicitLevel == null) {
+                    final QName appearance = getAppearance(attributes);
+                    level = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance) ? "modeless" : "modal";
+                } else {
+                    level = explicitLevel;
+                }
+            }
+
+            classes.append(level);
+            classes.append(" xforms-dialog-close-");
+            classes.append(Boolean.toString(!"false".equals(attributes.getValue("close"))));
+            classes.append(" xforms-dialog-draggable-");
+            classes.append(Boolean.toString(!"false".equals(attributes.getValue("draggable"))));
+            classes.append(" xforms-dialog-visible-");
+            classes.append(Boolean.toString("true".equals(attributes.getValue("visible"))));
+        }
 
         // Start main xhtml:div
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -56,7 +74,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandler {
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, getAttributes(attributes, classes.toString(), effectiveDialogId));
 
         // Child xhtml:div for label
-        final String labelValue = dialogXFormsControl.getLabel(pipelineContext);
+        final String labelValue = (dialogXFormsControl != null) ? dialogXFormsControl.getLabel(pipelineContext) : null;
         if (labelValue != null) {
             reusableAttributes.clear();
             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "hd xxforms-dialog-head");

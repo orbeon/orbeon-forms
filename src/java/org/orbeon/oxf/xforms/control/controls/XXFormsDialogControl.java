@@ -68,10 +68,12 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
     public XXFormsDialogControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
+
+        // NOTE: attribues logic duplicated in XXFormsDialogHandler
         this.level = element.attributeValue("level");
         if (this.level == null) {
             // Default is "modeless" for "minimal" appearance, "modal" otherwise
-            this.level = "minimal".equals(getAppearance()) ? "modeless" : "modal";
+            this.level = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.getName().equals(getAppearance()) ? "modeless" : "modal";
         }
         this.close = !"false".equals(element.attributeValue("close"));
         this.draggable = !"false".equals(element.attributeValue("draggable"));

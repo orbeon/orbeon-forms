@@ -1,0 +1,10 @@
+.xbl-fr-spell-checker { display: inline; }
+.xbl-fr-spell-checker .xforms-dialog { width: 30em } 
+.xbl-fr-spell-checker .xforms-label { width: 10em; display: inline-block } 
+.xbl-fr-spell-checker .xforms-output-output { font-weight: bold } 
+.xbl-fr-spell-checker input { width: 8em } 
+.xbl-fr-spell-checker td { line-height: 2em; padding-right: 1em } 
+.xbl-fr-spell-checker .xforms-trigger-appearance-minimal { padding-right: 1em; } 
+.xbl-fr-spell-checker .xforms-repeat-selected-item-1 { background-color: transparent } 
+.xbl-fr-spell-checker .xbl-fr-spell-checker-close { display: block; overflow: auto }
+.xbl-fr-spell-checker .xbl-fr-spell-checker-close .xbl-fr-button { float:right; margin-top: 1em } 

@@ -42,14 +42,10 @@
 
                 <!-- Result of spell checking -->
                 <xforms:instance id="result">
-                    <dummy/>
-                    <!-- 
-                        Example response:
-                        <spellresult error="0" clipped="0" charschecked="12">
-                            <c o="0" l="3" s="1">This Th's Thus Th HS</c>
-                            <c o="9" l="3" s="0">test tat ST St st</c>
-                        </spellresult>
-                    -->
+                    <spellresult error="0" clipped="0" charschecked="12">
+                        <c o="0" l="3" s="1">This Th's Thus Th HS</c>
+                        <c o="9" l="3" s="0">test tat ST St st</c>
+                    </spellresult>
                 </xforms:instance>
 
                 <xforms:instance id="ui">
@@ -90,7 +86,7 @@
                     <xforms:trigger appearance="minimal" ref=".">
                         <xforms:label><xhtml:img src="/apps/fr/style/images/silk/spellcheck.png"/></xforms:label>
                         <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="instance('request')/text" value="distinct-values(tokenize($binding, '\s'))"/>
+                            <xforms:setvalue ref="instance('request')/text" value="string-join(distinct-values(tokenize($binding, '\s')), ' ')"/>
                             <xforms:send submission="spell-check-submission"/>
                         </xforms:action>
                     </xforms:trigger>
@@ -99,7 +95,10 @@
                     <xxforms:dialog id="spell-checking-dialog">
                         <xforms:label>Spelling</xforms:label>
                         <xxforms:variable name="has-corrections" select="exists(instance('result')/c)"/>
-                        <xforms:setfocus ev:event="xxforms-dialog-open" if="not($has-corrections)" control="close"/>
+                        <xforms:action ev:event="xxforms-dialog-open">
+                            <xforms:setfocus if="$has-corrections" control="suggestion"/>
+                            <xforms:setfocus if="not($has-corrections)" control="close"/>
+                        </xforms:action>
                         <xforms:action ev:event="DOMActivate">
                             <xforms:delete nodeset="instance('result')/c[1]"/>
                             <xforms:setvalue ref="instance('ui')/unknown-word"/>
@@ -110,16 +109,14 @@
                                 <xhtml:tr>
                                     <xhtml:td>Unknown word:</xhtml:td>
                                     <xhtml:td>
-                                        <xforms:output value="instance('ui')/unknown-word">
-                                            <xxforms:script ev:event="xforms-value-changed">console.log("value changed");</xxforms:script>
-                                        </xforms:output>
+                                        <xforms:output value="instance('ui')/unknown-word"/>
                                     </xhtml:td>
                                 </xhtml:tr>
                                 <xhtml:tr>
                                     <xhtml:td>Choose suggestion:</xhtml:td>
                                     <xhtml:td>
                                         <xforms:repeat nodeset="tokenize(instance('result')/c[1], '\s')">
-                                            <xforms:setfocus ev:event="xforms-enabled xxforms-nodeset-changed" control="suggestion"/>
+                                            <xforms:setfocus ev:event="xxforms-nodeset-changed" control="suggestion"/>
                                             <xforms:trigger appearance="minimal" id="suggestion">
                                                 <xforms:label value="."/>
                                                 <xforms:setvalue ev:event="DOMActivate" ref="$binding" 
@@ -131,15 +128,17 @@
                                 <xhtml:tr>
                                     <xhtml:td>Or type correction:</xhtml:td>
                                     <xhtml:td>
-                                        <xforms:input ref="instance('ui')/correction"/>
-                                        <fr:button>
-                                            <xforms:label>
-                                                <xhtml:img src="/apps/fr/style/images/silk/script_edit.png"/>
-                                                Change
-                                            </xforms:label>
+                                        <xforms:group>
                                             <xforms:setvalue ev:event="DOMActivate" ref="$binding" 
                                                 value="replace($binding, instance('ui')/unknown-word, instance('ui')/correction)"/>
-                                        </fr:button>
+                                            <xforms:input ref="instance('ui')/correction"/>
+                                            <fr:button>
+                                                <xforms:label>
+                                                    <xhtml:img src="/apps/fr/style/images/silk/script_edit.png"/>
+                                                    Change
+                                                </xforms:label>
+                                            </fr:button>
+                                        </xforms:group>
                                     </xhtml:td>
                                 </xhtml:tr>
                                 <xhtml:tr>

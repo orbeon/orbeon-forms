@@ -32,6 +32,9 @@ import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.value.AtomicValue;
+import org.orbeon.saxon.value.NumericValue;
+import org.orbeon.saxon.value.StringValue;
 
 import java.util.*;
 
@@ -661,11 +664,36 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         public int oldRepeatIndex;// 1-based
     }
 
-    private int indexOfItem(List<Item> nodeset, Item nodeInfo) {
+    private int indexOfItem(List<Item> sequence, Item otherItem) {
         int index = 0;
-        for (Item currentItem: nodeset) {
-            if (currentItem.equals(nodeInfo)) {// equals() is the same as isSameNodeInfo() for NodeInfo, and compares the values for values
-                return index;
+        for (final Item currentItem: sequence) {
+            if (currentItem instanceof StringValue) {
+                // Saxon doesn't allow equals() on StringValue because it requires a collation and equals() might throw
+                if (otherItem instanceof StringValue) {
+                    final StringValue currentStringValue = (StringValue) currentItem;
+                    if (currentStringValue.codepointEquals((StringValue) otherItem)) {
+                        return index;
+                    }
+                }
+            } else if (currentItem instanceof NumericValue) {
+                // Saxon doesn't allow equals() between numeric and non-numeric values
+                if (otherItem instanceof NumericValue) {
+                    final NumericValue currentNumericValue = (NumericValue) currentItem;
+                    if (currentNumericValue.equals((NumericValue) otherItem)) {
+                        return index;
+                    }
+                }
+            } else if (currentItem instanceof AtomicValue) {
+                if (otherItem instanceof AtomicValue) {
+                    final AtomicValue currentAtomicValue = (AtomicValue) currentItem;
+                    if (currentAtomicValue.equals((AtomicValue) otherItem)) {
+                        return index;
+                    }
+                }
+            } else {
+                if (currentItem.equals(otherItem)) {// equals() is the same as isSameNodeInfo() for NodeInfo, and compares the values for values
+                    return index;
+                }
             }
             index++;
         }

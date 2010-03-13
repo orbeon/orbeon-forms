@@ -788,7 +788,7 @@
                 </xhtml:head>
                 <xhtml:body>
                     <xforms:output id="output1" value="xxforms:evaluate-avt('state={state}')"/>
-                    <xforms:variable name="city" select="city"/>
+                    <xxforms:variable name="city" select="city"/>
                     <xforms:output id="output2" value="xxforms:evaluate-avt('state={state}&amp;city={$city}')"/>
                     <xforms:repeat id="repeat" nodeset="*">
                         <xforms:output id="output3" value="xxforms:evaluate-avt('position={position()}&amp;index={index(''repeat'')}')"/>

@@ -2926,7 +2926,7 @@
         </output>
     </test>
 
-    <test description="Comparison of various tem types in repeat nodeset change" name="oxf:pipeline">
+    <test description="Comparison of various item types in repeat nodeset change" name="oxf:pipeline">
         <!-- See  -->
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">

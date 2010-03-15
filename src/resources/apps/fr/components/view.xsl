@@ -272,7 +272,7 @@
 
     <xsl:template match="fr:noscript-selector">
         <!-- Switch script/noscript -->
-        <xsl:if test="not($has-noscript-link = false()) and not($is-form-builder)">
+        <xsl:if test="not($has-noscript-link = false()) and not($is-form-builder) and $is-noscript-support">
             <xhtml:div class="fr-noscript-choice">
                 <xforms:group appearance="xxforms:internal">
                     <xforms:group ref=".[not(property('xxforms:noscript'))]">

@@ -31,6 +31,7 @@ public class XFormsProperties {
     public static final String STATE_HANDLING_SESSION_VALUE = "session"; // deprecated
 
     public static final String NOSCRIPT_PROPERTY = "noscript";
+    public static final String NOSCRIPT_SUPPORT_PROPERTY = "noscript-support";
     public static final String AJAX_PORTLET_PROPERTY = "ajax-portlet";
 
     public static final String READONLY_APPEARANCE_PROPERTY = "readonly-appearance";
@@ -180,6 +181,7 @@ public class XFormsProperties {
     private static final PropertyDefinition[] SUPPORTED_DOCUMENT_PROPERTIES_DEFAULTS = {
             new PropertyDefinition(STATE_HANDLING_PROPERTY, STATE_HANDLING_SERVER_VALUE, false),
             new PropertyDefinition(NOSCRIPT_PROPERTY, false, false),
+            new PropertyDefinition(NOSCRIPT_SUPPORT_PROPERTY, true, false),
             new PropertyDefinition(AJAX_PORTLET_PROPERTY, false, false),
             new PropertyDefinition(READONLY_PROPERTY, false, false),
             new PropertyDefinition(READONLY_APPEARANCE_PROPERTY, READONLY_APPEARANCE_DYNAMIC_VALUE, false),
@@ -399,8 +401,16 @@ public class XFormsProperties {
     }
 
     public static boolean isNoscript(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, NOSCRIPT_PROPERTY);
+        // Special behavior here: depends on other property as well
+        // Later move this logic somewhere else esp. when depends on more stuff like XBL controls used
+        return getBooleanProperty(containingDocument, NOSCRIPT_PROPERTY)
+                && isNoscriptSupport(containingDocument);
     }
+
+    public static boolean isNoscriptSupport(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, NOSCRIPT_SUPPORT_PROPERTY);
+    }
+
     public static boolean isAjaxPortlet(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, AJAX_PORTLET_PROPERTY);
     }

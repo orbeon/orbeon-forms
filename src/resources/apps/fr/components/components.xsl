@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -43,7 +43,9 @@
 
     <xsl:variable name="is-detail" select="$mode != 'summary'" as="xs:boolean"/>
     <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
-    <xsl:variable name="is-noscript" select="not($is-form-builder) and doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'"/>
+    <xsl:variable name="is-noscript-support" select="not(/xhtml:html/xhtml:head/xforms:model[1]/@xxforms:noscript-support = 'false')" as="xs:boolean"/>
+    <xsl:variable name="is-noscript" select="doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'
+                                                and $is-noscript-support" as="xs:boolean"/>
     <xsl:variable name="input-data" select="/*" as="element(xhtml:html)"/>
 
     <!-- Properties -->
@@ -173,7 +175,9 @@
                       xxforms:order="{if ($is-noscript) then 'label control alert hint help' else 'help label control alert hint'}"
                       xxforms:computed-binds="recalculate"
                       xxforms:offline="false"
-                      xxforms:noscript="{$is-noscript}">
+                      xxforms:noscript="{$is-noscript}"
+                      xxforms:noscript-support="{$is-noscript-support}"
+                      xxforms:xforms11-switch="false">
 
             <!-- Parameters passed to this page -->
             <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->

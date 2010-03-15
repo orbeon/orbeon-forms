@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -26,6 +26,7 @@
       xmlns:xbl="http://www.w3.org/ns/xbl"
 
       xxforms:external-events="show-fb-editor-create-dialog show-fb-test-dialog"
+      xxforms:noscript-support="false"
       id="fr-form-model">
 
     <!-- Variable pointing to the current language -->

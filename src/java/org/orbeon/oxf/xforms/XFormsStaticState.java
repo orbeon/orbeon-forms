@@ -581,7 +581,11 @@ public class XFormsStaticState {
      * @return true iif noscript mode is enabled
      */
     public boolean isNoScript() {
-        return getBooleanProperty(XFormsProperties.NOSCRIPT_PROPERTY);
+        // NOTE: Later can be also based on:
+        // o native controls used
+        // o XBL hints
+        return getBooleanProperty(XFormsProperties.NOSCRIPT_PROPERTY)
+                && getBooleanProperty(XFormsProperties.NOSCRIPT_SUPPORT_PROPERTY);
     }
 
     /**

@@ -5,6 +5,7 @@
 .xbl-fr-spell-checker input { width: 8em } 
 .xbl-fr-spell-checker td { line-height: 2em; padding-right: 1em } 
 .xbl-fr-spell-checker .xforms-trigger-appearance-minimal { padding-right: 1em; } 
-.xbl-fr-spell-checker .xforms-repeat-selected-item-1 { background-color: transparent } 
+.xbl-fr-spell-checker .xforms-repeat-selected-item-1,
+.xbl-fr-spell-checker .xforms-repeat-selected-item-2 { background-color: transparent }
 .xbl-fr-spell-checker .xbl-fr-spell-checker-close { display: block; overflow: auto }
 .xbl-fr-spell-checker .xbl-fr-spell-checker-close .xbl-fr-button { float:right; margin-top: 1em } 

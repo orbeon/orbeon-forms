@@ -23,6 +23,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
+import org.orbeon.oxf.xforms.analysis.UIDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -125,6 +126,8 @@ public class XFormsContainingDocument extends XBLContainer {
 
     private boolean goingOffline;
 
+    private UIDependencies uiDependencies;
+
     /**
      * Return the global function library.
      */
@@ -152,6 +155,8 @@ public class XFormsContainingDocument extends XBLContainer {
         {
             // Remember static state
             this.xformsStaticState = xformsStaticState;
+
+            uiDependencies = XFormsProperties.isXPathAnalysis(this) ? new UIDependencies(this) : null;
 
             // Remember URI resolver for initialization
             this.uriResolver = uriResolver;
@@ -196,6 +201,8 @@ public class XFormsContainingDocument extends XBLContainer {
             // Make sure there is location data
             setLocationData(this.xformsStaticState.getLocationData());
 
+            uiDependencies = XFormsProperties.isXPathAnalysis(this) ? new UIDependencies(this) : null;
+
             // Restore the containing document's dynamic state
             final String encodedDynamicState = xformsState.getDynamicState();
             try {
@@ -224,7 +231,6 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     public XFormsState getXFormsState(PipelineContext pipelineContext) {
-
         // Encode state
         return new XFormsState(xformsStaticState.getEncodedStaticState(pipelineContext), createEncodedDynamicState(pipelineContext, false));
     }
@@ -264,6 +270,13 @@ public class XFormsContainingDocument extends XBLContainer {
      */
     public XFormsControls getControls() {
         return xformsControls;
+    }
+
+    /**
+     * Return UI dependencies if supported.
+     */
+    public final UIDependencies getUIDependencies() {
+        return uiDependencies;
     }
 
     /**

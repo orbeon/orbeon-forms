@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -42,6 +42,7 @@ public class Variable {
 
     private final XBLContainer container;
     private final XFormsContextStack contextStack;
+
     private final Element variableElement;
     private final Element valueElement;
 
@@ -71,18 +72,20 @@ public class Variable {
         this.selectAttribute = valueElement.attributeValue("select");
     }
 
-    private void evaluate(PropertyContext pipelineContext, String sourceEffectiveId, boolean useCache) {
-
+    private void evaluate(PropertyContext pipelineContext, String sourceEffectiveId, boolean pushOuterContext, boolean useCache) {
         if (selectAttribute == null) {
             // Inline constructor (for now, only textual content, but in the future, we could allow xforms:output in it? more?)
             variableValue = new StringValue(valueElement.getStringValue());
         } else {
             // There is a select attribute
 
-            // Push binding for evaluation, so that @context and @model are evaluated
-            final String variableValuePrefixedId = container.getFullPrefix() + valueElement.attributeValue("id");
-            final XBLBindings.Scope variableValueScope = container.getContainingDocument().getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(variableValuePrefixedId);
-            contextStack.pushBinding(pipelineContext, valueElement, sourceEffectiveId, variableValueScope);
+            final boolean pushContext = pushOuterContext || variableElement != valueElement;
+            if (pushContext) {
+                // Push binding for evaluation, so that @context and @model are evaluated
+                final String variableValuePrefixedId = container.getFullPrefix() + valueElement.attributeValue("id");
+                final XBLBindings.Scope variableValueScope = container.getContainingDocument().getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(variableValuePrefixedId);
+                contextStack.pushBinding(pipelineContext, valueElement, sourceEffectiveId, variableValueScope);
+            }
             {
                 final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
                 final List<Item> currentNodeset = bindingContext.getNodeset();
@@ -99,7 +102,9 @@ public class Variable {
                     variableValue = EmptySequence.getInstance();
                 }
             }
-            contextStack.popBinding();
+            if (pushContext) {
+                contextStack.popBinding();
+            }
         }
     }
 
@@ -107,11 +112,11 @@ public class Variable {
         return variableName;
     }
 
-    public ValueRepresentation getVariableValue(PropertyContext pipelineContext, String sourceEffectiveId, boolean useCache) {
+    public ValueRepresentation getVariableValue(PropertyContext pipelineContext, String sourceEffectiveId, boolean pushOuterContext, boolean useCache) {
         // Make sure the variable is evaluated
         if (!evaluated) {
             evaluated = true;
-            evaluate(pipelineContext, sourceEffectiveId, useCache);
+            evaluate(pipelineContext, sourceEffectiveId, pushOuterContext, useCache);
         }
 
         // Return value and rewrap if necessary
@@ -130,14 +135,18 @@ public class Variable {
         }
     }
 
+    public void markDirty() {
+        evaluated = false;
+    }
+
     public LocationData getLocationData() {
         return (LocationData) variableElement.getData();
     }
 
-    public void testAs() {
+//    public void testAs() {
 //        final String testAs = "element(foobar)";
 //        new XSLVariable().makeSequenceType(testAs);
-    }
+//    }
 
     /**
      * This iterator rewraps NodeWrapper elements so that the original NodeWrapper is discarded and a new one created.

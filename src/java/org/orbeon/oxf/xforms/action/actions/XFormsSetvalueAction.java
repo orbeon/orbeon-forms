@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.analysis.UIDependencies;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
@@ -112,6 +113,10 @@ public class XFormsSetvalueAction extends XFormsAction {
 
             final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
             if (modifiedInstance != null) {// can be null if you set a value in a non-instance doc
+
+                final UIDependencies uiDependencies = containingDocument.getUIDependencies();
+                if (uiDependencies != null)
+                    uiDependencies.markValueChanged(modifiedInstance.getModel(containingDocument), currentNode);
 
                 // Dispatch extension event to instance
                 final XBLContainer modifiedContainer = modifiedInstance.getXBLContainer(containingDocument);

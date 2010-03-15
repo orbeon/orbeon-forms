@@ -185,7 +185,7 @@ public class XFormsContextStack {
 //                final XFormsModel tempModel = functionContext.getModel();
 //                final XFormsFunction.Context functionContext = getFunctionContext(sourceEffectiveId);
                 getFunctionContext(sourceEffectiveId);
-                pushVariable(currentElement, variable.getVariableName(), variable.getVariableValue(propertyContext, sourceEffectiveId, true), newScope);
+                pushVariable(currentElement, variable.getVariableName(), variable.getVariableValue(propertyContext, sourceEffectiveId, true, true), newScope);
                 returnFunctionContext();
 //                functionContext.setModel(tempModel);
 //                functionContext.setSourceEffectiveId(tempSourceEffectiveId);
@@ -565,6 +565,13 @@ public class XFormsContextStack {
                     bindingElement, "ref", ref, "context", context, "nodeset", nodeset, "modelId", modelId, "bindId", bindId));
             }
         }
+    }
+
+    public void pushBinding(BindingContext bindingContext) {
+        // NOTE: would be nice not to have to make a copy and just relink to parent
+        contextStack.push(new BindingContext(getCurrentBindingContext(), bindingContext.model, bindingContext.getNodeset(),
+                bindingContext.getPosition(), bindingContext.elementId, bindingContext.newBind, bindingContext.getControlElement(),
+                bindingContext.getLocationData(), bindingContext.hasOverriddenContext, bindingContext.contextItem, bindingContext.scope));
     }
 
     private void pushTemporaryContext(BindingContext parent, BindingContext base, Item contextItem) {

@@ -28,7 +28,6 @@ public class XFormsProperties {
     public static final String STATE_HANDLING_PROPERTY = "state-handling";
     public static final String STATE_HANDLING_SERVER_VALUE = "server";
     public static final String STATE_HANDLING_CLIENT_VALUE = "client";
-    public static final String STATE_HANDLING_SESSION_VALUE = "session"; // deprecated
 
     public static final String NOSCRIPT_PROPERTY = "noscript";
     public static final String NOSCRIPT_SUPPORT_PROPERTY = "noscript-support";
@@ -130,6 +129,7 @@ public class XFormsProperties {
     public enum XHTMLLayout { NOSPAN, SPAN }
 
     private static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
+    private static final String XPATH_ANALYSIS_PROPERTY = "xpath-analysis";
 
     public static class PropertyDefinition {
 
@@ -218,6 +218,7 @@ public class XFormsProperties {
             new PropertyDefinition(ASYNC_SUBMISSION_POLL_DELAY, 10 * 1000, false), // 10 seconds
             new PropertyDefinition(AJAX_UPDATE_FULL_THRESHOLD, 20, false),
             new PropertyDefinition(XFORMS11_SWITCH_PROPERTY, false, false), // false for now, but default should change at some point
+            new PropertyDefinition(XPATH_ANALYSIS_PROPERTY, false, false),
 
             // Properties to propagate to the client
             new PropertyDefinition(NEW_XHTML_LAYOUT, false, true),
@@ -552,6 +553,10 @@ public class XFormsProperties {
 
     public static boolean isEncryptItemValues(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, ENCRYPT_ITEM_VALUES_PROPERTY);
+    }
+
+    public static boolean isXPathAnalysis(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, XPATH_ANALYSIS_PROPERTY);
     }
 
     public static boolean isOfflineMode(XFormsContainingDocument containingDocument) {

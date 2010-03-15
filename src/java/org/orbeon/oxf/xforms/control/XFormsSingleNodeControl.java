@@ -231,41 +231,6 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         }
     }
 
-    // Experiment with not evaluating labels, etc. if control is not relevant.
-//    @Override
-//    protected void evaluate(PipelineContext pipelineContext) {
-//        getMIPsIfNeeded();
-//        super.evaluate(pipelineContext);
-//    }
-//
-//    @Override
-//    public String getLabel(PipelineContext pipelineContext) {
-//        getMIPsIfNeeded();
-//        // Do not compute if the control is not relevant
-//        return relevant ? super.getLabel(pipelineContext) : null;
-//    }
-//
-//    @Override
-//    public String getHelp(PipelineContext pipelineContext) {
-//        getMIPsIfNeeded();
-//        // Do not compute if the control is not relevant
-//        return relevant ? super.getHelp(pipelineContext) : null;
-//    }
-//
-//    @Override
-//    public String getHint(PipelineContext pipelineContext) {
-//        getMIPsIfNeeded();
-//        // Do not compute if the control is not relevant
-//        return relevant ? super.getHint(pipelineContext) : null;
-//    }
-//
-//    @Override
-//    public String getAlert(PipelineContext pipelineContext) {
-//        getMIPsIfNeeded();
-//        // Do not compute if the control is not relevant
-//        return relevant ? super.getAlert(pipelineContext) : null;
-//    }
-
     protected void getMIPsIfNeeded() {
         if (!mipsRead) {
             final Item currentItem = bindingContext.getSingleItem();

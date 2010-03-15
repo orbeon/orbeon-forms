@@ -35,25 +35,16 @@
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <!-- <xhtml:script type="text/javascript" src="/xbl/orbeon/spell-checker/spell-checker-unittest.js"/> -->
+        <xhtml:style type="text/css">
+            .xforms-repeat-selected-item-1 { background-color: transparent }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        <!-- <xforms:repeat nodeset="text">
+        <xforms:repeat nodeset="text">
             <xhtml:div>
                 <xforms:textarea ref="."/>
                 <fr:spell-checker ref="."/>
             </xhtml:div>
-        </xforms:repeat> -->
-        <xhtml:div>
-            <xforms:textarea ref="text[1]"/>
-            <fr:spell-checker ref="text[1]"/>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:textarea ref="text[2]"/>
-            <fr:spell-checker ref="text[2]"/>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:textarea ref="text[3]"/>
-            <fr:spell-checker ref="text[3]"/>
-        </xhtml:div>
+        </xforms:repeat>
     </xhtml:body>
 </xhtml:html>

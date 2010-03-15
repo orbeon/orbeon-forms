@@ -21,16 +21,12 @@ import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.function.Instance;
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance;
 import org.orbeon.oxf.xml.XPathCacheStaticContext;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.event.LocationProvider;
 import org.orbeon.saxon.expr.*;
-import org.orbeon.saxon.functions.Doc;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.orbeon.saxon.instruct.Executable;
@@ -44,7 +40,6 @@ import org.orbeon.saxon.trans.Variable;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.SequenceExtent;
-import org.orbeon.saxon.value.StringValue;
 
 import java.util.*;
 
@@ -289,6 +284,14 @@ public class XPathCache {
         new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, null, functionLibrary, null, false, true, null).makeObject();
     }
 
+    public static Expression createExpression(String xpathString, Map<String, String> prefixToURIMap, FunctionLibrary functionLibrary) {
+        try {
+            return ((PooledXPathExpression) new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, null, functionLibrary, null, false, true, null).makeObject()).getExpression();
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
     public static PooledXPathExpression getXPathExpression(PropertyContext propertyContext,
                                                            List<Item> contextItems, int contextPosition,
                                                            String xpathString,
@@ -418,7 +421,7 @@ public class XPathCache {
         }
     }
 
-    private static class  XFormsCachePoolableObjetFactory implements PoolableObjectFactory {
+    private static class XFormsCachePoolableObjetFactory implements PoolableObjectFactory {
         private final String xpathString;
         private final Map<String, String> prefixToURIMap;
         private final Set<String> variableNames;
@@ -562,19 +565,6 @@ public class XPathCache {
                     }
                 }
 
-                // TODO: For now only play with XForms expressions. But should decide probably based on flag?
-                if (false && functionLibrary == XFormsContainingDocument.getFunctionLibrary()) {
-                    final List<String> instanceIds = analyzeExpression(expression, xpathString);
-                    if (instanceIds == null)
-                        logger.info("  XXX EXPRESSION DEPENDS ON MORE THAN INSTANCES: " + xpathString);
-                    else {
-                        logger.info("  XXX EXPRESSION DEPENDS ON INSTANCES: " + xpathString);
-                        for (String instanceId: instanceIds) {
-                            logger.info("    instance: " + instanceId);
-                        }
-                    }
-                }
-
                 return new PooledXPathExpression(expression, pool, independentContext, variables);
             } catch (Throwable t) {
                 throw new OXFException(t);
@@ -586,91 +576,6 @@ public class XPathCache {
 
         public boolean validateObject(Object o) {
             return true;
-        }
-    }
-
-    private static List<String> analyzeExpression(Expression expression, String xpathString) {
-        if (expression instanceof ComputedExpression) {
-            try {
-                final PathMap pathmap = new PathMap((ComputedExpression) expression, new Configuration());
-                logger.info("TEST XPATH PATHS - path for expression: " + xpathString);
-                pathmap.diagnosticDump(System.out);
-
-                final int dependencies = expression.getDependencies();
-
-                if ((dependencies & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) != 0) {
-                    System.out.println("  xxx DEPENDS_ON_CONTEXT_ITEM");
-                    return null;
-                }
-                if ((dependencies & StaticProperty.DEPENDS_ON_CURRENT_ITEM) != 0) {
-                    System.out.println("  xxx DEPENDS_ON_CURRENT_ITEM");
-                    return null;
-                }
-                if ((dependencies & StaticProperty.DEPENDS_ON_CONTEXT_DOCUMENT) != 0) {
-                    System.out.println("  xxx DEPENDS_ON_CONTEXT_DOCUMENT");
-                    return null;
-                }
-                if ((dependencies & StaticProperty.DEPENDS_ON_LOCAL_VARIABLES) != 0) {
-                    System.out.println("  xxx DEPENDS_ON_LOCAL_VARIABLES");
-                    // Some day we'll have variables
-                    return null;
-                }
-                if ((dependencies & StaticProperty.NON_CREATIVE) != 0) {
-                    System.out.println("  xxx NON_CREATIVE");
-                }
-
-                final List<String> instancesList = new ArrayList<String>();
-
-                final PathMap.PathMapRoot[] roots = pathmap.getPathMapRoots();
-                for (final PathMap.PathMapRoot root: roots) {
-                    final Expression rootExpression = root.getRootExpression();
-
-                    if (rootExpression instanceof Instance || rootExpression instanceof XXFormsInstance) {
-                        final FunctionCall functionCall = (FunctionCall) rootExpression;
-
-                        // TODO: Saxon 9.0 expressions should test "instanceof StringValue" to "instanceof StringLiteral"
-                        if (functionCall.getArguments()[0] instanceof StringValue) {
-                            final String instanceName = ((StringValue) functionCall.getArguments()[0]).getStringValue();
-                            instancesList.add(instanceName);
-                        } else {
-                            // Instance name is not known at compile time
-                            return null;
-                        }
-                    } else if (rootExpression instanceof Doc) {// don't need document() function as that is XSLT
-                        final FunctionCall functionCall = (FunctionCall) rootExpression;
-
-                        // TODO: Saxon 9.0 expressions should test "instanceof StringValue" to "instanceof StringLiteral"
-                        if (functionCall.getArguments()[0] instanceof StringValue) {
-//                            final String literalURI = ((StringValue) functionCall.getArguments()[0]).getStringValue();
-                            return null;
-                        } else {
-                            // Document name is not known at compile time
-                            return null;
-                        }
-                    } else if (rootExpression instanceof ContextItemExpression) {
-                        return null;
-                    } else if (rootExpression instanceof RootExpression) {
-                        // We depend on the current XForms model.
-                        return null;
-                    }
-
-//                                final PathMap.PathMapArc[] rootArcs = root.getArcs();
-//
-//                                for (int j = 0; j < rootArcs.length; j++) {
-//                                    final PathMapArc currentArc = rootArcs[j];
-//                                    final AxisExpression getStep
-//                                }
-
-                }
-                return instancesList;
-
-            } catch (Exception e) {
-                logger.error("EXCEPTION WHILE ANALYZING PATHS: " + xpathString);
-                return null;
-            }
-        } else {
-            logger.info("TEST XPATH PATHS - expression not a ComputedExpression: " + xpathString);
-            return Collections.emptyList();
         }
     }
 

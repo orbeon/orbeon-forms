@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandler;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.function.Instance;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.SAXStore;
@@ -41,11 +42,15 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
+import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.NamePool;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.value.StringValue;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
+import java.io.PrintStream;
 import java.util.*;
 
 /**
@@ -392,7 +397,6 @@ public class XFormsStaticState {
             {
                 final String stateHandling = getStringProperty(XFormsProperties.STATE_HANDLING_PROPERTY);
                 if (!(stateHandling.equals(XFormsProperties.STATE_HANDLING_CLIENT_VALUE)
-                                || stateHandling.equals(XFormsProperties.STATE_HANDLING_SESSION_VALUE)
                                 || stateHandling.equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE)))
                     throw new ValidationException("Invalid xxforms:" + XFormsProperties.STATE_HANDLING_PROPERTY + " attribute value: " + stateHandling, getLocationData());
             }
@@ -1513,8 +1517,7 @@ public class XFormsStaticState {
     }
 
     private void handleControlsStatic(ControlElementVisitorListener controlElementVisitorListener, Element container) {
-        for (Object o: container.elements()) {
-            final Element currentControlElement = (Element) o;
+        for (final Element currentControlElement: Dom4jUtils.elements(container)) {
 
             final String controlName = currentControlElement.getName();
             final String controlId = currentControlElement.attributeValue("id");
@@ -1524,8 +1527,10 @@ public class XFormsStaticState {
                 controlElementVisitorListener.startVisitControl(currentControlElement, controlId);
                 handleControlsStatic(controlElementVisitorListener, currentControlElement);
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlId);
-            } else if (XFormsControlFactory.isCoreControl(currentControlElement.getNamespaceURI(), controlName) || xblBindings.isComponent(currentControlElement.getQName())) {
-                // Handle core control or component
+            } else if (XFormsControlFactory.isCoreControl(currentControlElement.getNamespaceURI(), controlName)
+                    || xblBindings.isComponent(currentControlElement.getQName())
+                    || controlName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
+                // Handle core control, component, or variable
                 controlElementVisitorListener.startVisitControl(currentControlElement, controlId);
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlId);
             }
@@ -1647,5 +1652,233 @@ public class XFormsStaticState {
 
     public SAXStore.Mark getElementMark(String prefixedId) {
         return metadata.marks.get(prefixedId);
+    }
+
+    // Use a synchronized map so we are reentrant
+    private Map<String, XPathAnalysis> pathAnalysisMap = Collections.synchronizedMap(new LinkedHashMap<String, XPathAnalysis>());
+
+    // This must be reentrant
+    public XPathAnalysis getXPathAnalysis(PropertyContext propertyContext, String containerPrefixedId, String prefixedId, String xpathString) {
+        XPathAnalysis pathAnalysis = pathAnalysisMap.get(prefixedId);
+        if (pathAnalysis == null) {
+            // Pass null context item as we don't care about actually running the expression
+            // TODO: get expression from pool and pass in-scope variables (probably more efficient)
+//            final PooledXPathExpression pooledXPathExpression
+//                    = XPathCache.getXPathExpression(propertyContext, null, xpathString, metadata.namespaceMappings.get(prefixedId),
+//                        null, XFormsContainingDocument.getFunctionLibrary(), null, null);
+
+            final Expression expression = XPathCache.createExpression(xpathString, metadata.namespaceMappings.get(prefixedId), XFormsContainingDocument.getFunctionLibrary());
+            try {
+                final XPathAnalysis localPathAnalysis = analyzeExpression(expression, xpathString);
+                if (localPathAnalysis.isDependOnContext()) {
+                    final XPathAnalysis parentAnalysis = pathAnalysisMap.get(containerPrefixedId);
+                    localPathAnalysis.rebase(parentAnalysis);
+                }
+
+                localPathAnalysis.processPaths();
+
+                pathAnalysisMap.put(prefixedId, localPathAnalysis);
+
+//                TODO resolve against variables
+            } finally {
+//                pooledXPathExpression.returnToPool();
+            }
+        }
+
+        return pathAnalysis;
+    }
+
+    public static class XPathAnalysis {
+        public final String xpathString;
+        public PathMap pathmap;
+        public final int dependencies;
+        private List<String> instanceIds;
+
+        public XPathAnalysis(String xpathString, PathMap pathmap, int dependencies) {
+            this.xpathString = xpathString;
+            this.pathmap = pathmap;
+            this.dependencies = dependencies;
+        }
+
+        public boolean isDependOnContext() {
+            return (dependencies & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) != 0;
+        }
+
+        public boolean intersects(Set<String> touchedPaths) {
+            // Return true if any path matches
+            // TODO: for now naively just check exact paths
+            for (final String path: paths) {
+                if (touchedPaths.contains(path))
+                    return true;
+            }
+            return false;
+        }
+
+        private List<PathMap.PathMapNode> findContextRoots() {
+            final List<PathMap.PathMapNode> result = new ArrayList<PathMap.PathMapNode>();
+            final PathMap.PathMapRoot[] roots = pathmap.getPathMapRoots();
+            for (final PathMap.PathMapRoot root: roots) {
+                if (root.getRootExpression() instanceof ContextItemExpression) {
+                    result.add(root);
+                }
+            }
+            return result;
+        }
+
+        public void rebase(XPathAnalysis parentAnalysis) {
+            final PathMap parentCopy = parentAnalysis.pathmap.clone();
+            final List<PathMap.PathMapNode> nodes = parentCopy.findFinalNodes();
+
+            for (final PathMap.PathMapNode node: nodes) {
+                for (final PathMap.PathMapNode contextRoot: findContextRoots()) {
+                    node.addArcs(Arrays.asList(contextRoot.getArcs()));
+                }
+            }
+            this.pathmap = parentCopy;
+        }
+
+        final Set<String> paths = new HashSet<String>();
+
+        public void processPaths() {
+            final List<Expression> stack = new ArrayList<Expression>();
+            for (final PathMap.PathMapRoot root: pathmap.getPathMapRoots()) {
+                stack.add(root.getRootExpression());
+                processNode(paths, stack, root);
+                stack.remove(stack.size() - 1);
+            }
+        }
+
+        public void processNode(Set<String> result, List<Expression> stack, PathMap.PathMapNode node) {
+            if (node.getArcs().length == 0) {
+                final StringBuilder sb = new StringBuilder();
+                for (final Expression expression: stack) {
+                    if (expression instanceof Instance) {
+                        sb.append("instance('");
+                        sb.append(((StringValue) ((Instance) expression).getArguments()[0]).getStringValue());
+                        sb.append("')");
+                    } else if (expression instanceof AxisExpression) {
+                        if (sb.length() > 0)
+                            sb.append('/');
+                        sb.append(NamePool.getDefaultNamePool().getDisplayName(((AxisExpression) expression).getNodeTest().getFingerprint()));
+                    }
+                }
+                result.add(sb.toString());
+            } else {
+                for (final PathMap.PathMapArc arc: node.getArcs()) {
+                    stack.add(arc.getStep());
+                    processNode(result, stack, arc.getTarget());
+                    stack.remove(stack.size() - 1);
+                }
+            }
+        }
+
+//        private static List<String> foobar(PathMap pathmap) {
+//
+//            List<String> instanceIds = null;
+//            final PathMap.PathMapRoot[] roots = pathmap.getPathMapRoots();
+//            for (final PathMap.PathMapRoot root: roots) {
+//                final Expression rootExpression = root.getRootExpression();
+//
+//                if (rootExpression instanceof Instance || rootExpression instanceof XXFormsInstance) {
+//                    final FunctionCall functionCall = (FunctionCall) rootExpression;
+//
+//                    // TODO: Saxon 9.0 expressions should test "instanceof StringValue" to "instanceof StringLiteral"
+//                    if (functionCall.getArguments()[0] instanceof StringValue) {
+//                        final String instanceName = ((StringValue) functionCall.getArguments()[0]).getStringValue();
+//                        if (instanceIds == null)
+//                            instanceIds = new ArrayList<String>();
+//                        instanceIds.add(instanceName);
+//                    } else {
+//                        // Instance name is not known at compile time
+//                        return null;
+//                    }
+//                } else if (rootExpression instanceof Doc) {// don't need document() function as that is XSLT
+//                    final FunctionCall functionCall = (FunctionCall) rootExpression;
+//
+//                    // TODO: Saxon 9.0 expressions should test "instanceof StringValue" to "instanceof StringLiteral"
+//                    if (functionCall.getArguments()[0] instanceof StringValue) {
+//    //                            final String literalURI = ((StringValue) functionCall.getArguments()[0]).getStringValue();
+//                        return true;
+//                    } else {
+//                        // Document name is not known at compile time
+//                        return true;
+//                    }
+//                } else if (rootExpression instanceof ContextItemExpression) {
+//                    return true;
+//                } else if (rootExpression instanceof RootExpression) {
+//                    // We depend on the current XForms model.
+//                    return true;
+//                }
+//
+//    //                                final PathMap.PathMapArc[] rootArcs = root.getArcs();
+//    //
+//    //                                for (int j = 0; j < rootArcs.length; j++) {
+//    //                                    final PathMapArc currentArc = rootArcs[j];
+//    //                                    final AxisExpression getStep
+//    //                                }
+//
+//            }
+//            return false;
+//        }
+
+        public void dump(PrintStream out) {
+            out.println("--------------------------------------------------------------------------------");
+            out.println("PATHMAP - expression: " + xpathString);
+
+            for (final String path: paths) {
+                out.println("  path: " + path);
+            }
+
+            pathmap.diagnosticDump(out);
+            dumpDependencies(out);
+//            if (instanceIds == null)
+//                out.println("  EXPRESSION DEPENDS ON MORE THAN INSTANCES: " + xpathString);
+//            else {
+//                out.println("  EXPRESSION DEPENDS ON INSTANCES: " + xpathString);
+//                for (final String instanceId: instanceIds) {
+//                    out.println("    instance: " + instanceId);
+//                }
+//            }
+        }
+
+        public void dumpDependencies(PrintStream out) {
+            if ((dependencies & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) != 0) {
+                out.println("  DEPENDS_ON_CONTEXT_ITEM");
+            }
+            if ((dependencies & StaticProperty.DEPENDS_ON_CURRENT_ITEM) != 0) {
+                out.println("  DEPENDS_ON_CURRENT_ITEM");
+            }
+            if ((dependencies & StaticProperty.DEPENDS_ON_CONTEXT_DOCUMENT) != 0) {
+                out.println("  DEPENDS_ON_CONTEXT_DOCUMENT");
+            }
+            if ((dependencies & StaticProperty.DEPENDS_ON_LOCAL_VARIABLES) != 0) {
+                out.println("  DEPENDS_ON_LOCAL_VARIABLES");
+            }
+            if ((dependencies & StaticProperty.NON_CREATIVE) != 0) {
+                out.println("  NON_CREATIVE");
+            }
+        }
+    }
+
+    private static XPathAnalysis analyzeExpression(Expression expression, String xpathString) {
+        if (expression instanceof ComputedExpression) {
+            try {
+                final PathMap pathmap = new PathMap((ComputedExpression) expression, new Configuration());
+                final int dependencies = expression.getDependencies();
+                return new XPathAnalysis(xpathString, pathmap, dependencies);
+            } catch (Exception e) {
+                logger.error("EXCEPTION WHILE ANALYZING PATHS: " + xpathString);
+                return null;
+            }
+        } else {
+            logger.info("TEST XPATH PATHS - expression not a ComputedExpression: " + xpathString);
+            return null;
+        }
+    }
+
+    public void dumpAnalysis(PropertyContext propertyContext) throws Exception {
+        for (final XPathAnalysis pathAnalysis: pathAnalysisMap.values()) {
+            pathAnalysis.dump(System.out);
+        }
     }
 }

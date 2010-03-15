@@ -110,7 +110,7 @@ public class ControlTree implements ExternalCopyable {
         // Visit the static tree of controls to create the actual tree of controls
         final CreateControlsListener listener
                 = new CreateControlsListener(propertyContext, controlIndex, rootControl, containingDocument.getSerializedControlStatesMap(propertyContext));
-        XFormsControls.visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener);
+        containingDocument.getControls().visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener, false);
 
         // Detach all root XFormsControl
         if (children != null) {
@@ -426,8 +426,8 @@ public class ControlTree implements ExternalCopyable {
         iterationControlIndex.indexControl(repeatIterationControl);
 
         // Create the subtree
-        XFormsControls.visitControlElementsHandleRepeat(propertyContext, repeatControl, iterationIndex,
-                new CreateControlsListener(propertyContext, iterationControlIndex, repeatIterationControl, null));
+        containingDocument.getControls().visitControlElementsHandleRepeat(propertyContext, repeatControl, iterationIndex,
+                new CreateControlsListener(propertyContext, iterationControlIndex, repeatIterationControl, null), false);
 
         // Update main index before dispatching, so that events can access newly created controls
         controlIndex.addAll(iterationControlIndex);

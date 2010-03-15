@@ -365,7 +365,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      * @param newValue          value to set
      * @param type              type of the value to set (xs:anyURI or xs:base64Binary), null if none
      */
-    public static void setValueForNode(PropertyContext propertyContext, Node node, String newValue, String type) {
+    private static void setValueForNode(PropertyContext propertyContext, Node node, String newValue, String type) {
 
         // Convert value based on types if possible
         if (type != null) {

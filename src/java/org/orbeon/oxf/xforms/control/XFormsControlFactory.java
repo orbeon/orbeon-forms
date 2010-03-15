@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -70,6 +70,8 @@ public class XFormsControlFactory {
         CONTAINER_CONTROLS.put(XFormsConstants.XXFORMS_DIALOG_QNAME.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
         CORE_VALUE_CONTROLS.put(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
         CORE_VALUE_CONTROLS.put(XFormsConstants.XXFORMS_TEXT_QNAME.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
+//        CORE_VALUE_CONTROLS.put(XFormsConstants.XXFORMS_VARIABLE_QNAME.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
+//        CORE_VALUE_CONTROLS.put(XFormsConstants.EXFORMS_VARIABLE_QNAME.getName(), XFormsConstants.EXFORMS_NAMESPACE_URI);
 
         CORE_CONTROLS.putAll(CORE_VALUE_CONTROLS);
         CORE_CONTROLS.putAll(coreNoValueControls);
@@ -199,6 +201,16 @@ public class XFormsControlFactory {
         nameToClassMap.put(XFormsConstants.XXFORMS_TEXT_QNAME, new Factory() {
             public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
                 return new XXFormsTextControl(container, parent, element, name, effectiveId);
+            }
+        });
+        nameToClassMap.put(XFormsConstants.XXFORMS_VARIABLE_QNAME, new Factory() {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+                return new XXFormsVariableControl(container, parent, element, name, effectiveId);
+            }
+        });
+        nameToClassMap.put(XFormsConstants.EXFORMS_VARIABLE_QNAME, new Factory() {
+            public XFormsControl createXFormsControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
+                return new XXFormsVariableControl(container, parent, element, name, effectiveId);
             }
         });
     }

@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -69,9 +70,8 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
             // Selected case id was restored from serialization
             // TODO: ideally, selected case id would be made available while sub-tree is created, so that
             // xxforms:case() function would work for nested bindings
-            final List<XFormsControl> children = getChildren();
-            for (XFormsControl child: children) {
-                final XFormsCaseControl currentCaseControl = (XFormsCaseControl) child;
+            final List<XFormsCaseControl> children = getChildrenCases();
+            for (XFormsCaseControl currentCaseControl: children) {
                 if (currentCaseControl.getId().equals(restoredCaseId)) {
                     // NOTE: Don't use setSelectedCase() as we don't want to cause initialLocal != currentLocal
                     final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
@@ -84,6 +84,22 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
             final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
             local.selectedCaseControl = findSelectedCase();
         }
+    }
+
+    private List<XFormsCaseControl> getChildrenCases() {
+        final List<XFormsControl> children = getChildren();
+        final List<XFormsCaseControl> childrenCases;
+        if (children == null || children.size() == 0) {
+            childrenCases = Collections.emptyList();
+        } else {
+            // Filter because XXFormsVariableControl can also be a child
+            childrenCases = new ArrayList<XFormsCaseControl>(children.size());
+            for (final XFormsControl child: children) {
+                if (child instanceof XFormsCaseControl)
+                    childrenCases.add((XFormsCaseControl) child);
+            }
+        }
+        return childrenCases;
     }
 
     /**
@@ -142,9 +158,8 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     private XFormsCaseControl findSelectedCase() {
-        final List<XFormsControl> children = getChildren();
-        for (XFormsControl child: children) {
-            final XFormsCaseControl currentCaseControl = (XFormsCaseControl) child;
+        final List<XFormsCaseControl> children = getChildrenCases();
+        for (XFormsCaseControl currentCaseControl: children) {
             if (currentCaseControl.isDefaultSelected()) {
                 // Found first case with selected="true"
                 return currentCaseControl;
@@ -163,7 +178,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
 
         // Get initial index as we copy "back" to an initial state
         final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getInitialLocal();
-        final int selectedCaseIndex =  getChildren().indexOf(local.selectedCaseControl);
+        final int selectedCaseIndex = getChildren().indexOf(local.selectedCaseControl);
 
         // Clone this and children
         cloned = (XFormsSwitchControl) super.getBackCopy(propertyContext);
@@ -244,9 +259,9 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
             } else {
                 // This is a new switch (can happen with repeat), send all deselected to be sure
                 // TODO: This should not be needed because the repeat template should have a reasonable default.
-                final List<XFormsControl> children = getChildren();
+                final List<XFormsCaseControl> children = getChildrenCases();
                 if (children != null && children.size() > 0) {
-                    for (final XFormsControl caseControl: children) {
+                    for (final XFormsCaseControl caseControl: children) {
                         if (!caseControl.getEffectiveId().equals(selectedCaseEffectiveId)) {
                             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
                                     "id", caseControl.getEffectiveId(),

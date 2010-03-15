@@ -140,6 +140,8 @@ public class XFormsConstants {
     
     // Variables
     public static final String XXFORMS_VARIABLE_NAME = "variable"; // don't use QName so we can support exforms/xxforms/xforms
+    public static final QName EXFORMS_VARIABLE_QNAME = new QName("variable", EXFORMS_NAMESPACE);
+    public static final QName XXFORMS_VARIABLE_QNAME = new QName("variable", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_SEQUENCE_QNAME = new QName("sequence", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_ITERATE_ATTRIBUTE_QNAME = new QName("iterate", XXFORMS_NAMESPACE);

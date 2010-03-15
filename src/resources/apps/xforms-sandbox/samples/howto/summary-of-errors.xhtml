@@ -11,65 +11,77 @@
     <xhtml:head>
         <xhtml:title>Summary of errors</xhtml:title>
         <xforms:model>
-            
+
             <!-- Instance with the sub-documents -->
-            <xforms:instance id="employees">
-                <employees>
-                    <employee id="1">
-                        <first-name>Jason</first-name>
-                        <last-name>Mraz</last-name>
-                        <expenses>9000</expenses>
-                    </employee>
-                    <employee id="2">
-                        <first-name>Lady</first-name>
-                        <last-name>Gaga</last-name>
-                        <expenses>50000</expenses>
-                    </employee>
-                    <employee id="3">
-                        <first-name>Boyoncé</first-name>
-                        <last-name/>
-                        <expenses>20000</expenses>
-                    </employee>
-                </employees>
+            <xforms:instance id="company">
+                <company>
+                    <name/>
+                    <address/>
+                    <employees>
+                        <employee id="1">
+                            <first-name>Jason</first-name>
+                            <last-name>Mraz</last-name>
+                            <expenses>9000</expenses>
+                        </employee>
+                        <employee id="2">
+                            <first-name>Lady</first-name>
+                            <last-name>Gaga</last-name>
+                            <expenses>50000</expenses>
+                        </employee>
+                        <employee id="3">
+                            <first-name>Boyoncé</first-name>
+                            <last-name/>
+                            <expenses>20000</expenses>
+                        </employee>
+                    </employees>
+                </company>
             </xforms:instance>
-            
-            <xforms:instance id="ui">
-                <ui>
-                    <current-employee/>
-                </ui>
+
+            <xforms:instance id="edit-employee">
+                <employee/>
             </xforms:instance>
-            
+
             <!-- Validation rules  -->
-            <xforms:bind nodeset="employee">
+            <xforms:bind nodeset="instance('company')/name" required="true()"/>
+            <xforms:bind nodeset="instance('company')/employees/employee, instance('edit-employee')">
                 <xforms:bind nodeset="first-name, last-name" required="true()"/>
                 <xforms:bind nodeset="expenses" constraint=". castable as xs:integer and xs:integer(.) lt 25000"/>
             </xforms:bind>
-            
+
         </xforms:model>
         <xhtml:style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent }
-            .xforms-label { display: block; margin-top: 1em; }
+            .xforms-label { display: block; margin-top: 1em }
+            .buttons { margin-top: 1em }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        
+
+        <xforms:input ref="name">
+            <xforms:label>Company name</xforms:label>
+            <xforms:alert>Company name is mandatory</xforms:alert>
+        </xforms:input>
+        <xforms:input ref="address">
+            <xforms:label>Company address</xforms:label>
+        </xforms:input>
+
         <!-- Summary of errors; the magic is done by the xxforms:valid() function -->
         <xhtml:ul>
-            <xforms:repeat nodeset="employee[not(xxforms:valid(., true()))]">
+            <xforms:repeat nodeset="employees/employee[not(xxforms:valid(., true()))]">
                 <xhtml:li>
                     <xforms:trigger appearance="minimal">
                         <xforms:label>Correct errors for employee <xforms:output value="@id"/></xforms:label>
                         <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="instance('ui')/current-employee" value="context()/@id"/>
+                            <xforms:insert nodeset="instance('edit-employee')" origin="context()"/>
                             <xforms:dispatch name="fr-visit-all" targetid="error-summary"/>
                         </xforms:action>
                     </xforms:trigger>
                 </xhtml:li>
             </xforms:repeat>
         </xhtml:ul>
-        
-        <!-- Show current employee -->
-        <xforms:group ref="employee[@id = instance('ui')/current-employee]" id="edit-employee">
+
+        <!-- Edit current employee -->
+        <xforms:group ref="instance('edit-employee')[exists(*)]" id="edit-employee-group">
             <xforms:input ref="first-name">
                 <xforms:label>First name</xforms:label>
                 <xforms:alert>First name is mandatory</xforms:alert>
@@ -82,8 +94,24 @@
                 <xforms:label>Expenses</xforms:label>
                 <xforms:alert>Expenses cannot be over $25,000</xforms:alert>
             </xforms:input>
+            <xhtml:div class="buttons">
+                <xforms:group>
+                    <xforms:delete ev:event="DOMActivate" nodeset="*"/>
+                    <fr:button>
+                        <xforms:label>OK</xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:insert nodeset="instance('company')/employees/employee[@id = instance('edit-employee')/@id]"
+                                origin="instance('edit-employee')"/>
+                            <xforms:delete nodeset="(instance('company')/employees/employee[@id = instance('edit-employee')/@id])[1]"/>
+                        </xforms:action>
+                    </fr:button>
+                    <fr:button>
+                        <xforms:label>Cancel</xforms:label>
+                    </fr:button>
+                </xforms:group>
+            </xhtml:div>
         </xforms:group>
-        
+
         <!-- Error summary for the current employee -->
         <fr:error-summary observer="edit-employee" id="error-summary">
             <fr:label>Errors for this employee</fr:label>

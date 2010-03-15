@@ -63,9 +63,15 @@
                 </xforms:bind>
 
                 <!--  Spell checking -->
+                <!-- https://www.google.com/tbproxy/spell?lang=en&amp;hl=en -->
+                <!-- http://localhost:8080/myapp/spellex/spell-service.jsp -->
                 <xforms:submission method="post" resource="https://www.google.com/tbproxy/spell?lang=en&amp;hl=en"
                         id="spell-check-submission" ref="instance('request')" replace="instance" instance="result">
-                    <xxforms:show ev:event="xforms-submit-done" dialog="spell-checking-dialog"/>
+                    <xforms:action ev:event="xforms-submit-done">
+                        <xforms:setvalue ref="instance('ui')/unknown-word"/>
+                        <xforms:setvalue ref="instance('ui')/correction"/>
+                        <xxforms:show dialog="spell-checking-dialog"/>
+                    </xforms:action>
                 </xforms:submission>
 
             </xforms:model>

@@ -129,11 +129,13 @@ public class XFormsInputControl extends XFormsValueControl {
                     // Date input
                     externalValue = externalValue.trim();
                     final Perl5MatchProcessor matcher = new Perl5MatchProcessor();
+                    // TODO: like on client, must handle oxf.xforms.format.input.date
                     externalValue = parse(matcher, DATE_PARSE_PATTERNS, externalValue);
                 } else if ("time".equals(typeName)) {
                     // Time input
                     externalValue = externalValue.trim();
                     final Perl5MatchProcessor matcher = new Perl5MatchProcessor();
+                    // TODO: like on client, must handle oxf.xforms.format.input.time
                     externalValue = parse(matcher, TIME_PARSE_PATTERNS, externalValue);
                 } else if ("dateTime".equals(typeName)) {
                     // Date + time input

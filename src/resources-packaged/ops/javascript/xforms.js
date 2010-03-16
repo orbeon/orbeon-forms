@@ -5297,7 +5297,7 @@ ORBEON.xforms.Init = {
                 visible: false,
                 draggable: false,
                 fixedcenter: false,
-                constraintoviewport: false,
+                constraintoviewport: true,
                 underlay: "none"
             });
             // Close the dialog when users click on document
@@ -5310,7 +5310,7 @@ ORBEON.xforms.Init = {
                 visible: false,
                 draggable: isDraggable,
                 fixedcenter: false,
-                constraintoviewport: false, // Enabling constraintoviewport conflicts with the CSS used to limit the width and height of the dialog on IE6
+                constraintoviewport: true,
                 underlay: "none"            // Similarly, setting the underlay to "shadow" conflicts with the CSS used to limit the width and height of the dialog on IE6
             });
 			yuiDialog.showEvent.subscribe(ORBEON.xforms.Events.dialogShow, dialog.id);

@@ -1,0 +1,37 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:f="http://orbeon.org/oxf/xml/formatting"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xi="http://www.w3.org/2001/XInclude"
+            xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:widget="http://orbeon.org/oxf/xml/widget"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xdt="http://www.w3.org/2005/xpath-datatypes"
+            xmlns:xbl="http://www.w3.org/ns/xbl"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner" lang="en">
+    <xhtml:head>
+        <xforms:model id="model">
+            <xforms:instance id="instance">
+                <instance>
+                    <company>
+                        <employee>Mary</employee>
+                    </company>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xforms:repeat nodeset="company">
+            <xforms:input ref="employee">
+                <xforms:delete ev:event="xforms-disabled" nodeset=".."/>
+            </xforms:input>
+            <xforms:trigger>
+                <xforms:label>Delete</xforms:label>
+                <xforms:delete ev:event="DOMActivate" nodeset="."/>
+            </xforms:trigger>
+        </xforms:repeat>
+
+    </xhtml:body>
+</xhtml:html>

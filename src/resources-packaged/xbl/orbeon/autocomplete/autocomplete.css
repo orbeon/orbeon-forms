@@ -1,16 +1,21 @@
 /* Override position: absolute in YUI, otherwise the the input is taken out of the flow
    and content after the autocomplete will show below the input field.  */
-.fr-autocomplete-search .xforms-input-input { position: relative; }
+.fr-autocomplete-search .xforms-input-input { position: relative }
 
-/* Make the div that contains the text field inline-block so the component can be used in inline mode */
+/* Make the div that contains the text field inline-block so the component can be used in inline mode
+   http://wiki.orbeon.com/forms/doc/contributor-guide/ie-bugs#TOC-Inline-block */
 .xbl-fr-autocomplete .yui-ac {
-    /* http://wiki.orbeon.com/forms/doc/contributor-guide/ie-bugs#TOC-Inline-block */
     display: -moz-inline-box;
     display: inline-block;
     *zoom: 1;
     *display: inline;
     vertical-align: middle;
 }
+
+/* Set positioning to absolute, overriding the YUI relative positioning, so the suggestion list is not cropped if the
+   control is used is a box with overflow: hidden, as in Form Runner. More on this at:
+   http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Absolutely-positioned-box-inside-a- */
+.xbl-fr-autocomplete .yui-ac { position: absolute }
 
 /* Required so the left border of the suggestion box is aligned with the left border of the text field.
    http://wiki.orbeon.com/forms/doc/contributor-guide/ie-bugs#TOC-IE6:-position:-absolute-div-acquiri */

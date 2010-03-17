@@ -62,3 +62,11 @@
     height: auto;
 }
 
+.yui-dt-resizer {
+    /*left: auto;
+    right: 0px;
+    top: auto;
+    bottom: 0px;
+    width: 5px; */
+}
+

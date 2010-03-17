@@ -486,11 +486,15 @@ YAHOO.xbl.fr.Datatable.prototype = {
         this.colSorters = [];
         for (var j = 0; j < this.headerColumns.length; j++) {
             var headerColumn = this.headerColumns[j];
-            var childDiv = YAHOO.util.Selector.query('div', headerColumn, true);
+            var childDiv = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(headerColumn, 'div');
+            var liner = null;
             var colResizer = null;
             if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
+                liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(childDiv, 'div');
                 colResizer = new YAHOO.xbl.fr.Datatable.colResizer(j, this.headerColumns[j], this)
                 this.colResizers[j] = colResizer;
+            } else {
+                liner = childDiv;
             }
 
             var width = (this.columnWidths[j] - 20) + 'px';
@@ -499,7 +503,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
             if (YAHOO.env.ua.ie == 0) {
                 var className = 'dt-' + this.id + '-col-' + (j + 1);
                 className = className.replace('\$', '-', 'g');
-                YAHOO.util.Dom.addClass(childDiv, className);
+                YAHOO.util.Dom.addClass(liner, className);
                 for (var k = 0; k < this.bodyColumns[j].length; k++) {
                     var cell = this.bodyColumns[j][k];
                     var liner = YAHOO.util.Selector.query('div', cell, true);
@@ -525,7 +529,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
                 }
             }
             if (! rule) {
-                var style = childDiv.style;
+                var style = liner.style;
                 style.width = width;
                 var styles = [style];
                 for (var k = 0; k < this.bodyColumns[j].length; k++) {
@@ -588,19 +592,14 @@ YAHOO.xbl.fr.Datatable.prototype = {
             node.className = node.savedClassName;
         }
 
-        // Restore column headers
+        // Restore column header widths
         for (var icol = 0; icol < this.headerColumns.length; icol++) {
             var th = this.headerColumns[icol];
             var resizerliner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(th, 'div', 'yui-dt-resizerliner');
             if (resizerliner != null) {
-                var resizer = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(resizerliner, 'div', 'yui-dt-resizer');
-                if (resizer != null) {
-                    resizerliner.removeChild(resizer);
-                }
                 var liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(resizerliner, 'div');
                 liner.style.width = "";
-                th.removeChild(resizerliner);
-                th.appendChild(liner);
+                liner.className = "yui-dt-liner";
             }
         }
         // Remove column widths
@@ -611,6 +610,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
                 var liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagAndClassName(cell, 'div', 'yui-dt-liner');
                 if (liner != null) {
                     liner.style.width = "";
+                    liner.className = "yui-dt-liner";
                 }
             }
         }
@@ -986,24 +986,15 @@ YAHOO.xbl.fr.Datatable.colResizer = function (index, th, datatable) {
     this.rule = null;
     this.styles = null;
 
-    this.resizerliner = document.createElement('div');
-    YAHOO.util.Dom.addClass(this.resizerliner, 'yui-dt-resizerliner');
+    this.resizerliner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(th, 'div')
 
-    this.liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(th, 'div');
+    var childrenDivs = this.resizerliner.getElementsByTagName('div');
 
-    this.th.replaceChild(this.resizerliner, this.liner);
+    this.liner = childrenDivs[0];
 
-    this.resizerliner.appendChild(this.liner);
+    this.resizer = childrenDivs[1];
 
-    this.resizer = document.createElement('div');
-    YAHOO.util.Dom.addClass(this.resizer, 'yui-dt-resizer');
-    this.resizerliner.appendChild(this.resizer);
-    this.resizer.style.left = 'auto';
-    this.resizer.style.right = '0pt';
-    this.resizer.style.top = 'auto';
-    this.resizer.style.bottom = '0pt';
     this.resizer.style.height = datatable.headerHeight + 'px';
-
 
     this.init(this.resizer, this.resizer, {
         dragOnly: true, dragElId: this.resizer.id

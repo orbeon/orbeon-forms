@@ -755,40 +755,56 @@
 
         <!-- <xforms:output value="$columnDesc/@index"/>-->
 
-        <xhtml:div class="yui-dt-liner datatable-cell-content">
-            <xhtml:span class="yui-dt-label">
-                <xsl:choose>
-                    <xsl:when test="@fr:sortable = 'true'">
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>
-                                <xsl:apply-templates select="node()" mode="dynamic"/>
-                            </xforms:label>
-                            <xsl:choose>
-                                <xsl:when test="$isExternallySortedAndPaginated">
-                                    <xforms:hint>
-                                        <xforms:output value="{@fr:sortMessage}"/>
-                                    </xforms:hint>
-                                    <xforms:dispatch ev:event="DOMActivate" name="fr-update-sort" target="fr.datatable" xxbl:scope="inner">
-                                        <xxforms:context name="fr-column" select="xs:integer($columnDesc/@index)"/>
-                                    </xforms:dispatch>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xforms:hint xxbl:scope="inner">Click to sort <xforms:output value="$columnDesc/@nextSortOrder"/></xforms:hint>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue ref="$columnDesc/ancestor::columns/@default" xxbl:scope="inner">false</xforms:setvalue>
-                                        <xforms:setvalue ref="$columnDesc/@currentSortOrder" value="$columnDesc/@nextSortOrder" xxbl:scope="inner"/>
-                                        <xforms:setvalue ref="$currentSortColumn" value="$columnDesc/@index" xxbl:scope="inner"/>
-                                    </xforms:action>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </xforms:trigger>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:apply-templates select="node()" mode="dynamic"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xhtml:span>
-        </xhtml:div>
+        <xsl:variable name="liner">
+            <xhtml:div class="yui-dt-liner  datatable-cell-content">
+                <xhtml:span class="yui-dt-label">
+                    <xsl:choose>
+                        <xsl:when test="@fr:sortable = 'true'">
+                            <xforms:trigger appearance="minimal">
+                                <xforms:label>
+                                    <xsl:apply-templates select="node()" mode="dynamic"/>
+                                </xforms:label>
+                                <xsl:choose>
+                                    <xsl:when test="$isExternallySortedAndPaginated">
+                                        <xforms:hint>
+                                            <xforms:output value="{@fr:sortMessage}"/>
+                                        </xforms:hint>
+                                        <xforms:dispatch ev:event="DOMActivate" name="fr-update-sort" target="fr.datatable" xxbl:scope="inner">
+                                            <xxforms:context name="fr-column" select="xs:integer($columnDesc/@index)"/>
+                                        </xforms:dispatch>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xforms:hint xxbl:scope="inner">Click to sort <xforms:output value="$columnDesc/@nextSortOrder"
+                                            /></xforms:hint>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:setvalue ref="$columnDesc/ancestor::columns/@default" xxbl:scope="inner">false</xforms:setvalue>
+                                            <xforms:setvalue ref="$columnDesc/@currentSortOrder" value="$columnDesc/@nextSortOrder" xxbl:scope="inner"/>
+                                            <xforms:setvalue ref="$currentSortColumn" value="$columnDesc/@index" xxbl:scope="inner"/>
+                                        </xforms:action>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xforms:trigger>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:apply-templates select="node()" mode="dynamic"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xhtml:span>
+            </xhtml:div>
+        </xsl:variable>
+
+        <xsl:choose>
+            <xsl:when test="@fr:resizeable = 'true'">
+                <xhtml:div class="yui-dt-resizerliner">
+                    <xsl:copy-of select="$liner"/>
+                    <xhtml:div class="yui-dt-resizer"/>
+                </xhtml:div>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="$liner"/>
+            </xsl:otherwise>
+        </xsl:choose>
+
 
     </xsl:template>
 
@@ -834,7 +850,7 @@
             <xsl:apply-templates select="node()" mode="dynamic"/>
         </xsl:copy>
     </xsl:template>
-    
+
     <xsl:template match="/xhtml:table/xhtml:thead/xhtml:tr/xforms:group" mode="addListener">
         <xsl:copy>
             <xsl:apply-templates select="@*" mode="dynamic"/>
@@ -844,7 +860,7 @@
             <xsl:apply-templates select="node()" mode="dynamic"/>
         </xsl:copy>
     </xsl:template>
-    
+
     <xsl:template match="header/xforms:repeat/xhtml:th" mode="dynamic">
         <xsl:if test="$sortAndPaginationMode = 'external' and @fr:sortable and not(@fr:sortMessage)">
             <xsl:message terminate="yes">In datatables with sortAndPaginationMode set to "external", sortable columns must have fr:sortMessage
@@ -916,13 +932,13 @@
 
         </xhtml:th>
     </xsl:template>
-    
+
     <xsl:template match="header/xforms:group/xhtml:th" mode="dynamic">
         <xsl:if test="$sortAndPaginationMode = 'external' and @fr:sortable and not(@fr:sortMessage)">
             <xsl:message terminate="yes">In datatables with sortAndPaginationMode set to "external", sortable columns must have fr:sortMessage
                 attributes.</xsl:message>
         </xsl:if>
-        
+
         <xxforms:variable name="position" xxbl:scope="inner">
             <xxforms:sequence select="position()" xxbl:scope="outer"/>
         </xxforms:variable>
@@ -978,14 +994,14 @@
                                 "/>
                         </xsl:otherwise>
                     </xsl:choose>
-                    
+
                 </xforms:action>
             </xforms:group>
-            
+
             <xxforms:variable name="columnDesc" select="$columnSet/column[@position = $position]" xxbl:scope="inner"/>
-            
+
             <xsl:call-template name="header-cell"/>
-            
+
         </xhtml:th>
     </xsl:template>
 
@@ -1187,7 +1203,7 @@
             else if ($fr-dt-column/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
             {@class}            
             ">
-            
+
             <xsl:apply-templates select="@*[name() != 'class']" mode="dynamic"/>
             <xhtml:div class="yui-dt-liner datatable-cell-content">
                 <xsl:apply-templates select="node()" mode="dynamic"/>
@@ -1267,7 +1283,7 @@
         <xsl:variable name="body" select="fr:significantElementInRowAtPosition(/*/xhtml:tbody/xforms:repeat/xhtml:tr, $position)"/>
         <xsl:if test="not($body/self::xforms:repeat)">
             <xsl:message terminate="yes">Datatable: mismatch, significant element position <xsl:value-of select="$position"/> is a <xsl:value-of
-                select="name()"/> in the header and a <xsl:value-of select="name($body)"/> in the body.</xsl:message>
+                    select="name()"/> in the header and a <xsl:value-of select="name($body)"/> in the body.</xsl:message>
         </xsl:if>
         <columnSet xmlns="">
             <xsl:if test="$isInternallySortedAndPaginated">
@@ -1284,13 +1300,13 @@
             </body>
         </columnSet>
     </xsl:template>
-    
+
     <xsl:template match="/*/xhtml:thead/xhtml:tr/xforms:group" mode="dyn-columns" priority="1">
         <xsl:variable name="position" select="fr:significantPositionInRow(.)"/>
         <xsl:variable name="body" select="fr:significantElementInRowAtPosition(/*/xhtml:tbody/xforms:group/xhtml:tr, $position)"/>
         <xsl:if test="not($body/self::xforms:group)">
             <xsl:message terminate="yes">Datatable: mismatch, significant element position <xsl:value-of select="$position"/> is a <xsl:value-of
-                select="name()"/> in the header and a <xsl:value-of select="name($body)"/> in the body.</xsl:message>
+                    select="name()"/> in the header and a <xsl:value-of select="name($body)"/> in the body.</xsl:message>
         </xsl:if>
         <columnSet xmlns="">
             <xsl:if test="$isInternallySortedAndPaginated">
@@ -1307,7 +1323,7 @@
             </body>
         </columnSet>
     </xsl:template>
-    
+
     <xsl:template match="column" mode="dyn-loadingIndicator">
         <xsl:apply-templates select="header/xhtml:th" mode="dynamic"/>
     </xsl:template>

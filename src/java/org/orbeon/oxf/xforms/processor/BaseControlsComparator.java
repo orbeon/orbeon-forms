@@ -74,16 +74,16 @@ public abstract class BaseControlsComparator {
         }
     }
 
-    protected void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsRepeatControl repeatControlInfo, int startSuffix, int endSuffix) {
+    protected void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsRepeatControl repeatControl, int startSuffix, int endSuffix) {
         if (!isTestMode) {
-            final String repeatControlId = repeatControlInfo.getEffectiveId();
+            final String repeatControlId = repeatControl.getEffectiveId();
             final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
             final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
 
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "copy-repeat-template",
                     new String[] {
                             // Get prefixed id without suffix as templates are global
-                            "id", repeatControlInfo.getPrefixedId(),
+                            "id", repeatControl.getPrefixedId(),
                             "parent-indexes", parentIndexes,
                             "start-suffix", Integer.toString(startSuffix), "end-suffix", Integer.toString(endSuffix)
                     });

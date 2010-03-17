@@ -139,30 +139,30 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
 
         assert attributesImpl.getLength() == 0;
 
-        final XXFormsAttributeControl attributeControlInfo2 = this;
+        final XXFormsAttributeControl attributeControl2 = this;
 
         // Whether it is necessary to output information about this control
         boolean doOutputElement = false;
 
         // Control id
-        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, attributeControlInfo2.getEffectiveId());
+        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, attributeControl2.getEffectiveId());
 
         // The client does not store an HTML representation of the xxforms:attribute control, so we
         // have to output these attributes.
         {
             // HTML element id
-            final String effectiveFor2 = attributeControlInfo2.getEffectiveForAttribute();
+            final String effectiveFor2 = attributeControl2.getEffectiveForAttribute();
             doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewlyVisibleSubtree, false);
         }
 
         {
             // Attribute name
-            final String name2 = attributeControlInfo2.getNameAttribute();
+            final String name2 = attributeControl2.getNameAttribute();
             doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "name", name2, isNewlyVisibleSubtree, false);
         }
 
         // Output element
-        outputElement(pipelineContext, ch, attributeControlInfo2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "attribute");
+        outputElement(pipelineContext, ch, attributeControl2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "attribute");
     }
 
     @Override

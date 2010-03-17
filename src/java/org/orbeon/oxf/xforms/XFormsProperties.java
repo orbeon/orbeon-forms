@@ -129,7 +129,7 @@ public class XFormsProperties {
     public enum XHTMLLayout { NOSPAN, SPAN }
 
     private static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
-    private static final String XPATH_ANALYSIS_PROPERTY = "xpath-analysis";
+    public static final String XPATH_ANALYSIS_PROPERTY = "xpath-analysis";
 
     public static class PropertyDefinition {
 
@@ -399,17 +399,6 @@ public class XFormsProperties {
 
     public static boolean isClientStateHandling(XFormsContainingDocument containingDocument) {
         return getStateHandling(containingDocument).equals(STATE_HANDLING_CLIENT_VALUE);
-    }
-
-    public static boolean isNoscript(XFormsContainingDocument containingDocument) {
-        // Special behavior here: depends on other property as well
-        // Later move this logic somewhere else esp. when depends on more stuff like XBL controls used
-        return getBooleanProperty(containingDocument, NOSCRIPT_PROPERTY)
-                && isNoscriptSupport(containingDocument);
-    }
-
-    public static boolean isNoscriptSupport(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, NOSCRIPT_SUPPORT_PROPERTY);
     }
 
     public static boolean isAjaxPortlet(XFormsContainingDocument containingDocument) {

@@ -90,7 +90,7 @@ public class HandlerContext {
         this.helpElementName = XFormsProperties.getHelpElementName(containingDocument);
         this.alertElementName = XFormsProperties.getAlertElementName(containingDocument);
 
-        this.isNoscript = XFormsProperties.isNoscript(containingDocument);
+        this.isNoscript = containingDocument.getStaticState().isNoscript();
         this.isSpanHTMLLayout = XFormsProperties.isSpanHTMLLayout(containingDocument);
     }
 

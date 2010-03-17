@@ -229,7 +229,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         final ElementHandlerController.Matcher triggerSubmitMinimalMatcher = controller.new Matcher() {
             public boolean match(Attributes attributes) {
                 final QName appearance = getAppearance(attributes);
-                return appearance != null && !staticState.isNoScript() // is noscript mode, use the full appearance
+                return appearance != null && !staticState.isNoscript() // is noscript mode, use the full appearance
                         && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance)    // minimal appearance
                             || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance)); // legacy appearance
             }

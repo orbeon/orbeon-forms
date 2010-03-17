@@ -603,7 +603,7 @@ public class XFormsContainingDocument extends XBLContainer {
         }
 
         // Warn that scripts won't run in noscript mode (duh)
-        if (XFormsProperties.isNoscript(this))
+        if (xformsStaticState.isNoscript())
             indentedLogger.logWarning("noscript", "script won't run in noscript mode", "script id", scriptId);
 
         if (scriptsToRun == null)

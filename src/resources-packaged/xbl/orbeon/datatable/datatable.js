@@ -552,6 +552,10 @@ YAHOO.xbl.fr.Datatable.prototype = {
 
         }
 
+        // The "real" init of the column resizers is done after the header dimensioning so that the dimensions are reliable
+        for (var iResizer = 0; iResizer < this.colResizers.length; iResizer++) {
+            this.colResizers[iResizer].initResizer();
+        }
 
     },
 
@@ -994,15 +998,6 @@ YAHOO.xbl.fr.Datatable.colResizer = function (index, th, datatable) {
 
     this.resizer = childrenDivs[1];
 
-    this.resizer.style.height = datatable.headerHeight + 'px';
-
-    this.init(this.resizer, this.resizer, {
-        dragOnly: true, dragElId: this.resizer.id
-    });
-
-    this.setYConstraint(0, 0);
-    this.initFrame();
-    this.delta = 7;
 }
 
 
@@ -1012,6 +1007,21 @@ YAHOO.extend(YAHOO.xbl.fr.Datatable.colResizer, YAHOO.util.DDProxy, {
     // Public methods
     //
     // ///////////////////////////////////////////////////////////////////////////
+
+    initResizer: function() {
+        this.resizer.style.height = this.datatable.headerHeight + 'px';
+        YAHOO.util.Dom.setY(this.resizer, YAHOO.util.Dom.getY(this.datatable.headerTable));
+        //this.resizer.style.top = (YAHOO.util.Dom.getY(this.datatable.headerTable) - YAHOO.util.Dom.getY(this.th)) + 'px';
+
+        this.init(this.resizer, this.resizer, {
+            dragOnly: true, dragElId: this.resizer.id
+        });
+
+        this.setYConstraint(0, 0);
+        this.initFrame();
+        this.delta = 7;
+
+    },
 
     setStyleArray: function (styles) {
         this.styles = styles;

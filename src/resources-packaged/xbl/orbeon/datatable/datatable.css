@@ -62,11 +62,6 @@
     height: auto;
 }
 
-.yui-dt-resizer {
-    /*left: auto;
-    right: 0px;
-    top: auto;
-    bottom: 0px;
-    width: 5px; */
+.yui-skin-sam .yui-dt th {
+    vertical-align: middle !important;
 }
-

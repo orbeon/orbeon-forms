@@ -749,6 +749,17 @@
         </xhtml:tr>
     </xsl:template>
 
+    <xsl:template match="/fr:datatable/xhtml:thead/xhtml:tr[not(@fr:master='true')]//xhtml:th" mode="dynamic">
+        <xsl:copy>
+            <xsl:apply-templates select="@*" mode="#current"/>
+            <xhtml:div class="yui-dt-liner  datatable-cell-content">
+                <xhtml:span class="yui-dt-label">
+                    <xsl:apply-templates select="node()" mode="#current"/>
+                </xhtml:span>
+            </xhtml:div>
+        </xsl:copy>
+    </xsl:template>
+
     <xsl:template name="header-cell">
 
         <!-- XXForms variable "columnDesc" is the current column description when we enter here -->

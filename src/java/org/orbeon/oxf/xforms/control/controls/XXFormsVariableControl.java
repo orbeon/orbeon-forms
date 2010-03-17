@@ -149,4 +149,9 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
 
         return super.equalsExternal(propertyContext, other);
     }
+
+    @Override
+    public boolean supportAjaxUpdates() {
+        return false;
+    }
 }

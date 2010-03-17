@@ -268,12 +268,12 @@ public class XFormsOutputControl extends XFormsValueControl {
 
     @Override
     public boolean addCustomAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
-        final XFormsOutputControl outputControlInfo1 = (XFormsOutputControl) other;
-        final XFormsOutputControl outputControlInfo2 = this;
+        final XFormsOutputControl outputControl1 = (XFormsOutputControl) other;
+        final XFormsOutputControl outputControl2 = this;
 
         // Mediatype
-        final String mediatypeValue1 = (outputControlInfo1 == null) ? null : outputControlInfo1.getMediatypeAttribute();
-        final String mediatypeValue2 = outputControlInfo2.getMediatypeAttribute();
+        final String mediatypeValue1 = (outputControl1 == null) ? null : outputControl1.getMediatypeAttribute();
+        final String mediatypeValue2 = outputControl2.getMediatypeAttribute();
 
         boolean added = false;
         if (!((mediatypeValue1 == null && mediatypeValue2 == null) || (mediatypeValue1 != null && mediatypeValue2 != null && mediatypeValue1.equals(mediatypeValue2)))) {

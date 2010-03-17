@@ -22,7 +22,10 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.control.ExternalCopyable;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -143,7 +146,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
     @Override
     public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
-        if (XFormsProperties.isNoscript(containingDocument) && filesElement != null) {
+        if (containingDocument.getStaticState().isNoscript() && filesElement != null) {
             // Must handle file elements
             XFormsUploadControl.handleFileElement(propertyContext, containingDocument, filesElement, this, true);// seems reasonable to set handleTemporaryFiles = true
         } else {
@@ -298,14 +301,14 @@ public class XFormsUploadControl extends XFormsValueControl {
     @Override
     public boolean addCustomAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
 
-        final XFormsUploadControl uploadControlInfo1 = (XFormsUploadControl) other;
-        final XFormsUploadControl uploadControlInfo2 = this;
+        final XFormsUploadControl uploadControl1 = (XFormsUploadControl) other;
+        final XFormsUploadControl uploadControl2 = this;
 
         boolean added = false;
         {
             // State
-            final String stateValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getState(pipelineContext);
-            final String stateValue2 = uploadControlInfo2.getState(pipelineContext);
+            final String stateValue1 = (uploadControl1 == null) ? null : uploadControl1.getState(pipelineContext);
+            final String stateValue2 = uploadControl2.getState(pipelineContext);
 
             if (!XFormsUtils.compareStrings(stateValue1, stateValue2)) {
                 final String attributeValue = stateValue2 != null ? stateValue2 : "";
@@ -314,8 +317,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
         {
             // Mediatype
-            final String mediatypeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileMediatype(pipelineContext);
-            final String mediatypeValue2 = uploadControlInfo2.getFileMediatype(pipelineContext);
+            final String mediatypeValue1 = (uploadControl1 == null) ? null : uploadControl1.getFileMediatype(pipelineContext);
+            final String mediatypeValue2 = uploadControl2.getFileMediatype(pipelineContext);
 
             if (!XFormsUtils.compareStrings(mediatypeValue1, mediatypeValue2)) {
                 final String attributeValue = mediatypeValue2 != null ? mediatypeValue2 : "";
@@ -324,8 +327,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
         {
             // Filename
-            final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileName(pipelineContext);
-            final String filenameValue2 = uploadControlInfo2.getFileName(pipelineContext);
+            final String filenameValue1 = (uploadControl1 == null) ? null : uploadControl1.getFileName(pipelineContext);
+            final String filenameValue2 = uploadControl2.getFileName(pipelineContext);
 
             if (!XFormsUtils.compareStrings(filenameValue1, filenameValue2)) {
                 final String attributeValue = filenameValue2 != null ? filenameValue2 : "";
@@ -334,8 +337,8 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
         {
             // Size
-            final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFileSize(pipelineContext);
-            final String sizeValue2 = uploadControlInfo2.getFileSize(pipelineContext);
+            final String sizeValue1 = (uploadControl1 == null) ? null : uploadControl1.getFileSize(pipelineContext);
+            final String sizeValue2 = uploadControl2.getFileSize(pipelineContext);
 
             if (!XFormsUtils.compareStrings(sizeValue1, sizeValue2)) {
                 final String attributeValue = sizeValue2 != null ? sizeValue2 : "";

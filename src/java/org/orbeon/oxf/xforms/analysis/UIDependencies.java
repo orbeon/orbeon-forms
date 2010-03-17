@@ -14,12 +14,10 @@
 package org.orbeon.oxf.xforms.analysis;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -52,10 +50,6 @@ public class UIDependencies {
 
     public void refreshDone() {
         modifiedNodes.clear();
-
-//        for (final XFormsModel model: containingDocument.getModels()) {// TODO: nested models
-//            model.clearValueChanged();
-//        }
     }
 
     public Set<String> getModifiedPaths() {
@@ -113,42 +107,17 @@ public class UIDependencies {
         return sb.toString();
     }
 
-    public boolean requireBindingUpdate(PropertyContext propertyContext, XFormsStaticState staticState,
-                                        XFormsControl currentControlsContainer, Element currentControlElement,
+    public boolean requireBindingUpdate(XFormsStaticState staticState, Element currentControlElement,
                                         String controlPrefixedId, boolean contextUpdated) {
-        final String bindingExpression;
-        {
-            final String ref = currentControlElement.attributeValue("ref");
-            if (ref != null) {
-                bindingExpression = ref;
-            } else {
-                bindingExpression = currentControlElement.attributeValue("nodeset");
-            }
-        }
-        if (bindingExpression != null) {
-            final String containerPrefixedId = (currentControlsContainer != null) ? currentControlsContainer.getPrefixedId() : null;
-            final XFormsStaticState.XPathAnalysis analysis = staticState.getXPathAnalysis(propertyContext, containerPrefixedId, controlPrefixedId, bindingExpression);
-            if (analysis != null) {
+        final XPathAnalysis analysis = staticState.getXPathAnalysis(controlPrefixedId);
+        if (analysis != null) {
 //                if (analysis.isDependOnContext() && contextUpdated) {
 //                    return true;
 //                } else {
-                    return intersects(analysis);
+                return analysis.intersects(getModifiedPaths());
 //                }
-            } else {
-                return true;
-            }
         } else {
             return true;
         }
-    }
-
-    private boolean intersects(XFormsStaticState.XPathAnalysis analysis) {
-        for (final XFormsModel model: containingDocument.getModels()) {// TODO: nested models
-            final Set<String> paths = getModifiedPaths();
-            if (analysis.intersects(paths))
-                return true;
-        }
-
-        return false;
     }
 }

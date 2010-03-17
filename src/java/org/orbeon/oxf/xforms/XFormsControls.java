@@ -479,6 +479,9 @@ public class XFormsControls implements XFormsObjectResolver {
                 // Evaluate variable right away in case it is used by further bindings
                 control.evaluateIfNeeded(propertyContext, isRefresh);
 
+                // Handle variable value dependencies
+                // TODO: UI-DEPENDENCIES
+
                 currentContextStack.popBinding();
 
                 // Push variable value on the stack
@@ -511,7 +514,7 @@ public class XFormsControls implements XFormsObjectResolver {
                                 XFormsControl currentControlsContainer, boolean contextUpdated,
                                 Element currentControlElement, String controlPrefixedId, String controlEffectiveId, XBLBindings.Scope newScope) {
 
-        final boolean requireUpdate = uiDependencies == null || uiDependencies.requireBindingUpdate(propertyContext, staticState, currentControlsContainer, currentControlElement, controlPrefixedId, contextUpdated);
+        final boolean requireUpdate = uiDependencies == null || uiDependencies.requireBindingUpdate(staticState, currentControlElement, controlPrefixedId, contextUpdated);
 
         if (requireUpdate) {
             // Push with evaluation

@@ -122,7 +122,7 @@ public class XFormsInputControl extends XFormsValueControl {
                 // Anything but "true" is "false"
                 if (!externalValue.equals("true"))
                     externalValue = "false";
-            } else if (XFormsProperties.isNoscript(containingDocument)) {
+            } else if (containingDocument.getStaticState().isNoscript()) {
                 // Noscript mode: value must be pre-processed on the server (in Ajax mode, ISO value is sent to server if possible)
 
                 if ( "date".equals(typeName)) {

@@ -33,6 +33,7 @@ import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
+import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
@@ -345,6 +346,7 @@ public class XBLBindings {
     public void processElementIfNeeded(PropertyContext propertyContext, IndentedLogger indentedLogger, Element controlElement,
                                        String controlPrefixedId, LocationData locationData,
                                        DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, String prefix,
+                                       ControlAnalysis parentControlAnalysis,
                                        StringBuilder repeatHierarchyStringBuffer, Stack<String> repeatAncestorsStack) {
 
         if (xblComponentBindings != null) {
@@ -453,7 +455,7 @@ public class XBLBindings {
                     }
 
                     staticState.analyzeComponentTree(propertyContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(),
-                            repeatHierarchyStringBuffer, repeatAncestorsStack);
+                            parentControlAnalysis, repeatHierarchyStringBuffer, repeatAncestorsStack);
                 }
             }
         }

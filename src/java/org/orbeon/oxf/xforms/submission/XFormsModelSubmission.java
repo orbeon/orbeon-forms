@@ -752,7 +752,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     && avtXXFormsTarget == null;  // can't optimize if there is a target
         
             // In noscript mode, or in "Ajax portlet" mode, there is no deferred submission process
-            isNoscript = XFormsProperties.isNoscript(containingDocument);
+            isNoscript = containingDocument.getStaticState().isNoscript();
             isAllowDeferredSubmission = !isNoscript && !XFormsProperties.isAjaxPortlet(containingDocument);
         
             isPossibleDeferredSubmission = (isReplaceAll && !isHandlingClientGetAll) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);

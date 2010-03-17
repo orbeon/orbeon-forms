@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
@@ -56,8 +56,8 @@ public class XHTMLElementHandler extends XFormsBaseHandler {
 
                         // Get static id of attribute control associated with this particular attribute
                         final String attributeControlStaticId; {
-                            final XFormsStaticState.ControlInfo controlInfo = containingDocument.getStaticState().getAttributeControl(prefixedId, attributeQName);
-                            attributeControlStaticId = controlInfo.element.attributeValue("id");
+                            final ControlAnalysis controlAnalysis = containingDocument.getStaticState().getAttributeControl(prefixedId, attributeQName);
+                            attributeControlStaticId = controlAnalysis.element.attributeValue("id");
                         }
 
                         // Find concrete control if possible

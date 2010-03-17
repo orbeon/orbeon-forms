@@ -50,24 +50,24 @@ public class XXFormsTextControl extends XFormsOutputControl implements XFormsPse
 
         assert attributesImpl.getLength() == 0;
 
-        final XXFormsTextControl textControlInfo2 = this;
+        final XXFormsTextControl textControl2 = this;
 
         // Whether it is necessary to output information about this control
         boolean doOutputElement = false;
 
         // Control id
-        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, textControlInfo2.getEffectiveId());
+        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, textControl2.getEffectiveId());
 
         // The client does not store an HTML representation of the xxforms:text control, so we
         // have to output these attributes.
         {
             // HTML element id
-            final String effectiveFor2 = textControlInfo2.getEffectiveForAttribute();
+            final String effectiveFor2 = textControl2.getEffectiveForAttribute();
             doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewlyVisibleSubtree, false);
         }
 
         // Output element
-        outputElement(pipelineContext, ch, textControlInfo2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "text");
+        outputElement(pipelineContext, ch, textControl2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "text");
     }
 
     @Override

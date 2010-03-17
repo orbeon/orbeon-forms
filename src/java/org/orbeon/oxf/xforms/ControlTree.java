@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
@@ -59,7 +60,7 @@ public class ControlTree implements ExternalCopyable {
         this.indentedLogger = indentedLogger;
 
         staticState = containingDocument.getStaticState();
-        controlIndex = new ControlIndex(XFormsProperties.isNoscript(containingDocument));
+        controlIndex = new ControlIndex(staticState.isNoscript());
 
         // Obtain global information about event handlers. This is a rough optimization so we can avoid sending certain
         // types of events below.
@@ -416,7 +417,7 @@ public class ControlTree implements ExternalCopyable {
                                                                   XFormsRepeatControl repeatControl, int iterationIndex) {
 
         // Create new index for the controls created in the iteration
-        final ControlIndex iterationControlIndex = new ControlIndex(XFormsProperties.isNoscript(containingDocument));
+        final ControlIndex iterationControlIndex = new ControlIndex(containingDocument.getStaticState().isNoscript());
 
         // Create iteration and set its binding context
         final XFormsRepeatIterationControl repeatIterationControl = new XFormsRepeatIterationControl(repeatControl.getXBLContainer(), repeatControl, iterationIndex);
@@ -559,7 +560,7 @@ public class ControlTree implements ExternalCopyable {
     }
 
     private void addMissingRepeatIndexes(XFormsStaticState staticState, Map<String, Integer> repeatIdToIndex) {
-        final Map<String, XFormsStaticState.ControlInfo> repeats = staticState.getRepeatControlInfoMap();
+        final Map<String, ControlAnalysis> repeats = staticState.getControlAnalysisMap();
         if (repeats != null) {
             for (String repeatPrefixedId: repeats.keySet()) {
                 if (repeatIdToIndex.get(repeatPrefixedId) == null) {

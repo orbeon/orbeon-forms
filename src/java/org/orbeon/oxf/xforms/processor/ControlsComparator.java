@@ -139,7 +139,7 @@ public class ControlsComparator {
                     // Repeat grouping control
                     if (control2 instanceof XFormsRepeatControl && children1 != null) {
 
-                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
+                        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control2;
 
                         // Special case of repeat update
 
@@ -156,7 +156,7 @@ public class ControlsComparator {
                             // Size has grown
 
                             // Copy template instructions
-                            outputCopyRepeatTemplate(ch, repeatControlInfo, size1 + 1, size2);
+                            outputCopyRepeatTemplate(ch, repeatControl, size1 + 1, size2);
 
                             // Diff the common subset
                             if (!diff(children1, children2.subList(0, size1))) {
@@ -183,14 +183,14 @@ public class ControlsComparator {
 
                     } else if (control2 instanceof XFormsRepeatControl && control1 == null) {
 
-                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
+                        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control2;
 
                         // Handle new sub-xforms:repeat
 
                         // Copy template instructions
                         final int size2 = children2.size();
                         if (size2 > 1) {
-                            outputCopyRepeatTemplate(ch, repeatControlInfo, 2, size2);// don't copy the first template, which is already copied when the parent is copied
+                            outputCopyRepeatTemplate(ch, repeatControl, 2, size2);// don't copy the first template, which is already copied when the parent is copied
                         } else if (size2 == 1) {
                             // NOP, the client already has the template copied
                         } else if (size2 == 0) {
@@ -206,14 +206,14 @@ public class ControlsComparator {
 
                     } else if (control2 instanceof XFormsRepeatControl && children1 == null) {
 
-                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) control2;
+                        final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control2;
 
                         // Handle repeat growing from size 0 (case of instance replacement, for example)
 
                         // Copy template instructions
                         final int size2 = children2.size();
                         if (size2 > 0) {
-                            outputCopyRepeatTemplate(ch, repeatControlInfo, 1, size2);
+                            outputCopyRepeatTemplate(ch, repeatControl, 1, size2);
 
                             // Issue new values for the children
                             if (!diff(null, children2)) {
@@ -378,16 +378,16 @@ public class ControlsComparator {
         }
     }
 
-    protected void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsRepeatControl repeatControlInfo, int startSuffix, int endSuffix) {
+    protected void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsRepeatControl repeatControl, int startSuffix, int endSuffix) {
         if (!isTestMode) {
-            final String repeatControlId = repeatControlInfo.getEffectiveId();
+            final String repeatControlId = repeatControl.getEffectiveId();
             final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
             final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
 
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "copy-repeat-template",
                     new String[] {
                             // Get prefixed id without suffix as templates are global
-                            "id", repeatControlInfo.getPrefixedId(),
+                            "id", repeatControl.getPrefixedId(),
                             "parent-indexes", parentIndexes,
                             "start-suffix", Integer.toString(startSuffix), "end-suffix", Integer.toString(endSuffix)
                     });

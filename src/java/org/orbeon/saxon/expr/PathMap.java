@@ -20,10 +20,7 @@ import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.sxpath.XPathExpression;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * A PathMap is a description of all the paths followed by an expression.
@@ -573,6 +570,14 @@ public class PathMap implements Cloneable {
         } catch (CloneNotSupportedException e) {
             return null;// won't happen
         }
+    }
+
+    public void addRoots(PathMapRoot[] roots) {
+        pathMapRoots.addAll(Arrays.asList(roots));
+    }
+
+    public void removeRoot(PathMapRoot root) {
+        pathMapRoots.remove(root);
     }
 
     public List<PathMapNode> findFinalNodes() {

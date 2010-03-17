@@ -245,7 +245,7 @@ public class XFormsServer extends ProcessorImpl {
             final IndentedLogger eventsIndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
             try {
                 // Run events if any
-                final boolean isNoscript = XFormsProperties.isNoscript(containingDocument);
+                final boolean isNoscript = containingDocument.getStaticState().isNoscript();
 
                 // Set URL rewriter resource path information based on information in static state
                 pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, containingDocument.getStaticState().getVersionedPathMatchers());
@@ -336,6 +336,9 @@ public class XFormsServer extends ProcessorImpl {
                 } else {
                     allEvents = false;
                 }
+
+                // TODO: UI-DEPENDENCIES TEMP
+//                containingDocument.getStaticState().dumpAnalysis();
 
                 if (contentHandler != null) {
                     // Create resulting document if there is a ContentHandler

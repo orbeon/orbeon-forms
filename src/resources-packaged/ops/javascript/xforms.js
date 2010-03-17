@@ -5138,6 +5138,7 @@ ORBEON.xforms.Init = {
     _tree: function(treeDiv) {
         var controlId = treeDiv.id;
         var allowMultipleSelection = ORBEON.util.Dom.hasClass(treeDiv, "xforms-select");
+		var showToolTip = ORBEON.util.Dom.hasClass(treeDiv, "xforms-show-tooltip");
         if (ORBEON.util.Utils.isNewXHTMLLayout())
             treeDiv = treeDiv.getElementsByTagName("div")[0];
         // Save in the control if it allows multiple selection
@@ -5164,8 +5165,36 @@ ORBEON.xforms.Init = {
             // or collapse if expanded
             if (object.node.expanded) return false;
         });
+		if (showToolTip) {
+		    function addTreeToolTip() {
+        		var nodes = yuiTree.getNodesByProperty();
+        		// Nodes can be null when the tree is empty
+                if (nodes != null) {
+        			for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++) {
+                        var node = nodes[nodeIndex];
+                        if (node.children.length == 0) continue;
+        				var contentEl = ORBEON.util.Dom.getElementById(node.contentElId);
+        				if (contentEl == null) continue; // This node isn't visible on page yet
+        				var iconEl = contentEl.previousSibling;
+        				var orbeonToolTip = new YAHOO.widget.Tooltip(contentEl.id + "-orbeon-tree-tooltip", {
+        					context: iconEl.id,
+        					text: (node.expanded? "Collapse " : "Expand ") + node.label,
+        					showDelay: 100
+        				});
+                     }
+                }
+        	}
+
+		    // Add initial tooltips
+			addTreeToolTip();
+			// When nodes are expanded or collapse, reset tooltips as they might have changed (new nodes, expand switched with collapse)
+			yuiTree.subscribe("expandComplete", function() { addTreeToolTip(); });
+			yuiTree.subscribe("collapseComplete", function() { addTreeToolTip(); });
+		}
+		// Show the tree now that it has been built
         ORBEON.util.Dom.removeClass(ORBEON.util.Utils.isNewXHTMLLayout() ? treeDiv.parentNode : treeDiv, "xforms-initially-hidden");
     },
+
 
     /**
      * Create a sub-menu attached to the given menu item. In the nameValueArray we

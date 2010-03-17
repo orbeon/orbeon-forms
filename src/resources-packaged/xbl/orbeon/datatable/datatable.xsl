@@ -110,7 +110,11 @@
     <xsl:variable name="rowsPerPage"
         select="if ($pass5/fr:datatable/@rowsPerPage castable as xs:integer) then $pass5/fr:datatable/@rowsPerPage cast as xs:integer else 10"/>
     <xsl:variable name="maxNbPagesToDisplay"
-        select="if ($pass5/fr:datatable/@maxNbPagesToDisplay castable as xs:integer) then $pass5/fr:datatable/@maxNbPagesToDisplay cast as xs:integer else -1"/>
+        select="if ($pass5/fr:datatable/@maxNbPagesToDisplay castable as xs:integer) 
+            then if ($pass5/fr:datatable/@maxNbPagesToDisplay cast as xs:integer mod 2 = 0 )
+                then $pass5/fr:datatable/@maxNbPagesToDisplay cast as xs:integer + 1
+                else $pass5/fr:datatable/@maxNbPagesToDisplay cast as xs:integer
+            else -1"/>
     <xsl:variable name="sortAndPaginationMode" select="$pass5/fr:datatable/@sortAndPaginationMode"/>
     <xsl:variable name="isExternallySortedAndPaginated" select="$sortAndPaginationMode = 'external'"/>
     <xsl:variable name="isInternallySortedAndPaginated" select="not($isExternallySortedAndPaginated)"/>

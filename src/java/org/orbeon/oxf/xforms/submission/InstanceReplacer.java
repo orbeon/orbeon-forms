@@ -77,7 +77,8 @@ public class InstanceReplacer extends BaseReplacer {
 
                 // TODO: What about configuring validation? And what default to choose?
                 // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
-                resultingDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
+                resultingDocument = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
+                        connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
 
                 if (indentedLogger.isDebugEnabled())
                     indentedLogger.logDebug("", "deserializing to read-only instance");
@@ -154,7 +155,7 @@ public class InstanceReplacer extends BaseReplacer {
                         detailsLogger.logDebug("", "replacing instance with mutable instance",
                             "instance", updatedInstance.getEffectiveId());
 
-                    newInstance = new XFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
+                    newInstance = new XFormsInstance(containingDocument.getStaticState().getXPathConfiguration(), updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
                             (Document) resultingDocument, connectionResult.resourceURI, resultingRequestBodyHash, p2.username, p2.password,
                             p2.isCache, p2.timeToLive, updatedInstance.getValidation(), p2.isHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
                 } else {

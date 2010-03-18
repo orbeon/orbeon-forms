@@ -249,6 +249,8 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Set URL rewriter resource path information based on information in static state
                 pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, containingDocument.getStaticState().getVersionedPathMatchers());
+                // Set XPath configuration
+                pipelineContext.setAttribute(XPathCache.XPATH_CACHE_CONFIGURATION_PROPERTY, containingDocument.getStaticState().getXPathConfiguration());
 
                 // Set deployment mode into request (useful for epilogue)
                 externalContext.getRequest().getAttributesMap().put(OrbeonXFormsFilter.RENDERER_DEPLOYMENT_ATTRIBUTE_NAME, containingDocument.getStaticState().getDeploymentType().name());

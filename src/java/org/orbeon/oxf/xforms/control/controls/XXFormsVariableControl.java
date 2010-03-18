@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.Variable;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -98,13 +99,12 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
                 while (true) {
                     final Item item1 = iter1.next();
                     final Item item2 = iter2.next();
+
                     if (item1 == null && item2 == null) {
                         return true;
                     }
-                    if (item1 == null || item2 == null) {
-                        return false;
-                    }
-                    if (!item1.equals(item2)) {
+
+                    if (!XFormsUtils.compareItems(item1, item2)) {
                         return false;
                     }
                 }

@@ -14,12 +14,23 @@
 package org.orbeon.saxon.expr;
 
 import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.functions.Doc;
+import org.orbeon.saxon.functions.Document;
+import org.orbeon.saxon.functions.SystemFunction;
 import org.orbeon.saxon.om.Axis;
+import org.orbeon.saxon.pattern.AnyNodeTest;
 import org.orbeon.saxon.pattern.NodeKindTest;
+import org.orbeon.saxon.query.StaticQueryContext;
+import org.orbeon.saxon.query.XQueryExpression;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.sxpath.XPathExpression;
+import org.orbeon.saxon.trans.XPathException;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.PrintStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -34,26 +45,32 @@ import java.util.*;
  *
  * <p>The current implementation works only for XPath 2.0 expressions (for example, constructs
  * like xsl:for-each-group are not handled.)</p>
+ *
+ * <p>This class, together with the overloaded method
+ * {@link Expression#addToPathMap(PathMap, org.orbeon.saxon.expr.PathMap.PathMapNodeSet)} can be
+ * seen as an implementation of the static path analysis algorithm given in section 4 of
+ * <a href="http://www-db.research.bell-labs.com/user/simeon/xml_projection.pdf">A. Marian and J. Simeon,
+ * Projecting XML Documents, VLDB 2003</a>.</p>
  */
 
-public class PathMap implements Cloneable {
+public class PathMap {
 
-    private List<PathMapRoot> pathMapRoots = new ArrayList<PathMapRoot>(); // a list of PathMapRoot objects
-//    private HashMap pathsForVariables = new HashMap();  // a map from a variable Binding to a PathMapNodeSet
-    private Configuration config;
+    private List<PathMapRoot> pathMapRoots = new ArrayList<PathMapRoot>();        // a list of PathMapRoot objects
+    private HashMap pathsForVariables = new HashMap();  // a map from a variable Binding to a PathMapNodeSet
 
     /**
      * A node in the path map. A node holds a set of arcs, each representing a link to another
      * node in the path map.
      */
 
-    public static class PathMapNode implements Cloneable {
-        List<PathMapArc> arcs = new ArrayList<PathMapArc>();
+    public static class PathMapNode {
+        List<PathMapArc> arcs;              // a list of PathMapArcs
         private boolean returnable;
         private boolean atomized;
         private boolean hasUnknownDependencies;
 
         @Override
+
         public PathMapNode clone() throws CloneNotSupportedException {
             final PathMapNode cloned = (PathMapNode) super.clone();
 
@@ -71,7 +88,9 @@ public class PathMap implements Cloneable {
          * Create a node in the PathMap (initially with no arcs)
          */
 
-        private PathMapNode() {}
+        private PathMapNode() {
+            arcs = new ArrayList<PathMapArc>();
+        }
 
         /**
          * Create a new arc
@@ -80,6 +99,12 @@ public class PathMap implements Cloneable {
          */
 
         public PathMapNode createArc(AxisExpression step) {
+            for (int i=0; i<arcs.size(); i++) {
+                PathMapArc a = (PathMapArc)arcs.get(i);
+                if (a.getStep().equals(step)) {
+                    return a.getTarget();
+                }
+            }
             PathMapNode target = new PathMapNode();
             PathMapArc arc = new PathMapArc(step, target);
             arcs.add(arc);
@@ -117,6 +142,7 @@ public class PathMap implements Cloneable {
             return (PathMapArc[])arcs.toArray(new PathMapArc[arcs.size()]);
         }
 
+        // ORBEON
         public void addArcs(List<PathMapArc> arcs) {
             this.arcs.addAll(arcs);
         }
@@ -199,12 +225,16 @@ public class PathMap implements Cloneable {
             this.rootExpression = root;
         }
 
-
+        /**
+         * Get the root expression
+         * @return the expression at the root of the path
+         */
         public Expression getRootExpression() {
             return rootExpression;
         }
 
         @Override
+        // ORBEON
         public PathMapRoot clone() throws CloneNotSupportedException {
             return (PathMapRoot) super.clone();
         }
@@ -248,6 +278,7 @@ public class PathMap implements Cloneable {
         }
 
         @Override
+        // ORBEON
         public PathMapArc clone() throws CloneNotSupportedException {
             final PathMapArc cloned = (PathMapArc) super.clone();
             if (target != null) {
@@ -259,30 +290,121 @@ public class PathMap implements Cloneable {
     }
 
     /**
+     * A (mutable) set of nodes in the path map
+     */
+
+    public static class PathMapNodeSet extends HashSet<PathMapNode> {
+
+        /**
+         * Create an initially-empty set of path map nodes
+         */
+
+        public PathMapNodeSet() {}
+
+        /**
+         * Create a set of path map nodes that initially contains a single node
+         * @param singleton the single node to act as the initial content
+         */
+
+        public PathMapNodeSet(PathMapNode singleton) {
+            add(singleton);
+        }
+
+        /**
+         * Create an arc from each node in this node set to a corresponding newly-created
+         * target node
+         * @param step the AxisExpression defining the transition
+         * @return the set of new target nodes
+         */
+
+        public PathMapNodeSet createArc(AxisExpression step) {
+            PathMapNodeSet targetSet = new PathMapNodeSet();
+            for (Iterator it=iterator(); it.hasNext();) {
+                PathMapNode node = (PathMapNode)it.next();
+                targetSet.add(node.createArc(step));
+            }
+            return targetSet;
+        }
+
+        /**
+         * Combine two node sets into one
+         * @param nodes the set of nodes to be added to this set
+         */
+
+        public void addNodeSet(PathMapNodeSet nodes) {
+            if (nodes != null) {
+                for (Iterator it=nodes.iterator(); it.hasNext();) {
+                    PathMapNode node = (PathMapNode)it.next();
+                    add(node);
+                }
+            }
+        }
+
+        /**
+         * Set the atomized property on all nodes in this nodeset
+         */
+
+        public void setAtomized() {
+            for (Iterator it=iterator(); it.hasNext();) {
+                PathMapNode node = (PathMapNode)it.next();
+                node.setAtomized();
+            }
+        }
+
+        /**
+         * Indicate that all the descendants of the nodes in this nodeset are required
+         */
+
+        public void addDescendants() {
+            for (Iterator it=iterator(); it.hasNext();) {
+                PathMapNode node = (PathMapNode)it.next();
+                AxisExpression down = new AxisExpression(Axis.DESCENDANT, AnyNodeTest.getInstance());
+                node.createArc(down);
+            }
+        }
+
+        /**
+         * Indicate that all the nodes have unknown dependencies
+         */
+
+        public void setHasUnknownDependencies() {
+            for (Iterator it=iterator(); it.hasNext();) {
+                PathMapNode node = (PathMapNode)it.next();
+                node.setHasUnknownDependencies();
+            }
+        }
+
+    }
+
+    /**
      * Create the PathMap for an expression
      * @param exp the expression whose PathMap is required
      */
 
-    public PathMap(ComputedExpression exp, Configuration config) {
-        this.config = config;
-
-        PathMapNode finalNodes = exp.addToPathMap(this, null);
-        // TODO: this is different from Saxon 9.1, might need to backport or upgrade
-//        if (finalNodes != null) {
-//            for (Iterator iter = finalNodes.iterator(); iter.hasNext(); ) {
-//                PathMapNode node = (PathMapNode)iter.next();
-//                node.setReturnable(true);
-//            }
-//        }
+    public PathMap(Expression exp) {
+        PathMapNodeSet finalNodes = exp.addToPathMap(this, null);
+        if (finalNodes != null) {
+            for (Iterator iter = finalNodes.iterator(); iter.hasNext(); ) {
+                PathMapNode node = (PathMapNode)iter.next();
+                node.setReturnable(true);
+            }
+        }
     }
 
     /**
-     * Make a new root node in the path map
+     * Make a new root node in the path map. However, if there is already a root for the same
+     * expression, the existing root for that expression is returned.
      * @param exp the expression represented by this root node
      * @return the new root node
      */
 
     public PathMapRoot makeNewRoot(Expression exp) {
+        for (int i=0; i<pathMapRoots.size(); i++) {
+            PathMapRoot r = (PathMapRoot)pathMapRoots.get(i);
+            if (exp.equals(r.getRootExpression())) {
+                return r;
+            }
+        }
         PathMapRoot root = new PathMapRoot(exp);
         pathMapRoots.add(root);
         return root;
@@ -298,72 +420,103 @@ public class PathMap implements Cloneable {
     }
 
     /**
-     * Display a printed representation of the path map
-     * @param out the output stream to which the output will be written
+     * Register the path used when evaluating a given variable binding
+     * @param binding the variable binding
+     * @param nodeset the set of PathMap nodes reachable when evaluating that variable
      */
 
-    public void diagnosticDump(PrintStream out) {
-        for (int i=0; i<pathMapRoots.size(); i++) {
-            out.println("\nROOT EXPRESSION " + i);
-            PathMapRoot mapRoot = (PathMapRoot)pathMapRoots.get(i);
-            Expression exp = mapRoot.rootExpression;
-            exp.display(0, out, config);
-            out.println("\nTREE FOR EXPRESSION " + i);
-            showArcs(out, mapRoot, 2);
-        }
+    public void registerPathForVariable(Binding binding, PathMapNodeSet nodeset) {
+        pathsForVariables.put(binding, nodeset);
     }
 
     /**
-     * Internal helper method called by diagnosticDump, to show the arcs emanating from a node
-     * @param out the output stream
-     * @param node the node in the path map whose arcs are to be displayed
-     * @param indent the indentation level in the output
+     * Get the path used when evaluating a given variable binding
+     * @param binding the variable binding
+     * @return the set of PathMap nodes reachable when evaluating that variable
      */
 
-    private void showArcs(PrintStream out, PathMapNode node, int indent) {
-        String pad = "                                           ".substring(0, indent);
-        List arcs = node.arcs;
-        out.println(pad + "returnable: " + node.isReturnable());
-        for (int i=0; i<arcs.size(); i++) {
-            out.println(pad + ((PathMapArc)arcs.get(i)).step);
-            showArcs(out, ((PathMapArc)arcs.get(i)).target, indent+2);
-        }
+    public PathMapNodeSet getPathForVariable(Binding binding) {
+        return (PathMapNodeSet)pathsForVariables.get(binding);
     }
 
-//    /**
-//     * Register the path used when evaluating a given variable binding
-//     * @param binding the variable binding
-//     * @param nodeset the set of PathMap nodes reachable when evaluating that variable
-//     */
-//
-//    public void registerPathForVariable(Binding binding, PathMapNode nodeset) {
-//        pathsForVariables.put(binding, nodeset);
-//    }
-//
-//    /**
-//     * Get the path used when evaluating a given variable binding
-//     * @param binding the variable binding
-//     * @return the set of PathMap nodes reachable when evaluating that variable
-//     */
-//
-//    public PathMapNode getPathForVariable(Binding binding) {
-//        return (PathMapNode)pathsForVariables.get(binding);
-//    }
-
     /**
-     * Main method for testing
-     * @param args Takes one argument, the XPath expression to be analyzed
-     * @throws Exception
+     * Get the path map root for the context document
+     * @return the path map root for the context document if there is one, or null if none is found.
+     * @throws IllegalStateException if there is more than one path map root for the context document
      */
 
-    public static void main(String[] args) throws Exception {
-        Configuration config = new Configuration();
-        XPathEvaluator xpath = new XPathEvaluator(config);
-        XPathExpression xpexp = xpath.createExpression(args[0]);
-        Expression exp = xpexp.getInternalExpression();
-        exp.display(0, System.err, config);
-        PathMap initialPath = new PathMap((ComputedExpression)exp, config);
-        initialPath.diagnosticDump(System.err);
+    public PathMapRoot getContextRoot() {
+        //System.err.println("BEFORE REDUCTION:");
+        //map.diagnosticDump(System.err);
+        PathMap.PathMapRoot[] roots = getPathMapRoots();
+        PathMapRoot contextRoot = null;
+        for (int r=0; r<roots.length; r++) {
+            PathMap.PathMapRoot newRoot = reduceToDownwardsAxes(roots[r]);
+            if (newRoot.getRootExpression() instanceof RootExpression) {
+                if (contextRoot != null) {
+                    throw new IllegalStateException("More than one context document root found in path map");
+                } else {
+                    contextRoot = newRoot;
+                }
+            }
+        }
+        //System.err.println("AFTER REDUCTION:");
+        //map.diagnosticDump(System.err);
+        return contextRoot;
+    }
+
+    /**
+     * Get the path map root for a call on the doc() or document() function with a given literal argument
+     * @param requiredUri the literal argument we are looking for
+     * @return the path map root for the specified document if there is one, or null if none is found.
+     * @throws IllegalStateException if there is more than one path map root for the specified document
+     */
+
+    public PathMapRoot getRootForDocument(String requiredUri) {
+        //System.err.println("BEFORE REDUCTION:");
+        //map.diagnosticDump(System.err);
+        PathMap.PathMapRoot[] roots = getPathMapRoots();
+        PathMapRoot requiredRoot = null;
+        for (int r=0; r<roots.length; r++) {
+            PathMap.PathMapRoot newRoot = reduceToDownwardsAxes(roots[r]);
+            Expression exp = newRoot.getRootExpression();
+            String baseUri = null;
+            if (exp instanceof Doc) {
+                baseUri = ((Doc)exp).getStaticBaseURI();
+            } else if (exp instanceof Document) {
+                baseUri = ((Document)exp).getStaticBaseURI();
+            }
+            Expression arg = ((SystemFunction)exp).getArguments()[0];
+            String suppliedUri = null;
+            if (arg instanceof Literal) {
+                try {
+                    String argValue = ((Literal)arg).getValue().getStringValue();
+                    if (baseUri == null) {
+                        if (new URI(argValue).isAbsolute()) {
+                            suppliedUri = argValue;
+                        } else {
+                            suppliedUri = null;
+                        }
+                    } else {
+                        suppliedUri = Configuration.getPlatform().makeAbsolute(argValue, baseUri).toString();
+                    }
+                } catch (URISyntaxException err) {
+                    suppliedUri = null;
+                } catch (XPathException err) {
+                    suppliedUri = null;
+                }
+            }
+            if (requiredUri.equals(suppliedUri)) {
+                if (requiredRoot != null) {
+                    throw new IllegalStateException("More than one document root found in path map for " + requiredUri);
+                } else {
+                    requiredRoot = newRoot;
+                }
+            }
+        }
+        //System.err.println("AFTER REDUCTION:");
+        //map.diagnosticDump(System.err);
+        return requiredRoot;
     }
 
     /**
@@ -387,7 +540,7 @@ public class PathMap implements Cloneable {
         PathMapRoot newRoot = root;
         if (root.getRootExpression() instanceof ContextItemExpression) {
             RootExpression slash = new RootExpression();
-            slash.setParentExpression(root.getRootExpression().getParentExpression());
+            slash.setContainer(root.getRootExpression().getContainer());
             //root.setRootExpression(slash);
             newRoot = makeNewRoot(slash);
             for (int i=root.arcs.size()-1; i>=0; i--) {
@@ -432,10 +585,10 @@ public class PathMap implements Cloneable {
      * The node at the bottom of the stack is the root.
      */
 
-    private void reduceToDownwardsAxes(PathMapRoot root, Stack<PathMapNode> nodeStack) {
+    private void reduceToDownwardsAxes(PathMapRoot root, Stack nodeStack) {
         //PathMapArc lastArc = (PathMapArc)arcStack.peek();
         //byte lastAxis = lastArc.getStep().getAxis();
-        PathMapNode node = nodeStack.peek();
+        PathMapNode node = (PathMapNode)nodeStack.peek();
         if (node.hasUnknownDependencies()) {
             root.setHasUnknownDependencies();
         }
@@ -450,7 +603,7 @@ public class PathMap implements Cloneable {
             PathMapArc thisArc = (PathMapArc)node.arcs.get(i);
             AxisExpression axisStep = thisArc.getStep();
             PathMapNode grandParent =
-                        (nodeStack.size() < 2 ? null : nodeStack.get(nodeStack.size()-2));
+                        (nodeStack.size() < 2 ? null : (PathMapNode)nodeStack.get(nodeStack.size()-2));
             byte lastAxis = -1;
             if (grandParent != null) {
                 for (Iterator iter = grandParent.arcs.iterator(); iter.hasNext(); ) {
@@ -467,8 +620,8 @@ public class PathMap implements Cloneable {
                     if (axisStep.getNodeTest() == NodeKindTest.DOCUMENT) {
                         // This is typically an absolute path expression appearing within a predicate
                         node.arcs.remove(i);
-                        for (Iterator iter = thisArc.getTarget().arcs.iterator(); iter.hasNext(); ) {
-                            root.arcs.add((PathMapArc) iter.next());
+                        for (Iterator<PathMapArc> iter = thisArc.getTarget().arcs.iterator(); iter.hasNext(); ) {
+                            root.arcs.add(iter.next());
                         }
                         break;
                     } else {
@@ -481,7 +634,7 @@ public class PathMap implements Cloneable {
                     // replace the axis by a downwards axis from the root
                     if (axisStep.getAxis() != Axis.DESCENDANT_OR_SELF) {
                         AxisExpression newStep = new AxisExpression(Axis.DESCENDANT_OR_SELF, axisStep.getNodeTest());
-                        newStep.setParentExpression(axisStep.getParentExpression());
+                        newStep.setContainer(axisStep.getContainer());
                         root.createArc(newStep, thisArc.getTarget());
                         node.arcs.remove(i);
                     }
@@ -499,13 +652,13 @@ public class PathMap implements Cloneable {
                 case Axis.PRECEDING_SIBLING: {
                     if (grandParent != null) {
                         AxisExpression newStep = new AxisExpression(lastAxis, axisStep.getNodeTest());
-                        newStep.setParentExpression(axisStep.getParentExpression());
+                        newStep.setContainer(axisStep.getContainer());
                         grandParent.createArc(newStep, thisArc.getTarget());
                         node.arcs.remove(i);
                         break;
                     } else {
                         AxisExpression newStep = new AxisExpression(Axis.CHILD, axisStep.getNodeTest());
-                        newStep.setParentExpression(axisStep.getParentExpression());
+                        newStep.setContainer(axisStep.getContainer());
                         root.createArc(newStep, thisArc.getTarget());
                         node.arcs.remove(i);
                         break;
@@ -528,7 +681,7 @@ public class PathMap implements Cloneable {
                         node.arcs.remove(i);
                     } else if (lastAxis == Axis.DESCENDANT) {
                         AxisExpression newStep = new AxisExpression(Axis.DESCENDANT_OR_SELF, axisStep.getNodeTest());
-                        newStep.setParentExpression(axisStep.getParentExpression());
+                        newStep.setContainer(axisStep.getContainer());
                         if (thisArc.getTarget().arcs.isEmpty()) {
                             grandParent.createArc(newStep);
                         } else {
@@ -538,7 +691,7 @@ public class PathMap implements Cloneable {
                     } else {
                         // don't try to be precise about a/b/../../c
                         AxisExpression newStep = new AxisExpression(Axis.DESCENDANT_OR_SELF, axisStep.getNodeTest());
-                        newStep.setParentExpression(axisStep.getParentExpression());
+                        newStep.setContainer(axisStep.getContainer());
                         if (thisArc.getTarget().arcs.isEmpty()) {
                             root.createArc(newStep);
                         } else {
@@ -559,6 +712,7 @@ public class PathMap implements Cloneable {
     }
 
     @Override
+    // ORBEON
     public PathMap clone() {
         try {
             final PathMap cloned = (PathMap) super.clone();
@@ -566,21 +720,25 @@ public class PathMap implements Cloneable {
             for (final PathMapRoot root: pathMapRoots) {
                 cloned.pathMapRoots.add(root.clone());
             }
+            // TODO: pathsForVariables
             return cloned;
         } catch (CloneNotSupportedException e) {
             return null;// won't happen
         }
     }
-
+    // ORBEON
     public void addRoots(PathMapRoot[] roots) {
         pathMapRoots.addAll(Arrays.asList(roots));
     }
 
+    // ORBEON
     public void removeRoot(PathMapRoot root) {
         pathMapRoots.remove(root);
     }
 
+    // ORBEON
     public List<PathMapNode> findFinalNodes() {
+        // TODO
         final List<PathMapNode> result = new ArrayList<PathMapNode>();
         for (final PathMapRoot root: pathMapRoots) {
             addNodes(result, root);
@@ -588,6 +746,7 @@ public class PathMap implements Cloneable {
         return result;
     }
 
+    // ORBEON
     private void addNodes(List<PathMapNode> result, PathMapNode node) {
         if (node.arcs.isEmpty()) {
             result.add(node);
@@ -598,23 +757,81 @@ public class PathMap implements Cloneable {
         }
     }
 
-//    public List<PathMapArc> findFinalArcs() {
-//        final List<PathMapArc> result = new ArrayList<PathMapArc>();
-//        for (final PathMapRoot root: pathMapRoots) {
-//            addArcs(result, root);
-//        }
-//        return result;
-//    }
-//
-//    private void addArcs(List<PathMapArc> result, PathMapNode node) {
-//        for (final PathMapArc arc: node.arcs) {
-//            if (arc.target.arcs.isEmpty()) {
-//                result.add(arc);
-//            } else {
-//                addArcs(result, arc.target);
-//            }
-//        }
-//    }
+    /**
+     * Display a printed representation of the path map
+     * @param out the output stream to which the output will be written
+     */
+
+    public void diagnosticDump(PrintStream out) {
+        for (int i=0; i<pathMapRoots.size(); i++) {
+            out.println("\nROOT EXPRESSION " + i);
+            PathMapRoot mapRoot = (PathMapRoot)pathMapRoots.get(i);
+            if (mapRoot.hasUnknownDependencies()) {
+                out.println("  -- has unknown dependencies --");
+            }
+            Expression exp = mapRoot.rootExpression;
+            exp.explain(out);
+            out.println("\nTREE FOR EXPRESSION " + i);
+            showArcs(out, mapRoot, 2);
+        }
+    }
+
+    /**
+     * Internal helper method called by diagnosticDump, to show the arcs emanating from a node.
+     * Each arc is shown as a representation of the axis step, followed optionally by "@" if the
+     * node reached by the arc is atomized, followed optionally by "#" if the
+     * node reached by the arc is a final returnable node.
+     * @param out the output stream
+     * @param node the node in the path map whose arcs are to be displayed
+     * @param indent the indentation level in the output
+     */
+
+    private void showArcs(PrintStream out, PathMapNode node, int indent) {
+        String pad = "                                           ".substring(0, indent);
+        List arcs = node.arcs;
+        for (int i=0; i<arcs.size(); i++) {
+            PathMapArc arc = ((PathMapArc)arcs.get(i));
+            out.println(pad + arc.step +
+                    (arc.target.isAtomized() ? " @" : "") +
+                    (arc.target.isReturnable() ? " #" : "") +
+                    (arc.target.hasUnknownDependencies() ? " ...??" : ""));
+            showArcs(out, arc.target, indent+2);
+        }
+    }
+
+    /**
+     * Main method for testing
+     * @param args Takes one argument, the XPath expression to be analyzed
+     * @throws Exception
+     */
+
+    public static void main(String[] args) throws Exception {
+        Configuration config = new Configuration();
+        Expression exp;
+        if (args[0].equals("xpath")) {
+            XPathEvaluator xpath = new XPathEvaluator(config);
+            XPathExpression xpexp = xpath.createExpression(args[1]);
+            exp = xpexp.getInternalExpression();
+        } else if (args[0].equals("xquery")) {
+            StaticQueryContext sqc = new StaticQueryContext(config);
+            sqc.setBaseURI(new File(args[1]).toURI().toString());
+            XQueryExpression xqe = sqc.compileQuery(new FileReader(args[1]));
+            exp = xqe.getExpression();
+        } else {
+            throw new IllegalArgumentException("first argument must be xpath or xquery");
+        }
+        exp.explain(System.err);
+        PathMap initialPath = new PathMap(exp);
+        initialPath.diagnosticDump(System.err);
+
+        PathMapRoot[] roots = initialPath.getPathMapRoots();
+        for (int i=0; i<roots.length; i++) {
+            initialPath.reduceToDownwardsAxes(roots[i]);
+        }
+        System.err.println("AFTER REDUCTION:");
+        initialPath.diagnosticDump(System.err);
+    }
+
 }
 
 //

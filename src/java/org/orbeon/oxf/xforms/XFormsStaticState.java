@@ -44,10 +44,14 @@ import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.tinytree.TinyBuilder;
+import org.xml.sax.SAXException;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
 
 /**
@@ -69,6 +73,10 @@ public class XFormsStaticState {
     private String uuid;
     private String encodedStaticState;      // encoded state
     private Document staticStateDocument;   // if present, stored there temporarily only until getEncodedStaticState() is called and encodedStaticState is produced
+
+    // Per static-state Saxon Configuration
+    private Configuration xpathConfiguration = new Configuration();
+    private DocumentWrapper documentWrapper = new DocumentWrapper(Dom4jUtils.createDocument(), null, xpathConfiguration);
 
     private Document controlsDocument;                                      // controls document
     private LinkedHashMap<String, Document> modelDocuments = new LinkedHashMap<String, Document>(); // Map<String modelPrefixedId, Document modelDocument>
@@ -148,6 +156,8 @@ public class XFormsStaticState {
      * @param annotatedDocument     SAXStore containing the XHTML for noscript mode, null if not available
      */
     public XFormsStaticState(PropertyContext propertyContext, Document staticStateDocument, XFormsAnnotatorContentHandler.Metadata metadata, SAXStore annotatedDocument) {
+        // Set XPath configuration
+        propertyContext.setAttribute(XPathCache.XPATH_CACHE_CONFIGURATION_PROPERTY, getXPathConfiguration());
         initialize(propertyContext, staticStateDocument, metadata, annotatedDocument, null);
     }
 
@@ -155,16 +165,23 @@ public class XFormsStaticState {
      * Create static state object from an encoded version. This constructor is used when restoring a static state from
      * a serialized form.
      *
-     * @param pipelineContext       current context
+     * @param propertyContext       current context
      * @param encodedStaticState    encoded static state
      */
-    public XFormsStaticState(PropertyContext pipelineContext, String encodedStaticState) {
+    public XFormsStaticState(PropertyContext propertyContext, String encodedStaticState) {
+
+        // Set XPath configuration
+        propertyContext.setAttribute(XPathCache.XPATH_CACHE_CONFIGURATION_PROPERTY, getXPathConfiguration());
 
         // Decode encodedStaticState into staticStateDocument
-        final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedStaticState);
+        final Document staticStateDocument = XFormsUtils.decodeXML(propertyContext, encodedStaticState);
 
         // Initialize
-        initialize(pipelineContext, staticStateDocument, null, null, encodedStaticState);
+        initialize(propertyContext, staticStateDocument, null, null, encodedStaticState);
+    }
+
+    public Configuration getXPathConfiguration() {
+        return xpathConfiguration;
     }
 
     public XFormsAnnotatorContentHandler.Metadata getMetadata() {
@@ -419,8 +436,6 @@ public class XFormsStaticState {
     }
 
     private void extractControlsModelsComponents(PropertyContext pipelineContext, Element staticStateElement) {
-
-        final Configuration xpathConfiguration = new Configuration();
 
         // Get top-level models from static state document
         {
@@ -847,7 +862,6 @@ public class XFormsStaticState {
             repeatChildrenMap = new HashMap<String, List<String>>();
 
             // Iterate over main static controls tree
-            final Configuration xpathConfiguration = new Configuration();
             final StringBuilder repeatHierarchyStringBuffer = new StringBuilder(1024);
             final Stack<String> repeatAncestorsStack = new Stack<String>();
             final ControlAnalysis rootControlAnalysis = new RootAnalysis(propertyContext, this);
@@ -1675,4 +1689,33 @@ public class XFormsStaticState {
             }
         }
     }
+
+    public DocumentWrapper getDefaultDocumentWrapper() {
+        return documentWrapper;
+    }
+
+    public final NodeInfo DUMMY_CONTEXT;
+    {
+        try {
+            final TinyBuilder treeBuilder = new TinyBuilder();
+            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler(xpathConfiguration);
+            identity.setResult(treeBuilder);
+
+            identity.startDocument();
+            identity.endDocument();
+
+            DUMMY_CONTEXT = treeBuilder.getCurrentRoot();
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    // If there is no XPath context defined at the root (in the case there is no default XForms model/instance
+    // available), we should use an empty context. However, currently for non-relevance in particular we must not run
+    // expressions with an empty context. To allow running expressions at the root of a container without models, we
+    // create instead a context with an empty document node instead. This way there is a context for evaluation. In the
+    // future, we should allow running expressions with no context, possibly after statically checking that they do not
+    // depend on the context, as well as prevent evaluations within non-relevant content by other means.
+//    final List<Item> DEFAULT_CONTEXT = XFormsConstants.EMPTY_ITEM_LIST;
+    public final List<Item> DEFAULT_CONTEXT = Collections.singletonList((Item) DUMMY_CONTEXT);
 }

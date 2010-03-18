@@ -28,7 +28,7 @@ import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.SingletonIterator;
-import org.orbeon.saxon.value.IntegerValue;
+import org.orbeon.saxon.value.Int64Value;
 import org.orbeon.saxon.value.StringValue;
 
 import java.util.Collections;
@@ -65,6 +65,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
         this.statusCode = statusCode;
     }
 
+    @Override
     public SequenceIterator getAttribute(String name) {
 
         if ("resource-uri".equals(name)) {
@@ -74,7 +75,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
             // "The protocol return code of the error response, or NaN if the failed submission did not receive an error
             // response."
             if (statusCode > 0)
-                return SingletonIterator.makeIterator(new IntegerValue(statusCode));
+                return SingletonIterator.makeIterator(new Int64Value(statusCode));
             else
                 return EmptyIterator.getInstance();// instead of returning NaN, we return an empty 
         } else if ("response-headers".equals(name)) {
@@ -102,10 +103,11 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
 
                 sb.append("</headers>");
 
-                final Item headersDocument = TransformerUtils.stringToTinyTree(sb.toString(), false);
+                final Item headersDocument = TransformerUtils.stringToTinyTree(getContainingDocument().getStaticState().getXPathConfiguration(),
+                        sb.toString(), false);
 
                 return XPathCache.evaluateAsExtent(getPipelineContext(), Collections.singletonList(headersDocument), 1,
-                        "/headers/header", XFormsConstants.EMPTY_NAMESPACE_MAPPING, null, null, null, null, getLocationData()).iterate(null);// NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
+                        "/headers/header", XFormsConstants.EMPTY_NAMESPACE_MAPPING, null, null, null, null, getLocationData()).iterate();
             } else {
                 // No headers
                 return EmptyIterator.getInstance();
@@ -120,6 +122,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
         }
     }
 
+    @Override
     protected IndentedLogger getIndentedLogger () {
         return getContainingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
     }

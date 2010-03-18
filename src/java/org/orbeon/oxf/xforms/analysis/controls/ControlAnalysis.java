@@ -20,9 +20,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.expr.ComputedExpression;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.PathMap;
 
@@ -101,7 +99,7 @@ public class ControlAnalysis {
 //                pooledXPathExpression.returnToPool();
 //        }
 
-        final Expression expression = XPathCache.createExpression(xpathString, staticState.getMetadata().namespaceMappings.get(prefixedId), XFormsContainingDocument.getFunctionLibrary());
+        final Expression expression = XPathCache.createExpression(staticState.getXPathConfiguration(), xpathString, staticState.getMetadata().namespaceMappings.get(prefixedId), XFormsContainingDocument.getFunctionLibrary());
             final XPathAnalysis localPathAnalysis = analyzeExpression(staticState, expression, xpathString);
             localPathAnalysis.rebase(parentControlAnalysis.bindingAnalysis, inScopeVariables);
             localPathAnalysis.processPaths();
@@ -155,17 +153,12 @@ public class ControlAnalysis {
     }
 
     private static XPathAnalysis analyzeExpression(XFormsStaticState staticState, Expression expression, String xpathString) {
-        if (expression instanceof ComputedExpression) {
-            try {
-                final PathMap pathmap = new PathMap((ComputedExpression) expression, new Configuration());
-                final int dependencies = expression.getDependencies();
-                return new XPathAnalysis(xpathString, pathmap, dependencies);
-            } catch (Exception e) {
-                staticState.getIndentedLogger().logError("", "EXCEPTION WHILE ANALYZING PATHS: " + xpathString);
-                return null;
-            }
-        } else {
-            staticState.getIndentedLogger().logInfo("", "TEST XPATH PATHS - expression not a ComputedExpression: " + xpathString);
+        try {
+            final PathMap pathmap = new PathMap(expression);
+            final int dependencies = expression.getDependencies();
+            return new XPathAnalysis(xpathString, pathmap, dependencies);
+        } catch (Exception e) {
+            staticState.getIndentedLogger().logError("", "EXCEPTION WHILE ANALYZING PATHS: " + xpathString);
             return null;
         }
     }

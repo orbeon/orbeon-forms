@@ -38,7 +38,7 @@ import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.Controller;
 import org.orbeon.saxon.FeatureKeys;
 import org.orbeon.saxon.event.ContentHandlerProxyLocator;
-import org.orbeon.saxon.event.Emitter;
+import org.orbeon.saxon.event.MessageEmitter;
 import org.orbeon.saxon.event.SaxonOutputKeys;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -46,9 +46,9 @@ import org.orbeon.saxon.instruct.TerminationException;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NamePool;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.trans.IndependentContext;
+import org.orbeon.saxon.om.StructuredQName;
+import org.orbeon.saxon.sxpath.IndependentContext;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.StringValue;
 import org.xml.sax.*;
 
 import javax.xml.transform.Templates;
@@ -57,6 +57,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Method;
@@ -623,13 +624,9 @@ public abstract class XSLTTransformer extends ProcessorImpl {
             // Built-in Saxon transformer
             saxonStringBuilderWriter = new StringBuilderWriter();
             final Controller saxonController = (Controller) transformerHandler.getTransformer();
-            // NOTE: Saxon 9 returns a Receiver (MessageEmitter -> XMLEmitter -> Emitter -> Receiver)
-            Emitter messageEmitter = saxonController.getMessageEmitter();
-            if (messageEmitter == null) {
-                // NOTE: Saxon 9 makes this method private, use setMessageEmitter() instead
-                messageEmitter = saxonController.makeMessageEmitter();
-            }
-            messageEmitter.setWriter(saxonStringBuilderWriter);
+            final MessageEmitter emitter = new MessageEmitter();
+            emitter.setStreamResult(new StreamResult(saxonStringBuilderWriter));
+            saxonController.setMessageEmitter(emitter);
         } else if (transformerClassName.equals("net.sf.saxon.Controller")) {
             // A Saxon transformer, we don't know which version
             saxonStringBuilderWriter = new StringBuilderWriter();
@@ -679,16 +676,15 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 {
                     // Dummy Function lib that accepts any name
                     setFunctionLibrary(new FunctionLibrary() {
-                        public Expression bind(final int nameCode, String uri, String local, final Expression[] staticArgs)  {
+                        public Expression bind(StructuredQName functionName, Expression[] staticArgs, StaticContext env) throws XPathException {
 
-                            // TODO: Saxon 9.0 expressions should test "instanceof StringValue" to "instanceof StringLiteral"
-                            if ((XMLConstants.XPATH_FUNCTIONS_NAMESPACE_URI.equals(uri) || "".equals(uri))
-                                    && ("doc".equals(local) || "document".equals(local))
+                            if ((XMLConstants.XPATH_FUNCTIONS_NAMESPACE_URI.equals(functionName.getNamespaceURI()) || "".equals(functionName.getNamespaceURI()))
+                                    && ("doc".equals(functionName.getLocalName()) || "document".equals(functionName.getLocalName()))
                                     && (staticArgs != null && staticArgs.length > 0)) {
 
-                                if (staticArgs[0] instanceof StringValue) {
+                                if (staticArgs[0] instanceof StringLiteral) {
                                     // Found doc() or document() function which contains a static string
-                                    final String literalURI = ((StringValue) staticArgs[0]).getStringValue();
+                                    final String literalURI = ((StringLiteral) staticArgs[0]).getStringValue();
 
                                     // We don't need to worry here about reference to the processor inputs
                                     if (!isProcessorInputScheme(literalURI)) {
@@ -705,12 +701,12 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
 
                             // NOTE: We used to return new FunctionCall() here, but MK says EmptySequence.getInstance() will work.
-                            // TODO: Check if this works in Saxon 9.0. It doesn't work in 8.8, so for now we keep return new FunctionCall().
+                            // TODO: Check if this works in Saxon 9.0. It doesn't work in 8.8, so for now we keep return new ContextItemExpression().
 //                            return EmptySequence.getInstance();
                             return new ContextItemExpression();
                         }
 
-                        public boolean isAvailable(int fingerprint, String uri, String local, int arity) {
+                        public boolean isAvailable(StructuredQName functionName, int arity) {
                             return true;
                         }
 
@@ -718,34 +714,34 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             return this;
                         }
                     });
-
-
                 }
 
-                public boolean isAvailable(int fingerprint, String uri, String local, int arity) {
-                    return true;
-                }
-
+                @Override
                 public String getURIForPrefix(String prefix) {
                     return namespaces.getURI(prefix);
                 }
 
+                @Override
                 public boolean isImportedSchema(String namespace) { return true; }
 
-                // Dummy var decl to allow any name
-                public VariableReference bindVariable(final int fingerprint) {
-                        return new VariableReference(new VariableDeclaration() {
-                            public void registerReference(BindingReference bindingReference) {
-                            }
+                @Override
+                // Dummy var declaration to allow any name
+                public VariableReference bindVariable(StructuredQName qName) throws XPathException {
+                    return new VariableReference();
 
-                            public int getNameCode() {
-                                return fingerprint;
-                            }
-
-                            public String getVariableName() {
-                                return "dummy";
-                            }
-                        });
+//                    return new VariableReference(XPathVariable.make());
+//                    return new VariableReference(new VariableReference(); {
+//                        public void registerReference(BindingReference bindingReference) {
+//                        }
+//
+//                        public int getNameCode() {
+//                            return fingerprint;
+//                        }
+//
+//                        public String getVariableName() {
+//                            return "dummy";
+//                        }
+//                    });
                 }
             };
         }
@@ -833,7 +829,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         if (containsDocString) {
                             // The following will call our FunctionLibrary.bind() method, which we use to test for the
                             // presence of the functions.
-                            ExpressionTool.make(xpathString, dummySaxonXPathContext, 0, -1, 0);
+                            ExpressionTool.make(xpathString, dummySaxonXPathContext, 0, -1, 0, false);
 
                             // NOTE: *If* we wanted to use Saxon to parse the whole Stylesheet:
                             

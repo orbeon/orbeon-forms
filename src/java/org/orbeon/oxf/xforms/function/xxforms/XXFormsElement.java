@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -19,8 +19,6 @@ import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -37,10 +35,6 @@ import org.orbeon.saxon.value.AtomicValue;
  * with the namespace mappings in scope where the expression is evaluated.
  */
 public class XXFormsElement extends XFormsFunction {
-
-    // Mmh, here we use a global wrapper for creating dom4j elements. Is this the right way of doing it?
-    public static final DocumentWrapper DOCUMENT_WRAPPER
-            = new DocumentWrapper(Dom4jUtils.createDocument(), null, new Configuration());
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
@@ -109,6 +103,6 @@ public class XXFormsElement extends XFormsFunction {
                 Dom4jUtils.normalizeTextNodes(element);
         }
 
-        return DOCUMENT_WRAPPER.wrap(element);
+        return getContainingDocument(xpathContext).getStaticState().getDefaultDocumentWrapper().wrap(element);
     }
 }

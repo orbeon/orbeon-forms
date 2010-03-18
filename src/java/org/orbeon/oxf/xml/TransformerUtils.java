@@ -23,6 +23,8 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.TransformerFactoryImpl;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.tinytree.TinyBuilder;
@@ -52,10 +54,6 @@ import java.util.Properties;
 public class TransformerUtils {
 
     public static final String DEFAULT_OUTPUT_ENCODING = "utf-8";
-
-    public static final String SAXON_BUILTIN_TRANSFORMER_TYPE = "org.orbeon.saxon.TransformerFactoryImpl";
-    public static final String IDENTITY_TYPE = SAXON_BUILTIN_TRANSFORMER_TYPE;
-    public static final String DEFAULT_TYPE = SAXON_BUILTIN_TRANSFORMER_TYPE;
 
     /**
      * Property name to use for choosing the amount of indentation.
@@ -170,7 +168,13 @@ public class TransformerUtils {
      * @throws TransformerConfigurationException
      */
     public static Transformer getIdentityTransformer() throws TransformerConfigurationException {
-        final Transformer transformer = getFactory(IDENTITY_TYPE).newTransformer();
+        final Transformer transformer = new TransformerFactoryImpl().newTransformer();
+        // Wrap Transformer for properties
+        return new TransformerWrapper(transformer, INDENT_AMOUNT_PROPERTY, SAXON_INDENT_AMOUNT_PROPERTY);
+    }
+
+    public static Transformer getIdentityTransformer(Configuration configuration) throws TransformerConfigurationException {
+        final Transformer transformer = new TransformerFactoryImpl(configuration).newTransformer();
         // Wrap Transformer for properties
         return new TransformerWrapper(transformer, INDENT_AMOUNT_PROPERTY, SAXON_INDENT_AMOUNT_PROPERTY);
     }
@@ -182,7 +186,17 @@ public class TransformerUtils {
      */
     public static TransformerHandler getIdentityTransformerHandler() {
         try {
-            TransformerHandler transformerHandler = getFactory(IDENTITY_TYPE).newTransformerHandler();
+            TransformerHandler transformerHandler = new TransformerFactoryImpl().newTransformerHandler();
+            // Wrap TransformerHandler for properties
+            return new TransformerHandlerWrapper(transformerHandler, INDENT_AMOUNT_PROPERTY, SAXON_INDENT_AMOUNT_PROPERTY);
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public static TransformerHandler getIdentityTransformerHandler(Configuration configuration) {
+        try {
+            TransformerHandler transformerHandler = new TransformerFactoryImpl(configuration).newTransformerHandler();
             // Wrap TransformerHandler for properties
             return new TransformerHandlerWrapper(transformerHandler, INDENT_AMOUNT_PROPERTY, SAXON_INDENT_AMOUNT_PROPERTY);
         } catch (TransformerException e) {
@@ -251,10 +265,11 @@ public class TransformerUtils {
      * @param   saxStore input SAXStore
      * @return  DocumentInfo
      */
-    public static DocumentInfo saxStoreToTinyTree(SAXStore saxStore) {
+    public static DocumentInfo saxStoreToTinyTree(Configuration configuration, SAXStore saxStore) {
         final TinyBuilder treeBuilder = new TinyBuilder();
         try {
-            final TransformerHandler identity = getIdentityTransformerHandler();
+            final TransformerHandler identity = getIdentityTransformerHandler(configuration);
+
             identity.setResult(treeBuilder);
             saxStore.replay(identity);
         } catch (SAXException e) {
@@ -292,10 +307,10 @@ public class TransformerUtils {
     /**
      * Transform a dom4j Document into a TinyTree.
      */
-    public static DocumentInfo dom4jToTinyTree(Document document) {
+    public static DocumentInfo dom4jToTinyTree(Configuration configuration, Document document) {
         final TinyBuilder treeBuilder = new TinyBuilder();
         try {
-            final Transformer identity = getIdentityTransformer();
+            final Transformer identity = getIdentityTransformer(configuration);
             identity.transform(new LocationDocumentSource(document), treeBuilder);
         } catch (TransformerException e) {
             throw new OXFException(e);
@@ -367,10 +382,10 @@ public class TransformerUtils {
     /**
      * Transform an InputStream to a TinyTree.
      */
-    public static DocumentInfo readTinyTree(InputStream inputStream, String systemId, boolean handleXInclude) {
+    public static DocumentInfo readTinyTree(Configuration configuration, InputStream inputStream, String systemId, boolean handleXInclude) {
         final TinyBuilder treeBuilder = new TinyBuilder();
         {
-            final TransformerHandler identityHandler = getIdentityTransformerHandler();
+            final TransformerHandler identityHandler = getIdentityTransformerHandler(configuration);
             identityHandler.setResult(treeBuilder);
             final ContentHandler ch;
             if (handleXInclude) {
@@ -449,9 +464,9 @@ public class TransformerUtils {
     /**
      * Transform a String to a TinyTree.
      */
-    public static DocumentInfo stringToTinyTree(String string, boolean handleXInclude) {
+    public static DocumentInfo stringToTinyTree(Configuration configuration, String string, boolean handleXInclude) {
         try {
-            return readTinyTree(new ByteArrayInputStream(string.getBytes("utf-8")), null, handleXInclude);
+            return readTinyTree(configuration, new ByteArrayInputStream(string.getBytes("utf-8")), null, handleXInclude);
         } catch (UnsupportedEncodingException e) {
             throw new OXFException(e);// should not happen
         }

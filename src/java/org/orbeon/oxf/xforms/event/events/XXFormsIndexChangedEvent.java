@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.SingletonIterator;
-import org.orbeon.saxon.value.IntegerValue;
+import org.orbeon.saxon.value.Int64Value;
 
 public class XXFormsIndexChangedEvent extends XFormsUIEvent {
 
@@ -41,9 +41,9 @@ public class XXFormsIndexChangedEvent extends XFormsUIEvent {
     @Override
     public SequenceIterator getAttribute(String name) {
         if (OLD_INDEX_ATTRIBUTE.equals(name)) {
-            return SingletonIterator.makeIterator(new IntegerValue(oldIndex));
+            return SingletonIterator.makeIterator(new Int64Value(oldIndex));
         } else if (NEW_INDEX_ATTRIBUTE.equals(name)) {
-            return SingletonIterator.makeIterator(new IntegerValue(newIndex));
+            return SingletonIterator.makeIterator(new Int64Value(newIndex));
         } else {
             return super.getAttribute(name);
         }

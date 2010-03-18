@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -37,7 +37,7 @@ import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.value.FloatValue;
-import org.orbeon.saxon.value.IntegerValue;
+import org.orbeon.saxon.value.Int64Value;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -250,8 +250,8 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
         final Map<String, ValueRepresentation> variableToValueMap = new HashMap<String, ValueRepresentation>();
 
 
-        variableToValueMap.put("page-count", new IntegerValue(reader.getNumberOfPages()));
-        variableToValueMap.put("page-number", new IntegerValue(groupContext.pageNumber));
+        variableToValueMap.put("page-count", new Int64Value(reader.getNumberOfPages()));
+        variableToValueMap.put("page-number", new Int64Value(groupContext.pageNumber));
         variableToValueMap.put("page-height", new FloatValue(groupContext.pageHeight));
 
         // Iterate through statements

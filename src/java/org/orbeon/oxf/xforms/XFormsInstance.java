@@ -90,7 +90,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      *
      * @param containerElement  container element
      */
-    public XFormsInstance(Element containerElement) {
+    public XFormsInstance(Configuration configuration, Element containerElement) {
 
         this.instanceStaticId = containerElement.attributeValue("id");
         this.modelEffectiveId = containerElement.attributeValue("model-id");
@@ -121,14 +121,14 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                 if (!readonly) {
                     if (exposeXPathTypes) {
                         // Make a typed document wrapper
-                        documentInfo = new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, new Configuration());
+                        documentInfo = new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, configuration);
                     } else {
                         // Make a non-typed document wrapper
-                        documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, new Configuration());
+                        documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString, false, false)), null, configuration);
                     }
                 } else {
                     // Just use TinyTree as is
-                    documentInfo = TransformerUtils.stringToTinyTree(xmlString, false);
+                    documentInfo = TransformerUtils.stringToTinyTree(configuration, xmlString, false);
                 }
             } else {
                 // Instance document is not available, defer to later initialization
@@ -141,14 +141,15 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         this.documentInfo = documentInfo;
     }
 
-    public XFormsInstance(String modelEffectiveId, String instanceStaticId, Document instanceDocument, String instanceSourceURI, String requestBodyHash,
-                          String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude, boolean exposeXPathTypes) {
+    public XFormsInstance(Configuration configuration, String modelEffectiveId, String instanceStaticId, Document instanceDocument,
+                          String instanceSourceURI, String requestBodyHash, String username, String password,
+                          boolean cache, long timeToLive, String validation, boolean handleXInclude, boolean exposeXPathTypes) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
         // NOTE: Make a typed document wrapper
         this(modelEffectiveId, instanceStaticId,
                 exposeXPathTypes
-                        ? new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration())
-                        : new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()),
+                        ? new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, configuration)
+                        : new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, configuration),
                 instanceSourceURI, requestBodyHash, username, password, cache, timeToLive, validation, handleXInclude, exposeXPathTypes);
     }
 

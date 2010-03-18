@@ -157,7 +157,7 @@ public abstract class XFormsEvent implements Cloneable {
             return SingletonIterator.makeIterator(StringValue.makeStringValue(getCurrentPhase().name()));
         } else if (customAttributes != null && customAttributes.get(name) != null) {
             // Return custom attribute if found
-            return (customAttributes.get(name)).iterate(null); // NOTE: With Saxon 8, the param is not used, and Saxon 9 has value.iterate()
+            return (customAttributes.get(name)).iterate();
         } else if (XFormsConstants.NO_INDEX_ADJUSTMENT.equals(name)) {
             // NOP (this is related to a temporary offline performance hack)
             return EmptyIterator.getInstance();

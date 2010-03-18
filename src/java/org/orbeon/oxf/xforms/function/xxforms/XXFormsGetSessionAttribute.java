@@ -32,13 +32,13 @@ public class XXFormsGetSessionAttribute extends XXFormsGetScopeAttribute {
 
         // Get attribute name
         final Expression attributeNameExpression = argument[0];
-        final String attributeName = attributeNameExpression.evaluateAsString(xpathContext);
+        final String attributeName = attributeNameExpression.evaluateAsString(xpathContext).toString();
 
         // Get optional content type
         final String contentType;
         if (argument.length >= 2) {
             final Expression contentTypeExpression = argument[1];
-            contentType = contentTypeExpression.evaluateAsString(xpathContext);
+            contentType = contentTypeExpression.evaluateAsString(xpathContext).toString();
         } else {
             contentType = null;
         }
@@ -53,7 +53,7 @@ public class XXFormsGetSessionAttribute extends XXFormsGetScopeAttribute {
         if (session != null) {
             // Found session
             final Object attributeObject = session.getAttributesMap().get(attributeName);
-            return convertAttributeValue(attributeObject, contentType, attributeName);
+            return convertAttributeValue(xpathContext, attributeObject, contentType, attributeName);
         } else {
             // No session, return empty result
             return EmptyIterator.getInstance();

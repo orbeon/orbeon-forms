@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.expr.*;
+import org.orbeon.saxon.om.StructuredQName;
 import org.orbeon.saxon.om.ValueRepresentation;
-import org.orbeon.saxon.trans.IndependentContext;
-import org.orbeon.saxon.trans.StaticError;
+import org.orbeon.saxon.sxpath.IndependentContext;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.QNameValue;
 import org.orbeon.saxon.value.SequenceType;
 import org.xml.sax.InputSource;
 
@@ -41,8 +41,8 @@ public class XPathCacheStaticContext extends IndependentContext {
     // Whether this context allows all variables
     private final boolean allowAllVariables;
 
-    public XPathCacheStaticContext(boolean allowAllVariables) {
-        super();
+    public XPathCacheStaticContext(Configuration configuration, boolean allowAllVariables) {
+        super(configuration);
         this.allowAllVariables = allowAllVariables;
         getConfiguration().setURIResolver(URI_RESOLVER);
     }
@@ -61,17 +61,16 @@ public class XPathCacheStaticContext extends IndependentContext {
         }
     }
 
-    public VariableReference bindVariable(int fingerprint) throws StaticError {
+    @Override
+    public VariableReference bindVariable(StructuredQName qName) throws XPathException {
         if (allowAllVariables) {
-            final QNameValue qname = new QNameValue(getNamePool(), fingerprint);
-            return new VariableReference(new DeferredVariable(qname));
+            return new VariableReference(new DeferredVariable(qName));
         } else {
             try {
-                return super.bindVariable(fingerprint);
-            } catch (StaticError e) {
+                return super.bindVariable(qName);
+            } catch (XPathException e) {
                 // Be a little more friendly in the error message
-                final QNameValue qname = new QNameValue(getNamePool(), fingerprint);
-                throw new StaticError("Undeclared variable in a standalone expression: $" + qname.getStringValue());
+                throw new XPathException("Undeclared variable in a standalone expression: $" + qName);
             }
         }
     }
@@ -84,10 +83,10 @@ public class XPathCacheStaticContext extends IndependentContext {
  */
 final class DeferredVariable implements VariableDeclaration, Binding {
 
-    private QNameValue name;
+    private StructuredQName qName;
 
-    public DeferredVariable(QNameValue name) {
-        this.name = name;
+    public DeferredVariable(StructuredQName qName) {
+        this.qName = qName;
     };
 
     public boolean isGlobal() {
@@ -102,16 +101,17 @@ final class DeferredVariable implements VariableDeclaration, Binding {
         return -1;
     }
 
-    public String getVariableName() {
-        return name.getStringValue();
-    }
-    public int getNameCode() {
-        return -1;
-    }
-
     public void registerReference(BindingReference ref) {
         ref.setStaticType(SequenceType.ANY_SEQUENCE, null, 0);
         ref.fixup(this);
+    }
+
+    public StructuredQName getVariableQName() {
+        return qName;
+    }
+
+    public SequenceType getRequiredType() {
+        return null;
     }
 
     public ValueRepresentation evaluateVariable(XPathContext context) throws XPathException {

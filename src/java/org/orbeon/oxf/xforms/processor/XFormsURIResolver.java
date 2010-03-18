@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.xml.sax.InputSource;
@@ -139,12 +140,12 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public DocumentInfo readURLAsDocumentInfo(String urlString, String username, String password, String headersToForward) {
+    public DocumentInfo readURLAsDocumentInfo(Configuration configuration, String urlString, String username, String password, String headersToForward) {
         try {
             final SAXSource source = (SAXSource) resolve(urlString, null, username, password, headersToForward);
 
             final TinyBuilder treeBuilder = new TinyBuilder();
-            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler(configuration);
             identity.setResult(treeBuilder);
 
             final XMLReader xmlReader = source.getXMLReader();

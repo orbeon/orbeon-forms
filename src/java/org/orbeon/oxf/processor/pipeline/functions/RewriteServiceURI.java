@@ -1,21 +1,21 @@
 /**
- *  Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.pipeline.functions;
 
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.StaticContext;
+import org.orbeon.saxon.expr.ExpressionVisitor;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.functions.SystemFunction;
 import org.orbeon.saxon.om.ListIterator;
@@ -31,7 +31,8 @@ public class RewriteServiceURI extends SystemFunction {
      * preEvaluate: this method suppresses compile-time evaluation by doing nothing
      * (because the value of the expression depends on the runtime context)
      */
-    public Expression preEvaluate(StaticContext env) {
+    @Override
+    public Expression preEvaluate(ExpressionVisitor visitor) throws XPathException {
         return this;
     }
 
@@ -39,7 +40,7 @@ public class RewriteServiceURI extends SystemFunction {
 
         // Get URI
         final Expression uriExpression = argument[0];
-        final String uri = uriExpression.evaluateAsString(xpathContext);
+        final String uri = uriExpression.evaluateAsString(xpathContext).toString();
 
         // Get mode
         final Expression modeExpression = (argument.length < 2) ? null : argument[1];

@@ -432,7 +432,7 @@ public class XFormsInsertAction extends XFormsAction {
 //                } else {
 //                    // Otherwise, hard to get to the wrapper, so create a new one
 //                    final Document insertDocument = ((Node) insertedNodes.get(0)).getDocument();
-//                    documentWrapper = new DocumentWrapper(insertDocument, null, new Configuration());
+//                    documentWrapper = new DocumentWrapper(insertDocument, null, new Configuration(foo));
 //                }
 
                 insertedNodeInfos = new ArrayList<Item>(insertedNodes.size());

@@ -296,7 +296,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         final XFormsInstance newInstance;
         {
             if (instanceDocument instanceof Document) {
-                newInstance = new XFormsInstance(modelEffectiveId, instanceStaticId, (Document) instanceDocument, instanceSourceURI,
+                newInstance = new XFormsInstance(containingDocument.getStaticState().getXPathConfiguration(), modelEffectiveId, instanceStaticId, (Document) instanceDocument, instanceSourceURI,
                         null, username, password, cached, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
             } else if (instanceDocument instanceof DocumentInfo) {
                 newInstance = new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, (DocumentInfo) instanceDocument, instanceSourceURI,
@@ -445,7 +445,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 final String currentModelEffectiveId = currentInstanceElement.attributeValue("model-id");
                 if (effectiveId.equals(currentModelEffectiveId)) {
                     // Create and set instance document on current model
-                    final XFormsInstance newInstance = new XFormsInstance(currentInstanceElement);
+                    final XFormsInstance newInstance = new XFormsInstance(containingDocument.getStaticState().getXPathConfiguration(), currentInstanceElement);
                     final boolean isReadonlyHint = XFormsInstance.isReadonlyHint(currentInstanceElement);
                     // NOTE: Here instance must contain document
                     setInstanceLoadFromCacheIfNecessary(propertyContext, isReadonlyHint, newInstance, null);
@@ -468,7 +468,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 final String xxformsValidation = containerElement.attributeValue(XFormsConstants.XXFORMS_VALIDATION_QNAME);
 
                 // Extract document
-                final Object instanceDocument = XXFormsExtractDocument.extractDocument(children.get(0), xxformsExcludeResultPrefixes, isReadonlyHint);
+                final Object instanceDocument = XXFormsExtractDocument.extractDocument(containingDocument.getStaticState().getXPathConfiguration(),
+                        children.get(0), xxformsExcludeResultPrefixes, isReadonlyHint);
 
                 // Set instance and associated information
                 setInstanceDocument(instanceDocument, effectiveId, instanceStaticId, null, null, null, false, -1, xxformsValidation, false);
@@ -674,7 +675,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 try {
                     // Extract document
-                    final Object instanceDocument = XXFormsExtractDocument.extractDocument((Element) children.get(0), xxformsExcludeResultPrefixes, readonlyHint);
+                    final Object instanceDocument
+                            = XXFormsExtractDocument.extractDocument(containingDocument.getStaticState().getXPathConfiguration(),
+                            (Element) children.get(0), xxformsExcludeResultPrefixes, readonlyHint);
 
                     // Set instance and associated information if everything went well
                     // NOTE: No XInclude supported to read instances with @src for now
@@ -789,7 +792,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             try {
                 // Read result as XML and create new shared instance
                 // TODO: Handle validating?
-                final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude);
+                final DocumentInfo documentInfo = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
+                        connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude);
                 return new ReadonlyXFormsInstance(effectiveId, instanceStaticId, documentInfo, instanceSourceURI,
                         null, null, null, true, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
             } catch (Exception e) {
@@ -851,7 +855,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 if (!isReadonlyHint) {
                     instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
                 } else {
-                    instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
+                    instanceDocument = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
+                            connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
                 }
             } finally {
                 // Clean-up
@@ -869,7 +874,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 instanceDocument = containingDocument.getURIResolver().readURLAsDocument(absoluteURLString, xxformsUsername, xxformsPassword,
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             } else {
-                instanceDocument = containingDocument.getURIResolver().readURLAsDocumentInfo(absoluteURLString, xxformsUsername, xxformsPassword,
+                instanceDocument = containingDocument.getURIResolver().readURLAsDocumentInfo(containingDocument.getStaticState().getXPathConfiguration(),
+                        absoluteURLString, xxformsUsername, xxformsPassword,
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             }
         }
@@ -908,7 +914,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             if (!isReadonlyHint) {
                 instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
             } else {
-                instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
+                instanceDocument = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
+                        connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
             }
         } finally {
             // Clean-up

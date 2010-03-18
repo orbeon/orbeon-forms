@@ -38,10 +38,10 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
+import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.*;
-import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
 import org.w3c.tidy.Tidy;
@@ -73,22 +73,6 @@ public class XFormsUtils {
     private static final String LOGGING_CATEGORY = "utils";
     private static final Logger logger = LoggerFactory.createLogger(XFormsUtils.class);
     private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
-
-    public static final NodeInfo DUMMY_CONTEXT;
-    static {
-        try {
-            final TinyBuilder treeBuilder = new TinyBuilder();
-            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-            identity.setResult(treeBuilder);
-
-            identity.startDocument();
-            identity.endDocument();
-
-            DUMMY_CONTEXT = treeBuilder.getCurrentRoot();
-        } catch (SAXException e) {
-            throw new OXFException(e);
-        }
-    }
 
     private static final int SRC_CONTENT_BUFFER_SIZE = 1024;
 
@@ -612,7 +596,7 @@ public class XFormsUtils {
         } else if (object instanceof Boolean) {
             valueRepresentation = BooleanValue.get((Boolean) object);
         } else if (object instanceof Integer) {
-            valueRepresentation = new IntegerValue((Integer) object);
+            valueRepresentation = new Int64Value((Integer) object);
         } else if (object instanceof Float) {
             valueRepresentation = new FloatValue((Float) object);
         } else if (object instanceof Double) {
@@ -1168,7 +1152,7 @@ public class XFormsUtils {
      * @param id                    id to prefix
      * @return                      prefixed id or null
      */
-    public static String namespaceId(XFormsContainingDocument containingDocument, String id) {
+    public static String namespaceId(XFormsContainingDocument containingDocument, CharSequence id) {
         if (id == null)
             return null;
         else
@@ -1369,13 +1353,13 @@ public class XFormsUtils {
      * @param namespaceMap  in-scope namespaces
      * @return              true iif the given string contains well-formed XPath 2.0
      */
-    public static boolean isXPath2Expression(String xpathString, Map<String, String> namespaceMap) {
+    public static boolean isXPath2Expression(Configuration configuration, String xpathString, Map<String, String> namespaceMap) {
         // Empty string is never well-formed XPath
         if (xpathString.trim().length() == 0)
             return false;
 
         try {
-            XPathCache.checkXPathExpression(xpathString, namespaceMap, XFormsContainingDocument.getFunctionLibrary());
+            XPathCache.checkXPathExpression(configuration, xpathString, namespaceMap, XFormsContainingDocument.getFunctionLibrary());
         } catch (Exception e) {
             // Ideally we would like the parser to not throw as this is time-consuming, but not sure ho.w to achieve that
             return false;
@@ -1839,5 +1823,44 @@ public class XFormsUtils {
      */
     public static String getFormId(XFormsContainingDocument containingDocument) {
         return namespaceId(containingDocument, "xforms-form");
+    }
+
+    public static boolean compareItems(Item item1, Item item2) {
+        if (item1 == null && item2 == null) {
+            return true;
+        }
+        if (item1 == null || item2 == null) {
+            return false;
+        }
+
+        if (item1 instanceof StringValue) {
+            // Saxon doesn't allow equals() on StringValue because it requires a collation and equals() might throw
+            if (item2 instanceof StringValue) {
+                final StringValue currentStringValue = (StringValue) item1;
+                if (currentStringValue.codepointEquals((StringValue) item2)) {
+                    return true;
+                }
+            }
+        } else if (item1 instanceof NumericValue) {
+            // Saxon doesn't allow equals() between numeric and non-numeric values
+            if (item2 instanceof NumericValue) {
+                final NumericValue currentNumericValue = (NumericValue) item1;
+                if (currentNumericValue.equals((NumericValue) item2)) {
+                    return true;
+                }
+            }
+        } else if (item1 instanceof AtomicValue) {
+            if (item2 instanceof AtomicValue) {
+                final AtomicValue currentAtomicValue = (AtomicValue) item1;
+                if (currentAtomicValue.equals((AtomicValue) item2)) {
+                    return true;
+                }
+            }
+        } else {
+            if (item1.equals(item2)) {// equals() is the same as isSameNodeInfo() for NodeInfo, and compares the values for values
+                return true;
+            }
+        }
+        return false;
     }
 }

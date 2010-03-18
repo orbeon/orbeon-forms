@@ -910,7 +910,7 @@ public class XBLBindings {
 
     private LocationDocumentResult filterShadowTree(Document fullShadowTree, String prefix, Scope innerScope, String controlPrefixedId, String baseURI) {
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-        final LocationDocumentResult result= new LocationDocumentResult();
+        final LocationDocumentResult result = new LocationDocumentResult();
         identity.setResult(result);
 
         // Run transformation and gather scope mappings

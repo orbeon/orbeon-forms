@@ -178,6 +178,16 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     /**
+     * Restore an XFormsContainingDocument from XFormsState only.
+     *
+     * @param pipelineContext   current context
+     * @param xformsState       XFormsState containing static and dynamic state
+     */
+    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState) {
+        this(pipelineContext, xformsState,  null);
+    }
+
+    /**
      * Restore an XFormsContainingDocument from XFormsState and XFormsStaticState.
      *
      * @param pipelineContext         current context
@@ -218,16 +228,6 @@ public class XFormsContainingDocument extends XBLContainer {
             }
         }
         indentedLogger.endHandleOperation();
-    }
-
-    /**
-     * Restore an XFormsContainingDocument from XFormsState only.
-     *
-     * @param pipelineContext   current context
-     * @param xformsState       XFormsState containing static and dynamic state
-     */
-    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState) {
-        this(pipelineContext, xformsState,  null);
     }
 
     public XFormsState getXFormsState(PipelineContext pipelineContext) {

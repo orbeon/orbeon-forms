@@ -31,9 +31,9 @@ public class Digest extends XFormsFunction {
         final Expression algorithmExpression = argument[1];
         final Expression encodingExpression = argument.length == 3 ? argument[2] : null;
 
-        final String data = dataExpression.evaluateAsString(xpathContext);
-        final String algorithm = algorithmExpression.evaluateAsString(xpathContext);
-        final String encoding = encodingExpression != null ? encodingExpression.evaluateAsString(xpathContext) : "base64";
+        final String data = dataExpression.evaluateAsString(xpathContext).toString();
+        final String algorithm = algorithmExpression.evaluateAsString(xpathContext).toString();
+        final String encoding = encodingExpression != null ? encodingExpression.evaluateAsString(xpathContext).toString() : "base64";
 
         // Create digest
         final String result = SecureUtils.digestString(data, algorithm, encoding);

@@ -1,35 +1,38 @@
 /**
- *  Copyright (C) 2007 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.pdf;
 
 import org.orbeon.oxf.common.OXFException;
-
 import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.functions.*;
 import org.orbeon.saxon.om.NamespaceConstant;
+import org.orbeon.saxon.om.StandardNames;
+import org.orbeon.saxon.om.StructuredQName;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.type.BuiltInAtomicType;
 import org.orbeon.saxon.type.ItemType;
-import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.SequenceType;
+import org.orbeon.saxon.value.Value;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class PDFFunctionLibrary implements FunctionLibrary {
 
-    private static Map functionTable = new HashMap();
+    private static Map<String, StandardFunction.Entry> functionTable = new HashMap<String, StandardFunction.Entry>();
 
     private static StandardFunction.Entry register(String name,
                                                    Class implementationClass,
@@ -47,6 +50,7 @@ public class PDFFunctionLibrary implements FunctionLibrary {
         e.itemType = itemType;
         e.cardinality = cardinality;
         e.argumentTypes = new SequenceType[maxArguments];
+        e.resultIfEmpty = new Value[maxArguments];
 
         functionTable.put(name, e);
         return e;
@@ -55,38 +59,38 @@ public class PDFFunctionLibrary implements FunctionLibrary {
     static {
         StandardFunction.Entry e;
 
-        // Useful XSLT function
-        e = register("format-date", FormatDate.class, Type.DATE, 2, 5, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 0, Type.DATE_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 3, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 4, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        // === XSLT 2.0 function
+        e = register("format-date", FormatDate.class, StandardNames.XS_DATE, 2, 5, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.DATE, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 2, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 3, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 4, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
 
-        e = register("format-dateTime", FormatDate.class, Type.DATE_TIME, 2, 5, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 0, Type.DATE_TIME_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 3, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 4, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        e = register("format-dateTime", FormatDate.class, StandardNames.XS_DATE_TIME, 2, 5, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.DATE_TIME, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 2, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 3, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 4, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
 
-        e = register("format-number", FormatNumber2.class, 0, 2, 3, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 0, Type.NUMBER_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("format-number", FormatNumber.class, 0, 2, 3, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.NUMERIC, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
-        e = register("format-time", FormatDate.class, Type.TIME, 2, 5, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 0, Type.TIME_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 3, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 4, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        e = register("format-time", FormatDate.class, StandardNames.XS_TIME, 2, 5, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.TIME, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 2, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 3, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 4, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
     }
 
     private StandardFunction.Entry getEntry(String uri, String local, int arity) {
         StandardFunction.Entry entry;
         if (uri.equals(NamespaceConstant.FN)) {
-            entry = (StandardFunction.Entry) functionTable.get(local);
+            entry = functionTable.get(local);
         } else {
             return null;
         }
@@ -98,13 +102,13 @@ public class PDFFunctionLibrary implements FunctionLibrary {
         return entry;
     }
 
-    public boolean isAvailable(int fingerprint, String uri, String local, int arity) {
-        StandardFunction.Entry entry = getEntry(uri, local, arity);
+    public boolean isAvailable(StructuredQName functionName, int arity) {
+        StandardFunction.Entry entry = getEntry(functionName.getNamespaceURI(), functionName.getLocalName(), arity);
         return entry != null;
     }
 
-    public Expression bind(int nameCode, String uri, String local, Expression[] staticArgs) throws XPathException {
-        StandardFunction.Entry entry = getEntry(uri, local, staticArgs.length);
+    public Expression bind(StructuredQName functionName, Expression[] staticArgs, StaticContext env) throws XPathException {
+        StandardFunction.Entry entry = getEntry(functionName.getNamespaceURI(), functionName.getLocalName(), staticArgs.length);
         if (entry == null) {
             return null;
         }
@@ -117,7 +121,7 @@ public class PDFFunctionLibrary implements FunctionLibrary {
             throw new OXFException("Failed to load XForms function: " + err.getMessage(), err);
         }
         f.setDetails(entry);
-        f.setFunctionNameCode(nameCode);
+        f.setFunctionName(functionName);
         f.setArguments(staticArgs);
         return f;
     }

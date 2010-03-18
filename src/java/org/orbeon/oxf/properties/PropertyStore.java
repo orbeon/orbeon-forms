@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -23,7 +23,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.XMLChar;
+import org.orbeon.saxon.om.Name10Checker;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -174,7 +174,7 @@ public class PropertyStore {
 
     public static class NCNameConverter implements Converter {
         public Object convert(final String value, final Element element) {
-            if (!XMLChar.isValidNCName(value)) {
+            if (!Name10Checker.getInstance().isValidNCName(value)) {
                 throw new ValidationException("Not an NCName: " + value, null);
             }
             return value;
@@ -183,7 +183,7 @@ public class PropertyStore {
 
     public static class NMTOKENConverter implements Converter {
         public Object convert(final String value, final Element element) {
-            if (!XMLChar.isValidNmtoken(value)) {
+            if (!Name10Checker.getInstance().isValidNmtoken(value)) {
                 throw new ValidationException("Not an NMTOKEN: " + value, null);
             }
             return value;
@@ -196,7 +196,7 @@ public class PropertyStore {
             final Set<String> tokens = new HashSet<String>(Arrays.asList(StringUtils.split(value)));
             // Check validity of individual tokens
             for (String token: tokens) {
-                if (!XMLChar.isValidNmtoken(token)) {
+                if (!Name10Checker.getInstance().isValidNmtoken(token)) {
                     throw new ValidationException("Not an NMTOKENS: " + value, null);
                 }
             }

@@ -187,6 +187,8 @@ public class Variable {
             return iter.position();
         }
 
+        public void close() {}
+
         public SequenceIterator getAnother() throws XPathException {
             return new RewrappingSequenceIterator(iter.getAnother());
         }

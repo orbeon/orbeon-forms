@@ -7132,8 +7132,22 @@ ORBEON.xforms.Server = {
                                 case "message": {
                                     var messageElement = actionElement.childNodes[actionIndex];
                                     var message = ORBEON.util.Dom.getStringValue(messageElement);
-                                    if (ORBEON.util.Dom.getAttribute(messageElement, "level") == "modal")
-                                        alert(message);
+                                    if (ORBEON.util.Dom.getAttribute(messageElement, "level") == "modal") {
+                                        // Instantiate the Dialog
+                                        // Prevent SimpleDialog from registering itself on the form
+                                        YAHOO.widget.SimpleDialog.prototype.registerForm = function() {};
+                                        var mySimpleDialog = new YAHOO.widget.SimpleDialog("xforms-message-dialog", {
+                                            width: "30em",
+                                            fixedcenter: true,
+                                            modal: true,
+                                            visible: false,
+                                            draggable: false
+                                        });
+                                        mySimpleDialog.setBody(message);
+                                        mySimpleDialog.render(document.body);
+                                        mySimpleDialog.show();
+                                        mySimpleDialog.close.focus();
+                                    }
                                     break;
                                 }
 

@@ -38,7 +38,7 @@ public class XXFormsItemset extends XFormsFunction {
             final XFormsSelect1Control select1Control = (XFormsSelect1Control) object;
 
             // Get format
-            final String format = argument[1].evaluateAsString(xpathContext);
+            final String format = argument[1].evaluateAsString(xpathContext).toString();
 
             // Obtain itemset
             final PropertyContext pipelineContext = getOrCreatePipelineContext();
@@ -51,7 +51,7 @@ public class XXFormsItemset extends XFormsFunction {
                 final String json = itemset.getJSONTreeInfo(pipelineContext, controlValue, isMultiple, select1Control.getLocationData());
                 return StringValue.makeStringValue(json);
             } else {
-                return itemset.getXMLTreeInfo(pipelineContext, controlValue, isMultiple, select1Control.getLocationData());
+                return itemset.getXMLTreeInfo(xpathContext.getConfiguration(), controlValue, isMultiple, select1Control.getLocationData());
             }
         } else {
             return null;

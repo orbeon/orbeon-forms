@@ -19,6 +19,7 @@ import org.orbeon.oxf.processor.scope.ScopeGenerator;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.SequenceIterator;
@@ -34,7 +35,7 @@ import java.io.StringReader;
  */
 public abstract class XXFormsGetScopeAttribute extends XFormsFunction {
 
-    protected SequenceIterator convertAttributeValue(Object attributeObject, String contentType, String key) throws XPathException {
+    protected SequenceIterator convertAttributeValue(XPathContext xpathContext, Object attributeObject, String contentType, String key) throws XPathException {
         if (attributeObject instanceof AtomicValue) {
             // Found atomic value
             return SingletonIterator.makeIterator((AtomicValue) attributeObject);
@@ -51,7 +52,7 @@ public abstract class XXFormsGetScopeAttribute extends XFormsFunction {
                 throw new OXFException(e);
             }
             // Convert to DocumentInfo
-            final DocumentInfo documentInfo = TransformerUtils.saxStoreToTinyTree(saxStore);
+            final DocumentInfo documentInfo = TransformerUtils.saxStoreToTinyTree(xpathContext.getConfiguration(), saxStore);
             return SingletonIterator.makeIterator(documentInfo);
         } else {
             // Empty result

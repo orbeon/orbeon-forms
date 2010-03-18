@@ -20,7 +20,6 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsElement;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.*;
@@ -67,7 +66,7 @@ public class XFormsSubmitSerializeEvent extends XFormsEvent {
             }
 
             // Return document element
-            final Item item = XXFormsElement.DOCUMENT_WRAPPER.wrap(submissionBodyElement);
+            final Item item = getContainingDocument().getStaticState().getDefaultDocumentWrapper().wrap(submissionBodyElement);
             return SingletonIterator.makeIterator(item);
         } else if (XXFORMS_BINDING_ATTRIBUTE.equals(name)) {
             // Return the node to which the submission is bound if any

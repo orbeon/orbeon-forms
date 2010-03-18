@@ -16,7 +16,8 @@
  */
 package org.orbeon.oxf.util;
 
-import org.orbeon.saxon.om.XMLChar;
+import org.orbeon.saxon.charcode.XMLCharacterData;
+import org.orbeon.saxon.om.Name10Checker;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,7 +58,7 @@ public class ISO9075 {
         if (name.length() == 0) {
             return name;
         }
-        if (XMLChar.isValidName(name) && name.indexOf("_x") < 0) {
+        if (Name10Checker.getInstance().isValidNCName(name) && name.indexOf("_x") < 0) {
             // already valid
             return name;
         } else {
@@ -66,7 +67,7 @@ public class ISO9075 {
             for (int i = 0; i < name.length(); i++) {
                 if (i == 0) {
                     // first character of name
-                    if (XMLChar.isNameStart(name.charAt(i))) {
+                    if (XMLCharacterData.isNCNameStart10(name.charAt(i))) {
                         if (needsEscaping(name, i)) {
                             // '_x' must be encoded
                             encode('_', encoded);
@@ -77,7 +78,7 @@ public class ISO9075 {
                         // not valid as first character -> encode
                         encode(name.charAt(i), encoded);
                     }
-                } else if (!XMLChar.isName(name.charAt(i))) {
+                } else if (!XMLCharacterData.isNCName10(name.charAt(i))) {
                     encode(name.charAt(i), encoded);
                 } else {
                     if (needsEscaping(name, i)) {

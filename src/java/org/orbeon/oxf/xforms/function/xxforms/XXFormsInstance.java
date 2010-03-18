@@ -33,6 +33,7 @@ import org.orbeon.saxon.trans.XPathException;
  */
 public class XXFormsInstance extends XFormsFunction {
 
+    @Override
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
         final XFormsContainingDocument containingDocument = getContainingDocument(xpathContext);
@@ -64,7 +65,8 @@ public class XXFormsInstance extends XFormsFunction {
         }
     }
 
-    public PathMap.PathMapNode addToPathMap(PathMap pathMap, PathMap.PathMapNode pathMapNode) {
-        return addDocToPathMap(pathMap, pathMapNode);
+    @Override
+    public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
+        return addDocToPathMap(pathMap, pathMapNodeSet);
     }
 }

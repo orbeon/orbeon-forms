@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -19,7 +19,7 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.CalendarValue;
 import org.orbeon.saxon.value.DateTimeValue;
 import org.orbeon.saxon.value.DateValue;
-import org.orbeon.saxon.value.IntegerValue;
+import org.orbeon.saxon.value.Int64Value;
 
 public class DaysFromDate extends XFormsFunction {
 
@@ -28,10 +28,10 @@ public class DaysFromDate extends XFormsFunction {
     public Item evaluateItem(XPathContext context) throws XPathException {
 
         // "If the string parameter represents a legal lexical xsd:date or xsd:dateTime"...
-        final String arg = argument[0].evaluateAsString(context);
+        final String arg = argument[0].evaluateAsString(context).toString();
         CalendarValue value = null;
         try {
-            value = new DateTimeValue(arg);
+            value = (CalendarValue) DateTimeValue.makeDateTimeValue(arg).asAtomic();
         } catch (XPathException e1) {// FIXME: handling this with exceptions may be slow
             try {
                 value = new DateValue(arg);
@@ -50,7 +50,7 @@ public class DaysFromDate extends XFormsFunction {
             // normalization."
 
             final DateTimeValue dateTimeValue = (value instanceof DateTimeValue) ? (DateTimeValue) value : value.toDateTime();
-            return new IntegerValue(dateTimeValue.normalize(context.getConfiguration()).toJulianInstant().subtract(SecondsFromDateTime.BASELINE).longValue() / SECONDS_PER_DAY);
+            return new Int64Value(dateTimeValue.normalize(context).toJulianInstant().subtract(SecondsFromDateTime.BASELINE).longValue() / SECONDS_PER_DAY);
         }
     }
 }

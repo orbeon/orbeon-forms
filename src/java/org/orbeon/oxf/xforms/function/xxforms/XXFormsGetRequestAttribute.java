@@ -35,13 +35,13 @@ public class XXFormsGetRequestAttribute extends XXFormsGetScopeAttribute {
         if (containingDocument == null || containingDocument.isInitializing()) { // support null for use outside of XForms
             // Get attribute name
             final Expression attributeNameExpression = argument[0];
-            final String attributeName = attributeNameExpression.evaluateAsString(xpathContext);
+            final String attributeName = attributeNameExpression.evaluateAsString(xpathContext).toString();
 
             // Get optional content type
             final String contentType;
             if (argument.length >= 2) {
                 final Expression contentTypeExpression = argument[1];
-                contentType = contentTypeExpression.evaluateAsString(xpathContext);
+                contentType = contentTypeExpression.evaluateAsString(xpathContext).toString();
             } else {
                 contentType = null;
             }
@@ -53,7 +53,7 @@ public class XXFormsGetRequestAttribute extends XXFormsGetScopeAttribute {
             final ExternalContext externalContext = staticContext.getExternalContext();
 
             final Object attributeObject = externalContext.getRequest().getAttributesMap().get(attributeName);
-            return convertAttributeValue(attributeObject, contentType, attributeName);
+            return convertAttributeValue(xpathContext, attributeObject, contentType, attributeName);
         } else {
             throw new OXFException("xxforms:get-request-attribute() can only be called during XForms initialization.");
         }

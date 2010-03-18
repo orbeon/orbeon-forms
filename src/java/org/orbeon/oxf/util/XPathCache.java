@@ -25,18 +25,19 @@ import org.orbeon.oxf.xml.XPathCacheStaticContext;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.event.LocationProvider;
-import org.orbeon.saxon.expr.*;
+import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.ExpressionTool;
+import org.orbeon.saxon.expr.ExpressionVisitor;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.functions.FunctionLibraryList;
-import org.orbeon.saxon.instruct.Executable;
-import org.orbeon.saxon.instruct.LocationMap;
-import org.orbeon.saxon.om.FastStringBuffer;
+import org.orbeon.saxon.instruct.SlotManager;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.style.AttributeValueTemplate;
-import org.orbeon.saxon.trans.IndependentContext;
-import org.orbeon.saxon.trans.Variable;
+import org.orbeon.saxon.sxpath.IndependentContext;
+import org.orbeon.saxon.sxpath.XPathEvaluator;
+import org.orbeon.saxon.sxpath.XPathExpression;
+import org.orbeon.saxon.sxpath.XPathVariable;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.SequenceExtent;
@@ -53,6 +54,8 @@ public class XPathCache {
 
     public static final String XPATH_CACHE_NAME = "cache.xpath";
     private static final int XPATH_CACHE_DEFAULT_SIZE = 200;
+
+    public static final String XPATH_CACHE_CONFIGURATION_PROPERTY = "orbeon.cache.xpath.configuration";
 
     private static final boolean DEBUG_TEST_KEY_OPTIMIZATION = false;
 
@@ -232,17 +235,17 @@ public class XPathCache {
     /**
      * Evaluate an XPath expression as a boolean value.
      */
-    public static boolean evaluateAsBoolean(PropertyContext propertyContext, List<Item> contextItems, int contextPosition, String xpathString, Map<String, String> prefixToURIMap, Map<String, ValueRepresentation> variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
-        final PooledXPathExpression xpathExpression =  XPathCache.getXPathExpression(propertyContext, contextItems, contextPosition, "string(subsequence(" + xpathString + ", 1, 1))",
-                prefixToURIMap, variableToValueMap, functionLibrary, baseURI, false, false, locationData);
-        try {
-            return xpathExpression.evaluateAsBoolean(functionContext);
-        } catch (XPathException e) {
-            throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData);
-        } finally {
-            if (xpathExpression != null) xpathExpression.returnToPool();
-        }
-    }
+//    public static boolean evaluateAsBoolean(PropertyContext propertyContext, List<Item> contextItems, int contextPosition, String xpathString, Map<String, String> prefixToURIMap, Map<String, ValueRepresentation> variableToValueMap, FunctionLibrary functionLibrary, FunctionContext functionContext, String baseURI, LocationData locationData) {
+//        final PooledXPathExpression xpathExpression =  XPathCache.getXPathExpression(propertyContext, contextItems, contextPosition, "string(subsequence(" + xpathString + ", 1, 1))",
+//                prefixToURIMap, variableToValueMap, functionLibrary, baseURI, false, false, locationData);
+//        try {
+//            return xpathExpression.evaluateAsBoolean(functionContext);
+//        } catch (XPathException e) {
+//            throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData);
+//        } finally {
+//            if (xpathExpression != null) xpathExpression.returnToPool();
+//        }
+//    }
 
     public static PooledXPathExpression getXPathExpression(PropertyContext propertyContext,
                                                            Item contextItem,
@@ -280,13 +283,13 @@ public class XPathCache {
      * @param functionLibrary   function library
      * @throws Exception        if the expression is not correct
      */
-    public static void checkXPathExpression(String xpathString, Map<String, String> prefixToURIMap, FunctionLibrary functionLibrary) throws Exception {
-        new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, null, functionLibrary, null, false, true, null).makeObject();
+    public static void checkXPathExpression(Configuration configuration, String xpathString, Map<String, String> prefixToURIMap, FunctionLibrary functionLibrary) throws Exception {
+        new XPathCachePoolableObjetFactory(null, configuration, xpathString, prefixToURIMap, null, functionLibrary, null, false, true, null).makeObject();
     }
 
-    public static Expression createExpression(String xpathString, Map<String, String> prefixToURIMap, FunctionLibrary functionLibrary) {
+    public static Expression createExpression(Configuration configuration, String xpathString, Map<String, String> prefixToURIMap, FunctionLibrary functionLibrary) {
         try {
-            return ((PooledXPathExpression) new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, null, functionLibrary, null, false, true, null).makeObject()).getExpression();
+            return ((PooledXPathExpression) new XPathCachePoolableObjetFactory(null, configuration, xpathString, prefixToURIMap, null, functionLibrary, null, false, true, null).makeObject()).getExpression();
         } catch (Exception e) {
             throw new OXFException(e);
         }
@@ -304,10 +307,13 @@ public class XPathCache {
                                                            LocationData locationData) {
 
         try {
+            // TEMP: XPath configuration from PropertyContext so we don't have to change all calls to XPath expressions 
+            final Configuration configuration = (Configuration) propertyContext.getAttribute(XPATH_CACHE_CONFIGURATION_PROPERTY);
+
             // Find pool from cache
             final Long validity = (long) 0;
             final Cache cache = ObjectCache.instance(XPATH_CACHE_NAME, XPATH_CACHE_DEFAULT_SIZE);
-            final FastStringBuffer cacheKeyString = new FastStringBuffer(xpathString);
+            final StringBuilder cacheKeyString = new StringBuilder(xpathString);
             {
                 if (functionLibrary != null) {// This is ok
                     cacheKeyString.append('|');
@@ -362,14 +368,14 @@ public class XPathCache {
             final PooledXPathExpression expr;
             if (testNoCache) {
                 // For testing only: don't get expression from cache
-                final Object o = new XFormsCachePoolableObjetFactory(null, xpathString, prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt, false, locationData).makeObject();
+                final Object o = new XPathCachePoolableObjetFactory(null, configuration, xpathString, prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt, false, locationData).makeObject();
                 expr = (PooledXPathExpression) o;
             } else {
                 // Get or create pool
                 final InternalCacheKey cacheKey = new InternalCacheKey("XPath Expression2", cacheKeyString.toString());
                 ObjectPool pool = (ObjectPool) cache.findValid(propertyContext, cacheKey, validity);
                 if (pool == null) {
-                    pool = createXPathPool(xpathString, prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt, locationData);
+                    pool = createXPathPool(configuration, xpathString, prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt, locationData);
                     cache.add(propertyContext, cacheKey, validity, pool);
                 }
 
@@ -402,7 +408,8 @@ public class XPathCache {
         return validationException;
     }
 
-    private static ObjectPool createXPathPool(String xpathString,
+    private static ObjectPool createXPathPool(Configuration xpathConfiguration,
+                                              String xpathString,
                                               Map<String, String> prefixToURIMap,
                                               Set<String> variableNames,
                                               FunctionLibrary functionLibrary,
@@ -412,7 +419,7 @@ public class XPathCache {
         try {
             // TODO: pool should have at least one hard reference
             final SoftReferenceObjectPool pool = new SoftReferenceObjectPool();
-            pool.setFactory(new XFormsCachePoolableObjetFactory(pool, xpathString,
+            pool.setFactory(new XPathCachePoolableObjetFactory(pool, xpathConfiguration, xpathString,
                     prefixToURIMap, variableNames, functionLibrary, baseURI, isAvt, false, locationData));
 
             return pool;
@@ -421,19 +428,21 @@ public class XPathCache {
         }
     }
 
-    private static class XFormsCachePoolableObjetFactory implements PoolableObjectFactory {
+    private static class XPathCachePoolableObjetFactory implements PoolableObjectFactory {
+        private final ObjectPool pool;
+        private Configuration xpathConfiguration;
         private final String xpathString;
         private final Map<String, String> prefixToURIMap;
         private final Set<String> variableNames;
         // NOTE: storing the FunctionLibrary in cache is ok if it doesn't hold dynamic references (case of global XFormsFunctionLibrary)
         private final FunctionLibrary functionLibrary;
-        private final ObjectPool pool;
         private final String baseURI;
         private final boolean isAvt;
         private final boolean allowAllVariables;
         private final LocationData locationData;
 
-        public XFormsCachePoolableObjetFactory(ObjectPool pool,
+        public XPathCachePoolableObjetFactory(ObjectPool pool,
+                                          Configuration xpathConfiguration,
                                           String xpathString,
                                           Map<String, String> prefixToURIMap,
                                           Set<String> variableNames,
@@ -443,6 +452,9 @@ public class XPathCache {
                                           boolean allowAllVariables,
                                           LocationData locationData) {
             this.pool = pool;
+
+            this.xpathConfiguration = (xpathConfiguration != null) ? xpathConfiguration : new Configuration();
+
             this.xpathString = xpathString;
             this.prefixToURIMap = prefixToURIMap;
             this.variableNames = variableNames;
@@ -472,7 +484,7 @@ public class XPathCache {
                 logger.debug("makeObject(" + xpathString + ")");
 
             // Create context
-            final IndependentContext independentContext = new XPathCacheStaticContext(allowAllVariables);
+            final IndependentContext independentContext = new XPathCacheStaticContext(xpathConfiguration, allowAllVariables);
 
             // Set the base URI if specified
             if (baseURI != null)
@@ -486,86 +498,90 @@ public class XPathCache {
             }
 
             // Declare variables (we don't use the values here, just the names)
-            final Map<String, Variable> variables = new HashMap<String, Variable>();
+            final Map<String, XPathVariable> variables = new HashMap<String, XPathVariable>();
             if (variableNames != null) {
                 for (final String name: variableNames) {
-                    final Variable variable = independentContext.declareVariable(name);
-                    variable.setUseStack(true);// "Indicate that values of variables are to be found on the stack, not in the Variable object itself"
+                    final XPathVariable variable = independentContext.declareVariable("", name);
+//                    variable.setUseStack(true);// "Indicate that values of variables are to be found on the stack, not in the Variable object itself"
                     variables.put(name, variable);
                 }
             }
 
             // Add function library
             if (functionLibrary != null) {
-                // This is ok
                 ((FunctionLibraryList) independentContext.getFunctionLibrary()).libraryList.add(0, functionLibrary);
             }
 
             // Create and compile the expression
             try {
-                final Expression expression;
+                final XPathExpression expression;
                 if (isAvt) {
-                    final Expression tempExpression = AttributeValueTemplate.make(xpathString, -1, independentContext);
+                    Expression tempExpression = AttributeValueTemplate.make(xpathString, -1, independentContext);
                     // Running typeCheck() is mandatory otherwise things break! This is also done when using evaluator.createExpression()
-                    expression = tempExpression.typeCheck(independentContext, Type.ITEM_TYPE);
+//                    expression = tempExpression.typeCheck(independentContext, Type.ITEM_TYPE);
+//                    ExpressionTool.allocateSlots(expression, independentContext.getStackFrameMap().getNumberOfVariables(), independentContext.getStackFrameMap());
+
+                    expression = prepareExpression(independentContext, tempExpression);
+
                 } else {
                     // We used to use XPathEvaluator.createExpression(), but there is a bug in it related to slots allocation, so we do the work ourselves instead.
-                    final Expression tempExpression = ExpressionTool.make(xpathString, independentContext, 0, Token.EOF, 1);
-                    expression = tempExpression.typeCheck(independentContext, Type.ITEM_TYPE);
+//                    final Expression tempExpression = ExpressionTool.make(xpathString, independentContext, 0, Token.EOF, 1);
+//                    expression = tempExpression.typeCheck(independentContext, Type.ITEM_TYPE);
+                    final XPathEvaluator evaluator = new XPathEvaluator();
+                    evaluator.setStaticContext(independentContext);
+                    expression = evaluator.createExpression(xpathString);
+
                 }
 
                 // Allocate variable slots in all cases
-                ExpressionTool.allocateSlots(expression, independentContext.getStackFrameMap().getNumberOfVariables(), independentContext.getStackFrameMap());
+//                ExpressionTool.allocateSlots(expression, independentContext.getStackFrameMap().getNumberOfVariables(), independentContext.getStackFrameMap());
 
-                {
-                    // Provide an Executable with the only purpose of allowing the evaluate() function find the right
-                    // FunctionLibrary
-                    if (expression instanceof ComputedExpression) {
-                        final ComputedExpression computedExpression = (ComputedExpression) expression;
-                        computedExpression.setParentExpression(new Container() {
+//                {
+//                    // Provide an Executable with the only purpose of allowing the evaluate() function find the right
+//                    // FunctionLibrary
+//                    expression.setContainer(new Container() {
+//
+//                        public Executable getExecutable() {
+//                            return new Executable(independentContext.getConfiguration()) {
+//                                {
+//                                    setFunctionLibrary(independentContext.getFunctionLibrary());
+//                                    setLocationMap(new LocationMap());
+//                                    setConfiguration(independentContext.getConfiguration());
+//                                }
+//                            };
+//                        }
+//
+//                        public LocationProvider getLocationProvider() {
+//                            return expression.getLocationProvider();
+//                        }
+//
+//                        public int getHostLanguage() {
+//                            return Configuration.JAVA_APPLICATION;
+//                        }
+//
+//                        public boolean replaceSubExpression(Expression expression, Expression expression1) {
+//                            return expression.replaceSubExpression(expression, expression1);
+//                        }
+//
+//                        public int getColumnNumber() {
+//                            return (locationData != null) ? locationData.getCol() : -1;
+//                        }
+//
+//                        public int getLineNumber() {
+//                            return (locationData != null) ? locationData.getLine() : -1;
+//                        }
+//
+//                        public String getPublicId() {
+//                            return (locationData != null) ? locationData.getPublicID() : null;
+//                        }
+//
+//                        public String getSystemId() {
+//                            return (locationData != null) ? locationData.getSystemID() : null;
+//                        }
+//                    });
+//                }
 
-                            public Executable getExecutable() {
-                                return new Executable() {
-                                    {
-                                        setFunctionLibrary(independentContext.getFunctionLibrary());
-                                        setLocationMap(new LocationMap());
-                                        setConfiguration(independentContext.getConfiguration());
-                                    }
-                                };
-                            }
-
-                            public LocationProvider getLocationProvider() {
-                                return computedExpression.getLocationProvider();
-                            }
-
-                            public int getHostLanguage() {
-                                return Configuration.JAVA_APPLICATION;
-                            }
-
-                            public boolean replaceSubExpression(Expression expression, Expression expression1) {
-                                return computedExpression.replaceSubExpression(expression, expression1);
-                            }
-
-                            public int getColumnNumber() {
-                                return (locationData != null) ? locationData.getCol() : -1;
-                            }
-
-                            public int getLineNumber() {
-                                return (locationData != null) ? locationData.getLine() : -1;
-                            }
-
-                            public String getPublicId() {
-                                return (locationData != null) ? locationData.getPublicID() : null;
-                            }
-
-                            public String getSystemId() {
-                                return (locationData != null) ? locationData.getSystemID() : null;
-                            }
-                        });
-                    }
-                }
-
-                return new PooledXPathExpression(expression, pool, independentContext, variables);
+                return new PooledXPathExpression(expression, pool, variables);
             } catch (Throwable t) {
                 throw new OXFException(t);
             }
@@ -576,6 +592,26 @@ public class XPathCache {
 
         public boolean validateObject(Object o) {
             return true;
+        }
+    }
+
+    public static XPathExpression prepareExpression(IndependentContext independentContext, Expression tempExpression) throws XPathException {
+        // Based on XPathEvaluator.createExpression()
+        //                    exp.setContainer(staticContext);
+        ExpressionVisitor visitor = ExpressionVisitor.make(independentContext);
+        visitor.setExecutable(independentContext.getExecutable());
+        tempExpression = visitor.typeCheck(tempExpression, Type.ITEM_TYPE);
+        tempExpression = visitor.optimize(tempExpression, Type.ITEM_TYPE);
+        final SlotManager map = independentContext.getStackFrameMap();
+        final int numberOfExternalVariables = map.getNumberOfVariables();
+        ExpressionTool.allocateSlots(tempExpression, numberOfExternalVariables, map);
+        return new CustomXPathExpression(null, tempExpression, map, numberOfExternalVariables);
+    }
+
+    private static class CustomXPathExpression extends XPathExpression {
+        protected CustomXPathExpression(XPathEvaluator evaluator, Expression exp, SlotManager map, int numberOfExternalVariables) {
+            super(evaluator, exp);
+            setStackFrameMap(map, numberOfExternalVariables);
         }
     }
 

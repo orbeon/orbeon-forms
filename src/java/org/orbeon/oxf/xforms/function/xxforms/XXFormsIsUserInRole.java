@@ -38,7 +38,7 @@ public class XXFormsIsUserInRole extends XFormsFunction {
 
         // Get role property
         final Expression propertyNameExpression = argument[0];
-        final String role = propertyNameExpression.evaluateAsString(xpathContext);
+        final String role = propertyNameExpression.evaluateAsString(xpathContext).toString();
 
         return SingletonIterator.makeIterator(
                 externalContext.getRequest().isUserInRole(role) ? BooleanValue.TRUE : BooleanValue.FALSE);

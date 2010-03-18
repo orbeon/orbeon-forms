@@ -40,13 +40,16 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.om.*;
-import org.orbeon.saxon.style.StandardNames;
+import org.orbeon.saxon.sxpath.IndependentContext;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
-import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.BuiltInAtomicType;
-import org.orbeon.saxon.type.BuiltInSchemaFactory;
-import org.orbeon.saxon.value.*;
+import org.orbeon.saxon.type.BuiltInType;
+import org.orbeon.saxon.type.ConversionResult;
+import org.orbeon.saxon.type.ValidationFailure;
+import org.orbeon.saxon.value.BooleanValue;
+import org.orbeon.saxon.value.QNameValue;
+import org.orbeon.saxon.value.SequenceExtent;
 import org.orbeon.saxon.value.StringValue;
 
 import java.util.*;
@@ -869,7 +872,7 @@ public class XFormsModelBinds {
                 try {
                     xpathEvaluator = new XPathEvaluator();
                     // NOTE: Not sure declaring namespaces here is necessary just to perform the cast
-                    final IndependentContext context = xpathEvaluator.getStaticContext();
+                    final IndependentContext context = (IndependentContext) xpathEvaluator.getStaticContext();
                     for (String prefix: namespaceMap.keySet()) {
                         context.declareNamespace(prefix, namespaceMap.get(prefix));
                     }
@@ -935,11 +938,11 @@ public class XFormsModelBinds {
                         // Try to perform casting
                         // TODO: Should we actually perform casting? This for example removes leading and trailing space around tokens. Is that expected?
                         final StringValue stringValue = new StringValue(nodeValue);
-                        final XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration());
-                        final AtomicValue result = stringValue.convertPrimitive((BuiltInAtomicType) BuiltInSchemaFactory.getSchemaType(requiredTypeFingerprint), true, xpContext);
+                        final XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getExecutable());
+                        final ConversionResult result = stringValue.convertPrimitive((BuiltInAtomicType) BuiltInType.getSchemaType(requiredTypeFingerprint), true, xpContext);
 
                         // Set error on node if necessary
-                        if (result instanceof ValidationErrorValue) {
+                        if (result instanceof ValidationFailure) {
                             isValid = false;
                             InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
                         }
@@ -957,7 +960,7 @@ public class XFormsModelBinds {
                             }
                         } else if (typeLocalname.equals("xpath2")) {
                             // xxforms:xpath2 type
-                            if (!isOptionalAndEmpty && !XFormsUtils.isXPath2Expression(nodeValue, namespaceMap)) {
+                            if (!isOptionalAndEmpty && !XFormsUtils.isXPath2Expression(containingDocument.getStaticState().getXPathConfiguration(), nodeValue, namespaceMap)) {
                                 isValid = false;
                                 InstanceData.updateValueValid(currentNodeInfo, false, bind.getId());
                             }

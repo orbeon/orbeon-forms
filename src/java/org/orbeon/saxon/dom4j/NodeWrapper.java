@@ -1,18 +1,30 @@
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 package org.orbeon.saxon.dom4j;
 
+import org.dom4j.*;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.event.Receiver;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.pattern.AnyNodeTest;
 import org.orbeon.saxon.pattern.NodeTest;
-import org.orbeon.saxon.style.StandardNames;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.Type;
+import org.orbeon.saxon.value.AtomicValue;
+import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.value.UntypedAtomicValue;
 import org.orbeon.saxon.value.Value;
-import org.orbeon.saxon.value.StringValue;
-import org.orbeon.saxon.value.AtomicValue;
-import org.dom4j.*;
 
 import java.util.*;
 import java.util.ListIterator;
@@ -148,14 +160,15 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
     */
     public int getTypeAnnotation() {
         if (getNodeKind() == Type.ATTRIBUTE) {
-            return StandardNames.XDT_UNTYPED_ATOMIC;
+            return StandardNames.XS_UNTYPED_ATOMIC;
         }
-        return StandardNames.XDT_UNTYPED;
+        return StandardNames.XS_UNTYPED;
     }
 
     /**
     * Determine whether this is the same node as another node. <br />
     * Note: a.isSameNode(b) if and only if generateId(a)==generateId(b)
+     * @param other the node to be compared with
     * @return true if this Node object and the supplied Node object represent the
     * same node in the tree.
     */
@@ -215,6 +228,14 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
     */
 
     public int getLineNumber() {
+        return -1;
+    }
+
+    /**
+     * Get column number
+     * @return the column number of the node in its original source document; or -1 if not available
+     */
+    public int getColumnNumber() {
         return -1;
     }
 
@@ -579,7 +600,6 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                  return Navigator.filteredSingleton(parent, nodeTest);
 
             case Axis.PRECEDING:
-
                  return new Navigator.AxisFilter(
                             new Navigator.PrecedingEnumeration(this, false),
                             nodeTest);
@@ -750,6 +770,36 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
         }
     }
 
+    /**
+     * Determine whether this node has the is-id property
+     *
+     * @return true if the node is an ID
+     */
+
+    public boolean isId() {
+        return false;
+    }
+
+    /**
+     * Determine whether this node has the is-idref property
+     *
+     * @return true if the node is an IDREF or IDREFS element or attribute
+     */
+
+    public boolean isIdref() {
+        return false;
+    }
+
+    /**
+     * Determine whether the node has the is-nilled property
+     *
+     * @return true if the node has the is-nilled property
+     */
+
+    public boolean isNilled() {
+        return false;
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
     // Axis enumeration classes
     ///////////////////////////////////////////////////////////////////////////////
@@ -798,13 +848,13 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                 Namespace ns = elem.getNamespace();
                 String prefix = ns.getPrefix();
                 String uri = ns.getURI();
-                if (!(prefix.equals("") && uri.equals(""))) {
+                if (!(prefix.length() == 0 && uri.length() == 0)) {
                     if (!nslist.containsKey(prefix)) {
                         nslist.put(ns.getPrefix(), ns);
                     }
                 }
                 List addl = elem.additionalNamespaces();
-                if (addl.size() > 0) {
+                if (!addl.isEmpty()) {
                     Iterator itr = addl.iterator();
                     while (itr.hasNext()) {
                         ns = (Namespace) itr.next();
@@ -922,11 +972,11 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                     if (nextChild instanceof Entity) {
                         throw new IllegalStateException("Unexpanded entity in DOM4J tree");
                     } else {
-                        if (isAtomizing()) {
-                            current = new UntypedAtomicValue(getStringValue(node));
-                        } else {
+//                        if (isAtomizing()) {
+//                            current = new UntypedAtomicValue(getStringValue(node));
+//                        } else {
                             current = makeWrapper(nextChild, docWrapper, commonParent, ix++);
-                        }
+//                        }
                     }
                 } else {
                     current = null;
@@ -942,11 +992,11 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                     if (nextChild instanceof Entity) {
                         throw new IllegalStateException("Unexpanded entity in DOM4J tree");
                     } else {
-                        if (isAtomizing()) {
-                            current = new UntypedAtomicValue(getStringValue(node));
-                        } else {
+//                        if (isAtomizing()) {
+//                            current = new UntypedAtomicValue(getStringValue(node));
+//                        } else {
                             current = makeWrapper(nextChild, docWrapper, commonParent, ix--);
-                        }
+//                        }
                     }
                 } else {
                     current = null;
@@ -979,7 +1029,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
         }
         NodeWrapper ow = (NodeWrapper)other;
         if (node instanceof Namespace) {
-            return this.getLocalPart().equals(ow.getLocalPart()) && this.getParent().isSameNodeInfo(ow.getParent());
+            return getLocalPart().equals(ow.getLocalPart()) && getParent().isSameNodeInfo(ow.getParent());
         }
         return node.equals(ow.node);
     }
@@ -1008,14 +1058,14 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
             final Element elem = (Element) node;
             final List namespaces = elem.declaredNamespaces();
 
-            if (namespaces == null || namespaces.size() == 0) {
+            if (namespaces == null || namespaces.isEmpty()) {
                 return EMPTY_NAMESPACE_LIST;
             }
             final int count = namespaces.size();
             if (count == 0) {
                 return EMPTY_NAMESPACE_LIST;
             } else {
-                int[] result = (count > buffer.length ? new int[count] : buffer);
+                int[] result = (buffer == null || count > buffer.length ? new int[count] : buffer);
                 NamePool pool = getNamePool();
                 int n = 0;
                 for (Iterator i = namespaces.iterator(); i.hasNext();) {
@@ -1036,16 +1086,6 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
     }
 
     /**
-    * Output all namespace nodes associated with this element. Does nothing if
-    * the node is not an element.
-    * @param out The relevant outputter
-     * @param includeAncestors True if namespaces declared on ancestor elements must
-     */
-    public void sendNamespaceDeclarations(Receiver out, boolean includeAncestors) throws XPathException {
-        Navigator.sendNamespaceDeclarations(this, out, includeAncestors);
-    }
-
-    /**
       * The equals() method compares nodes for identity. It is defined to give the same result
       * as isSameNodeInfo().
       * @param other the node to be compared with this node
@@ -1062,7 +1102,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
             return isSameNodeInfo((NodeInfo)other);
         } else {
             return false;
-}
+        }
     }
 
     /**
@@ -1078,21 +1118,3 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
      }
 }
 
-//
-// The contents of this file are subject to the Mozilla Public License Version 1.0 (the "License");
-// you may not use this file except in compliance with the License. You may obtain a copy of the
-// License at http://www.mozilla.org/MPL/
-//
-// Software distributed under the License is distributed on an "AS IS" basis,
-// WITHOUT WARRANTY OF ANY KIND, either express or implied.
-// See the License for the specific language governing rights and limitations under the License.
-//
-// The Original Code is: all this file.
-//
-// The Initial Developer of the Original Code is
-// Michael Kay (michael.h.kay@ntlworld.com).
-//
-// Portions created by (your name) are Copyright (C) (your legal entity). All Rights Reserved.
-//
-// Contributor(s): none.
-//

@@ -21,7 +21,7 @@ import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.SingletonIterator;
-import org.orbeon.saxon.value.IntegerValue;
+import org.orbeon.saxon.value.Int64Value;
 
 import java.util.List;
 
@@ -53,7 +53,7 @@ public class XFormsDeleteEvent extends XFormsEvent {
             return new ListIterator(deletedNodeInfos);
         } else if ("delete-location".equals(name)) {
             // "The delete location as defined by the delete action, or NaN if there is no delete location."
-            return (deleteIndex < 1) ? EmptyIterator.getInstance() : SingletonIterator.makeIterator(new IntegerValue(deleteIndex));
+            return (deleteIndex < 1) ? EmptyIterator.getInstance() : SingletonIterator.makeIterator(new Int64Value(deleteIndex));
         } else {
             return super.getAttribute(name);
         }

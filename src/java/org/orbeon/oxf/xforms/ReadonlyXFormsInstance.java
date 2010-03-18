@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.Document;
-import org.dom4j.Element;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 
@@ -24,9 +23,9 @@ import org.orbeon.saxon.om.DocumentInfo;
  */
 public class ReadonlyXFormsInstance extends XFormsInstance {
 
-    public ReadonlyXFormsInstance(Element containerElement) {
-        super(containerElement);
-    }
+//    public ReadonlyXFormsInstance(Element containerElement) {
+//        super(containerElement);
+//    }
 
     public ReadonlyXFormsInstance(String modelId, String instanceStaticId, DocumentInfo instanceDocumentInfo,
                                   String instanceSourceURI, String requestBodyHash,
@@ -42,7 +41,8 @@ public class ReadonlyXFormsInstance extends XFormsInstance {
      */
     public XFormsInstance createMutableInstance() {
         final Document mutableDocument = TransformerUtils.tinyTreeToDom4j2(getDocumentInfo());
-        return new XFormsInstance(modelEffectiveId, instanceStaticId, mutableDocument, getSourceURI(), getRequestBodyHash(), getUsername(), getPassword(),
+        return new XFormsInstance(getDocumentInfo().getConfiguration(), modelEffectiveId, instanceStaticId, mutableDocument,
+                getSourceURI(), getRequestBodyHash(), getUsername(), getPassword(),
                 isCache(), getTimeToLive(), getValidation(), isHandleXInclude(), isExposeXPathTypes());
     }
 }

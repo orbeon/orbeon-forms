@@ -98,7 +98,8 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                     InputStream is = null;
                     try {
                         is = new URL(tempURI).openStream();
-                        final DocumentInfo responseBody = TransformerUtils.readTinyTree(is, connectionResult.resourceURI, false);
+                        final DocumentInfo responseBody = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
+                                is, connectionResult.resourceURI, false);
                         setBodyDocument(responseBody);
                         return;
                     } catch (Exception e) {

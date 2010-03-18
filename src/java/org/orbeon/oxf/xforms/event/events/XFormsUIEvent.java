@@ -23,7 +23,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.SingletonIterator;
-import org.orbeon.saxon.value.IntegerValue;
+import org.orbeon.saxon.value.Int64Value;
 import org.orbeon.saxon.value.StringValue;
 
 /**
@@ -111,7 +111,7 @@ public abstract class XFormsUIEvent extends XFormsEvent {
             // Return the control's static position in the document
             final int controlStaticPosition = getContainingDocument().getStaticState().getControlPosition(targetControl.getPrefixedId());
             if (controlStaticPosition >= 0)
-                return SingletonIterator.makeIterator(new IntegerValue(controlStaticPosition));
+                return SingletonIterator.makeIterator(new Int64Value(controlStaticPosition));
             else
                 return EmptyIterator.getInstance();
         } else {

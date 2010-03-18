@@ -40,15 +40,6 @@ import java.util.*;
  */
 public class XFormsContextStack {
 
-    // If there is no XPath context defined at the root (in the case there is no default XForms model/instance
-    // available), we should use an empty context. However, currently for non-relevance in particular we must not run
-    // expressions with an empty context. To allow running expressions at the root of a container without models, we
-    // create instead a context with an empty document node instead. This way there is a context for evaluation. In the
-    // future, we should allow running expressions with no context, possibly after statically checking that they do not
-    // depend on the context, as well as prevent evaluations within non-relevant content by other means.
-//    final List<Item> DEFAULT_CONTEXT = XFormsConstants.EMPTY_ITEM_LIST;
-    public static final List<Item> DEFAULT_CONTEXT = Collections.singletonList((Item) XFormsUtils.DUMMY_CONTEXT);
-
     private XBLContainer container;
     private XFormsContainingDocument containingDocument;
     private XFormsFunction.Context functionContext;
@@ -123,7 +114,8 @@ public class XFormsContextStack {
                     xformsModel.getDefaultInstance().getLocationData(), false, defaultNode, container.getResolutionScope()));
         } else {
             // Push empty context
-            contextStack.push(new BindingContext(parentBindingContext, xformsModel, DEFAULT_CONTEXT, DEFAULT_CONTEXT.size(), null, true, null,
+            final List<Item> defaultContext = containingDocument.getStaticState().DEFAULT_CONTEXT;
+            contextStack.push(new BindingContext(parentBindingContext, xformsModel, defaultContext, defaultContext.size(), null, true, null,
                     (xformsModel != null) ? xformsModel.getLocationData() : null, false, null, container.getResolutionScope()));
         }
 
@@ -416,7 +408,7 @@ public class XFormsContextStack {
                                 evaluationPosition = evaluationContextBinding.getPosition();
                             } else {
                                 isDefaultContext = true;
-                                evaluationNodeset = XFormsContextStack.DEFAULT_CONTEXT;
+                                evaluationNodeset = containingDocument.getStaticState().DEFAULT_CONTEXT;
                                 evaluationPosition = 1;
                             }
 

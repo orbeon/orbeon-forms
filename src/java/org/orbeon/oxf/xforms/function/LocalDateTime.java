@@ -17,9 +17,7 @@ import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.DateTimeValue;
-import org.orbeon.saxon.value.DateValue;
 import org.orbeon.saxon.value.StringValue;
-import org.orbeon.saxon.value.TimeValue;
 
 import java.util.GregorianCalendar;
 
@@ -31,7 +29,7 @@ public class LocalDateTime extends XFormsFunction {
     public Item evaluateItem(XPathContext context) throws XPathException {
         DateTimeValue value;
         if(argument.length == 1 && "test".equals(argument[0].evaluateAsString(context))) {
-            value = new DateTimeValue(new DateValue("2004-12-31-07:00"), new TimeValue("12:00:00.000-07:00"));
+            value = (DateTimeValue) DateTimeValue.makeDateTimeValue("2004-12-31T12:00:00.000-07:00").asAtomic();
         } else {
 			value = new DateTimeValue(new GregorianCalendar(), true);
         }

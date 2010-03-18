@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.IntegerValue;
+import org.orbeon.saxon.value.Int64Value;
 
 /**
  * XForms index() function.
@@ -63,6 +63,6 @@ public class Index extends XFormsFunction {
         }
 
         // Return value found
-        return new IntegerValue(index);
+        return new Int64Value(index);
     }
 }

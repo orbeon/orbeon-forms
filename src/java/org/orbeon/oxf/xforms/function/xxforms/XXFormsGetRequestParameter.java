@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -40,7 +40,7 @@ public class XXFormsGetRequestParameter extends XFormsFunction {
         if (getContainingDocument(xpathContext).isInitializing()) {
             // Get parameter name
             final Expression parameterNameExpression = argument[0];
-            final String parameterName = parameterNameExpression.evaluateAsString(xpathContext);
+            final String parameterName = parameterNameExpression.evaluateAsString(xpathContext).toString();
 
             // Get parameter value
 

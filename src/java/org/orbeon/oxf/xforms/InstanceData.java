@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -20,11 +20,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.NodeWrapper;
-import org.orbeon.saxon.om.Axis;
-import org.orbeon.saxon.om.NameChecker;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.style.StandardNames;
+import org.orbeon.saxon.om.*;
 
 import java.util.*;
 

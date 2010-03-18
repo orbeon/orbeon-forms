@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -43,6 +43,6 @@ public class XXFormsAttribute extends XFormsFunction {
         final String value = (item != null) ? item.getStringValue() : "";
 
         final Attribute attribute = Dom4jUtils.createAttribute(qName, value);
-        return XXFormsElement.DOCUMENT_WRAPPER.wrap(attribute);
+        return getContainingDocument(xpathContext).getStaticState().getDefaultDocumentWrapper().wrap(attribute);
     }
 }

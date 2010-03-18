@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.submission.XFormsSubmissionUtils;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.ExpressionTool;
+import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -29,6 +30,7 @@ import org.orbeon.saxon.value.BooleanValue;
 
 public class XXFormsValid extends XFormsFunction {
 
+    @Override
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
         final Expression nodesetExpression = (argument.length > 0) ? argument[0] : null;
@@ -61,5 +63,10 @@ public class XXFormsValid extends XFormsFunction {
             result = XFormsSubmissionUtils.isSatisfiesValidRequired((NodeInfo) item, true, true);
         }
         return BooleanValue.get(result);
+    }
+
+    @Override
+    public int getIntrinsicDependencies() {
+	    return StaticProperty.DEPENDS_ON_CONTEXT_ITEM;
     }
 }

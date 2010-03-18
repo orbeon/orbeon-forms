@@ -42,7 +42,7 @@ public class Instance extends XFormsFunction {
         final String instanceId;
         {
             if (instanceIdExpression != null) {
-                final String tempId = instanceIdExpression.evaluateAsString(xpathContext).trim();
+                final String tempId = instanceIdExpression.evaluateAsString(xpathContext).toString().trim();
                 instanceId = (StringUtils.isNotBlank(tempId)) ? XFormsUtils.namespaceId(getContainingDocument(xpathContext), tempId) : null;
             } else {
                 instanceId = null;
@@ -71,7 +71,8 @@ public class Instance extends XFormsFunction {
         }
     }
 
-    public PathMap.PathMapNode addToPathMap(PathMap pathMap, PathMap.PathMapNode pathMapNode) {
-        return addDocToPathMap(pathMap, pathMapNode);
+    @Override
+    public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
+        return addDocToPathMap(pathMap, pathMapNodeSet);
     }
 }

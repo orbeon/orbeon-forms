@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.expr.ExpressionVisitor;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
@@ -47,9 +48,10 @@ public class Property extends XFormsFunction {
 
     private Map<String, String> namespaceMappings;
 
+    @Override
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
-        final String propertyNameString = argument[0].evaluateAsString(xpathContext);
+        final String propertyNameString = argument[0].evaluateAsString(xpathContext).toString();
         final QName propertyNameQName = Dom4jUtils.extractTextValueQName(namespaceMappings, propertyNameString, false);
 
         // Never return any property containing the string "password" as a first line of defense
@@ -80,10 +82,12 @@ public class Property extends XFormsFunction {
     }
 
     // The following copies StaticContext namespace information
-    public void checkArguments(StaticContext env) throws XPathException {
+    @Override
+    public void checkArguments(ExpressionVisitor visitor) throws XPathException {
         // See also Saxon Evaluate.java
         if (namespaceMappings == null) { // only do this once
-            super.checkArguments(env);
+            final StaticContext env = visitor.getStaticContext();
+            super.checkArguments(visitor);
 
             namespaceMappings = new HashMap<String, String>();
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -18,6 +18,7 @@ import org.orbeon.saxon.functions.Component;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.*;
+import org.orbeon.saxon.value.StringValue;
 
 public class Seconds extends XFormsFunction {
 
@@ -29,10 +30,10 @@ public class Seconds extends XFormsFunction {
 
 
     public Item evaluateItem(XPathContext context) throws XPathException {
-        String arg = argument[0].evaluateAsString(context);
+        String arg = argument[0].evaluateAsString(context).toString();
         final DurationValue value;
         try {
-            value = new DurationValue(arg);
+            value = (DurationValue) DurationValue.makeDuration(arg).asAtomic();
         } catch (XPathException e) {
             return NAN;
         }

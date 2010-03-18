@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -32,7 +32,6 @@ import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
@@ -59,9 +58,9 @@ public class XXFormsCallXPL extends XFormsFunction {
                 Expression xplURIExpression = argument[0];
                 //xplURL = new URL(((AnyURIValue) xplURIExpression.evaluateItem(xpathContext)).getStringValue());
                 if (getSystemId() == null)
-                    xplURL = URLFactory.createURL(xplURIExpression.evaluateAsString(xpathContext));
+                    xplURL = URLFactory.createURL(xplURIExpression.evaluateAsString(xpathContext).toString());
                 else
-                    xplURL = URLFactory.createURL(getSystemId(), xplURIExpression.evaluateAsString(xpathContext));
+                    xplURL = URLFactory.createURL(getSystemId(), xplURIExpression.evaluateAsString(xpathContext).toString());
             }
 
             // Get list of input names
@@ -192,7 +191,8 @@ public class XXFormsCallXPL extends XFormsFunction {
                     List<DocumentWrapper> results = new ArrayList<DocumentWrapper>(outputNames.size());
                     for (DOMSerializer domSerializer: domSerializers) {
                         domSerializer.start(pipelineContext);
-                        results.add(new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(domSerializer.getDocument(pipelineContext)), null, new Configuration()));
+                        results.add(new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(domSerializer.getDocument(pipelineContext)), null,
+                                xpathContext.getConfiguration()));
                     }
                     if (newPipelineContext && !pipelineContext.isDestroyed())
                         pipelineContext.destroy(true);

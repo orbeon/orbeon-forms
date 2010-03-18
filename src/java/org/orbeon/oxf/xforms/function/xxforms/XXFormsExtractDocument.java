@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2008 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
@@ -42,7 +42,7 @@ public class XXFormsExtractDocument extends XFormsFunction {
 
         // Get parameters
         final Item item = argument[0].evaluateItem(xpathContext);
-        final String excludeResultPrefixes = argument.length >= 2 ? argument[1].evaluateAsString(xpathContext) : null;
+        final String excludeResultPrefixes = argument.length >= 2 ? argument[1].evaluateAsString(xpathContext).toString() : null;
         final boolean readonly = argument.length >= 3 && ExpressionTool.effectiveBooleanValue(argument[2].iterate(xpathContext));
 
         // Make sure it is a NodeInfo
@@ -62,16 +62,16 @@ public class XXFormsExtractDocument extends XFormsFunction {
         }
 
         // Convert to Document or DocumentInfo
-        final Object result = extractDocument(rootElement, excludeResultPrefixes, readonly);
+        final Object result = extractDocument(xpathContext.getConfiguration(), rootElement, excludeResultPrefixes, readonly);
 
         // Return DocumentInfo
         if (result instanceof Document)
-            return new DocumentWrapper((Document) result, null, new Configuration());
+            return new DocumentWrapper((Document) result, null, getContainingDocument(xpathContext).getStaticState().getXPathConfiguration());
         else
             return (DocumentInfo) result;
     }
 
-    public static Object extractDocument(Element element, String excludeResultPrefixes, boolean readonly) {
+    public static Object extractDocument(Configuration configuration, Element element, String excludeResultPrefixes, boolean readonly) {
         Object instanceDocument;
         final Document tempDocument;
 
@@ -98,7 +98,7 @@ public class XXFormsExtractDocument extends XFormsFunction {
         if (!readonly) {
             instanceDocument = tempDocument;
         } else {
-            instanceDocument = TransformerUtils.dom4jToTinyTree(tempDocument);
+            instanceDocument = TransformerUtils.dom4jToTinyTree(configuration, tempDocument);
         }
 
         return instanceDocument;

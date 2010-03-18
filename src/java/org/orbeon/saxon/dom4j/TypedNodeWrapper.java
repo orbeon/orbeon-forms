@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -16,21 +16,15 @@ package org.orbeon.saxon.dom4j;
 import org.dom4j.Node;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsInstance;
-import org.orbeon.saxon.Err;
-import org.orbeon.saxon.om.NamePool;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.SingletonIterator;
-import org.orbeon.saxon.style.StandardNames;
-import org.orbeon.saxon.trans.DynamicError;
+import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.trans.Err;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.AtomicType;
-import org.orbeon.saxon.type.BuiltInSchemaFactory;
+import org.orbeon.saxon.type.BuiltInType;
 import org.orbeon.saxon.type.SchemaType;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.value.UntypedAtomicValue;
-import org.orbeon.saxon.value.ValidationErrorValue;
 import org.orbeon.saxon.value.Value;
 
 /**
@@ -79,10 +73,10 @@ public class TypedNodeWrapper extends NodeWrapper {
 
         int annotation = getTypeAnnotation();
         if ((annotation & NodeInfo.IS_DTD_TYPE) != 0) {
-            annotation = StandardNames.XDT_UNTYPED_ATOMIC;
+            annotation = StandardNames.XS_UNTYPED_ATOMIC;
         }
         annotation &= NamePool.FP_MASK;
-        if (annotation == -1 || annotation == StandardNames.XDT_UNTYPED_ATOMIC || annotation == StandardNames.XDT_UNTYPED) {
+        if (annotation == -1 || annotation == StandardNames.XS_UNTYPED_ATOMIC || annotation == StandardNames.XS_UNTYPED) {
             return SingletonIterator.makeIterator(new UntypedAtomicValue(getStringValueCS()));
         } else {
             SchemaType stype = getConfiguration().getSchemaType(annotation);
@@ -93,7 +87,7 @@ public class TypedNodeWrapper extends NodeWrapper {
                 } catch (Exception err) {
                     typeName = annotation + "";
                 }
-                throw new DynamicError("Unknown type annotation " +
+                throw new XPathException("Unknown type annotation " +
                         Err.wrap(typeName) + " in document instance");
             } else {
                 return stype.getTypedValue(this);
@@ -105,10 +99,10 @@ public class TypedNodeWrapper extends NodeWrapper {
     public Value atomize() throws XPathException {
         int annotation = getTypeAnnotation();
         if ((annotation & NodeInfo.IS_DTD_TYPE) != 0) {
-            annotation = StandardNames.XDT_UNTYPED_ATOMIC;
+            annotation = StandardNames.XS_UNTYPED_ATOMIC;
         }
         annotation &= NamePool.FP_MASK;
-        if (annotation == -1 || annotation == StandardNames.XDT_UNTYPED_ATOMIC || annotation == StandardNames.XDT_UNTYPED) {
+        if (annotation == -1 || annotation == StandardNames.XS_UNTYPED_ATOMIC || annotation == StandardNames.XS_UNTYPED) {
             return new UntypedAtomicValue(getStringValueCS());
         } else {
             SchemaType stype = getConfiguration().getSchemaType(annotation);
@@ -119,7 +113,7 @@ public class TypedNodeWrapper extends NodeWrapper {
                 } catch (Exception err) {
                     typeName = annotation + "";
                 }
-                throw new DynamicError("Unknown type annotation " +
+                throw new XPathException("Unknown type annotation " +
                         Err.wrap(typeName) + " in document instance");
             } else {
                 return stype.atomize(this);
@@ -155,12 +149,14 @@ public class TypedNodeWrapper extends NodeWrapper {
                 // Return identified type
                 // NOTE: Return a type iif the value matches the type, because that's required by the XPath semantic.
                 final StringValue value = new StringValue(XFormsInstance.getValueForNode((Node) node));
-                if (value.convert((AtomicType) BuiltInSchemaFactory.getSchemaType(requestedTypeFingerprint), getConfiguration().getConversionContext(), true) instanceof ValidationErrorValue) {
-                    // Back to default case
-                    return getUntypedType();
-                } else {
+
+                try {
+                    value.convert((AtomicType) BuiltInType.getSchemaType(requestedTypeFingerprint), getConfiguration().getConversionContext());
                     // Value matches type, return it
                     return requestedTypeFingerprint;
+                } catch (XPathException e) {
+                    // Back to default case
+                    return getUntypedType();
                 }
             }
         }
@@ -168,8 +164,8 @@ public class TypedNodeWrapper extends NodeWrapper {
 
     private int getUntypedType() {
         if (getNodeKind() == Type.ATTRIBUTE) {
-            return StandardNames.XDT_UNTYPED_ATOMIC;
+            return StandardNames.XS_UNTYPED_ATOMIC;
         }
-        return StandardNames.XDT_UNTYPED;
+        return StandardNames.XS_UNTYPED;
     }
 }

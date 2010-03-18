@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -23,7 +23,7 @@ import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.value.IntegerValue;
+import org.orbeon.saxon.value.Int64Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +65,7 @@ public class XXFormsNodesetChangedEvent extends XFormsUIEvent {
         if (list.size() > 0) {
             final List<Item> items = new ArrayList<Item>(list.size());
             for (XFormsRepeatIterationControl i: list)
-                items.add(new IntegerValue(i.getIterationIndex()));
+                items.add(new Int64Value(i.getIterationIndex()));
             return new ListIterator(items);
         } else {
             return EmptyIterator.getInstance();
@@ -76,7 +76,7 @@ public class XXFormsNodesetChangedEvent extends XFormsUIEvent {
         if (list.size() > 0) {
             final List<Item> items = new ArrayList<Item>(list.size());
             for (Integer i: list)
-                items.add(new IntegerValue(i));
+                items.add(new Int64Value(i));
             return new ListIterator(items);
         } else {
             return EmptyIterator.getInstance();

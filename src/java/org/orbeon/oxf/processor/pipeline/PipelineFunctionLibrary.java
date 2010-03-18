@@ -20,14 +20,19 @@ import org.orbeon.oxf.xforms.function.xxforms.XXFormsGetRequestAttribute;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsPropertiesStartsWith;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsProperty;
 import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.functions.*;
 import org.orbeon.saxon.om.NamespaceConstant;
+import org.orbeon.saxon.om.StandardNames;
+import org.orbeon.saxon.om.StructuredQName;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.type.BuiltInAtomicType;
 import org.orbeon.saxon.type.ItemType;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.AtomicValue;
 import org.orbeon.saxon.value.SequenceType;
+import org.orbeon.saxon.value.Value;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +46,7 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
         return instance;
     }
 
-    private static Map functionTable = new HashMap();
+    private static Map<String, StandardFunction.Entry> functionTable = new HashMap<String, StandardFunction.Entry>();
 
     private static StandardFunction.Entry register(String name,
                                                    Class implementationClass,
@@ -59,6 +64,7 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
         e.itemType = itemType;
         e.cardinality = cardinality;
         e.argumentTypes = new SequenceType[maxArguments];
+        e.resultIfEmpty = new Value[maxArguments];
 
         functionTable.put(name, e);
         return e;
@@ -70,7 +76,7 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
         return XXFormsProperty.property(name);
     }
 
-    public static List propertiesStartsWith(String name) {
+    public static List<AtomicValue> propertiesStartsWith(String name) {
         return XXFormsPropertiesStartsWith.propertiesStartsWith(name);
     }
 
@@ -86,58 +92,58 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
         StandardFunction.Entry e;
 
         // p:property() function
-        e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}property", XXFormsProperty.class, 0, 1, 1, Type.ANY_ATOMIC_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}property", XXFormsProperty.class, 0, 1, 1, BuiltInAtomicType.ANY_ATOMIC, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
         // p:rewrite-resource-uri() function
-        e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}rewrite-resource-uri", RewriteResourceURI.class, 0, 1, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}rewrite-resource-uri", RewriteResourceURI.class, 0, 1, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.BOOLEAN, StaticProperty.EXACTLY_ONE, null);
 
         // p:rewrite-service-uri() function
-        e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}rewrite-service-uri", RewriteServiceURI.class, 0, 1, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}rewrite-service-uri", RewriteServiceURI.class, 0, 1, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.BOOLEAN, StaticProperty.EXACTLY_ONE, null);
 
         // p:get-request-attribute()
         e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}get-request-attribute", XXFormsGetRequestAttribute.class, 0, 1, 2, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
-        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
-        // Useful XSLT function
-        e = register("format-date", FormatDate.class, Type.DATE, 2, 5, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 0, Type.DATE_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 3, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 4, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        // === XSLT 2.0 function
+        e = register("format-date", FormatDate.class, StandardNames.XS_DATE, 2, 5, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.DATE, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 2, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 3, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 4, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
 
-        e = register("format-dateTime", FormatDate.class, Type.DATE_TIME, 2, 5, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 0, Type.DATE_TIME_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 3, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 4, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        e = register("format-dateTime", FormatDate.class, StandardNames.XS_DATE_TIME, 2, 5, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.DATE_TIME, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 2, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 3, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 4, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
 
-        e = register("format-number", FormatNumber2.class, 0, 2, 3, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 0, Type.NUMBER_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("format-number", FormatNumber.class, 0, 2, 3, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.NUMERIC, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
-        e = register("format-time", FormatDate.class, Type.TIME, 2, 5, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 0, Type.TIME_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 3, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        StandardFunction.arg(e, 4, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        e = register("format-time", FormatDate.class, StandardNames.XS_TIME, 2, 5, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, BuiltInAtomicType.TIME, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 2, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 3, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
+        StandardFunction.arg(e, 4, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
     }
 
     private StandardFunction.Entry getEntry(String uri, String local, int arity) {
         StandardFunction.Entry entry;
         if (uri.equals(NamespaceConstant.FN)) {
-            entry = (StandardFunction.Entry) functionTable.get(local);
+            entry = functionTable.get(local);
         } else if (uri.equals(PipelineProcessor.PIPELINE_NAMESPACE_URI)) {
-            entry = (StandardFunction.Entry) functionTable.get("{" + uri + "}" + local);
+            entry = functionTable.get("{" + uri + "}" + local);
         } else {
             return null;
         }
@@ -149,13 +155,13 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
         return entry;
     }
 
-    public boolean isAvailable(int fingerprint, String uri, String local, int arity) {
-        StandardFunction.Entry entry = getEntry(uri, local, arity);
+    public boolean isAvailable(StructuredQName functionName, int arity) {
+        StandardFunction.Entry entry = getEntry(functionName.getNamespaceURI(), functionName.getLocalName(), arity);
         return entry != null;
     }
 
-    public Expression bind(int nameCode, String uri, String local, Expression[] staticArgs) throws XPathException {
-        StandardFunction.Entry entry = getEntry(uri, local, staticArgs.length);
+    public Expression bind(StructuredQName functionName, Expression[] staticArgs, StaticContext env) throws XPathException {
+        StandardFunction.Entry entry = getEntry(functionName.getNamespaceURI(), functionName.getLocalName(), staticArgs.length);
         if (entry == null) {
             return null;
         }
@@ -168,7 +174,7 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
             throw new OXFException("Failed to load function: " + err.getMessage(), err);
         }
         f.setDetails(entry);
-        f.setFunctionNameCode(nameCode);
+        f.setFunctionName(functionName);
         f.setArguments(staticArgs);
         return f;
     }

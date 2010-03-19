@@ -111,7 +111,7 @@ final class DeferredVariable implements VariableDeclaration, Binding {
     }
 
     public SequenceType getRequiredType() {
-        return null;
+        return SequenceType.ANY_SEQUENCE;
     }
 
     public ValueRepresentation evaluateVariable(XPathContext context) throws XPathException {

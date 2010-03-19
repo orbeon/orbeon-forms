@@ -74,7 +74,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
         final org.dom4j.Document configDocument = readCacheInputAsDOM4J(pipelineContext, "model");// TODO: after all, should we use "config"?
         final org.dom4j.Document instanceDocument = readInputAsDOM4J(pipelineContext, input);
 
-        final Configuration configuration = new Configuration();
+        final Configuration configuration = XPathCache.getGlobalConfiguration();
         final DocumentInfo configDocumentInfo = new DocumentWrapper(configDocument, null, configuration);
         final DocumentInfo instanceDocumentInfo = new DocumentWrapper(instanceDocument, null, configuration);
 

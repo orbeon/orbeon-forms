@@ -30,7 +30,6 @@ import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.trans.XPathException;
@@ -244,8 +243,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
     private PooledXPathExpression createExpression(PipelineContext pipelineContext) {
         // Read special "$data" input
         final Document dataInput = readInputAsDOM4J(pipelineContext, getInputByName(AbstractForEachProcessor.FOR_EACH_DATA_INPUT));
-        // XPATH: new Configuration() creates new NamePool
-        final DocumentInfo document = new DocumentWrapper(dataInput, null, new Configuration());
+        final DocumentInfo document = new DocumentWrapper(dataInput, null, XPathCache.getGlobalConfiguration());
         return XPathCache.getXPathExpression(pipelineContext,
                 document.getConfiguration(), document,
                 select, namespaceContext, getLocationData());

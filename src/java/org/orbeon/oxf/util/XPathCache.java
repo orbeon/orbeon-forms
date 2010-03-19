@@ -32,6 +32,7 @@ import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.orbeon.saxon.instruct.SlotManager;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NamePool;
 import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.style.AttributeValueTemplate;
 import org.orbeon.saxon.sxpath.IndependentContext;
@@ -51,6 +52,12 @@ import java.util.*;
  * good to do this within a finally() block enclosing the use of the expression.
  */
 public class XPathCache {
+
+    private static NamePool NAME_POOL = new NamePool();
+    private static Configuration CONFIGURATION = new Configuration();
+    static {
+        CONFIGURATION.setNamePool(NAME_POOL);
+    }
 
     public static final String XPATH_CACHE_NAME = "cache.xpath";
     private static final int XPATH_CACHE_DEFAULT_SIZE = 200;
@@ -77,6 +84,10 @@ public class XPathCache {
             this.baseURI = baseURI;
             this.locationData = locationData;
         }
+    }
+
+    public static Configuration getGlobalConfiguration() {
+        return CONFIGURATION;
     }
 
     private static Configuration getConfiguration(PropertyContext propertyContext) {
@@ -448,7 +459,7 @@ public class XPathCache {
                                           LocationData locationData) {
             this.pool = pool;
 
-            this.xpathConfiguration = (xpathConfiguration != null) ? xpathConfiguration : new Configuration();
+            this.xpathConfiguration = (xpathConfiguration != null) ? xpathConfiguration : XPathCache.getGlobalConfiguration();
 
             this.xpathString = xpathString;
             this.prefixToURIMap = prefixToURIMap;

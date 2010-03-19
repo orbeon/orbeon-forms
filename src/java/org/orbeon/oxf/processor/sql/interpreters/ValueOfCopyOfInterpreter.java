@@ -26,7 +26,6 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
-import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.Attributes;
@@ -46,8 +45,7 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
 
     public ValueOfCopyOfInterpreter(SQLProcessorInterpreterContext interpreterContext) {
         super(interpreterContext, false);
-        // XPATH: new Configuration() creates new NamePool
-        this.wrapper = new DocumentWrapper(interpreterContext.getCurrentNode().getDocument(), null, new Configuration());
+        this.wrapper = new DocumentWrapper(interpreterContext.getCurrentNode().getDocument(), null, XPathCache.getGlobalConfiguration());
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {

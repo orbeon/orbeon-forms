@@ -33,7 +33,6 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
-import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.ContentHandler;
@@ -66,8 +65,8 @@ public class XLSGenerator extends ProcessorImpl {
                     final byte[] fileContent;
                     {
                         final String NO_FILE = "No file was uploaded";
-                        // XPATH: new Configuration() creates new NamePool
-                        final DocumentInfo requestDocument = readInputAsTinyTree(context, new Configuration(), getInputByName(INPUT_REQUEST));
+                        final DocumentInfo requestDocument = readInputAsTinyTree(context, XPathCache.getGlobalConfiguration(),
+                                getInputByName(INPUT_REQUEST));
 
                         final PooledXPathExpression expr = XPathCache.getXPathExpression(context,
                                 requestDocument.getConfiguration(), requestDocument,

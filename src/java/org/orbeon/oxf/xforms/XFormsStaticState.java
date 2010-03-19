@@ -76,7 +76,7 @@ public class XFormsStaticState {
 
     // Global static-state Saxon Configuration
     // Would be nice to have one per static state maybe, but expressions in XPathCache are shared so NamePool must be shared
-    private static Configuration xpathConfiguration = new Configuration(); // this creates a new NamePool
+    private static Configuration xpathConfiguration = XPathCache.getGlobalConfiguration();
     private DocumentWrapper documentWrapper = new DocumentWrapper(Dom4jUtils.createDocument(), null, xpathConfiguration);
 
     private Document controlsDocument;                                      // controls document

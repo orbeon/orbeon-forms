@@ -38,7 +38,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocumentFactory;
-import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.w3c.dom.Node;
@@ -314,8 +313,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                                     ? ("document".equals(service.style) ? DEFAULT_SELECT_WEB_SERVICE_DOCUMENT : DEFAULT_SELECT_WEB_SERVICE_RPC)
                                                     : DEFAULT_SELECT_BUS;
 
-                                            // XPATH: new Configuration() creates new NamePool
-                                            final DocumentInfo documentInfo = new DocumentWrapper(resultEnvelopeDOM4j, null, new Configuration());
+                                            final DocumentInfo documentInfo = new DocumentWrapper(resultEnvelopeDOM4j, null, XPathCache.getGlobalConfiguration());
                                             final PooledXPathExpression expr = XPathCache.getXPathExpression(context,
                                                     documentInfo.getConfiguration(), documentInfo, xpathString,
                                                     operation != null && operation.select != null

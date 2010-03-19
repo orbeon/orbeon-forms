@@ -29,6 +29,8 @@ import java.util.Map;
 
 public class ControlAnalysis {
 
+    public final XFormsStaticState staticState;
+
     public final String prefixedId;
     public final Element element;
     public final LocationData locationData;
@@ -51,6 +53,7 @@ public class ControlAnalysis {
                        Element element, LocationData locationData, int index, boolean hasNodeBinding, boolean isValueControl,
                        ControlAnalysis parentControlAnalysis, ControlAnalysis ancestorRepeat, Map<String, ControlAnalysis> inScopeVariables) {
 
+        this.staticState = staticState;
         this.prefixedId = prefixedId;
         this.element = element;
         this.locationData = locationData;
@@ -152,7 +155,7 @@ public class ControlAnalysis {
         }
     }
 
-    private static XPathAnalysis analyzeExpression(XFormsStaticState staticState, Expression expression, String xpathString) {
+    private XPathAnalysis analyzeExpression(XFormsStaticState staticState, Expression expression, String xpathString) {
         try {
             final PathMap pathmap = new PathMap(expression);
             final int dependencies = expression.getDependencies();

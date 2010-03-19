@@ -26,7 +26,6 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XLSUtils;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.trans.XPathException;
 
@@ -68,8 +67,7 @@ public class XLSSerializer extends HttpBinarySerializer {
         try {
             final PatternMatcher matcher = new Perl5Matcher();
             Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
-            // XPATH: new Configuration() creates new NamePool
-            final DocumentWrapper wrapper = new DocumentWrapper(dataDocument, null, new Configuration());
+            final DocumentWrapper wrapper = new DocumentWrapper(dataDocument, null, XPathCache.getGlobalConfiguration());
 
             Document configDocument = readInputAsDOM4J(pipelineContext, INPUT_CONFIG);
 

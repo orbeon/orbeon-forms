@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.PathMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,12 +74,12 @@ public class ControlAnalysis {
                 } else {
                     bindingExpression = element.attributeValue("nodeset");
                 }
-    //            final String parentPrefixedId = (parentControlAnalysis != null) ? parentControlAnalysis.prefixedId : null;
-                this.bindingAnalysis = (bindingExpression != null) ? analyseXPath(staticState, prefixedId, bindingExpression) : null;
+                this.bindingAnalysis = (bindingExpression != null) ? analyzeXPath(staticState, parentControlAnalysis.bindingAnalysis,
+                        prefixedId, bindingExpression) : null;
 
                 final boolean isVariable = this instanceof VariableAnalysis;
                 // TODO: TEMP: later other controls will do value analysis
-                this.valueAnalysis = isVariable ? getVariableValueAnalysis(staticState, prefixedId, element.attributeValue("select")) : null;
+                this.valueAnalysis = isVariable ? analyzeVariableValue(staticState, prefixedId, element.attributeValue("select")) : null;
             } else {
                 bindingAnalysis = null;
                 valueAnalysis = null;
@@ -91,35 +90,21 @@ public class ControlAnalysis {
         }
     }
 
-    private XPathAnalysis analyseXPath(XFormsStaticState staticState, String prefixedId, String xpathString) {
-        // Pass null context item as we don't care about actually running the expression
+    private XPathAnalysis analyzeXPath(XFormsStaticState staticState, XPathAnalysis baseAnalysis, String prefixedId, String xpathString) {
+        // Create new expression
         // TODO: get expression from pool and pass in-scope variables (probably more efficient)
-//            final PooledXPathExpression pooledXPathExpression
-//                    = XPathCache.getXPathExpression(propertyContext, null, xpathString, metadata.namespaceMappings.get(prefixedId),
-//                        null, XFormsContainingDocument.getFunctionLibrary(), null, null);
-//        try {
-//        } finally {
-//                pooledXPathExpression.returnToPool();
-//        }
-
-        final Expression expression = XPathCache.createExpression(staticState.getXPathConfiguration(), xpathString, staticState.getMetadata().namespaceMappings.get(prefixedId), XFormsContainingDocument.getFunctionLibrary());
-            final XPathAnalysis localPathAnalysis = analyzeExpression(staticState, expression, xpathString);
-//            localPathAnalysis.rebase(parentControlAnalysis.bindingAnalysis, inScopeVariables);
-            localPathAnalysis.processPaths();
-            return localPathAnalysis;
+        final Expression expression = XPathCache.createExpression(staticState.getXPathConfiguration(), xpathString,
+                staticState.getMetadata().namespaceMappings.get(prefixedId), XFormsContainingDocument.getFunctionLibrary());
+        // Analyse it
+        return new XPathAnalysis(staticState, expression, xpathString, baseAnalysis, inScopeVariables);
 
     }
 
-    public XPathAnalysis getVariableValueAnalysis(XFormsStaticState staticState, String prefixedId, String xpathString) {
+    public XPathAnalysis analyzeVariableValue(XFormsStaticState staticState, String prefixedId, String xpathString) {
         // Get analysis for variable value
         // TODO: handle xxf:sequence child of variable
-//        if (bindingAnalysis != null) {
-//            // Use the variable's binding
-//            return analyseXPath(staticState, prefixedId, xpathString);
-//        } else {
-//            // Use the parent's binding
-            return analyseXPath(staticState, prefixedId, xpathString);
-//        }
+        final XPathAnalysis baseAnalysis = (bindingAnalysis != null) ? bindingAnalysis : parentControlAnalysis.bindingAnalysis;
+        return analyzeXPath(staticState, baseAnalysis, prefixedId, xpathString);
     }
 
     public void addContainedVariable(String variableName, String variablePrefixedId) {
@@ -155,34 +140,6 @@ public class ControlAnalysis {
         }
     }
 
-    private XPathAnalysis analyzeExpression(XFormsStaticState staticState, Expression expression, String xpathString) {
-        try {
-            final Map<String, PathMap> variables = new HashMap<String, PathMap>();
-            if (inScopeVariables != null) {
-                for (final Map.Entry<String, ControlAnalysis> entry: inScopeVariables.entrySet()) {
-                    variables.put(entry.getKey(), entry.getValue().valueAnalysis.pathmap);
-                }
-            }
-
-            final PathMap pathmap;
-            if (parentControlAnalysis == null || parentControlAnalysis.bindingAnalysis == null) {
-                // We are at the top, start with a new PathMap
-                pathmap = new PathMap(expression, variables);
-            } else {
-                // We cloned and add to an existing PathMap
-                pathmap = parentControlAnalysis.bindingAnalysis.pathmap.clone();
-                pathmap.setInScopeVariables(variables);
-                pathmap.updateFinalNodes(expression.addToPathMap(pathmap, pathmap.findFinalNodes()));
-            }
-
-            final int dependencies = expression.getDependencies();// TODO FIX THIS
-            return new XPathAnalysis(xpathString, pathmap, dependencies);
-        } catch (Exception e) {
-            staticState.getIndentedLogger().logError("", "EXCEPTION WHILE ANALYZING PATHS: " + xpathString);
-            return null;
-        }
-    }
-
     public void addClasses(String classes) {
         if (this.classes == null) {
             // Set
@@ -195,5 +152,12 @@ public class ControlAnalysis {
 
     public String getClasses() {
         return classes;
+    }
+
+    public int getLevel() {
+        if (parentControlAnalysis == null)
+            return 0;
+        else
+            return parentControlAnalysis.getLevel() + 1;
     }
 }

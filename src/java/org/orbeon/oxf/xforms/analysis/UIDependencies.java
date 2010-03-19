@@ -18,6 +18,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -26,7 +27,13 @@ import java.util.*;
 public class UIDependencies {
 
     private final XFormsContainingDocument containingDocument;
+
     private final Map<String, Set<NodeInfo>> modifiedNodes = new HashMap<String, Set<NodeInfo>>();
+    private final Set<String> structuralChanges = new HashSet<String>();
+
+    private boolean modifiedPathsSet;
+    private Set<String> modifiedPaths = new HashSet<String>();
+    private int updateCount;
 
     public UIDependencies(XFormsContainingDocument containingDocument) {
         this.containingDocument = containingDocument;
@@ -45,30 +52,42 @@ public class UIDependencies {
         }
 
         nodeInfos.add(nodeInfo);
+    }
 
+    public void markStructuralChange(XFormsModel model) {
+        structuralChanges.add(model.getPrefixedId());
     }
 
     public void refreshDone() {
+
+        containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "refresh done", "bindings updated", Integer.toString(updateCount));
+
         modifiedNodes.clear();
+        structuralChanges.clear();
+
+        modifiedPathsSet = false;
+        modifiedPaths.clear();
+
+        updateCount = 0;
     }
 
     public Set<String> getModifiedPaths() {
+        if (!modifiedPathsSet) {
 
-        if (modifiedNodes.size() == 0) {
-            return Collections.emptySet();
-        } else {
-            final Set<String> result = new HashSet<String>();
+            assert modifiedNodes.isEmpty();
 
-            for (final Map.Entry<String, Set<NodeInfo>> entry: modifiedNodes.entrySet()) {
-                for (final NodeInfo node: entry.getValue()) {
-                    final XFormsInstance instance = containingDocument.getInstanceForNode(node);
-                    if (instance != null)
-                        result.add(createNodePath(instance, node));
+            if (modifiedNodes.size() != 0) {
+                for (final Map.Entry<String, Set<NodeInfo>> entry: modifiedNodes.entrySet()) {
+                    for (final NodeInfo node: entry.getValue()) {
+                        final XFormsInstance instance = containingDocument.getInstanceForNode(node);
+                        if (instance != null)
+                            modifiedPaths.add(createNodePath(instance, node));
+                    }
                 }
             }
-
-            return result;
+            modifiedPathsSet = true;
         }
+        return modifiedPaths;
     }
 
     private static String createNodePath(XFormsInstance instance, NodeInfo node) {
@@ -96,7 +115,6 @@ public class UIDependencies {
                 sb.append('/');
                 if (currentNode.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
                     sb.append(currentNode.getDisplayName());
-//                    sb.append("/text()");
                 } else if (currentNode.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
                     sb.append('@');
                     sb.append(currentNode.getDisplayName());
@@ -109,15 +127,37 @@ public class UIDependencies {
 
     public boolean requireBindingUpdate(XFormsStaticState staticState, Element currentControlElement,
                                         String controlPrefixedId, boolean contextUpdated) {
-        final XPathAnalysis analysis = staticState.getXPathAnalysis(controlPrefixedId);
-        if (analysis != null) {
-//                if (analysis.isDependOnContext() && contextUpdated) {
-//                    return true;
-//                } else {
-                return analysis.intersects(getModifiedPaths());
-//                }
+
+        final boolean result;
+        final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
+        if (controlAnalysis.bindingAnalysis == null) {
+            // Control does not have an XPath binding
+            result = false;
+        } else if (!controlAnalysis.bindingAnalysis.figuredOutDependencies) {
+            // We couldn't figure out the dependencies for this binding
+            result = true;
         } else {
-            return true;
+            // Control has an XPath binding
+            if (structuralChanges.isEmpty()) {
+                // No structural change
+                final XPathAnalysis analysis = staticState.getXPathAnalysis(controlPrefixedId);
+                if (analysis != null) {
+                    result = analysis.intersectsValue(getModifiedPaths());
+                } else {
+                    result = true;
+                }
+            } else {
+                // Structural change
+                // TODO: do model by model
+                result = true;
+            }
         }
+        if (result) {
+            containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "binding modified", "prefixed id", controlPrefixedId,
+                    "XPath", controlAnalysis.bindingAnalysis.xpathString);
+            updateCount++;
+        }
+
+        return result;
     }
 }

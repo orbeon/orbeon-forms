@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.analysis.UIDependencies;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
@@ -1047,7 +1048,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             // As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
             // performing RRRR directly
-            deferredActionContext.setAllDeferredFlags(true);
+            markStructuralChange();
         }
     }
 
@@ -1071,8 +1072,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return deferredActionContext;
     }
 
-    public void setAllDeferredFlags(boolean value) {
-        deferredActionContext.setAllDeferredFlags(value);
+    public void markStructuralChange() {
+        // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
+        deferredActionContext.setAllDeferredFlags(true);
+
+        // Notify UI dependencies of the change
+        final UIDependencies uiDependencies = containingDocument.getUIDependencies();
+        if (uiDependencies != null)
+            uiDependencies.markStructuralChange(this);
     }
 
     public void startOutermostActionHandler() {

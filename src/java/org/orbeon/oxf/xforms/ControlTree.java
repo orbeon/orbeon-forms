@@ -560,7 +560,7 @@ public class ControlTree implements ExternalCopyable {
     }
 
     private void addMissingRepeatIndexes(XFormsStaticState staticState, Map<String, Integer> repeatIdToIndex) {
-        final Map<String, ControlAnalysis> repeats = staticState.getControlAnalysisMap();
+        final Map<String, ControlAnalysis> repeats = staticState.getRepeatControlAnalysisMap();
         if (repeats != null) {
             for (String repeatPrefixedId: repeats.keySet()) {
                 if (repeatIdToIndex.get(repeatPrefixedId) == null) {

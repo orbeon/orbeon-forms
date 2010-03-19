@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.analysis;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.function.Instance;
 import org.orbeon.saxon.expr.*;
-import org.orbeon.saxon.om.NamePool;
 import org.orbeon.saxon.pattern.NodeKindTest;
 
 import java.io.PrintStream;
@@ -140,7 +139,7 @@ public class XPathAnalysis {
                             sb.append('/');
                         final int fingerprint = ((AxisExpression) expression).getNodeTest().getFingerprint();
                         if (fingerprint != -1)
-                            sb.append(NamePool.getDefaultNamePool().getDisplayName(fingerprint));
+                            sb.append(expression.getExecutable().getConfiguration().getNamePool().getDisplayName(fingerprint));
                         else
                             sb.append("/text()");
                     }

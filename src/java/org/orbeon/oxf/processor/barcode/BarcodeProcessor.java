@@ -57,10 +57,8 @@ public class BarcodeProcessor extends HttpBinarySerializer {// TODO: HttpBinaryS
 		final Document instanceDocument = readInputAsDOM4J(context, "data");
 
         // Wraps documents for XPath API
-        final DocumentInfo configDocumentInfo = new DocumentWrapper(
-				configDocument, null, new org.orbeon.saxon.Configuration());
-		final DocumentInfo instanceDocumentInfo = new DocumentWrapper(
-				instanceDocument, null, new org.orbeon.saxon.Configuration());
+        final DocumentInfo configDocumentInfo = new DocumentWrapper(configDocument, null, XPathCache.getGlobalConfiguration());
+		final DocumentInfo instanceDocumentInfo = new DocumentWrapper(instanceDocument, null, XPathCache.getGlobalConfiguration());
 
 		try {
             final StringBuilderWriter barcodeConfigWriter = new StringBuilderWriter();

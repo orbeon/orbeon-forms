@@ -187,7 +187,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
 //            }
             // Lazily read input in case there is only a p:otherwise
             if (hrefDocumentInfo == null) {
-                final Configuration configuration = new Configuration();
+                final Configuration configuration = XPathCache.getGlobalConfiguration();
                 hrefDocumentInfo = readCacheInputAsTinyTree(pipelineContext, configuration, AbstractChooseProcessor.CHOOSE_DATA_INPUT);
             }
             PooledXPathExpression expression = null;

@@ -25,7 +25,6 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 
@@ -104,12 +103,11 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
     // Test that xxforms:attribute elements with @id and @for were created for
     public void testXXFormsAttribute() {
 
-        final Map<String, Map<String, String>> mappings = new HashMap<String, Map<String, String>>();
         final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);
         final XFormsAnnotatorContentHandler.Metadata metadata = new XFormsAnnotatorContentHandler.Metadata();
         final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.getLogger(), ""), null, metadata, Dom4jUtils.createElement("dummy"))
                 .annotateShadowTree(document, "", false);
-        final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, new Configuration());
+        final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, XPathCache.getGlobalConfiguration());
 
         // Check there is an xxforms:attribute for "html" with correct name
         List result = XPathCache.evaluate(new PipelineContext(), documentWrapper, "//xxforms:attribute[@for = 'html']", BASIC_NAMESPACE_MAPPINGS, null, null, null, null, null);

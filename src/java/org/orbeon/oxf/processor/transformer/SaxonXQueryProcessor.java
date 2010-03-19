@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.transformer;
 
@@ -22,8 +22,9 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.xslt.StringErrorListener;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
-import org.orbeon.oxf.properties.PropertyStore;
 import org.orbeon.oxf.properties.PropertySet;
+import org.orbeon.oxf.properties.PropertyStore;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
@@ -32,8 +33,8 @@ import org.orbeon.saxon.query.StaticQueryContext;
 import org.orbeon.saxon.query.XQueryExpression;
 import org.xml.sax.ContentHandler;
 
-import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.URIResolver;
+import javax.xml.transform.sax.SAXResult;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -71,7 +72,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     // Create XQuery configuration (depends on attributes input)
                     final URIResolver uriResolver = new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
                     // TODO: once caching is in place, make sure cached object does not contain a reference to the URIResolver
-                    final Configuration config = new Configuration();
+                    final Configuration config = XPathCache.getGlobalConfiguration();
                     {
                         config.setErrorListener(new StringErrorListener(logger));
 

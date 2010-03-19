@@ -30,7 +30,6 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
@@ -77,8 +76,7 @@ public class XPathProcessor extends ProcessorImpl {
                     }
                 });
 
-                // XPATH: new Configuration() creates new NamePool
-                final DocumentInfo documentInfo = readCacheInputAsTinyTree(context, new Configuration(), INPUT_DATA);
+                final DocumentInfo documentInfo = readCacheInputAsTinyTree(context, XPathCache.getGlobalConfiguration(), INPUT_DATA);
                 PooledXPathExpression xpath = null;
                 try {
                     final String baseURI = (locationData == null) ? null : locationData.getSystemID();

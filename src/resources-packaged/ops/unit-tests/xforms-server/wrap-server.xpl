@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -38,8 +38,8 @@
             <xsl:transform version="2.0">
                 <xsl:output method="xml" name="xml"/>
                 <xsl:template match="/">
-                    <event-request xmlns="http://orbeon.org/oxf/xml/xforms" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
-                        <static-state>
+                    <xxforms:event-request xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                        <xxforms:static-state>
                             <xsl:variable name="static-state" as="document-node()">
                                 <xsl:document>
                                     <static-state xmlns="">
@@ -50,9 +50,10 @@
                                     </static-state>
                                 </xsl:document>
                             </xsl:variable>
+                            <!--<xsl:copy-of select="$static-state"/>-->
                             <xsl:value-of select="context:encodeXML($static-state)"/>
-                        </static-state>
-                        <dynamic-state>
+                        </xxforms:static-state>
+                        <xxforms:dynamic-state>
                             <xsl:if test="doc('input:instances')/instances/instance">
                                 <xsl:variable name="dynamic-state" as="document-node()">
                                     <xsl:document>
@@ -70,11 +71,11 @@
                                 </xsl:variable>
                                 <xsl:value-of select="context:encodeXML($dynamic-state)"/>
                             </xsl:if>
-                        </dynamic-state>
-                        <action>
+                        </xxforms:dynamic-state>
+                        <xxforms:action>
                             <xsl:copy-of select="doc('input:action')/*/*"/>
-                        </action>
-                    </event-request>
+                        </xxforms:action>
+                    </xxforms:event-request>
                 </xsl:template>
             </xsl:transform>
         </p:input>

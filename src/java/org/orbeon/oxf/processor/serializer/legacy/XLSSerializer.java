@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.serializer.legacy;
 
@@ -68,6 +68,7 @@ public class XLSSerializer extends HttpBinarySerializer {
         try {
             final PatternMatcher matcher = new Perl5Matcher();
             Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
+            // XPATH: new Configuration() creates new NamePool
             final DocumentWrapper wrapper = new DocumentWrapper(dataDocument, null, new Configuration());
 
             Document configDocument = readInputAsDOM4J(pipelineContext, INPUT_CONFIG);
@@ -85,7 +86,7 @@ public class XLSSerializer extends HttpBinarySerializer {
             PooledXPathExpression expr = null;
             List nodes = null;
             try {
-                expr = XPathCache.getXPathExpression(pipelineContext, wrapper, "/workbook/sheet", getLocationData());
+                expr = XPathCache.getXPathExpression(pipelineContext, wrapper.getConfiguration(), wrapper, "/workbook/sheet", getLocationData());
                 nodes = expr.evaluate();
             } catch (XPathException e) {
                 throw new OXFException(e);
@@ -148,7 +149,7 @@ public class XLSSerializer extends HttpBinarySerializer {
 
                         // Set cell value
                         PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                                wrapper.wrap(sheetElement), "string(" + sourceXPath + ")", getLocationData());
+                                wrapper.getConfiguration(), wrapper.wrap(sheetElement), "string(" + sourceXPath + ")", getLocationData());
                         String newValue;
                         try {
                             newValue = (String) expr.evaluateSingle();

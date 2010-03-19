@@ -13,11 +13,9 @@
  */
 package org.orbeon.oxf.xforms.function.exforms;
 
+import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsSort;
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.ExpressionVisitor;
-import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.expr.XPathContextMajor;
+import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
@@ -32,17 +30,13 @@ public class EXFormsSort extends XXFormsSort {
         final Expression sequenceToSortExpression = argument[0];
         final Expression selectExpression = argument[1];
 
-        final Expression sortKeyExpression;
-        final XPathContextMajor newXPathContext;
-        {
-            // NOTE: It would be better if we could use XPathCache/PooledXPathExpression instead of rewriting custom
-            // code below. This would provide caching of compiled expressions, abstraction and some simplicity.
+        final XPathContextMajor newXPathContext = xpathContext.newCleanContext();
 
-            // Prepare expression and context
-            final PreparedExpression preparedExpression = prepareExpression(xpathContext, selectExpression, false);
-            newXPathContext = prepareXPathContext(xpathContext, preparedExpression);
-            // Return expression
-            sortKeyExpression = preparedExpression.expression;
+        final Expression sortKeyExpression;
+        {
+            // Prepare expression
+            final PooledXPathExpression xpathExpression = prepareExpression(xpathContext, selectExpression, false);
+            sortKeyExpression = xpathExpression.prepareExpression(newXPathContext, PooledXPathExpression.getFunctionContext(xpathContext));
         }
 
         return sort(newXPathContext, sequenceToSortExpression, sortKeyExpression);
@@ -52,5 +46,10 @@ public class EXFormsSort extends XXFormsSort {
     public void checkArguments(ExpressionVisitor visitor) throws XPathException {
         // Needed by prepareExpression()
         copyStaticContextIfNeeded(visitor);
+    }
+
+    @Override
+    public int getIntrinsicDependencies() {
+	    return StaticProperty.DEPENDS_ON_CONTEXT_ITEM;
     }
 }

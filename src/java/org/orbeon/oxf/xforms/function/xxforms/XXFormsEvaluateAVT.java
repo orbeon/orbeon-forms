@@ -13,11 +13,9 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
+import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.saxon.expr.Expression;
-import org.orbeon.saxon.expr.ExpressionVisitor;
-import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.expr.XPathContextMajor;
+import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
@@ -26,17 +24,13 @@ public class XXFormsEvaluateAVT extends XFormsFunction {
     @Override
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
-        final Expression avtExpression;
-        final XPathContextMajor newXPathContext;
-        {
-            // NOTE: It would be better if we could use XPathCache/PooledXPathExpression instead of rewriting custom
-            // code below. This would provide caching of compiled expressions, abstraction and some simplicity.
+        final XPathContextMajor newXPathContext = xpathContext.newCleanContext();
 
-            // Prepare expression and context
-            final PreparedExpression preparedExpression = prepareExpression(xpathContext, argument[0], true);
-            newXPathContext = prepareXPathContext(xpathContext, preparedExpression);
-            // Return expression
-            avtExpression = preparedExpression.expression;
+        final Expression avtExpression;
+        {
+            // Prepare expression
+            final PooledXPathExpression xpathExpression = prepareExpression(xpathContext, argument[0], true);
+            avtExpression = xpathExpression.prepareExpression(newXPathContext, PooledXPathExpression.getFunctionContext(xpathContext));
         }
 
         return avtExpression.iterate(newXPathContext);
@@ -46,5 +40,10 @@ public class XXFormsEvaluateAVT extends XFormsFunction {
     public void checkArguments(ExpressionVisitor visitor) throws XPathException {
         // Needed by prepareExpression()
         copyStaticContextIfNeeded(visitor);
+    }
+
+    @Override
+    public int getIntrinsicDependencies() {
+	    return StaticProperty.DEPENDS_ON_FOCUS;
     }
 }

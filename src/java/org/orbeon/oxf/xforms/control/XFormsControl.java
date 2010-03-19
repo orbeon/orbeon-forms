@@ -1107,7 +1107,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         final Iterator<Item> j = nodeset2.iterator();
         for (Item currentItem1: nodeset1) {
             final Item currentItem2 = j.next();
-            if (!currentItem1.equals(currentItem2)) {// equals() is the same as isSameNodeInfo() for NodeInfo, and compares the values for values
+            if (!XFormsUtils.compareItems(currentItem1, currentItem2)) {
                 // Found a difference
                 return false;
             }

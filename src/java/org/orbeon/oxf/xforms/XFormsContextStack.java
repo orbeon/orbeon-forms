@@ -435,7 +435,7 @@ public class XFormsContextStack {
                                 // NOTE: We prevent evaluation if the context was empty. However there are cases where this
                                 // should be allowed, if the expression does not depend on the context. Ideally, we would know
                                 // statically whether an expression depends on the context or not, and take separate action if
-                                // that's the case. Currently, such an expression will produce a DynamicError.
+                                // that's the case. Currently, such an expression will produce an XPathException.
 
                                 // It might be the case that when we implement non-evaluation of relevant subtrees, this won't
                                 // be an issue anymore, and we can simply allow evaluation of such expressions. Otherwise,

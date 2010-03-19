@@ -53,7 +53,7 @@ import java.util.*;
  * Projecting XML Documents, VLDB 2003</a>.</p>
  */
 
-public class PathMap {
+public class PathMap implements Cloneable {
 
     private List<PathMapRoot> pathMapRoots = new ArrayList<PathMapRoot>();        // a list of PathMapRoot objects
     private HashMap pathsForVariables = new HashMap();  // a map from a variable Binding to a PathMapNodeSet
@@ -63,14 +63,14 @@ public class PathMap {
      * node in the path map.
      */
 
-    public static class PathMapNode {
+    public static class PathMapNode implements Cloneable {
         List<PathMapArc> arcs;              // a list of PathMapArcs
         private boolean returnable;
         private boolean atomized;
         private boolean hasUnknownDependencies;
 
+        // ORBEON
         @Override
-
         public PathMapNode clone() throws CloneNotSupportedException {
             final PathMapNode cloned = (PathMapNode) super.clone();
 
@@ -233,8 +233,8 @@ public class PathMap {
             return rootExpression;
         }
 
-        @Override
         // ORBEON
+        @Override
         public PathMapRoot clone() throws CloneNotSupportedException {
             return (PathMapRoot) super.clone();
         }
@@ -277,8 +277,8 @@ public class PathMap {
             return target;
         }
 
-        @Override
         // ORBEON
+        @Override
         public PathMapArc clone() throws CloneNotSupportedException {
             final PathMapArc cloned = (PathMapArc) super.clone();
             if (target != null) {
@@ -293,7 +293,7 @@ public class PathMap {
      * A (mutable) set of nodes in the path map
      */
 
-    public static class PathMapNodeSet extends HashSet<PathMapNode> {
+    public static class PathMapNodeSet extends HashSet {
 
         /**
          * Create an initially-empty set of path map nodes
@@ -571,7 +571,7 @@ public class PathMap {
         }
         // Now process the tree of paths recursively, rewriting all axes in terms of downwards
         // selections, if necessary as downward selections from the root
-        Stack<PathMapNode> nodeStack = new Stack<PathMapNode>();
+        Stack nodeStack = new Stack();
         nodeStack.push(newRoot);
         reduceToDownwardsAxes(newRoot, nodeStack);
         newRoot.isDownwardsOnly = true;
@@ -711,8 +711,8 @@ public class PathMap {
 
     }
 
-    @Override
     // ORBEON
+    @Override
     public PathMap clone() {
         try {
             final PathMap cloned = (PathMap) super.clone();
@@ -720,12 +720,15 @@ public class PathMap {
             for (final PathMapRoot root: pathMapRoots) {
                 cloned.pathMapRoots.add(root.clone());
             }
-            // TODO: pathsForVariables
+
+            // TODO: pathsForVariables?
+
             return cloned;
         } catch (CloneNotSupportedException e) {
             return null;// won't happen
         }
     }
+
     // ORBEON
     public void addRoots(PathMapRoot[] roots) {
         pathMapRoots.addAll(Arrays.asList(roots));
@@ -738,7 +741,6 @@ public class PathMap {
 
     // ORBEON
     public List<PathMapNode> findFinalNodes() {
-        // TODO
         final List<PathMapNode> result = new ArrayList<PathMapNode>();
         for (final PathMapRoot root: pathMapRoots) {
             addNodes(result, root);

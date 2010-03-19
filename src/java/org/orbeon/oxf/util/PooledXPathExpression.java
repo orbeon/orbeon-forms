@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.ValueRepresentation;
@@ -43,7 +44,7 @@ public class PooledXPathExpression {
 
     // Dynamic context
     private Map<String, ValueRepresentation> variableToValueMap;
-    private List<Item> contextItems;
+    private Item contextItem;
     private int contextPosition;
 
     public PooledXPathExpression(XPathExpression expression, ObjectPool pool, Map<String, XPathVariable> variables) {
@@ -59,7 +60,7 @@ public class PooledXPathExpression {
         try {
             // Free up dynamic context references
             variableToValueMap = null;
-            contextItems = null;
+            contextItem = null;
 
             // Return object to pool
             if (pool != null) // may be null for testing
@@ -74,7 +75,7 @@ public class PooledXPathExpression {
     }
 
     private Item getContextItem() {
-        return (contextPosition > 0 && contextItems.size() > contextPosition - 1) ? contextItems.get(contextPosition - 1) : null;
+        return contextItem;
     }
 
     /**
@@ -125,14 +126,14 @@ public class PooledXPathExpression {
      * Evaluate and return a List of native Java objects, including underlying wrapped nodes.
      */
     public List evaluate() throws XPathException {
-        return convertToJava(evaluate(getContextItem(), null));
+        return convertToJava(evaluate(null));
     }
 
     /**
      * Evaluate and return a List of native Java objects, but keep NodeInfo objects.
      */
     public List<Object> evaluateKeepNodeInfo(Object functionContext) throws XPathException {
-        final SequenceIterator iter = evaluate(getContextItem(), functionContext);
+        final SequenceIterator iter = evaluate(functionContext);
 
         final SequenceExtent extent = new SequenceExtent(iter);
         return convertToJavaKeepNodeInfo(extent);
@@ -142,7 +143,7 @@ public class PooledXPathExpression {
      * Evaluate and return a List of Item objects.
      */
     public List<Item> evaluateKeepItems(Object functionContext) throws XPathException {
-        final SequenceIterator iter = evaluate(getContextItem(), functionContext);
+        final SequenceIterator iter = evaluate(functionContext);
 
         final List<Item> result = new ArrayList<Item>();
         Item next;
@@ -156,7 +157,7 @@ public class PooledXPathExpression {
      * Evaluate the expression as a variable value usable by Saxon in further XPath expressions.
      */
     public SequenceExtent evaluateAsExtent(Object functionContext) throws XPathException {
-        final SequenceIterator iter = evaluate(getContextItem(), functionContext);
+        final SequenceIterator iter = evaluate(functionContext);
 
         return new SequenceExtent(iter);
     }
@@ -177,17 +178,17 @@ public class PooledXPathExpression {
         }
     }
 
-    private List<Object> convertToJava(SequenceExtent extent) throws XPathException {
-        final List<Object> result = new ArrayList<Object>(extent.getLength());
-        final SequenceIterator iter = extent.iterate(null);
-        while (true) {
-            final Item currentItem = iter.next();
-            if (currentItem == null) {
-                return result;
-            }
-            result.add(Value.convertToJava(currentItem));
-        }
-    }
+//    private List<Object> convertToJava(SequenceExtent extent) throws XPathException {
+//        final List<Object> result = new ArrayList<Object>(extent.getLength());
+//        final SequenceIterator iter = extent.iterate(null);
+//        while (true) {
+//            final Item currentItem = iter.next();
+//            if (currentItem == null) {
+//                return result;
+//            }
+//            result.add(Value.convertToJava(currentItem));
+//        }
+//    }
 
     private List<Object> convertToJava(SequenceIterator iterator) throws XPathException {
         final List<Object> result = new ArrayList<Object>();
@@ -205,7 +206,7 @@ public class PooledXPathExpression {
      * evaluation doesn't return any item.
      */
     public Object evaluateSingle() throws XPathException {
-        final SequenceIterator iter = evaluate(getContextItem(), null);
+        final SequenceIterator iter = evaluate(null);
 
         final Item firstItem = iter.next();
         if (firstItem == null) {
@@ -220,7 +221,7 @@ public class PooledXPathExpression {
      * doesn't return any item.
      */
     public Object evaluateSingleKeepNodeInfo(Object functionContext) throws XPathException {
-        final SequenceIterator iter = evaluate(getContextItem(), functionContext);
+        final SequenceIterator iter = evaluate(functionContext);
 
         final Item firstItem = iter.next();
         if (firstItem == null) {
@@ -234,6 +235,11 @@ public class PooledXPathExpression {
         }
     }
 
+    public Expression prepareExpression(XPathContextMajor xpathContext, Object functionContext) throws XPathException {
+        prepareDynamicContext(xpathContext, functionContext);
+        return expression.getInternalExpression();
+    }
+
     /**
      * Return the function context passed to the expression if any.
      */
@@ -241,34 +247,23 @@ public class PooledXPathExpression {
         return xpathContext.getController().getUserData("", PooledXPathExpression.class.getName());
     }
 
-    private SequenceIterator evaluate(Item contextItem, Object functionContext) throws XPathException {
-
-        final XPathDynamicContext dynamicContext = expression.createDynamicContext(contextItem);
-        prepareContext(dynamicContext.getXPathContextObject(), functionContext);
+    private SequenceIterator evaluate(Object functionContext) throws XPathException {
+        final XPathDynamicContext dynamicContext = prepareDynamicContext(null, functionContext);
         return expression.iterate(dynamicContext);
     }
 
-    /**
-     * Evaluate the expression as a boolean value.
-     */
-//    public boolean evaluateAsBoolean(Object functionContext) throws XPathException {
-//        final Item contextItem = getContextItem();
-//        final XPathContextMajor xpathContext = new XPathContextMajor(contextItem, expression.getExecutable());
-//        prepareContext(xpathContext, functionContext);
-//        // TODO: this actually doesn't work like cast as xs:boolean, which is the purpose of this
-////        return expression.effectiveBooleanValue(xpathContext);
-//        throw new OXFException("NIY");
-//    }
+    private XPathDynamicContext prepareDynamicContext(XPathContextMajor xpathContext, Object functionContext) throws XPathException {
 
-    private void prepareContext(XPathContext xpathContext, Object functionContext) throws XPathException {
+        final XPathDynamicContext dynamicContext;
+        if (xpathContext == null) {
+            dynamicContext = expression.createDynamicContext(contextItem, contextPosition);
+            xpathContext = (XPathContextMajor) dynamicContext.getXPathContextObject();
+        } else {
+            dynamicContext = expression.createDynamicContext(xpathContext, contextItem, contextPosition);
+        }
 
         // Pass function context to controller
         xpathContext.getController().setUserData("", this.getClass().getName(), functionContext);
-
-        // Use low-level Expression object and implement context node-set and context position
-//        final SlotManager slotManager = expression. this.stackFrameMap; // this is already set on XPathExpressionImpl but we can't get to it
-        xpathContext.setCurrentIterator(new ListSequenceIterator(contextItems, contextPosition));
-//        xpathContext.openStackFrame(slotManager);
 
         // Set variable values if any
         if (variableToValueMap != null) {
@@ -284,47 +279,8 @@ public class PooledXPathExpression {
                 }
             }
         }
-    }
 
-    private static class ListSequenceIterator implements SequenceIterator, Cloneable {
-
-        private List<Item> contextItems;
-        private int currentPosition; // 1-based
-
-        public ListSequenceIterator(List<Item> contextItems, int currentPosition) {
-            this.contextItems = contextItems;
-            this.currentPosition = currentPosition;
-        }
-
-        public Item current() {
-            if (currentPosition > 0 && contextItems.size() > currentPosition - 1)
-                return contextItems.get(currentPosition - 1);
-            else
-                return null;
-        }
-
-        public SequenceIterator getAnother() {
-            return new ListSequenceIterator(contextItems, 0);
-        }
-
-        public Item next() {
-            if (currentPosition < contextItems.size()) {
-                currentPosition++;
-            } else {
-                currentPosition = -1;
-            }
-            return current();
-        }
-
-        public int position() {
-            return currentPosition;
-        }
-
-        public void close() {}
-
-        public int getProperties() {
-            return 0; // "It is always acceptable to return the value zero, indicating that there are no known special properties."
-        }
+        return dynamicContext;
     }
 
     /**
@@ -334,7 +290,15 @@ public class PooledXPathExpression {
      * @param contextPosition       1-based current position
      */
     public void setContextItems(List<Item> contextItems, int contextPosition) {
-        this.contextItems = contextItems;
+
+        if (contextPosition > 0 && contextPosition <= contextItems.size())
+            setContextItem(contextItems.get(contextPosition - 1), contextPosition);
+        else
+            setContextItem(null, 0);
+    }
+
+    public void setContextItem(Item contextItem, int contextPosition) {
+        this.contextItem = contextItem;
         this.contextPosition = contextPosition;
     }
 
@@ -351,6 +315,6 @@ public class PooledXPathExpression {
         variables = null;
 
         variableToValueMap = null;
-        contextItems = null;
+        contextItem = null;
     }
 }

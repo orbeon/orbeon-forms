@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -29,6 +30,7 @@ import org.orbeon.saxon.value.Value;
 
 public class XXFormsType extends XFormsFunction {
 
+    @Override
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
         final Expression nodesetExpression = argument[0];
@@ -77,5 +79,10 @@ public class XXFormsType extends XFormsFunction {
             // Return () if we can't access the node or if it is not an atomic value or a node
             return null;
         }
+    }
+
+    @Override
+    public int getIntrinsicDependencies() {
+	    return StaticProperty.DEPENDS_ON_CONTEXT_ITEM;
     }
 }

@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
@@ -26,26 +26,27 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.Configuration;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.NamespaceSupport;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  *
  */
 public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHandler {
-    DocumentWrapper wrapper;
+    final DocumentWrapper wrapper;
 
     public ValueOfCopyOfInterpreter(SQLProcessorInterpreterContext interpreterContext) {
         super(interpreterContext, false);
+        // XPATH: new Configuration() creates new NamePool
         this.wrapper = new DocumentWrapper(interpreterContext.getCurrentNode().getDocument(), null, new Configuration());
     }
 
@@ -121,7 +122,7 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
                         // Get string value
                         // TODO: use XPathCache.evaluateAsString()
                         PooledXPathExpression expr = XPathCache.getXPathExpression(interpreterContext.getPipelineContext(),
-                                wrapper.wrap(result), "string(.)", null);
+                                wrapper.getConfiguration(), wrapper.wrap(result), "string(.)", null);
                         String stringValue;
                         try {
                             stringValue = (String) expr.evaluateSingle();

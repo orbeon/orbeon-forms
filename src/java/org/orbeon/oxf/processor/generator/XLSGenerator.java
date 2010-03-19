@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.generator;
 
@@ -33,9 +33,9 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.ContentHandler;
 
 import java.io.ByteArrayInputStream;
@@ -66,9 +66,11 @@ public class XLSGenerator extends ProcessorImpl {
                     final byte[] fileContent;
                     {
                         final String NO_FILE = "No file was uploaded";
-                        final Document requestDocument  = readInputAsDOM4J(context, INPUT_REQUEST);
+                        // XPATH: new Configuration() creates new NamePool
+                        final DocumentInfo requestDocument = readInputAsTinyTree(context, new Configuration(), getInputByName(INPUT_REQUEST));
+
                         final PooledXPathExpression expr = XPathCache.getXPathExpression(context,
-                                new DocumentWrapper(requestDocument, null, new Configuration()),
+                                requestDocument.getConfiguration(), requestDocument,
                                 "/request/parameters/parameter[1]/value", getLocationData());
 
                         final Element valueElement;

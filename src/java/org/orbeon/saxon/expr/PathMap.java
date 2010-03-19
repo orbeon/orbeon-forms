@@ -58,6 +58,8 @@ public class PathMap implements Cloneable {
     private List<PathMapRoot> pathMapRoots = new ArrayList<PathMapRoot>();        // a list of PathMapRoot objects
     private HashMap pathsForVariables = new HashMap();  // a map from a variable Binding to a PathMapNodeSet
 
+    private Map<String, PathMap> inScopeVariables;
+
     /**
      * A node in the path map. A node holds a set of arcs, each representing a link to another
      * node in the path map.
@@ -154,7 +156,7 @@ public class PathMap implements Cloneable {
          */
 
         public void setReturnable(boolean returnable) {
-            this.returnable = true;
+            this.returnable = returnable;
         }
 
         /**
@@ -293,7 +295,7 @@ public class PathMap implements Cloneable {
      * A (mutable) set of nodes in the path map
      */
 
-    public static class PathMapNodeSet extends HashSet {
+    public static class PathMapNodeSet extends HashSet<PathMapNode> {
 
         /**
          * Create an initially-empty set of path map nodes
@@ -382,13 +384,16 @@ public class PathMap implements Cloneable {
      */
 
     public PathMap(Expression exp) {
-        PathMapNodeSet finalNodes = exp.addToPathMap(this, null);
-        if (finalNodes != null) {
-            for (Iterator iter = finalNodes.iterator(); iter.hasNext(); ) {
-                PathMapNode node = (PathMapNode)iter.next();
-                node.setReturnable(true);
-            }
-        }
+        final PathMapNodeSet finalNodes = exp.addToPathMap(this, null);
+        diagnosticDump(System.out);
+        updateFinalNodes(finalNodes);
+    }
+
+    public PathMap(Expression exp, Map<String, PathMap> inScopeVariables) {
+        this.inScopeVariables = inScopeVariables;
+        final PathMapNodeSet finalNodes = exp.addToPathMap(this, null);
+        diagnosticDump(System.out);
+        updateFinalNodes(finalNodes);
     }
 
     /**
@@ -436,7 +441,13 @@ public class PathMap implements Cloneable {
      */
 
     public PathMapNodeSet getPathForVariable(Binding binding) {
-        return (PathMapNodeSet)pathsForVariables.get(binding);
+        final PathMapNodeSet localResult = (PathMapNodeSet)pathsForVariables.get(binding);
+        if (localResult != null)
+            return localResult;
+
+//        final PathMap variablePathMap = inScopeVariables.get(binding.getVariableQName().getDisplayName());
+
+        return null;
     }
 
     /**
@@ -711,7 +722,7 @@ public class PathMap implements Cloneable {
 
     }
 
-    // ORBEON
+    // ORBEON START
     @Override
     public PathMap clone() {
         try {
@@ -725,39 +736,63 @@ public class PathMap implements Cloneable {
 
             return cloned;
         } catch (CloneNotSupportedException e) {
-            return null;// won't happen
+            return null;// should not happen
         }
     }
 
-    // ORBEON
     public void addRoots(PathMapRoot[] roots) {
         pathMapRoots.addAll(Arrays.asList(roots));
     }
 
-    // ORBEON
     public void removeRoot(PathMapRoot root) {
         pathMapRoots.remove(root);
     }
 
-    // ORBEON
-    public List<PathMapNode> findFinalNodes() {
-        final List<PathMapNode> result = new ArrayList<PathMapNode>();
+    public PathMapNodeSet findFinalNodes() {
+        final PathMapNodeSet result = new PathMapNodeSet();
         for (final PathMapRoot root: pathMapRoots) {
             addNodes(result, root);
         }
         return result;
     }
 
-    // ORBEON
-    private void addNodes(List<PathMapNode> result, PathMapNode node) {
-        if (node.arcs.isEmpty()) {
+    private void addNodes(PathMapNodeSet result, PathMapNode node) {
+        if (node.isReturnable()) {
             result.add(node);
-        } else {
+        }
+//        else {
             for (final PathMapArc arc: node.arcs) {
                 addNodes(result, arc.getTarget());
             }
+//        }
+    }
+
+    private void clearFinalNodes() {
+        for (final PathMapRoot root: pathMapRoots) {
+            clearNodes(root);
         }
     }
+
+    private void clearNodes(PathMapNode node) {
+        node.setReturnable(false);
+        for (final PathMapArc arc: node.arcs) {
+            clearNodes(arc.getTarget());
+        }
+    }
+
+    public void updateFinalNodes(PathMapNodeSet finalNodes) {
+        // We provide a new set of final nodes so clear the old ones
+        clearFinalNodes();
+        // Simply mark the new ones
+        if (finalNodes != null) {
+            for (Iterator iter = finalNodes.iterator(); iter.hasNext(); ) {
+                PathMapNode node = (PathMapNode)iter.next();
+                node.setReturnable(true);
+            }
+        }
+    }
+
+    // ORBEON END
 
     /**
      * Display a printed representation of the path map

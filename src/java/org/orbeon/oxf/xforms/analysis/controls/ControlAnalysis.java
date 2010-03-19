@@ -104,7 +104,7 @@ public class ControlAnalysis {
 
         final Expression expression = XPathCache.createExpression(staticState.getXPathConfiguration(), xpathString, staticState.getMetadata().namespaceMappings.get(prefixedId), XFormsContainingDocument.getFunctionLibrary());
             final XPathAnalysis localPathAnalysis = analyzeExpression(staticState, expression, xpathString);
-            localPathAnalysis.rebase(parentControlAnalysis.bindingAnalysis, inScopeVariables);
+//            localPathAnalysis.rebase(parentControlAnalysis.bindingAnalysis, inScopeVariables);
             localPathAnalysis.processPaths();
             return localPathAnalysis;
 
@@ -157,7 +157,24 @@ public class ControlAnalysis {
 
     private XPathAnalysis analyzeExpression(XFormsStaticState staticState, Expression expression, String xpathString) {
         try {
-            final PathMap pathmap = new PathMap(expression);
+            final Map<String, PathMap> variables = new HashMap<String, PathMap>();
+            if (inScopeVariables != null) {
+                for (final Map.Entry<String, ControlAnalysis> entry: inScopeVariables.entrySet()) {
+                    variables.put(entry.getKey(), entry.getValue().valueAnalysis.pathmap);
+                }
+            }
+
+            final PathMap pathmap;
+            if (parentControlAnalysis == null || parentControlAnalysis.bindingAnalysis == null) {
+                // We are at the top, start with a new PathMap
+                pathmap = new PathMap(expression, variables);
+            } else {
+                // We cloned and add to an existing PathMap
+                pathmap = parentControlAnalysis.bindingAnalysis.pathmap.clone();
+//                pathmap.setInScopeVariables(variables);
+                pathmap.updateFinalNodes(expression.addToPathMap(pathmap, pathmap.findFinalNodes()));
+            }
+
             final int dependencies = expression.getDependencies();
             return new XPathAnalysis(xpathString, pathmap, dependencies);
         } catch (Exception e) {

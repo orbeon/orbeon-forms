@@ -23,7 +23,7 @@
         <xhtml:title>XForms Message</xhtml:title>
         <xforms:model>
             <xforms:instance id="instance">
-                <message>Message from instance</message>
+                <message>2: message from instance</message>
             </xforms:instance>
         </xforms:model>
     </xhtml:head>
@@ -31,7 +31,10 @@
         <xforms:group>
             <xforms:trigger>
                 <xforms:label>Show alert</xforms:label>
-                <xforms:message level="modal" ev:event="DOMActivate" ref="."/>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:message level="modal">1: Inline message</xforms:message>
+                    <xforms:message level="modal" ref="."/>
+                </xforms:action>
             </xforms:trigger>
         </xforms:group>
     </xhtml:body>

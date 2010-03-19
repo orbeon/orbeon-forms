@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function;
 
+import org.orbeon.saxon.expr.PathMap;
 import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
@@ -37,5 +38,11 @@ public class Context extends XFormsFunction {
     @Override
     public int getIntrinsicDependencies() {
 	    return StaticProperty.DEPENDS_ON_CONTEXT_ITEM;
+    }
+
+    @Override
+    public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
+        // TODO: something smart
+        return super.addToPathMap(pathMap, pathMapNodeSet);
     }
 }

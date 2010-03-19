@@ -13,177 +13,216 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.function.Instance;
 import org.orbeon.saxon.expr.*;
+import org.orbeon.saxon.om.Axis;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class XPathAnalysis {
 
     public final String xpathString;
-    public PathMap pathmap;
-    public final int dependencies;
+    public final PathMap pathmap;
+//    public final int dependencies;
 
-    final Set<String> paths = new HashSet<String>();
+    final Set<String> atomizedPaths = new HashSet<String>();
+    final Set<String> returnablePaths = new HashSet<String>();
+    final Set<String> otherPaths = new HashSet<String>();
 
-    public XPathAnalysis(String xpathString, PathMap pathmap, int dependencies) {
+    final boolean figuredOutDependencies;
+
+    public XPathAnalysis(XFormsStaticState staticState, Expression expression, String xpathString,
+                         XPathAnalysis parentBindingAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+
         this.xpathString = xpathString;
-        this.pathmap = pathmap;
-        this.dependencies = dependencies;
+//        this.dependencies = dependencies;
+
+        try {
+            final Map<String, PathMap> variables = new HashMap<String, PathMap>();
+            if (inScopeVariables != null) {
+                for (final Map.Entry<String, ControlAnalysis> entry: inScopeVariables.entrySet()) {
+                    variables.put(entry.getKey(), entry.getValue().valueAnalysis.pathmap);
+                }
+            }
+
+            final PathMap pathmap;
+            if (parentBindingAnalysis == null) {
+                // We are at the top, start with a new PathMap
+                pathmap = new PathMap(expression, variables);
+            } else {
+                if ((expression.getDependencies() & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) != 0) {
+                    // Expression depends on the context item
+                    // We clone and add to an existing PathMap
+                    pathmap = parentBindingAnalysis.pathmap.clone();
+                    pathmap.setInScopeVariables(variables);
+                    pathmap.updateFinalNodes(expression.addToPathMap(pathmap, pathmap.findFinalNodes()));
+                } else {
+                    // Expression does not depend on the context item
+                    pathmap = new PathMap(expression, variables);
+                }
+            }
+
+            // TODO: Reduction of ancestor::foobar / ancestor-or-self::foobar / parent::node()
+//            pathmap.simplifyAncestors();
+
+//            final PathMap.PathMapRoot[] oldRoots = pathmap.getPathMapRoots();
+//            final PathMap.PathMapRoot[] newRoots = new PathMap.PathMapRoot[oldRoots.length];
+//            int rootIndex = 0;
+//            for (final PathMap.PathMapRoot root: oldRoots) {
+//                newRoots[rootIndex++] = pathmap.reduceToDownwardsAxes(root);
+//                pathmap.removeRoot(root);
+//            }
+//            pathmap.addRoots(newRoots);
+
+            this.pathmap = pathmap;
+
+//            final int dependencies = expression.getDependencies();
+
+            // Produce resulting paths
+            figuredOutDependencies = processPaths();
+
+        } catch (Exception e) {
+            throw new OXFException("Exception while analyzing XPath expression: " + xpathString, e);
+        }
     }
 
-    public boolean intersects(Set<String> touchedPaths) {
+    public boolean intersectsValue(Set<String> touchedPaths) {
         // Return true if any path matches
         // TODO: for now naively just check exact paths
-        for (final String path: paths) {
+        for (final String path: atomizedPaths) {
             if (touchedPaths.contains(path))
             return true;
         }
         return false;
     }
 
-//    public void rebase(XPathAnalysis parentAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
-//
-//        final Map<String, List<PathMap.PathMapNode>> finalNodes = new HashMap<String, List<PathMap.PathMapNode>>();
-//
-//        // TODO: check returnable stuff
-//
-//        for (final PathMap.PathMapRoot root: pathmap.getPathMapRoots()) {
-//            final Expression rootExpression = root.getRootExpression();
-//            if (rootExpression instanceof VariableReference && !(rootExpression instanceof LocalVariableReference)) {
-//                final String variableName = getSaxonVariableName((VariableReference) rootExpression);
-//                final XPathAnalysis variableAnalysis = inScopeVariables.get(variableName).valueAnalysis;
-//
-//                List<PathMap.PathMapNode> finals = getFinals(pathmap, finalNodes, variableAnalysis, variableName);
-//                rebase(finals, root);
-//                pathmap.removeRoot(root);
-//            } else if (rootExpression instanceof ContextItemExpression) {
-//                List<PathMap.PathMapNode> finals = getFinals(pathmap, finalNodes, parentAnalysis, ".");
-//                rebase(finals, root);
-//                pathmap.removeRoot(root);
-//            } else {
-//                // Keep root as is
-//            }
-//        }
-//    }
-
-//    private List<PathMap.PathMapNode> getFinals(PathMap result, Map<String, List<PathMap.PathMapNode>> finalNodes, XPathAnalysis baseAnalysis, String name) {
-//        List<PathMap.PathMapNode> finals = finalNodes.get(name);
-//        if (finals == null) {
-//            // Clone the parent and find its final nodes
-//            final PathMap cloneParent = baseAnalysis.pathmap.clone();
-//            finals = cloneParent.findFinalNodes();
-//            finalNodes.put(name, finals);
-//
-//            // Add all the parent roots
-//            result.addRoots(cloneParent.getPathMapRoots());
-//        }
-//        return finals;
-//    }
-
-//    private void rebase(List<PathMap.PathMapNode> finals, PathMap.PathMapRoot root) {
-//        for (final PathMap.PathMapNode returnedNode: finals) {
-//            returnedNode.addArcs(Arrays.asList(root.getArcs()));
-//        }
-//    }
-
-//    private PathMap rebase(XPathAnalysis parentAnalysis, List<PathMap.PathMapNode> roots) {
-//
-//        final List<PathMap.PathMapNode> returnedNodes = result.findFinalNodes();
-//
-//        for (final PathMap.PathMapNode returnedNode: returnedNodes) {
-//            for (final PathMap.PathMapNode contextRoot: roots) {
-//                returnedNode.addArcs(Arrays.asList(contextRoot.getArcs()));
-//            }
-//        }
-//        return result;
-//    }
-
-    private String getSaxonVariableName(VariableReference variableReference) {
-        return variableReference.getBinding().getVariableQName().getDisplayName();
-    }
-
-    public void processPaths() {
+    private boolean processPaths() {
+        // TODO: need to deal with namespaces!
         final List<Expression> stack = new ArrayList<Expression>();
         for (final PathMap.PathMapRoot root: pathmap.getPathMapRoots()) {
             stack.add(root.getRootExpression());
-            processNode(paths, stack, root);
+            final boolean success = processNode(stack, root);
+            if (!success)
+                return false;
             stack.remove(stack.size() - 1);
         }
+        return true;
     }
 
-    public void processNode(Set<String> result, List<Expression> stack, PathMap.PathMapNode node) {
-        if (node.isReturnable()) {
+    private boolean processNode(List<Expression> stack, PathMap.PathMapNode node) {
+        boolean success = true;
+        if (node.getArcs().length == 0 || node.isReturnable()) {
+
             final StringBuilder sb = new StringBuilder();
 
             for (final Expression expression: stack) {
                 if (expression instanceof Instance) {
+                    // Instance function
                     final Expression instanceNameExpression = ((Instance) expression).getArguments()[0];
                     if (instanceNameExpression instanceof StringLiteral) {
                         sb.append("instance('");
                         sb.append(((StringLiteral) instanceNameExpression).getStringValue());
                         sb.append("')");
                     } else {
-                        //TODO: what to do here?
+                        // Non-literal instance name
+                        success = false;
+                        break;
                     }
                 } else if (expression instanceof AxisExpression) {
-                    if (sb.length() > 0)
-                        sb.append('/');
-                    final int fingerprint = ((AxisExpression) expression).getNodeTest().getFingerprint();
-                    if (fingerprint != -1)
+                    final AxisExpression axisExpression = (AxisExpression) expression;
+                    if (axisExpression.getAxis() == Axis.SELF) {
+                        // Self axis
+                        // NOP
+                    } else if (axisExpression.getAxis() == Axis.CHILD) {
+                        // Child axis
+                        if (sb.length() > 0)
+                            sb.append('/');
+                        final int fingerprint = axisExpression.getNodeTest().getFingerprint();
                         sb.append(expression.getExecutable().getConfiguration().getNamePool().getDisplayName(fingerprint));
-                    else
-                        sb.append("/text()");
+                    } else {
+                        // Unhandled axis
+                        success = false;
+                        break;
+                    }
+                } else {
+                    success = false;
+                    break;
                 }
             }
-            result.add(sb.toString());
-        } else {
+            if (success) {
+                if (node.isReturnable()) {
+                    returnablePaths.add(sb.toString());
+                } else if (node.isAtomized()) {
+                    atomizedPaths.add(sb.toString());
+                } else {
+                    // Not sure if this can happen
+                    otherPaths.add(sb.toString());
+                }
+            } else {
+                // We can't deal with this path
+                return false;
+            }
+        }
+
+        // Process children nodes
+        if (node.getArcs().length > 0) {
             for (final PathMap.PathMapArc arc: node.getArcs()) {
                 stack.add(arc.getStep());
-                processNode(result, stack, arc.getTarget());
+                success &= processNode(stack, arc.getTarget());
+                if (!success) {
+                    return false;
+                }
                 stack.remove(stack.size() - 1);
             }
         }
+
+        // We managed to deal with this path
+        return true;
     }
 
-    public void dump(PrintStream out) {
-        out.println("PATHMAP - expression: " + xpathString);
+    public void dump(PrintStream out, int indent) {
 
-        for (final String path: paths) {
-            out.println("  path: " + path);
+        final String pad = "                                           ".substring(0, indent);
+
+        out.println(pad + "PATHMAP - expression: " + xpathString);
+        out.println(pad + "ok: " + figuredOutDependencies);
+        out.println(pad + "dependent:");
+        for (final String path: atomizedPaths) {
+            out.println(pad + "  path: " + path);
         }
 
-        pathmap.diagnosticDump(out);
-        dumpDependencies(out);
-//            if (instanceIds == null)
-//                out.println("  EXPRESSION DEPENDS ON MORE THAN INSTANCES: " + xpathString);
-//            else {
-//                out.println("  EXPRESSION DEPENDS ON INSTANCES: " + xpathString);
-//                for (final String instanceId: instanceIds) {
-//                    out.println("    instance: " + instanceId);
-//                }
-//            }
+        out.println(pad + "returnable:");
+        for (final String path: returnablePaths) {
+            out.println(pad + "  path: " + path);
+        }
+
+        out.println(pad + "other:");
+        for (final String path: otherPaths) {
+            out.println(pad + "  path: " + path);
+        }
+
+//        pathmap.diagnosticDump(out);
     }
 
-    public void dumpDependencies(PrintStream out) {
-        if ((dependencies & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) != 0) {
-            out.println("  DEPENDS_ON_CONTEXT_ITEM");
-        }
-        if ((dependencies & StaticProperty.DEPENDS_ON_CURRENT_ITEM) != 0) {
-            out.println("  DEPENDS_ON_CURRENT_ITEM");
-        }
-        if ((dependencies & StaticProperty.DEPENDS_ON_CONTEXT_DOCUMENT) != 0) {
-            out.println("  DEPENDS_ON_CONTEXT_DOCUMENT");
-        }
-        if ((dependencies & StaticProperty.DEPENDS_ON_LOCAL_VARIABLES) != 0) {
-            out.println("  DEPENDS_ON_LOCAL_VARIABLES");
-        }
-        if ((dependencies & StaticProperty.NON_CREATIVE) != 0) {
-            out.println("  NON_CREATIVE");
-        }
-    }
+//    public void dumpDependencies(PrintStream out) {
+//        if ((dependencies & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) != 0) {
+//            out.println("  DEPENDS_ON_CONTEXT_ITEM");
+//        }
+//        if ((dependencies & StaticProperty.DEPENDS_ON_CURRENT_ITEM) != 0) {
+//            out.println("  DEPENDS_ON_CURRENT_ITEM");
+//        }
+//        if ((dependencies & StaticProperty.DEPENDS_ON_CONTEXT_DOCUMENT) != 0) {
+//            out.println("  DEPENDS_ON_CONTEXT_DOCUMENT");
+//        }
+//        if ((dependencies & StaticProperty.DEPENDS_ON_LOCAL_VARIABLES) != 0) {
+//            out.println("  DEPENDS_ON_LOCAL_VARIABLES");
+//        }
+//        if ((dependencies & StaticProperty.NON_CREATIVE) != 0) {
+//            out.println("  NON_CREATIVE");
+//        }
+//    }
 }

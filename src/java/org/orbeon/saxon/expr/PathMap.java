@@ -56,7 +56,7 @@ import java.util.*;
 public class PathMap implements Cloneable {
 
     private List<PathMapRoot> pathMapRoots = new ArrayList<PathMapRoot>();        // a list of PathMapRoot objects
-    private HashMap pathsForVariables = new HashMap();  // a map from a variable Binding to a PathMapNodeSet
+    private HashMap<Binding, PathMapNodeSet> pathsForVariables = new HashMap<Binding, PathMapNodeSet>();  // a map from a variable Binding to a PathMapNodeSet
 
     private Map<String, PathMap> inScopeVariables;
 
@@ -385,17 +385,17 @@ public class PathMap implements Cloneable {
 
     public PathMap(Expression exp) {
         final PathMapNodeSet finalNodes = exp.addToPathMap(this, null);
-        diagnosticDump(System.out);
         updateFinalNodes(finalNodes);
     }
 
+    // ORBEON
     public PathMap(Expression exp, Map<String, PathMap> inScopeVariables) {
         this.inScopeVariables = inScopeVariables;
         final PathMapNodeSet finalNodes = exp.addToPathMap(this, null);
-        diagnosticDump(System.out);
         updateFinalNodes(finalNodes);
     }
 
+    // ORBEON
     public void setInScopeVariables(Map<String, PathMap> inScopeVariables) {
         this.inScopeVariables = inScopeVariables;
     }
@@ -453,10 +453,14 @@ public class PathMap implements Cloneable {
         // Check external variables
         // Clone the PathMap first because the nodes returned must belong to this PathMap
         final PathMap variablePathMap = inScopeVariables.get(binding.getVariableQName().getDisplayName());
-        final PathMap clonedVariablePathMap = variablePathMap.clone();
-        addRoots(clonedVariablePathMap.getPathMapRoots());
-
-        return clonedVariablePathMap.findFinalNodes();
+        if (variablePathMap != null) {
+            final PathMap clonedVariablePathMap = variablePathMap.clone();
+            addRoots(clonedVariablePathMap.getPathMapRoots());
+            return clonedVariablePathMap.findFinalNodes();
+        } else {
+            // TODO: when can this happen? it does seem to happen, e.g. w/ names like zz:zz1303689357 for internal LetExpression
+            return null;
+        }
     }
 
     /**
@@ -738,10 +742,12 @@ public class PathMap implements Cloneable {
             final PathMap cloned = (PathMap) super.clone();
             cloned.pathMapRoots = new ArrayList<PathMapRoot>(pathMapRoots.size());
             for (final PathMapRoot root: pathMapRoots) {
-                cloned.pathMapRoots.add(root.clone());
+                final  PathMapRoot newRoot = root.clone();
+                newRoot.isDownwardsOnly = false;
+                cloned.pathMapRoots.add(newRoot);
             }
 
-            // TODO: pathsForVariables?
+            cloned.pathsForVariables = new HashMap<Binding, PathMapNodeSet>();
 
             return cloned;
         } catch (CloneNotSupportedException e) {

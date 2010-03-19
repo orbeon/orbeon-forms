@@ -732,7 +732,7 @@ public class XFormsStaticState {
         return false;
     }
 
-    public Map<String, ControlAnalysis> getControlAnalysisMap() {
+    public Map<String, ControlAnalysis> getRepeatControlAnalysisMap() {
         return controlTypes.get("repeat");
     }
 
@@ -1670,6 +1670,10 @@ public class XFormsStaticState {
         return metadata.marks.get(prefixedId);
     }
 
+    public ControlAnalysis getControlAnalysis(String prefixedId) {
+        return controlAnalysisMap.get(prefixedId);
+    }
+
     public XPathAnalysis getXPathAnalysis(String prefixedId) {
         return controlAnalysisMap.get(prefixedId).bindingAnalysis;
     }
@@ -1677,15 +1681,17 @@ public class XFormsStaticState {
     public void dumpAnalysis() throws Exception {
         if (isXPathAnalysis()) {
             for (final ControlAnalysis info: controlAnalysisMap.values()) {
-                System.out.println("- Control ----------------------------------------------------------------------");
-                System.out.println(info.prefixedId);
+                final String pad = "                                           ".substring(0, info.getLevel());
+
+                System.out.println(pad + "- Control ----------------------------------------------------------------------");
+                System.out.println(pad + info.prefixedId);
                 if (info.bindingAnalysis != null) {
-                    System.out.println("- Binding ----------------------------------------------------------------------");
-                    info.bindingAnalysis.dump(System.out);
+                    System.out.println(pad + "- Binding ----------------------------------------------------------------------");
+                    info.bindingAnalysis.dump(System.out, info.getLevel());
                 }
                 if (info.valueAnalysis != null) {
-                    System.out.println("- Value ------------------------------------------------------------------------");
-                    info.valueAnalysis.dump(System.out);
+                    System.out.println(pad + "- Value ------------------------------------------------------------------------");
+                    info.valueAnalysis.dump(System.out, info.getLevel());
                 }
             }
         }

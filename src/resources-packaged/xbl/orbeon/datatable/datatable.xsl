@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2009-2010 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <!DOCTYPE xsl:transform [
 <!ENTITY neutralElementsInHeaderOrBody "self::xxforms:variable|self::xforms:action|self::xforms:setvalue|self::xforms:insert|self::xforms:delete|self::xforms:setindex|self::xforms:toggle|self::xforms:setfocus|self::xforms:dispatch|self::xforms:rebuild|self::xforms:recalculate|self::xforms:revalidate|self::xforms:refresh|self::xforms:reset|self::xforms:load|self::xforms:send">
 ]>
@@ -1157,8 +1157,8 @@
 
     <xsl:template match="/*/xhtml:tbody/xforms:repeat/xhtml:tr/xhtml:td" mode="dynamic">
         <xxforms:variable name="index" select="{count(preceding-sibling::*) + 1}" xxbl:scope="inner"/>
-        <xxforms:variable name="fr-dt-columnDesc" model="datatable-model" xxbl:scope="outer">
-            <xxforms:sequence select="instance('datatable-instance')/*[position() = $index]" xxbl:scope="inner"/>
+        <xxforms:variable name="fr-dt-columnDesc" xxbl:scope="outer">
+            <xxforms:sequence model="datatable-model" select="instance('datatable-instance')/*[position() = $index]" xxbl:scope="inner"/>
         </xxforms:variable>
 
         <xhtml:td
@@ -1183,8 +1183,8 @@
         <xxforms:variable name="index" select="{count(../preceding-sibling::*) + 1}" xxbl:scope="inner"/>
         <xxforms:variable name="columnSet" model="datatable-model" select="instance('datatable-instance')/*[position() = $index]" xxbl:scope="inner"/>
         <xxforms:variable name="columnIndex" model="datatable-model" select="$columnSet/@index + $position - 1" xxbl:scope="inner"/>
-        <xxforms:variable name="fr-dt-column" model="datatable-model" xxbl:scope="outer">
-            <xxforms:sequence select="$columnSet/column[@index = $columnIndex]" xxbl:scope="inner"/>
+        <xxforms:variable name="fr-dt-column" xxbl:scope="outer">
+            <xxforms:sequence model="datatable-model" select="$columnSet/column[@index = $columnIndex]" xxbl:scope="inner"/>
         </xxforms:variable>
         <xhtml:td
             class="
@@ -1208,8 +1208,8 @@
         <xxforms:variable name="index" select="{count(../preceding-sibling::*) + 1}" xxbl:scope="inner"/>
         <xxforms:variable name="columnSet" model="datatable-model" select="instance('datatable-instance')/*[position() = $index]" xxbl:scope="inner"/>
         <xxforms:variable name="columnIndex" model="datatable-model" select="$columnSet/@index + $position - 1" xxbl:scope="inner"/>
-        <xxforms:variable name="fr-dt-column" model="datatable-model" xxbl:scope="outer">
-            <xxforms:sequence select="$columnSet/column[@index = $columnIndex]" xxbl:scope="inner"/>
+        <xxforms:variable name="fr-dt-column" xxbl:scope="outer">
+            <xxforms:sequence model="datatable-model" select="$columnSet/column[@index = $columnIndex]" xxbl:scope="inner"/>
         </xxforms:variable>
         <xhtml:td
             class="

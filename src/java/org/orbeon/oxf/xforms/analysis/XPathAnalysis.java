@@ -13,13 +13,15 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
-import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.function.Instance;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.pattern.NodeKindTest;
 
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class XPathAnalysis {
 
@@ -45,50 +47,50 @@ public class XPathAnalysis {
         return false;
     }
 
-    public void rebase(XPathAnalysis parentAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+//    public void rebase(XPathAnalysis parentAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+//
+//        final Map<String, List<PathMap.PathMapNode>> finalNodes = new HashMap<String, List<PathMap.PathMapNode>>();
+//
+//        // TODO: check returnable stuff
+//
+//        for (final PathMap.PathMapRoot root: pathmap.getPathMapRoots()) {
+//            final Expression rootExpression = root.getRootExpression();
+//            if (rootExpression instanceof VariableReference && !(rootExpression instanceof LocalVariableReference)) {
+//                final String variableName = getSaxonVariableName((VariableReference) rootExpression);
+//                final XPathAnalysis variableAnalysis = inScopeVariables.get(variableName).valueAnalysis;
+//
+//                List<PathMap.PathMapNode> finals = getFinals(pathmap, finalNodes, variableAnalysis, variableName);
+//                rebase(finals, root);
+//                pathmap.removeRoot(root);
+//            } else if (rootExpression instanceof ContextItemExpression) {
+//                List<PathMap.PathMapNode> finals = getFinals(pathmap, finalNodes, parentAnalysis, ".");
+//                rebase(finals, root);
+//                pathmap.removeRoot(root);
+//            } else {
+//                // Keep root as is
+//            }
+//        }
+//    }
 
-        final Map<String, List<PathMap.PathMapNode>> finalNodes = new HashMap<String, List<PathMap.PathMapNode>>();
+//    private List<PathMap.PathMapNode> getFinals(PathMap result, Map<String, List<PathMap.PathMapNode>> finalNodes, XPathAnalysis baseAnalysis, String name) {
+//        List<PathMap.PathMapNode> finals = finalNodes.get(name);
+//        if (finals == null) {
+//            // Clone the parent and find its final nodes
+//            final PathMap cloneParent = baseAnalysis.pathmap.clone();
+//            finals = cloneParent.findFinalNodes();
+//            finalNodes.put(name, finals);
+//
+//            // Add all the parent roots
+//            result.addRoots(cloneParent.getPathMapRoots());
+//        }
+//        return finals;
+//    }
 
-        // TODO: check returnable stuff
-
-        for (final PathMap.PathMapRoot root: pathmap.getPathMapRoots()) {
-            final Expression rootExpression = root.getRootExpression();
-            if (rootExpression instanceof VariableReference && !(rootExpression instanceof LocalVariableReference)) {
-                final String variableName = getSaxonVariableName((VariableReference) rootExpression);
-                final XPathAnalysis variableAnalysis = inScopeVariables.get(variableName).valueAnalysis;
-
-                List<PathMap.PathMapNode> finals = getFinals(pathmap, finalNodes, variableAnalysis, variableName);
-                rebase(finals, root);
-                pathmap.removeRoot(root);
-            } else if (rootExpression instanceof ContextItemExpression) {
-                List<PathMap.PathMapNode> finals = getFinals(pathmap, finalNodes, parentAnalysis, ".");
-                rebase(finals, root);
-                pathmap.removeRoot(root);
-            } else {
-                // Keep root as is
-            }
-        }
-    }
-
-    private List<PathMap.PathMapNode> getFinals(PathMap result, Map<String, List<PathMap.PathMapNode>> finalNodes, XPathAnalysis baseAnalysis, String name) {
-        List<PathMap.PathMapNode> finals = finalNodes.get(name);
-        if (finals == null) {
-            // Clone the parent and find its final nodes
-            final PathMap cloneParent = baseAnalysis.pathmap.clone();
-            finals = cloneParent.findFinalNodes();
-            finalNodes.put(name, finals);
-
-            // Add all the parent roots
-            result.addRoots(cloneParent.getPathMapRoots());
-        }
-        return finals;
-    }
-
-    private void rebase(List<PathMap.PathMapNode> finals, PathMap.PathMapRoot root) {
-        for (final PathMap.PathMapNode returnedNode: finals) {
-            returnedNode.addArcs(Arrays.asList(root.getArcs()));
-        }
-    }
+//    private void rebase(List<PathMap.PathMapNode> finals, PathMap.PathMapRoot root) {
+//        for (final PathMap.PathMapNode returnedNode: finals) {
+//            returnedNode.addArcs(Arrays.asList(root.getArcs()));
+//        }
+//    }
 
 //    private PathMap rebase(XPathAnalysis parentAnalysis, List<PathMap.PathMapNode> roots) {
 //

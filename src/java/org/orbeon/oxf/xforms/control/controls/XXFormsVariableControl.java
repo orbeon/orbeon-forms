@@ -154,4 +154,10 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
     public boolean supportAjaxUpdates() {
         return false;
     }
+
+    @Override
+    public boolean setFocus() {
+        // Variable can never have focus
+        return false;
+    }
 }

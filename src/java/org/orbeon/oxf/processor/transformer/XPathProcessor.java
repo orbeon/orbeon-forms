@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.transformer;
 
@@ -31,7 +31,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.trans.XPathException;
@@ -67,7 +67,7 @@ public class XPathProcessor extends ProcessorImpl {
                         Document config = readInputAsDOM4J(context, INPUT_CONFIG);
 
                         // Get declared namespaces
-                        Map namespaces = new HashMap();
+                        Map<String, String> namespaces = new HashMap<String, String>();
                         for (Iterator i = config.getRootElement().selectNodes("/config/namespace").iterator(); i.hasNext();) {
                             Element namespaceElement = (Element) i.next();
                             namespaces.put(namespaceElement.attributeValue("prefix"),
@@ -77,11 +77,13 @@ public class XPathProcessor extends ProcessorImpl {
                     }
                 });
 
-                DocumentWrapper wrapper = new DocumentWrapper(readCacheInputAsDOM4J(context, INPUT_DATA), null, new Configuration());
+                // XPATH: new Configuration() creates new NamePool
+                final DocumentInfo documentInfo = readCacheInputAsTinyTree(context, new Configuration(), INPUT_DATA);
                 PooledXPathExpression xpath = null;
                 try {
                     final String baseURI = (locationData == null) ? null : locationData.getSystemID();
-                    xpath = XPathCache.getXPathExpression(context, wrapper, config.getExpression(), config.getNamespaces(), null, PipelineFunctionLibrary.instance(), baseURI, locationData);
+                    xpath = XPathCache.getXPathExpression(context, documentInfo.getConfiguration(), documentInfo,
+                            config.getExpression(), config.getNamespaces(), null, PipelineFunctionLibrary.instance(), baseURI, locationData);
                     List results = xpath.evaluate();
                     contentHandler.startDocument();
                     // WARNING: Here we break the rule that processors must output valid XML documents, because
@@ -150,10 +152,10 @@ public class XPathProcessor extends ProcessorImpl {
     }
 
     protected static class Config {
-        private Map namespaces;
+        private Map<String, String> namespaces;
         private String expression;
 
-        public Config(Map namespaces, String expression) {
+        public Config(Map<String, String> namespaces, String expression) {
             this.namespaces = namespaces;
             this.expression = expression;
         }
@@ -166,11 +168,11 @@ public class XPathProcessor extends ProcessorImpl {
             this.expression = expression;
         }
 
-        public Map getNamespaces() {
+        public Map<String, String> getNamespaces() {
             return namespaces;
         }
 
-        public void setNamespaces(Map namespaces) {
+        public void setNamespaces(Map<String, String> namespaces) {
             this.namespaces = namespaces;
         }
 

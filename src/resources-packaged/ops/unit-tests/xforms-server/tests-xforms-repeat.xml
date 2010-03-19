@@ -1439,7 +1439,7 @@
                                     <xforms:action ev:event="xxforms-nodeset-changed" ev:target="my-repeat">
                                         <xforms:insert context="instance('changes')" nodeset="*" origin="xxforms:element('change', count(instance('instance')/value))"/>
                                     </xforms:action>
-                                    <xforms:repeat nodeset="xxforms:sort(value, ., 'text', @order)" id="my-repeat">
+                                    <xforms:repeat nodeset="xxforms:sort(value, string(.), 'text', @order)" id="my-repeat">
                                         <xforms:output id="my-output" value="."/>
                                     </xforms:repeat>
                                 </xforms:group>
@@ -2265,7 +2265,7 @@
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:repeat nodeset="exf:sort(event, '.', 'text', instance('other')/order)" id="my-repeat">
+                    <xforms:repeat nodeset="exf:sort(event, 'string(.)', 'text', instance('other')/order)" id="my-repeat">
                         <xforms:action ev:event="xxforms-nodeset-changed">
                             <xforms:setvalue ref="instance('other')/selection" value="xxforms:repeat-nodeset('my-repeat')[index('my-repeat')]"/>
                             <xforms:setvalue ref="instance('other')/index" value="index('my-repeat')"/>

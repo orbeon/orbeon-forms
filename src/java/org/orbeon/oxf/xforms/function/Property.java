@@ -23,7 +23,6 @@ import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NamespaceResolver;
-import org.orbeon.saxon.trans.StaticError;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
@@ -77,7 +76,7 @@ public class Property extends XFormsFunction {
             return (Item) XFormsUtils.convertJavaObjectToSaxonObject(value);
 
         } else {
-            throw new StaticError("Invalid property() function parameter: " + propertyNameString);
+            throw new XPathException("Invalid property() function parameter: " + propertyNameString);
         }
     }
 

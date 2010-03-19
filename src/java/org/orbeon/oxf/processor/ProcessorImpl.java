@@ -34,6 +34,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.tinytree.TinyBuilder;
@@ -463,12 +464,12 @@ public abstract class ProcessorImpl implements Processor {
         return ch.getDocument();
     }
 
-    protected DocumentInfo readInputAsTinyTree(PipelineContext context, ProcessorInput input) {
+    protected DocumentInfo readInputAsTinyTree(PipelineContext pipelineContext, Configuration configuration, ProcessorInput input) {
         final TinyBuilder treeBuilder = new TinyBuilder();
 
-        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler(configuration);
         identity.setResult(treeBuilder);
-        readInputAsSAX(context, input, identity);
+        readInputAsSAX(pipelineContext, input, identity);
 
         return (DocumentInfo) treeBuilder.getCurrentRoot();
     }
@@ -498,10 +499,10 @@ public abstract class ProcessorImpl implements Processor {
         });
     }
 
-    protected DocumentInfo readCacheInputAsTinyTree(PipelineContext context, String inputName) {
-        return (DocumentInfo) readCacheInputAsObject(context, getInputByName(inputName), new CacheableInputReader() {
+    protected DocumentInfo readCacheInputAsTinyTree(PipelineContext pipelineContext, final Configuration configuration, String inputName) {
+        return (DocumentInfo) readCacheInputAsObject(pipelineContext, getInputByName(inputName), new CacheableInputReader() {
             public Object read(PipelineContext context, ProcessorInput input) {
-                return readInputAsTinyTree(context, input);
+                return readInputAsTinyTree(context, configuration, input);
             }
         });
     }

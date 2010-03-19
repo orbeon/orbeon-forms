@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
@@ -22,8 +22,8 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.soap.SOAPConstants;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.Text;
 import org.dom4j.QName;
+import org.dom4j.Text;
 import org.dom4j.io.DOMReader;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -33,9 +33,14 @@ import org.orbeon.oxf.util.JMSUtils;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.*;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocumentFactory;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.om.DocumentInfo;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -44,13 +49,11 @@ import org.xml.sax.SAXException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
+import java.util.*;
 
 public class DelegationProcessor extends ProcessorImpl {
 
@@ -72,7 +75,7 @@ public class DelegationProcessor extends ProcessorImpl {
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(final org.orbeon.oxf.pipeline.api.PipelineContext context, final ContentHandler contentHandler) {
-                final java.util.List services = readServices(readInputAsDOM4J(context, INPUT_INTERFACE));
+                final List<ServiceDefinition> services = readServices(readInputAsDOM4J(context, INPUT_INTERFACE));
 
                 readInputAsSAX(context, INPUT_CALL, new ForwardingContentHandler(contentHandler) {
 
@@ -93,8 +96,8 @@ public class DelegationProcessor extends ProcessorImpl {
                             // Find service
                             service = null;
                             String serviceId = attributes.getValue("service");
-                            for ( java.util.Iterator i = services.iterator(); i.hasNext();) {
-                                ServiceDefinition candidateService = (ServiceDefinition) i.next();
+                            for ( Iterator<ServiceDefinition> i = services.iterator(); i.hasNext();) {
+                                ServiceDefinition candidateService = i.next();
                                 if (candidateService.id.equals(serviceId)) {
                                     service = candidateService;
                                     break;
@@ -108,8 +111,8 @@ public class DelegationProcessor extends ProcessorImpl {
 
                             // Find operation for Web service
                             if (service.type == ServiceDefinition.WEB_SERVICE_TYPE && operationName != null) {
-                                for (java.util.Iterator i = service.operations.iterator(); i.hasNext();) {
-                                    OperationDefinition candidateOperation = (OperationDefinition) i.next();
+                                for (Iterator<OperationDefinition> i = service.operations.iterator(); i.hasNext();) {
+                                    OperationDefinition candidateOperation = i.next();
                                     if (candidateOperation.name.equals(operationName)) {
                                         operation = candidateOperation;
                                         break;
@@ -311,9 +314,10 @@ public class DelegationProcessor extends ProcessorImpl {
                                                     ? ("document".equals(service.style) ? DEFAULT_SELECT_WEB_SERVICE_DOCUMENT : DEFAULT_SELECT_WEB_SERVICE_RPC)
                                                     : DEFAULT_SELECT_BUS;
 
+                                            // XPATH: new Configuration() creates new NamePool
+                                            final DocumentInfo documentInfo = new DocumentWrapper(resultEnvelopeDOM4j, null, new Configuration());
                                             final PooledXPathExpression expr = XPathCache.getXPathExpression(context,
-                                                    new DocumentWrapper(resultEnvelopeDOM4j, null, new Configuration()),
-                                                    xpathString,
+                                                    documentInfo.getConfiguration(), documentInfo, xpathString,
                                                     operation != null && operation.select != null
                                                             ? operation.selectNamespaceContext : null, getLocationData());
 
@@ -344,8 +348,8 @@ public class DelegationProcessor extends ProcessorImpl {
                                         final Document parametersDocument = getParametersDocument();
 
                                         // Get parameter values and types
-                                        final List parameterTypes = new ArrayList();
-                                        final List parameterValues = new ArrayList();
+                                        final List<Class> parameterTypes = new ArrayList<Class>();
+                                        final List<Serializable> parameterValues = new ArrayList<Serializable>();
 
                                         // Go throught elements
                                         for (Iterator i = XPathUtils.selectIterator(parametersDocument, "/*/*"); i.hasNext();) {
@@ -460,8 +464,8 @@ public class DelegationProcessor extends ProcessorImpl {
     /**
      * Calls a method on an object with the reflexion API.
      */
-    private String callMethod(Class clazz, String methodName, java.util.List parameterTypes,
-                              Object instance, java.util.List parameterValues)
+    private String callMethod(Class clazz, String methodName, List<Class> parameterTypes,
+                              Object instance, List<Serializable> parameterValues)
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         String result;
         Class[] parameterClasses = new Class[parameterTypes.size()];
@@ -474,9 +478,9 @@ public class DelegationProcessor extends ProcessorImpl {
     /**
      * Returns a list of AbstractSercice objects.
      */
-    private java.util.List readServices(Document interfaceDocument) {
+    private List<ServiceDefinition> readServices(Document interfaceDocument) {
 
-        java.util.List services = new java.util.ArrayList();
+        List<ServiceDefinition> services = new java.util.ArrayList<ServiceDefinition>();
         for (java.util.Iterator i = interfaceDocument.getRootElement().elements("service").iterator(); i.hasNext();) {
             Element serviceElement = (Element) i.next();
 
@@ -535,7 +539,7 @@ public class DelegationProcessor extends ProcessorImpl {
         public String style;
         public String soapVersion;
         public boolean returnFault;
-        public java.util.List operations = new java.util.ArrayList();
+        public List<OperationDefinition> operations = new java.util.ArrayList<OperationDefinition>();
     }
 
     private static class OperationDefinition {
@@ -545,6 +549,6 @@ public class DelegationProcessor extends ProcessorImpl {
         public String soapAction;
         public String encodingStyle;
         public String select;
-        public java.util.Map selectNamespaceContext;
+        public Map<String,String> selectNamespaceContext;
     }
 }

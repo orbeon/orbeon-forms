@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -17,6 +17,7 @@ import org.apache.axis.utils.StringUtils;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
@@ -29,6 +30,8 @@ import java.util.List;
  * xxforms:invalid-binds()
  */
 public class XXFormsInvalidBinds extends XFormsFunction {
+
+    @Override
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
         final Expression nodesetExpression = argument[0];
@@ -53,5 +56,10 @@ public class XXFormsInvalidBinds extends XFormsFunction {
         for (String invalidBindId: invalidBindIds)
             result.add(new StringValue(invalidBindId));
         return new ListIterator(result);
+    }
+
+    @Override
+    public int getIntrinsicDependencies() {
+	    return StaticProperty.DEPENDS_ON_CONTEXT_ITEM;
     }
 }

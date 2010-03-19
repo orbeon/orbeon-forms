@@ -1,50 +1,51 @@
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 package org.orbeon.oxf.processor.pipeline.foreach;
 
-import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.generator.DOMGenerator;
-import org.orbeon.oxf.processor.pipeline.ast.*;
-import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
-import org.orbeon.oxf.processor.pipeline.TeeProcessor;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
-import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.PooledXPathExpression;
-import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.cache.OutputCacheKey;
-import org.orbeon.oxf.cache.Cacheable;
-import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.Configuration;
+import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.dom4j.Document;
+import org.orbeon.oxf.cache.Cacheable;
+import org.orbeon.oxf.cache.OutputCacheKey;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
+import org.orbeon.oxf.processor.pipeline.TeeProcessor;
+import org.orbeon.oxf.processor.pipeline.ast.*;
+import org.orbeon.oxf.util.PooledXPathExpression;
+import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.*;
 
-/**
- * Copyright (C) 2007 Orbeon, Inc.
-* <p/>
-* This program is free software; you can redistribute it and/or modify it under the terms of the
-* GNU Lesser General Public License as published by the Free Software Foundation; either version
-* 2.1 of the License, or (at your option) any later version.
-* <p/>
-* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-* See the GNU Lesser General Public License for more details.
-* <p/>
-* The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-*/
 public class ConcreteForEachProcessor extends ProcessorImpl {
 
     private final Processor forEachBlockProcessor;
     private final ProcessorOutput iterationOutput;
     private final String select;
-    private final Map namespaceContext;
+    private final Map<String, String> namespaceContext;
     private String rootLocalName;
     private String rootQName;
     private String rootNamespaceURI;
@@ -105,7 +106,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
             } else {
                 // Extract prefix, find namespace URI
                 final String prefix = rootQName.substring(0, columnPosition);
-                rootNamespaceURI = (String) namespaceContext.get(prefix);
+                rootNamespaceURI = namespaceContext.get(prefix);
                 if (rootNamespaceURI == null)
                     throw new ValidationException("Prefix '" + prefix + "' used in root attribute is undefined", forEachAST.getLocationData());
                 rootLocalName = rootQName.substring(columnPosition + 1);
@@ -178,7 +179,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
             }
 
             /**
-             * For each is not cachable. See comment in getKeyImpl().
+             * For each is not cacheable. See comment in getKeyImpl().
              */
             protected Object getValidityImpl(PipelineContext pipelineContext) {
                 return null;
@@ -190,11 +191,11 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
     }
 
     private void commitInputs(PipelineContext pipelineContext, int iterationCount) {
-        for (Iterator i = getConnectedInputs().entrySet().iterator(); i.hasNext();) {
-            final Map.Entry entry = (Map.Entry) i.next();
+        for (Iterator<Map.Entry<String,List<ProcessorInput>>> i = getConnectedInputs().entrySet().iterator(); i.hasNext();) {
+            final Map.Entry<String,List<ProcessorInput>> entry = i.next();
 
-            final List inputs = (List) entry.getValue();
-            final ProcessorInput input = (ProcessorInput) inputs.get(0);// NOTE: We don't really support multiple inputs with the same name.
+            final List<ProcessorInput> inputs = entry.getValue();
+            final ProcessorInput input = inputs.get(0);// NOTE: We don't really support multiple inputs with the same name.
 
             if (!AbstractForEachProcessor.FOR_EACH_DATA_INPUT.equals(input.getName())) {// ignore $data
                 final ProcessorOutput output = input.getOutput();
@@ -243,8 +244,10 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
     private PooledXPathExpression createExpression(PipelineContext pipelineContext) {
         // Read special "$data" input
         final Document dataInput = readInputAsDOM4J(pipelineContext, getInputByName(AbstractForEachProcessor.FOR_EACH_DATA_INPUT));
+        // XPATH: new Configuration() creates new NamePool
+        final DocumentInfo document = new DocumentWrapper(dataInput, null, new Configuration());
         return XPathCache.getXPathExpression(pipelineContext,
-                new DocumentWrapper(dataInput, null, new Configuration()),
+                document.getConfiguration(), document,
                 select, namespaceContext, getLocationData());
     }
 
@@ -296,8 +299,8 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
         final Set outputIds = new HashSet();
 
         // Init the 2 sets above
-        for (Iterator i = forEachAST.getStatements().iterator(); i.hasNext();) {
-            final ASTStatement astStatement = (ASTStatement) i.next();
+        for (Iterator<ASTStatement> i = forEachAST.getStatements().iterator(); i.hasNext();) {
+            final ASTStatement astStatement = i.next();
             final IdInfo idInfo = astStatement.getIdInfo();
             inputRefs.addAll(idInfo.getInputRefs());
             outputIds.addAll(idInfo.getOutputIds());
@@ -337,7 +340,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
      */
     private class IterationProcessorOutput extends ProcessorOutputImpl {
 
-        public IterationProcessorOutput(Class clazz, String name) {
+        public IterationProcessorOutput(Class<AbstractForEachProcessor> clazz, String name) {
             super(clazz, name);
         }
 

@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.ContentHandler;
@@ -158,8 +159,8 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
         return output;
     }
 
-    public void start(PipelineContext context) {
-        final State state = (State) getState(context);
+    public void start(PipelineContext pipelineContext) {
+        final State state = (State) getState(pipelineContext);
         if (state.started)
             throw new IllegalStateException("ASTChoose Processor already started");
 
@@ -185,12 +186,17 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
 //                break;
 //            }
             // Lazily read input in case there is only a p:otherwise
-            if (hrefDocumentInfo == null)
-                hrefDocumentInfo = readCacheInputAsTinyTree(context, AbstractChooseProcessor.CHOOSE_DATA_INPUT);
+            if (hrefDocumentInfo == null) {
+                final Configuration configuration = new Configuration();
+                hrefDocumentInfo = readCacheInputAsTinyTree(pipelineContext, configuration, AbstractChooseProcessor.CHOOSE_DATA_INPUT);
+            }
             PooledXPathExpression expression = null;
             final Map namespaces = (Map) branchNamespaces.get(branchIndex);
             try {
-                expression = XPathCache.getXPathExpression(context, hrefDocumentInfo, "boolean(" + condition + ")", namespaces, null, PipelineFunctionLibrary.instance(), null, locationData);// TODO: location should be that of branch
+                expression = XPathCache.getXPathExpression(pipelineContext, hrefDocumentInfo.getConfiguration(),
+                        hrefDocumentInfo, "boolean(" + condition + ")", namespaces, null,
+                        PipelineFunctionLibrary.instance(), null, locationData);// TODO: location should be that of branch
+
                 if (((Boolean) expression.evaluateSingle()).booleanValue()) {
                     selectedBranch = branchIndex;
                     break;
@@ -232,7 +238,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             }
 
             // Connect branch outputs, or start processor
-            selectedBranchProcessor.reset(context);
+            selectedBranchProcessor.reset(pipelineContext);
             if (outputsById.size() == 0 && outputsByParamRef.size() == 0) {
                 if (logger.isDebugEnabled()) {
                     final String condition = (String) branchConditions.get(selectedBranch);
@@ -242,7 +248,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                     else
                         logger.debug("Choose: taking otherwise branch at " + locationData);
                 }
-                selectedBranchProcessor.start(context);
+                selectedBranchProcessor.start(pipelineContext);
             }
             state.started = true;
         }

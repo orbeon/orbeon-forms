@@ -773,7 +773,7 @@
                                 <xforms:output id="output-string" value="value[1]"/>
                                 <xforms:output id="output-integer" value="value[2] + 1"/>
                                 <xforms:output id="output-boolean" value="false() != value[3]"/>
-                                <xforms:output id="output-date" value="value[4] + xdt:dayTimeDuration('P1D')"/>
+                                <xforms:output id="output-date" value="value[4] + xs:dayTimeDuration('P1D')"/>
                                 <xforms:output id="output-time" value="value[5] + xs:dayTimeDuration('PT10H30M')"/>
                                 <xforms:output id="output-double" value="value[6] + .5"/>
                                 <xforms:output id="output-string-2" value="value[7]"/>

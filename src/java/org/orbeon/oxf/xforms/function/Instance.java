@@ -32,6 +32,7 @@ import org.orbeon.saxon.trans.XPathException;
  */
 public class Instance extends XFormsFunction {
 
+    @Override
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
         // Get instance id
         

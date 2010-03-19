@@ -396,6 +396,10 @@ public class PathMap implements Cloneable {
         updateFinalNodes(finalNodes);
     }
 
+    public void setInScopeVariables(Map<String, PathMap> inScopeVariables) {
+        this.inScopeVariables = inScopeVariables;
+    }
+
     /**
      * Make a new root node in the path map. However, if there is already a root for the same
      * expression, the existing root for that expression is returned.
@@ -441,13 +445,18 @@ public class PathMap implements Cloneable {
      */
 
     public PathMapNodeSet getPathForVariable(Binding binding) {
+        // Check local variables
         final PathMapNodeSet localResult = (PathMapNodeSet)pathsForVariables.get(binding);
         if (localResult != null)
             return localResult;
 
-//        final PathMap variablePathMap = inScopeVariables.get(binding.getVariableQName().getDisplayName());
+        // Check external variables
+        // Clone the PathMap first because the nodes returned must belong to this PathMap
+        final PathMap variablePathMap = inScopeVariables.get(binding.getVariableQName().getDisplayName());
+        final PathMap clonedVariablePathMap = variablePathMap.clone();
+        addRoots(clonedVariablePathMap.getPathMapRoots());
 
-        return null;
+        return clonedVariablePathMap.findFinalNodes();
     }
 
     /**

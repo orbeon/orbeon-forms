@@ -171,11 +171,11 @@ public class ControlAnalysis {
             } else {
                 // We cloned and add to an existing PathMap
                 pathmap = parentControlAnalysis.bindingAnalysis.pathmap.clone();
-//                pathmap.setInScopeVariables(variables);
+                pathmap.setInScopeVariables(variables);
                 pathmap.updateFinalNodes(expression.addToPathMap(pathmap, pathmap.findFinalNodes()));
             }
 
-            final int dependencies = expression.getDependencies();
+            final int dependencies = expression.getDependencies();// TODO FIX THIS
             return new XPathAnalysis(xpathString, pathmap, dependencies);
         } catch (Exception e) {
             staticState.getIndentedLogger().logError("", "EXCEPTION WHILE ANALYZING PATHS: " + xpathString);

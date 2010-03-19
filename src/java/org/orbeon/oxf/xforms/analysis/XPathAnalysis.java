@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.xforms.function.Instance;
 import org.orbeon.saxon.expr.*;
-import org.orbeon.saxon.pattern.NodeKindTest;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -118,36 +117,30 @@ public class XPathAnalysis {
     }
 
     public void processNode(Set<String> result, List<Expression> stack, PathMap.PathMapNode node) {
-        if (node.getArcs().length == 0) {
+        if (node.isReturnable()) {
             final StringBuilder sb = new StringBuilder();
 
-            // Add only if last expression is not //text()
-            final Expression lastExpression = stack.get(stack.size() - 1);
-            if (!(lastExpression instanceof AxisExpression
-                    && ((AxisExpression) lastExpression).getNodeTest() == NodeKindTest.TEXT)) {
-
-                for (final Expression expression: stack) {
-                    if (expression instanceof Instance) {
-                        final Expression instanceNameExpression = ((Instance) expression).getArguments()[0];
-                        if (instanceNameExpression instanceof StringLiteral) {
-                            sb.append("instance('");
-                            sb.append(((StringLiteral) instanceNameExpression).getStringValue());
-                            sb.append("')");
-                        } else {
-                            //TODO: what to do here?
-                        }
-                    } else if (expression instanceof AxisExpression) {
-                        if (sb.length() > 0)
-                            sb.append('/');
-                        final int fingerprint = ((AxisExpression) expression).getNodeTest().getFingerprint();
-                        if (fingerprint != -1)
-                            sb.append(expression.getExecutable().getConfiguration().getNamePool().getDisplayName(fingerprint));
-                        else
-                            sb.append("/text()");
+            for (final Expression expression: stack) {
+                if (expression instanceof Instance) {
+                    final Expression instanceNameExpression = ((Instance) expression).getArguments()[0];
+                    if (instanceNameExpression instanceof StringLiteral) {
+                        sb.append("instance('");
+                        sb.append(((StringLiteral) instanceNameExpression).getStringValue());
+                        sb.append("')");
+                    } else {
+                        //TODO: what to do here?
                     }
+                } else if (expression instanceof AxisExpression) {
+                    if (sb.length() > 0)
+                        sb.append('/');
+                    final int fingerprint = ((AxisExpression) expression).getNodeTest().getFingerprint();
+                    if (fingerprint != -1)
+                        sb.append(expression.getExecutable().getConfiguration().getNamePool().getDisplayName(fingerprint));
+                    else
+                        sb.append("/text()");
                 }
-                result.add(sb.toString());
             }
+            result.add(sb.toString());
         } else {
             for (final PathMap.PathMapArc arc: node.getArcs()) {
                 stack.add(arc.getStep());

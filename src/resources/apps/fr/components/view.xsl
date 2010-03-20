@@ -328,17 +328,15 @@
             <xhtml:div class="fr-orbeon-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:div>
         </xsl:if>
     </xsl:template>
-    
+
+    <!-- Content handled separately -->
     <xsl:template match="fr:dialogs"/>
 
     <xsl:template name="fr-dialogs">
         <xforms:group id="fr-dialogs-group" appearance="xxforms:internal">
 
-            <!-- Custom dialogs -->
-            <xsl:apply-templates select=".//xxforms:dialog">
-                <!-- Make sure dialogs are handled -->
-                <xsl:with-param name="include-dialogs" select="true()" tunnel="yes" as="xs:boolean"/>
-            </xsl:apply-templates>
+            <!-- Copy custom dialogs under fr:dialogs only (other dialogs will be left in place) -->
+            <xsl:apply-templates select=".//fr:dialogs//xxforms:dialog"/>
 
             <!-- Misc standard dialogs -->
             <xi:include href="oxf:/apps/fr/import-export/import-export-dialog.xml" xxi:omit-xml-base="true"/>
@@ -366,14 +364,6 @@
                 </xhtml:div>
             </xxforms:dialog>
         </xforms:group>
-    </xsl:template>
-
-    <!-- Special handling for dialogs, as we include them at the top-level and not within fr-form-group -->
-    <xsl:template match="xxforms:dialog">
-        <xsl:param name="include-dialogs" select="false()" tunnel="yes" as="xs:boolean"/>
-        <xsl:if test="$include-dialogs">
-            <xsl:next-match/>
-        </xsl:if>
     </xsl:template>
 
     <!-- Noscript section help entry -->

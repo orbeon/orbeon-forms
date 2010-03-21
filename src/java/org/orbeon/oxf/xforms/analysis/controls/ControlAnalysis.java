@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
@@ -67,19 +68,50 @@ public class ControlAnalysis {
 
             // XPath analysis if needed
             if (staticState.isXPathAnalysis() && element != null) {
-                final String bindingExpression;
-                final String ref = element.attributeValue("ref");
-                if (ref != null) {
-                    bindingExpression = ref;
-                } else {
-                    bindingExpression = element.attributeValue("nodeset");
-                }
-                this.bindingAnalysis = (bindingExpression != null) ? analyzeXPath(staticState, parentControlAnalysis.bindingAnalysis,
-                        prefixedId, bindingExpression) : null;
 
-                final boolean isVariable = this instanceof VariableAnalysis;
-                // TODO: TEMP: later other controls will do value analysis
-                this.valueAnalysis = isVariable ? analyzeVariableValue(staticState, prefixedId, element.attributeValue("select")) : null;
+                // TODO: handle @model and xxbl:scope changes
+                final String bindingExpression;
+                if (element.attributeValue("context") == null) {
+                    final String ref = element.attributeValue("ref");
+                    if (ref != null) {
+                        bindingExpression = ref;
+                    } else {
+                        bindingExpression = element.attributeValue("nodeset");
+                    }
+                } else {
+                    // TODO: handle @context
+                    bindingExpression = null;
+                }
+
+                if ((bindingExpression != null)) {
+                    this.bindingAnalysis = analyzeXPath(staticState, getAncestorOrSelfXPathAnalysis(), prefixedId, bindingExpression);
+                } else {
+                    this.bindingAnalysis = null;
+                }
+
+                final XPathAnalysis baseAnalysis = getAncestorOrSelfXPathAnalysis();
+                if (this instanceof VariableAnalysis) {
+                    // TODO: handle xxf:sequence
+                    this.valueAnalysis = analyzeXPath(staticState, baseAnalysis, prefixedId, element.attributeValue("select"));
+                } else if (isValueControl) {
+                    final String valueAttribute = element.attributeValue("value");
+
+                    final boolean isXXFormsAttribute = element.getQName().equals(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME);
+                    if (isXXFormsAttribute) {
+                        // TODO
+                        // NOTE: bad design that AVT has @value as attribute name
+                        this.valueAnalysis = null;
+                    } else if (valueAttribute != null) {
+                        // E.g. xforms:output/@value
+                        this.valueAnalysis = analyzeXPath(staticState, baseAnalysis, prefixedId, valueAttribute);
+                    } else {
+                        // Value is considered the string value
+                        this.valueAnalysis = analyzeXPath(staticState, baseAnalysis, prefixedId, "string()");
+                    }
+                } else {
+                    this.valueAnalysis = null;
+                }
+
             } else {
                 bindingAnalysis = null;
                 valueAnalysis = null;
@@ -90,6 +122,19 @@ public class ControlAnalysis {
         }
     }
 
+    private XPathAnalysis getAncestorOrSelfXPathAnalysis() {
+        ControlAnalysis currentControlAnalysis = this;
+        while (currentControlAnalysis != null) {
+
+            if (currentControlAnalysis.bindingAnalysis != null)
+                return currentControlAnalysis.bindingAnalysis;
+
+            currentControlAnalysis = currentControlAnalysis.parentControlAnalysis;
+        }
+
+        return null;
+    }
+
     private XPathAnalysis analyzeXPath(XFormsStaticState staticState, XPathAnalysis baseAnalysis, String prefixedId, String xpathString) {
         // Create new expression
         // TODO: get expression from pool and pass in-scope variables (probably more efficient)
@@ -98,13 +143,6 @@ public class ControlAnalysis {
         // Analyse it
         return new XPathAnalysis(staticState, expression, xpathString, baseAnalysis, inScopeVariables);
 
-    }
-
-    public XPathAnalysis analyzeVariableValue(XFormsStaticState staticState, String prefixedId, String xpathString) {
-        // Get analysis for variable value
-        // TODO: handle xxf:sequence child of variable
-        final XPathAnalysis baseAnalysis = (bindingAnalysis != null) ? bindingAnalysis : parentControlAnalysis.bindingAnalysis;
-        return analyzeXPath(staticState, baseAnalysis, prefixedId, xpathString);
     }
 
     public void addContainedVariable(String variableName, String variablePrefixedId) {

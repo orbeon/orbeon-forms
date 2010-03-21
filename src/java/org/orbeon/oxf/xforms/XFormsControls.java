@@ -328,7 +328,7 @@ public class XFormsControls implements XFormsObjectResolver {
         final Element rootElement = containingDocument.getStaticState().getControlsDocument().getRootElement();
     
         visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                containingDocument.getStaticState(), rootXBLContainer, null, rootElement, "", "", isRefresh, false);
+                containingDocument.getStaticState(), rootXBLContainer, null, rootElement, "", "", isRefresh);
     }
 
     public void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsRepeatControl enclosingRepeatControl,
@@ -347,7 +347,7 @@ public class XFormsControls implements XFormsObjectResolver {
         visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                 containingDocument.getStaticState(), enclosingRepeatControl.getXBLContainer(), enclosingRepeatControl, repeatControlElement,
                 XFormsUtils.getEffectiveIdPrefix(enclosingRepeatControl.getEffectiveId()),
-                XFormsUtils.getEffectiveIdSuffix(XFormsUtils.getIterationEffectiveId(enclosingRepeatControl.getEffectiveId(), iterationIndex)), isRefresh, false);
+                XFormsUtils.getEffectiveIdSuffix(XFormsUtils.getIterationEffectiveId(enclosingRepeatControl.getEffectiveId(), iterationIndex)), isRefresh);
     }
 
     public void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsContainerControl containerControl,
@@ -370,7 +370,7 @@ public class XFormsControls implements XFormsObjectResolver {
             visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                     containingDocument.getStaticState(), currentXBLContainer, control, control.getControlElement(),
                     XFormsUtils.getEffectiveIdPrefix(control.getEffectiveId()),
-                    XFormsUtils.getEffectiveIdSuffix(control.getEffectiveId()), isRefresh, false);
+                    XFormsUtils.getEffectiveIdSuffix(control.getEffectiveId()), isRefresh);
         }
         // End visit container control
         controlElementVisitorListener.endVisitControl(control.getControlElement(), control.getEffectiveId());
@@ -379,7 +379,7 @@ public class XFormsControls implements XFormsObjectResolver {
     private void visitControlElementsHandleRepeat(PropertyContext propertyContext, ControlElementVisitorListener controlElementVisitorListener,
                                                     boolean isOptimizeRelevance, XFormsStaticState staticState, XBLContainer currentXBLContainer,
                                                     XFormsControl currentControlsContainer, Element containerElement, String idPrefix, String idPostfix,
-                                                    boolean isRefresh, boolean contextUpdated) {
+                                                    boolean isRefresh) {
 
         int variablesCount = 0;
         final XFormsContextStack currentContextStack = currentXBLContainer.getContextStack();
@@ -395,7 +395,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
             if (currentControlName.equals("repeat")) {
                 // Handle xforms:repeat
-                pushBinding(propertyContext, staticState, currentContextStack, currentControlsContainer, contextUpdated, currentControlElement, controlPrefixedId, controlEffectiveId, newScope);
+                pushBinding(propertyContext, currentContextStack, currentControlElement, controlPrefixedId, controlEffectiveId, newScope);
 
                 // Visit xforms:repeat element
                 final XFormsControl newRepeatControl = controlElementVisitorListener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
@@ -419,7 +419,7 @@ public class XFormsControls implements XFormsObjectResolver {
                                 // iteration. This is used for handling new iterations.
                                 final String newIdPostfix = idPostfix.equals("") ? Integer.toString(iterationIndex) : (idPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iterationIndex);
                                 visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                                        staticState, currentXBLContainer, newRepeatControl, currentControlElement, idPrefix, newIdPostfix, isRefresh, true);// xxx contextUpdated
+                                        staticState, currentXBLContainer, newRepeatControl, currentControlElement, idPrefix, newIdPostfix, isRefresh);
                             }
                             controlElementVisitorListener.endRepeatIteration(iterationIndex);
                         }
@@ -431,7 +431,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 currentContextStack.popBinding();
             } else if (XFormsControlFactory.isContainerControl(currentControlURI, currentControlName)) {
                 // Handle XForms grouping controls
-                pushBinding(propertyContext, staticState, currentContextStack, currentControlsContainer, contextUpdated, currentControlElement, controlPrefixedId, controlEffectiveId, newScope);
+                pushBinding(propertyContext, currentContextStack, currentControlElement, controlPrefixedId, controlEffectiveId, newScope);
                 final XFormsControl newContainerControl = controlElementVisitorListener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
                 final XFormsContextStack.BindingContext currentBindingContext = currentContextStack.getCurrentBindingContext();
                 {
@@ -456,7 +456,7 @@ public class XFormsControls implements XFormsObjectResolver {
                                 || (currentBindingContext.getSingleItem() != null && InstanceData.getInheritedRelevant((NodeInfo) currentBindingContext.getSingleItem())))) {
 
                             visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                                    staticState, currentXBLContainer, newContainerControl, currentControlElement, idPrefix, idPostfix, isRefresh, true);// xxx contextUpdated
+                                    staticState, currentXBLContainer, newContainerControl, currentControlElement, idPrefix, idPostfix, isRefresh);
                         }
 //                    }
                 }
@@ -465,14 +465,14 @@ public class XFormsControls implements XFormsObjectResolver {
             } else if (XFormsControlFactory.isCoreControl(currentControlURI, currentControlName)) {
                 // Handle leaf control
 
-                pushBinding(propertyContext, staticState, currentContextStack, currentControlsContainer, contextUpdated, currentControlElement, controlPrefixedId, controlEffectiveId, newScope);
+                pushBinding(propertyContext, currentContextStack, currentControlElement, controlPrefixedId, controlEffectiveId, newScope);
                 controlElementVisitorListener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlEffectiveId);
                 currentContextStack.popBinding();
             } else if (currentControlName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
                 // Handle xxforms:variable as a leaf control
 
-                pushBinding(propertyContext, staticState, currentContextStack, currentControlsContainer, contextUpdated, currentControlElement, controlPrefixedId, controlEffectiveId, newScope);
+                pushBinding(propertyContext, currentContextStack, currentControlElement, controlPrefixedId, controlEffectiveId, newScope);
                 final XXFormsVariableControl control = (XXFormsVariableControl) controlElementVisitorListener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlEffectiveId);
 
@@ -496,7 +496,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 // Recurse into the shadow component tree
                 final Element shadowTreeDocumentElement = staticState.getXBLBindings().getCompactShadowTree(idPrefix + controlStaticId);
                 visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                        staticState, newControl.getNestedContainer(), newControl, shadowTreeDocumentElement, newControl.getNestedContainer().getFullPrefix(), idPostfix, isRefresh, true);// xxx contextUpdated
+                        staticState, newControl.getNestedContainer(), newControl, shadowTreeDocumentElement, newControl.getNestedContainer().getFullPrefix(), idPostfix, isRefresh);
 
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlEffectiveId);
 
@@ -510,11 +510,10 @@ public class XFormsControls implements XFormsObjectResolver {
             currentContextStack.popBinding();
     }
 
-    private boolean pushBinding(PropertyContext propertyContext, XFormsStaticState staticState, XFormsContextStack currentContextStack,
-                                XFormsControl currentControlsContainer, boolean contextUpdated,
-                                Element currentControlElement, String controlPrefixedId, String controlEffectiveId, XBLBindings.Scope newScope) {
+    private boolean pushBinding(PropertyContext propertyContext, XFormsContextStack currentContextStack, Element currentControlElement,
+                                String controlPrefixedId, String controlEffectiveId, XBLBindings.Scope newScope) {
 
-        final boolean requireUpdate = uiDependencies == null || uiDependencies.requireBindingUpdate(staticState, currentControlElement, controlPrefixedId, contextUpdated);
+        final boolean requireUpdate = uiDependencies == null || uiDependencies.requireBindingUpdate(controlPrefixedId);
 
         if (requireUpdate) {
             // Push with evaluation
@@ -648,7 +647,7 @@ public class XFormsControls implements XFormsObjectResolver {
             cloneInitialStateIfNeeded(propertyContext);
 
             indentedLogger.startHandleOperation("controls", "updating bindings");
-            final ControlTree.UpdateBindingsListener listener = new ControlTree.UpdateBindingsListener(propertyContext, currentControlTree.getEffectiveIdsToControls());
+            final ControlTree.UpdateBindingsListener listener = new ControlTree.UpdateBindingsListener(propertyContext, containingDocument, currentControlTree.getEffectiveIdsToControls());
             {
                 // Visit all controls and update their bindings
                 visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener, true);
@@ -677,7 +676,7 @@ public class XFormsControls implements XFormsObjectResolver {
         indentedLogger.startHandleOperation("controls", "evaluating");
         {
             final Map<String, XFormsControl> effectiveIdsToControls = getCurrentControlTree().getEffectiveIdsToControls();
-            // Evaluate all controls
+            // Evaluate all controls if needed
             if (effectiveIdsToControls != null) {
                 for (final Map.Entry<String, XFormsControl> currentEntry: effectiveIdsToControls.entrySet()) {
                     final XFormsControl currentControl = currentEntry.getValue();
@@ -770,7 +769,7 @@ public class XFormsControls implements XFormsObjectResolver {
         cloneInitialStateIfNeeded(propertyContext);
 
         indentedLogger.startHandleOperation("controls", "updating bindings");
-        final ControlTree.UpdateBindingsListener listener = new ControlTree.UpdateBindingsListener(propertyContext, currentControlTree.getEffectiveIdsToControls());
+        final ControlTree.UpdateBindingsListener listener = new ControlTree.UpdateBindingsListener(propertyContext, containingDocument, currentControlTree.getEffectiveIdsToControls());
         {
             // Visit all controls and update their bindings
             visitControlElementsHandleRepeat(propertyContext, containerControl, listener, true);

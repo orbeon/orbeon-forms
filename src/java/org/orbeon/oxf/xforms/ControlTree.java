@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.analysis.UIDependencies;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -886,14 +887,20 @@ public class ControlTree implements ExternalCopyable {
     public static class UpdateBindingsListener implements XFormsControls.ControlElementVisitorListener {
 
         private final PropertyContext propertyContext;
+        private final XFormsContainingDocument containingDocument;
         private final Map effectiveIdsToControls;
+
+        private final UIDependencies uiDependencies;
 
         private transient int updateCount;
         private transient int iterationCount;
 
-        public UpdateBindingsListener(PropertyContext propertyContext, Map effectiveIdsToControls) {
+        public UpdateBindingsListener(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Map effectiveIdsToControls) {
             this.propertyContext = propertyContext;
+            this.containingDocument = containingDocument;
             this.effectiveIdsToControls = effectiveIdsToControls;
+
+            this.uiDependencies = containingDocument.getUIDependencies();
         }
 
         private Set<String> newIterationsSet = new HashSet<String>();
@@ -936,7 +943,9 @@ public class ControlTree implements ExternalCopyable {
 
             // Mark the control as dirty so it gets reevaluated
             // NOTE: existing repeat iterations are marked dirty below in startRepeatIteration()
-            control.markDirty();
+            if (uiDependencies == null || uiDependencies.requireValueUpdate(control.getPrefixedId())) {
+                control.markDirty();
+            }
 
             return control;
         }
@@ -952,7 +961,9 @@ public class ControlTree implements ExternalCopyable {
             final boolean isExistingIteration = !newIterationsSet.contains(effectiveIterationId);
             if (isExistingIteration) {
                 // Mark the control as dirty so it gets reevaluated
-                repeatIterationControl.markDirty();
+                if (uiDependencies == null || uiDependencies.requireValueUpdate(repeatIterationControl.getPrefixedId())) {
+                    repeatIterationControl.markDirty();
+                }
                 // NOTE: We don't need to call repeatIterationControl.setBindingContext() because XFormsRepeatControl/updateIterations() does it already
             }
 

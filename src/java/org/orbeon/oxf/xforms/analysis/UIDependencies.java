@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
-import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
@@ -27,16 +26,19 @@ import java.util.*;
 public class UIDependencies {
 
     private final XFormsContainingDocument containingDocument;
+    private final XFormsStaticState staticState;
 
     private final Map<String, Set<NodeInfo>> modifiedNodes = new HashMap<String, Set<NodeInfo>>();
     private final Set<String> structuralChanges = new HashSet<String>();
 
     private boolean modifiedPathsSet;
     private Set<String> modifiedPaths = new HashSet<String>();
-    private int updateCount;
+    private int bindingUpdateCount;
+    private int valueUpdateCount;
 
     public UIDependencies(XFormsContainingDocument containingDocument) {
         this.containingDocument = containingDocument;
+        this.staticState = containingDocument.getStaticState();
     }
 
     public void markValueChanged(XFormsModel model, NodeInfo nodeInfo) {
@@ -60,7 +62,9 @@ public class UIDependencies {
 
     public void refreshDone() {
 
-        containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "refresh done", "bindings updated", Integer.toString(updateCount));
+        containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "refresh done",
+                "bindings updated", Integer.toString(bindingUpdateCount),
+                "values updated", Integer.toString(valueUpdateCount));
 
         modifiedNodes.clear();
         structuralChanges.clear();
@@ -68,7 +72,8 @@ public class UIDependencies {
         modifiedPathsSet = false;
         modifiedPaths.clear();
 
-        updateCount = 0;
+        bindingUpdateCount = 0;
+        valueUpdateCount = 0;
     }
 
     public Set<String> getModifiedPaths() {
@@ -125,8 +130,37 @@ public class UIDependencies {
         return sb.toString();
     }
 
-    public boolean requireBindingUpdate(XFormsStaticState staticState, Element currentControlElement,
-                                        String controlPrefixedId, boolean contextUpdated) {
+    public boolean requireValueUpdate(String controlPrefixedId) {
+
+        final boolean result;
+        final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
+        if (controlAnalysis.valueAnalysis == null) {
+            // Control does not have an XPath binding
+            result = true;
+        } else if (!controlAnalysis.valueAnalysis.figuredOutDependencies) {
+            // Value dependencies are unknown
+            result = true;
+        } else {
+            // Value dependencies are known
+            if (structuralChanges.isEmpty()) {
+                // No structural change
+                result = controlAnalysis.valueAnalysis.intersectsValue(getModifiedPaths());
+            } else {
+                // Structural change
+                // TODO: do model by model
+                result = true;
+            }
+        }
+        if (result && controlAnalysis.valueAnalysis != null) {
+            containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "value modified", "prefixed id", controlPrefixedId,
+                    "XPath", controlAnalysis.valueAnalysis.xpathString);
+            valueUpdateCount++;
+        }
+
+        return result;
+    }
+
+    public boolean requireBindingUpdate(String controlPrefixedId) {
 
         final boolean result;
         final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
@@ -134,18 +168,13 @@ public class UIDependencies {
             // Control does not have an XPath binding
             result = false;
         } else if (!controlAnalysis.bindingAnalysis.figuredOutDependencies) {
-            // We couldn't figure out the dependencies for this binding
+            // Binding dependencies are unknown
             result = true;
         } else {
-            // Control has an XPath binding
+            // Binding dependencies are known
             if (structuralChanges.isEmpty()) {
                 // No structural change
-                final XPathAnalysis analysis = staticState.getXPathAnalysis(controlPrefixedId);
-                if (analysis != null) {
-                    result = analysis.intersectsValue(getModifiedPaths());
-                } else {
-                    result = true;
-                }
+                result = controlAnalysis.bindingAnalysis.intersectsBinding(getModifiedPaths());
             } else {
                 // Structural change
                 // TODO: do model by model
@@ -155,7 +184,7 @@ public class UIDependencies {
         if (result) {
             containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "binding modified", "prefixed id", controlPrefixedId,
                     "XPath", controlAnalysis.bindingAnalysis.xpathString);
-            updateCount++;
+            bindingUpdateCount++;
         }
 
         return result;

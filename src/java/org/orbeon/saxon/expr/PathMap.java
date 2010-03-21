@@ -149,6 +149,13 @@ public class PathMap implements Cloneable {
             this.arcs.addAll(arcs);
         }
 
+        public void addArcs(PathMapArc[] arcs) {
+            this.arcs.addAll(Arrays.asList(arcs));
+        }
+        public void removeArc(PathMapArc arc) {
+            this.arcs.remove(arc);
+        }
+
         /**
          * Indicate that the node represents a value that is returnable as the result of the
          * supplied expression, rather than merely a node that is visited en route
@@ -883,7 +890,6 @@ public class PathMap implements Cloneable {
         System.err.println("AFTER REDUCTION:");
         initialPath.diagnosticDump(System.err);
     }
-
 }
 
 //

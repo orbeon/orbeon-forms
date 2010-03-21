@@ -886,7 +886,7 @@ public class XFormsContainingDocument extends XBLContainer {
                             // We have a focus change (otherwise, the focus is assumed to remain the same)
 
                             // Dispatch DOMFocusOut
-                            // NOTE: setExternalValue() above may cause e.g. xforms-select / xforms-deselect events to be
+                            // NOTE: storeExternalValue() above may cause e.g. xforms-select / xforms-deselect events to be
                             // dispatched, so we get the control again to have a fresh reference
                             dispatchEventCheckTarget(pipelineContext, new DOMFocusOutEvent(this, eventTarget));
 

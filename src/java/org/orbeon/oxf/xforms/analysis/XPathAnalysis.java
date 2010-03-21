@@ -29,14 +29,13 @@ public class XPathAnalysis {
     public final PathMap pathmap;
 //    public final int dependencies;
 
-    final Set<String> atomizedPaths = new HashSet<String>();
+    final Set<String> dependentPaths = new HashSet<String>();
     final Set<String> returnablePaths = new HashSet<String>();
-    final Set<String> otherPaths = new HashSet<String>();
 
     final boolean figuredOutDependencies;
 
     public XPathAnalysis(XFormsStaticState staticState, Expression expression, String xpathString,
-                         XPathAnalysis parentBindingAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+                         XPathAnalysis baseAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
 
         this.xpathString = xpathString;
 //        this.dependencies = dependencies;
@@ -50,14 +49,14 @@ public class XPathAnalysis {
             }
 
             final PathMap pathmap;
-            if (parentBindingAnalysis == null) {
+            if (baseAnalysis == null) {
                 // We are at the top, start with a new PathMap
                 pathmap = new PathMap(expression, variables);
             } else {
                 if ((expression.getDependencies() & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) != 0) {
                     // Expression depends on the context item
                     // We clone and add to an existing PathMap
-                    pathmap = parentBindingAnalysis.pathmap.clone();
+                    pathmap = baseAnalysis.pathmap.clone();
                     pathmap.setInScopeVariables(variables);
                     pathmap.updateFinalNodes(expression.addToPathMap(pathmap, pathmap.findFinalNodes()));
                 } else {
@@ -66,17 +65,8 @@ public class XPathAnalysis {
                 }
             }
 
-            // TODO: Reduction of ancestor::foobar / ancestor-or-self::foobar / parent::node()
-//            pathmap.simplifyAncestors();
-
-//            final PathMap.PathMapRoot[] oldRoots = pathmap.getPathMapRoots();
-//            final PathMap.PathMapRoot[] newRoots = new PathMap.PathMapRoot[oldRoots.length];
-//            int rootIndex = 0;
-//            for (final PathMap.PathMapRoot root: oldRoots) {
-//                newRoots[rootIndex++] = pathmap.reduceToDownwardsAxes(root);
-//                pathmap.removeRoot(root);
-//            }
-//            pathmap.addRoots(newRoots);
+            // Try to reduce ancestor axis
+            reduceAncestorAxis(pathmap);
 
             this.pathmap = pathmap;
 
@@ -90,12 +80,26 @@ public class XPathAnalysis {
         }
     }
 
+    public boolean intersectsBinding(Set<String> touchedPaths) {
+        // Return true if any path matches
+        // TODO: for now naively just check exact paths
+        for (final String path: dependentPaths) {
+            if (touchedPaths.contains(path))
+                return true;
+        }
+        return false;
+    }
+
     public boolean intersectsValue(Set<String> touchedPaths) {
         // Return true if any path matches
         // TODO: for now naively just check exact paths
-        for (final String path: atomizedPaths) {
+        for (final String path: returnablePaths) {
             if (touchedPaths.contains(path))
-            return true;
+                return true;
+        }
+        for (final String path: dependentPaths) {
+            if (touchedPaths.contains(path))
+                return true;
         }
         return false;
     }
@@ -154,13 +158,11 @@ public class XPathAnalysis {
                 }
             }
             if (success) {
+                final String s = sb.toString();
                 if (node.isReturnable()) {
-                    returnablePaths.add(sb.toString());
-                } else if (node.isAtomized()) {
-                    atomizedPaths.add(sb.toString());
+                    returnablePaths.add(s);
                 } else {
-                    // Not sure if this can happen
-                    otherPaths.add(sb.toString());
+                    dependentPaths.add(s);
                 }
             } else {
                 // We can't deal with this path
@@ -191,7 +193,7 @@ public class XPathAnalysis {
         out.println(pad + "PATHMAP - expression: " + xpathString);
         out.println(pad + "ok: " + figuredOutDependencies);
         out.println(pad + "dependent:");
-        for (final String path: atomizedPaths) {
+        for (final String path: dependentPaths) {
             out.println(pad + "  path: " + path);
         }
 
@@ -199,11 +201,11 @@ public class XPathAnalysis {
         for (final String path: returnablePaths) {
             out.println(pad + "  path: " + path);
         }
-
-        out.println(pad + "other:");
-        for (final String path: otherPaths) {
-            out.println(pad + "  path: " + path);
-        }
+//
+//        out.println(pad + "other:");
+//        for (final String path: otherPaths) {
+//            out.println(pad + "  path: " + path);
+//        }
 
 //        pathmap.diagnosticDump(out);
     }
@@ -225,4 +227,94 @@ public class XPathAnalysis {
 //            out.println("  NON_CREATIVE");
 //        }
 //    }
+
+    private static class NodeArc {
+        public final PathMap.PathMapNode node;
+        public final PathMap.PathMapArc arc;
+
+        private NodeArc(PathMap.PathMapNode node, PathMap.PathMapArc arc) {
+            this.node = node;
+            this.arc = arc;
+        }
+    }
+
+    private boolean reduceAncestorAxis(PathMap pathmap) {
+        final List<NodeArc> stack = new ArrayList<NodeArc>();
+        for (final PathMap.PathMapRoot root: pathmap.getPathMapRoots()) {
+            // Apply as long as we find matches
+            while (reduceAncestorAxis(stack, root)) {
+                stack.clear();
+            }
+            stack.clear();
+        }
+        return true;
+    }
+
+    private boolean reduceAncestorAxis(List<NodeArc> stack, PathMap.PathMapNode node) {
+        // Process children nodes
+        if (node.getArcs().length > 0) {
+            for (final PathMap.PathMapArc arc: node.getArcs()) {
+
+                final AxisExpression e = arc.getStep();
+                if (e.getAxis() == Axis.ANCESTOR && e.getNodeTest().getFingerprint() != -1) {
+                    // Found ancestor::foobar
+
+                    final int nodeName = e.getNodeTest().getFingerprint();
+                    final PathMap.PathMapArc ancestorArc = ancestorWithFingerprint(stack, nodeName);
+                    if (ancestorArc != null) {
+
+                        // Move arcs
+                        ancestorArc.getTarget().addArcs(arc.getTarget().getArcs());
+
+                        // Remove current arc from its node as it's been moved
+                        node.removeArc(arc);
+
+                        // Remove orphan nodes
+                        removeOrphanNodes(stack);
+
+                        return true;
+                    } else {
+                        // Ignore for now
+                    }
+                }
+
+                {
+                    stack.add(new NodeArc(node, arc));
+                    if (reduceAncestorAxis(stack, arc.getTarget())) {
+                        return true;
+                    }
+                    stack.remove(stack.size() - 1);
+                }
+            }
+        }
+
+        // We did not find a match
+        return false;
+    }
+
+    private PathMap.PathMapArc ancestorWithFingerprint(List<NodeArc> stack, int nodeName) {
+        Collections.reverse(stack);
+        for (final NodeArc nodeArc: stack.subList(1, stack.size())) {
+            final AxisExpression e = nodeArc.arc.getStep();
+
+            if (e.getAxis() == Axis.CHILD && e.getNodeTest().getFingerprint() == nodeName) {
+                Collections.reverse(stack);
+                return nodeArc.arc;
+            }
+        }
+        // Not found
+        Collections.reverse(stack);
+        return null;
+    }
+
+    private void removeOrphanNodes(List<NodeArc> stack) {
+        Collections.reverse(stack);
+        for (final NodeArc nodeArc: stack) {
+            if (nodeArc.arc.getTarget().getArcs().length == 0) {
+                nodeArc.node.removeArc(nodeArc.arc);
+            }
+        }
+
+        Collections.reverse(stack);
+    }
 }

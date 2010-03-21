@@ -26,7 +26,6 @@ import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.IdGenerator;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
-import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.*;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandler;
@@ -1672,10 +1671,6 @@ public class XFormsStaticState {
 
     public ControlAnalysis getControlAnalysis(String prefixedId) {
         return controlAnalysisMap.get(prefixedId);
-    }
-
-    public XPathAnalysis getXPathAnalysis(String prefixedId) {
-        return controlAnalysisMap.get(prefixedId).bindingAnalysis;
     }
 
     public void dumpAnalysis() throws Exception {

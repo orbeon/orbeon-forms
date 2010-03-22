@@ -135,8 +135,8 @@ public class UIDependencies {
         final boolean result;
         final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
         if (controlAnalysis.valueAnalysis == null) {
-            // Control does not have an XPath binding
-            result = true;
+            // Control does not have a value
+            result = true;//TODO: should be able to return false here; change once markDirty is handled better
         } else if (!controlAnalysis.valueAnalysis.figuredOutDependencies) {
             // Value dependencies are unknown
             result = true;

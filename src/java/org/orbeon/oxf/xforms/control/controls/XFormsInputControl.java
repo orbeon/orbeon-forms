@@ -71,11 +71,6 @@ public class XFormsInputControl extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
-        super.evaluate(propertyContext, isRefresh);
-    }
-
-    @Override
     protected void evaluateExternalValue(PropertyContext propertyContext) {
 
         final String internalValue = getValue(propertyContext);

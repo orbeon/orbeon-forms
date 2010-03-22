@@ -18,13 +18,16 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.ArrayList;
@@ -42,14 +45,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     private transient String restoredCaseId;    // used by deserializeLocal() and childrenAdded()
 
     public static class XFormsSwitchControlLocal extends XFormsControlLocal {
-        private XFormsCaseControl selectedCaseControl;
-
-        private XFormsSwitchControlLocal() {
-        }
-
-        public XFormsCaseControl getSelectedCaseControl() {
-            return selectedCaseControl;
-        }
+        private String selectedCaseControlId;
     }
 
     public XFormsSwitchControl(XBLContainer container, XFormsControl parent, Element element, String name, String id) {
@@ -60,29 +56,27 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     @Override
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
+        super.setBindingContext(propertyContext, bindingContext, isCreate);
+
+        if (isCreate) {
+            final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
+            if (restoredCaseId != null) {
+                // Selected case id was restored from serialization
+                local.selectedCaseControlId = restoredCaseId;
+                restoredCaseId = null;
+            } else {
+                // Store initial selected case information
+                local.selectedCaseControlId = findDefaultSelectedCaseId();
+            }
+        }
+    }
+
+    @Override
     public void childrenAdded(PropertyContext propertyContext) {
 
         if (getSize() == 0) {
             throw new OXFException("xforms:switch does not contain at least one xforms:case for switch id: " + getEffectiveId());
-        }
-
-        if (restoredCaseId != null) {
-            // Selected case id was restored from serialization
-            // TODO: ideally, selected case id would be made available while sub-tree is created, so that
-            // xxforms:case() function would work for nested bindings
-            final List<XFormsCaseControl> children = getChildrenCases();
-            for (XFormsCaseControl currentCaseControl: children) {
-                if (currentCaseControl.getId().equals(restoredCaseId)) {
-                    // NOTE: Don't use setSelectedCase() as we don't want to cause initialLocal != currentLocal
-                    final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
-                    local.selectedCaseControl = currentCaseControl;
-                    break;
-                }
-            }
-        } else {
-            // Store initial selected case information
-            final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
-            local.selectedCaseControl = findSelectedCase();
         }
     }
 
@@ -115,9 +109,9 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
 
         final XFormsSwitchControlLocal localForUpdate = (XFormsSwitchControlLocal) getLocalForUpdate();
 
-        final XFormsCaseControl previouslySelectedCaseControl = localForUpdate.selectedCaseControl;
-        final boolean isChanging = previouslySelectedCaseControl != caseControlToSelect;
-        localForUpdate.selectedCaseControl = caseControlToSelect;
+        final XFormsCaseControl previouslySelectedCaseControl = getSelectedCase();
+        final boolean isChanging = previouslySelectedCaseControl.getId() != caseControlToSelect.getId();
+        localForUpdate.selectedCaseControlId = caseControlToSelect.getId();
 
         if (isChanging && propertyContext != null) { // Not sure when propertyContext could be null! It shouldn't be!
             // "This action adjusts all selected attributes on the affected cases to reflect the new state, and then
@@ -144,29 +138,33 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     /**
-     * Get the currently selected case.
+     * Get the effective id of the currently selected case.
      *
-     * @return currently selected case
+     * @return effective id
      */
-    public XFormsCaseControl getSelectedCase() {
+    public String getSelectedCaseEffectiveId() {
         final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
-        if (local.selectedCaseControl != null) {
-            return local.selectedCaseControl;
+        if (local.selectedCaseControlId != null) {
+            return XFormsUtils.getRelatedEffectiveId(getEffectiveId(), local.selectedCaseControlId);
         } else {
             throw new OXFException("Selected case was not set for xforms:switch: " + getEffectiveId());
         }
     }
 
-    private XFormsCaseControl findSelectedCase() {
-        final List<XFormsCaseControl> children = getChildrenCases();
-        for (XFormsCaseControl currentCaseControl: children) {
-            if (currentCaseControl.isDefaultSelected()) {
+    public XFormsCaseControl getSelectedCase() {
+        return (XFormsCaseControl) containingDocument.getControls().getObjectByEffectiveId(getSelectedCaseEffectiveId());
+    }
+
+    private String findDefaultSelectedCaseId() {
+        final List<Element> caseElements = Dom4jUtils.elements(getControlElement(), XFormsConstants.CASE_QNAME);
+        for (final Element caseElement: caseElements) {
+            if (XFormsCaseControl.isDefaultSelected(caseElement)) {
                 // Found first case with selected="true"
-                return currentCaseControl;
+                return caseElement.attributeValue("id");
             }
         }
         // Didn't find a case with selected="true" so return first case
-        return (XFormsCaseControl) children.get(0);
+        return caseElements.get(0).attributeValue("id");
     }
 
     @Override
@@ -177,8 +175,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         // We want the new one to point to the children of the cloned nodes, not the children
 
         // Get initial index as we copy "back" to an initial state
-        final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getInitialLocal();
-        final int selectedCaseIndex = getChildren().indexOf(local.selectedCaseControl);
+        final XFormsSwitchControlLocal initialLocal = (XFormsSwitchControlLocal) getInitialLocal();
 
         // Clone this and children
         cloned = (XFormsSwitchControl) super.getBackCopy(propertyContext);
@@ -187,9 +184,9 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         final XFormsSwitchControlLocal clonedLocal = (XFormsSwitchControlLocal) cloned.getInitialLocal();
 
         // NOTE: we don't call getLocalForUpdate() because we know that XFormsSwitchControlLocal is safe to write
-        // to (super.clone() ensures that we have a new copy)
+        // to (super.getBackCopy() ensures that we have a new copy)
 
-        clonedLocal.selectedCaseControl = (XFormsCaseControl) cloned.getChildren().get(selectedCaseIndex);
+        clonedLocal.selectedCaseControlId = initialLocal.selectedCaseControlId;
 
         return cloned;
     }
@@ -197,7 +194,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     @Override
     public Map<String, String> serializeLocal() {
         // Serialize case id
-        return Collections.singletonMap("case-id", getSelectedCase().getId());
+        return Collections.singletonMap("case-id", XFormsUtils.getStaticIdFromId(getSelectedCaseEffectiveId()));
     }
 
     @Override
@@ -229,7 +226,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     private boolean compareSelectedCase(XFormsSwitchControl otherSwitchControl) {
-        return getSelectedCase().getEffectiveId().equals(getOtherSelectedCaseEffectiveId(otherSwitchControl));
+        return getSelectedCaseEffectiveId().equals(getOtherSelectedCaseEffectiveId(otherSwitchControl));
     }
 
     @Override
@@ -243,7 +240,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         if (!compareSelectedCase(switchControl1)) {
 
             // Output selected case id
-            final String selectedCaseEffectiveId = getSelectedCase().getEffectiveId();
+            final String selectedCaseEffectiveId = getSelectedCaseEffectiveId();
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
                     "id", selectedCaseEffectiveId,
                     "visibility", "visible"
@@ -275,7 +272,12 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     private String getOtherSelectedCaseEffectiveId(XFormsSwitchControl switchControl1) {
-        return (switchControl1 != null) ? ((XFormsSwitchControlLocal) switchControl1.getInitialLocal()).getSelectedCaseControl().getEffectiveId() : null;
+        if (switchControl1 != null) {
+            final String selectedCaseId = ((XFormsSwitchControlLocal) switchControl1.getInitialLocal()).selectedCaseControlId;
+            return XFormsUtils.getRelatedEffectiveId(switchControl1.getEffectiveId(), selectedCaseId);
+        } else {
+            return null;
+        }
     }
 
     // NOTE: Duplicated in XXFormsDialogControl

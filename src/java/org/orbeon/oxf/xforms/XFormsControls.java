@@ -240,10 +240,11 @@ public class XFormsControls implements XFormsObjectResolver {
      * @param bindingContext    binding context set to the context of the new iteration
      * @param repeatControl     repeat control
      * @param iterationIndex    new iteration index (1..repeat size + 1)
+     * @param isRefresh         whether this is called during refresh (as opposed to insert/delete handling)
      * @return                  newly created repeat iteration control
      */
     public XFormsRepeatIterationControl createRepeatIterationTree(final PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext,
-                                                                  XFormsRepeatControl repeatControl, int iterationIndex) {
+                                                                  XFormsRepeatControl repeatControl, int iterationIndex, boolean isRefresh) {
 
         if (initialControlTree == currentControlTree && containingDocument.isHandleDifferences())
             throw new OXFException("Cannot call insertRepeatIteration() when initialControlTree == currentControlTree");
@@ -251,7 +252,8 @@ public class XFormsControls implements XFormsObjectResolver {
         final XFormsRepeatIterationControl repeatIterationControl;
         indentedLogger.startHandleOperation("controls", "adding iteration");
         {
-            repeatIterationControl = currentControlTree.createRepeatIterationTree(propertyContext, containingDocument, bindingContext, repeatControl, iterationIndex);
+            repeatIterationControl = currentControlTree.createRepeatIterationTree(propertyContext, containingDocument,
+                    bindingContext, repeatControl, iterationIndex, isRefresh);
         }
         indentedLogger.endHandleOperation();
 

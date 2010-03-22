@@ -79,13 +79,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     protected XFormsContextStack.BindingContext bindingContext;
 
-    private boolean isEvaluated;
-
     // Relevance
     private boolean relevant;
     private boolean wasRelevant;
 
     // Optional extension attributes supported by the control
+    // TODO: must be evaluated lazily
     private Map<QName, String> extensionAttributesValues;
 
     // Label, help, hint and alert (evaluated lazily)
@@ -182,6 +181,20 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     public LocationData getLocationData() {
         return (controlElement != null) ? (LocationData) controlElement.getData() : null;
+    }
+
+    public void saveBinding() {
+        wasRelevant = relevant;
+    }
+
+    /**
+     * Set this control's binding context.
+     */
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
+        this.bindingContext = bindingContext;
+
+        // Relevance is a property of all controls
+        setRelevant(computeRelevant());
     }
 
     public boolean isRelevant() {
@@ -451,13 +464,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     /**
-     * Set this control's binding context.
-     */
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
-        this.bindingContext = bindingContext;
-    }
-
-    /**
      * Return the binding context for this control.
      */
     public XFormsContextStack.BindingContext getBindingContext() {
@@ -469,22 +475,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public final void evaluateIfNeeded(PropertyContext propertyContext, boolean isRefresh) {
-        if (!isEvaluated) {
-            isEvaluated = true;// be careful with this flag, you can get into a recursion if you don't set it before calling evaluate()
-            try {
-                evaluate(propertyContext, isRefresh);
-
-                // Evaluate standard extension attributes
-                evaluateExtensionAttributes(propertyContext, STANDARD_EXTENSION_ATTRIBUTES);
-                // Evaluate custom extension attributes
-                final QName[] extensionAttributes = getExtensionAttributes();
-                if (extensionAttributes != null) {
-                    evaluateExtensionAttributes(propertyContext, extensionAttributes);
-                }
-            } catch (ValidationException e) {
-                    throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating control",
-                        getControlElement(), "element", Dom4jUtils.elementToDebugString(getControlElement())));
-            }
+        try {
+            evaluate(propertyContext, isRefresh);
+        } catch (ValidationException e) {
+                throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating control",
+                    getControlElement(), "element", Dom4jUtils.elementToDebugString(getControlElement())));
         }
     }
 
@@ -506,11 +501,17 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     /**
-     * Mark a control as "dirty" to mean that the control:
-     *
-     * o needs to be re-evaluated
-     * o must save its current state for purposes of refresh events dispatch
-     *
+     * Tell the control to save its current value for purposes of refresh events dispatch.
+     */
+    public void saveValue() {
+        // Keep previous values for refresh updates
+        // NOTE: effectiveId might have changed already upon updateEffectiveId(); in which case, use tempEffectiveId
+        previousEffectiveId = (tempEffectiveId != null) ? tempEffectiveId : effectiveId;
+        tempEffectiveId = null;
+    }
+
+    /**
+     * Mark a control as "dirty" to mean that the control needs to be re-evaluated.
      * As of 2010-02 this is called:
      *
      * o by UpdateBindingsListener during a refresh, just before evaluation
@@ -518,14 +519,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      */
     public void markDirty() {
 
-        // Keep previous values for refresh updates
-        // NOTE: effectiveId might have changed already upon updateEffectiveId(); in which case, use tempEffectiveId
-        previousEffectiveId = (tempEffectiveId != null) ? tempEffectiveId : effectiveId;
-        tempEffectiveId = null;
-        wasRelevant = relevant;
-
         // Clear everything
-        isEvaluated = false;
         if (label != null)
             label.markDirty();
         if (hint != null)
@@ -546,8 +540,14 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      */
     protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
 
-        // Relevance is a property of all controls
-        setRelevant(computeRelevant());
+        // TODO: these should be evaluated lazily
+        // Evaluate standard extension attributes
+        evaluateExtensionAttributes(propertyContext, STANDARD_EXTENSION_ATTRIBUTES);
+        // Evaluate custom extension attributes
+        final QName[] extensionAttributes = getExtensionAttributes();
+        if (extensionAttributes != null) {
+            evaluateExtensionAttributes(propertyContext, extensionAttributes);
+        }
 
         // NOTE: We no longer evaluate LHHA here, instead we do lazy evaluation. This is good in particular when there
         // are multiple refreshes during an Ajax request, and LHHA values are only needed in the end.
@@ -555,7 +555,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         if (!isRefresh) {
             // Sync values
             previousEffectiveId = effectiveId;
-            wasRelevant = relevant;
         }
     }
 
@@ -1204,9 +1203,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         @Override
         public String getValue(PropertyContext propertyContext) {
-
-            assert control.isEvaluated : "control must be evaluated before LHHA value is evaluated";
-
             if (!isEvaluated) {
                 if (control.isRelevant()) {
                     value = getLabelHelpHintAlertValue(propertyContext);

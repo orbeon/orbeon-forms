@@ -17,7 +17,6 @@ import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
@@ -37,8 +36,6 @@ import java.util.Set;
  * Represents an extension xxforms:dialog control.
  */
 public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
-
-//    private static final boolean TESTING_DIALOG_OPTIMIZATION = false;
 
     private String level;
     private boolean close;
@@ -69,7 +66,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     public XXFormsDialogControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
 
-        // NOTE: attribues logic duplicated in XXFormsDialogHandler
+        // NOTE: attributes logic duplicated in XXFormsDialogHandler
         this.level = element.attributeValue("level");
         if (this.level == null) {
             // Default is "modeless" for "minimal" appearance, "modal" otherwise
@@ -93,15 +90,6 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
             // Otherwise we are relevant only if we are selected
             return !isXForms11Switch() || isVisible();
         }
-    }
-
-    @Override
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
-        super.setBindingContext(propertyContext, bindingContext, isCreate);
-
-        // TODO
-//        if (TESTING_DIALOG_OPTIMIZATION)
-//            updateContent(propertyContext, isVisible());
     }
 
     @Override

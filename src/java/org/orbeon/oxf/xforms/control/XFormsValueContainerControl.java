@@ -15,8 +15,11 @@ package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 
 /**
  * A container control which supports value change events. Currently:
@@ -26,6 +29,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
  */
 public abstract class XFormsValueContainerControl extends XFormsSingleNodeContainerControl {
 
+    private boolean hasValue;
     private String value;
     private String previousValue;
 
@@ -34,15 +38,27 @@ public abstract class XFormsValueContainerControl extends XFormsSingleNodeContai
     }
 
     @Override
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
+        super.setBindingContext(propertyContext, bindingContext, isCreate);
+
+        final Item boundItem = getBoundItem();
+        if (boundItem instanceof NodeInfo && !XFormsUtils.hasChildrenElements((NodeInfo) boundItem)) {
+            hasValue = true;
+        } else {
+            hasValue = false;
+        }
+    }
+
+    @Override
     protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
         super.evaluate(propertyContext, isRefresh);
 
         // Evaluate control values
-        if (isRelevant()) {
-            // Control is relevant
+        if (hasValue && isRelevant()) {
+            // Control has value and is relevant
             value = XFormsUtils.getBoundItemValue(getBoundItem());
         } else {
-            // Control is not relevant
+            // Control doesn't have value or is not relevant
             value = null;
         }
 
@@ -53,8 +69,8 @@ public abstract class XFormsValueContainerControl extends XFormsSingleNodeContai
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
+    public void saveValue() {
+        super.saveValue();
 
         // Keep previous value
         previousValue = value;

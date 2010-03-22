@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
@@ -36,7 +37,6 @@ import java.util.Set;
  */
 public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
-    private boolean isValueEvaluated;
     private String value;
 
     // External value (evaluated lazily)
@@ -51,6 +51,11 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     @Override
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
+        super.setBindingContext(propertyContext, bindingContext, isCreate);
+    }
+
+    @Override
     protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
 
         // Evaluate other aspects of the control if necessary
@@ -59,10 +64,9 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         // Evaluate control values
         if (isRelevant()) {
             // Control is relevant
-            getValue(propertyContext);
+            evaluateValue(propertyContext);
         } else {
             // Control is not relevant
-            isValueEvaluated = true;
             isExternalValueEvaluated = true;
             value = null;
         }
@@ -78,14 +82,18 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
+    public void saveValue() {
+        super.saveValue();
 
         // Keep previous values
         previousValue = value;
-        // Don't need to set external value because not used in isValueChanged()
+        // Don't need to save external value because not used in isValueChanged()
+    }
 
-        isValueEvaluated = false;
+    @Override
+    public void markDirty() {
+        super.markDirty();
+
         isExternalValueEvaluated = false;
         value = null;
         externalValue = null;
@@ -164,10 +172,6 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
      * @param propertyContext   current context
      */
     public final String getValue(PropertyContext propertyContext) {
-        if (!isValueEvaluated) {
-            evaluateValue(propertyContext);
-            isValueEvaluated = true;
-        }
         return value;
     }
 
@@ -177,9 +181,6 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
      * @param propertyContext   current context
      */
     public final String getExternalValue(PropertyContext propertyContext) {
-
-        assert isValueEvaluated : "control value must be evaluated before external value is evaluated";
-
         if (!isExternalValueEvaluated) {
             if (isRelevant()) {
                 evaluateExternalValue(propertyContext);

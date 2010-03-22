@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.value.AtomicValue;
@@ -40,9 +39,6 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
 
     // Bound item
     private Item boundItem;
-
-    // Whether MIPs have been read from the node
-    private boolean mipsRead;
 
     // Standard MIPs
     private boolean readonly;
@@ -66,19 +62,12 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
+    public void saveBinding() {
+        super.saveBinding();
 
-        // Keep previous values
         wasReadonly = readonly;
         wasRequired = required;
         wasValid = valid;
-
-        // Clear everything
-        mipsRead = false;
-        type = null;
-        customMIPs = null;
-        customMIPsAsString = null;
     }
 
     @Override
@@ -87,9 +76,46 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         // Keep binding context
         super.setBindingContext(propertyContext, bindingContext, isCreate);
 
-        // Set bound item, only considering actual bindings with @bind, @ref or @nodeset
+        // Set bound item, only considering actual bindings (with @bind, @ref or @nodeset)
         if (bindingContext.isNewBind())
             this.boundItem = bindingContext.getSingleItem();
+
+        // Get MIPs
+        final Item currentItem = getBoundItem();
+        if (currentItem != null) {
+            if (currentItem instanceof NodeInfo) {
+                // Control is bound to a node - get model item properties
+                final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
+                this.readonly = InstanceData.getInheritedReadonly(currentNodeInfo);
+                this.required = InstanceData.getRequired(currentNodeInfo);
+                this.valid = InstanceData.getValid(currentNodeInfo);
+                this.type = InstanceData.getType(currentNodeInfo);
+
+                // Custom MIPs
+                final Map<String, String> tempCustomMIPs = InstanceData.getAllCustom(currentNodeInfo);
+                if (tempCustomMIPs != null)
+                    this.customMIPs = new HashMap<String, String>(tempCustomMIPs);
+
+                // Handle global read-only setting
+                if (XFormsProperties.isReadonly(containingDocument))
+                    this.readonly = true;
+            } else {
+                // Control is not bound to a node, MIPs get default values
+                setDefaultMIPs();
+            }
+        } else {
+            // Control is not bound to a node because it doesn't have a binding (group, trigger, dialog, etc. without @ref)
+            setDefaultMIPs();
+        }
+    }
+
+    private void setDefaultMIPs() {
+        this.readonly = false;
+        this.required = false;
+        this.valid = true;// by default, a control is not invalid
+        this.type = null;
+        this.customMIPs = null;
+        this.customMIPsAsString = null;
     }
 
     /**
@@ -103,7 +129,6 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     public boolean isReadonly() {
-        getMIPsIfNeeded();
         return readonly;
     }
 
@@ -124,7 +149,6 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     public boolean isRequired() {
-        getMIPsIfNeeded();
         return required;
     }
 
@@ -145,12 +169,10 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     public String getType() {
-        getMIPsIfNeeded();
         return type;
     }
 
     public Map<String, String> getCustomMIPs() {
-        getMIPsIfNeeded();
         return customMIPs;
     }
 
@@ -160,18 +182,17 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
      * @return  classes, or null if no custom MIPs
      */
     public String getCustomMIPsClasses() {
-        final Map customMIPs = getCustomMIPs();
+        final Map<String, String> customMIPs = getCustomMIPs();
         if (customMIPs != null) {
             // There are custom MIPs
             if (customMIPsAsString == null) {
                 // Must compute now
 
-                final FastStringBuffer sb = new FastStringBuffer(20);
+                final StringBuilder sb = new StringBuilder(20);
 
-                for (Object o: customMIPs.entrySet()) {
-                    final Map.Entry entry = (Map.Entry) o;
-                    final String name = (String) entry.getKey();
-                    final String value = (String) entry.getValue();
+                for (final Map.Entry<String, String> entry: customMIPs.entrySet()) {
+                    final String name = entry.getKey();
+                    final String value = entry.getValue();
 
                     if (sb.length() > 0)
                         sb.append(' ');
@@ -213,62 +234,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     public boolean isValid() {
-        getMIPsIfNeeded();
         return valid;
-    }
-
-    @Override
-    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
-        super.evaluate(propertyContext, isRefresh);
-
-        getMIPsIfNeeded();
-
-        if (!isRefresh) {
-            // Sync values
-            wasReadonly = readonly;
-            wasRequired = required;
-            wasValid = valid;
-        }
-    }
-
-    protected void getMIPsIfNeeded() {
-        if (!mipsRead) {
-            final Item currentItem = bindingContext.getSingleItem();
-            if (bindingContext.isNewBind()) {
-                if (currentItem instanceof NodeInfo) {
-                    // Control is bound to a node - get model item properties
-                    final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
-                    this.readonly = InstanceData.getInheritedReadonly(currentNodeInfo);
-                    this.required = InstanceData.getRequired(currentNodeInfo);
-                    this.valid = InstanceData.getValid(currentNodeInfo);
-                    this.type = InstanceData.getType(currentNodeInfo);
-
-                    // Custom MIPs
-                    this.customMIPs = InstanceData.getAllCustom(currentNodeInfo);
-                    if (this.customMIPs != null)
-                        this.customMIPs = new HashMap<String, String>(this.customMIPs);
-
-                    // Handle global read-only setting
-                    if (XFormsProperties.isReadonly(containingDocument))
-                        this.readonly = true;
-                } else {
-                    // Control is not bound to a node, MIPs get default values
-                    this.readonly = false;
-                    this.required = false;
-                    this.valid = true;// by default, a control is not invalid
-                    this.type = null;
-                    this.customMIPs = null;
-                }
-            } else {
-                // Control is not bound to a node because it doesn't have a binding (group, trigger, dialog, etc. without @ref)
-                this.readonly = false;
-                this.required = false;
-                this.valid = true;// by default, a control is not invalid
-                this.type = null;
-                this.customMIPs = null;
-            }
-            mipsRead = true;
-        }
     }
 
     @Override
@@ -308,10 +274,6 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
             return true;
 
         final XFormsSingleNodeControl otherSingleNodeControl = (XFormsSingleNodeControl) other;
-
-        // Make sure the MIPs are up to date before comparing them
-        getMIPsIfNeeded();
-        otherSingleNodeControl.getMIPsIfNeeded();
 
         // Standard MIPs
         if (readonly != otherSingleNodeControl.readonly)

@@ -84,12 +84,13 @@ public class ControlAnalysis {
                 }
 
                 if ((bindingExpression != null)) {
-                    this.bindingAnalysis = analyzeXPath(staticState, getAncestorOrSelfXPathAnalysis(), prefixedId, bindingExpression);
+                    this.bindingAnalysis = analyzeXPath(staticState, getAncestorOrSelfBindingAnalysis(), prefixedId, bindingExpression);
                 } else {
-                    this.bindingAnalysis = null;
+                    // TODO: TEMP: just do this for now so that controls w/o their own binding also get binding updated
+                    this.bindingAnalysis = getAncestorOrSelfBindingAnalysis();
                 }
 
-                final XPathAnalysis baseAnalysis = getAncestorOrSelfXPathAnalysis();
+                final XPathAnalysis baseAnalysis = getAncestorOrSelfBindingAnalysis();
                 if (this instanceof VariableAnalysis) {
                     // TODO: handle xxf:sequence
                     this.valueAnalysis = analyzeXPath(staticState, baseAnalysis, prefixedId, element.attributeValue("select"));
@@ -122,7 +123,7 @@ public class ControlAnalysis {
         }
     }
 
-    private XPathAnalysis getAncestorOrSelfXPathAnalysis() {
+    private XPathAnalysis getAncestorOrSelfBindingAnalysis() {
         ControlAnalysis currentControlAnalysis = this;
         while (currentControlAnalysis != null) {
 

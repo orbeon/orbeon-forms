@@ -798,9 +798,11 @@ public class XFormsContainingDocument extends XBLContainer {
                 // When going online, ensure rebuild/revalidate before each event
                 rebuildRecalculateIfNeeded(pipelineContext);
 
+                getControls().cloneInitialStateIfNeeded(pipelineContext);
+                // Save control value for refresh events
+                xformsControl.saveValue();
                 // Mark the control as dirty, because we may have done a rebuild/recalculate earlier, and this means
                 // the MIPs need to be re-evaluated before being checked below
-                getControls().cloneInitialStateIfNeeded(pipelineContext);
                 xformsControl.markDirty();
             }
 

@@ -37,7 +37,6 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
     // Actual variable name/value representation
     private Variable variable;
 
-    private boolean isValueEvaluated;
     private ValueRepresentation value;
     // Previous value for refresh
     private ValueRepresentation previousValue;
@@ -54,22 +53,28 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
         super.evaluate(propertyContext, isRefresh);
 
         // Evaluate control values
-        // TODO: for now evaluate anyway because during bindings update, we don't have proper relevance computed yet
-//        if (isRelevant()) {
+        if (isRelevant()) {
             // Control is relevant
             getContextStack().setBinding(this);
             value = variable.getVariableValue(propertyContext, getEffectiveId(), false, true);
-//        } else {
-//            // Control is not relevant
-//            value = null;
-//        }
-
-        isValueEvaluated = true;
+        } else {
+            // Control is not relevant
+            value = null;
+        }
 
         if (!isRefresh) {
             // Sync values
+            // TODO: shouldn't be here
             previousValue = value;
         }
+    }
+
+    @Override
+    public void saveValue() {
+        super.saveValue();
+
+        // Keep previous values
+        previousValue = value;
     }
 
     @Override
@@ -79,10 +84,6 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
         // Mark variable value as dirty
         variable.markDirty();
 
-        // Keep previous values
-        previousValue = value;
-
-        isValueEvaluated = false;
         value = null;
     }
 
@@ -125,7 +126,6 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
      * @param propertyContext   current context
      */
     public final ValueRepresentation getValue(PropertyContext propertyContext) {
-        assert isValueEvaluated;
         return value;
     }
 

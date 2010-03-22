@@ -309,12 +309,12 @@
                                 <events>
                                     <event type="xforms-enabled" target="xf-25" indexes="2"/>
                                     <event type="xforms-enabled" target="component-inner-group" indexes="2"/>
+                                    <event type="xforms-enabled" target="result-variable" indexes="2"/>
                                     <event type="xforms-enabled" target="component-result-group" indexes="2"/>
                                     <event type="xforms-enabled" target="component-controls-group" indexes="2"/>
                                     <event type="xforms-enabled" target="year-select" indexes="2"/>
                                     <event type="xforms-enabled" target="month-select" indexes="2"/>
                                     <event type="xforms-enabled" target="day-select" indexes="2"/>
-                                    <event type="xforms-enabled" target="result-variable" indexes="2"/>
                                     <event type="xforms-value-changed" target="year-select" indexes="2"/>
                                     <event type="xforms-value-changed" target="month-select" indexes="2"/>
                                     <event type="xforms-value-changed" target="day-select" indexes="2"/>

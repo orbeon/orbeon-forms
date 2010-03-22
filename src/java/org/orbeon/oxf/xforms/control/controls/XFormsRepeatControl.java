@@ -64,7 +64,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         final String startIndexString = element.attributeValue("startindex");
         this.startIndex = (startIndexString != null) ? Integer.parseInt(startIndexString) : 1;
     }
-
+    
     @Override
     public boolean hasJavaScriptInitialization() {
         // If there is DnD, must tell the client to perform initialization
@@ -85,7 +85,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         super.setBindingContext(propertyContext, bindingContext, isCreate);
 
         // Ensure that the initial index is set, unless the state was already restored. In that case, the index was
-        // reset from serialized data and the initial index must not be used.
+        // reset from serialized data and the start index must not be used.
         if (isCreate && !restoredState) {
             final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
             local.index = ensureIndexBounds(getStartIndex());
@@ -159,8 +159,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
     @Override
     protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
-        
-        // This will evaluate relevance
+
         super.evaluate(propertyContext, isRefresh);
 
         // Evaluate iterations
@@ -308,7 +307,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         final List<Item> oldRepeatNodeset = getBindingContext().getNodeset();
 
         // Set binding context and get new nodeset
-        final List<Item> newRepeatNodeset;
+        final XFormsContextStack.BindingContext newBindingContext;
         {
             // Set new binding context on the repeat control
             // NOTE: here we just reevaluate against the parent; maybe we should reevaluate all the way down
@@ -323,16 +322,18 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 contextStack.popBinding();
             }
             contextStack.pushBinding(propertyContext, getControlElement(), getEffectiveId(), getResolutionScope());
-            setBindingContext(propertyContext, contextStack.getCurrentBindingContext(), false);
-
-            newRepeatNodeset = getBindingContext().getNodeset();
+            newBindingContext = contextStack.getCurrentBindingContext();
         }
 
         // Move things around and create new iterations if needed
-        if (!compareNodesets(oldRepeatNodeset, newRepeatNodeset)) {
+        if (!compareNodesets(oldRepeatNodeset, newBindingContext.getNodeset())) {
+
+            saveBinding();
+            setBindingContext(propertyContext, newBindingContext, false);
+
             // Update iterations
             final List<XFormsRepeatIterationControl> newIterations
-                    = updateIterations(propertyContext, oldRepeatNodeset, insertedNodeInfos);
+                    = updateIterations(propertyContext, oldRepeatNodeset, insertedNodeInfos, false);
             // Initialize all new iterations
             final ControlTree currentControlTree = containingDocument.getControls().getCurrentControlTree();
             for (final XFormsRepeatIterationControl newIteration: newIterations) {
@@ -341,6 +342,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             }
             // Perform a very local refresh on the control
             // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events if needed
+            saveValue();
             markDirty();
             evaluate(propertyContext, true);
             containingDocument.getControls().dispatchRefreshEvents(propertyContext, Collections.singletonList(getEffectiveId()));
@@ -357,10 +359,11 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
      * @param propertyContext       current context
      * @param oldRepeatNodeset      old node-set
      * @param insertedNodeInfos     nodes just inserted by xforms:insert if any, or null
+     * @param isRefresh             whether this is called during refresh (as opposed to insert/delete handling)
      * @return                      new iterations if any, or an empty list
      */
     public List<XFormsRepeatIterationControl> updateIterations(PropertyContext propertyContext, List<Item> oldRepeatNodeset,
-                                                               List<Item> insertedNodeInfos) {
+                                                               List<Item> insertedNodeInfos, boolean isRefresh) {
 
         // NOTE: The following assumes the nodesets have changed
 
@@ -521,7 +524,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     // Create repeat iteration with proper binding context
                     contextStack.pushIteration(repeatIndex);
                     final XFormsRepeatIterationControl newIteration
-                            = controls.createRepeatIterationTree(propertyContext, contextStack.getCurrentBindingContext(), this, repeatIndex);
+                            = controls.createRepeatIterationTree(propertyContext, contextStack.getCurrentBindingContext(), this, repeatIndex, isRefresh);
                     contextStack.popBinding();
 
                     updated = true;
@@ -562,10 +565,16 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                         currentControlTree.indexSubtree(existingIteration, true);
                         updated = true;
 
-
                         // Add information for moved iterations
                         movedIterationsOldPositions.add(newIterationOldIndex);
                         movedIterationsNewPositions.add(repeatIndex);
+                    } else {
+                        // Iteration index stayed the same
+
+                        // Set binding context so as to evaluate relevance
+                        contextStack.pushIteration(repeatIndex);
+                        existingIteration.setBindingContext(propertyContext, contextStack.getCurrentBindingContext(), false);
+                        contextStack.popBinding();
                     }
 
                     // Add existing iteration

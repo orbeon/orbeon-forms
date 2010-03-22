@@ -367,8 +367,6 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
     margin-left: 2em;
 }
 
-#xforms-message-dialog .bd { padding: 10px 2.8em 10px 10px }
-
 #wait .bd { background-color: white }
 
 /* ***** Tree ******************************************************************************************************* */

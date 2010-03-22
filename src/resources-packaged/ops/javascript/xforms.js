@@ -2809,6 +2809,29 @@ ORBEON.xforms.Controls = {
         ORBEON.xforms.Globals.helpTooltipForControl[control.id] = null;
         ORBEON.xforms.Globals.dialogs[control.id] = null;
         ORBEON.xforms.Globals.dialogMinimalLastMouseOut[control.id] = null;
+    },
+
+    showMessage: function(messageQueue) {
+        // Prevent SimpleDialog from registering itself on the form
+        YAHOO.widget.SimpleDialog.prototype.registerForm = function() {};
+        // Instantiate the Dialog
+        var mySimpleDialog = new YAHOO.widget.SimpleDialog("xforms-message-dialog", {
+            width: "30em",
+            fixedcenter: true,
+            modal: true,
+            close: false,
+            visible: false,
+            draggable: false,
+            buttons: [ { text: "Close", handler: function() {
+                this.hide();
+                messageQueue.shift();
+                if (messageQueue.length > 0) ORBEON.xforms.Controls.showMessage(messageQueue);
+            }, idDefault: true }]
+        });
+        mySimpleDialog.setHeader("Message");
+        mySimpleDialog.setBody(messageQueue[0]);
+        mySimpleDialog.render(document.body);
+        mySimpleDialog.show(messageQueue);
     }
 };
 
@@ -7133,31 +7156,9 @@ ORBEON.xforms.Server = {
                                     var messageElement = actionElement.childNodes[actionIndex];
                                     var message = ORBEON.util.Dom.getStringValue(messageElement);
                                     if (ORBEON.util.Dom.getAttribute(messageElement, "level") == "modal") {
-                                        // Prevent SimpleDialog from registering itself on the form
-                                        YAHOO.widget.SimpleDialog.prototype.registerForm = function() {};
                                         var messageQueue = messageQueue || [];
                                         messageQueue.push(message);
-                                        function showMessage() {
-                                            // Instantiate the Dialog
-                                            var mySimpleDialog = new YAHOO.widget.SimpleDialog("xforms-message-dialog", {
-                                                width: "30em",
-                                                fixedcenter: true,
-                                                modal: true,
-                                                close: false,
-                                                visible: false,
-                                                draggable: false,
-                                                buttons: [ { text: "Close", handler: function() {
-                                                    this.hide();
-                                                    messageQueue.shift();
-                                                    if (messageQueue.length > 0) showMessage();
-                                                }, idDefault: true }]
-                                            });
-                                            mySimpleDialog.setHeader("Message");
-                                            mySimpleDialog.setBody(messageQueue[0]);
-                                            mySimpleDialog.render(document.body);
-                                            mySimpleDialog.show();
-                                        }
-                                        if (messageQueue.length == 1) showMessage();
+                                        if (messageQueue.length == 1) ORBEON.xforms.Controls.showMessage(messageQueue);
                                     }
                                     break;
                                 }

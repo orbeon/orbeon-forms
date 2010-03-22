@@ -416,13 +416,22 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
                 // Initial xforms:message to run if present
                 if (messagesToRun != null) {
+                    boolean foundModalMessage = false;
                     for (final XFormsContainingDocument.Message message: messagesToRun) {
                         if ("modal".equals(message.getLevel())) {
-                            // TODO: should not call directly alert() but a client-side method
-                            sb.append("alert(\"");
+                            if (foundModalMessage) {
+                                sb.append(", ");
+                            } else {
+                                foundModalMessage = true;
+                                sb.append("ORBEON.xforms.Controls.showMessage([");
+                            }
+                            sb.append("\"");
                             sb.append(XFormsUtils.escapeJavaScript(message.getMessage()));
-                            sb.append("\");");
+                            sb.append("\"");
                         }
+                    }
+                    if (foundModalMessage) {
+                        sb.append("]);");
                     }
                 }
 

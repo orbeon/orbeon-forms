@@ -1,20 +1,21 @@
 /**
- *  Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.PathMap;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.sort.SortExpression;
@@ -26,6 +27,7 @@ import org.orbeon.saxon.trans.XPathException;
  */
 public class XXFormsSort extends XFormsFunction {
 
+    @Override
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
         final Expression sequenceToSortExpression = argument[0];
@@ -35,6 +37,15 @@ public class XXFormsSort extends XFormsFunction {
     }
 
     protected SequenceIterator sort(XPathContext xpathContext, Expression sequenceToSortExpression, Expression sortKeyExpression) throws XPathException {
+
+        // For now only a single sort key is supported
+        final SortKeyDefinition sortKey = getSortKeyDefinition(sortKeyExpression);
+        final SortKeyDefinition[] sortKeys = { sortKey };
+
+        return new SortExpression(sequenceToSortExpression, sortKeys).iterate(xpathContext);
+    }
+
+    private SortKeyDefinition getSortKeyDefinition(Expression sortKeyExpression) {
         final Expression datatypeExpression = (argument.length > 2) ? argument[2] : null;
         final Expression orderExpression = (argument.length > 3) ? argument[3] : null;
         final Expression caseOrderExpression = (argument.length > 4) ? argument[4] : null;
@@ -43,22 +54,54 @@ public class XXFormsSort extends XFormsFunction {
 //        Expression collationExpression = argument[6];// new in XSLT 2.0
 //        Expression stableExpression = argument[7];// new in XSLT 2.0
 
-        final SortKeyDefinition sortKey = new SortKeyDefinition();
-        sortKey.setSortKey(sortKeyExpression);
+        final SortKeyDefinition sortKeyDefinition = new SortKeyDefinition();
+        sortKeyDefinition.setSortKey(sortKeyExpression);
 
         if (datatypeExpression != null)
-            sortKey.setDataTypeExpression(datatypeExpression);
+            sortKeyDefinition.setDataTypeExpression(datatypeExpression);
         if (orderExpression != null)
-            sortKey.setOrder(orderExpression);
+            sortKeyDefinition.setOrder(orderExpression);
         if (caseOrderExpression != null)
-            sortKey.setCaseOrder(caseOrderExpression);
+            sortKeyDefinition.setCaseOrder(caseOrderExpression);
 
 //        sortKey.setLanguage(langExpression);
 //        sortKey.setCollationName(collationExpression);
 //        sortKey.setStable(stableExpression);
 
-        final SortKeyDefinition[] sortKeys = { sortKey };
+        return sortKeyDefinition;
+    }
 
-        return new SortExpression(sequenceToSortExpression, sortKeys).iterate(xpathContext);
+    @Override
+    public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
+        final PathMap.PathMapNodeSet target = argument[0].addToPathMap(pathMap, pathMapNodeSet);
+
+        final SortKeyDefinition sortKeyDefinition = getSortKeyDefinition(argument[1]);
+
+        // Sort key
+        sortKeyDefinition.getSortKey().addToPathMap(pathMap, target);
+
+        // Sort key parameters
+        Expression e = sortKeyDefinition.getOrder();
+        if (e != null) {
+            e.addToPathMap(pathMap, pathMapNodeSet);
+        }
+        e = sortKeyDefinition.getCaseOrder();
+        if (e != null) {
+            e.addToPathMap(pathMap, pathMapNodeSet);
+        }
+        e = sortKeyDefinition.getDataTypeExpression();
+        if (e != null) {
+            e.addToPathMap(pathMap, pathMapNodeSet);
+        }
+        e = sortKeyDefinition.getLanguage();
+        if (e != null) {
+            e.addToPathMap(pathMap, pathMapNodeSet);
+        }
+        e = sortKeyDefinition.getCollationNameExpression();
+        if (e != null) {
+            e.addToPathMap(pathMap, pathMapNodeSet);
+        }
+
+        return target;
     }
 }

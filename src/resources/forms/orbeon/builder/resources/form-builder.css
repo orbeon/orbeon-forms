@@ -342,9 +342,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
 /* Selected cell */
 .xforms-repeat-selected-item-4 {
-    background-color: #F8F8F8;
-    background-image: url( ../../../../apps/fr/style/logo-bg.gif );
-    background-repeat: repeat-x;
+    background: url("../images/light-blue-gradient.png") repeat-x  #E8F2FF;
 }
 
 /* Grid content */

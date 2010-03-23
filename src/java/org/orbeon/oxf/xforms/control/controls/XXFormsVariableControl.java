@@ -25,6 +25,7 @@ import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.ValueRepresentation;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.EmptySequence;
 import org.orbeon.saxon.value.Value;
 
 /**
@@ -59,7 +60,9 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
             value = variable.getVariableValue(propertyContext, getEffectiveId(), false, true);
         } else {
             // Control is not relevant
-            value = null;
+            // NOTE: Nobody should use this variable if it's non-relevant, but right now we still have possible uses
+            // of non-relevant variables.
+            value = EmptySequence.getInstance();
         }
 
         if (!isRefresh) {

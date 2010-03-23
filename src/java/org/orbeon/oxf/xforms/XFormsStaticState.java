@@ -863,11 +863,10 @@ public class XFormsStaticState {
 
             // Iterate over main static controls tree
             final StringBuilder repeatHierarchyStringBuffer = new StringBuilder(1024);
-            final Stack<String> repeatAncestorsStack = new Stack<String>();
-            final ControlAnalysis rootControlAnalysis = new RootAnalysis(propertyContext, this);
+            final ContainerAnalysis rootControlAnalysis = new RootAnalysis(propertyContext, this);
 
             analyzeComponentTree(propertyContext, xpathConfiguration, "", controlsDocument.getRootElement(), rootControlAnalysis,
-                    repeatHierarchyStringBuffer, repeatAncestorsStack);
+                    repeatHierarchyStringBuffer);
 
             if (xxformsScripts != null && xxformsScripts.size() > 0)
                 indentedLogger.logDebug("", "extracted script elements", "count", Integer.toString(xxformsScripts.size()));
@@ -1094,8 +1093,8 @@ public class XFormsStaticState {
     }
 
     public void analyzeComponentTree(final PropertyContext propertyContext, final Configuration xpathConfiguration,
-                                     final String prefix, Element startElement, final ControlAnalysis startControlAnalysis,
-                                     final StringBuilder repeatHierarchyStringBuffer, final Stack<String> repeatAncestorsStack) {
+                                     final String prefix, Element startElement, final ContainerAnalysis startControlAnalysis,
+                                     final StringBuilder repeatHierarchyStringBuffer) {
 
         final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(startElement.getDocument(), null, xpathConfiguration);
 
@@ -1105,7 +1104,7 @@ public class XFormsStaticState {
         // Visit tree
         visitAllControlStatic(startElement, startControlAnalysis, new XFormsStaticState.ControlElementVisitorListener() {
 
-            public ControlAnalysis startVisitControl(Element controlElement, ControlAnalysis parentControlAnalysis, String controlStaticId) {
+            public ControlAnalysis startVisitControl(Element controlElement, ContainerAnalysis parentControlAnalysis, String controlStaticId, boolean isContainer) {
 
                 // Check for mandatory id
                 if (controlStaticId == null)
@@ -1122,7 +1121,7 @@ public class XFormsStaticState {
 
                 // If element is not built-in, check XBL and generate shadow content if needed
                 xblBindings.processElementIfNeeded(propertyContext, indentedLogger, controlElement, controlPrefixedId, locationData,
-                        controlsDocumentInfo, xpathConfiguration, prefix, parentControlAnalysis, repeatHierarchyStringBuffer, repeatAncestorsStack);
+                        controlsDocumentInfo, xpathConfiguration, prefix, parentControlAnalysis, repeatHierarchyStringBuffer);
 
                 // Check for mandatory and optional bindings
                 final boolean hasNodeBinding;
@@ -1154,40 +1153,38 @@ public class XFormsStaticState {
 
                 // Create and index static control information
 
-                final ControlAnalysis parentRepeatControlAnalysis;
-                if (repeatAncestorsStack.size() > 0) {
-                    parentRepeatControlAnalysis = controlAnalysisMap.get(repeatAncestorsStack.peek());
-                } else {
-                    parentRepeatControlAnalysis = null;
-                }
-
                 final ControlAnalysis controlAnalysis;
                 if (controlName.equals("repeat")) {
                     controlAnalysis = new RepeatAnalysis(propertyContext, XFormsStaticState.this,
                         controlsDocumentInfo, controlPrefixedId, controlElement, locationData, controlAnalysisMap.size() + 1, hasNodeBinding,
-                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, parentRepeatControlAnalysis,
+                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis,
+                        parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap));
+                } else if (isContainer) {
+                    controlAnalysis = new ContainerAnalysis(propertyContext, XFormsStaticState.this,
+                        controlsDocumentInfo, controlPrefixedId, controlElement, locationData, controlAnalysisMap.size() + 1, hasNodeBinding,
+                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis,
                         parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap));
                 } else if (controlName.equals("select") || controlName.equals("select1")) {
                     controlAnalysis = new Select1Analysis(propertyContext, XFormsStaticState.this,
                         controlsDocumentInfo, controlPrefixedId, controlElement, locationData, controlAnalysisMap.size() + 1, hasNodeBinding,
-                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, parentRepeatControlAnalysis,
+                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis,
                         parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap));
                 } else if ("variable".equals(controlName)) {
                     controlAnalysis = new VariableAnalysis(propertyContext, XFormsStaticState.this,
                         controlsDocumentInfo, controlPrefixedId, controlElement, locationData, controlAnalysisMap.size() + 1, hasNodeBinding,
-                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, parentRepeatControlAnalysis,
+                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis,
                         parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap));
                 } else if ("attribute".equals(controlName)) {
                     controlAnalysis = new AttributeAnalysis(propertyContext, XFormsStaticState.this,
                         controlsDocumentInfo, controlPrefixedId, controlElement, locationData, controlAnalysisMap.size() + 1, hasNodeBinding,
-                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, parentRepeatControlAnalysis,
+                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis,
                         parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap));
                 } else {
                     // Default
                     controlAnalysis = new ControlAnalysis(propertyContext, XFormsStaticState.this,
                         controlsDocumentInfo, controlPrefixedId, controlElement, locationData, controlAnalysisMap.size() + 1, hasNodeBinding,
-                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, parentRepeatControlAnalysis,
-                        parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap));
+                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis,
+                            parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap));
                 }
 
                 controlAnalysisMap.put(controlPrefixedId, controlAnalysis);
@@ -1201,8 +1198,11 @@ public class XFormsStaticState {
                     controlsMap.put(controlPrefixedId, controlAnalysis);
                 }
 
-                if (controlName.equals("repeat")) {
+                // TODO: move repeat and attribute cases below to RepeatAnalysis and AttributeAnalysis
+                if (controlAnalysis instanceof RepeatAnalysis) {
                     // Gather xforms:repeat information
+
+                    final RepeatAnalysis ancestorRepeatAnalysis = controlAnalysis.getAncestorRepeat();
 
                     // Find repeat parents
                     {
@@ -1212,18 +1212,17 @@ public class XFormsStaticState {
 
                         repeatHierarchyStringBuffer.append(controlPrefixedId);
 
-                        if (repeatAncestorsStack.size() > 0) {
+                        if (ancestorRepeatAnalysis != null) {
                             // If we have a parent, append it
-                            final String parentRepeatId = repeatAncestorsStack.peek();
                             repeatHierarchyStringBuffer.append(' ');
-                            repeatHierarchyStringBuffer.append(parentRepeatId);
+                            repeatHierarchyStringBuffer.append(ancestorRepeatAnalysis.prefixedId);
                         }
                     }
                     // Find repeat children
                     {
-                        if (repeatAncestorsStack.size() > 0) {
+                        if (ancestorRepeatAnalysis != null) {
                             // If we have a parent, tell the parent that it has a child
-                            final String parentRepeatId = repeatAncestorsStack.peek();
+                            final String parentRepeatId = ancestorRepeatAnalysis.prefixedId;
                             List<String> parentRepeatList = repeatChildrenMap.get(parentRepeatId);
                             if (parentRepeatList == null) {
                                 parentRepeatList = new ArrayList<String>();
@@ -1233,8 +1232,6 @@ public class XFormsStaticState {
                         }
 
                     }
-
-                    repeatAncestorsStack.push(controlPrefixedId);
                 } else if ("attribute".equals(controlName)) {
                     // Special indexing of xxforms:attribute controls
                     final String prefixedForAttribute = prefix + controlElement.attributeValue("for");
@@ -1258,10 +1255,6 @@ public class XFormsStaticState {
             }
 
             public void endVisitControl(Element controlElement, String controlId) {
-                final String controlName = controlElement.getName();
-                if (controlName.equals("repeat")) {
-                    repeatAncestorsStack.pop();
-                }
             }
         });
 
@@ -1543,11 +1536,11 @@ public class XFormsStaticState {
      * Visit all the control elements without handling repeats or looking at the binding contexts. This is done entirely
      * statically. Only controls are visited, including grouping controls, leaf controls, and components.
      */
-    private void visitAllControlStatic(Element startElement, ControlAnalysis startControlAnalysis, ControlElementVisitorListener controlElementVisitorListener) {
+    private void visitAllControlStatic(Element startElement, ContainerAnalysis startControlAnalysis, ControlElementVisitorListener controlElementVisitorListener) {
         handleControlsStatic(controlElementVisitorListener, startElement, startControlAnalysis);
     }
 
-    private void handleControlsStatic(ControlElementVisitorListener controlElementVisitorListener, Element container, ControlAnalysis containerControlAnalysis) {
+    private void handleControlsStatic(ControlElementVisitorListener controlElementVisitorListener, Element container, ContainerAnalysis containerControlAnalysis) {
         for (final Element currentControlElement: Dom4jUtils.elements(container)) {
 
             final String controlName = currentControlElement.getName();
@@ -1555,21 +1548,21 @@ public class XFormsStaticState {
 
             if (XFormsControlFactory.isContainerControl(currentControlElement.getNamespaceURI(), controlName)) {
                 // Handle XForms grouping controls
-                final ControlAnalysis newContainer = controlElementVisitorListener.startVisitControl(currentControlElement, containerControlAnalysis, controlStaticId);
+                final ContainerAnalysis newContainer = (ContainerAnalysis) controlElementVisitorListener.startVisitControl(currentControlElement, containerControlAnalysis, controlStaticId, true);
                 handleControlsStatic(controlElementVisitorListener, currentControlElement, newContainer);
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlStaticId);
             } else if (XFormsControlFactory.isCoreControl(currentControlElement.getNamespaceURI(), controlName)
                     || xblBindings.isComponent(currentControlElement.getQName())
                     || controlName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
                 // Handle core control, component, or variable
-                controlElementVisitorListener.startVisitControl(currentControlElement, containerControlAnalysis, controlStaticId);
+                controlElementVisitorListener.startVisitControl(currentControlElement, containerControlAnalysis, controlStaticId, false);
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlStaticId);
             }
         }
     }
 
     private static interface ControlElementVisitorListener {
-        ControlAnalysis startVisitControl(Element controlElement, ControlAnalysis containerControlAnalysis, String controlStaticId);
+        ControlAnalysis startVisitControl(Element controlElement, ContainerAnalysis containerControlAnalysis, String controlStaticId, boolean isContainer);
         void endVisitControl(Element controlElement, String controlId);
     }
 
@@ -1651,7 +1644,7 @@ public class XFormsStaticState {
             return Collections.emptyList();
 
         // Simple case where there is no ancestor repeat
-        ControlAnalysis repeatControlAnalysis = controlAnalysis.ancestorRepeat;
+        RepeatAnalysis repeatControlAnalysis = controlAnalysis.getAncestorRepeat();
         if (repeatControlAnalysis == null)
             return Collections.emptyList();
 
@@ -1660,7 +1653,7 @@ public class XFormsStaticState {
         // Go until there are no more ancestors OR we find the boundary repeat
         while (repeatControlAnalysis != null && (endPrefixedId == null || !endPrefixedId.equals(repeatControlAnalysis.prefixedId)) ) {
             result.add(repeatControlAnalysis.prefixedId);
-            repeatControlAnalysis = repeatControlAnalysis.ancestorRepeat;
+            repeatControlAnalysis = repeatControlAnalysis.getAncestorRepeat();
         }
         return result;
     }

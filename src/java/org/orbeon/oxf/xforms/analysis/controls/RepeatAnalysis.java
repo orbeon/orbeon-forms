@@ -21,8 +21,8 @@ import org.orbeon.saxon.dom4j.DocumentWrapper;
 
 import java.util.Map;
 
-public class RepeatAnalysis extends ControlAnalysis {
-    public RepeatAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo, String prefixedId, Element element, LocationData locationData, int index, boolean hasNodeBinding, boolean isValueControl, ControlAnalysis parentControlAnalysis, ControlAnalysis ancestorRepeat, Map<String, ControlAnalysis> inScopeVariables) {
-        super(propertyContext, staticState, controlsDocumentInfo, prefixedId, element, locationData, index, hasNodeBinding, isValueControl, parentControlAnalysis, ancestorRepeat, inScopeVariables);
+public class RepeatAnalysis extends ContainerAnalysis {
+    public RepeatAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo, String prefixedId, Element element, LocationData locationData, int index, boolean hasNodeBinding, boolean isValueControl, ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+        super(propertyContext, staticState, controlsDocumentInfo, prefixedId, element, locationData, index, hasNodeBinding, isValueControl, parentControlAnalysis, inScopeVariables);
     }
 }

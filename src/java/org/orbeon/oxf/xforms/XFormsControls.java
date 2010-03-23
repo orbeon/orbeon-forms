@@ -107,9 +107,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
     public void refreshDone() {
         requireRefresh = false;
-        final UIDependencies uiDependencies = containingDocument.getUIDependencies();
-        if (uiDependencies != null)
-            uiDependencies.refreshDone();
+        uiDependencies.refreshDone();
     }
 
     public void refreshIfNeeded(PropertyContext propertyContext, XBLContainer container) {
@@ -515,7 +513,7 @@ public class XFormsControls implements XFormsObjectResolver {
     private boolean pushBinding(PropertyContext propertyContext, XFormsContextStack currentContextStack, Element currentControlElement,
                                 String controlPrefixedId, String controlEffectiveId, XBLBindings.Scope newScope) {
 
-        final boolean requireUpdate = uiDependencies == null || uiDependencies.requireBindingUpdate(controlPrefixedId);
+        final boolean requireUpdate = uiDependencies.requireBindingUpdate(controlPrefixedId);
 
         if (requireUpdate) {
             // Push with evaluation

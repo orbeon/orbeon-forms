@@ -3162,30 +3162,29 @@ ORBEON.xforms.Events = {
 
         // Create tooltip if have never "seen" this control
         if (tooltipForControl[control.id] == null) {
-        if (message != "") {
-            // We have a hint, initialize YUI tooltip
-            var yuiTooltip =
-                        new YAHOO.widget.Tooltip(control.id + toolTipSuffix, {
-                            context: target.id,
-                        text: message,
-                        showDelay: delay,
-                        effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2},
-                        // We provide here a "high" zIndex value so the tooltip is "always" displayed on top over everything else.
-                        // Otherwise, with dialogs, the tooltip might end up being below the dialog and be invisible.
-                        zIndex: 1000
-                    });
+            if (message != "") {
+                // We have a hint, initialize YUI tooltip
+                var yuiTooltip = new YAHOO.widget.Tooltip(control.id + toolTipSuffix, {
+                    context: target.id,
+                    text: message,
+                    showDelay: delay,
+                    effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2},
+                    // We provide here a "high" zIndex value so the tooltip is "always" displayed on top over everything else.
+                    // Otherwise, with dialogs, the tooltip might end up being below the dialog and be invisible.
+                    zIndex: 1000
+                });
                 yuiTooltip.orbeonControl = control;
                 var context = ORBEON.util.Dom.getElementById(target.id);
-            // Send the mouse move event, because the tooltip gets positioned when receiving a mouse move.
-            // Without this, sometimes the first time the tooltip is shows at the top left of the screen
-            yuiTooltip.onContextMouseMove.call(context, event, yuiTooltip);
-            // Send the mouse over event to the tooltip, since the YUI tooltip didn't receive it as it didn't
-            // exist yet when the event was dispatched by the browser
-            yuiTooltip.onContextMouseOver.call(context, event, yuiTooltip);
-            // Save reference to YUI tooltip
+                // Send the mouse move event, because the tooltip gets positioned when receiving a mouse move.
+                // Without this, sometimes the first time the tooltip is shows at the top left of the screen
+                yuiTooltip.onContextMouseMove.call(context, event, yuiTooltip);
+                // Send the mouse over event to the tooltip, since the YUI tooltip didn't receive it as it didn't
+                // exist yet when the event was dispatched by the browser
+                yuiTooltip.onContextMouseOver.call(context, event, yuiTooltip);
+                // Save reference to YUI tooltip
                 tooltipForControl[control.id] = yuiTooltip;
-        } else {
-            // Remember we looked at this control already
+            } else {
+                // Remember we looked at this control already
                 tooltipForControl[control.id] = true;
             }
         }
@@ -3264,14 +3263,13 @@ ORBEON.xforms.Events = {
     mouseout: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
-
-            if (ORBEON.util.Dom.hasClass(target, "xforms-dialog-appearance-minimal")) {
-                // Minimal dialog: register listener to maybe close the dialog
-//                ORBEON.xforms.Globals.dialogMinimalLastMouseOut[yuiDialog.element.id] = new Date().getTime();
-//                window.setTimeout(function() {
-//                    ORBEON.xforms.Events.dialogMinimalCheckMouseIn(yuiDialog);
-//                },
-//                XFORMS_DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_IN_MS);
+            // Send the mouseout event to the YUI tooltip to handle the case where: (1) we get the mouseover event, (2) we
+            // create a YUI tooltip, (3) the mouseout happens before the YUI dialog got a chance to register its listener
+            // on mouseout, (4) the YUI dialog is only dismissed after autodismissdelay (5 seconds) leaving a trail.
+            var yuiTooltip = ORBEON.xforms.Globals.hintTooltipForControl[target.id];
+            if (! ORBEON.util.Dom.hasClass(document.body, "xforms-disable-hint-as-tooltip")
+                    && YAHOO.lang.isObject(yuiTooltip)) {
+                yuiTooltip.onContextMouseOut.call(target.id, event, yuiTooltip);
             }
         }
     },

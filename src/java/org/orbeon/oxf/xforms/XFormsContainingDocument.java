@@ -23,6 +23,8 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
+import org.orbeon.oxf.xforms.analysis.DumbUIDependencies;
+import org.orbeon.oxf.xforms.analysis.PathMapUIDependencies;
 import org.orbeon.oxf.xforms.analysis.UIDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -156,7 +158,7 @@ public class XFormsContainingDocument extends XBLContainer {
             // Remember static state
             this.xformsStaticState = xformsStaticState;
 
-            uiDependencies = XFormsProperties.isXPathAnalysis(this) ? new UIDependencies(this) : null;
+            createUIDependencies();
 
             // Remember URI resolver for initialization
             this.uriResolver = uriResolver;
@@ -175,6 +177,10 @@ public class XFormsContainingDocument extends XBLContainer {
             // NOTE: we clear isInitializing when Ajax requests come in
         }
         indentedLogger.endHandleOperation();
+    }
+
+    private void createUIDependencies() {
+        uiDependencies = XFormsProperties.isXPathAnalysis(this) ? new PathMapUIDependencies(this) : new DumbUIDependencies();
     }
 
     /**
@@ -211,7 +217,7 @@ public class XFormsContainingDocument extends XBLContainer {
             // Make sure there is location data
             setLocationData(this.xformsStaticState.getLocationData());
 
-            uiDependencies = XFormsProperties.isXPathAnalysis(this) ? new UIDependencies(this) : null;
+            createUIDependencies();
 
             // Restore the containing document's dynamic state
             final String encodedDynamicState = xformsState.getDynamicState();
@@ -273,7 +279,7 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     /**
-     * Return UI dependencies if supported.
+     * Return UI dependencies implementation.
      */
     public final UIDependencies getUIDependencies() {
         return uiDependencies;

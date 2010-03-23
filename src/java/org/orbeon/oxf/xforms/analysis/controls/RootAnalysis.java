@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.analysis.controls;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 
-public class RootAnalysis extends ControlAnalysis {
+public class RootAnalysis extends ContainerAnalysis {
     public RootAnalysis(PropertyContext propertyContext, XFormsStaticState staticState) {
-        super(propertyContext, staticState, null, "#controls", null, staticState.getLocationData(), 1, false, false, null, null, null);
+        super(propertyContext, staticState, null, "#controls", null, staticState.getLocationData(), 1, false, false, null, null);
     }
 }

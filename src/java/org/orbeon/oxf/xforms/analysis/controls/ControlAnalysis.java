@@ -24,7 +24,6 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.Expression;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class ControlAnalysis {
@@ -37,21 +36,17 @@ public class ControlAnalysis {
     public final int index;
     public final boolean hasNodeBinding;
     public final boolean isValueControl;
-    public final ControlAnalysis parentControlAnalysis;
-    public final ControlAnalysis ancestorRepeat;
+    public final ContainerAnalysis parentControlAnalysis;
     public final Map<String, ControlAnalysis> inScopeVariables; // variable name -> ControlAnalysis
 
     public final XPathAnalysis bindingAnalysis;
     public final XPathAnalysis valueAnalysis;
 
-    // TODO: move to ContainerAnalysis
-    private Map<String, String> containedVariables; // variable name -> prefixed id
-
     private String classes;
 
     public ControlAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo, String prefixedId,
-                       Element element, LocationData locationData, int index, boolean hasNodeBinding, boolean isValueControl,
-                       ControlAnalysis parentControlAnalysis, ControlAnalysis ancestorRepeat, Map<String, ControlAnalysis> inScopeVariables) {
+                           Element element, LocationData locationData, int index, boolean hasNodeBinding, boolean isValueControl,
+                           ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
 
         this.staticState = staticState;
         this.prefixedId = prefixedId;
@@ -61,7 +56,6 @@ public class ControlAnalysis {
         this.hasNodeBinding = hasNodeBinding;
         this.isValueControl = isValueControl;
         this.parentControlAnalysis = parentControlAnalysis;
-        this.ancestorRepeat = ancestorRepeat;
         this.inScopeVariables = inScopeVariables;
 
         if (element != null) {
@@ -146,39 +140,6 @@ public class ControlAnalysis {
 
     }
 
-    public void addContainedVariable(String variableName, String variablePrefixedId) {
-        if (containedVariables == null)
-            containedVariables = new HashMap<String, String>();
-        containedVariables.put(variableName, variablePrefixedId);
-    }
-
-    public void clearContainedVariables() {
-        // TODO: when to call this? should call to free memory
-        containedVariables = null;
-    }
-
-    public Map<String, ControlAnalysis> getInScopeVariablesForContained(Map<String, ControlAnalysis> controlAnalysisMap) {
-        if (inScopeVariables == null && containedVariables == null) {
-            // No variables at all
-            return null;
-        } else if (containedVariables == null) {
-            // No contained variables
-            return inScopeVariables;
-        } else {
-            // Contained variables
-            final Map<String, ControlAnalysis> result = new HashMap<String, ControlAnalysis>();
-            // Add all of parent's in-scope variables
-            if (inScopeVariables != null)
-                result.putAll(inScopeVariables);
-            // Add all new variables so far
-            for (final Map.Entry<String, String> entry: containedVariables.entrySet()) {
-                result.put(entry.getKey(), controlAnalysisMap.get(entry.getValue()));
-            }
-
-            return result;
-        }
-    }
-
     public void addClasses(String classes) {
         if (this.classes == null) {
             // Set
@@ -198,5 +159,15 @@ public class ControlAnalysis {
             return 0;
         else
             return parentControlAnalysis.getLevel() + 1;
+    }
+
+    public RepeatAnalysis getAncestorRepeat() {
+        ContainerAnalysis currentParent = parentControlAnalysis;
+        while (currentParent != null) {
+            if (currentParent instanceof RepeatAnalysis)
+                return (RepeatAnalysis) currentParent;
+            currentParent = currentParent.parentControlAnalysis;
+        }
+        return null;
     }
 }

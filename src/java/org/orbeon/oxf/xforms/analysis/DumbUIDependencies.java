@@ -17,12 +17,26 @@ import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.saxon.om.NodeInfo;
 
 /**
- * Interface to UI dependencies implementation.
+ * This implementation of UI dependencies simply says that everything must be updated all the time.
  */
-public interface UIDependencies {
-    void markValueChanged(XFormsModel model, NodeInfo nodeInfo);
-    void markStructuralChange(XFormsModel model);
-    void refreshDone();
-    boolean requireValueUpdate(String controlPrefixedId);
-    boolean requireBindingUpdate(String controlPrefixedId);
+public class DumbUIDependencies implements UIDependencies {
+    public void markValueChanged(XFormsModel model, NodeInfo nodeInfo) {
+        // NOP
+    }
+
+    public void markStructuralChange(XFormsModel model) {
+        // NOP
+    }
+
+    public void refreshDone() {
+        // NOP
+    }
+
+    public boolean requireValueUpdate(String controlPrefixedId) {
+        return true;
+    }
+
+    public boolean requireBindingUpdate(String controlPrefixedId) {
+        return true;
+    }
 }

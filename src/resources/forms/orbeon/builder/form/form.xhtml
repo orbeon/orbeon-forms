@@ -66,7 +66,6 @@
                     });
 
                     YAHOO.widget.Overlay.windowResizeEvent.subscribe(function() {
-//                        layoutElement.style.height = YAHOO.util.Dom.getViewportHeight() + "px";
                         layout.set('height', YAHOO.util.Dom.getViewportHeight());
                         layout.set('width', YAHOO.util.Dom.getViewportWidth());
                         layout.resize();
@@ -77,6 +76,11 @@
                     // Only make content visible after initialization to prevent expensive relayout
                     YAHOO.util.Dom.setStyle("left1", "display", "block");
                     YAHOO.util.Dom.setStyle("center1", "display", "block");
+
+                    <!-- Set focus on the app name input field when the page loads. This isn't done with xforms:setfocus
+                         because that action would run before the layout is rendered and the dialog visible. -->
+                    if (! YAHOO.util.Dom.hasClass("fb-editor-metadata-dialog", "xforms-initially-hidden"))
+                        ORBEON.xforms.Controls.setFocus("fb-application-name-input");
                 });
             })();
         </xhtml:script>

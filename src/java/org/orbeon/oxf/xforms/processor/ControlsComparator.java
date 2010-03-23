@@ -356,7 +356,7 @@ public class ControlsComparator {
                 // Replay into SAX pipeline
                 controller.startDocument();
                 // new SAXLoggerProcessor.DebugContentHandler()
-                containingDocument.getStaticState().getXHTMLDocument().replay(controller, mark);
+                mark.replay(controller);
                 controller.endDocument();
             }
             ch.endElement();

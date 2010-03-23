@@ -19,6 +19,7 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -110,6 +111,14 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
             this.namespaceMappings = namespaceMappings;
         }
 
+        public boolean hasTopLevelMarks() {
+            for (final String prefixedId: marks.keySet()) {
+                if (prefixedId.equals(XFormsUtils.getStaticIdFromId(prefixedId)))
+                    return true;
+            }
+            return false;
+        }
+
         private void readAutomaticXBLMappingsIfNeeded() {
             if (automaticMappings == null) {
 
@@ -196,7 +205,6 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
      */
     public XFormsAnnotatorContentHandler(SAXStore contentHandler, ExternalContext externalContext, Metadata metadata) {
         this(contentHandler, externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), metadata);
-        this.saxStore = contentHandler;
     }
 
     /**
@@ -215,6 +223,9 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
 
         this.metadata = metadata;
         this.isGenerateIds = true;
+
+        if (contentHandler instanceof SAXStore)
+            this.saxStore = (SAXStore) contentHandler;
     }
 
     /**
@@ -290,8 +301,9 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
             if (saxStore != null) {
                 // Remember mark if xxforms:update="full"
                 final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
-                if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate))
-                    metadata.marks.put(reusableStringArray[0], saxStore.getElementMark());
+                if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
+                    addMark(reusableStringArray[0], saxStore.getElementMark());
+                }
             }
 
             if (inTitle && "output".equals(localname)) {
@@ -482,6 +494,10 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
         // TODO: WHY?
         namespaces.put(XMLConstants.XML_PREFIX, XMLConstants.XML_URI);
         metadata.namespaceMappings.put(id, namespaces);
+    }
+
+    protected void addMark(String id, SAXStore.Mark mark) {
+        metadata.marks.put(id, mark);
     }
 
     private void storeXBLBinding(String elementAttribute) {

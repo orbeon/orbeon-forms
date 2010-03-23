@@ -37,6 +37,7 @@ import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
+import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -461,7 +462,7 @@ public class XBLBindings {
 
     public Document annotateHandler(Element currentHandlerElement, String newPrefix, Scope innerScope, Scope outerScope, XFormsConstants.XXBLScope startScope) {
         final Document handlerDocument = Dom4jUtils.createDocumentCopyParentNamespaces(currentHandlerElement, false);// for now, don't detach because element can be processed by multiple bindings
-        final Document annotatedDocument = annotateShadowTree(handlerDocument, newPrefix);
+        final Document annotatedDocument = annotateShadowTree(handlerDocument, newPrefix, false);
         gatherScopeMappingsAndTransform(annotatedDocument, newPrefix, innerScope, outerScope, startScope, null, false, "/");
         return annotatedDocument;
     }
@@ -472,7 +473,7 @@ public class XBLBindings {
 
             // Annotate if needed, otherwise leave as is
             if (annotate) {
-                currentModelDocument = annotateShadowTree(currentModelDocument, prefix);
+                currentModelDocument = annotateShadowTree(currentModelDocument, prefix, false);
                 gatherScopeMappingsAndTransform(currentModelDocument, prefix, innerScope, outerScope, startScope, null, false, "/");
             }
 
@@ -514,7 +515,8 @@ public class XBLBindings {
             applyXBLTransformation(propertyContext, documentWrapper, shadowTreeDocument, boundElement);
 
             // 3: Annotate tree
-            final Document annotatedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, prefix);
+            final boolean hasUpdateFull = hasFullUpdate(shadowTreeDocument);
+            final Document annotatedShadowTreeDocument = annotateShadowTree(shadowTreeDocument, prefix, hasUpdateFull);
 
             if (indentedLogger.isDebugEnabled()) {
                 indentedLogger.endHandleOperation("document", logShadowTrees ? Dom4jUtils.domToString(annotatedShadowTreeDocument) : null);
@@ -526,8 +528,26 @@ public class XBLBindings {
         }
     }
 
-    // TODO: could this be done as a processor instead? could then have XSLT -> XBL -> XFACH
-    private static void applyXBLTransformation(final PropertyContext propertyContext, final DocumentWrapper documentWrapper, Document shadowTreeDocument, final Element boundElement) {
+    private boolean hasFullUpdate(Document shadowTreeDocument) {
+        final boolean[] hasUpdateFull = new boolean[1];
+        Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
+            public void startElement(Element element) {
+                // Check if there is any xxforms:update="full"
+                final String xxformsUpdate = element.attributeValue(XFormsConstants.XXFORMS_UPDATE_QNAME);
+                if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
+                    hasUpdateFull[0] = true;
+                }
+            }
+            public void endElement(Element element) {}
+            public void text(Text text) {}
+        }, true);
+        return hasUpdateFull[0];
+    }
+
+    // TODO: could this be done as a processor instead? could then have XSLT -> XBL -> XFACH and stream
+    private static void applyXBLTransformation(final PropertyContext propertyContext, final DocumentWrapper documentWrapper,
+                                               Document shadowTreeDocument, final Element boundElement) {
+
         Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
 
             public void startElement(Element element) {
@@ -768,7 +788,7 @@ public class XBLBindings {
     }
 
     // Keep public for unit tests
-    public Document annotateShadowTree(Document shadowTreeDocument, final String prefix) {
+    public Document annotateShadowTree(Document shadowTreeDocument, final String prefix, boolean hasFullUpdate) {
         // Create transformer
         final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
 
@@ -776,13 +796,21 @@ public class XBLBindings {
         final LocationDocumentResult documentResult = new LocationDocumentResult();
         identity.setResult(documentResult);
 
+        // Put SAXStore in the middle if we have full updates
+        final ContentHandler output = hasFullUpdate ? new SAXStore(identity) : identity;
+
         // Write the document through the annotator
         // TODO: this adds xml:base on root element, must fix
-        TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsAnnotatorContentHandler(identity, "", false, metadata) {
+        TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsAnnotatorContentHandler(output, "", false, metadata) {
             @Override
             protected void addNamespaces(String id) {
                 // Store prefixed id in order to avoid clashes between top-level controls and shadow trees
                 super.addNamespaces(prefix + id);
+            }
+
+            @Override
+            protected void addMark(String id, SAXStore.Mark mark) {
+                super.addMark(prefix + id, mark);
             }
         });
 

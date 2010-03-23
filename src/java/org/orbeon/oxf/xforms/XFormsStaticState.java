@@ -281,8 +281,8 @@ public class XFormsStaticState {
             } else if (isNoScript()) {
                 // Use provided SAXStore ONLY if noscript mode is requested
                 this.xhtmlDocument = xhtmlDocument;
-            } else if (this.metadata.marks.size() > 0) {
-                // Keep XHTML if we have marks
+            } else if (this.metadata.hasTopLevelMarks()) {
+                // Keep XHTML if we have top-level marks
                 this.xhtmlDocument = xhtmlDocument;
             } else {
                 // Otherwise there is no need to keep XHTML

@@ -837,9 +837,9 @@ public class Dom4jUtils {
     }
 
     public static interface VisitorListener {
-        public void startElement(Element element);
-        public void endElement(Element element);
-        public void text(Text text);
+        void startElement(Element element);
+        void endElement(Element element);
+        void text(Text text);
     }
 
     /**

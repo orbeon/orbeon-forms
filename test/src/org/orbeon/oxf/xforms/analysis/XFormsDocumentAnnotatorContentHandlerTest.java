@@ -108,7 +108,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
         final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);
         final XFormsAnnotatorContentHandler.Metadata metadata = new XFormsAnnotatorContentHandler.Metadata();
         final Document annotatedDocument = new XBLBindings(new IndentedLogger(XFormsServer.getLogger(), ""), null, metadata, Dom4jUtils.createElement("dummy"))
-                .annotateShadowTree(document, "");
+                .annotateShadowTree(document, "", false);
         final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, new Configuration());
 
         // Check there is an xxforms:attribute for "html" with correct name

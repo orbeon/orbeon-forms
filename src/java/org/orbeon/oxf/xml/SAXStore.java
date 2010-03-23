@@ -79,9 +79,9 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
 
     private transient Locator locator; // used only for recording events, MUST be cleared afterwards
 
-    private static final Mark START_MARK = new Mark();
+    private final Mark START_MARK = new Mark();
 
-    public static class Mark {
+    public class Mark {
         public final int eventBufferPosition;
         public final int charBufferPosition;
         public final int intBufferPosition;
@@ -108,6 +108,10 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
             this.systemIdBufferPosition = store.systemIdBufferPosition;
             this.attributeCountBufferPosition = store.attributeCountBufferPosition;
             this.stringBufferPosition = store.stringBuffer.size();
+        }
+
+        public void replay(ContentHandler ch) throws SAXException {
+            SAXStore.this.replay(ch, this);
         }
     }
 

@@ -25,6 +25,7 @@ import java.util.*;
 
 public class XPathAnalysis {
 
+    public final XFormsStaticState staticState;
     public final String xpathString;
     public final PathMap pathmap;
 //    public final int dependencies;
@@ -37,6 +38,7 @@ public class XPathAnalysis {
     public XPathAnalysis(XFormsStaticState staticState, Expression expression, String xpathString,
                          XPathAnalysis baseAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
 
+        this.staticState = staticState;
         this.xpathString = xpathString;
 //        this.dependencies = dependencies;
 
@@ -117,6 +119,10 @@ public class XPathAnalysis {
         return true;
     }
 
+    public static String buildInstanceString(String instanceId) {
+        return "instance('" + instanceId.replaceAll("'", "''") + "')";
+    }
+
     private boolean processNode(List<Expression> stack, PathMap.PathMapNode node) {
         boolean success = true;
         if (node.getArcs().length == 0 || node.isReturnable()) {
@@ -126,15 +132,21 @@ public class XPathAnalysis {
             for (final Expression expression: stack) {
                 if (expression instanceof Instance) {
                     // Instance function
-                    final Expression instanceNameExpression = ((Instance) expression).getArguments()[0];
-                    if (instanceNameExpression instanceof StringLiteral) {
-                        sb.append("instance('");
-                        sb.append(((StringLiteral) instanceNameExpression).getStringValue());
-                        sb.append("')");
+                    final Instance instanceExpression = ((Instance) expression);
+
+                    final boolean hasParameter = instanceExpression.getArguments().length > 0;
+                    if (!hasParameter) {
+                        // TODO: use model
+                        sb.append(buildInstanceString(staticState.getDefaultInstanceId()));
                     } else {
-                        // Non-literal instance name
-                        success = false;
-                        break;
+                        final Expression instanceNameExpression = instanceExpression.getArguments()[0];
+                        if (instanceNameExpression instanceof StringLiteral) {
+                            sb.append(buildInstanceString(((StringLiteral) instanceNameExpression).getStringValue()));
+                        } else {
+                            // Non-literal instance name
+                            success = false;
+                            break;
+                        }
                     }
                 } else if (expression instanceof AxisExpression) {
                     final AxisExpression axisExpression = (AxisExpression) expression;

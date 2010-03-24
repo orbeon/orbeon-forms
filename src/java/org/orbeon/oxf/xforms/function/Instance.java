@@ -74,6 +74,8 @@ public class Instance extends XFormsFunction {
 
     @Override
     public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
-        return addDocToPathMap(pathMap, pathMapNodeSet);
+        if (argument.length > 0)
+            argument[0].addToPathMap(pathMap, pathMapNodeSet);
+        return new PathMap.PathMapNodeSet(pathMap.makeNewRoot(this));
     }
 }

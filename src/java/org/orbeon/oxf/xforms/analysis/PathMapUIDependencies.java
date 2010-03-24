@@ -115,9 +115,7 @@ public class PathMapUIDependencies implements UIDependencies {
 
         Collections.reverse(ancestorOrSelf);
 
-        sb.append("instance('");
-        sb.append(instance.getPrefixedId());
-        sb.append("')");
+        sb.append(XPathAnalysis.buildInstanceString(instance.getPrefixedId()));
 
         if (ancestorOrSelf.size() > 2) { // first is the document, second is the root element
             for (final NodeInfo currentNode: ancestorOrSelf.subList(2, ancestorOrSelf.size())) {

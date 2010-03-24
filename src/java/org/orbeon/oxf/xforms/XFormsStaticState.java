@@ -82,6 +82,9 @@ public class XFormsStaticState {
     private LinkedHashMap<String, Document> modelDocuments = new LinkedHashMap<String, Document>(); // Map<String modelPrefixedId, Document modelDocument>
     private SAXStore xhtmlDocument;                                         // entire XHTML document for noscript mode only
 
+    private String defaultModelId;
+    private String defaultInstanceId;
+
     private Map<String, String> xxformsScripts;                             // Map of id to script content
 
     private final Map<String, Object> nonDefaultProperties = new HashMap<String, Object>(); // Map of property name to property value (String, Integer, Boolean)
@@ -492,6 +495,16 @@ public class XFormsStaticState {
             }
         }
 
+        // Get default model and default instance ids
+        {
+            final Map.Entry<String, Document> entry = modelDocuments.entrySet().iterator().next();
+            defaultModelId = entry.getKey();
+            final List<Element> instanceElements = getInstanceContainers(defaultModelId);
+            if (instanceElements.size() > 0) {
+                defaultInstanceId = instanceElements.get(0).attributeValue("id");
+            }
+        }
+
         // Extract components
         xblBindings = new XBLBindings(indentedLogger, this, metadata, staticStateElement);
     }
@@ -642,6 +655,14 @@ public class XFormsStaticState {
 
     public Map<String, Document> getModelDocuments() {
         return modelDocuments;
+    }
+
+    public String getDefaultModelId() {
+        return defaultModelId;
+    }
+
+    public String getDefaultInstanceId() {
+        return defaultInstanceId;
     }
 
     public Map<String, String> getScripts() {

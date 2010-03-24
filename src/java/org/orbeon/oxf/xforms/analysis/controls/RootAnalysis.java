@@ -13,11 +13,40 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls;
 
+import org.dom4j.Document;
+import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+
+import java.util.List;
+import java.util.Map;
 
 public class RootAnalysis extends ContainerAnalysis {
     public RootAnalysis(PropertyContext propertyContext, XFormsStaticState staticState) {
         super(propertyContext, staticState, null, "#controls", null, staticState.getLocationData(), 1, false, false, null, null);
+    }
+
+    @Override
+    protected XPathAnalysis computeBindingAnalysis() {
+        final Map<String, Document> modelDocuments = staticState.getModelDocuments();
+
+        if (modelDocuments.size() > 0) {
+            final Map.Entry<String, Document> entry = modelDocuments.entrySet().iterator().next();
+
+            final String modelId = entry.getKey(); // TODO: use model
+            final List<Element> instanceElements = Dom4jUtils.elements(entry.getValue().getRootElement(), XFormsConstants.XFORMS_INSTANCE_QNAME);
+            if (instanceElements.size() > 0) {
+                final String instanceId = instanceElements.get(0).attributeValue("id");
+
+                return analyzeXPath(staticState, null, prefixedId, "instance('" + instanceId.replaceAll("'", "''") + "')");
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 }

@@ -58,62 +58,60 @@ public class ControlAnalysis {
         this.parentControlAnalysis = parentControlAnalysis;
         this.inScopeVariables = inScopeVariables;
 
-        if (element != null) {
-
-            // XPath analysis if needed
-            if (staticState.isXPathAnalysis() && element != null) {
-
-                // TODO: handle @model and xxbl:scope changes
-                final String bindingExpression;
-                if (element.attributeValue("context") == null) {
-                    final String ref = element.attributeValue("ref");
-                    if (ref != null) {
-                        bindingExpression = ref;
-                    } else {
-                        bindingExpression = element.attributeValue("nodeset");
-                    }
-                } else {
-                    // TODO: handle @context
-                    bindingExpression = null;
-                }
-
-                if ((bindingExpression != null)) {
-                    this.bindingAnalysis = analyzeXPath(staticState, getAncestorOrSelfBindingAnalysis(), prefixedId, bindingExpression);
-                } else {
-                    // TODO: TEMP: just do this for now so that controls w/o their own binding also get binding updated
-                    this.bindingAnalysis = getAncestorOrSelfBindingAnalysis();
-                }
-
-                final XPathAnalysis baseAnalysis = getAncestorOrSelfBindingAnalysis();
-                if (this instanceof VariableAnalysis) {
-                    // TODO: handle xxf:sequence
-                    this.valueAnalysis = analyzeXPath(staticState, baseAnalysis, prefixedId, element.attributeValue("select"));
-                } else if (isValueControl) {
-                    final String valueAttribute = element.attributeValue("value");
-
-                    final boolean isXXFormsAttribute = element.getQName().equals(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME);
-                    if (isXXFormsAttribute) {
-                        // TODO
-                        // NOTE: bad design that AVT has @value as attribute name
-                        this.valueAnalysis = null;
-                    } else if (valueAttribute != null) {
-                        // E.g. xforms:output/@value
-                        this.valueAnalysis = analyzeXPath(staticState, baseAnalysis, prefixedId, valueAttribute);
-                    } else {
-                        // Value is considered the string value
-                        this.valueAnalysis = analyzeXPath(staticState, baseAnalysis, prefixedId, "string()");
-                    }
-                } else {
-                    this.valueAnalysis = null;
-                }
-
-            } else {
-                bindingAnalysis = null;
-                valueAnalysis = null;
-            }
+        if (staticState.isXPathAnalysis() && element != null) {
+            // TODO: handle @model and xxbl:scope changes
+            this.bindingAnalysis = computeBindingAnalysis();
+            this.valueAnalysis = computeValueAnalysis();
         } else {
             bindingAnalysis = null;
             valueAnalysis = null;
+        }
+    }
+
+    protected XPathAnalysis computeBindingAnalysis() {
+        final String bindingExpression;
+        if (element.attributeValue("context") == null) {
+            final String ref = element.attributeValue("ref");
+            if (ref != null) {
+                bindingExpression = ref;
+            } else {
+                bindingExpression = element.attributeValue("nodeset");
+            }
+        } else {
+            // TODO: handle @context
+            bindingExpression = null;
+        }
+
+        if ((bindingExpression != null)) {
+            return analyzeXPath(staticState, getAncestorOrSelfBindingAnalysis(), prefixedId, bindingExpression);
+        } else {
+            // TODO: TEMP: just do this for now so that controls w/o their own binding also get binding updated
+            return getAncestorOrSelfBindingAnalysis();
+        }
+    }
+
+    protected XPathAnalysis computeValueAnalysis () {
+        final XPathAnalysis baseAnalysis = getAncestorOrSelfBindingAnalysis();
+        if (this instanceof VariableAnalysis) {
+            // TODO: handle xxf:sequence
+            return analyzeXPath(staticState, baseAnalysis, prefixedId, element.attributeValue("select"));
+        } else if (isValueControl) {
+            final String valueAttribute = element.attributeValue("value");
+
+            final boolean isXXFormsAttribute = element.getQName().equals(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME);
+            if (isXXFormsAttribute) {
+                // TODO
+                // NOTE: bad design that AVT has @value as attribute name
+                return null;
+            } else if (valueAttribute != null) {
+                // E.g. xforms:output/@value
+                return analyzeXPath(staticState, baseAnalysis, prefixedId, valueAttribute);
+            } else {
+                // Value is considered the string value
+                return analyzeXPath(staticState, baseAnalysis, prefixedId, "string()");
+            }
+        } else {
+            return null;
         }
     }
 
@@ -130,7 +128,7 @@ public class ControlAnalysis {
         return null;
     }
 
-    private XPathAnalysis analyzeXPath(XFormsStaticState staticState, XPathAnalysis baseAnalysis, String prefixedId, String xpathString) {
+    protected XPathAnalysis analyzeXPath(XFormsStaticState staticState, XPathAnalysis baseAnalysis, String prefixedId, String xpathString) {
         // Create new expression
         // TODO: get expression from pool and pass in-scope variables (probably more efficient)
         final Expression expression = XPathCache.createExpression(staticState.getXPathConfiguration(), xpathString,

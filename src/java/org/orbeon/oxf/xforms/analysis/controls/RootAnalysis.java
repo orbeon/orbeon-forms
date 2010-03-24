@@ -41,6 +41,7 @@ public class RootAnalysis extends ContainerAnalysis {
             if (instanceElements.size() > 0) {
                 final String instanceId = instanceElements.get(0).attributeValue("id");
 
+                // Start with instance('defaultInstanceId')
                 return analyzeXPath(staticState, null, prefixedId, "instance('" + instanceId.replaceAll("'", "''") + "')");
             } else {
                 return null;

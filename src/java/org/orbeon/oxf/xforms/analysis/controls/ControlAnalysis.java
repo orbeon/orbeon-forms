@@ -58,7 +58,7 @@ public class ControlAnalysis {
         this.parentControlAnalysis = parentControlAnalysis;
         this.inScopeVariables = inScopeVariables;
 
-        if (staticState.isXPathAnalysis() && element != null) {
+        if (staticState.isXPathAnalysis()) {
             // TODO: handle @model and xxbl:scope changes
             this.bindingAnalysis = computeBindingAnalysis();
             this.valueAnalysis = computeValueAnalysis();
@@ -69,46 +69,54 @@ public class ControlAnalysis {
     }
 
     protected XPathAnalysis computeBindingAnalysis() {
-        final String bindingExpression;
-        if (element.attributeValue("context") == null) {
-            final String ref = element.attributeValue("ref");
-            if (ref != null) {
-                bindingExpression = ref;
+        if (element != null) {
+            final String bindingExpression;
+            if (element.attributeValue("context") == null) {
+                final String ref = element.attributeValue("ref");
+                if (ref != null) {
+                    bindingExpression = ref;
+                } else {
+                    bindingExpression = element.attributeValue("nodeset");
+                }
             } else {
-                bindingExpression = element.attributeValue("nodeset");
+                // TODO: handle @context
+                bindingExpression = null;
+            }
+
+            if ((bindingExpression != null)) {
+                return analyzeXPath(staticState, getAncestorOrSelfBindingAnalysis(), prefixedId, bindingExpression);
+            } else {
+                // TODO: TEMP: just do this for now so that controls w/o their own binding also get binding updated
+                return getAncestorOrSelfBindingAnalysis();
             }
         } else {
-            // TODO: handle @context
-            bindingExpression = null;
-        }
-
-        if ((bindingExpression != null)) {
-            return analyzeXPath(staticState, getAncestorOrSelfBindingAnalysis(), prefixedId, bindingExpression);
-        } else {
-            // TODO: TEMP: just do this for now so that controls w/o their own binding also get binding updated
-            return getAncestorOrSelfBindingAnalysis();
+            return null;
         }
     }
 
     protected XPathAnalysis computeValueAnalysis () {
-        final XPathAnalysis baseAnalysis = getAncestorOrSelfBindingAnalysis();
-        if (this instanceof VariableAnalysis) {
-            // TODO: handle xxf:sequence
-            return analyzeXPath(staticState, baseAnalysis, prefixedId, element.attributeValue("select"));
-        } else if (isValueControl) {
-            final String valueAttribute = element.attributeValue("value");
+        if (element != null) {
+            final XPathAnalysis baseAnalysis = getAncestorOrSelfBindingAnalysis();
+            if (this instanceof VariableAnalysis) {
+                // TODO: handle xxf:sequence
+                return analyzeXPath(staticState, baseAnalysis, prefixedId, element.attributeValue("select"));
+            } else if (isValueControl) {
+                final String valueAttribute = element.attributeValue("value");
 
-            final boolean isXXFormsAttribute = element.getQName().equals(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME);
-            if (isXXFormsAttribute) {
-                // TODO
-                // NOTE: bad design that AVT has @value as attribute name
-                return null;
-            } else if (valueAttribute != null) {
-                // E.g. xforms:output/@value
-                return analyzeXPath(staticState, baseAnalysis, prefixedId, valueAttribute);
+                final boolean isXXFormsAttribute = element.getQName().equals(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME);
+                if (isXXFormsAttribute) {
+                    // TODO
+                    // NOTE: bad design that AVT has @value as attribute name
+                    return null;
+                } else if (valueAttribute != null) {
+                    // E.g. xforms:output/@value
+                    return analyzeXPath(staticState, baseAnalysis, prefixedId, valueAttribute);
+                } else {
+                    // Value is considered the string value
+                    return analyzeXPath(staticState, baseAnalysis, prefixedId, "string()");
+                }
             } else {
-                // Value is considered the string value
-                return analyzeXPath(staticState, baseAnalysis, prefixedId, "string()");
+                return null;
             }
         } else {
             return null;

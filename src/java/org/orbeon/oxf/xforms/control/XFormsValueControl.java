@@ -56,10 +56,10 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
+    protected void evaluateImpl(PropertyContext propertyContext, boolean isRefresh) {
 
         // Evaluate other aspects of the control if necessary
-        super.evaluate(propertyContext, isRefresh);
+        super.evaluateImpl(propertyContext, isRefresh);
 
         // Evaluate control values
         if (isRelevant()) {

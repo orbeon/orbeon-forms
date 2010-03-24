@@ -474,9 +474,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return getBindingContext();
     }
 
-    public final void evaluateIfNeeded(PropertyContext propertyContext, boolean isRefresh) {
+    public final void evaluate(PropertyContext propertyContext, boolean isRefresh) {
         try {
-            evaluate(propertyContext, isRefresh);
+            evaluateImpl(propertyContext, isRefresh);
         } catch (ValidationException e) {
                 throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating control",
                     getControlElement(), "element", Dom4jUtils.elementToDebugString(getControlElement())));
@@ -538,7 +538,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @param propertyContext   current context
      * @param isRefresh         true if part of the refresh process, false if initialization and new repeat iteration creation
      */
-    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
+    protected void evaluateImpl(PropertyContext propertyContext, boolean isRefresh) {
 
         // TODO: these should be evaluated lazily
         // Evaluate standard extension attributes

@@ -340,7 +340,7 @@ public class XFormsServer extends ProcessorImpl {
                 }
 
                 // TODO: UI-DEPENDENCIES TEMP
-//                containingDocument.getStaticState().dumpAnalysis();
+                containingDocument.getStaticState().dumpAnalysis();
 
                 if (contentHandler != null) {
                     // Create resulting document if there is a ContentHandler

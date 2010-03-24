@@ -158,16 +158,16 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
+    protected void evaluateImpl(PropertyContext propertyContext, boolean isRefresh) {
 
-        super.evaluate(propertyContext, isRefresh);
+        super.evaluateImpl(propertyContext, isRefresh);
 
         // Evaluate iterations
         final List<XFormsControl> children = getChildren();
         if (children != null) {
             for (final XFormsControl child: children) {
                 final XFormsRepeatIterationControl currentRepeatIteration = (XFormsRepeatIterationControl) child;
-                currentRepeatIteration.evaluate(propertyContext, isRefresh);
+                currentRepeatIteration.evaluateImpl(propertyContext, isRefresh);
             }
         }
     }
@@ -344,7 +344,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events if needed
             saveValue();
             markDirty();
-            evaluate(propertyContext, true);
+            evaluateImpl(propertyContext, true);
             containingDocument.getControls().dispatchRefreshEvents(propertyContext, Collections.singletonList(getEffectiveId()));
         }
     }

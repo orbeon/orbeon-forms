@@ -477,7 +477,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlEffectiveId);
 
                 // Evaluate variable right away in case it is used by further bindings
-                control.evaluateIfNeeded(propertyContext, isRefresh);
+                control.evaluate(propertyContext, isRefresh);
 
                 // Handle variable value dependencies
                 // TODO: UI-DEPENDENCIES
@@ -596,9 +596,9 @@ public class XFormsControls implements XFormsObjectResolver {
             indentedLogger.startHandleOperation("model", "performing refresh", "container id", container.getEffectiveId());
             {
                 // Update control bindings
-                updateBindingsIfNeeded(propertyContext);
+                updateControlBindings(propertyContext);
                 // Update control values
-                evaluateValuesIfNeeded(propertyContext);
+                evaluateControlValues(propertyContext);
 
                 if (currentControlTree.isAllowSendingRefreshEvents()) {
                     // There are potentially event handlers for UI events, so do the whole processing
@@ -627,12 +627,12 @@ public class XFormsControls implements XFormsObjectResolver {
     }
 
     /**
-     * Rebuild the controls tree bindings if needed.
+     * Update all the control bindings.
      *
      * @param propertyContext   current context
      * @return                  true iif bindings were updated
      */
-    private boolean updateBindingsIfNeeded(final PropertyContext propertyContext) {
+    private boolean updateControlBindings(final PropertyContext propertyContext) {
 
         if (!initialized) {
             return false;
@@ -666,12 +666,11 @@ public class XFormsControls implements XFormsObjectResolver {
     }
 
     /**
-     * Evaluate all the controls if needed. Should be used before output initial XHTML and before computing differences
-     * in XFormsServer.
+     * Evaluate all the control values.
      *
      * @param propertyContext   current context
      */
-    private void evaluateValuesIfNeeded(PropertyContext propertyContext) {
+    private void evaluateControlValues(PropertyContext propertyContext) {
 
         indentedLogger.startHandleOperation("controls", "evaluating");
         {
@@ -680,7 +679,7 @@ public class XFormsControls implements XFormsObjectResolver {
             if (effectiveIdsToControls != null) {
                 for (final Map.Entry<String, XFormsControl> currentEntry: effectiveIdsToControls.entrySet()) {
                     final XFormsControl currentControl = currentEntry.getValue();
-                    currentControl.evaluateIfNeeded(propertyContext, true);
+                    currentControl.evaluate(propertyContext, true);
                 }
             }
         }
@@ -742,7 +741,7 @@ public class XFormsControls implements XFormsObjectResolver {
         ControlTree.visitControls(containerControl, true, new XFormsControlVisitorAdapter() {
             @Override
             public boolean startVisitControl(XFormsControl control) {
-                control.evaluateIfNeeded(propertyContext, true);
+                control.evaluate(propertyContext, true);
                 return true;
             }
         });

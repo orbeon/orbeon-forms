@@ -50,8 +50,8 @@ public abstract class XFormsValueContainerControl extends XFormsSingleNodeContai
     }
 
     @Override
-    protected void evaluate(PropertyContext propertyContext, boolean isRefresh) {
-        super.evaluate(propertyContext, isRefresh);
+    protected void evaluateImpl(PropertyContext propertyContext, boolean isRefresh) {
+        super.evaluateImpl(propertyContext, isRefresh);
 
         // Evaluate control values
         if (hasValue && isRelevant()) {

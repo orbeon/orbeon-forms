@@ -101,7 +101,7 @@ h1.fr-form-title {
 #fb-editor-metadata-dialog .xforms-label { display: block; }
 #fb-editor-metadata-dialog .xforms-hint { width: 25em; margin-bottom: 1em; }
 #fb-editor-metadata-dialog .xforms-alert { width: 25em; }
-#fb-editor-metadata-dialog .fb-editor-metadata-dialog-fields { display: inline-block; }
+#fb-editor-metadata-dialog .fb-editor-metadata-dialog-fields { float: left; width: 20em }
 #fb-editor-metadata-dialog .fb-editor-metadata-dialog-buttons { margin-top: 1em; }
 /* Itemset editor dialog */
 #fb-itemset-editor-dialog { width: 35em }

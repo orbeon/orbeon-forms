@@ -28,7 +28,6 @@ public class XPathAnalysis {
     public final XFormsStaticState staticState;
     public final String xpathString;
     public final PathMap pathmap;
-//    public final int dependencies;
 
     final Set<String> dependentPaths = new HashSet<String>();
     final Set<String> returnablePaths = new HashSet<String>();
@@ -36,11 +35,11 @@ public class XPathAnalysis {
     final boolean figuredOutDependencies;
 
     public XPathAnalysis(XFormsStaticState staticState, Expression expression, String xpathString,
-                         XPathAnalysis baseAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+                         XPathAnalysis baseAnalysis, Map<String, ControlAnalysis> inScopeVariables,
+                         String defaultInstancePrefixedId) {
 
         this.staticState = staticState;
         this.xpathString = xpathString;
-//        this.dependencies = dependencies;
 
         try {
             final Map<String, PathMap> variables = new HashMap<String, PathMap>();
@@ -72,10 +71,8 @@ public class XPathAnalysis {
 
             this.pathmap = pathmap;
 
-//            final int dependencies = expression.getDependencies();
-
             // Produce resulting paths
-            figuredOutDependencies = processPaths();
+            figuredOutDependencies = processPaths(defaultInstancePrefixedId);
 
         } catch (Exception e) {
             throw new OXFException("Exception while analyzing XPath expression: " + xpathString, e);
@@ -106,12 +103,12 @@ public class XPathAnalysis {
         return false;
     }
 
-    private boolean processPaths() {
+    private boolean processPaths(String defaultInstancePrefixedId) {
         // TODO: need to deal with namespaces!
         final List<Expression> stack = new ArrayList<Expression>();
         for (final PathMap.PathMapRoot root: pathmap.getPathMapRoots()) {
             stack.add(root.getRootExpression());
-            final boolean success = processNode(stack, root);
+            final boolean success = processNode(stack, root, defaultInstancePrefixedId);
             if (!success)
                 return false;
             stack.remove(stack.size() - 1);
@@ -123,7 +120,7 @@ public class XPathAnalysis {
         return "instance('" + instanceId.replaceAll("'", "''") + "')";
     }
 
-    private boolean processNode(List<Expression> stack, PathMap.PathMapNode node) {
+    private boolean processNode(List<Expression> stack, PathMap.PathMapNode node, String defaultInstancePrefixedId) {
         boolean success = true;
         if (node.getArcs().length == 0 || node.isReturnable()) {
 
@@ -136,8 +133,7 @@ public class XPathAnalysis {
 
                     final boolean hasParameter = instanceExpression.getArguments().length > 0;
                     if (!hasParameter) {
-                        // TODO: use model
-                        sb.append(buildInstanceString(staticState.getDefaultInstanceId()));
+                        sb.append(buildInstanceString(defaultInstancePrefixedId));
                     } else {
                         final Expression instanceNameExpression = instanceExpression.getArguments()[0];
                         if (instanceNameExpression instanceof StringLiteral) {
@@ -186,7 +182,7 @@ public class XPathAnalysis {
         if (node.getArcs().length > 0) {
             for (final PathMap.PathMapArc arc: node.getArcs()) {
                 stack.add(arc.getStep());
-                success &= processNode(stack, arc.getTarget());
+                success &= processNode(stack, arc.getTarget(), defaultInstancePrefixedId);
                 if (!success) {
                     return false;
                 }

@@ -131,6 +131,13 @@ public class XBLBindings {
         public String toString() {
             return scopeId;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof Scope))
+                return false;
+            return this == obj || scopeId.equals(((Scope) obj).scopeId);
+        }
     }
 
     public Scope getResolutionScopeById(String scopeId) {
@@ -346,7 +353,7 @@ public class XBLBindings {
 
     public void processElementIfNeeded(PropertyContext propertyContext, IndentedLogger indentedLogger, Element controlElement,
                                        String controlPrefixedId, LocationData locationData,
-                                       DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, String prefix,
+                                       DocumentWrapper controlsDocumentInfo, Configuration xpathConfiguration, Scope scope,
                                        ContainerAnalysis parentControlAnalysis,
                                        StringBuilder repeatHierarchyStringBuffer) {
 
@@ -437,6 +444,7 @@ public class XBLBindings {
 
                                 // NOTE: <xbl:handler> has similar attributes as XForms actions, in particular @event, @phase, etc.
                                 final String controlStaticId = XFormsUtils.getStaticIdFromId(controlPrefixedId);
+                                final String prefix = scope.getFullPrefix();
                                 final XFormsEventHandlerImpl eventHandler = new XFormsEventHandlerImpl(prefix, currentHandlerAnnotatedElement,
                                         null, controlStaticId, true, controlStaticId,
                                         currentHandlerAnnotatedElement.attributeValue(XFormsConstants.XBL_HANDLER_EVENT_ATTRIBUTE_QNAME),
@@ -455,7 +463,7 @@ public class XBLBindings {
                         }
                     }
 
-                    staticState.analyzeComponentTree(propertyContext, xpathConfiguration, newPrefix, compactShadowTreeDocument.getRootElement(),
+                    staticState.analyzeComponentTree(propertyContext, xpathConfiguration, newScope, compactShadowTreeDocument.getRootElement(),
                             parentControlAnalysis, repeatHierarchyStringBuffer);
                 }
             }

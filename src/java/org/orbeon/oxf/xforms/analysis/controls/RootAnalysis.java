@@ -16,16 +16,21 @@ package org.orbeon.oxf.xforms.analysis.controls;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 
 public class RootAnalysis extends ContainerAnalysis {
-    public RootAnalysis(PropertyContext propertyContext, XFormsStaticState staticState) {
-        super(propertyContext, staticState, null, "#controls", null, staticState.getLocationData(), 1, false, false, null, null);
+    public RootAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, XBLBindings.Scope scope) {
+        super(propertyContext, staticState, null, scope, "#controls", null, staticState.getLocationData(), 1, false, false, null, null);
+    }
+
+    @Override
+    protected String computeModelPrefixedId() {
+        return staticState.getDefaultModelId();
     }
 
     @Override
     protected XPathAnalysis computeBindingAnalysis() {
         if (staticState.getDefaultModelId() != null) {
-            // TODO: use model
             final String defaultInstanceId = staticState.getDefaultInstanceId();
             if (defaultInstanceId != null) {
                 // Start with instance('defaultInstanceId')

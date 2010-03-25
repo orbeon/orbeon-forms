@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 
@@ -26,8 +27,8 @@ public class ContainerAnalysis extends ControlAnalysis {
 
     private Map<String, String> containedVariables; // variable name -> prefixed id
 
-    public ContainerAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo, String prefixedId, Element element, LocationData locationData, int index, boolean hasNodeBinding, boolean isValueControl, ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
-        super(propertyContext, staticState, controlsDocumentInfo, prefixedId, element, locationData, index, hasNodeBinding, isValueControl, parentControlAnalysis, inScopeVariables);
+    public ContainerAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo, XBLBindings.Scope scope, String prefixedId, Element element, LocationData locationData, int index, boolean hasNodeBinding, boolean isValueControl, ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+        super(propertyContext, staticState, controlsDocumentInfo, scope, prefixedId, element, locationData, index, hasNodeBinding, isValueControl, parentControlAnalysis, inScopeVariables);
     }
 
     public void addContainedVariable(String variableName, String variablePrefixedId) {

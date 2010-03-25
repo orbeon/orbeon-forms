@@ -117,30 +117,7 @@ public class ControlAnalysis {
                 bindingExpression = null;
             }
 
-            final XPathAnalysis baseAnalysis;
-            {
-                final XPathAnalysis ancestor = getAncestorOrSelfBindingAnalysis();
-                if (ancestor != null) {
-                    // There is an ancestor control in the same scope with same model, use its analysis as base
-                    baseAnalysis = ancestor;
-                } else {
-                    // We are a top-level control in a scope/model combination, create analysis
-                    if (modelPrefixedId != null) {
-                        final String defaultInstanceId = staticState.getDefaultInstancePrefixedIdForModel(modelPrefixedId);
-                        if (defaultInstanceId != null) {
-                            // Start with instance('defaultInstanceId')
-                            baseAnalysis = analyzeXPath(staticState, null, prefixedId, XPathAnalysis.buildInstanceString(defaultInstanceId));
-                        } else {
-                            // No default instance
-                            baseAnalysis = null;
-                        }
-                    } else {
-                        // No default model
-                        baseAnalysis = null;
-                    }
-                }
-            }
-
+            final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis();
             if ((bindingExpression != null)) {
                 // New binding expression
                 return analyzeXPath(staticState, baseAnalysis, prefixedId, bindingExpression);
@@ -153,13 +130,35 @@ public class ControlAnalysis {
         }
     }
 
+    protected XPathAnalysis findOrCreateBaseAnalysis() {
+        final XPathAnalysis baseAnalysis;
+        final XPathAnalysis ancestor = getAncestorOrSelfBindingAnalysis();
+        if (ancestor != null) {
+            // There is an ancestor control in the same scope with same model, use its analysis as base
+            baseAnalysis = ancestor;
+        } else {
+            // We are a top-level control in a scope/model combination, create analysis
+            if (modelPrefixedId != null) {
+                final String defaultInstanceId = staticState.getDefaultInstancePrefixedIdForModel(modelPrefixedId);
+                if (defaultInstanceId != null) {
+                    // Start with instance('defaultInstanceId')
+                    baseAnalysis = analyzeXPath(staticState, null, prefixedId, XPathAnalysis.buildInstanceString(defaultInstanceId));
+                } else {
+                    // No default instance
+                    baseAnalysis = null;
+                }
+            } else {
+                // No default model
+                baseAnalysis = null;
+            }
+        }
+        return baseAnalysis;
+    }
+
     protected XPathAnalysis computeValueAnalysis () {
         if (element != null) {
-            final XPathAnalysis baseAnalysis = getAncestorOrSelfBindingAnalysis();
-            if (this instanceof VariableAnalysis) {
-                // TODO: handle xxf:sequence
-                return analyzeXPath(staticState, baseAnalysis, prefixedId, element.attributeValue("select"));
-            } else if (isValueControl) {
+            final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis();
+            if (isValueControl) {
                 final String valueAttribute = element.attributeValue("value");
 
                 final boolean isXXFormsAttribute = element.getQName().equals(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME);

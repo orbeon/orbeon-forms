@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -29,5 +30,12 @@ public class VariableAnalysis extends ControlAnalysis {
 
         // Gather variable information
         parentControlAnalysis.addContainedVariable(element.attributeValue("name"), prefixedId);
+    }
+
+    @Override
+    protected XPathAnalysis computeValueAnalysis() {
+        // TODO: handle xxf:sequence
+        final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis();
+        return analyzeXPath(staticState, baseAnalysis, prefixedId, element.attributeValue("select"));
     }
 }

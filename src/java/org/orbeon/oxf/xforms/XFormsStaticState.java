@@ -684,14 +684,14 @@ public class XFormsStaticState {
         return defaultInstanceId;
     }
 
-    public String getDefaultInstancePrefixedIdForScope(XBLBindings.Scope scope) {
-        final String defaultModelPrefixedId = getDefaultModelIdForScope(scope);
-        if (defaultModelPrefixedId != null) {
-            return getDefaultInstancePrefixedIdForModel(defaultModelPrefixedId);
-        } else {
-            return null;
-        }
-    }
+//    public String getDefaultInstancePrefixedIdForScope(XBLBindings.Scope scope) {
+//        final String defaultModelPrefixedId = getDefaultModelIdForScope(scope);
+//        if (defaultModelPrefixedId != null) {
+//            return getDefaultInstancePrefixedIdForModel(defaultModelPrefixedId);
+//        } else {
+//            return null;
+//        }
+//    }
 
     public Map<String, String> getScripts() {
         return xxformsScripts;

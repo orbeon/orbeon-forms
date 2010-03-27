@@ -20,7 +20,6 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -83,7 +82,7 @@ public class ControlAnalysis {
             final String localModelId = element.attributeValue("model");
             if (localModelId != null) {
                 // Get model prefixed id and verify it belongs to this scope
-                final String localModelPrefixedId = XFormsUtils.getRelatedEffectiveId(prefixedId, localModelId);
+                final String localModelPrefixedId = scope.getPrefixedIdForStaticId(localModelId);
                 if (!staticState.getModelDocuments().containsKey(localModelPrefixedId))
                     throw new ValidationException("Reference to non-existing model id: " + localModelId, locationData);
                 return localModelPrefixedId;

@@ -37,7 +37,7 @@ public class XPathAnalysis {
     public XPathAnalysis(XFormsStaticState staticState, Expression expression, String xpathString,
                          XPathAnalysis baseAnalysis, Map<String, ControlAnalysis> inScopeVariables,
                          String defaultInstancePrefixedId) {
-
+        
         this.staticState = staticState;
         this.xpathString = xpathString;
 
@@ -264,6 +264,7 @@ public class XPathAnalysis {
             for (final PathMap.PathMapArc arc: node.getArcs()) {
 
                 final AxisExpression e = arc.getStep();
+                // TODO: handle ANCESTOR_OR_SELF and PARENT
                 if (e.getAxis() == Axis.ANCESTOR && e.getNodeTest().getFingerprint() != -1) {
                     // Found ancestor::foobar
 

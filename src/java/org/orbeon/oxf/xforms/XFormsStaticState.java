@@ -23,6 +23,7 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory;
 import org.orbeon.oxf.xforms.analysis.IdGenerator;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
@@ -1143,12 +1144,12 @@ public class XFormsStaticState {
     }
 
     public void analyzeComponentTree(final PropertyContext propertyContext, final Configuration xpathConfiguration,
-                                     final XBLBindings.Scope scope, Element startElement, final ContainerAnalysis startControlAnalysis,
+                                     final XBLBindings.Scope innerScope, Element startElement, final ContainerAnalysis startControlAnalysis,
                                      final StringBuilder repeatHierarchyStringBuffer) {
 
         final DocumentWrapper controlsDocumentInfo = new DocumentWrapper(startElement.getDocument(), null, xpathConfiguration);
 
-        final String prefix = scope.getFullPrefix();
+        final String prefix = innerScope.getFullPrefix();
 
         // Extract scripts for this tree of controls
         extractXFormsScripts(propertyContext, controlsDocumentInfo, prefix);
@@ -1173,7 +1174,7 @@ public class XFormsStaticState {
 
                 // If element is not built-in, check XBL and generate shadow content if needed
                 xblBindings.processElementIfNeeded(propertyContext, indentedLogger, controlElement, controlPrefixedId, locationData,
-                        controlsDocumentInfo, xpathConfiguration, scope, parentControlAnalysis, repeatHierarchyStringBuffer);
+                        controlsDocumentInfo, xpathConfiguration, innerScope, parentControlAnalysis, repeatHierarchyStringBuffer);
 
                 // Check for mandatory and optional bindings
                 final boolean hasNodeBinding;
@@ -1204,39 +1205,14 @@ public class XFormsStaticState {
                 }
 
                 // Create and index static control information
+                final ControlAnalysis controlAnalysis; {
+                    final XBLBindings.Scope controlScope = xblBindings.getResolutionScopeByPrefixedId(controlPrefixedId);
+                    final int controlIndex = controlAnalysisMap.size() + 1;
+                    final Map<String, ControlAnalysis> inScopeVariables = parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap);
 
-                final ControlAnalysis controlAnalysis;
-                if (controlName.equals("repeat")) {
-                    controlAnalysis = new RepeatAnalysis(propertyContext, XFormsStaticState.this,
-                        controlsDocumentInfo, scope, controlPrefixedId, controlElement, locationData, controlAnalysisMap.size() + 1, hasNodeBinding,
-                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis,
-                        parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap));
-                } else if (isContainer) {
-                    controlAnalysis = new ContainerAnalysis(propertyContext, XFormsStaticState.this,
-                        controlsDocumentInfo, scope, controlPrefixedId, controlElement, locationData, controlAnalysisMap.size() + 1, hasNodeBinding,
-                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis,
-                        parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap));
-                } else if (controlName.equals("select") || controlName.equals("select1")) {
-                    controlAnalysis = new Select1Analysis(propertyContext, XFormsStaticState.this,
-                        controlsDocumentInfo, scope, controlPrefixedId, controlElement, locationData, controlAnalysisMap.size() + 1, hasNodeBinding,
-                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis,
-                        parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap));
-                } else if ("variable".equals(controlName)) {
-                    controlAnalysis = new VariableAnalysis(propertyContext, XFormsStaticState.this,
-                        controlsDocumentInfo, scope, controlPrefixedId, controlElement, locationData, controlAnalysisMap.size() + 1, hasNodeBinding,
-                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis,
-                        parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap));
-                } else if ("attribute".equals(controlName)) {
-                    controlAnalysis = new AttributeAnalysis(propertyContext, XFormsStaticState.this,
-                        controlsDocumentInfo, scope, controlPrefixedId, controlElement, locationData, controlAnalysisMap.size() + 1, hasNodeBinding,
-                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis,
-                        parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap));
-                } else {
-                    // Default
-                    controlAnalysis = new ControlAnalysis(propertyContext, XFormsStaticState.this,
-                        controlsDocumentInfo, scope, controlPrefixedId, controlElement, locationData, controlAnalysisMap.size() + 1, hasNodeBinding,
-                        XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis,
-                            parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap));
+                    controlAnalysis = ControlAnalysisFactory.create(propertyContext, XFormsStaticState.this, controlsDocumentInfo,
+                        controlScope, controlPrefixedId, controlElement, locationData,controlIndex, hasNodeBinding,
+                        isContainer, parentControlAnalysis, inScopeVariables);
                 }
 
                 controlAnalysisMap.put(controlPrefixedId, controlAnalysis);

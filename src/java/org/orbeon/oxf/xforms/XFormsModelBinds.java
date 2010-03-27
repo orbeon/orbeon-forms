@@ -517,7 +517,7 @@ public class XFormsModelBinds {
         final Map<Item, Object> result = new HashMap<Item, Object>();
 
         // Iterate through controls
-        for (Map.Entry<String,XFormsControl> currentEntry: idsToXFormsControls.entrySet()) {
+        for (Map.Entry<String, XFormsControl> currentEntry: idsToXFormsControls.entrySet()) {
             final XFormsControl currentControl = currentEntry.getValue();
 
             if (currentControl instanceof XFormsSingleNodeControl

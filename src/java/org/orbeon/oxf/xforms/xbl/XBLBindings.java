@@ -390,11 +390,10 @@ public class XBLBindings {
                     }
 
                     // Generate compact shadow tree for this static id
-                    final Scope newScope = new Scope(newPrefix.substring(0, newPrefix.length() - 1));
-                    final Document compactShadowTreeDocument = filterShadowTree(indentedLogger, fullShadowTreeDocument, controlElement, newPrefix, newScope, controlPrefixedId);
-
-                    final Scope innerScope = getResolutionScopeById(controlPrefixedId);
+                    final Scope newInnerScope = new Scope(controlPrefixedId);
                     final Scope outerScope = prefixedIdToXBLScopeMap.get(controlPrefixedId);
+
+                    final Document compactShadowTreeDocument = filterShadowTree(indentedLogger, fullShadowTreeDocument, controlElement, newPrefix, newInnerScope, controlPrefixedId);
 
                     // Register models placed under xbl:implementation
                     if (xblImplementations != null) {
@@ -402,7 +401,7 @@ public class XBLBindings {
                         if (implementationModelDocuments != null && implementationModelDocuments.size() > 0) {
                             // Say we DO annotate because these models are outside the template
                             addModelDocuments(controlPrefixedId, implementationModelDocuments, newPrefix, true,
-                                    innerScope, outerScope, XFormsConstants.XXBLScope.inner);
+                                    newInnerScope, outerScope, XFormsConstants.XXBLScope.inner);
                             if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", "registered XBL implementation model documents", "count", Integer.toString(implementationModelDocuments.size()));
                         }
@@ -440,7 +439,7 @@ public class XBLBindings {
 
                                 // Annotate handler and gather scope information
                                 final Element currentHandlerAnnotatedElement
-                                        = annotateHandler(currentHandlerElement, newPrefix, innerScope, outerScope, XFormsConstants.XXBLScope.inner).getRootElement();
+                                        = annotateHandler(currentHandlerElement, newPrefix, newInnerScope, outerScope, XFormsConstants.XXBLScope.inner).getRootElement();
 
                                 // NOTE: <xbl:handler> has similar attributes as XForms actions, in particular @event, @phase, etc.
                                 final String controlStaticId = XFormsUtils.getStaticIdFromId(controlPrefixedId);
@@ -463,7 +462,7 @@ public class XBLBindings {
                         }
                     }
 
-                    staticState.analyzeComponentTree(propertyContext, xpathConfiguration, newScope, compactShadowTreeDocument.getRootElement(),
+                    staticState.analyzeComponentTree(propertyContext, xpathConfiguration, newInnerScope, compactShadowTreeDocument.getRootElement(),
                             parentControlAnalysis, repeatHierarchyStringBuffer);
                 }
             }

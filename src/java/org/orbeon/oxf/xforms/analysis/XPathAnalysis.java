@@ -147,7 +147,6 @@ public class XPathAnalysis {
                 } else if (expression instanceof AxisExpression) {
                     final AxisExpression axisExpression = (AxisExpression) expression;
                     if (axisExpression.getAxis() == Axis.SELF) {
-                        // Self axis
                         // NOP
                     } else if (axisExpression.getAxis() == Axis.CHILD) {
                         // Child axis
@@ -284,6 +283,22 @@ public class XPathAnalysis {
                         return true;
                     } else {
                         // Ignore for now
+                    }
+                } else if (e.getAxis() == Axis.FOLLOWING_SIBLING || e.getAxis() == Axis.PRECEDING_SIBLING) {
+                    // Simplify preceding-sibling::foobar / following-sibling::foobar
+                    final NodeArc parentNodeArc = stack.get(stack.size() - 1);
+                    if (stack.size() > 2) {
+                        final NodeArc grandparentNodeArc = stack.get(stack.size() - 2);
+
+                        final AxisExpression newStep = new AxisExpression(parentNodeArc.arc.getStep().getAxis(), e.getNodeTest());
+                        newStep.setContainer(e.getContainer());
+                        grandparentNodeArc.node.createArc(newStep, arc.getTarget());
+                        node.removeArc(arc);
+                    } else {
+                        final AxisExpression newStep = new AxisExpression(Axis.CHILD, e.getNodeTest());
+                        newStep.setContainer(e.getContainer());
+                        parentNodeArc.node.createArc(newStep, arc.getTarget());
+                        node.removeArc(arc);
                     }
                 }
 

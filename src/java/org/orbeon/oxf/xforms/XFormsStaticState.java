@@ -1282,7 +1282,10 @@ public class XFormsStaticState {
                 return controlAnalysis;
             }
 
-            public void endVisitControl(Element controlElement, String controlId) {
+            public void endVisitControl(Element controlElement, ContainerAnalysis containerControlAnalysis, ControlAnalysis newControl, boolean isContainer) {
+                if (isContainer) {
+                    ((ContainerAnalysis) newControl).clearContainedVariables();
+                }
             }
         });
 
@@ -1578,20 +1581,20 @@ public class XFormsStaticState {
                 // Handle XForms grouping controls
                 final ContainerAnalysis newContainer = (ContainerAnalysis) controlElementVisitorListener.startVisitControl(currentControlElement, containerControlAnalysis, controlStaticId, true);
                 handleControlsStatic(controlElementVisitorListener, currentControlElement, newContainer);
-                controlElementVisitorListener.endVisitControl(currentControlElement, controlStaticId);
+                controlElementVisitorListener.endVisitControl(currentControlElement, containerControlAnalysis, newContainer, true);
             } else if (XFormsControlFactory.isCoreControl(currentControlElement.getNamespaceURI(), controlName)
                     || xblBindings.isComponent(currentControlElement.getQName())
                     || controlName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
                 // Handle core control, component, or variable
-                controlElementVisitorListener.startVisitControl(currentControlElement, containerControlAnalysis, controlStaticId, false);
-                controlElementVisitorListener.endVisitControl(currentControlElement, controlStaticId);
+                final ControlAnalysis newControl = controlElementVisitorListener.startVisitControl(currentControlElement, containerControlAnalysis, controlStaticId, false);
+                controlElementVisitorListener.endVisitControl(currentControlElement, containerControlAnalysis, newControl, false);
             }
         }
     }
 
     private static interface ControlElementVisitorListener {
         ControlAnalysis startVisitControl(Element controlElement, ContainerAnalysis containerControlAnalysis, String controlStaticId, boolean isContainer);
-        void endVisitControl(Element controlElement, String controlId);
+        void endVisitControl(Element controlElement, ContainerAnalysis containerControlAnalysis, ControlAnalysis newControl, boolean isContainer);
     }
 
     public static class ItemsInfo {

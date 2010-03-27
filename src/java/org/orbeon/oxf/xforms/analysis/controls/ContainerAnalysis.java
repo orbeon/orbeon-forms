@@ -38,7 +38,7 @@ public class ContainerAnalysis extends ControlAnalysis {
     }
 
     public void clearContainedVariables() {
-        // TODO: when to call this? should call to free memory
+        // Free this since this information is only useful while building sub-controls
         containedVariables = null;
     }
 

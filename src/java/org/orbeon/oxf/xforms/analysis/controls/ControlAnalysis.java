@@ -93,7 +93,7 @@ public class ControlAnalysis {
                     return ancestor.modelPrefixedId;
                 } else {
                     // Top-level control in a new scope, use default model id for scope
-                    return staticState.getDefaultModelIdForScope(scope);
+                    return staticState.getDefaultModelPrefixedIdForScope(scope);
                 }
             }
         } else {
@@ -216,8 +216,7 @@ public class ControlAnalysis {
         final Expression expression = XPathCache.createExpression(staticState.getXPathConfiguration(), xpathString,
                 staticState.getMetadata().namespaceMappings.get(prefixedId), XFormsContainingDocument.getFunctionLibrary());
         // Analyse it
-        final String defaultInstanceId = staticState.getDefaultInstancePrefixedIdForModel(modelPrefixedId);
-        return new XPathAnalysis(staticState, expression, xpathString, baseAnalysis, inScopeVariables, defaultInstanceId);
+        return new XPathAnalysis(staticState, expression, xpathString, baseAnalysis, inScopeVariables, scope, modelPrefixedId);
 
     }
 

@@ -35,7 +35,13 @@ public class VariableAnalysis extends ControlAnalysis {
     @Override
     protected XPathAnalysis computeValueAnalysis() {
         // TODO: handle xxf:sequence
-        final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis();
-        return analyzeXPath(staticState, baseAnalysis, prefixedId, element.attributeValue("select"));
+        final String selectAttribute = element.attributeValue("select");
+        if (selectAttribute != null) {
+            final XPathAnalysis baseAnalysis = findOrCreateBaseAnalysis();
+            return analyzeXPath(staticState, baseAnalysis, prefixedId, selectAttribute);
+        } else {
+            // Value is constant
+            return XPathAnalysis.CONSTANT_ANALYSIS;
+        }
     }
 }

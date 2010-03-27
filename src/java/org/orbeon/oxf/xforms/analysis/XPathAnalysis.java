@@ -15,9 +15,11 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.function.Instance;
+import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.Axis;
 
@@ -33,11 +35,22 @@ public class XPathAnalysis {
     final Set<String> dependentPaths = new HashSet<String>();
     final Set<String> returnablePaths = new HashSet<String>();
 
+    final Set<String> dependentModels = new HashSet<String>();
+
     final boolean figuredOutDependencies;
+
+    public static XPathAnalysis CONSTANT_ANALYSIS = new XPathAnalysis();
+
+    private XPathAnalysis() {
+        staticState = null;
+        xpathString = null;
+        pathmap = null;
+        figuredOutDependencies = true;
+    }
 
     public XPathAnalysis(XFormsStaticState staticState, Expression expression, String xpathString,
                          XPathAnalysis baseAnalysis, Map<String, ControlAnalysis> inScopeVariables,
-                         String defaultInstancePrefixedId) {
+                         XBLBindings.Scope scope, String modelPrefixedId) {
         
         this.staticState = staticState;
         this.xpathString = xpathString;
@@ -73,7 +86,7 @@ public class XPathAnalysis {
             this.pathmap = pathmap;
 
             // Produce resulting paths
-            figuredOutDependencies = processPaths(defaultInstancePrefixedId);
+            figuredOutDependencies = processPaths(scope, modelPrefixedId);
 
         } catch (Exception e) {
             throw new OXFException("Exception while analyzing XPath expression: " + xpathString, e);
@@ -104,11 +117,19 @@ public class XPathAnalysis {
         return false;
     }
 
-    private boolean processPaths(String defaultInstancePrefixedId) {
+    public boolean intersectsModels(Set<String> touchedModels) {
+        for (final String model: touchedModels) {
+            if (dependentModels.contains(model))
+                return true;
+        }
+        return false;
+    }
+
+    private boolean processPaths(XBLBindings.Scope scope, String modelPrefixedId) {
         final List<Expression> stack = new ArrayList<Expression>();
         for (final PathMap.PathMapRoot root: pathmap.getPathMapRoots()) {
             stack.add(root.getRootExpression());
-            final boolean success = processNode(stack, root, defaultInstancePrefixedId);
+            final boolean success = processNode(stack, root, scope, modelPrefixedId);
             if (!success)
                 return false;
             stack.remove(stack.size() - 1);
@@ -120,7 +141,7 @@ public class XPathAnalysis {
         return "instance('" + instanceId.replaceAll("'", "''") + "')";
     }
 
-    private boolean processNode(List<Expression> stack, PathMap.PathMapNode node, String defaultInstancePrefixedId) {
+    private boolean processNode(List<Expression> stack, PathMap.PathMapNode node, XBLBindings.Scope scope, String modelPrefixedId) {
         boolean success = true;
         if (node.getArcs().length == 0 || node.isReturnable()) {
 
@@ -133,11 +154,19 @@ public class XPathAnalysis {
 
                     final boolean hasParameter = instanceExpression.getArguments().length > 0;
                     if (!hasParameter) {
-                        sb.append(buildInstanceString(defaultInstancePrefixedId));
+                        // instance() resolves to default model/instance for scope
+                        sb.append(buildInstanceString(staticState.getDefaultInstancePrefixedIdForScope(scope)));
+                        dependentModels.add(staticState.getDefaultModelPrefixedIdForScope(scope));
                     } else {
                         final Expression instanceNameExpression = instanceExpression.getArguments()[0];
                         if (instanceNameExpression instanceof StringLiteral) {
-                            sb.append(buildInstanceString(((StringLiteral) instanceNameExpression).getStringValue()));
+                            final String originalInstanceId = ((StringLiteral) instanceNameExpression).getStringValue();
+                            // HACK: datatable e.g. uses instance(prefixedId)!
+                            final String prefixedInstanceId = originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1
+                                    ? originalInstanceId
+                                    : scope.getPrefixedIdForStaticId(originalInstanceId);
+                            sb.append(buildInstanceString(prefixedInstanceId));
+                            dependentModels.add(modelPrefixedId);
                         } else {
                             // Non-literal instance name
                             success = false;
@@ -187,7 +216,7 @@ public class XPathAnalysis {
         if (node.getArcs().length > 0) {
             for (final PathMap.PathMapArc arc: node.getArcs()) {
                 stack.add(arc.getStep());
-                success &= processNode(stack, arc.getTarget(), defaultInstancePrefixedId);
+                success &= processNode(stack, arc.getTarget(), scope, modelPrefixedId);
                 if (!success) {
                     return false;
                 }

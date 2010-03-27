@@ -160,16 +160,15 @@ public class PathMapUIDependencies implements UIDependencies {
                 // Value dependencies are known
                 if (structuralChanges.isEmpty()) {
                     // No structural change
-                    result = controlAnalysis.valueAnalysis.intersectsValue(getModifiedPaths());
+                    result = valueAnalysis.intersectsValue(getModifiedPaths());
                 } else {
                     // Structural change
-                    // TODO: do model by model
-                    result = true;
+                    result = valueAnalysis.intersectsModels(structuralChanges);
                 }
             }
             if (result && valueAnalysis != null) {
                 containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "value modified", "prefixed id", controlPrefixedId,
-                        "XPath", controlAnalysis.valueAnalysis.xpathString);
+                        "XPath", valueAnalysis.xpathString);
             }
 
             modifiedValueCache.put(controlPrefixedId, result);
@@ -202,8 +201,7 @@ public class PathMapUIDependencies implements UIDependencies {
                     result = controlAnalysis.bindingAnalysis.intersectsBinding(getModifiedPaths());
                 } else {
                     // Structural change
-                    // TODO: do model by model
-                    result = true;
+                    result = controlAnalysis.bindingAnalysis.intersectsModels(structuralChanges);
                 }
             }
             if (result) {

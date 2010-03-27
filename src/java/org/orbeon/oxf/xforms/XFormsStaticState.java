@@ -668,7 +668,7 @@ public class XFormsStaticState {
         return defaultModelId;
     }
 
-    public String getDefaultModelIdForScope(XBLBindings.Scope scope) {
+    public String getDefaultModelPrefixedIdForScope(XBLBindings.Scope scope) {
         final String fullPrefix = scope.getFullPrefix();
         for (final String modelPrefixedId: modelDocuments.keySet()) {
             final String modelPrefix = XFormsUtils.getEffectiveIdPrefix(modelPrefixedId);
@@ -685,14 +685,14 @@ public class XFormsStaticState {
         return defaultInstanceId;
     }
 
-//    public String getDefaultInstancePrefixedIdForScope(XBLBindings.Scope scope) {
-//        final String defaultModelPrefixedId = getDefaultModelIdForScope(scope);
-//        if (defaultModelPrefixedId != null) {
-//            return getDefaultInstancePrefixedIdForModel(defaultModelPrefixedId);
-//        } else {
-//            return null;
-//        }
-//    }
+    public String getDefaultInstancePrefixedIdForScope(XBLBindings.Scope scope) {
+        final String defaultModelPrefixedId = getDefaultModelPrefixedIdForScope(scope);
+        if (defaultModelPrefixedId != null) {
+            return getDefaultInstancePrefixedIdForModel(defaultModelPrefixedId);
+        } else {
+            return null;
+        }
+    }
 
     public Map<String, String> getScripts() {
         return xxformsScripts;

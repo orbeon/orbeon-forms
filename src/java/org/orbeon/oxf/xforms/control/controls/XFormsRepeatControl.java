@@ -159,7 +159,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
     @Override
     protected void evaluateImpl(PropertyContext propertyContext, boolean isRefresh) {
-
+        // TODO: don't need this right?
         super.evaluateImpl(propertyContext, isRefresh);
 
         // Evaluate iterations

@@ -37,6 +37,11 @@ public class PathMapUIDependencies implements UIDependencies {
 
     private boolean modifiedPathsSet;
     private Set<String> modifiedPaths = new HashSet<String>();
+
+    // Cache to speedup checks on repeated items
+    private Map<String, Boolean> modifiedBindingCache = new HashMap<String, Boolean>();
+    private Map<String, Boolean> modifiedValueCache = new HashMap<String, Boolean>();
+
     private int bindingUpdateCount;
     private int valueUpdateCount;
 
@@ -75,6 +80,8 @@ public class PathMapUIDependencies implements UIDependencies {
 
         modifiedPathsSet = false;
         modifiedPaths.clear();
+        modifiedBindingCache.clear();
+        modifiedValueCache.clear();
 
         bindingUpdateCount = 0;
         valueUpdateCount = 0;
@@ -121,10 +128,10 @@ public class PathMapUIDependencies implements UIDependencies {
             for (final NodeInfo currentNode: ancestorOrSelf.subList(2, ancestorOrSelf.size())) {
                 sb.append('/');
                 if (currentNode.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
-                    sb.append(currentNode.getDisplayName());
+                    sb.append(currentNode.getFingerprint());
                 } else if (currentNode.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
                     sb.append('@');
-                    sb.append(currentNode.getDisplayName());
+                    sb.append(currentNode.getFingerprint());
                 }
             }
         }
@@ -135,60 +142,82 @@ public class PathMapUIDependencies implements UIDependencies {
     public boolean requireValueUpdate(String controlPrefixedId) {
 
         final boolean result;
-        final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
-        if (controlAnalysis.valueAnalysis == null) {
-            // Control does not have a value
-            result = true;//TODO: should be able to return false here; change once markDirty is handled better
-        } else if (!controlAnalysis.valueAnalysis.figuredOutDependencies) {
-            // Value dependencies are unknown
-            result = true;
+        final Boolean cached = modifiedValueCache.get(controlPrefixedId);
+        final XPathAnalysis valueAnalysis;
+        if (cached != null) {
+            result =  cached;
+            valueAnalysis = result ? staticState.getControlAnalysis(controlPrefixedId).valueAnalysis : null;
         } else {
-            // Value dependencies are known
-            if (structuralChanges.isEmpty()) {
-                // No structural change
-                result = controlAnalysis.valueAnalysis.intersectsValue(getModifiedPaths());
-            } else {
-                // Structural change
-                // TODO: do model by model
+            final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
+            valueAnalysis = controlAnalysis.valueAnalysis;
+            if (valueAnalysis == null) {
+                // Control does not have a value
+                result = true;//TODO: should be able to return false here; change once markDirty is handled better
+            } else if (!valueAnalysis.figuredOutDependencies) {
+                // Value dependencies are unknown
                 result = true;
+            } else {
+                // Value dependencies are known
+                if (structuralChanges.isEmpty()) {
+                    // No structural change
+                    result = controlAnalysis.valueAnalysis.intersectsValue(getModifiedPaths());
+                } else {
+                    // Structural change
+                    // TODO: do model by model
+                    result = true;
+                }
             }
-        }
-        if (result && controlAnalysis.valueAnalysis != null) {
-            containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "value modified", "prefixed id", controlPrefixedId,
-                    "XPath", controlAnalysis.valueAnalysis.xpathString);
-            valueUpdateCount++;
+            if (result && valueAnalysis != null) {
+                containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "value modified", "prefixed id", controlPrefixedId,
+                        "XPath", controlAnalysis.valueAnalysis.xpathString);
+            }
+
+            modifiedValueCache.put(controlPrefixedId, result);
         }
 
+        if (result && valueAnalysis != null) {// TODO: see above, check on valueAnalysis only because non-value controls still call this method
+            valueUpdateCount++;
+        }
         return result;
     }
 
     public boolean requireBindingUpdate(String controlPrefixedId) {
 
         final boolean result;
-        final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
-        if (controlAnalysis.bindingAnalysis == null) {
-            // Control does not have an XPath binding
-            result = false;
-        } else if (!controlAnalysis.bindingAnalysis.figuredOutDependencies) {
-            // Binding dependencies are unknown
-            result = true;
+        final Boolean cached = modifiedBindingCache.get(controlPrefixedId);
+        if (cached != null) {
+            result = cached;
         } else {
-            // Binding dependencies are known
-            if (structuralChanges.isEmpty()) {
-                // No structural change
-                result = controlAnalysis.bindingAnalysis.intersectsBinding(getModifiedPaths());
-            } else {
-                // Structural change
-                // TODO: do model by model
+            final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
+            if (controlAnalysis.bindingAnalysis == null) {
+                // Control does not have an XPath binding
+                result = false;
+            } else if (!controlAnalysis.bindingAnalysis.figuredOutDependencies) {
+                // Binding dependencies are unknown
                 result = true;
+            } else {
+                // Binding dependencies are known
+                if (structuralChanges.isEmpty()) {
+                    // No structural change
+                    result = controlAnalysis.bindingAnalysis.intersectsBinding(getModifiedPaths());
+                } else {
+                    // Structural change
+                    // TODO: do model by model
+                    result = true;
+                }
             }
-        }
-        if (result) {
-            containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "binding modified", "prefixed id", controlPrefixedId,
-                    "XPath", controlAnalysis.bindingAnalysis.xpathString);
-            bindingUpdateCount++;
+            if (result) {
+                containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "binding modified", "prefixed id", controlPrefixedId,
+                        "XPath", controlAnalysis.bindingAnalysis.xpathString);
+                bindingUpdateCount++;
+            }
+
+            modifiedBindingCache.put(controlPrefixedId, result);
         }
 
+        if (result) {
+            bindingUpdateCount++;
+        }
         return result;
     }
 }

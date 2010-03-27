@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.function.Instance;
@@ -104,7 +105,6 @@ public class XPathAnalysis {
     }
 
     private boolean processPaths(String defaultInstancePrefixedId) {
-        // TODO: need to deal with namespaces!
         final List<Expression> stack = new ArrayList<Expression>();
         for (final PathMap.PathMapRoot root: pathmap.getPathMapRoots()) {
             stack.add(root.getRootExpression());
@@ -153,7 +153,13 @@ public class XPathAnalysis {
                         if (sb.length() > 0)
                             sb.append('/');
                         final int fingerprint = axisExpression.getNodeTest().getFingerprint();
-                        sb.append(expression.getExecutable().getConfiguration().getNamePool().getDisplayName(fingerprint));
+                        if (fingerprint != -1) {
+                            sb.append(fingerprint);
+                        } else {
+                            // Unnamed node
+                            success = false;
+                            break;
+                        }
                     } else {
                         // Unhandled axis
                         success = false;
@@ -201,40 +207,31 @@ public class XPathAnalysis {
         out.println(pad + "ok: " + figuredOutDependencies);
         out.println(pad + "dependent:");
         for (final String path: dependentPaths) {
-            out.println(pad + "  path: " + path);
+            out.println(pad + "  path: " + getDisplayPath(path));
         }
 
         out.println(pad + "returnable:");
         for (final String path: returnablePaths) {
-            out.println(pad + "  path: " + path);
+            out.println(pad + "  path: " + getDisplayPath(path));
         }
-//
-//        out.println(pad + "other:");
-//        for (final String path: otherPaths) {
-//            out.println(pad + "  path: " + path);
-//        }
-
-//        pathmap.diagnosticDump(out);
     }
 
-//    public void dumpDependencies(PrintStream out) {
-//        if ((dependencies & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) != 0) {
-//            out.println("  DEPENDS_ON_CONTEXT_ITEM");
-//        }
-//        if ((dependencies & StaticProperty.DEPENDS_ON_CURRENT_ITEM) != 0) {
-//            out.println("  DEPENDS_ON_CURRENT_ITEM");
-//        }
-//        if ((dependencies & StaticProperty.DEPENDS_ON_CONTEXT_DOCUMENT) != 0) {
-//            out.println("  DEPENDS_ON_CONTEXT_DOCUMENT");
-//        }
-//        if ((dependencies & StaticProperty.DEPENDS_ON_LOCAL_VARIABLES) != 0) {
-//            out.println("  DEPENDS_ON_LOCAL_VARIABLES");
-//        }
-//        if ((dependencies & StaticProperty.NON_CREATIVE) != 0) {
-//            out.println("  NON_CREATIVE");
-//        }
-//    }
-
+    private String getDisplayPath(String path) {
+        final StringTokenizer st = new StringTokenizer(path, "/");
+        final StringBuilder sb = new StringBuilder();
+        while (st.hasMoreTokens()) {
+            final String s = st.nextToken();
+            try {
+                final int i = Integer.parseInt(s);
+                sb.append(XPathCache.getGlobalConfiguration().getNamePool().getDisplayName(i));
+            } catch (NumberFormatException e) {
+                sb.append(s);
+            }
+            if (st.hasMoreTokens())
+                sb.append('/');
+        }
+        return sb.toString();
+    }
     private static class NodeArc {
         public final PathMap.PathMapNode node;
         public final PathMap.PathMapArc arc;

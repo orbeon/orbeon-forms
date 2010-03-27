@@ -506,6 +506,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     public void saveValue() {
         // Keep previous values for refresh updates
         // NOTE: effectiveId might have changed already upon updateEffectiveId(); in which case, use tempEffectiveId
+        // TODO: move this
         previousEffectiveId = (tempEffectiveId != null) ? tempEffectiveId : effectiveId;
         tempEffectiveId = null;
     }
@@ -538,6 +539,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * @param propertyContext   current context
      * @param isRefresh         true if part of the refresh process, false if initialization and new repeat iteration creation
      */
+    // TODO: move this method to XFormsValueControl and XFormsValueContainerControl
     protected void evaluateImpl(PropertyContext propertyContext, boolean isRefresh) {
 
         // TODO: these should be evaluated lazily
@@ -552,6 +554,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         // NOTE: We no longer evaluate LHHA here, instead we do lazy evaluation. This is good in particular when there
         // are multiple refreshes during an Ajax request, and LHHA values are only needed in the end.
 
+        // TODO: move this
         if (!isRefresh) {
             // Sync values
             previousEffectiveId = effectiveId;

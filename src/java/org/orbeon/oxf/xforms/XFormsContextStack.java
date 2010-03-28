@@ -560,10 +560,9 @@ public class XFormsContextStack {
     }
 
     public void pushBinding(BindingContext bindingContext) {
-        // NOTE: would be nice not to have to make a copy and just relink to parent
-        contextStack.push(new BindingContext(getCurrentBindingContext(), bindingContext.model, bindingContext.getNodeset(),
-                bindingContext.getPosition(), bindingContext.elementId, bindingContext.newBind, bindingContext.getControlElement(),
-                bindingContext.getLocationData(), bindingContext.hasOverriddenContext, bindingContext.contextItem, bindingContext.scope));
+        // Don't make a copy and just relink to parent
+        bindingContext.updateParent(getCurrentBindingContext());
+        contextStack.push(bindingContext);
     }
 
     private void pushTemporaryContext(BindingContext parent, BindingContext base, Item contextItem) {
@@ -821,7 +820,7 @@ public class XFormsContextStack {
     }
 
     public static class BindingContext {
-        public final BindingContext parent;
+        public BindingContext parent;
         public final XFormsModel model;
         public final List<Item> nodeset;
         public final int position;
@@ -864,6 +863,10 @@ public class XFormsContextStack {
 //                        throw new ValidationException("A reference to a node (such as element, attribute, or text) is required in a binding. Attempted to bind to the invalid item type: " + currentItem.getClass(), this.locationData);
 //                }
 //            }
+        }
+
+        public void updateParent(BindingContext parent) {
+            this.parent = parent;
         }
 
         public BindingContext(BindingContext parent, BindingContext base, Element controlElement, LocationData locationData, String variableName,

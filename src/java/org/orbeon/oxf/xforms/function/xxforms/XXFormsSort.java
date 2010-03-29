@@ -17,10 +17,15 @@ import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.PathMap;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.sort.SortExpression;
+import org.orbeon.saxon.sort.AtomicComparer;
 import org.orbeon.saxon.sort.SortKeyDefinition;
+import org.orbeon.saxon.sort.SortKeyEvaluator;
+import org.orbeon.saxon.sort.SortedIterator;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.Value;
 
 /**
  * exforms:sort() function
@@ -36,15 +41,29 @@ public class XXFormsSort extends XFormsFunction {
         return sort(xpathContext, sequenceToSortExpression, sortKeyExpression);
     }
 
-    protected SequenceIterator sort(XPathContext xpathContext, Expression sequenceToSortExpression, Expression sortKeyExpression) throws XPathException {
-
-        // For now only a single sort key is supported
-        final SortKeyDefinition sortKey = getSortKeyDefinition(sortKeyExpression);
-        final SortKeyDefinition[] sortKeys = { sortKey };
-
-        return new SortExpression(sequenceToSortExpression, sortKeys).iterate(xpathContext);
+    protected SequenceIterator sort(XPathContext xpathContext, Expression sequenceToSortExpression, final Expression sortKeyExpression) throws XPathException {
+        final SortKeyEvaluator sortKeyEvaluator = new SortKeyEvaluator() {
+            public Item evaluateSortKey(int n, XPathContext context) throws XPathException {
+                Item c = sortKeyExpression.evaluateItem(context);
+                if (c instanceof NodeInfo) {
+                    final Value v = ((NodeInfo)c).atomize();
+                    if (v.getLength() == 0) {
+                        c = null;
+                    } else if (v.getLength() == 1) {
+                        c = v.itemAt(0);
+                    } else {
+                        throw new XPathException("error in saxon:sort() - a node has a typed value of length > 1");
+                    }
+                }
+                return c;
+            }
+        };
+        final SortKeyDefinition sortKeyDefinition = getSortKeyDefinition(sortKeyExpression);
+        final AtomicComparer comparer = sortKeyDefinition.makeComparator(xpathContext);
+        final AtomicComparer[] comparers = { comparer };
+        return new SortedIterator(xpathContext, sequenceToSortExpression.iterate(xpathContext), sortKeyEvaluator, comparers);
     }
-
+    
     private SortKeyDefinition getSortKeyDefinition(Expression sortKeyExpression) {
         final Expression datatypeExpression = (argument.length > 2) ? argument[2] : null;
         final Expression orderExpression = (argument.length > 3) ? argument[3] : null;

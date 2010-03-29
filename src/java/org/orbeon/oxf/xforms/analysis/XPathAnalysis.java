@@ -165,8 +165,19 @@ public class XPathAnalysis {
                             final String prefixedInstanceId = originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1
                                     ? originalInstanceId
                                     : scope.getPrefixedIdForStaticId(originalInstanceId);
-                            sb.append(buildInstanceString(prefixedInstanceId));
-                            dependentModels.add(modelPrefixedId);
+
+                            if (prefixedInstanceId != null) {
+                                // Instance found
+                                sb.append(buildInstanceString(prefixedInstanceId));
+                                dependentModels.add(modelPrefixedId);
+                            } else {
+                                // Instance not found (could be reference to unknown instance e.g. author typo!)
+
+                                // This is successful, but the path must not be added
+                                sb.setLength(0);
+                                success = true;
+                                break;
+                            }
                         } else {
                             // Non-literal instance name
                             success = false;
@@ -200,11 +211,16 @@ public class XPathAnalysis {
                 }
             }
             if (success) {
-                final String s = sb.toString();
-                if (node.isReturnable()) {
-                    returnablePaths.add(s);
+                if (sb.length() > 0) {
+                    // A path was created
+                    final String s = sb.toString();
+                    if (node.isReturnable()) {
+                        returnablePaths.add(s);
+                    } else {
+                        dependentPaths.add(s);
+                    }
                 } else {
-                    dependentPaths.add(s);
+                    // NOP: don't add the path as this is not considered a dependency
                 }
             } else {
                 // We can't deal with this path

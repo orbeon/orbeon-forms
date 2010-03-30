@@ -1118,7 +1118,7 @@ public class XFormsModelBinds {
 
         public Bind(PropertyContext propertyContext, Element bindElement, boolean isSingleNodeContext) {
             this.bindElement = bindElement;
-            this.id = bindElement.attributeValue(XFormsConstants.ID_QNAME);
+            this.id = XFormsUtils.getElementStaticId(bindElement);
             this.name = bindElement.attributeValue(XFormsConstants.NAME_QNAME);
 
             // Remember variables

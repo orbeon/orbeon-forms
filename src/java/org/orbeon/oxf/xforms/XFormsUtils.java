@@ -1865,4 +1865,14 @@ public class XFormsUtils {
         }
         return false;
     }
+
+    /**
+     * Get an element's static id.
+     *
+     * @param element   element to check
+     * @return          static id or null
+     */
+    public static String getElementStaticId(Element element) {
+        return element.attributeValue(XFormsConstants.ID_QNAME);
+    }
 }

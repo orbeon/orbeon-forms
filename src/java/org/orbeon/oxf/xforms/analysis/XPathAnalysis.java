@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.function.Instance;
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.Axis;
@@ -148,9 +149,9 @@ public class XPathAnalysis {
             final StringBuilder sb = new StringBuilder();
 
             for (final Expression expression: stack) {
-                if (expression instanceof Instance) {
+                if (expression instanceof Instance || expression instanceof XXFormsInstance) {
                     // Instance function
-                    final Instance instanceExpression = ((Instance) expression);
+                    final FunctionCall instanceExpression = (FunctionCall) expression;
 
                     final boolean hasParameter = instanceExpression.getArguments().length > 0;
                     if (!hasParameter) {
@@ -161,10 +162,19 @@ public class XPathAnalysis {
                         final Expression instanceNameExpression = instanceExpression.getArguments()[0];
                         if (instanceNameExpression instanceof StringLiteral) {
                             final String originalInstanceId = ((StringLiteral) instanceNameExpression).getStringValue();
-                            // HACK: datatable e.g. uses instance(prefixedId)!
-                            final String prefixedInstanceId = originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1
-                                    ? originalInstanceId
-                                    : scope.getPrefixedIdForStaticId(originalInstanceId);
+                            final boolean searchAncestors = expression instanceof XXFormsInstance;
+
+                            final String prefixedInstanceId;
+                            if (searchAncestors) {
+                                // xxforms:instance()
+                                prefixedInstanceId = staticState.findInstancePrefixedId(scope, originalInstanceId);
+                            } else if (originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1) {
+                                // HACK: datatable e.g. uses instance(prefixedId)!
+                                prefixedInstanceId = originalInstanceId;
+                            } else {
+                                // Normal use of instance()
+                                prefixedInstanceId = scope.getPrefixedIdForStaticId(originalInstanceId);
+                            }
 
                             if (prefixedInstanceId != null) {
                                 // Instance found
@@ -172,7 +182,8 @@ public class XPathAnalysis {
                                 dependentModels.add(modelPrefixedId);
                             } else {
                                 // Instance not found (could be reference to unknown instance e.g. author typo!)
-
+                                // TODO: must also catch case where id is found but does not correspond to instance
+                                // TODO: warn in log
                                 // This is successful, but the path must not be added
                                 sb.setLength(0);
                                 success = true;
@@ -188,12 +199,14 @@ public class XPathAnalysis {
                     final AxisExpression axisExpression = (AxisExpression) expression;
                     if (axisExpression.getAxis() == Axis.SELF) {
                         // NOP
-                    } else if (axisExpression.getAxis() == Axis.CHILD) {
-                        // Child axis
+                    } else if (axisExpression.getAxis() == Axis.CHILD || axisExpression.getAxis() == Axis.ATTRIBUTE) {
+                        // Child or attribute axis
                         if (sb.length() > 0)
                             sb.append('/');
                         final int fingerprint = axisExpression.getNodeTest().getFingerprint();
                         if (fingerprint != -1) {
+                            if (axisExpression.getAxis() == Axis.ATTRIBUTE)
+                                sb.append("@");
                             sb.append(fingerprint);
                         } else {
                             // Unnamed node
@@ -265,18 +278,23 @@ public class XPathAnalysis {
         final StringTokenizer st = new StringTokenizer(path, "/");
         final StringBuilder sb = new StringBuilder();
         while (st.hasMoreTokens()) {
-            final String s = st.nextToken();
+            String token = st.nextToken();
+            if (token.startsWith("@")) {
+                sb.append('@');
+                token = token.substring(1);
+            }
             try {
-                final int i = Integer.parseInt(s);
+                final int i = Integer.parseInt(token);
                 sb.append(XPathCache.getGlobalConfiguration().getNamePool().getDisplayName(i));
             } catch (NumberFormatException e) {
-                sb.append(s);
+                sb.append(token);
             }
             if (st.hasMoreTokens())
                 sb.append('/');
         }
         return sb.toString();
     }
+
     private static class NodeArc {
         public final PathMap.PathMapNode node;
         public final PathMap.PathMapArc arc;
@@ -305,27 +323,18 @@ public class XPathAnalysis {
             for (final PathMap.PathMapArc arc: node.getArcs()) {
 
                 final AxisExpression e = arc.getStep();
-                // TODO: handle ANCESTOR_OR_SELF and PARENT
+                // TODO: handle ANCESTOR_OR_SELF axis
                 if (e.getAxis() == Axis.ANCESTOR && e.getNodeTest().getFingerprint() != -1) {
                     // Found ancestor::foobar
-
                     final int nodeName = e.getNodeTest().getFingerprint();
                     final PathMap.PathMapArc ancestorArc = ancestorWithFingerprint(stack, nodeName);
-                    if (ancestorArc != null) {
-
-                        // Move arcs
-                        ancestorArc.getTarget().addArcs(arc.getTarget().getArcs());
-
-                        // Remove current arc from its node as it's been moved
-                        node.removeArc(arc);
-
-                        // Remove orphan nodes
-                        removeOrphanNodes(stack);
-
+                    if (moveArc(stack, node, arc, ancestorArc))
                         return true;
-                    } else {
-                        // Ignore for now
-                    }
+                } else if (e.getAxis() == Axis.PARENT) {
+                    // Parent axis
+                    final NodeArc grandparentNodeArc = stack.get(stack.size() - 2);
+                    if (moveArc(stack, node, arc, grandparentNodeArc.arc))
+                        return true;
                 } else if (e.getAxis() == Axis.FOLLOWING_SIBLING || e.getAxis() == Axis.PRECEDING_SIBLING) {
                     // Simplify preceding-sibling::foobar / following-sibling::foobar
                     final NodeArc parentNodeArc = stack.get(stack.size() - 1);
@@ -355,6 +364,25 @@ public class XPathAnalysis {
         }
 
         // We did not find a match
+        return false;
+    }
+
+    private boolean moveArc(List<NodeArc> stack, PathMap.PathMapNode node, PathMap.PathMapArc arc, PathMap.PathMapArc ancestorArc) {
+        if (ancestorArc != null) {
+
+            // Move arcs
+            ancestorArc.getTarget().addArcs(arc.getTarget().getArcs());
+
+            // Remove current arc from its node as it's been moved
+            node.removeArc(arc);
+
+            // Remove orphan nodes
+            removeOrphanNodes(stack);
+
+            return true;
+        } else {
+            // Ignore for now
+        }
         return false;
     }
 

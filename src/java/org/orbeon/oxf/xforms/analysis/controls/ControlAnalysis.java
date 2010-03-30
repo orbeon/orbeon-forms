@@ -83,7 +83,7 @@ public class ControlAnalysis {
             if (localModelId != null) {
                 // Get model prefixed id and verify it belongs to this scope
                 final String localModelPrefixedId = scope.getPrefixedIdForStaticId(localModelId);
-                if (!staticState.getModelDocuments().containsKey(localModelPrefixedId))
+                if (staticState.getModel(localModelPrefixedId) == null)
                     throw new ValidationException("Reference to non-existing model id: " + localModelId, locationData);
                 return localModelPrefixedId;
             } else {
@@ -138,10 +138,10 @@ public class ControlAnalysis {
         } else {
             // We are a top-level control in a scope/model combination, create analysis
             if (modelPrefixedId != null) {
-                final String defaultInstanceId = staticState.getDefaultInstancePrefixedIdForModel(modelPrefixedId);
-                if (defaultInstanceId != null) {
+                final String defaultInstancePrefixedId = staticState.getDefaultInstancePrefixedIdForScope(scope);
+                if (defaultInstancePrefixedId != null) {
                     // Start with instance('defaultInstanceId')
-                    baseAnalysis = analyzeXPath(staticState, null, prefixedId, XPathAnalysis.buildInstanceString(defaultInstanceId));
+                    baseAnalysis = analyzeXPath(staticState, null, prefixedId, XPathAnalysis.buildInstanceString(defaultInstancePrefixedId));
                 } else {
                     // No default instance
                     baseAnalysis = null;

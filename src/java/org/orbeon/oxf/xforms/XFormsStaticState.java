@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.analysis.IdGenerator;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
 import org.orbeon.oxf.xforms.analysis.controls.*;
+import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandler;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerImpl;
@@ -80,11 +81,11 @@ public class XFormsStaticState {
     private DocumentWrapper documentWrapper = new DocumentWrapper(Dom4jUtils.createDocument(), null, xpathConfiguration);
 
     private Document controlsDocument;                                      // controls document
-    private LinkedHashMap<String, Document> modelDocuments = new LinkedHashMap<String, Document>(); // Map<String modelPrefixedId, Document modelDocument>
     private SAXStore xhtmlDocument;                                         // entire XHTML document for noscript mode only
 
-    private String defaultModelId;
-    private String defaultInstanceId;
+    // Static representation of models and instances
+    private LinkedHashMap<XBLBindings.Scope, List<Model>> modelsByScope = new LinkedHashMap<XBLBindings.Scope, List<Model>>();
+    private Map<String, Model> modelsByPrefixedId = new LinkedHashMap<String, Model>();
 
     private Map<String, String> xxformsScripts;                             // Map of id to script content
 
@@ -256,7 +257,7 @@ public class XFormsStaticState {
                 // Use the last id used for id generation. During state restoration, XBL components must start with this id.
                 final Element currentIdElement = staticStateElement.element(XFormsExtractorContentHandler.LAST_ID_QNAME);
                 assert currentIdElement != null;
-                final String lastId = currentIdElement.attributeValue("id");
+                final String lastId = XFormsUtils.getElementStaticId(currentIdElement);
                 assert lastId != null;
                 idGenerator = new IdGenerator(Integer.parseInt(lastId));
             }
@@ -366,9 +367,9 @@ public class XFormsStaticState {
                     }
                 }
             }
-            // Properties on xforms:model elements
-            for (final Map.Entry<String, Document> currentEntry: modelDocuments.entrySet()) {
-                final Document currentModelDocument = currentEntry.getValue();
+            // Properties on top-level xforms:model elements
+            for (final Model model: modelsByScope.get(xblBindings.getTopLevelScope())) {
+                final Document currentModelDocument = model.document;
                 for (Iterator j = currentModelDocument.getRootElement().attributeIterator(); j.hasNext();) {
                     final Attribute currentAttribute = (Attribute) j.next();
                     if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(currentAttribute.getNamespaceURI())) {
@@ -406,7 +407,7 @@ public class XFormsStaticState {
             } else {
                 // Property defined in the document
 
-                // If the property is identical to the deault, remove it
+                // If the property is identical to the default, remove it
                 if (actualPropertyValue.equals(defaultPropertyValue))
                     nonDefaultProperties.remove(propertyName);
             }
@@ -441,10 +442,14 @@ public class XFormsStaticState {
 
     private void extractControlsModelsComponents(PropertyContext pipelineContext, Element staticStateElement) {
 
+        // Extract static components information
+        // NOTE: Do this here so that xblBindings is available for scope resolution  
+        xblBindings = new XBLBindings(indentedLogger, this, metadata, staticStateElement);
+
         // Get top-level models from static state document
         {
             final List modelsElements = staticStateElement.elements(XFormsConstants.XFORMS_MODEL_QNAME);
-            modelDocuments.clear();
+            modelsByScope.clear();
 
             // FIXME: we don't get a System ID here. Is there a simple solution?
             int modelsCount = 0;
@@ -452,7 +457,7 @@ public class XFormsStaticState {
                 final Element modelElement = (Element) i.next();
                 // Copy the element because we may need it in staticStateDocument for encoding
                 final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(modelElement);
-                addModelDocument(modelElement.attributeValue("id"), modelDocument);
+                addModelDocument(xblBindings.getTopLevelScope(), modelDocument);
             }
 
             indentedLogger.logDebug("", "created top-level model documents", "count", Integer.toString(modelsCount));
@@ -492,38 +497,30 @@ public class XFormsStaticState {
             final List<Document> extractedModels = extractNestedModels(pipelineContext, controlsDocumentInfo, false, locationData);
             indentedLogger.logDebug("", "created nested model documents", "count", Integer.toString(extractedModels.size()));
             for (final Document currentModelDocument: extractedModels) {
-                addModelDocument(currentModelDocument.getRootElement().attributeValue("id"), currentModelDocument);
+                addModelDocument(xblBindings.getTopLevelScope(), currentModelDocument);
             }
-        }
-
-        // Get default model and default instance ids
-        {
-            final Map.Entry<String, Document> entry = modelDocuments.entrySet().iterator().next();
-            defaultModelId = entry.getKey();
-            defaultInstanceId = getDefaultInstancePrefixedIdForModel(defaultModelId);
-        }
-
-        // Extract components
-        xblBindings = new XBLBindings(indentedLogger, this, metadata, staticStateElement);
-    }
-
-    public String getDefaultInstancePrefixedIdForModel(String modelPrefixedId) {
-        final List<Element> instanceElements = getInstanceContainers(modelPrefixedId);
-        if (instanceElements.size() > 0) {
-            return XFormsUtils.getRelatedEffectiveId(modelPrefixedId, instanceElements.get(0).attributeValue("id"));
-        } else {
-            return null;
         }
     }
 
     /**
      * Register a model document. Used by this and XBLBindings.
      *
-     * @param prefixedId        prefixed id of the model
+     * @param scope             XBL scope
      * @param modelDocument     model document
      */
-    public void addModelDocument(String prefixedId, Document modelDocument) {
-        modelDocuments.put(prefixedId, modelDocument);
+    public void addModelDocument(XBLBindings.Scope scope, Document modelDocument) {
+        List<Model> models = modelsByScope.get(scope);
+        if (models == null) {
+            models = new ArrayList<Model>();
+            modelsByScope.put(scope, models);
+        }
+        final Model newModel = new Model(scope, modelDocument);
+        models.add(newModel);
+        modelsByPrefixedId.put(newModel.prefixedId, newModel);
+    }
+
+    public Model getModel(String prefixedId) {
+        return modelsByPrefixedId.get(prefixedId);
     }
 
     public void extractXFormsScripts(PropertyContext pipelineContext, DocumentWrapper documentInfo, String prefix) {
@@ -545,7 +542,7 @@ public class XFormsStaticState {
                 final Element scriptElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
                 // Remember script content
-                xxformsScripts.put(prefix + scriptElement.attributeValue("id"), scriptElement.getStringValue());
+                xxformsScripts.put(prefix + XFormsUtils.getElementStaticId(scriptElement), scriptElement.getStringValue());
             }
         }
     }
@@ -605,12 +602,7 @@ public class XFormsStaticState {
      * @return                      container elements
      */
     public List<Element> getInstanceContainers(String modelPrefixedId) {
-        
-        // Find model document
-        final Document modelDocument = modelDocuments.get(modelPrefixedId);
-
-        // Return all containers
-        return Dom4jUtils.elements(modelDocument.getRootElement(), XFormsConstants.XFORMS_INSTANCE_QNAME);
+        return modelsByPrefixedId.get(modelPrefixedId).instanceElements;
     }
 
     /**
@@ -660,38 +652,50 @@ public class XFormsStaticState {
         return controlsDocument;
     }
 
-    public Map<String, Document> getModelDocuments() {
-        return modelDocuments;
+    public Model getDefaultModelForScope(XBLBindings.Scope scope) {
+        final List<Model> models = modelsByScope.get(scope);
+        if (models == null || models.size() == 0) {
+            // No model found for the given scope
+            return null;
+        } else {
+            return models.get(0);
+        }
     }
 
-    public String getDefaultModelId() {
-        return defaultModelId;
+    public final List<Model> getModelsForScope(XBLBindings.Scope scope) {
+        final List<Model> models = modelsByScope.get(scope);
+        return (models != null) ? models : Collections.<Model>emptyList();
     }
 
     public String getDefaultModelPrefixedIdForScope(XBLBindings.Scope scope) {
-        final String fullPrefix = scope.getFullPrefix();
-        for (final String modelPrefixedId: modelDocuments.keySet()) {
-            final String modelPrefix = XFormsUtils.getEffectiveIdPrefix(modelPrefixedId);
-            if (fullPrefix.equals(modelPrefix)) {
-                // This model belongs to this scope
-                return modelPrefixedId;
-            }
-        }
-        // No model found for the given scope
-        return null;
-    }
-
-    public String getDefaultInstanceId() {
-        return defaultInstanceId;
+        final Model model = getDefaultModelForScope(scope);
+        return (model != null) ? model.prefixedId : null;
     }
 
     public String getDefaultInstancePrefixedIdForScope(XBLBindings.Scope scope) {
-        final String defaultModelPrefixedId = getDefaultModelPrefixedIdForScope(scope);
-        if (defaultModelPrefixedId != null) {
-            return getDefaultInstancePrefixedIdForModel(defaultModelPrefixedId);
-        } else {
-            return null;
+        final Model model = getDefaultModelForScope(scope);
+        return (model != null) ? model.defaultInstancePrefixedId: null;
+    }
+
+    public String getDefaultModelId() {
+        return getDefaultModelForScope(xblBindings.getTopLevelScope()).prefixedId;
+    }
+
+    public String getDefaultInstanceId() {
+        return getDefaultInstancePrefixedIdForScope(xblBindings.getTopLevelScope());
+    }
+
+    public String findInstancePrefixedId(XBLBindings.Scope startScope, String instanceStaticId) {
+        XBLBindings.Scope currentScope = startScope;
+        while (currentScope != null) {
+            for (final Model model: getModelsForScope(currentScope)) {
+                if (model.instanceStaticIds.contains(instanceStaticId)) {
+                    return currentScope.getPrefixedIdForStaticId(instanceStaticId);
+                }
+            }
+            currentScope = currentScope.parent;
         }
+        return null;
     }
 
     public Map<String, String> getScripts() {
@@ -837,7 +841,7 @@ public class XFormsStaticState {
      * @return              Map<String prefix, String uri>
      */
     public Map<String, String> getNamespaceMappings(String prefix, Element element) {
-        final String id = element.attributeValue("id");
+        final String id = XFormsUtils.getElementStaticId(element);
         if (id != null) {
             // There is an id attribute
             final String prefixedId = (prefix != null) ? prefix + id : id; 
@@ -926,9 +930,9 @@ public class XFormsStaticState {
             repeatHierarchyString = repeatHierarchyStringBuffer.toString();
 
             // Iterate over models to extract event handlers and scripts
-            for (final Map.Entry<String, Document> currentEntry: modelDocuments.entrySet()) {
+            for (final Map.Entry<String, Model> currentEntry: modelsByPrefixedId.entrySet()) {
                 final String modelPrefixedId = currentEntry.getKey();
-                final Document modelDocument = currentEntry.getValue();
+                final Document modelDocument = currentEntry.getValue().document;
                 final DocumentWrapper modelDocumentInfo = new DocumentWrapper(modelDocument, null, xpathConfiguration);
                 // NOTE: Say we don't want to exclude gathering event handlers within nested models, since this is a model
                 extractEventHandlers(propertyContext, xpathConfiguration, modelDocumentInfo, XFormsUtils.getEffectiveIdPrefix(modelPrefixedId), false);
@@ -979,7 +983,7 @@ public class XFormsStaticState {
                 xpathExpression, BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
 
         final XBLBindings.Scope innerScope = xblBindings.getResolutionScopeByPrefix(prefix); // if at top-level, prefix is ""
-        final XBLBindings.Scope outerScope = (prefix.length() == 0) ? xblBindings.getResolutionScopeByPrefix("") : xblBindings.getResolutionScopeByPrefixedId(innerScope.scopeId);
+        final XBLBindings.Scope outerScope = (prefix.length() == 0) ? xblBindings.getTopLevelScope() : xblBindings.getResolutionScopeByPrefixedId(innerScope.scopeId);
 
         // Check all candidate elements
         for (Object actionHandler: actionHandlers) {
@@ -1003,7 +1007,7 @@ public class XFormsStaticState {
                             parentStaticId = XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID;
                         } else {
                              // Nested handler
-                            parentStaticId = actionElement.getParent().attributeValue("id");
+                            parentStaticId = XFormsUtils.getElementStaticId(actionElement.getParent());
                         }
 
                         if (parentStaticId != null) {
@@ -1041,7 +1045,7 @@ public class XFormsStaticState {
                     } else {
                         // Analyzing models
                         newActionElement = actionElement;
-                        parentStaticId = actionElement.getParent().attributeValue("id");
+                        parentStaticId = XFormsUtils.getElementStaticId(actionElement.getParent());
                     }
 
                     // Register action handler
@@ -1051,8 +1055,8 @@ public class XFormsStaticState {
                         final String ancestorObserverStaticId; {
                             final Element ancestorObserver = findAncestorObserver(actionElement);
                             if (ancestorObserver != null) {
-                                assert ancestorObserver.attributeValue("id") != null : "ancestor observer must have an id";
-                                ancestorObserverStaticId = ancestorObserver.attributeValue("id");
+                                assert XFormsUtils.getElementStaticId(ancestorObserver) != null : "ancestor observer must have an id";
+                                ancestorObserverStaticId = XFormsUtils.getElementStaticId(ancestorObserver);
                             } else if (isControls && isControlsTopLevelHandler(actionElement)) {
                                 // Specially handle #document static id for top-level handlers
                                 ancestorObserverStaticId = XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID;
@@ -1066,7 +1070,7 @@ public class XFormsStaticState {
                         final String observersPrefix;
                         if (evObserversStaticIds != null) {
                             // Explicit ev:observer, prefix might be different
-                            final XBLBindings.Scope actionScope = xblBindings.getResolutionScopeByPrefixedId(prefix + newActionElement.attributeValue("id"));
+                            final XBLBindings.Scope actionScope = xblBindings.getResolutionScopeByPrefixedId(prefix + XFormsUtils.getElementStaticId(newActionElement));
                             observersPrefix = (actionScope != null) ? actionScope.getFullPrefix() : prefix;
                         } else {
                             // Parent is observer and has the same prefix
@@ -1111,7 +1115,7 @@ public class XFormsStaticState {
         // Recurse until we find an element which is a binding
         Element currentAncestor = element.getParent();
         while (currentAncestor != null) {
-            if (xblBindings.hasBinding(prefix + currentAncestor.attributeValue("id"))) {
+            if (xblBindings.hasBinding(prefix + XFormsUtils.getElementStaticId(currentAncestor))) {
                 return true;
             }
             currentAncestor = currentAncestor.getParent();
@@ -1314,7 +1318,7 @@ public class XFormsStaticState {
                 final String controlPrefixedId;
                 if (forAttribute == null || XFormsControlFactory.isCoreControl(parentElement.getNamespaceURI(), parentElement.getName())) {
                     // Element is directly nested in XForms element OR it has a @for attribute but is within a core control so we ignore the @for attribute
-                    controlPrefixedId = prefix + lhhaElement.getParent().attributeValue("id");
+                    controlPrefixedId = prefix + XFormsUtils.getElementStaticId(lhhaElement.getParent());
                 } else {
                     // Element has a @for attribute and is not within a core control
                     if (xblBindings != null) { // mmh, can bindings be null?
@@ -1324,7 +1328,7 @@ public class XFormsStaticState {
                             controlPrefixedId = null;
                         } else {
                             // Find prefixed id of control with assumption that it is in the same scope as the LHHA element
-                            final XBLBindings.Scope lhhaScope = xblBindings.getResolutionScopeByPrefixedId(prefix + lhhaElement.attributeValue("id"));
+                            final XBLBindings.Scope lhhaScope = xblBindings.getResolutionScopeByPrefixedId(prefix + XFormsUtils.getElementStaticId(lhhaElement));
                             controlPrefixedId = lhhaScope.getPrefixedIdForStaticId(forAttribute);
                         }
                     } else {
@@ -1356,10 +1360,9 @@ public class XFormsStaticState {
         {
             {
                 // Create list of all the documents to search
-                final List<DocumentWrapper> documentInfos = new ArrayList<DocumentWrapper>(modelDocuments.size() + 1);
-                for (final Map.Entry<String, Document> currenEntry: modelDocuments.entrySet()) {
-                    final Document currentModelDocument = currenEntry.getValue();
-                    documentInfos.add(new DocumentWrapper(currentModelDocument, null, xpathConfiguration));
+                final List<DocumentWrapper> documentInfos = new ArrayList<DocumentWrapper>(modelsByPrefixedId.size() + 1);
+                for (final Model model: modelsByPrefixedId.values()) {
+                    documentInfos.add(new DocumentWrapper(model.document, null, xpathConfiguration));
                 }
                 documentInfos.add(controlsDocumentInfo);
 
@@ -1538,7 +1541,7 @@ public class XFormsStaticState {
 
                 Dom4jUtils.visitSubtree(newEventHandlerImpl.getEventHandlerElement(), new Dom4jUtils.VisitorListener() {
                     public void startElement(Element element) {
-                        final String id = element.attributeValue("id");
+                        final String id = XFormsUtils.getElementStaticId(element);
                         if (id != null)
                             eventHandlerAncestorsMap.put(prefix + id, ancestorObserverPrefixedId);
                     }
@@ -1575,7 +1578,7 @@ public class XFormsStaticState {
         for (final Element currentControlElement: Dom4jUtils.elements(container)) {
 
             final String controlName = currentControlElement.getName();
-            final String controlStaticId = currentControlElement.attributeValue("id");
+            final String controlStaticId = XFormsUtils.getElementStaticId(currentControlElement);
 
             if (XFormsControlFactory.isContainerControl(currentControlElement.getNamespaceURI(), controlName)) {
                 // Handle XForms grouping controls

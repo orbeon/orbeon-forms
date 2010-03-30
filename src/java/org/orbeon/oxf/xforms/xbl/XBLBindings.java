@@ -91,13 +91,17 @@ public class XBLBindings {
     private final Map<Scope, Map<String, String>> scopeToIdMap = new HashMap<Scope, Map<String, String>>(); // maps XBL scope => (map static id => prefixed id)
     private final Map<String, Scope> scopeIds = new HashMap<String, Scope>();                               // all distinct scopes by scope id
 
-    private final Scope TOP_LEVEL_SCOPE = new Scope("");
+    private final Scope TOP_LEVEL_SCOPE = new Scope(null, "");
 
     public class Scope {
+        public final Scope parent;
         public final String scopeId;
 
-        private Scope(String scopeId) {
+        private Scope(Scope parent, String scopeId) {
+            assert parent != null || scopeId.equals("");
             assert !scopeIds.containsKey(scopeId);
+            
+            this.parent = parent;
             this.scopeId = scopeId;
             scopeIds.put(scopeId, this);
         }
@@ -138,6 +142,10 @@ public class XBLBindings {
                 return false;
             return this == obj || scopeId.equals(((Scope) obj).scopeId);
         }
+    }
+
+    public Scope getTopLevelScope() {
+        return TOP_LEVEL_SCOPE;
     }
 
     public Scope getResolutionScopeById(String scopeId) {
@@ -390,7 +398,7 @@ public class XBLBindings {
                     }
 
                     // Generate compact shadow tree for this static id
-                    final Scope newInnerScope = new Scope(controlPrefixedId);
+                    final Scope newInnerScope = new Scope(scope, controlPrefixedId);
                     final Scope outerScope = prefixedIdToXBLScopeMap.get(controlPrefixedId);
 
                     final Document compactShadowTreeDocument = filterShadowTree(indentedLogger, fullShadowTreeDocument, controlElement, newPrefix, newInnerScope, controlPrefixedId);
@@ -400,7 +408,7 @@ public class XBLBindings {
                         final List<Document> implementationModelDocuments = xblImplementations.get(controlElement.getQName());
                         if (implementationModelDocuments != null && implementationModelDocuments.size() > 0) {
                             // Say we DO annotate because these models are outside the template
-                            addModelDocuments(controlPrefixedId, implementationModelDocuments, newPrefix, true,
+                            addModelDocuments(implementationModelDocuments, newPrefix, true,
                                     newInnerScope, outerScope, XFormsConstants.XXBLScope.inner);
                             if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", "registered XBL implementation model documents", "count", Integer.toString(implementationModelDocuments.size()));
@@ -414,7 +422,7 @@ public class XBLBindings {
                         final List<Document> templateModelDocuments = XFormsStaticState.extractNestedModels(propertyContext, compactShadowTreeWrapper, true, locationData);
                         if (templateModelDocuments.size() > 0) {
                             // Say we don't annotate documents because already annotated as part as template processing
-                            addModelDocuments(controlPrefixedId, templateModelDocuments, newPrefix, false, null, null, null);
+                            addModelDocuments(templateModelDocuments, newPrefix, false, newInnerScope, null, null);
                             if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", "created and registered XBL template model documents", "count", Integer.toString(templateModelDocuments.size()));
                         }
@@ -425,7 +433,7 @@ public class XBLBindings {
                     xblCompactShadowTrees.put(controlPrefixedId, compactShadowTreeDocument);
 
                     // Remember id of binding
-                    xblBindingIds.put(controlPrefixedId, bindingElement.attributeValue("id"));
+                    xblBindingIds.put(controlPrefixedId, XFormsUtils.getElementStaticId(bindingElement));
 
                     // Extract xbl:xbl/xbl:script and xbl:binding/xbl:resources/xbl:style
                     // TODO: should do this here, in order to include only the scripts and resources actually used
@@ -476,19 +484,18 @@ public class XBLBindings {
         return annotatedDocument;
     }
 
-    private void addModelDocuments(String controlPrefixedId, List<Document> modelDocuments, String prefix, boolean annotate,
-                                   Scope innerScope, Scope outerScope, XFormsConstants.XXBLScope startScope) {
+    private void addModelDocuments(List<Document> modelDocuments, String prefix, boolean annotate,
+                                   Scope newInnerScope, Scope outerScope, XFormsConstants.XXBLScope startScope) {
         for (Document currentModelDocument: modelDocuments) {
 
             // Annotate if needed, otherwise leave as is
             if (annotate) {
                 currentModelDocument = annotateShadowTree(currentModelDocument, prefix, false);
-                gatherScopeMappingsAndTransform(currentModelDocument, prefix, innerScope, outerScope, startScope, null, false, "/");
+                gatherScopeMappingsAndTransform(currentModelDocument, prefix, newInnerScope, outerScope, startScope, null, false, "/");
             }
 
             // Store models by "prefixed id"
-            final String modelStaticId = currentModelDocument.getRootElement().attributeValue("id");
-            staticState.addModelDocument(controlPrefixedId + XFormsConstants.COMPONENT_SEPARATOR + modelStaticId, currentModelDocument);
+            staticState.addModelDocument(newInnerScope, currentModelDocument);
         }
     }
 
@@ -509,7 +516,7 @@ public class XBLBindings {
         if (templateElement != null) {
 
             if (indentedLogger.isDebugEnabled()) {
-                indentedLogger.startHandleOperation("", "generating XBL shadow content", "bound element", Dom4jUtils.elementToDebugString(boundElement), "binding id", binding.attributeValue("id"));
+                indentedLogger.startHandleOperation("", "generating XBL shadow content", "bound element", Dom4jUtils.elementToDebugString(boundElement), "binding id", XFormsUtils.getElementStaticId(binding));
             }
 
             // TODO: in script mode, XHTML elements in template should only be kept during page generation

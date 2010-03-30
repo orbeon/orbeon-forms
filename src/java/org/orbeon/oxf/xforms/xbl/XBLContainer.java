@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.xbl;
 
-import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -21,6 +20,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -284,21 +284,13 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public void addAllModels() {
         // Iterate through all models and finds the one that apply to this container
-        for (Map.Entry<String,Document> currentEntry: containingDocument.getStaticState().getModelDocuments().entrySet()) {
-            final String modelPrefixedId = currentEntry.getKey();
-            final Document modelDocument = currentEntry.getValue();
+        for (Model model: containingDocument.getStaticState().getModelsForScope(getResolutionScope())) {
+            // Find model's effective id, e.g. if container's effective id is foo$bar.1-2 and models static id is
+            // my-model => foo$bar$my-model.1-2
+            final String modelEffectiveId = model.prefixedId + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
 
-            final String modelPrefix = XFormsUtils.getEffectiveIdPrefix(modelPrefixedId);
-            if (fullPrefix.equals(modelPrefix)) {
-                // This model belongs to this container
-
-                // Find model's effective id, e.g. if container's effective id is foo$bar.1-2 and models static id is
-                // my-model => foo$bar$my-model.1-2
-                final String modelEffectiveId = modelPrefixedId + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
-
-                // Create and add model
-                addModel(new XFormsModel(this, modelEffectiveId, modelDocument));
-            }
+            // Create and add model
+            addModel(new XFormsModel(this, modelEffectiveId, model.document));
         }
     }
 

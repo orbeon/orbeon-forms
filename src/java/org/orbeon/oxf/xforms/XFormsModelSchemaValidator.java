@@ -40,7 +40,6 @@ import org.dom4j.QName;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.resources.URLFactory;
@@ -53,6 +52,7 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.relaxng.datatype.Datatype;
 import org.relaxng.datatype.DatatypeException;
@@ -699,7 +699,7 @@ public class XFormsModelSchemaValidator {
             }
             return grammar;
         } catch (Exception e) {
-            throw new OXFException(e);
+            throw ValidationException.wrapException(e, new ExtendedLocationData(schemaURI, -1, -1, "loading schema from URI"));
         }
     }
 

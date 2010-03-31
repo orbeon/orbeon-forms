@@ -217,7 +217,9 @@ public class NetUtils {
             try {
                 return getLastModified(urlConnection);
             } finally {
-                urlConnection.getInputStream().close();
+                final InputStream is = urlConnection.getInputStream();
+                if (is != null)
+                    is.close();
             }
         }
     }

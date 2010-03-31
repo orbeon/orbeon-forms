@@ -549,8 +549,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // 1. All XML Schema loaded (throws xforms-link-exception)
 
-        loadSchemasIfNeeded(propertyContext);
-        // TODO: throw exception event
+        try {
+            loadSchemasIfNeeded(propertyContext);
+        } catch (Exception e) {
+            final String schemaAttribute = modelElement.attributeValue("schema");
+            container.dispatchEvent(propertyContext, new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this,
+                    schemaAttribute, modelElement, e));
+        }
 
         // 2. Create XPath data model from instance (inline or external) (throws xforms-link-exception)
         //    Instance may not be specified.

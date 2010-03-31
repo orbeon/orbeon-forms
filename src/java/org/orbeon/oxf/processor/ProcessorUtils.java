@@ -236,10 +236,11 @@ public class ProcessorUtils {
      * @param contentType   optional content type to set as attribute on the root element
      * @param lastModified  optional last modified timestamp
      * @param statusCode    optional status code, or -1 is to ignore
+     * @param fileName      optional filename
      */
-    public static void readBinary(InputStream is, ContentHandler output, String contentType, Long lastModified, int statusCode) {
+    public static void readBinary(InputStream is, ContentHandler output, String contentType, Long lastModified, int statusCode, String fileName) {
         try {
-            outputStartDocument(output, contentType, lastModified, statusCode, XMLConstants.XS_BASE64BINARY_QNAME, DEFAULT_BINARY_DOCUMENT_ELEMENT);
+            outputStartDocument(output, contentType, lastModified, statusCode, fileName, XMLConstants.XS_BASE64BINARY_QNAME, DEFAULT_BINARY_DOCUMENT_ELEMENT);
             XMLUtils.inputStreamToBase64Characters(new BufferedInputStream(is), output);
             outputEndDocument(output, DEFAULT_BINARY_DOCUMENT_ELEMENT);
         } catch (Exception e) {
@@ -247,13 +248,28 @@ public class ProcessorUtils {
         }
     }
 
-    private static void outputStartDocument(ContentHandler output, String contentType, Long lastModified, int statusCode, QName type, String documentElement) {
+    /**
+     * Generate a "standard" Orbeon binary document.
+     *
+     * @param is            InputStream to read from
+     * @param output        output ContentHandler to write binary document to
+     * @param contentType   optional content type to set as attribute on the root element
+     * @param lastModified  optional last modified timestamp
+     * @param statusCode    optional status code, or -1 is to ignore
+     */
+    public static void readBinary(InputStream is, ContentHandler output, String contentType, Long lastModified, int statusCode) {
+        readBinary(is, output, contentType, lastModified, statusCode, null);
+    }
+
+    private static void outputStartDocument(ContentHandler output, String contentType, Long lastModified, int statusCode, String fileName, QName type, String documentElement) {
         try {
             // Create attributes for root element: xsi:type, and optional content-type
             final AttributesImpl attributes = new AttributesImpl();
             attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", type.getQualifiedName());
             if (contentType != null)
                 attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
+            if (fileName != null)
+                attributes.addAttribute("", "file-name", "file-name", "CDATA", fileName);
             if (lastModified != null)
                 attributes.addAttribute("", "last-modified", "last-modified", "CDATA", ISODateUtils.getRFC1123Date(lastModified));
             if (statusCode > 0)
@@ -267,6 +283,10 @@ public class ProcessorUtils {
         } catch (Exception e) {
             throw new OXFException(e);
         }
+    }
+
+    private static void outputStartDocument(ContentHandler output, String contentType, Long lastModified, int statusCode, QName type, String documentElement) {
+        outputStartDocument(output, contentType, lastModified, statusCode, null, type, documentElement);
     }
 
     private static void outputEndDocument(ContentHandler output, String documentElement) {

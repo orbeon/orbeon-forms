@@ -48,6 +48,9 @@ public class ZipProcessor extends ProcessorImpl {
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
 
+            String fileName = null;
+            int statusCode = -1;
+
             public void readImpl(PipelineContext context, ContentHandler contentHandler) {
                 try {
                     // Create temporary zip file
@@ -69,6 +72,12 @@ public class ZipProcessor extends ProcessorImpl {
                                 if ("file".equals(localName)) {
                                     name = atts.getValue("name");
                                     uri = new StringBuffer();
+                                } else if ("files".equals(localName)) {
+                                    fileName = atts.getValue("file-name");
+                                    String value = atts.getValue("status-code");
+                                    if (value != null ) {
+                                        statusCode = Integer.parseInt(value);
+                                    }
                                 }
                             }
 
@@ -126,7 +135,7 @@ public class ZipProcessor extends ProcessorImpl {
                     // Generate an Orbeon binary document with the content of the zip file
                     FileInputStream zipInputStream = new FileInputStream(temporaryZipFile);
                     try {
-                        ProcessorUtils.readBinary(zipInputStream, contentHandler, "multipart/x-gzip", null, -1);
+                        ProcessorUtils.readBinary(zipInputStream, contentHandler, "multipart/x-gzip", null, statusCode, fileName);
                     } finally {
                         zipInputStream.close();
                     }

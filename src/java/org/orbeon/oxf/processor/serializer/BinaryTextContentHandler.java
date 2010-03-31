@@ -151,6 +151,20 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
                     response.setCaching(ISODateUtils.parseRFC1123Date(validityAttribute), true, true);
             }
 
+            // Set file-name if available
+            final String fileName = attributes.getValue("file-name");
+            if (fileName != null) {
+                if (response != null)
+                    response.setHeader("Content-Disposition", "attachment; filename=" + fileName );
+            }
+
+            // Set status code if available
+            final String statusCode = attributes.getValue("status-code");
+            if (statusCode != null) {
+                if (response != null)
+                     response.setStatus(Integer.parseInt(statusCode));
+            }
+
             // Set ContentHandler and headers depending on input type
             final String contentTypeAttribute = attributes.getValue("content-type");
             if (isBinaryInput) {

@@ -64,12 +64,24 @@
                     </p>
                 </li>
                 <li>
-                    <p>
-                        <code>last-modified</code>: optional, provides a last modification date which may be used by
-                        the consumer
-                    </p>
-                </li>
-            </ul>
+                     <p>
+                         <code>last-modified</code>: optional, provides a last modification date which may be used by
+                         the consumer
+                     </p>
+                 </li>
+                <li>
+                     <p>
+                         <code>status-code</code>: optional, provides a status code which may be used by
+                         the consumer
+                     </p>
+                 </li>
+                <li>
+                     <p>
+                         <code>file-name</code>: optional, provides a file name which may be used by
+                         the consumer
+                     </p>
+                 </li>
+             </ul>
             <p>
                 Example:
             </p>

@@ -708,23 +708,25 @@ ORBEON.util.DateTime = {
     },
 
     jsDateToformatDisplayDate: function(jsDate) {
-        if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D].[M].[Y]") {
-            // "Swiss" date
-            return jsDate.getDate()
-                   + '.' + (jsDate.getMonth() + 1)
-                   + '.' + jsDate.getFullYear();
-        } else if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D]/[M]/[Y]") {
-            // EU date
-            return jsDate.getDate()
-                   + '/' + (jsDate.getMonth() + 1)
-                   + '/' + jsDate.getFullYear();
-        } else {
-            // Default: [M]/[D]/[Y]
-            // US date
-            return (jsDate.getMonth() + 1)
-                   + '/' + jsDate.getDate()
-                   + '/' + jsDate.getFullYear();
+        var inputDateFormat = ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY); // e.g. "[D01].[M01].[Y]"
+        var inputDateFormatParts = inputDateFormat.split(new RegExp("[\\[\\]]")); // e.g. ["", "D01", ".", "M01", ".", "Y", ""]
+        var result = [];
+        for (var inputDateFormatPartIndex = 0; inputDateFormatPartIndex < inputDateFormatParts.length; inputDateFormatPartIndex++) {
+            var inputDateFormatPart = inputDateFormatParts[inputDateFormatPartIndex];
+
+            function padAndPush(dateOperation) {
+                var part = dateOperation.apply(jsDate).toString();
+                if (inputDateFormatPart.indexOf("01") == 1 && part.length < 2) part = "0" + part;
+                result.push(part);
+            }
+
+            if (inputDateFormatPart == "") ; // NOP: the first and last part will be an empty string
+            else if (inputDateFormatPart.indexOf("D") == 0) padAndPush(jsDate.getDate);
+            else if (inputDateFormatPart.indexOf("M") == 0) padAndPush(function() { return this.getMonth() + 1; });
+            else if (inputDateFormatPart.indexOf("Y") == 0) padAndPush(jsDate.getFullYear);
+            else result.push(inputDateFormatPart);
         }
+        return result.join("");
     },
 
     /**
@@ -910,22 +912,24 @@ ORBEON.util.DateTime = {
             }
         },
         // mm/dd/yyyy (American style) or dd/mm/yyyy (European style)
-        {   re: /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/,
+        {   re: /^(\d{1,2}).(\d{1,2}).(\d{2,4})$/,
             handler: function(bits) {
                 var d;
-                if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D]/[M]/[Y]") {
+                if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY).indexOf("[D") == 0) {
+                    // Day first
                     d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
                 } else {
+                    // Month first
                     d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
                 }
                 return d;
             }
         },
         // mm/dd (American style without year) or dd/mm (European style without year)
-        {   re: /^(\d{1,2})\/(\d{1,2})$/,
+        {   re: /^(\d{1,2}).(\d{1,2})$/,
             handler: function(bits) {
                 var d;
-                if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY) == "[D]/[M]/[Y]") {
+                if (ORBEON.util.Utils.getProperty(FORMAT_INPUT_DATE_PROPERTY).indexOf("[D") == 0) {
                     d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
                 } else {
                     d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
@@ -933,14 +937,8 @@ ORBEON.util.DateTime = {
                 return d;
             }
         },
-        // dd.mm.yyyy (Swiss style)
-        {   re: /^(\d{1,2})\.(\d{1,2})\.(\d{2,4})$/,
-            handler: function(bits) {
-                return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[3]), parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
-            }
-        },
         // yyyy-mm-dd (ISO style)
-        {   re: /(^\d{2,4})-(\d{1,2})-(\d{1,2})(Z|([+-]\d{2}:\d{2}))?$/, // allow for optional trailing timezone
+        {   re: /(^\d{4})-(\d{1,2})-(\d{1,2})(Z|([+-]\d{2}:\d{2}))?$/, // allow for optional trailing timezone
             handler: function(bits) {
                 return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[1]), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10));
             }
@@ -3048,12 +3046,13 @@ ORBEON.xforms.Events = {
                     }
 
                     // Handle first text field (time or date)
-                    toDisplayValue(ORBEON.util.Dom.getChildElementByIndex(target, 0),
+                    toDisplayValue(YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, target)[0],
                             ORBEON.util.Dom.hasClass(target, "xforms-type-time") ? ORBEON.util.DateTime.magicTimeToJSDate : ORBEON.util.DateTime.magicDateToJSDate,
                             ORBEON.util.Dom.hasClass(target, "xforms-type-time") ? ORBEON.util.DateTime.jsDateToformatDisplayTime : ORBEON.util.DateTime.jsDateToformatDisplayDate);
                     // Handle second text field for dateTime
                     if (ORBEON.util.Dom.hasClass(target, "xforms-type-dateTime"))
-                        toDisplayValue(ORBEON.util.Dom.getChildElementByIndex(target, 1), ORBEON.util.DateTime.magicTimeToJSDate, ORBEON.util.DateTime.jsDateToformatDisplayTime);
+                        toDisplayValue(YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, target)[1],
+                            ORBEON.util.DateTime.magicTimeToJSDate, ORBEON.util.DateTime.jsDateToformatDisplayTime);
                 }
 
                 // Fire change event

@@ -20,7 +20,9 @@
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:saxon="http://saxon.sf.net/"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
 
@@ -42,9 +44,9 @@
                 }
             </xbl:style>
         </xbl:resources>
-        <xbl:template>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <!-- Group has complete single-node binding -->
-            <xforms:group class="yui-button yui-push-button" xbl:attr="model context ref bind" xxbl:scope="outer">
+            <xforms:group class="yui-button yui-push-button" xbl:attr="model context ref bind" xxbl:scope="outer" xsl:version="2.0">
                 <xhtml:span class="first-child">
                     <!-- Bind trigger so it can handle read-only -->
                     <xforms:trigger ref="." xbl:attr="xxforms:modal">
@@ -52,8 +54,11 @@
 
                         <xxforms:script ev:event="xforms-enabled">
                             var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
-                            if (button == null)
-                                new YAHOO.widget.Button(event.target.parentNode.parentNode);
+                            if (button == null) {
+                                button = new YAHOO.widget.Button(event.target.parentNode.parentNode);
+                                <!-- TODO: once we can pass values from XForms to JavaScript we'll be able to get rid of the XSLT used here -->
+                                <xsl:if test="/fr:button/@tabindex">button.set("tabindex", <xsl:value-of select="/fr:button/@tabindex"/>);</xsl:if>
+                            }
                         </xxforms:script>
                         <xxforms:script ev:event="xforms-readonly">
                             var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
@@ -71,3 +76,4 @@
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>
+

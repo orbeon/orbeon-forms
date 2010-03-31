@@ -66,7 +66,6 @@
                     });
 
                     YAHOO.widget.Overlay.windowResizeEvent.subscribe(function() {
-//                        layoutElement.style.height = YAHOO.util.Dom.getViewportHeight() + "px";
                         layout.set('height', YAHOO.util.Dom.getViewportHeight());
                         layout.set('width', YAHOO.util.Dom.getViewportWidth());
                         layout.resize();
@@ -77,6 +76,11 @@
                     // Only make content visible after initialization to prevent expensive relayout
                     YAHOO.util.Dom.setStyle("left1", "display", "block");
                     YAHOO.util.Dom.setStyle("center1", "display", "block");
+
+                    <!-- Set focus on the app name input field when the page loads. This isn't done with xforms:setfocus
+                         because that action would run before the layout is rendered and the dialog visible. -->
+                    if (! YAHOO.util.Dom.hasClass("fb-editor-metadata-dialog", "xforms-initially-hidden"))
+                        ORBEON.xforms.Controls.setFocus("fb-application-name-input");
                 });
             })();
         </xhtml:script>
@@ -105,7 +109,7 @@
                         <!-- Use an input if app name is a wildcard -->
                         <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
                         <xforms:group ref=".[$is-input]">
-                            <xforms:input ref="application-name" id="fb-application-name-input">
+                            <xforms:input ref="application-name" id="fb-application-name-input" tabindex="1">
                                 <xforms:label ref="$form-resources/application-name/label"/>
                                 <xforms:hint ref="$form-resources/application-name/hint"/>
                                 <xforms:alert ref="$form-resources/application-name/alert"/>
@@ -123,7 +127,7 @@
                         </xforms:group>
 
                         <!-- Form name -->
-                        <xforms:input ref="form-name" id="fb-form-name-input">
+                        <xforms:input ref="form-name" id="fb-form-name-input" tabindex="2">
                             <xforms:label ref="$form-resources/form-name/label"/>
                             <xforms:hint ref="$form-resources/form-name/hint"/>
                             <xforms:alert ref="$form-resources/form-name/alert"/>
@@ -132,16 +136,16 @@
                     <xhtml:div class="fr-separator"/>
                     <xhtml:div class="fb-editor-metadata-dialog-buttons">
                         <xhtml:div class="fr-buttons">
-                            <fr:button>
+                            <fr:button id="fb-metadata-continue-trigger" tabindex="3">
+                                <xforms:label value="$form-resources/continue/label"/>
+                            </fr:button>
+                            <fr:button tabindex="4">
                                 <xforms:label value="$form-resources/cancel/label"/>
                                 <!-- Hide this dialog or go to the summary page -->
                                 <xforms:action ev:event="DOMActivate">
-                                    <xforms:load if="$is-new-form" resource="../summary/"/>
+                                    <xforms:load if="$is-new-form" resource="summary"/>
                                     <xxforms:hide if="not($is-new-form)" ev:event="DOMActivate" dialog="fb-editor-metadata-dialog"/>
                                 </xforms:action>
-                            </fr:button>
-                            <fr:button id="fb-metadata-continue-trigger">
-                                <xforms:label value="$form-resources/continue/label"/>
                             </fr:button>
                         </xhtml:div>
                         <xhtml:div class="fr-clear"/>

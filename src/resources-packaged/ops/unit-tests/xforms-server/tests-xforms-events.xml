@@ -1816,6 +1816,110 @@
         </output>
     </test>
 
+    <test description="Value change event on variable" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model xxforms:state-handling="client" id="model">
+                                    <xforms:instance id="instance">
+                                        <instance>
+                                            <value>old</value>
+                                            <constant>constant</constant>
+                                            <e1>tomato</e1>
+                                            <e2>tomato</e2>
+                                            <e3>mozzarella</e3>
+                                        </instance>
+                                    </xforms:instance>
+
+                                    <xforms:action ev:event="xforms-ready">
+                                        <xforms:setvalue ref="value">new</xforms:setvalue>
+
+                                    </xforms:action>
+
+                                    <!-- TEST: Events to gather -->
+                                    <xforms:instance id="events">
+                                        <events/>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:group id="events-group">
+                                    <xforms:insert ev:event="xforms-value-changed"
+                                                   context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:targetid'))
+                                                             ))"/>
+
+                                    <!-- Must never get event as value is constant-->
+                                    <xxforms:variable id="v1" name="v1">foobar</xxforms:variable>
+                                    <!-- Must get event -->
+                                    <xxforms:variable id="v2a" name="v2a" select="value/string()"/>
+                                    <!-- Must not get event -->
+                                    <xxforms:variable id="v2b" name="v2b" select="value"/>
+                                    <!-- Must not get event -->
+                                    <xxforms:variable id="v3a" name="v3a" select="constant/string()"/>
+                                    <xxforms:variable id="v3b" name="v3b" select="constant"/>
+                                    <!-- Must get event -->
+                                    <xxforms:variable id="v4a" name="v4a" select="if (value = 'old') then e1 else e2"/>
+                                    <!-- Must not get event -->
+                                    <xxforms:variable id="v4b" name="v4b" select="(if (value = 'old') then e1 else e2)/string()"/>
+                                    <!-- Must get event -->
+                                    <xxforms:variable id="v5a" name="v5a" select="if (value = 'old') then e1 else e3"/>
+                                    <xxforms:variable id="v5b" name="v5b" select="(if (value = 'old') then e1 else e3)/string()"/>
+                                    <!-- Must get event -->
+                                    <xxforms:variable id="v6" name="v6" select="if (value = 'old') then (e1, e2) else (e1, e2, e3)"/>
+                                    <xxforms:variable id="v7" name="v7" select="if (value = 'old') then 'tomato' else 42"/>
+
+                                </xforms:group>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value>new</value>
+                                    <constant>constant</constant>
+                                    <e1>tomato</e1>
+                                    <e2>tomato</e2>
+                                    <e3>mozzarella</e3>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xforms-value-changed" target="v2a"/>
+                                    <event type="xforms-value-changed" target="v4a"/>
+                                    <event type="xforms-value-changed" target="v5a"/>
+                                    <event type="xforms-value-changed" target="v5b"/>
+                                    <event type="xforms-value-changed" target="v6"/>
+                                    <event type="xforms-value-changed" target="v7"/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO:

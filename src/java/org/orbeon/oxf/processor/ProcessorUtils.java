@@ -269,7 +269,7 @@ public class ProcessorUtils {
             if (contentType != null)
                 attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
             if (fileName != null)
-                attributes.addAttribute("", "file-name", "file-name", "CDATA", fileName);
+                attributes.addAttribute("", "filename", "filename", "CDATA", fileName);
             if (lastModified != null)
                 attributes.addAttribute("", "last-modified", "last-modified", "CDATA", ISODateUtils.getRFC1123Date(lastModified));
             if (statusCode > 0)

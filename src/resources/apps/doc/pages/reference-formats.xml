@@ -77,7 +77,7 @@
                  </li>
                 <li>
                      <p>
-                         <code>file-name</code>: optional, provides a file name which may be used by
+                         <code>filename</code>: optional, provides a file name which may be used by
                          the consumer
                      </p>
                  </li>

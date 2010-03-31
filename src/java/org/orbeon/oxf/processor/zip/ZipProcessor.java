@@ -73,7 +73,7 @@ public class ZipProcessor extends ProcessorImpl {
                                     name = atts.getValue("name");
                                     uri = new StringBuffer();
                                 } else if ("files".equals(localName)) {
-                                    fileName = atts.getValue("file-name");
+                                    fileName = atts.getValue("filename");
                                     String value = atts.getValue("status-code");
                                     if (value != null ) {
                                         statusCode = Integer.parseInt(value);

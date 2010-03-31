@@ -21,15 +21,20 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.ProcessorUtils;
+import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -78,7 +83,31 @@ public class ZipProcessor extends ProcessorImpl {
                                 try {
                                     if ("file".equals(localName)) {
                                         zipOutputStream.putNextEntry(new ZipEntry(name));
-                                        InputStream fileInputStream = new FileInputStream(new File(new URI(uri.toString())));
+                                        final LocationData locationData = getLocationData();
+                                        final URL fullURL;
+                                        final String realPath;
+                                        try {
+                                            fullURL = (locationData != null && locationData.getSystemID() != null)
+                                                                            ? URLFactory.createURL(locationData.getSystemID(), uri.toString())
+                                                                            : URLFactory.createURL(uri.toString());
+
+                                            if (fullURL.getProtocol().equals("oxf")) {
+                                                // Get real path to resource path if possible
+                                                realPath = ResourceManagerWrapper.instance().getRealPath(fullURL.getFile());
+                                                if (realPath == null)
+                                                    throw new OXFException("Zip processor is unable to obtain the real path of the file using the oxf: protocol for the base-directory property: " + uri.toString());
+                                            } else if (fullURL.getProtocol().equals("file")) {
+                                                String host = fullURL.getHost();
+                                                realPath = host + (host.length() > 0 ? ":" : "") + fullURL.getFile();
+                                            } else {
+                                                throw new OXFException("Zip processor only supports the file: and oxf: protocols for the base-directory property: " + uri.toString());
+                                            }
+
+                                        } catch (MalformedURLException e) {
+                                            throw new OXFException(e);
+                                        }
+
+                                        InputStream fileInputStream = new FileInputStream(new File(realPath));
                                         try {
                                             NetUtils.copyStream(fileInputStream, zipOutputStream);
                                         } finally {
@@ -86,8 +115,6 @@ public class ZipProcessor extends ProcessorImpl {
                                         }
                                     }
                                 } catch (IOException e) {
-                                    throw new OXFException(e);
-                                } catch (URISyntaxException e) {
                                     throw new OXFException(e);
                                 }
                             }

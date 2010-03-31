@@ -465,7 +465,7 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
     { *width: 13em }
 
 /* Show placeholder frame for buttons */
-.fr-buttons-placeholder { width: 100%; background: white; display: block; border: 2px dashed #004B92; text-align: center }
+.fr-buttons-placeholder { width: 100%; display: block; text-align: center }
 .fr-buttons-placeholder div { margin: .5em }
 
 /* ***** Print and PDF ********************************************************************************************** */

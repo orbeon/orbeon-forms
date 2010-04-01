@@ -103,10 +103,6 @@
                     font-style: italic
                 }
 
-                /* ***** Autocomplete ***********************************************************/
-                .autocomplete-container { height: 12em; }
-                .autocomplete-container .yui-ac { width: 100%; }
-
             </xhtml:style>
         </xsl:copy>
     </xsl:template>

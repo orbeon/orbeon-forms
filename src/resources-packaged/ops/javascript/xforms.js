@@ -3591,7 +3591,7 @@ ORBEON.xforms.Events = {
      */
     treeLabelClick: function(object) {
 
-        // Depending who calls this listeners, we either get the node directly (for the enterKeyPressed 
+        // Depending who calls this listeners, we either get the node directly (for the enterKeyPressed
         // and labelClick events) or we get an object which contains the node (for clickEvent).
         var node = ! YAHOO.lang.isUndefined(object._type) && (object._type == "TextNode" || object._type == "TaskNode")
             ? object : object.node;
@@ -3980,6 +3980,20 @@ ORBEON.widgets.YUICalendar = function() {
                 submit: "OK",
                 cancel: "Aancelar",
                 invalidYear: "A\xf1o debe ser un n\xfamero"
+            }
+        },
+        "nl": {
+            properties: {
+                "MONTHS_LONG": [ "Januari", "Februari", "Maart", "April", "Mei", "Juni", "Juli", "Augustus",  "September",  "Oktober",  "November",  "December" ],
+                "WEEKDAYS_SHORT": ["Zo", "Ma", "Di", "Wo", "Do", "Vr", "Za"],
+                "START_WEEKDAY": 1
+            },
+            navigator: {
+                month: "Month",
+                year: "Year",
+                submit: "OK",
+                cancel: "Cancel",
+                invalidYear: "Year needs to be a number"
             }
         }
     };

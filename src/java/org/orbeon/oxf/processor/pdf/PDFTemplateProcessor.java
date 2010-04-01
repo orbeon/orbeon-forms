@@ -127,7 +127,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
                     final BaseFont baseFont2 = BaseFont.createFont("Courier", BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
                     contentByte.beginText();
                     {
-                        // 20-pixel lines and side legences
+                        // 20-pixel lines and side legends
 
                         contentByte.setFontAndSize(baseFont2, (float) 7);
 

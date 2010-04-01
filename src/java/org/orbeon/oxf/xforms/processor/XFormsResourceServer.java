@@ -351,7 +351,7 @@ public class XFormsResourceServer extends ProcessorImpl {
             final List<URLRewriterUtils.PathMatcher> matchAllPathMatcher = URLRewriterUtils.getMatchAllPathMatcher();
 
             // Output Orbeon Forms version
-            outputWriter.write("/* This file was produced by Orbeon Forms " + Version.getVersion() + " */\n");
+            outputWriter.write("/* This file was produced by " + Version.getVersionString() + " */\n");
 
             for (final XFormsFeatures.ResourceConfig resource: resources) {
                 final String resourcePath = resource.getResourcePath(isMinimal);
@@ -423,7 +423,7 @@ public class XFormsResourceServer extends ProcessorImpl {
 
             // Output Orbeon Forms version
             final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
-            outputWriter.write("// This file was produced by Orbeon Forms " + Version.getVersion() + "\n");
+            outputWriter.write("// This file was produced by " + Version.getVersionString() + "\n");
             outputWriter.flush();
 
             // Output

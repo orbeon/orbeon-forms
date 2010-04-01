@@ -56,15 +56,12 @@ public class XFormsProperties {
 //    private static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "optimize-local-instance-loads";
     private static final String OPTIMIZE_RELEVANCE_PROPERTY = "optimize-relevance";
     private static final String EXPOSE_XPATH_TYPES_PROPERTY = "expose-xpath-types";
-    private static final String INITIAL_REFRESH_EVENTS_PROPERTY = "server.events.initial-refresh-events";
     private static final String AJAX_SHOW_LOADING_ICON_PROPERTY = "ajax.show-loading-icon";
     private static final String AJAX_SHOW_ERRORS_PROPERTY = "ajax.show-errors";
     private static final String AJAX_UPDATE_FULL_THRESHOLD = "ajax.update.full.threshold";
 
     private static final String MINIMAL_RESOURCES_PROPERTY = "minimal-resources";
     private static final String COMBINE_RESOURCES_PROPERTY = "combine-resources";
-
-    private static final String SKIP_SCHEMA_VALIDATION_PROPERTY = "skip-schema-validation";
 
     private static final String TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX = "format.output.";
     private static final String TYPE_INPUT_FORMAT_PROPERTY_PREFIX = "format.input.";
@@ -198,12 +195,10 @@ public class XFormsProperties {
             new PropertyDefinition(OPTIMIZE_LOCAL_INSTANCE_INCLUDE_PROPERTY, false, false),
             new PropertyDefinition(OPTIMIZE_RELEVANCE_PROPERTY, false, false),
             new PropertyDefinition(EXPOSE_XPATH_TYPES_PROPERTY, false, false),
-            new PropertyDefinition(INITIAL_REFRESH_EVENTS_PROPERTY, true, false),
             new PropertyDefinition(AJAX_SHOW_LOADING_ICON_PROPERTY, true, false),
             new PropertyDefinition(AJAX_SHOW_ERRORS_PROPERTY, true, false),
             new PropertyDefinition(MINIMAL_RESOURCES_PROPERTY, true, false),
             new PropertyDefinition(COMBINE_RESOURCES_PROPERTY, true, false),
-            new PropertyDefinition(SKIP_SCHEMA_VALIDATION_PROPERTY, false, false),
             new PropertyDefinition(COMPUTED_BINDS_PROPERTY, COMPUTED_BINDS_RECALCULATE_VALUE, false),
             new PropertyDefinition(DATE_FORMAT_PROPERTY, "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(DATETIME_FORMAT_PROPERTY, "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
@@ -298,6 +293,7 @@ public class XFormsProperties {
     private static final String DEBUG_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.debug";
     private static final String ERROR_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.error";
 
+    // == Global properties ============================================================================================
     /**
      * Return a PropertyDefinition given a property name.
      *
@@ -393,6 +389,8 @@ public class XFormsProperties {
                 (CACHE_COMBINED_RESOURCES_PROPERTY, CACHE_COMBINED_RESOURCES_DEFAULT);
     }
 
+    // == XForms document properties ===================================================================================
+
     public static String getStateHandling(XFormsContainingDocument containingDocument) {
         return getStringProperty(containingDocument, STATE_HANDLING_PROPERTY);
     }
@@ -445,10 +443,6 @@ public class XFormsProperties {
 
     public static boolean isOptimizeRelevance(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, OPTIMIZE_RELEVANCE_PROPERTY);
-    }
-
-    public static boolean isSkipSchemaValidation(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, SKIP_SCHEMA_VALIDATION_PROPERTY);
     }
 
     public static String getComputedBinds(XFormsContainingDocument containingDocument) {
@@ -544,10 +538,6 @@ public class XFormsProperties {
         return getBooleanProperty(containingDocument, ENCRYPT_ITEM_VALUES_PROPERTY);
     }
 
-    public static boolean isXPathAnalysis(XFormsContainingDocument containingDocument) {
-        return getBooleanProperty(containingDocument, XPATH_ANALYSIS_PROPERTY);
-    }
-
     public static boolean isOfflineMode(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, OFFLINE_SUPPORT_PROPERTY);
     }
@@ -584,6 +574,8 @@ public class XFormsProperties {
     public static String getHTMLEditor(XFormsContainingDocument containingDocument) {
         return getStringProperty(containingDocument, XHTML_EDITOR_PROPERTY);
     }
+
+    // == Helpers ======================================================================================================
 
     public static Object getProperty(XFormsContainingDocument containingDocument, String propertyName) {
         return containingDocument.getStaticState().getProperty(propertyName);

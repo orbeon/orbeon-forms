@@ -1,20 +1,20 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.portlet;
 
 import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
-import org.orbeon.oxf.webapp.OXFClassLoader;
+import org.orbeon.oxf.webapp.OrbeonClassLoader;
 
 import javax.portlet.*;
 import java.io.IOException;
@@ -42,18 +42,18 @@ public class OrbeonPortlet extends GenericPortlet {
 
     public void init() throws PortletException {
         try {
-            // Instanciate WebAppExternalContext
+            // Instantiate WebAppExternalContext
             webAppExternalContext = new PortletWebAppExternalContext(getPortletContext());
 
-            // Instanciate Portlet delegate
-            Class delegatePortletClass = OXFClassLoader.getClassLoader(webAppExternalContext).loadClass(OPSPortlet.class.getName() + OXFClassLoader.DELEGATE_CLASS_SUFFIX);
+            // Instantiate Portlet delegate
+            Class delegatePortletClass = OrbeonClassLoader.getClassLoader(webAppExternalContext).loadClass(OPSPortlet.class.getName() + OrbeonClassLoader.DELEGATE_CLASS_SUFFIX);
             delegatePortlet = (GenericPortlet) delegatePortletClass.newInstance();
 
             // Initialize Portlet delegate
             Thread currentThread = Thread.currentThread();
             ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
             try {
-                currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+                currentThread.setContextClassLoader(OrbeonClassLoader.getClassLoader(webAppExternalContext));
                 delegatePortlet.init(getPortletConfig());
             } finally {
                 currentThread.setContextClassLoader(oldThreadContextClassLoader);
@@ -68,7 +68,7 @@ public class OrbeonPortlet extends GenericPortlet {
         Thread currentThread = Thread.currentThread();
         ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
         try {
-            currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            currentThread.setContextClassLoader(OrbeonClassLoader.getClassLoader(webAppExternalContext));
             delegatePortlet.processAction(actionRequest, response);
         } finally {
             currentThread.setContextClassLoader(oldThreadContextClassLoader);
@@ -80,7 +80,7 @@ public class OrbeonPortlet extends GenericPortlet {
         Thread currentThread = Thread.currentThread();
         ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
         try {
-            currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            currentThread.setContextClassLoader(OrbeonClassLoader.getClassLoader(webAppExternalContext));
             delegatePortlet.render(request, response);
         } finally {
             currentThread.setContextClassLoader(oldThreadContextClassLoader);
@@ -92,7 +92,7 @@ public class OrbeonPortlet extends GenericPortlet {
         Thread currentThread = Thread.currentThread();
         ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
         try {
-            currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            currentThread.setContextClassLoader(OrbeonClassLoader.getClassLoader(webAppExternalContext));
             delegatePortlet.destroy();
         } finally {
             currentThread.setContextClassLoader(oldThreadContextClassLoader);

@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -40,7 +40,7 @@
                                             then (/xhtml:html/xhtml:body/xhtml:h1)[1]
                                             else '[Untitled]'" as="xs:string"/>
     <!-- Orbeon Forms version -->
-    <xsl:variable name="orbeon-forms-version" select="version:getVersion()" as="xs:string"/>
+    <xsl:variable name="orbeon-forms-version" select="version:getVersionString()" as="xs:string"/>
 
     <!-- - - - - - - Themed page template - - - - - - -->
     <xsl:template match="/">
@@ -55,7 +55,7 @@
                 <!-- Handle head elements except scripts -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:head/(xhtml:link | xhtml:style)"/>
                 <!-- Orbeon Forms version -->
-                <xhtml:meta name="generator" content="Orbeon Forms {$orbeon-forms-version}"/>
+                <xhtml:meta name="generator" content="{$orbeon-forms-version}"/>
                 <!-- Favicon -->
                 <xhtml:link rel="shortcut icon" href="/ops/images/orbeon-icon-16.ico"/>
                 <xhtml:link rel="icon" href="/ops/images/orbeon-icon-16.png" type="image/png"/>

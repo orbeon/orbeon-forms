@@ -92,7 +92,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
      */
     public XFormsInstance(Configuration configuration, Element containerElement) {
 
-        this.instanceStaticId = containerElement.attributeValue("id");
+        this.instanceStaticId = XFormsUtils.getElementStaticId(containerElement);
         this.modelEffectiveId = containerElement.attributeValue("model-id");
 
         this.sourceURI = containerElement.attributeValue("source-uri");
@@ -607,7 +607,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     }
 
     public static String getInstanceStaticId(Element xformsInstanceElement) {
-        return xformsInstanceElement.attributeValue("id");
+        return XFormsUtils.getElementStaticId(xformsInstanceElement);
     }
 
     public static boolean isReadonlyHint(Element element) {

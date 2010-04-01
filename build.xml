@@ -126,16 +126,23 @@
     <target name="init">
 
         <tstamp/>
-        <!-- E.g.:
+        <!--
+            Version number:
+
             dev-3.7.1       => released dev version
             dev-post-3.7.1  => post-release nightly build
             beta1-3.8.0     => beta for 3.8.0
             rc1-3.8.0       => release candidate for 3.8.0
-            stable-3.8.0    => released stable version
+            3.8.0           => final 3.8.0
+
+            Full release number:
+
+            3.8.0.201004010558-CE: released CE version
+            3.8.0.201004010558-PE: released PE version
          -->
         <property name="version.number" value="dev-post-3.7.1"/>
         <!-- Can be overridden on command-line to provide different suffix -->
-        <property name="artifact.suffix" value=""/>
+        <property name="artifact.suffix" value="-CE"/>
         <tstamp>
             <format property="time" pattern="yyyyMMddHHmm" timezone="GMT"/>
         </tstamp>
@@ -229,6 +236,7 @@
             <src path="${build.dir}/src"/>
             <src path="${java-src.dir}"/>
             <exclude name="org/orbeon/oxf/common/Version.java"/>
+            <exclude name="org/orbeon/oxf/xforms/analysis/PathMapUIDependencies.java"/>
         </javac>
     </target>
 

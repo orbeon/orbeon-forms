@@ -290,7 +290,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             final String modelEffectiveId = model.prefixedId + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
 
             // Create and add model
-            addModel(new XFormsModel(this, modelEffectiveId, model.document));
+            addModel(new XFormsModel(this, modelEffectiveId, model));
         }
     }
 

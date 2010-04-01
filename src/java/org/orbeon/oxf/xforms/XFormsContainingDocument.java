@@ -19,12 +19,11 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
-import org.orbeon.oxf.xforms.analysis.DumbUIDependencies;
-import org.orbeon.oxf.xforms.analysis.PathMapUIDependencies;
 import org.orbeon.oxf.xforms.analysis.UIDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -128,7 +127,7 @@ public class XFormsContainingDocument extends XBLContainer {
 
     private boolean goingOffline;
 
-    private UIDependencies uiDependencies;
+    private final UIDependencies uiDependencies;
 
     /**
      * Return the global function library.
@@ -158,7 +157,7 @@ public class XFormsContainingDocument extends XBLContainer {
             // Remember static state
             this.xformsStaticState = xformsStaticState;
 
-            createUIDependencies();
+            this.uiDependencies = Version.instance().createUIDependencies();
 
             // Remember URI resolver for initialization
             this.uriResolver = uriResolver;
@@ -177,10 +176,6 @@ public class XFormsContainingDocument extends XBLContainer {
             // NOTE: we clear isInitializing when Ajax requests come in
         }
         indentedLogger.endHandleOperation();
-    }
-
-    private void createUIDependencies() {
-        uiDependencies = XFormsProperties.isXPathAnalysis(this) ? new PathMapUIDependencies(this) : new DumbUIDependencies();
     }
 
     /**
@@ -217,7 +212,7 @@ public class XFormsContainingDocument extends XBLContainer {
             // Make sure there is location data
             setLocationData(this.xformsStaticState.getLocationData());
 
-            createUIDependencies();
+            this.uiDependencies = Version.instance().createUIDependencies();
 
             // Restore the containing document's dynamic state
             final String encodedDynamicState = xformsState.getDynamicState();

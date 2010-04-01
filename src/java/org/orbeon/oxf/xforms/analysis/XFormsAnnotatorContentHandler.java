@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
@@ -298,7 +299,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
             // Create a new id and update the attributes if needed
             attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
 
-            if (saxStore != null) {
+            if (saxStore != null && Version.instance().isPE()) {
                 // Remember mark if xxforms:update="full"
                 final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
                 if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {

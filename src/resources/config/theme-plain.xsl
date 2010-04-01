@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2006-2007 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <!--
     This is a very simple theme that shows you how to create a common layout for all your pages. You can modify it at
     will or, even better, copy it as theme-[yourapp].xsl and refer to the new name from the epilogue pipeline.
@@ -22,7 +22,7 @@
     xmlns:version="java:org.orbeon.oxf.common.Version">
 
     <!-- Orbeon Forms version -->
-    <xsl:variable name="orbeon-forms-version" select="version:getVersion()" as="xs:string"/>
+    <xsl:variable name="orbeon-forms-version" select="version:getVersionString()" as="xs:string"/>
 
     <!-- - - - - - - Themed page template - - - - - - -->
     <xsl:template match="/*">
@@ -46,7 +46,7 @@
                     </xsl:choose>
                 </xhtml:title>
                 <!-- Orbeon Forms version -->
-                <xhtml:meta name="generator" content="Orbeon Forms {$orbeon-forms-version}"/>
+                <xhtml:meta name="generator" content="{$orbeon-forms-version}"/>
                 <!-- Favicon -->
                 <xhtml:link rel="shortcut icon" href="/ops/images/orbeon-icon-16.ico"/>
                 <xhtml:link rel="icon" href="/ops/images/orbeon-icon-16.png" type="image/png"/>

@@ -306,7 +306,7 @@ public class URLRewriterUtils {
                 if (isMatch) {
                     // 4. Found a match, perform additional rewrite at the beginning
 
-                    final String version = isPlatformURL ? Version.getVersion() : applicationVersion;
+                    final String version = isPlatformURL ? Version.getVersionNumber() : applicationVersion;
                     // Call full method so that we can get the proper client context path
                     return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(),
                             request.getClientContextPath(urlString), request.getRequestPath(), "/" + version + absoluteURINoContext, rewriteMode);
@@ -353,7 +353,8 @@ public class URLRewriterUtils {
 //    }
 
     public static boolean isResourcesVersioned() {
-        return Properties.instance().getPropertySet().getBoolean(RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSIONED_DEFAULT);
+        final boolean requested = Properties.instance().getPropertySet().getBoolean(RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSIONED_DEFAULT);
+        return Version.instance().isPEFeatureEnabled(requested, RESOURCES_VERSIONED_PROPERTY);
     }
 
     public static String getRewritingStrategy(String containerType, String defaultStrategy) {

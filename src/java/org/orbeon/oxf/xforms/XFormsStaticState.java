@@ -18,6 +18,7 @@ import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
@@ -633,7 +634,8 @@ public class XFormsStaticState {
             isNoscript = getBooleanProperty(XFormsProperties.NOSCRIPT_PROPERTY)
                     && getBooleanProperty(XFormsProperties.NOSCRIPT_SUPPORT_PROPERTY);
 
-            isXPathAnalysis = getBooleanProperty(XFormsProperties.XPATH_ANALYSIS_PROPERTY);
+            isXPathAnalysis = Version.instance().isPEFeatureEnabled(getBooleanProperty(XFormsProperties.XPATH_ANALYSIS_PROPERTY),
+                    XFormsProperties.XPATH_ANALYSIS_PROPERTY);
 
             propertiesRead = true;
         }

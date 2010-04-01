@@ -18,10 +18,12 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
@@ -82,7 +84,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     // Containing document
     private final XFormsContainingDocument containingDocument;
 
-    public XFormsModel(XBLContainer container, String effectiveId, Document modelDocument) {
+    public XFormsModel(XBLContainer container, String effectiveId, Model model) {
 
         // Set container
         this.container = container;
@@ -91,7 +93,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         this.indentedLogger = containingDocument.getIndentedLogger(LOGGING_CATEGORY);
         
         // Remember document
-        this.modelDocument = modelDocument;
+        this.modelDocument = model.document;
 
         // Basic check trying to make sure this is an XForms model
         // TODO: should rather use schema here or when obtaining document passed to this constructor
@@ -102,7 +104,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     + XFormsConstants.XFORMS_NAMESPACE_URI + "'. Found instead: '" + rootNamespaceURI + "'",
                     (LocationData) modelElement.getData());
 
-        staticId = modelElement.attributeValue("id");
+        staticId = XFormsUtils.getElementStaticId(modelElement);
         this.effectiveId = effectiveId;
 
         // Extract list of instances ids
@@ -135,7 +137,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // At least one submission in this model
                 submissions = new HashMap<String, XFormsModelSubmission>();
                 for (Element submissionElement: submissionElements) {
-                    final String submissionId = submissionElement.attributeValue("id");
+                    final String submissionId = XFormsUtils.getElementStaticId(submissionElement);
                     submissions.put(submissionId, new XFormsModelSubmission(this.container, submissionId, submissionElement, this));
                 }
             }
@@ -361,13 +363,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     private void loadSchemasIfNeeded(PropertyContext propertyContext) {
         if (schemaValidator == null) {
-            if (!XFormsProperties.isSkipSchemaValidation(containingDocument)) {
-                final Element modelElement = modelDocument.getRootElement();
-                schemaValidator = new XFormsModelSchemaValidator(modelElement, indentedLogger);
-                schemaValidator.loadSchemas(propertyContext);
+            final Element modelElement = modelDocument.getRootElement();
+            schemaValidator = new XFormsModelSchemaValidator(modelElement, indentedLogger);
+            schemaValidator.loadSchemas(propertyContext);
 
-                mustSchemaValidate = schemaValidator.hasSchema();
-            }
+            mustSchemaValidate = schemaValidator.hasSchema();
         }
     }
 
@@ -566,7 +566,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             if (instanceContainers.size() > 0) {
                 // Iterate through all instances
                 int instancePosition = 0;
-                for (Element containerElement : instanceContainers) {
+                for (final Element containerElement : instanceContainers) {
                     // Skip processing in case somebody has already set this particular instance
                     if (instances.get(instancePosition++) != null) {
                         // NOP
@@ -576,7 +576,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                         final LocationData locationData = (LocationData) containerElement.getData();
                         final String instanceStaticId = XFormsInstance.getInstanceStaticId(containerElement);
                         final boolean isReadonlyHint = XFormsInstance.isReadonlyHint(containerElement);
-                        final boolean isCacheHint = XFormsInstance.isCacheHint(containerElement);
+                        final boolean isCacheHint = Version.instance().isPEFeatureEnabled(XFormsInstance.isCacheHint(containerElement), "cached XForms instance");
                         final long xxformsTimeToLive = XFormsInstance.getTimeToLive(containerElement);
                         final String xxformsValidation = containerElement.attributeValue(XFormsConstants.XXFORMS_VALIDATION_QNAME);
 
@@ -644,7 +644,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     private void loadInstance(PropertyContext propertyContext, Element instanceContainer, String instanceStaticId, boolean readonlyHint, boolean isCacheHint, long xxformsTimeToLive, String xxformsValidation, LocationData locationData) {
         indentedLogger.startHandleOperation("load", "loading instance",
-                "instance id", instanceContainer.attributeValue("id"));
+                "instance id", XFormsUtils.getElementStaticId(instanceContainer));
         {
             // Get instance resource URI, can be from @src or @resource
 

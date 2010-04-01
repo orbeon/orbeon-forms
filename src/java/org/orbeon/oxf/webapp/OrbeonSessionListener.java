@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -38,7 +38,7 @@ public class OrbeonSessionListener implements HttpSessionListener {
         Thread currentThread = Thread.currentThread();
         ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
         try {
-            currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            currentThread.setContextClassLoader(OrbeonClassLoader.getClassLoader(webAppExternalContext));
             httpSessionListenerDelegate.sessionCreated(event);
         } finally {
             currentThread.setContextClassLoader(oldThreadContextClassLoader);
@@ -54,7 +54,7 @@ public class OrbeonSessionListener implements HttpSessionListener {
         Thread currentThread = Thread.currentThread();
         ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
         try {
-            currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            currentThread.setContextClassLoader(OrbeonClassLoader.getClassLoader(webAppExternalContext));
             httpSessionListenerDelegate.sessionDestroyed(event);
         } finally {
             currentThread.setContextClassLoader(oldThreadContextClassLoader);
@@ -64,7 +64,7 @@ public class OrbeonSessionListener implements HttpSessionListener {
     private void initializeDelegate(WebAppExternalContext webAppExternalContext) {
         try {
             if (httpSessionListenerDelegate == null) {
-                Class delegateServletClass = OXFClassLoader.getClassLoader(webAppExternalContext).loadClass(OrbeonSessionListener.class.getName() + OXFClassLoader.DELEGATE_CLASS_SUFFIX);
+                Class delegateServletClass = OrbeonClassLoader.getClassLoader(webAppExternalContext).loadClass(OrbeonSessionListener.class.getName() + OrbeonClassLoader.DELEGATE_CLASS_SUFFIX);
                 httpSessionListenerDelegate = (HttpSessionListener) delegateServletClass.newInstance();
             }
         } catch (Exception e) {

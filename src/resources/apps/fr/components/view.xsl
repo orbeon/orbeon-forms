@@ -324,8 +324,8 @@
 
     <xsl:template match="fr:version">
         <xsl:if test="not($has-version = false())">
-            <xsl:variable xmlns:version="java:org.orbeon.oxf.common.Version" name="orbeon-forms-version" select="version:getVersion()" as="xs:string"/>
-            <xhtml:div class="fr-orbeon-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:div>
+            <xsl:variable xmlns:version="java:org.orbeon.oxf.common.Version" name="orbeon-forms-version" select="version:getVersionString()" as="xs:string"/>
+            <xhtml:div class="fr-orbeon-version"><xsl:value-of select="$orbeon-forms-version"/></xhtml:div>
         </xsl:if>
     </xsl:template>
 

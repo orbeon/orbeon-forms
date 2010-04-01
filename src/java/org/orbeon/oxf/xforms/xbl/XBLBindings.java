@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.xbl;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DOMSerializer;
 import org.orbeon.oxf.processor.Processor;
@@ -545,19 +546,23 @@ public class XBLBindings {
     }
 
     private boolean hasFullUpdate(Document shadowTreeDocument) {
-        final boolean[] hasUpdateFull = new boolean[1];
-        Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
-            public void startElement(Element element) {
-                // Check if there is any xxforms:update="full"
-                final String xxformsUpdate = element.attributeValue(XFormsConstants.XXFORMS_UPDATE_QNAME);
-                if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
-                    hasUpdateFull[0] = true;
+        if (Version.instance().isPE()) {
+            final boolean[] hasUpdateFull = new boolean[1];
+            Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
+                public void startElement(Element element) {
+                    // Check if there is any xxforms:update="full"
+                    final String xxformsUpdate = element.attributeValue(XFormsConstants.XXFORMS_UPDATE_QNAME);
+                    if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
+                        hasUpdateFull[0] = true;
+                    }
                 }
-            }
-            public void endElement(Element element) {}
-            public void text(Text text) {}
-        }, true);
-        return hasUpdateFull[0];
+                public void endElement(Element element) {}
+                public void text(Text text) {}
+            }, true);
+            return hasUpdateFull[0];
+        } else {
+            return false;
+        }
     }
 
     // TODO: could this be done as a processor instead? could then have XSLT -> XBL -> XFACH and stream

@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2005-2007 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <!--
 
   This stylesheet is called from error.xpl and is used to format OPS and Java stack traces.
@@ -29,7 +29,7 @@
 
     <xsl:variable name="servlet-classes" as="xs:string+" select="('org.orbeon.oxf.servlet.OPSServlet', 'org.orbeon.oxf.servlet.OXFServlet')"/>
     <xsl:variable name="portlet-classes" as="xs:string+" select="('org.orbeon.oxf.portlet.OPSPortlet', 'org.orbeon.oxf.portlet.OPSPortlet')"/>
-    <xsl:variable name="orbeon-forms-version" as="xs:string" select="version:getVersion()"/>
+    <xsl:variable name="orbeon-forms-version" as="xs:string" select="version:getVersionString()"/>
     <xsl:variable name="title" as="xs:string" select="'Orbeon Forms - An Error has Occurred'"/>
 
     <!-- Format the XForms error panel message body. This must return a single root element. -->
@@ -269,7 +269,7 @@
                             </table>
                         </div>
                     </div>
-                    <p class="ops-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></p>
+                    <p class="ops-version"><xsl:value-of select="$orbeon-forms-version"/></p>
                 </div>
             </body>
         </html>

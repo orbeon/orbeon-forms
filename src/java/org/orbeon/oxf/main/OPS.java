@@ -145,7 +145,7 @@ public class OPS {
 
             // Print version if asked
             if (cmd.hasOption('v')) {
-                System.out.println("Orbeon Forms " + Version.getVersion());
+                System.out.println(Version.getVersionString());
                 // Terminate if there is no other argument and no pipeline URL
                 if (!cmd.hasOption('r') && (otherArgs == null || otherArgs.length == 0))
                     System.exit(0);

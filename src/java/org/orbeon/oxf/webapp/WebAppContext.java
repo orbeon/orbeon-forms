@@ -85,7 +85,7 @@ public class WebAppContext {
             if (initializeLogging) {
                 LoggerFactory.initBasicLogger();
             }
-            logger.info("Starting Orbeon Forms Release " + Version.getVersion());
+            logger.info("Starting " + Version.getVersionString());
 
             // 1. Initialize the Resource Manager
             final Map<String, Object> properties = new LinkedHashMap<String, Object>();

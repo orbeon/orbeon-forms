@@ -1,20 +1,20 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.servlet;
 
-import org.orbeon.oxf.webapp.OXFClassLoader;
 import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
+import org.orbeon.oxf.webapp.OrbeonClassLoader;
 
 import javax.servlet.*;
 import java.io.IOException;
@@ -38,14 +38,14 @@ public class OrbeonServletFilter implements Filter {
             webAppExternalContext = new ServletWebAppExternalContext(config.getServletContext());
 
             // Instanciate Servlet Filter delegate
-            Class delegateServletClass = OXFClassLoader.getClassLoader(webAppExternalContext).loadClass(OrbeonServletFilter.class.getName() + OXFClassLoader.DELEGATE_CLASS_SUFFIX);
+            Class delegateServletClass = OrbeonClassLoader.getClassLoader(webAppExternalContext).loadClass(OrbeonServletFilter.class.getName() + OrbeonClassLoader.DELEGATE_CLASS_SUFFIX);
             servletFilterDelegate = (Filter) delegateServletClass.newInstance();
 
             // Initialize Servlet Filter delegate
             Thread currentThread = Thread.currentThread();
             ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
             try {
-                currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+                currentThread.setContextClassLoader(OrbeonClassLoader.getClassLoader(webAppExternalContext));
                 servletFilterDelegate.init(config);
             } finally {
                 currentThread.setContextClassLoader(oldThreadContextClassLoader);
@@ -60,7 +60,7 @@ public class OrbeonServletFilter implements Filter {
         Thread currentThread = Thread.currentThread();
         ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
         try {
-            currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            currentThread.setContextClassLoader(OrbeonClassLoader.getClassLoader(webAppExternalContext));
             servletFilterDelegate.doFilter(request, response, chain);
         } finally {
             currentThread.setContextClassLoader(oldThreadContextClassLoader);
@@ -72,7 +72,7 @@ public class OrbeonServletFilter implements Filter {
         Thread currentThread = Thread.currentThread();
         ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
         try {
-            currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            currentThread.setContextClassLoader(OrbeonClassLoader.getClassLoader(webAppExternalContext));
             servletFilterDelegate.destroy();
         } finally {
             currentThread.setContextClassLoader(oldThreadContextClassLoader);

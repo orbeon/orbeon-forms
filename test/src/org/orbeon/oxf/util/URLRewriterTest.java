@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -108,7 +108,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     public void testResourceRewrite() {
 
         final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getMatchAllPathMatcher();
-        final String version = Version.getVersion();
+        final String version = Version.getVersionNumber();
 
         // Test against request
         int mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE;
@@ -204,7 +204,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     public void testResourceRewriteForward() {
 
         final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getMatchAllPathMatcher();
-        final String version = Version.getVersion();
+        final String version = Version.getVersionNumber();
 
         // Test against request
         int mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE;
@@ -251,7 +251,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     public void testResourceRewriteFilter() {
 
         final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getMatchAllPathMatcher();
-        final String version = Version.getVersion();
+        final String version = Version.getVersionNumber();
 
         // Test against request
         int mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE;

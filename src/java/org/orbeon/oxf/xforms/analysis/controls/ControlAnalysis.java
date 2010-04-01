@@ -72,8 +72,8 @@ public class ControlAnalysis {
             this.bindingAnalysis = computeBindingAnalysis();
             this.valueAnalysis = computeValueAnalysis();
         } else {
-            bindingAnalysis = null;
-            valueAnalysis = null;
+            this.bindingAnalysis = null;
+            this.valueAnalysis = null;
         }
     }
 

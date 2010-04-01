@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 package org.orbeon.oxf.webapp;
 
 import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
@@ -14,7 +27,7 @@ import java.util.StringTokenizer;
 /**
  *
  */
-public class OXFClassLoader extends URLClassLoader {
+public class OrbeonClassLoader extends URLClassLoader {
 
     // Suffix for all delegate classes
     public static final String DELEGATE_CLASS_SUFFIX = "Delegate";
@@ -33,15 +46,15 @@ public class OXFClassLoader extends URLClassLoader {
      */
     public static ClassLoader getClassLoader(WebAppExternalContext webAppExternalContext) {
         if (classLoader == null) {
-            synchronized (OXFClassLoader.class) {
+            synchronized (OrbeonClassLoader.class) {
                 if (classLoader == null) {
 
                     if ("true".equals(webAppExternalContext.getInitAttributesMap().get(CLASSLOADER_ENABLE_PROPERTY))) {
                         // Allowed to use OXF Class Loader
                         boolean withinOXFClassLoader = false;
-                        ClassLoader cl = OXFClassLoader.class.getClassLoader();
+                        ClassLoader cl = OrbeonClassLoader.class.getClassLoader();
                         do {
-                            if (cl.getClass().getName().equals(OXFClassLoader.class.getName())) {
+                            if (cl.getClass().getName().equals(OrbeonClassLoader.class.getName())) {
                                 withinOXFClassLoader = true;
                                 break;
                             }
@@ -53,14 +66,14 @@ public class OXFClassLoader extends URLClassLoader {
                             // Return OXFClassLoader
                             URL[] urls = buildClassPath(webAppExternalContext);
                             String[] ignorePackages = buildIgnorePackages(webAppExternalContext);
-                            classLoader = new OXFClassLoader(urls, OXFClassLoader.class.getClassLoader(), ignorePackages);
+                            classLoader = new OrbeonClassLoader(urls, OrbeonClassLoader.class.getClassLoader(), ignorePackages);
                         } else {
                             // Otherwise return Class Loader that loaded the OXFClassLoader class
-                            classLoader = OXFClassLoader.class.getClassLoader();
+                            classLoader = OrbeonClassLoader.class.getClassLoader();
                         }
                     } else {
                         // Return Class Loader that loaded the OXFClassLoader class
-                        classLoader = OXFClassLoader.class.getClassLoader();
+                        classLoader = OrbeonClassLoader.class.getClassLoader();
                     }
                 }
             }
@@ -74,7 +87,7 @@ public class OXFClassLoader extends URLClassLoader {
         if (ignorePackagesProperty == null)
             return null;
 
-        List packages = new ArrayList();
+        List<String> packages = new ArrayList<String>();
         StringTokenizer st = new StringTokenizer(ignorePackagesProperty);
         while (st.hasMoreTokens()) {
             String p = st.nextToken().trim();
@@ -100,7 +113,7 @@ public class OXFClassLoader extends URLClassLoader {
      * @param ignorePackages  names of packages to ingore
      * @param parent          parent classloader
      */
-    public OXFClassLoader(URL[] urls, ClassLoader parent, String[] ignorePackages) {
+    public OrbeonClassLoader(URL[] urls, ClassLoader parent, String[] ignorePackages) {
         super(urls, parent);
         this.ignorePackages = ignorePackages;
     }
@@ -148,7 +161,7 @@ public class OXFClassLoader extends URLClassLoader {
 
     private static URL[] buildClassPath(WebAppExternalContext webAppExternalContext) {
 
-        List files = new ArrayList();
+        List<URL> files = new ArrayList<URL>();
 
         // Get WEB-INF/lib directory
         String webInfLibPath = webAppExternalContext.getRealPath("WEB-INF/lib");

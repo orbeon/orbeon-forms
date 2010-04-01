@@ -1,20 +1,20 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.servlet;
 
 import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
-import org.orbeon.oxf.webapp.OXFClassLoader;
+import org.orbeon.oxf.webapp.OrbeonClassLoader;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -45,18 +45,18 @@ public class OrbeonServlet extends HttpServlet {
 
     public void init() throws ServletException {
         try {
-            // Instanciate WebAppExternalContext
+            // Instantiate WebAppExternalContext
             webAppExternalContext = new ServletWebAppExternalContext(getServletContext());
 
-            // Instanciate Servlet delegate
-            Class delegateServletClass = OXFClassLoader.getClassLoader(webAppExternalContext).loadClass(OrbeonServlet.class.getName() + OXFClassLoader.DELEGATE_CLASS_SUFFIX);
+            // Instantiate Servlet delegate
+            Class delegateServletClass = OrbeonClassLoader.getClassLoader(webAppExternalContext).loadClass(OrbeonServlet.class.getName() + OrbeonClassLoader.DELEGATE_CLASS_SUFFIX);
             delegateServlet = (HttpServlet) delegateServletClass.newInstance();
 
             // Initialize Servlet delegate
             Thread currentThread = Thread.currentThread();
             ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
             try {
-                currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+                currentThread.setContextClassLoader(OrbeonClassLoader.getClassLoader(webAppExternalContext));
                 delegateServlet.init(getServletConfig());
             } finally {
                 currentThread.setContextClassLoader(oldThreadContextClassLoader);
@@ -71,7 +71,7 @@ public class OrbeonServlet extends HttpServlet {
         Thread currentThread = Thread.currentThread();
         ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
         try {
-            currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            currentThread.setContextClassLoader(OrbeonClassLoader.getClassLoader(webAppExternalContext));
             delegateServlet.service(request, response);
         } finally {
             currentThread.setContextClassLoader(oldThreadContextClassLoader);
@@ -83,7 +83,7 @@ public class OrbeonServlet extends HttpServlet {
         Thread currentThread = Thread.currentThread();
         ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
         try {
-            currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            currentThread.setContextClassLoader(OrbeonClassLoader.getClassLoader(webAppExternalContext));
             delegateServlet.destroy();
         } finally {
             currentThread.setContextClassLoader(oldThreadContextClassLoader);

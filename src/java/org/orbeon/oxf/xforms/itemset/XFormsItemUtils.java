@@ -125,17 +125,17 @@ public class XFormsItemUtils {
 
             public void startElement(Element element) {
                 final String localname = element.getName();
-                if (XFormsConstants.XFORMS_ITEM_QNAME.getName().equals(localname)) {
+                if (XFormsConstants.ITEM_QNAME.getName().equals(localname)) {
                     // xforms:item
 
 //                    mayReuse[0] = false;
-                    final String label = getLabelValue(element.element(XFormsConstants.XFORMS_LABEL_QNAME));
-                    final String value = getValueValue(element.element(XFormsConstants.XFORMS_VALUE_QNAME));
+                    final String label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
+                    final String value = getValueValue(element.element(XFormsConstants.VALUE_QNAME));
 
                     final Map<String, String> attributes = getAttributes(element);
                     currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label != null ? label : "", value != null ? value : ""));
 
-                } else if (XFormsConstants.XFORMS_ITEMSET_QNAME.getName().equals(localname)) {
+                } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
                     // xforms:itemset
                     contextStack.pushBinding(propertyContext, element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
                     {
@@ -166,12 +166,12 @@ public class XFormsItemUtils {
                                     // the nodeset.
                                     final boolean isRelevant = InstanceData.getInheritedRelevant(currentNodeInfo);
                                     if (isRelevant) {
-                                        final String label = getLabelValue(element.element(XFormsConstants.XFORMS_LABEL_QNAME));
+                                        final String label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
                                         final Element valueCopyElement;
                                         {
-                                            final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
+                                            final Element valueElement = element.element(XFormsConstants.VALUE_QNAME);
                                             valueCopyElement = (valueElement != null)
-                                                    ? valueElement : element.element(XFormsConstants.XFORMS_COPY_QNAME);
+                                                    ? valueElement : element.element(XFormsConstants.COPY_QNAME);
                                         }
                                         if (valueCopyElement == null)
                                             throw new ValidationException("xforms:itemset element must contain one xforms:value or one xforms:copy element.", select1Control.getLocationData());
@@ -200,7 +200,7 @@ public class XFormsItemUtils {
                                         }
 
                                         // Handle new item
-                                        if (valueCopyElement.getName().equals(XFormsConstants.XFORMS_VALUE_QNAME.getName())) {
+                                        if (valueCopyElement.getName().equals(XFormsConstants.VALUE_QNAME.getName())) {
                                             // Handle xforms:value
                                             // TODO: This could be optimized for xforms:value/@ref|@value as we could get the expression from the cache only once
                                             final String value = getValueValue(valueCopyElement);
@@ -227,12 +227,12 @@ public class XFormsItemUtils {
                     }
                     contextStack.popBinding();
 
-                } else if (XFormsConstants.XFORMS_CHOICES_QNAME.getName().equals(localname)) {
+                } else if (XFormsConstants.CHOICES_QNAME.getName().equals(localname)) {
                     // xforms:choices
 
-                    final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                    final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
                     if (labelElement != null) {
-                        final String label = getLabelValue(element.element(XFormsConstants.XFORMS_LABEL_QNAME));
+                        final String label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
 
                         final Map<String, String> attributes = getAttributes(element);
                         final Item newContainer = new Item(isMultiple, isEncryptItemValues, attributes, label, null);
@@ -295,10 +295,10 @@ public class XFormsItemUtils {
 
             public void endElement(Element element) {
                 final String localname = element.getName();
-                if (XFormsConstants.XFORMS_CHOICES_QNAME.getName().equals(localname)) {
+                if (XFormsConstants.CHOICES_QNAME.getName().equals(localname)) {
                     // xforms:choices
 
-                    final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                    final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
                     if (labelElement != null) {
                         currentContainer = currentContainer.getParent();
                     }
@@ -372,15 +372,15 @@ public class XFormsItemUtils {
 
             public void startElement(Element element) {
                 final String localname = element.getName();
-                if (XFormsConstants.XFORMS_ITEM_QNAME.getName().equals(localname)) {
+                if (XFormsConstants.ITEM_QNAME.getName().equals(localname)) {
                     // xforms:item
 
-                    final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                    final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
                     if (labelElement == null)
                         throw new ValidationException("xforms:item must contain an xforms:label element.", (LocationData) controlElement.getData());
                     final String label = XFormsUtils.getStaticChildElementValue(labelElement, false, null);
 
-                    final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
+                    final Element valueElement = element.element(XFormsConstants.VALUE_QNAME);
                     if (valueElement == null)
                         throw new ValidationException("xforms:item must contain an xforms:value element.", (LocationData) controlElement.getData());
                     final String value = XFormsUtils.getStaticChildElementValue(valueElement, false, null);
@@ -388,17 +388,17 @@ public class XFormsItemUtils {
                     final Map<String, String> attributes = getAttributes(element);
                     currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label != null ? label : "", value != null ? value : ""));
 
-                } else if (XFormsConstants.XFORMS_ITEMSET_QNAME.getName().equals(localname)) {
+                } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
                     // xforms:itemset
 
                     throw new ValidationException("xforms:itemset must not appear in static itemset.", (LocationData) controlElement.getData());
 
-                } else if (XFormsConstants.XFORMS_CHOICES_QNAME.getName().equals(localname)) {
+                } else if (XFormsConstants.CHOICES_QNAME.getName().equals(localname)) {
                     // xforms:choices
 
-                    final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                    final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
                     if (labelElement != null) {
-                        final String label = XFormsUtils.getStaticChildElementValue(element.element(XFormsConstants.XFORMS_LABEL_QNAME), false, null);
+                        final String label = XFormsUtils.getStaticChildElementValue(element.element(XFormsConstants.LABEL_QNAME), false, null);
 
                         final Map<String, String> attributes = getAttributes(element);
                         final Item newContainer = new Item(isMultiple, isEncryptItemValues, attributes, label, null);
@@ -410,10 +410,10 @@ public class XFormsItemUtils {
 
             public void endElement(Element element) {
                 final String localname = element.getName();
-                 if (XFormsConstants.XFORMS_CHOICES_QNAME.getName().equals(localname)) {
+                 if (XFormsConstants.CHOICES_QNAME.getName().equals(localname)) {
                     // xforms:choices
 
-                    final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                    final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
                     if (labelElement != null) {
                         currentContainer = currentContainer.getParent();
                     }

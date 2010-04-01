@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -163,7 +163,7 @@
                             <xxforms:sequence select="." xxbl:scope="outer"/>
                         </xxforms:variable>
 
-                        <!-- Expose internally a variable pointing to Form Runner ressources -->
+                        <!-- Expose internally a variable pointing to Form Runner resources -->
                         <xxforms:variable name="fr-resources" as="element()?">
                             <xxforms:sequence select="$fr-resources" xxbl:scope="outer"/>
                         </xxforms:variable>
@@ -171,16 +171,15 @@
                         <xforms:group appearance="xxforms:internal" ref="$result">
                             <xforms:action ev:event="xforms-enabled">
                                 <!-- Section becomes visible -->
-                                <xforms:action model="{$component-id}-model">
-                                    <xxforms:variable name="local-instance" select="." as="element()"/>
+                                <xforms:action>
                                     <xforms:action if="$result/*">
                                         <!-- There are already some nodes, copy them in -->
-                                        <xforms:delete nodeset="$local-instance/*"/>
-                                        <xforms:insert context="$local-instance" origin="$result/*"/>
+                                        <xforms:delete nodeset="instance()/*"/>
+                                        <xforms:insert context="instance()" origin="$result/*"/>
                                     </xforms:action>
                                     <xforms:action if="not($result/*)">
                                         <!-- No nodes, copy template out -->
-                                        <xforms:insert context="$result" origin="$local-instance/*"/>
+                                        <xforms:insert context="$result" origin="instance()/*"/>
                                     </xforms:action>
                                 </xforms:action>
                             </xforms:action>
@@ -197,7 +196,7 @@
                             <!-- TODO: must change language dynamically -->
                             <xxforms:variable name="form-resources" select="instance('fr-form-resources')/*[1]" as="element(resource)"/>
 
-                            <!-- Copy grids within section-->
+                            <!-- Copy grids within section -->
                             <xsl:copy-of select="$fr-section/fr:grid"/>
 
                         </xforms:group>

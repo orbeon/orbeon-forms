@@ -235,6 +235,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
      * Get column number
      * @return the column number of the node in its original source document; or -1 if not available
      */
+
     public int getColumnNumber() {
         return -1;
     }

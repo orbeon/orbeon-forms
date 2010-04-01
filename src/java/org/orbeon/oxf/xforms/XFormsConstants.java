@@ -165,8 +165,8 @@ public class XFormsConstants {
 
     public static final QName APPEARANCE_QNAME = new QName("appearance");
 
-    public static final QName XFORMS_FILENAME_QNAME = new QName("filename", XFORMS_NAMESPACE);
-    public static final QName XFORMS_MEDIATYPE_QNAME = new QName("mediatype", XFORMS_NAMESPACE);
+    public static final QName FILENAME_QNAME = new QName("filename", XFORMS_NAMESPACE);
+    public static final QName MEDIATYPE_QNAME = new QName("mediatype", XFORMS_NAMESPACE);
     public static final QName XXFORMS_SIZE_QNAME = new QName("size", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_MAXLENGTH_QNAME = new QName("maxlength", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_AUTOCOMPLETE_QNAME = new QName("autocomplete", XXFORMS_NAMESPACE);
@@ -209,17 +209,17 @@ public class XFormsConstants {
     public static final QName XXFORMS_EVENTS_QNAME = new QName("events", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DIVS_QNAME = new QName("divs", XXFORMS_NAMESPACE);
 
-    public static final QName XFORMS_LABEL_QNAME = new QName("label", XFORMS_NAMESPACE);
-    public static final QName XFORMS_HELP_QNAME = new QName("help", XFORMS_NAMESPACE);
-    public static final QName XFORMS_HINT_QNAME = new QName("hint", XFORMS_NAMESPACE);
-    public static final QName XFORMS_ALERT_QNAME = new QName("alert", XFORMS_NAMESPACE);
-    public static final QName XFORMS_VALUE_QNAME = new QName("value", XFORMS_NAMESPACE);
-    public static final QName XFORMS_COPY_QNAME = new QName("copy", XFORMS_NAMESPACE);
-    public static final QName XFORMS_ITEMSET_QNAME = new QName("itemset", XFORMS_NAMESPACE);
-    public static final QName XFORMS_ITEM_QNAME = new QName("item", XFORMS_NAMESPACE);
-    public static final QName XFORMS_CHOICES_QNAME = new QName("choices", XFORMS_NAMESPACE);
+    public static final QName LABEL_QNAME = new QName("label", XFORMS_NAMESPACE);
+    public static final QName HELP_QNAME = new QName("help", XFORMS_NAMESPACE);
+    public static final QName HINT_QNAME = new QName("hint", XFORMS_NAMESPACE);
+    public static final QName ALERT_QNAME = new QName("alert", XFORMS_NAMESPACE);
+    public static final QName VALUE_QNAME = new QName("value", XFORMS_NAMESPACE);
+    public static final QName COPY_QNAME = new QName("copy", XFORMS_NAMESPACE);
+    public static final QName ITEMSET_QNAME = new QName("itemset", XFORMS_NAMESPACE);
+    public static final QName ITEM_QNAME = new QName("item", XFORMS_NAMESPACE);
+    public static final QName CHOICES_QNAME = new QName("choices", XFORMS_NAMESPACE);
     public static final QName XFORMS_OUTPUT_QNAME = new QName("output", XFORMS_NAMESPACE);
-    public static final QName XFORMS_LOAD_QNAME = new QName("load", XFORMS_NAMESPACE);
+    public static final QName LOAD_QNAME = new QName("load", XFORMS_NAMESPACE);
 
     public static final String XFORMS_SUBMIT_REPLACE_ALL = "all";
     public static final String XFORMS_SUBMIT_REPLACE_INSTANCE = "instance";

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -14,14 +14,16 @@
   -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <!--
@@ -67,8 +69,8 @@
         </xbl:resources>
         <xbl:implementation>
             <!-- Local model -->
-            <xforms:model id="date-model">
-                <xforms:instance id="date-instance">
+            <xf:model id="date-model">
+                <xf:instance id="date-instance">
                     <date>
                         <!-- Individual components of the date -->
                         <year/>
@@ -76,88 +78,97 @@
                         <day/>
                         <!-- Whether the resulting date is valid -->
                         <is-valid/>
+                        <!-- Whether the values are readonly -->
+                        <is-readonly/>
                     </date>
-                </xforms:instance>
+                </xf:instance>
                 <!-- Set the validity on the whole instance -->
-                <xforms:bind nodeset="." constraint="is-valid = 'true'"/>
+                <xf:bind nodeset="." constraint="is-valid = 'true'"/>
                 <!-- Make instance read-only when the form must be read-only -->
-                <xforms:bind nodeset="." readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
-            </xforms:model>
+                <xf:bind nodeset="." readonly="is-readonly = 'true'"/>
+            </xf:model>
         </xbl:implementation>
         <xbl:template>
             <!-- Local controls -->
-            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+            <xf:group xbl:attr="model context ref bind" xxbl:scope="outer">
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
                 
                 <!-- Inner group -->
-                <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
+                <xf:group appearance="xxf:internal" xxbl:scope="inner">
                     <!-- Variable pointing to external single-node binding -->
-                    <xxforms:variable name="result" as="node()?">
-                        <xxforms:sequence select="." xxbl:scope="outer"/>
-                    </xxforms:variable>
-    
-                    <!-- React to update to bound node or control coming into existence -->
-                    <xforms:group ref="$result" appearance="xxforms:internal">
-                        <!-- Only set local values if the bound node is an xs:date -->
-                        <xforms:action ev:event="xforms-value-changed xforms-enabled">
-                            <xforms:action if="$result castable as xs:date">
-                                <xforms:setvalue ref="instance('date-instance')/year" value="year-from-date($result)"/>
-                                <xforms:setvalue ref="instance('date-instance')/month" value="month-from-date($result)"/>
-                                <xforms:setvalue ref="instance('date-instance')/day" value="day-from-date($result)"/>
-                            </xforms:action>
-                            <xforms:action if="not($result castable as xs:date) and normalize-space($result) = ''">
-                                <xforms:setvalue ref="instance('date-instance')/year"/>
-                                <xforms:setvalue ref="instance('date-instance')/month"/>
-                                <xforms:setvalue ref="instance('date-instance')/day"/>
-                            </xforms:action>
-                            <xforms:action if="not($result castable as xs:date) and count(tokenize($result, '-')) ge 3">
-                                <xforms:action xxforms:iterate="tokenize($result, '-')">
-                                    <xxforms:variable name="position" select="position()" as="xs:integer"/>
-                                    <xforms:setvalue ref="instance('date-instance')/*[$position]"
+                    <xxf:variable name="binding" as="node()?">
+                        <xxf:sequence select="." xxbl:scope="outer"/>
+                    </xxf:variable>
+                    <!-- Read external value -->
+                    <xxf:variable name="value" as="xs:string" select="$binding/string()">
+                        <xf:action ev:event="xforms-value-changed xforms-enabled">
+                            <!-- Only set local values if the bound node is an xs:date -->
+                            <xf:action if="$binding castable as xs:date">
+                                <xf:setvalue ref="instance('date-instance')/year" value="year-from-date($binding)"/>
+                                <xf:setvalue ref="instance('date-instance')/month" value="month-from-date($binding)"/>
+                                <xf:setvalue ref="instance('date-instance')/day" value="day-from-date($binding)"/>
+                            </xf:action>
+                            <xf:action if="not($binding castable as xs:date) and normalize-space($binding) = ''">
+                                <xf:setvalue ref="instance('date-instance')/year"/>
+                                <xf:setvalue ref="instance('date-instance')/month"/>
+                                <xf:setvalue ref="instance('date-instance')/day"/>
+                            </xf:action>
+                            <xf:action if="not($binding castable as xs:date) and count(tokenize($binding, '-')) ge 3">
+                                <xf:action xxf:iterate="tokenize($binding, '-')">
+                                    <xxf:variable name="position" select="position()" as="xs:integer"/>
+                                    <xf:setvalue ref="instance('date-instance')/*[$position]"
                                                      value="if (context() castable as xs:integer) then xs:integer(context()) else ''"/>
-                                </xforms:action>
-                            </xforms:action>
-                        </xforms:action>
-                    </xforms:group>
+                                </xf:action>
+                            </xf:action>
+                        </xf:action>
+                    </xxf:variable>
+                    <!-- Propagate readonly -->
+                    <xxf:variable name="readonly" as="xs:boolean" select="exf:readonly($binding)">
+                        <xf:setvalue ev:event="xforms-enabled xforms-value-changed"
+                                     ref="instance('date-instance')/is-readonly" value="exf:readonly($binding)"/>
+                    </xxf:variable>
     
-                    <xforms:group class="fr-component-group">
+                    <xf:group class="fr-component-group">
 
-                        <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
-                        <xforms:input ref="month" class="fr-width-2" xbl:attr="navindex navindex=tabindex"/>
-                        <xforms:input ref="day" class="fr-width-2"/>
-                        <xforms:input ref="year" class="fr-width-4"/>
+                        <xf:group ref=".[not(is-readonly = 'true' and property('xxf:readonly-appearance') = 'static')]">
+                            <!-- Don't show fields at all in static readonly mode -->
+                            <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
+                            <xf:input ref="month" class="fr-width-2" xbl:attr="navindex navindex=tabindex"/>
+                            <xf:input ref="day" class="fr-width-2"/>
+                            <xf:input ref="year" class="fr-width-4"/>
+                        </xf:group>
     
                         <!-- React to update to local values -->
-                        <xforms:action ev:event="xforms-value-changed">
-                            <xxforms:variable name="c" select="normalize-space(string-join((year, month, day), ''))" as="xs:string"/>
-                            <xforms:action if="$c = ''">
-                                <xforms:setvalue ref="is-valid" value="false()"/>
-                                <xforms:setvalue ref="$result"/>
-                            </xforms:action>
-                            <xforms:action if="$c != ''">
+                        <xf:action ev:event="xforms-value-changed">
+                            <xxf:variable name="c" select="normalize-space(string-join((year, month, day), ''))" as="xs:string"/>
+                            <xf:action if="$c = ''">
+                                <xf:setvalue ref="is-valid" value="false()"/>
+                                <xf:setvalue ref="$binding"/>
+                            </xf:action>
+                            <xf:action if="$c != ''">
                                 <!-- Compute date parts -->
-                                <xxforms:variable name="y" select="if (year castable as xs:integer) then format-number(xs:integer(year), '0000') else '____'" as="xs:string"/>
-                                <xxforms:variable name="m" select="if (month castable as xs:integer) then format-number(xs:integer(month), '00') else '__'" as="xs:string"/>
-                                <xxforms:variable name="d" select="if (day castable as xs:integer) then format-number(xs:integer(day), '00') else '__'" as="xs:string"/>
+                                <xxf:variable name="y" select="if (year castable as xs:integer) then format-number(xs:integer(year), '0000') else '____'" as="xs:string"/>
+                                <xxf:variable name="m" select="if (month castable as xs:integer) then format-number(xs:integer(month), '00') else '__'" as="xs:string"/>
+                                <xxf:variable name="d" select="if (day castable as xs:integer) then format-number(xs:integer(day), '00') else '__'" as="xs:string"/>
 
                                 <!-- Create date string -->
-                                <xxforms:variable name="date-string" select="string-join(($y, $m, $d), '-')" as="xs:string"/>
+                                <xxf:variable name="date-string" select="string-join(($y, $m, $d), '-')" as="xs:string"/>
 
                                 <!-- Set value to format like 2008-02-31 or 0000-12-01 if parts are unknown -->
-                                <xforms:setvalue ref="is-valid" value="$date-string castable as xs:date"/>
-                                <xforms:setvalue ref="$result" value="$date-string"/>
-                            </xforms:action>
-                        </xforms:action>
+                                <xf:setvalue ref="is-valid" value="$date-string castable as xs:date"/>
+                                <xf:setvalue ref="$binding" value="$date-string"/>
+                            </xf:action>
+                        </xf:action>
     
                         <!-- Date picker -->
-                        <xforms:input ref="$result" appearance="minimal"/>
-                    </xforms:group>
+                        <xf:input ref="$binding" appearance="minimal"/>
+                    </xf:group>
 
                     <!-- Stop propagation of all UI events -->
-                    <xforms:action ev:event="#all" ev:propagate="stop"/>
-                </xforms:group>
+                    <xf:action ev:event="#all" ev:propagate="stop"/>
+                </xf:group>
 
-            </xforms:group>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

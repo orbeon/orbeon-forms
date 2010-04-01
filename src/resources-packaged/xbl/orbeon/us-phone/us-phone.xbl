@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -14,14 +14,16 @@
   -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
     <!--
         Component to represent a US phone number split into area code and the rest of the number.
@@ -60,62 +62,67 @@
         </xbl:resources>
         <xbl:implementation>
             <!-- Local model -->
-            <xforms:model id="number-model">
-                <xforms:instance id="number-instance">
+            <xf:model id="number-model">
+                <xf:instance id="number-instance">
                     <number>
                         <area/>
                         <local/>
+                        <!-- Whether the values are readonly -->
+                        <is-readonly/>
                     </number>
-                </xforms:instance>
+                </xf:instance>
                 <!-- Ensure the area code is on 3 digits -->
-                <xforms:bind nodeset="area" type="xs:integer" constraint="for $i in xs:integer(.) return $i ge 100 and $i le 999"/>
+                <xf:bind nodeset="area" type="xs:integer" constraint="for $i in xs:integer(.) return $i ge 100 and $i le 999"/>
                 <!-- Ensure the local number contains only digits and spaces -->
-                <xforms:bind nodeset="local" constraint="matches(normalize-space(), '^[0-9\s]*$') and string-length(translate(normalize-space(), ' ', '')) = 7"/>
+                <xf:bind nodeset="local" constraint="matches(normalize-space(), '^[0-9\s]*$') and string-length(translate(normalize-space(), ' ', '')) = 7"/>
                 <!-- Make instance read-only when the form must be read-only -->
-                <xforms:bind nodeset="." readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
-            </xforms:model>
+                <xf:bind nodeset="." readonly="is-readonly = 'true'"/>
+            </xf:model>
         </xbl:implementation>
         <xbl:template>
             <!-- Local controls -->
-            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+            <xf:group xbl:attr="model context ref bind" xxbl:scope="outer">
                 <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
 
                 <!-- Inner group -->
-                <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
+                <xf:group appearance="xxf:internal" xxbl:scope="inner">
                     <!-- Variable pointing to external single-node binding -->
-                    <xxforms:variable name="result" as="node()?">
-                        <xxforms:sequence select="." xxbl:scope="outer"/>
-                    </xxforms:variable>
+                    <xxf:variable name="binding" as="node()?">
+                        <xxf:sequence select="." xxbl:scope="outer"/>
+                    </xxf:variable>
+                    <!-- Read external value -->
+                    <xxf:variable name="value" as="xs:string" select="$binding/string()">
+                        <xf:action ev:event="xforms-value-changed xforms-enabled" if="$binding castable as xs:positiveInteger">
+                            <xf:setvalue ref="instance('number-instance')/area" value="substring($binding, 1, 3)"/>
+                            <xf:setvalue ref="instance('number-instance')/local" value="concat(substring($binding, 4, 3), ' ', substring($binding, 7, 4))"/>
+                        </xf:action>
+                    </xxf:variable>
+                    <!-- Propagate readonly -->
+                    <xxf:variable name="readonly" as="xs:boolean" select="exf:readonly($binding)">
+                        <xf:setvalue ev:event="xforms-enabled xforms-value-changed"
+                                     ref="instance('number-instance')/is-readonly" value="exf:readonly($binding)"/>
+                    </xxf:variable>
 
-                    <!-- React to update to bound node -->
-                    <xforms:group ref="$result" appearance="xxforms:internal">
-                        <!-- Only set local values if the bound node is an xs:date -->
-                        <xforms:action ev:event="xforms-value-changed xforms-enabled" if="$result castable as xs:positiveInteger">
-                            <xforms:setvalue ref="instance('number-instance')/area" value="substring($result, 1, 3)"/>
-                            <xforms:setvalue ref="instance('number-instance')/local" value="concat(substring($result, 4, 3), ' ', substring($result, 7, 4))"/>
-                        </xforms:action>
-                    </xforms:group>
-
-                    <xforms:group class="fr-component-group">
+                    <xf:group class="fr-component-group">
                         <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
-                        (<xforms:input ref="area" class="fr-us-phone-area" xbl:attr="navindex navindex=tabindex"><xforms:alert class="xforms-disabled"/></xforms:input>)
-                        <xforms:input ref="local" class="fr-us-phone-local"><xforms:alert class="xforms-disabled"/></xforms:input>
+                        (<xf:input ref="area" class="fr-us-phone-area" xbl:attr="navindex navindex=tabindex"><xf:alert class="xforms-disabled"/></xf:input>)
+                        <xf:input ref="local" class="fr-us-phone-local"><xf:alert class="xforms-disabled"/></xf:input>
 
                         <!-- React to update to local values -->
-                        <xforms:action ev:event="xforms-value-changed">
-                            <xxforms:variable name="phone-string" select="translate(concat(area, local), ' ', '')" as="xs:string"/>
-                            <xxforms:variable name="is-valid-phone-string" as="xs:boolean"
+                        <xf:action ev:event="xforms-value-changed">
+                            <xxf:variable name="phone-string" select="translate(concat(area, local), ' ', '')" as="xs:string"/>
+                            <xxf:variable name="is-valid-phone-string" as="xs:boolean"
                                               select="$phone-string castable as xs:positiveInteger and string-length($phone-string) = 10"/>
-                            <xforms:setvalue if="$is-valid-phone-string" ref="$result" value="$phone-string"/>
-                            <xforms:setvalue if="not($is-valid-phone-string)" ref="$result" value="if ($phone-string = '') then '' else 'INVALID_NUMBER'"/>
-                        </xforms:action>
-                    </xforms:group>
+                            <xf:setvalue if="$is-valid-phone-string" ref="$binding" value="$phone-string"/>
+                            <xf:setvalue if="not($is-valid-phone-string)" ref="$binding" value="if ($phone-string = '') then '' else 'INVALID_NUMBER'"/>
+                        </xf:action>
+                    </xf:group>
 
                     <!-- Stop propagation of all UI events -->
-                    <xforms:action ev:event="#all" ev:propagate="stop"/>
-                </xforms:group>
+                    <xf:action ev:event="#all" ev:propagate="stop"/>
+                </xf:group>
 
-            </xforms:group>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 

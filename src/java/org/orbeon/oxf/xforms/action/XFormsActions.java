@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.action;
 
 import org.apache.log4j.Logger;
+import org.dom4j.QName;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.action.actions.*;
@@ -40,12 +41,16 @@ public class XFormsActions {
     public static final String XFORMS_SETFOCUS_ACTION = "setfocus";
     public static final String XFORMS_LOAD_ACTION = "load";
     public static final String XFORMS_SETVALUE_ACTION = "setvalue";
+    public static final QName XFORMS_SETVALUE_ACTION_QNAME = new QName(XFORMS_SETVALUE_ACTION, XFormsConstants.XFORMS_NAMESPACE);
     public static final String XFORMS_SEND_ACTION = "send";
     public static final String XFORMS_RESET_ACTION = "reset";
     public static final String XFORMS_MESSAGE_ACTION = "message";
+    public static final QName XFORMS_MESSAGE_ACTION_QNAME = new QName(XFORMS_MESSAGE_ACTION, XFormsConstants.XFORMS_NAMESPACE);
     public static final String XFORMS_TOGGLE_ACTION = "toggle";
+    public static final QName XFORMS_TOGGLE_ACTION_QNAME = new QName(XFORMS_TOGGLE_ACTION, XFormsConstants.XFORMS_NAMESPACE);
     public static final String XFORMS_INSERT_ACTION = "insert";
     public static final String XFORMS_DELETE_ACTION = "delete";
+    public static final QName XFORMS_DELETE_ACTION_QNAME = new QName(XFORMS_DELETE_ACTION, XFormsConstants.XFORMS_NAMESPACE);
     public static final String XFORMS_SETINDEX_ACTION = "setindex";
 
     // Extension actions

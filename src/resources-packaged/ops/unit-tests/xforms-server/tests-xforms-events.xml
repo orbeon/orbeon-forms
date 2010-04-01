@@ -1878,6 +1878,16 @@
                                     <xxforms:variable id="v7" name="v7" select="if (value = 'old') then 'tomato' else 42"/>
 
                                 </xforms:group>
+                                <!-- Must get event -->
+                                <xxforms:variable id="v8" name="v8" select="value/string()">
+                                    <xforms:insert ev:event="xforms-value-changed"
+                                                   context="instance('events')" nodeset="*"
+                                                   origin="xxforms:element('event',
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:targetid'))
+                                                             ))"/>
+                                    <xf:action ev:event="#all" ev:propagate="stop"/>
+                                </xxforms:variable>
                             </xhtml:body>
                         </xhtml:html>
                     </p:input>
@@ -1908,6 +1918,7 @@
                                     <event type="xforms-value-changed" target="v5b"/>
                                     <event type="xforms-value-changed" target="v6"/>
                                     <event type="xforms-value-changed" target="v7"/>
+                                    <event type="xforms-value-changed" target="v8"/>
                                 </events>
                             </instance>
                         </instances>

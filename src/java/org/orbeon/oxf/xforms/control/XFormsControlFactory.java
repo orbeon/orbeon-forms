@@ -14,15 +14,19 @@
 package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
+import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Factory for all existing XForms controls.
@@ -32,87 +36,88 @@ public class XFormsControlFactory {
     private static Map<QName, Factory> nameToClassMap = new HashMap<QName, Factory>();
 
     // TODO: fix terminology which is not consistent with class hierarchy
-    private static final Map<String, String> CONTAINER_CONTROLS = new HashMap<String, String>();
-    private static final Map<String, String> CORE_VALUE_CONTROLS = new HashMap<String, String>();
-    private static final Map<String, String> CORE_CONTROLS = new HashMap<String, String>();
-    private static final Map<String, String> BUILTIN_CONTROLS = new HashMap<String, String>();
+    private static final Set<QName> CONTAINER_CONTROLS = new HashSet<QName>();
+    private static final Set<QName> CORE_VALUE_CONTROLS = new HashSet<QName>();
+    private static final Set<QName> CORE_CONTROLS = new HashSet<QName>();
+    private static final Set<QName> BUILTIN_CONTROLS = new HashSet<QName>();
 
-    public static final Map<String, String> MANDATORY_SINGLE_NODE_CONTROLS = new HashMap<String, String>();
-    public static final Map<String, String> OPTIONAL_SINGLE_NODE_CONTROLS = new HashMap<String, String>();
-    public static final Map<String, String> NO_SINGLE_NODE_CONTROLS = new HashMap<String, String>();
-    public static final Map<String, String> MANDATORY_NODESET_CONTROLS = new HashMap<String, String>();
-    public static final Map<String, String> NO_NODESET_CONTROLS = new HashMap<String, String>();
-    public static final Map<String, String> SINGLE_NODE_OR_VALUE_CONTROLS = new HashMap<String, String>();
+    public static final Set<QName> MANDATORY_SINGLE_NODE_CONTROLS = new HashSet<QName>();
+    public static final Set<QName> OPTIONAL_SINGLE_NODE_CONTROLS = new HashSet<QName>();
+    public static final Set<QName> NO_SINGLE_NODE_CONTROLS = new HashSet<QName>();
+    public static final Set<QName> MANDATORY_NODESET_CONTROLS = new HashSet<QName>();
+    public static final Set<QName> NO_NODESET_CONTROLS = new HashSet<QName>();
+    public static final Set<QName> SINGLE_NODE_OR_VALUE_CONTROLS = new HashSet<QName>();
 
     static {
         // TODO: standardize on QName?
 
         // Standard controls
-        CONTAINER_CONTROLS.put(XFormsConstants.GROUP_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
-        CONTAINER_CONTROLS.put(XFormsConstants.REPEAT_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
-        CONTAINER_CONTROLS.put(XFormsConstants.SWITCH_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
-        CONTAINER_CONTROLS.put(XFormsConstants.CASE_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        CONTAINER_CONTROLS.add(XFormsConstants.GROUP_QNAME);
+        CONTAINER_CONTROLS.add(XFormsConstants.REPEAT_QNAME);
+        CONTAINER_CONTROLS.add(XFormsConstants.SWITCH_QNAME);
+        CONTAINER_CONTROLS.add(XFormsConstants.CASE_QNAME);
 
-        CORE_VALUE_CONTROLS.put(XFormsConstants.INPUT_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put(XFormsConstants.SECRET_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put(XFormsConstants.TEXTAREA_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put(XFormsConstants.OUTPUT_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put(XFormsConstants.UPLOAD_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put(XFormsConstants.RANGE_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put(XFormsConstants.SELECT_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put(XFormsConstants.SELECT1_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.INPUT_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.SECRET_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.TEXTAREA_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.OUTPUT_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.UPLOAD_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.RANGE_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.SELECT_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.SELECT1_QNAME);
 
-        final Map<String, String> coreNoValueControls = new HashMap<String, String>();
-        coreNoValueControls.put(XFormsConstants.SUBMIT_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
-        coreNoValueControls.put(XFormsConstants.TRIGGER_QNAME.getName(), XFormsConstants.XFORMS_NAMESPACE_URI);
+        final Set<QName> coreNoValueControls = new HashSet<QName>();
+        coreNoValueControls.add(XFormsConstants.SUBMIT_QNAME);
+        coreNoValueControls.add(XFormsConstants.TRIGGER_QNAME);
 
         // Extension controls
-        CONTAINER_CONTROLS.put(XFormsConstants.XXFORMS_DIALOG_QNAME.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
-        CORE_VALUE_CONTROLS.put(XFormsConstants.XXFORMS_TEXT_QNAME.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
-//        CORE_VALUE_CONTROLS.put(XFormsConstants.XXFORMS_VARIABLE_QNAME.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI);
-//        CORE_VALUE_CONTROLS.put(XFormsConstants.EXFORMS_VARIABLE_QNAME.getName(), XFormsConstants.EXFORMS_NAMESPACE_URI);
+        CONTAINER_CONTROLS.add(XFormsConstants.XXFORMS_DIALOG_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.XXFORMS_ATTRIBUTE_QNAME);
+        CORE_VALUE_CONTROLS.add(XFormsConstants.XXFORMS_TEXT_QNAME);
 
-        CORE_CONTROLS.putAll(CORE_VALUE_CONTROLS);
-        CORE_CONTROLS.putAll(coreNoValueControls);
+        CORE_CONTROLS.addAll(CORE_VALUE_CONTROLS);
+        CORE_CONTROLS.addAll(coreNoValueControls);
 
-        BUILTIN_CONTROLS.putAll(CONTAINER_CONTROLS);
-        BUILTIN_CONTROLS.putAll(CORE_CONTROLS);
+        BUILTIN_CONTROLS.addAll(CONTAINER_CONTROLS);
+        BUILTIN_CONTROLS.addAll(CORE_CONTROLS);
 
-        MANDATORY_SINGLE_NODE_CONTROLS.putAll(CORE_VALUE_CONTROLS);
-        MANDATORY_SINGLE_NODE_CONTROLS.remove("output");
-        MANDATORY_SINGLE_NODE_CONTROLS.put("filename", "");
-        MANDATORY_SINGLE_NODE_CONTROLS.put("mediatype", "");
-        MANDATORY_SINGLE_NODE_CONTROLS.put("setvalue", "");
+        BUILTIN_CONTROLS.add(XFormsConstants.XXFORMS_VARIABLE_QNAME);
+        BUILTIN_CONTROLS.add(XFormsConstants.EXFORMS_VARIABLE_QNAME);
 
-        SINGLE_NODE_OR_VALUE_CONTROLS.put("output", "");
+        MANDATORY_SINGLE_NODE_CONTROLS.addAll(CORE_VALUE_CONTROLS);
+        MANDATORY_SINGLE_NODE_CONTROLS.remove(XFormsConstants.UPLOAD_QNAME);
+        MANDATORY_SINGLE_NODE_CONTROLS.add(XFormsConstants.FILENAME_QNAME);
+        MANDATORY_SINGLE_NODE_CONTROLS.add(XFormsConstants.MEDIATYPE_QNAME);
+        MANDATORY_SINGLE_NODE_CONTROLS.add(XFormsActions.XFORMS_SETVALUE_ACTION_QNAME);
+
+        SINGLE_NODE_OR_VALUE_CONTROLS.add(XFormsConstants.OUTPUT_QNAME);
 
         // TODO: some of those are not controls at all, must review this
-        OPTIONAL_SINGLE_NODE_CONTROLS.putAll(coreNoValueControls);
-        OPTIONAL_SINGLE_NODE_CONTROLS.put("output", "");  // can have @value attribute
-        OPTIONAL_SINGLE_NODE_CONTROLS.put("value", "");   // can have inline text
-        OPTIONAL_SINGLE_NODE_CONTROLS.put("label", "");   // can have linking or inline text
-        OPTIONAL_SINGLE_NODE_CONTROLS.put("help", "");    // can have linking or inline text
-        OPTIONAL_SINGLE_NODE_CONTROLS.put("hint", "");    // can have linking or inline text
-        OPTIONAL_SINGLE_NODE_CONTROLS.put("alert", "");   // can have linking or inline text
-        OPTIONAL_SINGLE_NODE_CONTROLS.put("copy", "");
-        OPTIONAL_SINGLE_NODE_CONTROLS.put("load", "");    // can have linking
-        OPTIONAL_SINGLE_NODE_CONTROLS.put("message", ""); // can have linking or inline text
-        OPTIONAL_SINGLE_NODE_CONTROLS.put("group", "");
-        OPTIONAL_SINGLE_NODE_CONTROLS.put("switch", "");
+        OPTIONAL_SINGLE_NODE_CONTROLS.addAll(coreNoValueControls);
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.UPLOAD_QNAME);  // can have @value attribute
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.VALUE_QNAME);   // can have inline text
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.LABEL_QNAME);   // can have linking or inline text
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.HELP_QNAME);    // can have linking or inline text
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.HINT_QNAME);    // can have linking or inline text
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.ALERT_QNAME);   // can have linking or inline text
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.COPY_QNAME);
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.LOAD_QNAME);    // can have linking
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsActions.XFORMS_MESSAGE_ACTION_QNAME); // can have linking or inline text
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.GROUP_QNAME);
+        OPTIONAL_SINGLE_NODE_CONTROLS.add(XFormsConstants.SWITCH_QNAME);
 
-        NO_SINGLE_NODE_CONTROLS.put("choices", "");
-        NO_SINGLE_NODE_CONTROLS.put("item", "");
-        NO_SINGLE_NODE_CONTROLS.put("case", "");
-        NO_SINGLE_NODE_CONTROLS.put("toggle", "");
+        NO_SINGLE_NODE_CONTROLS.add(XFormsConstants.CHOICES_QNAME);
+        NO_SINGLE_NODE_CONTROLS.add(XFormsConstants.ITEM_QNAME);
+        NO_SINGLE_NODE_CONTROLS.add(XFormsConstants.CASE_QNAME);
+        NO_SINGLE_NODE_CONTROLS.add(XFormsActions.XFORMS_TOGGLE_ACTION_QNAME);
 
-        MANDATORY_NODESET_CONTROLS.put("repeat", "");
-        MANDATORY_NODESET_CONTROLS.put("itemset", "");
-        MANDATORY_NODESET_CONTROLS.put("delete", "");
+        MANDATORY_NODESET_CONTROLS.add(XFormsConstants.REPEAT_QNAME);
+        MANDATORY_NODESET_CONTROLS.add(XFormsConstants.ITEMSET_QNAME);
+        MANDATORY_NODESET_CONTROLS.add(XFormsActions.XFORMS_DELETE_ACTION_QNAME);
 
-        NO_NODESET_CONTROLS.putAll(MANDATORY_SINGLE_NODE_CONTROLS);
-        NO_NODESET_CONTROLS.putAll(OPTIONAL_SINGLE_NODE_CONTROLS);
-        NO_NODESET_CONTROLS.putAll(NO_SINGLE_NODE_CONTROLS);
+        NO_NODESET_CONTROLS.addAll(MANDATORY_SINGLE_NODE_CONTROLS);
+        NO_NODESET_CONTROLS.addAll(OPTIONAL_SINGLE_NODE_CONTROLS);
+        NO_NODESET_CONTROLS.addAll(NO_SINGLE_NODE_CONTROLS);
     }
 
     static {
@@ -244,23 +249,23 @@ public class XFormsControlFactory {
     }
 
     public static boolean isValueControl(String controlURI, String controlName) {
-        final String uri = CORE_VALUE_CONTROLS.get(controlName);
-        return controlURI.equals(uri);
+        return CORE_VALUE_CONTROLS.contains(getQName(controlURI, controlName));
     }
 
     public static boolean isContainerControl(String controlURI, String controlName) {
-        final String uri = CONTAINER_CONTROLS.get(controlName);
-        return controlURI.equals(uri);
+        return CONTAINER_CONTROLS.contains(getQName(controlURI, controlName));
     }
 
     public static boolean isCoreControl(String controlURI, String controlName) {
-        final String uri = CORE_CONTROLS.get(controlName);
-        return controlURI.equals(uri);
+        return CORE_CONTROLS.contains(getQName(controlURI, controlName));
     }
 
     public static boolean isBuiltinControl(String controlURI, String controlName) {
-        final String uri = BUILTIN_CONTROLS.get(controlName);
-        return controlURI.equals(uri);
+        return BUILTIN_CONTROLS.contains(getQName(controlURI, controlName));
+    }
+
+    private static QName getQName(String controlURI, String controlName) {
+        return QName.get(controlName, Namespace.get("", controlURI));
     }
 
     public static abstract class Factory {

@@ -1,19 +1,16 @@
 <!--
-    Copyright (C) 2005 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
-    subject to the following terms:
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    * Conversion to other formats is allowed, but the actual content may not be altered or edited
-      in any way.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    * You may create printed copies for your own personal use.
-
-    * For all other uses, such as selling printed copies or using (parts of) the manual in another
-      publication, prior written agreement from Orbeon, Inc. is required.
-
-    Please contact Orbeon at info@orbeon.com for more information.
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
         <title>Page Flow Epilogue</title>
@@ -677,13 +674,6 @@
                             <p>
                                 <b>xforms.css.</b> These are definitions related to XForms controls. These definitions
                                 may be overridden by users if they are not happy with the defaults.
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                <b>xforms-widgets.css.</b> These are definitions related to XForms pseudo-controls
-                                created by the <code>xforms-widgets.xsl</code> stylesheet. These definitions may be
-                                overridden by users if they are not happy with the defaults.
                             </p>
                         </li>
                         <li>

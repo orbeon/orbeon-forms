@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -14,14 +14,16 @@
   -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <xbl:binding id="fr-date-picker" element="fr|date-picker">
@@ -49,9 +51,9 @@
             </xbl:style>
         </xbl:resources>
         <xbl:template>
-            <xforms:group xbl:attr="model context ref bind" class="fr-component-group" xxbl:scope="outer">
-                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/><xforms:output ref="."/><xforms:input ref="." appearance="minimal"/>
-            </xforms:group>
+            <xf:group xbl:attr="model context ref bind" class="fr-component-group" xxbl:scope="outer">
+                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/><xf:output ref="."/><xf:input ref=".[not(exf:readonly() and property('xxf:readonly-appearance') = 'static')]" appearance="minimal"/>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 

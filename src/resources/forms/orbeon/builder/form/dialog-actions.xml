@@ -157,7 +157,8 @@
                     </fr:repeat>
                 </xforms:group>
                 <!-- Only show this section if there are selection controls -->
-                <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-done' and exists($body//(xforms:select | xforms:select1))]">
+                <xxforms:variable name="controls-with-itemset" select="$body//(xforms:*|fr:*)[(@ref or @bind) and ends-with(@id, '-control') and exists(xforms:itemset)]" as="element()*"/>
+                <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-done' and exists($controls-with-itemset)]">
                     <xforms:label ref="$form-resources/dialog-actions/response-itemset/label"/>
                     <fr:repeat nodeset="xforms:action[@class = 'fr-itemset-action']" id="fb-bindings-itemset-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-itemset-action']" columns="2" appearance="xxforms:table">
                         <fr:body>
@@ -171,7 +172,7 @@
                                             <xforms:label ref="$form-resources/select/label"/>
                                             <xforms:value/>
                                         </xforms:item>
-                                        <xforms:itemset nodeset="$body//(xforms:select | xforms:select1)[(@ref or @bind) and ends-with(@id, '-control')]">
+                                        <xforms:itemset nodeset="$controls-with-itemset">
                                             <!-- Try to build a reasonably user-friendly label -->
                                             <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                             <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>

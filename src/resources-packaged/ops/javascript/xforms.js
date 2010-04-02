@@ -3989,11 +3989,11 @@ ORBEON.widgets.YUICalendar = function() {
                 "START_WEEKDAY": 1
             },
             navigator: {
-                month: "Month",
-                year: "Year",
-                submit: "OK",
-                cancel: "Cancel",
-                invalidYear: "Year needs to be a number"
+               month: "Maand",
+               year: "Jaar",
+               submit: "OK",
+               cancel: "Annuleren",
+               invalidYear: "Jaar dient een getal te zijn"
             }
         }
     };

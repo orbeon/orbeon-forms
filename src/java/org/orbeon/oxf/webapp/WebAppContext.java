@@ -85,7 +85,6 @@ public class WebAppContext {
             if (initializeLogging) {
                 LoggerFactory.initBasicLogger();
             }
-            logger.info("Starting " + Version.getVersionString());
 
             // 1. Initialize the Resource Manager
             final Map<String, Object> properties = new LinkedHashMap<String, Object>();
@@ -102,6 +101,9 @@ public class WebAppContext {
             final String propertiesFile = getServletInitParametersMap().get(PROPERTIES_PROPERTY);
             if (propertiesFile != null)
                 org.orbeon.oxf.properties.Properties.init(propertiesFile);
+
+            // NOTE: Version string might depend on license check which depends on properties
+            logger.info("Starting " + Version.getVersionString());
 
             // 3. Initialize log4j with a DOMConfiguration
             if (initializeLogging) {

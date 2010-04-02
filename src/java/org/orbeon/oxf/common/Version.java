@@ -27,7 +27,7 @@ import java.util.Set;
  */
 public class Version {
 
-    public static final String RELEASE_NUMBER = "@RELEASE@";
+    protected static final String RELEASE_NUMBER = "@RELEASE@";
 
     private static final Logger logger = LoggerFactory.createLogger(Version.class);
     private static final Set<String> WARNED_FEATURES = new HashSet<String>();
@@ -54,7 +54,7 @@ public class Version {
             }
             version = (Version) versionClass.newInstance();
         } catch (Exception e) {
-            logger.info("Did not find PE Version, using default Version");
+            logger.info("Did not find PE Version, using CE Version");
             version = new Version();
         }
     }

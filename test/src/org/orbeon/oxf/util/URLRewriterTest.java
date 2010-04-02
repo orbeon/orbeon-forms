@@ -107,7 +107,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
 
     public void testResourceRewrite() {
 
-        final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getMatchAllPathMatcher();
+        final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
         final String version = Version.getVersionNumber();
 
         // Test against request
@@ -203,7 +203,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
 
     public void testResourceRewriteForward() {
 
-        final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getMatchAllPathMatcher();
+        final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
         final String version = Version.getVersionNumber();
 
         // Test against request
@@ -250,7 +250,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     
     public void testResourceRewriteFilter() {
 
-        final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getMatchAllPathMatcher();
+        final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
         final String version = Version.getVersionNumber();
 
         // Test against request

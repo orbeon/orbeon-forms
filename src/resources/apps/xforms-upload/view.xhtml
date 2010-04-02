@@ -60,7 +60,7 @@
             .xforms-repeat-selected-item-1 { background: transparent }
             .xforms-upload-info { background: white; display: block; padding: 2px; width: 99%; margin: 1px }
             .upload-table .xforms-alert { display: none }
-            .upload-table td { vertical-align: top } 
+            .upload-table td { vertical-align: top }
             .upload-table { background-color: #fce5b6 }
             .xforms-mediatype-image img { max-width: 100px; max-height: 100px; vertical-align: middle; margin:0 0.5em 0.5em; }
             .xforms-output-appearance-xxforms-download { display: block }
@@ -99,7 +99,7 @@
             </tr>
             <xforms:repeat nodeset="file" id="file-repeat">
                 <tr>
-                    <td>    
+                    <td>
                         <xforms:output value="count(preceding-sibling::file) + 1"/>
                     </td>
                     <td>
@@ -112,12 +112,12 @@
                     </td>
                     <td>
                         <!-- Upload field -->
-                        <fr:upload ref="." xxforms:size="60">
+                        <xforms:upload ref="." xxforms:size="60">
                             <xforms:filename ref="@filename"/>
                             <xforms:mediatype ref="@mediatype"/>
                             <xxforms:size ref="@size"/>
                             <xforms:setvalue ev:event="xforms-select" ref="instance('selected')">Yes! A file got selected!</xforms:setvalue>
-                        </fr:upload>
+                        </xforms:upload>
                         <!-- Download link -->
                         <xforms:output ref="." appearance="xxforms:download">
                             <xforms:filename ref="@filename"/>

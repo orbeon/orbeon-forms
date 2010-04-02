@@ -15,6 +15,7 @@ package org.orbeon.oxf.common;
 
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.analysis.DumbUIDependencies;
 import org.orbeon.oxf.xforms.analysis.UIDependencies;
 
@@ -58,7 +59,7 @@ public class Version {
         }
     }
 
-    private Version() {}
+    protected Version() {}
     
     public static Version instance() {
         return version;
@@ -84,7 +85,16 @@ public class Version {
      * @return product version string
      */
     public static String getVersionString() {
-        return "Orbeon Forms " + RELEASE_NUMBER + (instance().isPE() ? " PE": "");
+        return "Orbeon Forms " + RELEASE_NUMBER + ' ' + instance().getCode();
+    }
+
+    /**
+     * Version code, e.g. "CE" or "PE".
+     *
+     * @return
+     */
+    public String getCode() {
+        return "CE";
     }
 
     public boolean isPE() {
@@ -92,23 +102,17 @@ public class Version {
     }
 
     public boolean isPEFeatureEnabled(boolean featureRequested, String featureName) {
-        if (!featureRequested) {
-            // Feature is not requested so is not enabled
-            return false;
-        } else if (featureRequested && isPE()) {
-            // Feature is requested and allowed
-            return true;
-        } else {
-            // Feature is requested and disallowed
+        if (featureRequested) {
+            // Feature is requested but disallowed
             if (!WARNED_FEATURES.contains(featureName)) { // just warn the first time
                 logger.warn("Feature is not enabled in this version of the product: " + featureName);
                 WARNED_FEATURES.add(featureName);
             }
-            return false;
         }
+        return false;
     }
 
-    public UIDependencies createUIDependencies() {
+    public UIDependencies createUIDependencies(XFormsContainingDocument containingDocument) {
         return new DumbUIDependencies();
     }
 

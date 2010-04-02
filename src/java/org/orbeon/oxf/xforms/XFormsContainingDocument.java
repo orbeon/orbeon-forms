@@ -157,7 +157,7 @@ public class XFormsContainingDocument extends XBLContainer {
             // Remember static state
             this.xformsStaticState = xformsStaticState;
 
-            this.uiDependencies = Version.instance().createUIDependencies();
+            this.uiDependencies = Version.instance().createUIDependencies(this);
 
             // Remember URI resolver for initialization
             this.uriResolver = uriResolver;
@@ -212,7 +212,7 @@ public class XFormsContainingDocument extends XBLContainer {
             // Make sure there is location data
             setLocationData(this.xformsStaticState.getLocationData());
 
-            this.uiDependencies = Version.instance().createUIDependencies();
+            this.uiDependencies = Version.instance().createUIDependencies(this);
 
             // Restore the containing document's dynamic state
             final String encodedDynamicState = xformsState.getDynamicState();

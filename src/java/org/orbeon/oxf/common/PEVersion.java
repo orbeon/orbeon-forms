@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.common;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DOMSerializer;
@@ -30,82 +31,91 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class PEVersion extends Version {
+import static org.orbeon.oxf.processor.ProcessorImpl.OUTPUT_DATA;
 
-    private boolean isLicensed;
+public class PEVersion extends Version {
 
     public static final String LICENSE_URL = "oxf:/config/license.xml";
     public static final String ORBEON_PUBLIC_KEY = "oxf:/config/orbeon-public.xml";
 
-    private PEVersion() {
+    private final LicenseInfo licenseInfo;
+
+    public PEVersion() {
         try {
-            final LicenseInfo licenseInfo = check();
-            isLicensed = true;
-            logger.info("This copy of " + getVersionString() + " is licensed to: " + licenseInfo.toString());
+            licenseInfo = check();
+            logger.info("This installation of " + getLocalVersionString() + " is licensed to: " + licenseInfo.toString());
         } catch (Exception e) {
-            isLicensed = false;
+            logger.error("License check failed for " + getLocalVersionString());
+            throw new OXFException(e);
         }
     }
 
+    private String getLocalVersionString() {
+        return "Orbeon Forms " + RELEASE_NUMBER + ' ' + getCode();
+    }
+
     private final LicenseInfo check() {
+        // Connect pipeline
         final Processor licence = PipelineUtils.createURLGenerator(LICENSE_URL);
         final Processor key = PipelineUtils.createURLGenerator(ORBEON_PUBLIC_KEY);
 
         final SignatureVerifierProcessor verifierProcessor = new SignatureVerifierProcessor();
-        PipelineUtils.connect(licence, ProcessorImpl.OUTPUT_DATA, verifierProcessor, ProcessorImpl.INPUT_DATA);
-        PipelineUtils.connect(key, ProcessorImpl.OUTPUT_DATA, verifierProcessor, SignatureVerifierProcessor.INPUT_PUBLIC_KEY);
+        PipelineUtils.connect(licence, OUTPUT_DATA, verifierProcessor, ProcessorImpl.INPUT_DATA);
+        PipelineUtils.connect(key, OUTPUT_DATA, verifierProcessor, SignatureVerifierProcessor.INPUT_PUBLIC_KEY);
 
         final DOMSerializer serializer = new DOMSerializer();
 
-        PipelineUtils.connect(verifierProcessor, ProcessorImpl.OUTPUT_DATA, serializer, ProcessorImpl.INPUT_DATA);
+        PipelineUtils.connect(verifierProcessor, OUTPUT_DATA, serializer, ProcessorImpl.INPUT_DATA);
 
         // Execute pipeline
         final PipelineContext pipelineContext = new PipelineContext();
         serializer.reset(pipelineContext);
         serializer.start(pipelineContext);
 
+        // Gather resulting license information
         final Document licenceDocument = serializer.getDocument(pipelineContext);
 
         final String licensor = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/licensor");
         final String licensee = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/licensee");
-        final String company = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/company");
+        final String organization = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/organization");
         final String email = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/email");
         final String issued = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/issued");
         final Date expiration;
         try {
             final String expireStr = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/expiration");
-            if (expireStr != null && !expireStr.equals("")) {
+            if (StringUtils.isNotBlank(expireStr)) {
                 final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                 expiration = df.parse(expireStr);
-            } else
+            } else {
                 expiration = null;
+            }
         } catch (ParseException e) {
             throw new OXFException(e);
         }
 
         if (expiration != null) {
             if (new Date().after(expiration)) {
-                final String message = "License expires on: " + DateFormat.getDateInstance().format(expiration);
+                final String message = "License has expired on " + DateFormat.getDateInstance().format(expiration);
                 logger.error(message);
                 throw new OXFException(message);
             }
         }
 
-        return new LicenseInfo(licensor, licensee, company, email, issued, expiration);
+        return new LicenseInfo(licensor, licensee, organization, email, issued, expiration);
     }
 
     private static class LicenseInfo {
         public final String licensor;
         public final String licensee;
-        public final String company;
+        public final String organization;
         public final String email;
         public final String issued;
         public final Date expiration;
 
-        private LicenseInfo(String licensor, String licensee, String company, String email, String issued, Date expiration) {
+        private LicenseInfo(String licensor, String licensee, String organization, String email, String issued, Date expiration) {
             this.licensor = licensor;
             this.licensee = licensee;
-            this.company = company;
+            this.organization = organization;
             this.email = email;
             this.issued = issued;
             this.expiration = expiration;
@@ -114,7 +124,7 @@ public class PEVersion extends Version {
         @Override
         public String toString() {
             final String expires = (expiration != null) ? " and expires on " + DateFormat.getDateInstance().format(expiration) : "";
-            return licensee + " / " + company + " / " + email + expires;
+            return licensee + " / " + organization + " / " + email + expires;
         }
     }
 
@@ -125,7 +135,7 @@ public class PEVersion extends Version {
 
     @Override
     public boolean isPE() {
-        return isLicensed;
+        return licenseInfo != null;
     }
 
     @Override

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -11,11 +12,11 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<public-key>MIIBtzCCASwGByqGSM44BAEwggEfAoGBAP1/U4EddRIpUt9KnC7s5Of2EbdSPO9EAMMeP4C2USZp&#13;
-RV1AIlH7WT2NWPq/xfW6MPbLm1Vs14E7gB00b/JmYLdrmVClpJ+f6AR7ECLCT7up1/63xhv4O1fn&#13;
-xqimFQ8E+4P208UewwI1VBNaFpEy9nXzrith1yrv8iIDGZ3RSAHHAhUAl2BQjxUjC8yykrmCouuE&#13;
-C/BYHPUCgYEA9+GghdabPd7LvKtcNrhXuXmUr7v6OuqC+VdMCz0HgmdRWVeOutRZT+ZxBxCBgLRJ&#13;
-FnEj6EwoFhO3zwkyjMim4TwWeotUfI0o4KOuHiuzpnWRbqN/C/ohNWLx+2J6ASQ7zKTxvqhRkImo&#13;
-g9/hWuWfBpKLZl6Ae1UlZAFMO/7PSSoDgYQAAoGAbfAcnUE8MMi1WwTE4313xAFCDMsQmBFinZyw&#13;
-/rBO65u92DFiCXzKn6gsspCC1OTbcGQsxYmO9jDJPVGMParZeDXaj9R/owA+1L2/cOXASWY/P73K&#13;
-aAGHYYZczhAEG2x2AdmMSZ6g/ybSO+DiZAQLzfTV3k6BhSn2nuifuB9i1Qo=</public-key>
+<public-key>MIIBuDCCASwGByqGSM44BAEwggEfAoGBAP1/U4EddRIpUt9KnC7s5Of2EbdSPO9EAMMeP4C2USZp
+RV1AIlH7WT2NWPq/xfW6MPbLm1Vs14E7gB00b/JmYLdrmVClpJ+f6AR7ECLCT7up1/63xhv4O1fn
+xqimFQ8E+4P208UewwI1VBNaFpEy9nXzrith1yrv8iIDGZ3RSAHHAhUAl2BQjxUjC8yykrmCouuE
+C/BYHPUCgYEA9+GghdabPd7LvKtcNrhXuXmUr7v6OuqC+VdMCz0HgmdRWVeOutRZT+ZxBxCBgLRJ
+FnEj6EwoFhO3zwkyjMim4TwWeotUfI0o4KOuHiuzpnWRbqN/C/ohNWLx+2J6ASQ7zKTxvqhRkImo
+g9/hWuWfBpKLZl6Ae1UlZAFMO/7PSSoDgYUAAoGBAPYZzfKpHE/oX8nuflYegHP3WDwzLtppKqNw
+VUE5BelKCp9j/YAtDotkN+cE7eSgi/6qV/lnGkfjkn0pxxLAXr6JhnilFKTZAH0JJPG63CR/FutH
+iZ+A4j72U1JgILcBg0pUjuNCqh+DKNC+hM1sKUetkHqOTW0y8+XWOb9aN8qf</public-key>

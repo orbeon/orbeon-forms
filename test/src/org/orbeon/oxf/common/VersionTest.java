@@ -17,9 +17,16 @@ import junit.framework.TestCase;
 
 public class VersionTest extends TestCase {
     public void testProductConfiguration() {
-        assertEquals("PE", Version.instance().getCode());
-        assertTrue(Version.instance().isPE());
-        assertFalse(Version.instance().isPEFeatureEnabled(false, "foobar"));
-        assertTrue(Version.instance().isPEFeatureEnabled(true, "foobar"));
+        if (Version.instance().isPE()) {
+            assertEquals("PE", Version.instance().getCode());
+            assertTrue(Version.instance().isPE());
+            assertFalse(Version.instance().isPEFeatureEnabled(false, "foobar"));
+            assertTrue(Version.instance().isPEFeatureEnabled(true, "foobar"));
+        } else {
+            assertEquals("CE", Version.instance().getCode());
+            assertFalse(Version.instance().isPE());
+            assertFalse(Version.instance().isPEFeatureEnabled(false, "foobar"));
+            assertFalse(Version.instance().isPEFeatureEnabled(true, "foobar"));
+        }
     }
 }

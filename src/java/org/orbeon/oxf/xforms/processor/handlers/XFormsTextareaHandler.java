@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -79,7 +80,9 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                     if (value != null) {
                         final boolean isHTMLMediaType = "text/html".equals(textareaControl.getMediatype());
                         if (!isHTMLMediaType) {
-                            contentHandler.characters(value.toCharArray(), 0, value.length());
+                            // Output and replace spaces with &nbsp; so that spaces are preserved in the resulting HTML
+                            final String replaced = StringUtils.replace(value, " ", XMLConstants.NBSP);
+                            contentHandler.characters(replaced.toCharArray(), 0, replaced.length());
                         } else {
                             XFormsUtils.streamHTMLFragment(contentHandler, value, textareaControl.getLocationData(), xhtmlPrefix);
                         }

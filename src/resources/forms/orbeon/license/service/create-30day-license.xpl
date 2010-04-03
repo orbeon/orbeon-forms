@@ -16,8 +16,8 @@
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <p:param type="input" name="instance" debug="xxx"/>
-    <p:param type="output" name="data" debug="yyy"/>
+    <p:param type="input" name="instance"/>
+    <p:param type="output" name="data"/>
 
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#instance" schema-href="license-request.rng"/>

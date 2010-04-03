@@ -20,11 +20,14 @@ import org.orbeon.oxf.processor.DOMSerializer;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.SignatureVerifierProcessor;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.analysis.PathMapUIDependencies;
 import org.orbeon.oxf.xforms.analysis.UIDependencies;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -35,7 +38,8 @@ import static org.orbeon.oxf.processor.ProcessorImpl.OUTPUT_DATA;
 
 public class PEVersion extends Version {
 
-    public static final String LICENSE_URL = "oxf:/config/license.xml";
+    public static final String LICENSE_PATH = "/config/license.xml";
+    public static final String LICENSE_URL = "oxf:" + LICENSE_PATH;
     public static final String ORBEON_PUBLIC_KEY = "oxf:/config/orbeon-public.xml";
 
     private final LicenseInfo licenseInfo;
@@ -55,10 +59,21 @@ public class PEVersion extends Version {
     }
 
     private final LicenseInfo check() {
-        // Connect pipeline
-        final Processor licence = PipelineUtils.createURLGenerator(LICENSE_URL);
+
         final Processor key = PipelineUtils.createURLGenerator(ORBEON_PUBLIC_KEY);
 
+        // Remove blank spaces in license file as that's the way it was signed
+        final Processor licence;
+        try {
+            final Document rawLicenceDocument = ResourceManagerWrapper.instance().getContentAsDOM4J(LICENSE_PATH);
+            final String compactString = Dom4jUtils.domToCompactString(rawLicenceDocument);
+            final Document licenseDocument = Dom4jUtils.readDom4j(compactString, false, false);
+            licence = new DOMGenerator(licenseDocument, "license", DOMGenerator.ZeroValidity, LICENSE_URL);
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+
+        // Connect pipeline
         final SignatureVerifierProcessor verifierProcessor = new SignatureVerifierProcessor();
         PipelineUtils.connect(licence, OUTPUT_DATA, verifierProcessor, ProcessorImpl.INPUT_DATA);
         PipelineUtils.connect(key, OUTPUT_DATA, verifierProcessor, SignatureVerifierProcessor.INPUT_PUBLIC_KEY);

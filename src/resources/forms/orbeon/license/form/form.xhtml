@@ -221,7 +221,7 @@
                     <xforms:action class="fr-set-control-value-action">
 
                         <xxforms:variable name="control-name" select="'license-data'" as="xs:string"/>
-                        <xxforms:variable name="control-value" select="saxon:serialize(/, 'xml')" as="xs:string"/>
+                        <xxforms:variable name="control-value" select="saxon:serialize(/, xxforms:instance('fr-xsl-output-instance'))" as="xs:string"/>
 
                         <xforms:insert nodeset="instance('fr-form-instance')/*/*"
                                        origin="xxforms:element($control-name)"/>
@@ -362,7 +362,7 @@
                     </fr:grid>
 
                 </fr:section>
-
+                <!--<fr:xforms-inspector/>-->
             </fr:body>
         </fr:view>
     </xhtml:body>

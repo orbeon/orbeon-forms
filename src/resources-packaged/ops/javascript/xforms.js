@@ -3311,15 +3311,16 @@ ORBEON.xforms.Events = {
                 ORBEON.xforms.Events.focus(event);
                 var event = new ORBEON.xforms.Server.Event(null, target.id, null, null, "DOMActivate");
                 ORBEON.xforms.Server.fireEvents([event], false);
-            }
-            if (ORBEON.util.Dom.hasClass(target, "xforms-trigger-appearance-modal")) {
-                // If click on a modal trigger, we want to prevent any further interaction with the form until
-                // we get a response to this Ajax request from the server.
-                // Remove focus from trigger, otherwise user can press enter and activate the trigger even after the
-                // the progress panel is displayed.
-                target.blur();
-                // Display progress panel if trigger with "xforms-trigger-appearance-modal" class was activated
-                ORBEON.util.Utils.displayModalProgressPanel();
+
+                if (ORBEON.util.Dom.hasClass(target, "xforms-trigger-appearance-modal")) {
+                    // If click on a modal trigger, we want to prevent any further interaction with the form until
+                    // we get a response to this Ajax request from the server.
+                    // Remove focus from trigger, otherwise user can press enter and activate the trigger even after the
+                    // the progress panel is displayed.
+                    target.blur();
+                    // Display progress panel if trigger with "xforms-trigger-appearance-modal" class was activated
+                    ORBEON.util.Utils.displayModalProgressPanel();
+                }
             }
         } else if (target != null &&
                    (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-full")

@@ -145,6 +145,7 @@ public class PEVersion extends Version {
 
     @Override
     public UIDependencies createUIDependencies(XFormsContainingDocument containingDocument) {
-        return isPE() ? new PathMapUIDependencies(containingDocument) : super.createUIDependencies(containingDocument);
+        final boolean requested = containingDocument.getStaticState().isXPathAnalysis();
+        return (requested && isPE()) ? new PathMapUIDependencies(containingDocument) : super.createUIDependencies(containingDocument);
     }
 }

@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -61,13 +62,17 @@ public class XFormsSetindexAction extends XFormsAction {
     }
 
     private static void executeSetindexAction(XFormsActionInterpreter actionInterpreter, PropertyContext propertyContext, XFormsEventObserver eventObserver,
-                                                Element actionElement, String repeatStaticId, String indexString) {
+                                              Element actionElement, String repeatStaticId, String indexString) {
         if ("NaN".equals(indexString)) {
             // "If the index evaluates to NaN the action has no effect."
             return;
         }
 
         final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
+
+        // "This XForms Action begins by invoking the deferred update behavior."
+        final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
+        containingDocument.synchronizeAndRefresh(propertyContext);
 
         // Find repeat control
         final Object control = actionInterpreter.resolveEffectiveControl(propertyContext, actionElement, repeatStaticId);

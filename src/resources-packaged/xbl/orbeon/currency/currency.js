@@ -61,11 +61,8 @@ YAHOO.xbl.fr.Currency.prototype = {
         this.visibleInputElement.value = this.numberToCurrency(this.visibleInputElement.value);
         // Update xforms-required-empty/xforms-required-filled and xforms-visited
         ORBEON.xforms.Controls.updateRequiredEmpty(this.groupElement, newValue);
-        if (! ORBEON.util.Dom.hasClass(this.groupElement, "xforms-visited")) {
-            ORBEON.xforms.Events.runOnNext(ORBEON.xforms.Events.ajaxResponseProcessedEvent,
-                function() { ORBEON.xforms.Controls.updateInvalidVisited(this.groupElement); },
-                this, true);
-        }
+        if (! ORBEON.util.Dom.hasClass(this.groupElement, "xforms-visited"))
+            ORBEON.xforms.Controls.updateInvalidVisitedOnNextAjaxResponse(this.groupElement);
     },
 
     setfocus: function() {

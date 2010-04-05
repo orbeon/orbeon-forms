@@ -129,7 +129,7 @@ public class XFormsContextStack {
         // TODO: Check dirty flag to prevent needless re-evaluation
 
         // All variables in the model are in scope for the nested binds and actions.
-        final List<Element> elements = Dom4jUtils.elements(xformsModel.getModelDocument().getRootElement(), XFormsConstants.XXFORMS_VARIABLE_NAME);
+        final List<Element> elements = Dom4jUtils.elements(xformsModel.getStaticModel().document.getRootElement(), XFormsConstants.XXFORMS_VARIABLE_NAME);
         final List<BindingContext.VariableInfo> variableInfos
                 = addAndScopeVariables(propertyContext, xformsModel.getXBLContainer(), elements, xformsModel.getEffectiveId());
 
@@ -329,15 +329,27 @@ public class XFormsContextStack {
                         // NOTE: For now, only the top-level models in a resolution scope are considered
                         final XBLContainer resolutionScopeContainer = container.findResolutionScope(scope);
                         final Object o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, bindId, baseBindingContext.getSingleItem());
-                        if (!(o instanceof XFormsModelBinds.Bind)) {
-                            // TODO: should be dispatched to element having the @model attribute
-                            // There is no model in scope so the bind id is incorrect
-                            container.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, container));
+                        if (o == null && resolutionScopeContainer.containsBind(bindId)) {
+                            // The bind attribute was valid for this scope, but no runtime object was found for the bind
+                            // This can happen e.g. if a nested bind is within a bind with an empty nodeset
 
-                            newNodeset = null;
+                            newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
                             hasOverriddenContext = false;
                             contextItem = null;
-                            isNewBind = false;
+                            isNewBind = true;
+                            newPosition = 0;
+                            isPushModelVariables = false;
+                            variableInfo = null;
+                        } else if (!(o instanceof XFormsModelBinds.Bind)) {
+                            // The bind attribute did not resolve to a bind: dispatch xforms-binding-exception
+
+                            // TODO: should be dispatched to element having the @model attribute
+                            container.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, container));
+
+                            newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
+                            hasOverriddenContext = false;
+                            contextItem = null;
+                            isNewBind = true;
                             newPosition = 0;
                             isPushModelVariables = false;
                             variableInfo = null;

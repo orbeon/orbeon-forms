@@ -54,7 +54,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     public static final Logger logger = LoggerFactory.createLogger(XFormsModel.class);
     public final IndentedLogger indentedLogger;
 
-    private final Document modelDocument;
+    private final Model staticModel;
 
     // Model attributes
     private final String staticId;
@@ -84,20 +84,20 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     // Containing document
     private final XFormsContainingDocument containingDocument;
 
-    public XFormsModel(XBLContainer container, String effectiveId, Model model) {
+    public XFormsModel(XBLContainer container, String effectiveId, Model staticModel) {
+
+        // Remember static model
+        this.staticModel = staticModel;
 
         // Set container
         this.container = container;
         this.containingDocument = container.getContainingDocument();
 
         this.indentedLogger = containingDocument.getIndentedLogger(LOGGING_CATEGORY);
-        
-        // Remember document
-        this.modelDocument = model.document;
 
         // Basic check trying to make sure this is an XForms model
         // TODO: should rather use schema here or when obtaining document passed to this constructor
-        final Element modelElement = modelDocument.getRootElement();
+        final Element modelElement = staticModel.document.getRootElement();
         final String rootNamespaceURI = modelElement.getNamespaceURI();
         if (!rootNamespaceURI.equals(XFormsConstants.XFORMS_NAMESPACE_URI))
             throw new ValidationException("Root element of XForms model must be in namespace '"
@@ -188,8 +188,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return containingDocument;
     }
 
-    public Document getModelDocument() {
-        return modelDocument;
+    public Model getStaticModel() {
+        return staticModel;
     }
 
     /**
@@ -350,7 +350,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     public LocationData getLocationData() {
-        return (LocationData) modelDocument.getRootElement().getData();
+        return (LocationData) staticModel.document.getRootElement().getData();
     }
 
     public XFormsModelBinds getBinds() {
@@ -363,7 +363,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     private void loadSchemasIfNeeded(PropertyContext propertyContext) {
         if (schemaValidator == null) {
-            final Element modelElement = modelDocument.getRootElement();
+            final Element modelElement = staticModel.document.getRootElement();
             schemaValidator = new XFormsModelSchemaValidator(modelElement, indentedLogger);
             schemaValidator.loadSchemas(propertyContext);
 
@@ -524,7 +524,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             if (throwable instanceof RuntimeException)
                 throw (RuntimeException) throwable;
             else
-                throw new ValidationException("Received fatal error event: " + eventName, throwable, (LocationData) modelDocument.getRootElement().getData());
+                throw new ValidationException("Received fatal error event: " + eventName, throwable, getLocationData());
         }
     }
 
@@ -545,7 +545,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     private void doModelConstruct(PropertyContext propertyContext) {
-        final Element modelElement = modelDocument.getRootElement();
+        final Element modelElement = staticModel.document.getRootElement();
 
         // 1. All XML Schema loaded (throws xforms-link-exception)
 

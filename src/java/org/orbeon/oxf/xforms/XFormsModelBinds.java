@@ -93,13 +93,10 @@ public class XFormsModelBinds {
      * @return      XFormsModelBinds or null if the model doesn't have xforms:bind elements
      */
     public static XFormsModelBinds create(XFormsModel model) {
-        final List<Element> bindElements = Dom4jUtils.elements(model.getModelDocument().getRootElement(), XFormsConstants.XFORMS_BIND_QNAME);
-        final boolean hasBinds = bindElements != null && bindElements.size() > 0;
-
-        return hasBinds ? new XFormsModelBinds(model, bindElements) : null;
+        return model.getStaticModel().hasBinds() ? new XFormsModelBinds(model) : null;
     }
 
-    private XFormsModelBinds(XFormsModel model, List<Element> bindElements) {
+    private XFormsModelBinds(XFormsModel model) {
         this.model = model;
 
         this.indentedLogger = model.getIndentedLogger();
@@ -107,7 +104,7 @@ public class XFormsModelBinds {
         this.containingDocument = model.getContainingDocument();
         this.computedBindsCalculate = XFormsProperties.getComputedBinds(containingDocument).equals(XFormsProperties.COMPUTED_BINDS_RECALCULATE_VALUE);
 
-        this.bindElements = bindElements;
+        this.bindElements = model.getStaticModel().bindElements;
 
         // For the lifecycle of an XForms document, new XFormsModelBinds() may be created multiple times, e.g. if the
         // state is deserialized, but we know that new XFormsModelBinds() will occur only once during document
@@ -134,7 +131,7 @@ public class XFormsModelBinds {
         variableNamesToIds.clear();
 
         // Iterate through all top-level bind elements
-        for (Element currentBindElement: bindElements) {
+        for (final Element currentBindElement: bindElements) {
             // Create and remember as top-level bind
             final Bind currentBind = new Bind(propertyContext, currentBindElement, true);
             topLevelBinds.add(currentBind);
@@ -266,7 +263,7 @@ public class XFormsModelBinds {
             if (contextItem instanceof NodeInfo) {
                 final List<BindIteration> iterationsForContextNode = iterationsForContextNodeInfo.get(contextItem);
                 if (iterationsForContextNode != null) {
-                    for (BindIteration currentIteration: iterationsForContextNode) {
+                    for (final BindIteration currentIteration: iterationsForContextNode) {
                         final Bind currentBind = currentIteration.getBind(bindId);
                         if (currentBind != null) {
                             // Found
@@ -275,6 +272,9 @@ public class XFormsModelBinds {
                     }
                 }
             }
+            // "From among the bind objects associated with the target bind element, if there exists a bind object
+            // created with the same in-scope evaluation context node as the source object, then that bind object is the
+            // desired target bind object. Otherwise, the IDREF resolution produced a null search result."
         }
 
         // Nothing found

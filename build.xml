@@ -739,7 +739,7 @@
             <arg value="--bwlimit=50"/>
             <arg value="${artifact.name}.war"/>
             <arg value="${artifact.name}.zip"/>
-            <arg value="${artifact.name}-src.zip"/>
+            <!--<arg value="${artifact.name}-src.zip"/>-->
             <arg value="orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops"/>
         </exec>
 

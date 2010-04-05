@@ -280,11 +280,25 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     }
 
     /**
+     * Check whether if the bind id can resolve in this scope
+     *
+     * @param bindId    bind id to check
+     * @return
+     */
+    public boolean containsBind(String bindId) {
+        for (final Model model: containingDocument.getStaticState().getModelsForScope(getResolutionScope())) {
+            if (model.containsBind(bindId))
+                return true;
+        }
+        return false;
+    }
+
+    /**
      * Create and index models corresponding to this container's scope.
      */
     public void addAllModels() {
         // Iterate through all models and finds the one that apply to this container
-        for (Model model: containingDocument.getStaticState().getModelsForScope(getResolutionScope())) {
+        for (final Model model: containingDocument.getStaticState().getModelsForScope(getResolutionScope())) {
             // Find model's effective id, e.g. if container's effective id is foo$bar.1-2 and models static id is
             // my-model => foo$bar$my-model.1-2
             final String modelEffectiveId = model.prefixedId + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
@@ -524,7 +538,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     }
 
     private Object searchContainedModels(String sourceEffectiveId, String targetStaticId, Item contextItem) {
-        for (XFormsModel model: models) {
+        for (final XFormsModel model: models) {
             final Object resultObject = model.resolveObjectById(sourceEffectiveId, targetStaticId, contextItem);
             if (resultObject != null)
                 return resultObject;

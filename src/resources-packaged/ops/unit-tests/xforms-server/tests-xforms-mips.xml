@@ -1152,4 +1152,89 @@
             </xxf:event-response>
         </output>
     </test>
+
+    <test description="Reference to nested bind within empty nodeset" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model>
+                                    <xforms:instance>
+                                        <instance>
+                                            <company>
+                                                <employee/>
+                                                <employee/>
+                                            </company>
+                                            <company>
+                                                <employee/>
+                                                <employee/>
+                                            </company>
+                                        </instance>
+                                    </xforms:instance>
+                                    <xforms:bind nodeset="company" id="companies">
+                                        <xforms:bind nodeset="employee" id="employees"/>
+                                    </xforms:bind>
+                                    <xforms:bind nodeset="foo" id="foos">
+                                        <xforms:bind nodeset="bar" id="bars"/>
+                                    </xforms:bind>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <!-- Must be non-relevant because the context item does not match -->
+                                <xforms:input bind="employees" id="input1"/>
+                                <!-- Must be non-relevant because the node-set is empty -->
+                                <xforms:input bind="foos" id="input2"/>
+
+                                <!-- Must be non-relevant because the context item matches -->
+                                <xforms:group bind="companies" id="group1">
+                                    <xforms:input bind="employees" id="input3"/>
+                                </xforms:group>
+
+                                <!-- Must be non-relevant -->
+                                <xforms:group bind="foos" id="group2">
+                                    <xforms:input bind="bars" id="input4"/>
+                                </xforms:group>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="xf-2" model-id="xf-1">
+                                <instance>
+                                    <company>
+                                        <employee/>
+                                        <employee/>
+                                    </company>
+                                    <company>
+                                        <employee/>
+                                        <employee/>
+                                    </company>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="input1" relevant="false"/>
+                        <xxf:control id="input2" relevant="false"/>
+                        <xxf:control id="group2" relevant="false"/>
+                        <xxf:control id="input4" relevant="false"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 </group>

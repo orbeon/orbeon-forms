@@ -124,7 +124,7 @@ public class Variable {
             // Rewrap NodeWrapper contained in the variable value. Not the most efficient, but at this point we have to
             // to ensure that things work properly. See RewrappingSequenceIterator for more details.
             try {
-                return new SequenceExtent(new RewrappingSequenceIterator(((SequenceExtent) variableValue).iterate(null)));
+                return new SequenceExtent(new RewrappingSequenceIterator(((SequenceExtent) variableValue).iterate()));
             } catch (XPathException e) {
                 // Should not happen with SequenceExtent
                 throw new OXFException(e);

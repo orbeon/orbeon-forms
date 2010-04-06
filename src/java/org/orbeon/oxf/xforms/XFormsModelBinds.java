@@ -483,7 +483,7 @@ public class XFormsModelBinds {
     private static List<Item> sequenceExtentToList(SequenceExtent sequenceExtent) {
         try {
             final List<Item> result = new ArrayList<Item>(sequenceExtent.getLength());
-            final SequenceIterator si = sequenceExtent.iterate(null);
+            final SequenceIterator si = sequenceExtent.iterate();
             for (Item item = si.next(); item != null; item = si.next()) {
                 result.add(item);
             }

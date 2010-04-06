@@ -568,6 +568,7 @@
     <xs:choice minOccurs="0" maxOccurs="unbounded">
       <xs:group ref="inline"/>
       <xs:group ref="misc.inline"/>
+      <xs:any namespace="##other" processContents="lax"/>
     </xs:choice>
   </xs:complexType>
 

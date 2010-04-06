@@ -164,7 +164,7 @@ public class PooledXPathExpression {
 
     private List<Object> convertToJavaKeepNodeInfo(SequenceExtent extent) throws XPathException {
         final List<Object> result = new ArrayList<Object>(extent.getLength());
-        final SequenceIterator iter = extent.iterate(null);
+        final SequenceIterator iter = extent.iterate();
         while (true) {
             final Item currentItem = iter.next();
             if (currentItem == null) {

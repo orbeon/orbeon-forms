@@ -534,7 +534,7 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="my-summary$er" index="1"/>
+                            <control effective-id="my-summary$er" index="2"/>
                             <control effective-id="repeat" index="2"/>
                         </controls>
                     </dynamic-state>

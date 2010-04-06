@@ -55,7 +55,7 @@
                     </ui>
                 </xforms:instance>
                 <xforms:bind nodeset="instance('ui')">
-                    <xforms:bind nodeset="unknown-word" calculate="if (. != '') then . else 
+                    <xforms:bind nodeset="unknown-word" calculate="if (. != '') then . else
                         for $c in instance('result')/c[1] return
                         substring(instance('request')/text, $c/@o + 1, $c/@l)"/>
                     <xforms:bind nodeset="correction" calculate="if (. != '') then . else ../unknown-word"
@@ -63,9 +63,7 @@
                 </xforms:bind>
 
                 <!--  Spell checking -->
-                <!-- https://www.google.com/tbproxy/spell?lang=en&amp;hl=en -->
-                <!-- http://localhost:8080/myapp/spellex/spell-service.jsp -->
-                <xforms:submission method="post" resource="https://www.google.com/tbproxy/spell?lang=en&amp;hl=en"
+                <xforms:submission method="post" resource="{xxforms:property('oxf.xforms.xbl.fr.spell-checker.service')}"
                         id="spell-check-submission" ref="instance('request')" replace="instance" instance="result">
                     <xforms:action ev:event="xforms-submit-done">
                         <xforms:setvalue ref="instance('ui')/unknown-word"/>
@@ -89,10 +87,12 @@
                     </xxforms:variable>
 
                     <!-- Trigger that starts spell checking -->
-                    <xforms:trigger appearance="minimal" ref=".">
-                        <xforms:label><xhtml:img src="/apps/fr/style/images/silk/spellcheck.png"/></xforms:label>
+                    <xforms:trigger appearance="minimal" ref="." class="xbl-fr-spell-checker-icon">
+                        <xforms:label/>
                         <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="instance('request')/text" value="string-join(distinct-values(tokenize($binding, '\s')), ' ')"/>
+                            <xforms:setvalue ref="instance('request')/text" value="string-join(distinct-values(
+                                for $token in tokenize($binding, '[\s;,.]') return if ($token != '') then $token else ()
+                            ), ' ')"/>
                             <xforms:send submission="spell-check-submission"/>
                         </xforms:action>
                     </xforms:trigger>
@@ -125,7 +125,7 @@
                                             <xforms:setfocus ev:event="xxforms-nodeset-changed" control="suggestion"/>
                                             <xforms:trigger appearance="minimal" id="suggestion">
                                                 <xforms:label value="."/>
-                                                <xforms:setvalue ev:event="DOMActivate" ref="$binding" 
+                                                <xforms:setvalue ev:event="DOMActivate" ref="$binding"
                                                     value="replace($binding, instance('ui')/unknown-word, context())"/>
                                             </xforms:trigger>
                                         </xforms:repeat>
@@ -135,7 +135,7 @@
                                     <xhtml:td>Or type correction:</xhtml:td>
                                     <xhtml:td>
                                         <xforms:group>
-                                            <xforms:setvalue ev:event="DOMActivate" ref="$binding" 
+                                            <xforms:setvalue ev:event="DOMActivate" ref="$binding"
                                                 value="replace($binding, instance('ui')/unknown-word, instance('ui')/correction)"/>
                                             <xforms:input ref="instance('ui')/correction"/>
                                             <fr:button>

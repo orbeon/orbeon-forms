@@ -37,11 +37,12 @@
         <!-- <xhtml:script type="text/javascript" src="/xbl/orbeon/spell-checker/spell-checker-unittest.js"/> -->
         <xhtml:style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent }
+            .block { margin-bottom: 1em }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
         <xforms:repeat nodeset="text">
-            <xhtml:div>
+            <xhtml:div class="block">
                 <xforms:textarea ref="."/>
                 <fr:spell-checker ref="."/>
             </xhtml:div>

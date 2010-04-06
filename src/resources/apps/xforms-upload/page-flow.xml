@@ -15,7 +15,7 @@
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <page path-info="/xforms-upload/" model="main-model.xpl" view="view.xhtml"/>
+    <page path-info="/xforms-upload/" view="view.xhtml"/>
     <page path-info="/xforms-upload/test" model="test.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>

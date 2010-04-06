@@ -78,7 +78,7 @@ public class XFormsMessageAction extends XFormsAction {
 
             // Get message value
             // TODO: In the future, we should support HTML
-            final String messageValue = XFormsUtils.getElementValue(propertyContext, containingDocument,
+            final String messageValue = XFormsUtils.getElementValue(propertyContext, actionInterpreter.getXBLContainer(),
                     actionInterpreter.getContextStack(), actionInterpreter.getSourceEffectiveId(actionElement), actionElement, false, null);
 
             if (LOG_APPEARANCES.get(levelQName) != null) {

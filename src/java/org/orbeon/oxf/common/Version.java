@@ -29,7 +29,7 @@ public class Version {
 
     protected static final String RELEASE_NUMBER = "@RELEASE@";
 
-    private static final Logger logger = LoggerFactory.createLogger(Version.class);
+    protected static final Logger logger = LoggerFactory.createLogger(Version.class);
     private static final Set<String> WARNED_FEATURES = new HashSet<String>();
 
     private static Version version;

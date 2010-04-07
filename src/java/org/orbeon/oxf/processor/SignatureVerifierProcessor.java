@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
@@ -43,34 +43,33 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
 
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, final ContentHandler contentHandler) {
                 try {
-                    Document pubDoc = readCacheInputAsDOM4J(context, INPUT_PUBLIC_KEY);
-                    String pubString = XPathUtils.selectStringValueNormalize(pubDoc, "/public-key");
-                    byte[] pubBytes = Base64.decode(pubString);
-                    X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(pubBytes);
-                    KeyFactory keyFactory = KeyFactory.getInstance("DSA");
-                    PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
+                    final Document pubDoc = readCacheInputAsDOM4J(context, INPUT_PUBLIC_KEY);
+                    final String pubString = XPathUtils.selectStringValueNormalize(pubDoc, "/public-key");
+                    final byte[] pubBytes = Base64.decode(pubString);
+                    final X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(pubBytes);
+                    final KeyFactory keyFactory = KeyFactory.getInstance("DSA");
+                    final PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
 
-                    Signature dsa = Signature.getInstance("SHA1withDSA");
+                    final Signature dsa = Signature.getInstance("SHA1withDSA");
                     dsa.initVerify(pubKey);
 
-                    Document data = readInputAsDOM4J(context, INPUT_DATA);
-                    Node sigDataNode = data.selectSingleNode("/signed-data/data/*");
-                    String sig = XPathUtils.selectStringValueNormalize(data, "/signed-data/signature");
+                    final Document data = readInputAsDOM4J(context, INPUT_DATA);
+                    final Node sigDataNode = data.selectSingleNode("/signed-data/data/*");
+                    final String sig = XPathUtils.selectStringValueNormalize(data, "/signed-data/signature");
 
                     sigDataNode.detach();
-                    Document sigData = new NonLazyUserDataDocument();
+                    final Document sigData = new NonLazyUserDataDocument();
                     sigData.add(sigDataNode);
 
                     dsa.update(Dom4jUtils.domToString(sigData).getBytes("utf-8"));
 
-
                     if (!dsa.verify(Base64.decode(sig)))
                         throw new OXFException("Invalid Signature");
                     else {
-                        LocationSAXWriter saw = new LocationSAXWriter();
+                        final LocationSAXWriter saw = new LocationSAXWriter();
                         saw.setContentHandler(contentHandler);
                         saw.write(sigData);
                     }

@@ -17,7 +17,7 @@
     For further information, see: http://www.w3.org/TR/xhtml1
 
     Copyright (c) 1998-2002 W3C (MIT, INRIA, Keio),
-    All Rights Reserved. 
+    All Rights Reserved.
 
     The DTD version is identified by the PUBLIC and SYSTEM identifiers:
 
@@ -36,7 +36,7 @@
     ================ Character mnemonic entities =========================
 
     XHTML entity sets are identified by the PUBLIC and SYSTEM identifiers:
-  
+
     PUBLIC "-//W3C//ENTITIES Latin 1 for XHTML//EN"
     SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml-lat1.ent"
 
@@ -126,7 +126,7 @@
       <xs:documentation>
       tabindex attribute specifies the position of the current element
       in the tabbing order for the current document. This value must be
-      a number between 0 and 32767. User agents should ignore leading zeros. 
+      a number between 0 and 32767. User agents should ignore leading zeros.
       </xs:documentation>
     </xs:annotation>
     <xs:restriction base="Number">
@@ -568,6 +568,7 @@
     <xs:choice minOccurs="0" maxOccurs="unbounded">
       <xs:group ref="inline"/>
       <xs:group ref="misc.inline"/>
+      <xs:any namespace="##other" processContents="lax"/>
     </xs:choice>
   </xs:complexType>
 
@@ -745,6 +746,7 @@
         <xs:element ref="link"/>
         <xs:element ref="object"/>
         <xs:element ref="isindex"/>
+        <xs:any namespace="##other" processContents="lax"/>
       </xs:choice>
     </xs:sequence>
   </xs:group>
@@ -996,7 +998,7 @@
   <xs:element name="div">
     <xs:annotation>
       <xs:documentation>
-      generic language/style container      
+      generic language/style container
       </xs:documentation>
     </xs:annotation>
     <xs:complexType mixed="true">
@@ -1355,7 +1357,7 @@
   <xs:element name="pre">
     <xs:annotation>
       <xs:documentation>
-      content is "Inline" excluding 
+      content is "Inline" excluding
          "img|object|applet|big|small|sub|sup|font|basefont"
       </xs:documentation>
     </xs:annotation>

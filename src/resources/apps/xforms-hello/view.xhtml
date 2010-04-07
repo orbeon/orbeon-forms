@@ -11,27 +11,31 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms">
-    <head>
-        <title>XForms Hello</title>
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xhtml:head>
+        <xhtml:title>XForms Hello</xhtml:title>
         <xforms:model>
             <xforms:instance>
                 <first-name xmlns=""/>
             </xforms:instance>
         </xforms:model>
-    </head>
-    <body>
-        <p>
-            <i>This example is described in details in the <a href="/doc/intro-tutorial">Orbeon Forms Tutorial</a>.</i>
-        </p>
-        <p>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:p>
+            <xhtml:i>This example is described in details in the <xhtml:a href="/doc/intro-tutorial">Orbeon Forms Tutorial</xhtml:a>.</xhtml:i>
+        </xhtml:p>
+        <xhtml:p>
             <xforms:input ref="/first-name" incremental="true">
                 <xforms:label>Please enter your first name:</xforms:label>
             </xforms:input>
-        </p>
-        <p>
+        </xhtml:p>
+        <xhtml:p>
             <xforms:output value="if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')"/>
-        </p>
-    </body>
-</html>
+        </xhtml:p>
+    </xhtml:body>
+</xhtml:html>

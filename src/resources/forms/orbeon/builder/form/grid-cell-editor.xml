@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -244,6 +244,10 @@
                               appearance="fr:in-place" class="fb-control-label">
                     <xforms:hint ref="$form-resources/enter-label/label"/>
                 </xforms:input>
+                <!--<fr:inplace-input id="fb-control-label-control" ref="$resource-holder/label"-->
+                                  <!--class="fb-control-label">-->
+                    <!--<xforms:hint ref="$form-resources/enter-label/label"/>-->
+                <!--</fr:inplace-input>-->
             </xforms:group>
 
             <!-- Display representation of the control -->
@@ -303,6 +307,9 @@
                     <xforms:input id="fb-xforms-output-text-input" ref="$instance-holder" appearance="fr:in-place" incremental="false">
                         <xforms:hint ref="$form-resources/enter-text/label"/>
                     </xforms:input>
+                    <!--<fr:inplace-input id="fb-xforms-output-text-input" ref="$instance-holder" incremental="false">-->
+                        <!--<xforms:hint ref="$form-resources/enter-text/label"/>-->
+                    <!--</fr:inplace-input>-->
                 </xforms:group>
                 <!-- NOTES:
                      o We don't show button with empty label as it appears bad

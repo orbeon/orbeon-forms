@@ -433,7 +433,7 @@
 
     <xforms:instance id="fr-triggers-instance">
         <triggers xmlns="">
-            <!-- Regular save/submuit -->
+            <!-- Regular save/submit -->
             <save/>
             <submit/>
             <!-- These versions are disabled when possible -->
@@ -474,7 +474,7 @@
             and not(instance('fr-persistence-instance')/data-status = 'clean') or xxforms:instance('fr-error-summary-instance')/valid = 'false'"/>
 
         <!-- Conditions for disabling workflow buttons -->
-        <xforms:bind nodeset="workflow-review" readonly="exforms:readonly(../submit)"/>
+        <xforms:bind nodeset="workflow-review" readonly="exforms:readonly(../strict-submit)"/>
         <xforms:bind nodeset="workflow-edit" readonly="exforms:readonly(../strict-submit)"/>
         <xforms:bind nodeset="workflow-send" readonly="exforms:readonly(../strict-submit)"/>
     </xforms:bind>

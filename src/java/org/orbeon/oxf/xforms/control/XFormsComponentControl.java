@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -46,35 +46,43 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
-        final boolean isNewBinding = getBindingContext() == null;
-        final boolean isNodesetChange = isNewBinding|| !compareNodesets(getBindingContext().getNodeset(), bindingContext.getNodeset());
-
-        // Set/update binding context on control
-        super.setBindingContext(propertyContext, bindingContext, isCreate);
+    // TODO: we should not override this, but currently due to the way XFormsContextStack works with XBL, even non-relevant
+    // XFormsComponentControl expect the binding to be set.
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext) {
+        super.setBindingContext(propertyContext, bindingContext);
 
         nestedContainer.setBindingContext(bindingContext);
         nestedContainer.getContextStack().resetBindingContext(propertyContext);
+    }
 
-        // Set/update binding context on container
-        if (isNewBinding) {
-            // Control is newly bound
+    @Override
+    protected void onCreate(PropertyContext propertyContext) {
+        super.onCreate(propertyContext);
 
-            if (containingDocument.isRestoringDynamicState(propertyContext)) {
-                // Restore models
-                nestedContainer.restoreModelsState(propertyContext);
-            } else {
-                // Start models initialization
-                nestedContainer.initializeModels(propertyContext, new String[] {
-                        XFormsEvents.XFORMS_MODEL_CONSTRUCT,
-                        XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE
-                });
-                isInitializeModels = true;
-            }
-            nestedContainer.getContextStack().resetBindingContext(propertyContext);
-        } else if (isNodesetChange) {
+        // Control is newly created
+
+        if (containingDocument.isRestoringDynamicState(propertyContext)) {
+            // Restore models
+            nestedContainer.restoreModelsState(propertyContext);
+        } else {
+            // Start models initialization
+            nestedContainer.initializeModels(propertyContext, new String[] {
+                    XFormsEvents.XFORMS_MODEL_CONSTRUCT,
+                    XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE
+            });
+            isInitializeModels = true;
+        }
+        nestedContainer.getContextStack().resetBindingContext(propertyContext);
+    }
+
+    @Override
+    protected void onBindingUpdate(PropertyContext propertyContext, XFormsContextStack.BindingContext oldBinding, XFormsContextStack.BindingContext newBinding) {
+        super.onBindingUpdate(propertyContext, oldBinding, newBinding);
+
+        final boolean isNodesetChange = !compareNodesets(oldBinding.getNodeset(), newBinding.getNodeset());
+        if (isNodesetChange) {
             // Control's binding changed
-
+            // NOP for now
         }
     }
 

@@ -727,14 +727,10 @@
         <output name="response">
             <controls>
                 <control effective-id="repeat1" index="2"/>
-                <control effective-id="repeat2·1" index="0"/>
                 <control effective-id="repeat2·2" index="2"/>
-                <control effective-id="repeat2·3" index="0"/>
                 <control effective-id="repeat3" index="1"/>
                 <control effective-id="repeat4" index="1"/>
-                <control effective-id="repeat5·1" index="0"/>
                 <control effective-id="repeat5·2" index="1"/>
-                <control effective-id="repeat5·3" index="0"/>
             </controls>
         </output>
     </test>
@@ -1570,9 +1566,6 @@
                                 </changes>
                             </instance>
                         </instances>
-                        <controls>
-                            <control effective-id="my-repeat" index="0"/>
-                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -2365,9 +2358,6 @@
                                 </events>
                             </instance>
                         </instances>
-                        <controls>
-                            <control effective-id="my-repeat" index="0"/>
-                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -2493,10 +2483,7 @@
                         </instances>
                         <controls>
                             <control effective-id="my-repeat-1a" index="1"/>
-                            <control effective-id="my-repeat-1b" index="0"/>
-                            <control effective-id="my-repeat-2" index="1"/>
                             <control effective-id="my-repeat-3" index="1"/>
-                            <control effective-id="my-repeat-4" index="0"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -2862,9 +2849,6 @@
                                 <instance> </instance>
                             </instance>
                         </instances>
-                        <controls>
-                            <control effective-id="my-repeat" index="0"/>
-                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>

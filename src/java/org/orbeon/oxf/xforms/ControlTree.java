@@ -111,8 +111,8 @@ public class ControlTree implements ExternalCopyable {
 
         // Visit the static tree of controls to create the actual tree of controls
         final CreateControlsListener listener
-                = new CreateControlsListener(propertyContext, controlIndex, rootControl, containingDocument.getSerializedControlStatesMap(propertyContext), false);
-        containingDocument.getControls().visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener, false);
+                = new CreateControlsListener(propertyContext, controlIndex, rootControl, containingDocument.getSerializedControlStatesMap(propertyContext));
+        containingDocument.getControls().visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener);
 
         // Detach all root XFormsControl
         if (children != null) {
@@ -145,7 +145,7 @@ public class ControlTree implements ExternalCopyable {
     private void dispatchCreationEvents(PropertyContext propertyContext, Collection<String> controlsEffectiveIds) {
         indentedLogger.startHandleOperation("controls", "dispatching creation events");
         {
-            for (String effectiveId: controlsEffectiveIds) {
+            for (final String effectiveId: controlsEffectiveIds) {
                 final XFormsControl control = controlIndex.getControl(effectiveId);
                 dispatchCreationEvents(propertyContext, control);
             }
@@ -159,11 +159,21 @@ public class ControlTree implements ExternalCopyable {
                 final XBLContainer container = control.getXBLContainer();
                 final XFormsContainingDocument containingDocument = container.getContainingDocument();
 
+                // Commit current control properties
+                control.wasRelevant();
+                control.getPreviousEffectiveId();
+                if (control instanceof XFormsSingleNodeControl) {
+                    final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
+                    singleNodeControl.isValueChanged();
+                    singleNodeControl.wasRequired();
+                    singleNodeControl.wasReadonly();
+                    singleNodeControl.wasValid();
+                }
+
                 // Dispatch xforms-enabled if needed
                 if (isAllowSendingRelevantEvents) {
                     container.dispatchEvent(propertyContext, new XFormsEnabledEvent(containingDocument, control));
                 }
-
                 if (control instanceof XFormsSingleNodeControl) {
                     final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
                     // Dispatch events only if the MIP value is different from the default
@@ -355,32 +365,26 @@ public class ControlTree implements ExternalCopyable {
      * @param bindingContext        binding context set to the context of the new iteration
      * @param repeatControl         repeat control
      * @param iterationIndex        new iteration to repeat (1..repeat size + 1)
-     * @param isRefresh             whether this is called during refresh (as opposed to insert/delete handling)
      * @return                      newly created repeat iteration control
      */
     public XFormsRepeatIterationControl createRepeatIterationTree(PropertyContext propertyContext,
                                                                   XFormsContainingDocument containingDocument,
                                                                   XFormsContextStack.BindingContext bindingContext,
-                                                                  XFormsRepeatControl repeatControl, int iterationIndex, boolean isRefresh) {
+                                                                  XFormsRepeatControl repeatControl, int iterationIndex) {
 
         // Create new index for the controls created in the iteration
         final ControlIndex iterationControlIndex = new ControlIndex(containingDocument.getStaticState().isNoscript());
 
         // Create iteration and set its binding context
         final XFormsRepeatIterationControl repeatIterationControl = new XFormsRepeatIterationControl(repeatControl.getXBLContainer(), repeatControl, iterationIndex);
-
-        if (isRefresh)
-            repeatIterationControl.saveBinding();
-        repeatIterationControl.setBindingContext(propertyContext, bindingContext, true);
-        if (!isRefresh)
-            repeatIterationControl.saveBinding();
+        repeatIterationControl.setBindingContext(propertyContext, bindingContext);
 
         // Index this control
         iterationControlIndex.indexControl(repeatIterationControl);
 
         // Create the subtree
         containingDocument.getControls().visitControlElementsHandleRepeat(propertyContext, repeatControl, iterationIndex,
-                new CreateControlsListener(propertyContext, iterationControlIndex, repeatIterationControl, null, isRefresh), isRefresh);
+                new CreateControlsListener(propertyContext, iterationControlIndex, repeatIterationControl, null));
 
         // Update main index before dispatching, so that events can access newly created controls
         controlIndex.addAll(iterationControlIndex);
@@ -475,7 +479,7 @@ public class ControlTree implements ExternalCopyable {
 
         visitControlsFollowRepeats(new XFormsControls.XFormsControlVisitorAdapter() {
             public boolean startVisitControl(XFormsControl control) {
-                if (control instanceof XFormsRepeatControl) {
+                if (control instanceof XFormsRepeatControl && control.isRelevant()) {
                     // Found xforms:repeat
                     final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
                     repeatIdToIndex.put(repeatControl.getPrefixedId(), ((XFormsRepeatControl.XFormsRepeatControlLocal) repeatControl.getInitialLocal()).getIndex());
@@ -497,7 +501,7 @@ public class ControlTree implements ExternalCopyable {
 
         visitControlsFollowRepeats(new XFormsControls.XFormsControlVisitorAdapter() {
             public boolean startVisitControl(XFormsControl control) {
-                if (control instanceof XFormsRepeatControl) {
+                if (control instanceof XFormsRepeatControl && control.isRelevant()) {
                     // Found xforms:repeat
                     final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
                     repeatIdToIndex.put(repeatControl.getPrefixedId(), repeatControl.getIndex());
@@ -728,20 +732,18 @@ public class ControlTree implements ExternalCopyable {
         private final Map serializedControls;
         private final PropertyContext propertyContext;
         private final ControlIndex controlIndex;
-        private final boolean isRefresh;
 
         private transient int updateCount;
         private transient int iterationCount;
 
         public CreateControlsListener(PropertyContext propertyContext, ControlIndex controlIndex, XFormsControl rootControl,
-                                      Map serializedControlStateMap, boolean isRefresh) {
+                                      Map serializedControlStateMap) {
 
             this.currentControlsContainer = rootControl;
 
             this.serializedControls = serializedControlStateMap;
             this.propertyContext = propertyContext;
             this.controlIndex = controlIndex;
-            this.isRefresh = isRefresh;
         }
 
         public XFormsControl startVisitControl(XBLContainer container, Element controlElement, String effectiveControlId) {
@@ -760,11 +762,7 @@ public class ControlTree implements ExternalCopyable {
 
             // Set current binding for control element
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
-            if (isRefresh)
-                control.saveBinding();
-            control.setBindingContext(propertyContext, currentBindingContext, true);
-            if (!isRefresh)
-                control.saveBinding();
+            control.setBindingContext(propertyContext, currentBindingContext);
 
             // Index this control
             // NOTE: Could do this even before context is set if needed. We used to have to put it here back when
@@ -815,11 +813,7 @@ public class ControlTree implements ExternalCopyable {
 
             // Set current binding for iteration
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();
-            if (isRefresh)
-                repeatIterationControl.saveBinding();
-            repeatIterationControl.setBindingContext(propertyContext, currentBindingContext, true);
-            if (!isRefresh)
-                repeatIterationControl.saveBinding();
+            repeatIterationControl.setBindingContext(propertyContext, currentBindingContext);
 
             // Index this control
             // NOTE: Could do this even before context is set if needed. We used to have to put it here back when
@@ -884,11 +878,10 @@ public class ControlTree implements ExternalCopyable {
                 final List<Item> oldRepeatNodeset = oldBindingContext.getNodeset();
 
                 // Set new current binding for control element
-                repeatControl.saveBinding();
-                repeatControl.setBindingContext(propertyContext, newBindingContext, false);
+                repeatControl.setBindingContext(propertyContext, newBindingContext);
 
                 // Update iterations
-                final List<XFormsRepeatIterationControl> newIterations = repeatControl.updateIterations(propertyContext, oldRepeatNodeset, null, true);
+                final List<XFormsRepeatIterationControl> newIterations = repeatControl.updateIterations(propertyContext, oldRepeatNodeset, null);
 
                 // Remember newly created iterations so we don't recurse into them in startRepeatIteration()
                 // o It is not needed to recurse into them because their bindings are up to date since they have just been created
@@ -901,12 +894,8 @@ public class ControlTree implements ExternalCopyable {
                 // Handle all other controls
 
                 // Set new current binding for control element
-                control.saveBinding();
-                control.setBindingContext(propertyContext, newBindingContext, false);
+                control.setBindingContext(propertyContext, newBindingContext);
             }
-
-            // Save control value for refresh events
-            control.saveValue();
 
             // Mark the control as dirty so it gets reevaluated
             // NOTE: existing repeat iterations are marked dirty below in startRepeatIteration()
@@ -927,8 +916,6 @@ public class ControlTree implements ExternalCopyable {
             // Check whether this is an existing iteration as opposed to a newly created iteration
             final boolean isExistingIteration = !newIterationsSet.contains(effectiveIterationId);
             if (isExistingIteration) {
-                // Save control value for refresh events
-                repeatIterationControl.saveValue();
                 // Mark the control as dirty so it gets reevaluated
                 if (uiDependencies.requireValueUpdate(repeatIterationControl.getPrefixedId())) {
                     repeatIterationControl.markDirty();

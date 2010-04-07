@@ -38,9 +38,18 @@ public abstract class XFormsValueContainerControl extends XFormsSingleNodeContai
     }
 
     @Override
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
-        super.setBindingContext(propertyContext, bindingContext, isCreate);
+    protected void onCreate(PropertyContext propertyContext) {
+        super.onCreate(propertyContext);
+        readBinding();
+    }
 
+    @Override
+    protected void onBindingUpdate(PropertyContext propertyContext, XFormsContextStack.BindingContext oldBinding, XFormsContextStack.BindingContext newBinding) {
+        super.onBindingUpdate(propertyContext, oldBinding, newBinding);
+        readBinding();
+    }
+
+    private void readBinding() {
         final Item boundItem = getBoundItem();
         if (boundItem instanceof NodeInfo && !XFormsUtils.hasChildrenElements((NodeInfo) boundItem)) {
             hasValue = true;
@@ -50,8 +59,8 @@ public abstract class XFormsValueContainerControl extends XFormsSingleNodeContai
     }
 
     @Override
-    protected void evaluateImpl(PropertyContext propertyContext, boolean isRefresh) {
-        super.evaluateImpl(propertyContext, isRefresh);
+    protected void evaluateImpl(PropertyContext propertyContext) {
+        super.evaluateImpl(propertyContext);
 
         // Evaluate control values
         if (hasValue && isRelevant()) {
@@ -61,25 +70,14 @@ public abstract class XFormsValueContainerControl extends XFormsSingleNodeContai
             // Control doesn't have value or is not relevant
             value = null;
         }
-
-        if (!isRefresh) {
-            // Sync value
-            previousValue = value;
-        }
-    }
-
-    @Override
-    public void saveValue() {
-        super.saveValue();
-
-        // Keep previous value
-        previousValue = value;
     }
 
     @Override
     public boolean isValueChanged() {
         // For special uses, we want to allow the group to detect value changes
-        return !XFormsUtils.compareStrings(previousValue, value);
+        final boolean result = !XFormsUtils.compareStrings(previousValue, value);
+        previousValue = value;
+        return result;
     }
 
     @Override

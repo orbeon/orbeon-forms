@@ -32,7 +32,7 @@ public class XXFormsCase  extends XFormsFunction {
 
         final Object switchControl = getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), switchStaticId, null);
 
-        if (switchControl instanceof XFormsSwitchControl) {
+        if (switchControl instanceof XFormsSwitchControl && ((XFormsSwitchControl) switchControl).isRelevant()) {
             // NOTE: Return the static id, not the effective id
             return StringValue.makeStringValue(XFormsUtils.getStaticIdFromId(((XFormsSwitchControl) switchControl).getSelectedCaseEffectiveId()));
         } else {

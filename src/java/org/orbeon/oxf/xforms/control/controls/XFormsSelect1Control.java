@@ -70,9 +70,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
-        super.setBindingContext(propertyContext, bindingContext, isCreate);
-
+    protected void onCreate(PropertyContext propertyContext) {
+        super.onCreate(propertyContext);
         // Evaluate itemsets only if restoring dynamic state
         // NOTE: This doesn't sound like it is the right place to do this, does it?
         if (containingDocument.isRestoringDynamicState(propertyContext))

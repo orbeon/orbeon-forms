@@ -120,7 +120,7 @@ public class ControlIndex {
         {
             // Evaluate all controls
             for (final XFormsControl currentControl: effectiveIdsToControls) {
-                currentControl.evaluate(propertyContext, false);
+                currentControl.evaluate(propertyContext);
             }
         }
         indentedLogger.endHandleOperation();

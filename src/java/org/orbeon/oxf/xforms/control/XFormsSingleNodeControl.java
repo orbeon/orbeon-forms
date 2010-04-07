@@ -48,7 +48,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     // Previous values for refresh
     private boolean wasReadonly;
     private boolean wasRequired;
-    private boolean wasValid;
+    private boolean wasValid = true;
 
     // Type
     private String type;
@@ -62,20 +62,23 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    public void saveBinding() {
-        super.saveBinding();
+    protected void onCreate(PropertyContext propertyContext) {
+        super.onCreate(propertyContext);
 
-        wasReadonly = readonly;
-        wasRequired = required;
-        wasValid = valid;
+        readBinding();
+
+        wasReadonly = false;
+        wasRequired = false;
+        wasValid = true;
     }
 
     @Override
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
+    protected void onBindingUpdate(PropertyContext propertyContext, XFormsContextStack.BindingContext oldBinding, XFormsContextStack.BindingContext newBinding) {
+        super.onBindingUpdate(propertyContext, oldBinding, newBinding);
+        readBinding();
+    }
 
-        // Keep binding context
-        super.setBindingContext(propertyContext, bindingContext, isCreate);
-
+    private void readBinding() {
         // Set bound item, only considering actual bindings (with @bind, @ref or @nodeset)
         if (bindingContext.isNewBind())
             this.boundItem = bindingContext.getSingleItem();
@@ -153,15 +156,21 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     public boolean wasReadonly() {
-        return wasReadonly;
+        final boolean result = wasReadonly;
+        wasReadonly = readonly;
+        return result;
     }
 
     public boolean wasRequired() {
-        return wasRequired;
+        final boolean result = wasRequired;
+        wasRequired = required;
+        return result;
     }
 
     public boolean wasValid() {
-        return wasValid;
+        final boolean result = wasValid;
+        wasValid = valid;
+        return result;
     }
 
     public boolean isValueChanged() {

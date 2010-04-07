@@ -507,4 +507,91 @@
         </output>
     </test>
 
+    <test description="Event handler within variable can access outer variable value" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <foo>42</foo>
+                                <bar/>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:setvalue ev:event="xforms-ready" ref="foo" value="43"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xxforms:variable name="foo" select="xs:integer(foo)" as="xs:integer">
+                        <xforms:setvalue ev:event="xforms-value-changed" ref="bar" value="$foo"/>
+                    </xxforms:variable>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <foo>43</foo>
+                                    <bar>43</bar>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Event handler after variable can access preceding variable value" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <foo>42</foo>
+                                <bar/>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:setvalue ev:event="xforms-ready" ref="foo" value="43"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xxforms:variable name="foo" select="xs:integer(foo)" as="xs:integer" id="foo"/>
+                    <xforms:setvalue ev:observer="foo" ev:event="xforms-value-changed" ref="bar" value="$foo"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <foo>43</foo>
+                                    <bar>43</bar>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

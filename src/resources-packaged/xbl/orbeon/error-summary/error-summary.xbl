@@ -423,7 +423,9 @@ Inserting error information into error list:
                                 <xxforms:variable name="ref" as="item()?">
                                     <xxforms:sequence select="." xxbl:scope="outer"/>
                                 </xxforms:variable>
-                                <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="context()"/>
+                                <xxforms:variable name="errors-count" as="xs:integer" select="xs:integer(.)">
+                                    <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="$errors-count"/>
+                                </xxforms:variable>
                             </xforms:group>
                         </xforms:group>
 
@@ -433,7 +435,9 @@ Inserting error information into error list:
                                 <xxforms:variable name="ref" as="item()?">
                                     <xxforms:sequence select="." xxbl:scope="outer"/>
                                 </xxforms:variable>
-                                <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="context()"/>
+                                <xxforms:variable name="visible-errors-count" as="xs:integer" select="xs:integer(.)">
+                                    <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="$visible-errors-count"/>
+                                </xxforms:variable>
                             </xforms:group>
                         </xforms:group>
 
@@ -443,7 +447,9 @@ Inserting error information into error list:
                                 <xxforms:variable name="ref" as="item()?">
                                     <xxforms:sequence select="." xxbl:scope="outer"/>
                                 </xxforms:variable>
-                                <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="context()"/>
+                                <xxforms:variable name="valid" as="xs:boolean" select="xs:boolean(.)" id="xxx">
+                                    <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$ref" value="$valid"/>
+                                </xxforms:variable>
                             </xforms:group>
                         </xforms:group>
 

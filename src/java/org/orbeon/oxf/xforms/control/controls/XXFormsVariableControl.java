@@ -48,15 +48,16 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    protected void evaluateImpl(PropertyContext propertyContext, boolean isRefresh) {
+    protected void evaluateImpl(PropertyContext propertyContext) {
 
         // Evaluate other aspects of the control if necessary
-        super.evaluateImpl(propertyContext, isRefresh);
+        super.evaluateImpl(propertyContext);
 
         // Evaluate control values
         if (isRelevant()) {
             // Control is relevant
             getContextStack().setBinding(this);
+            variable.markDirty();
             value = variable.getVariableValue(propertyContext, getEffectiveId(), false, true);
         } else {
             // Control is not relevant
@@ -64,42 +65,20 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
             // of non-relevant variables.
             value = EmptySequence.getInstance();
         }
-
-        if (!isRefresh) {
-            // Sync values
-            // TODO: shouldn't be here
-            previousValue = value;
-        }
-    }
-
-    @Override
-    public void saveValue() {
-        super.saveValue();
-
-        // Keep previous values
-        previousValue = value;
-    }
-
-    @Override
-    public void markDirty() {
-        super.markDirty();
-
-        // Mark variable value as dirty
-        variable.markDirty();
-
-        value = null;
     }
 
     @Override
     public boolean isValueChanged() {
-        return !compareValues(value, previousValue);
+        final boolean result = !compareValues(previousValue, value);
+        previousValue = value;
+        return result;
     }
 
     private static boolean compareValues(ValueRepresentation value1, ValueRepresentation value2) {
         if (value1 instanceof Value && value2 instanceof Value) {
             try {
-                final SequenceIterator iter1 = ((Value) value1).iterate(null);
-                final SequenceIterator iter2 = ((Value) value2).iterate(null);
+                final SequenceIterator iter1 = ((Value) value1).iterate();
+                final SequenceIterator iter2 = ((Value) value2).iterate();
                 while (true) {
                     final Item item1 = iter1.next();
                     final Item item2 = iter2.next();

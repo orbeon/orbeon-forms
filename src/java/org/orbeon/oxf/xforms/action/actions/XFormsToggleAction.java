@@ -59,8 +59,8 @@ public class XFormsToggleAction extends XFormsAction {
         final XFormsCaseControl caseControl = (XFormsCaseControl) actionInterpreter.resolveEffectiveControl(propertyContext, actionElement, caseStaticId);
         if (caseControl != null) { // can be null if the switch is not relevant
             // Found control
-            if (!caseControl.isSelected()) {
-                // This case is not currently selected
+            if (caseControl.getParent().isRelevant() && !caseControl.isSelected()) {
+                // This case is in a relevant switch and not currently selected
 
                 // Actually toggle the xforms:case
                 final XFormsControls controls = containingDocument.getControls();

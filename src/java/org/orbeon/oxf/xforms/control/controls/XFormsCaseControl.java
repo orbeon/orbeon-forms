@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
@@ -51,7 +52,7 @@ public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl implem
      * Return whether this is the currently selected case within the current switch.
      */
     public boolean isSelected() {
-        return getSwitch().getSelectedCaseEffectiveId().equals(getEffectiveId());
+        return XFormsUtils.compareStrings(getSwitch().getSelectedCaseEffectiveId(), getEffectiveId());
     }
 
     /**

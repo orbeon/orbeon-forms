@@ -74,13 +74,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     // Dynamic information (changes depending on the content of XForms instances)
     private String previousEffectiveId;
-    private String tempEffectiveId;
     private String effectiveId;
 
     protected XFormsContextStack.BindingContext bindingContext;
 
     // Relevance
-    private boolean relevant;
+    private boolean relevant = false;
     private boolean wasRelevant;
 
     // Optional extension attributes supported by the control
@@ -157,9 +156,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         final String parentSuffix = XFormsUtils.getEffectiveIdSuffix(parentEffectiveId);
 
         if (!parentSuffix.equals("")) {
-            // Keep initial effective id for the next refresh
-            if (tempEffectiveId == null)
-                tempEffectiveId = effectiveId;
             // Update effective id
             effectiveId = XFormsUtils.getPrefixedId(effectiveId) + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + parentSuffix;
         } else {
@@ -183,26 +179,42 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return (controlElement != null) ? (LocationData) controlElement.getData() : null;
     }
 
-    public void saveBinding() {
-        wasRelevant = relevant;
-    }
-
     /**
      * Set this control's binding context.
      */
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
+    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext) {
+        final XFormsContextStack.BindingContext oldBinding = this.bindingContext;
         this.bindingContext = bindingContext;
 
         // Relevance is a property of all controls
-        setRelevant(computeRelevant());
+        final boolean oldRelevant = this.relevant;
+        final boolean newRelevant = computeRelevant();
+
+        if (!oldRelevant && newRelevant) {
+            // Control is created
+            this.relevant = newRelevant;
+            onCreate(propertyContext);
+        } else if (oldRelevant && !newRelevant) {
+            // Control is destroyed
+            onDestroy(propertyContext);
+            this.relevant = newRelevant;
+        } else if (newRelevant) {
+            onBindingUpdate(propertyContext, oldBinding, bindingContext);
+        }
     }
 
     public boolean isRelevant() {
         return relevant;
     }
 
-    protected final void setRelevant(boolean relevant) {
-        this.relevant = relevant;
+    protected void onCreate(PropertyContext propertyContext) {
+        wasRelevant = false;
+    }
+
+    protected void onDestroy(PropertyContext propertyContext) {
+    }
+
+    protected void onBindingUpdate(PropertyContext propertyContext, XFormsContextStack.BindingContext oldBinding, XFormsContextStack.BindingContext newBinding) {
     }
 
     protected boolean computeRelevant() {
@@ -213,11 +225,15 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     public String getPreviousEffectiveId() {
-        return previousEffectiveId;
+        final String result = previousEffectiveId;
+        previousEffectiveId = effectiveId;
+        return result;
     }
 
     public boolean wasRelevant() {
-        return wasRelevant;
+        final boolean result = wasRelevant;
+        wasRelevant = relevant;
+        return result;
     }
 
     public boolean supportsRefreshEvents() {
@@ -474,9 +490,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return getBindingContext();
     }
 
-    public final void evaluate(PropertyContext propertyContext, boolean isRefresh) {
+    public final void evaluate(PropertyContext propertyContext) {
         try {
-            evaluateImpl(propertyContext, isRefresh);
+            evaluateImpl(propertyContext);
         } catch (ValidationException e) {
                 throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating control",
                     getControlElement(), "element", Dom4jUtils.elementToDebugString(getControlElement())));
@@ -501,23 +517,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     /**
-     * Tell the control to save its current value for purposes of refresh events dispatch.
-     */
-    public void saveValue() {
-        // Keep previous values for refresh updates
-        // NOTE: effectiveId might have changed already upon updateEffectiveId(); in which case, use tempEffectiveId
-        // TODO: move this
-        previousEffectiveId = (tempEffectiveId != null) ? tempEffectiveId : effectiveId;
-        tempEffectiveId = null;
-    }
-
-    /**
      * Mark a control as "dirty" to mean that the control needs to be re-evaluated.
      * As of 2010-02 this is called:
      *
      * o by UpdateBindingsListener during a refresh, just before evaluation
      * o when going online, before handling each external event
      */
+    // TODO: get rid of this method
     public void markDirty() {
 
         // Clear everything
@@ -537,10 +543,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * Evaluate this control.
      *
      * @param propertyContext   current context
-     * @param isRefresh         true if part of the refresh process, false if initialization and new repeat iteration creation
      */
     // TODO: move this method to XFormsValueControl and XFormsValueContainerControl
-    protected void evaluateImpl(PropertyContext propertyContext, boolean isRefresh) {
+    protected void evaluateImpl(PropertyContext propertyContext) {
 
         // TODO: these should be evaluated lazily
         // Evaluate standard extension attributes
@@ -553,12 +558,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         // NOTE: We no longer evaluate LHHA here, instead we do lazy evaluation. This is good in particular when there
         // are multiple refreshes during an Ajax request, and LHHA values are only needed in the end.
-
-        // TODO: move this
-        if (!isRefresh) {
-            // Sync values
-            previousEffectiveId = effectiveId;
-        }
     }
 
     /**

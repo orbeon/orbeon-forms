@@ -185,13 +185,15 @@ public class XFormsControls implements XFormsObjectResolver {
         final Element controlsElement = Dom4jUtils.createElement("controls");
         visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
             public boolean startVisitControl(XFormsControl control) {
-                final Map nameValues = control.serializeLocal();
-                if (nameValues != null) {
-                    final Element controlElement = controlsElement.addElement("control");
-                    controlElement.addAttribute("effective-id", control.getEffectiveId());
-                    for (Object o: nameValues.entrySet()) {
-                        final Map.Entry currentEntry = (Map.Entry) o;
-                        controlElement.addAttribute((String) currentEntry.getKey(), (String) currentEntry.getValue());
+                if (control.isRelevant()) { // don't serialize anything for non-relevant controls
+                    final Map nameValues = control.serializeLocal();
+                    if (nameValues != null) {
+                        final Element controlElement = controlsElement.addElement("control");
+                        controlElement.addAttribute("effective-id", control.getEffectiveId());
+                        for (Object o: nameValues.entrySet()) {
+                            final Map.Entry currentEntry = (Map.Entry) o;
+                            controlElement.addAttribute((String) currentEntry.getKey(), (String) currentEntry.getValue());
+                        }
                     }
                 }
                 return true;
@@ -238,11 +240,10 @@ public class XFormsControls implements XFormsObjectResolver {
      * @param bindingContext    binding context set to the context of the new iteration
      * @param repeatControl     repeat control
      * @param iterationIndex    new iteration index (1..repeat size + 1)
-     * @param isRefresh         whether this is called during refresh (as opposed to insert/delete handling)
      * @return                  newly created repeat iteration control
      */
     public XFormsRepeatIterationControl createRepeatIterationTree(final PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext,
-                                                                  XFormsRepeatControl repeatControl, int iterationIndex, boolean isRefresh) {
+                                                                  XFormsRepeatControl repeatControl, int iterationIndex) {
 
         if (initialControlTree == currentControlTree && containingDocument.isHandleDifferences())
             throw new OXFException("Cannot call insertRepeatIteration() when initialControlTree == currentControlTree");
@@ -251,7 +252,7 @@ public class XFormsControls implements XFormsObjectResolver {
         indentedLogger.startHandleOperation("controls", "adding iteration");
         {
             repeatIterationControl = currentControlTree.createRepeatIterationTree(propertyContext, containingDocument,
-                    bindingContext, repeatControl, iterationIndex, isRefresh);
+                    bindingContext, repeatControl, iterationIndex);
         }
         indentedLogger.endHandleOperation();
 
@@ -321,18 +322,17 @@ public class XFormsControls implements XFormsObjectResolver {
      * Visit all the controls elements by following repeats to allow creating the actual control.
      */
     public void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsContainingDocument containingDocument,
-                                                    XBLContainer rootXBLContainer, ControlElementVisitorListener controlElementVisitorListener,
-                                                    boolean isRefresh) {
+                                                    XBLContainer rootXBLContainer, ControlElementVisitorListener controlElementVisitorListener) {
         rootXBLContainer.getContextStack().resetBindingContext(propertyContext);
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
         final Element rootElement = containingDocument.getStaticState().getControlsDocument().getRootElement();
     
         visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                containingDocument.getStaticState(), rootXBLContainer, null, rootElement, "", "", isRefresh);
+                containingDocument.getStaticState(), rootXBLContainer, null, rootElement, "", "");
     }
 
     public void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsRepeatControl enclosingRepeatControl,
-                                                    int iterationIndex, ControlElementVisitorListener controlElementVisitorListener, boolean isRefresh) {
+                                                    int iterationIndex, ControlElementVisitorListener controlElementVisitorListener) {
 
         final XFormsContainingDocument containingDocument = enclosingRepeatControl.getXBLContainer().getContainingDocument();
         final boolean isOptimizeRelevance = XFormsProperties.isOptimizeRelevance(containingDocument);
@@ -347,11 +347,11 @@ public class XFormsControls implements XFormsObjectResolver {
         visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                 containingDocument.getStaticState(), enclosingRepeatControl.getXBLContainer(), enclosingRepeatControl, repeatControlElement,
                 XFormsUtils.getEffectiveIdPrefix(enclosingRepeatControl.getEffectiveId()),
-                XFormsUtils.getEffectiveIdSuffix(XFormsUtils.getIterationEffectiveId(enclosingRepeatControl.getEffectiveId(), iterationIndex)), isRefresh);
+                XFormsUtils.getEffectiveIdSuffix(XFormsUtils.getIterationEffectiveId(enclosingRepeatControl.getEffectiveId(), iterationIndex)));
     }
 
     public void visitControlElementsHandleRepeat(PropertyContext propertyContext, XFormsContainerControl containerControl,
-                                                    ControlElementVisitorListener controlElementVisitorListener, boolean isRefresh) {
+                                                    ControlElementVisitorListener controlElementVisitorListener) {
 
         final XFormsControl control = (XFormsControl) containerControl;
         final XFormsContainingDocument containingDocument = control.getXBLContainer().getContainingDocument();
@@ -370,7 +370,7 @@ public class XFormsControls implements XFormsObjectResolver {
             visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
                     containingDocument.getStaticState(), currentXBLContainer, control, control.getControlElement(),
                     XFormsUtils.getEffectiveIdPrefix(control.getEffectiveId()),
-                    XFormsUtils.getEffectiveIdSuffix(control.getEffectiveId()), isRefresh);
+                    XFormsUtils.getEffectiveIdSuffix(control.getEffectiveId()));
         }
         // End visit container control
         controlElementVisitorListener.endVisitControl(control.getControlElement(), control.getEffectiveId());
@@ -378,8 +378,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
     private void visitControlElementsHandleRepeat(PropertyContext propertyContext, ControlElementVisitorListener controlElementVisitorListener,
                                                     boolean isOptimizeRelevance, XFormsStaticState staticState, XBLContainer currentXBLContainer,
-                                                    XFormsControl currentControlsContainer, Element containerElement, String idPrefix, String idPostfix,
-                                                    boolean isRefresh) {
+                                                    XFormsControl currentControlsContainer, Element containerElement, String idPrefix, String idPostfix) {
 
         int variablesCount = 0;
         final XFormsContextStack currentContextStack = currentXBLContainer.getContextStack();
@@ -419,7 +418,7 @@ public class XFormsControls implements XFormsObjectResolver {
                                 // iteration. This is used for handling new iterations.
                                 final String newIdPostfix = idPostfix.equals("") ? Integer.toString(iterationIndex) : (idPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iterationIndex);
                                 visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                                        staticState, currentXBLContainer, newRepeatControl, currentControlElement, idPrefix, newIdPostfix, isRefresh);
+                                        staticState, currentXBLContainer, newRepeatControl, currentControlElement, idPrefix, newIdPostfix);
                             }
                             controlElementVisitorListener.endRepeatIteration(iterationIndex);
                         }
@@ -456,7 +455,7 @@ public class XFormsControls implements XFormsObjectResolver {
                                 || (currentBindingContext.getSingleItem() != null && InstanceData.getInheritedRelevant((NodeInfo) currentBindingContext.getSingleItem())))) {
 
                             visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                                    staticState, currentXBLContainer, newContainerControl, currentControlElement, idPrefix, idPostfix, isRefresh);
+                                    staticState, currentXBLContainer, newContainerControl, currentControlElement, idPrefix, idPostfix);
                         }
 //                    }
                 }
@@ -477,7 +476,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlEffectiveId);
 
                 // Evaluate variable right away in case it is used by further bindings
-                control.evaluate(propertyContext, isRefresh);
+                control.evaluate(propertyContext);
 
                 // Handle variable value dependencies
                 // TODO: UI-DEPENDENCIES
@@ -496,7 +495,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 // Recurse into the shadow component tree
                 final Element shadowTreeDocumentElement = staticState.getXBLBindings().getCompactShadowTree(idPrefix + controlStaticId);
                 visitControlElementsHandleRepeat(propertyContext, controlElementVisitorListener, isOptimizeRelevance,
-                        staticState, newControl.getNestedContainer(), newControl, shadowTreeDocumentElement, newControl.getNestedContainer().getFullPrefix(), idPostfix, isRefresh);
+                        staticState, newControl.getNestedContainer(), newControl, shadowTreeDocumentElement, newControl.getNestedContainer().getFullPrefix(), idPostfix);
 
                 controlElementVisitorListener.endVisitControl(currentControlElement, controlEffectiveId);
 
@@ -650,7 +649,7 @@ public class XFormsControls implements XFormsObjectResolver {
             final ControlTree.UpdateBindingsListener listener = new ControlTree.UpdateBindingsListener(propertyContext, containingDocument, currentControlTree.getEffectiveIdsToControls());
             {
                 // Visit all controls and update their bindings
-                visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener, true);
+                visitControlElementsHandleRepeat(propertyContext, containingDocument, rootContainer, listener);
             }
             indentedLogger.endHandleOperation(
                     "controls updated", Integer.toString(listener.getUpdateCount()),
@@ -679,7 +678,7 @@ public class XFormsControls implements XFormsObjectResolver {
             if (effectiveIdsToControls != null) {
                 for (final Map.Entry<String, XFormsControl> currentEntry: effectiveIdsToControls.entrySet()) {
                     final XFormsControl currentControl = currentEntry.getValue();
-                    currentControl.evaluate(propertyContext, true);
+                    currentControl.evaluate(propertyContext);
                 }
             }
         }
@@ -741,7 +740,7 @@ public class XFormsControls implements XFormsObjectResolver {
         ControlTree.visitControls(containerControl, true, new XFormsControlVisitorAdapter() {
             @Override
             public boolean startVisitControl(XFormsControl control) {
-                control.evaluate(propertyContext, true);
+                control.evaluate(propertyContext);
                 return true;
             }
         });
@@ -771,7 +770,7 @@ public class XFormsControls implements XFormsObjectResolver {
         final ControlTree.UpdateBindingsListener listener = new ControlTree.UpdateBindingsListener(propertyContext, containingDocument, currentControlTree.getEffectiveIdsToControls());
         {
             // Visit all controls and update their bindings
-            visitControlElementsHandleRepeat(propertyContext, containerControl, listener, true);
+            visitControlElementsHandleRepeat(propertyContext, containerControl, listener);
         }
         indentedLogger.endHandleOperation(
                 "controls updated", Integer.toString(listener.getUpdateCount()),

@@ -18,7 +18,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -56,19 +55,16 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     @Override
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
-        super.setBindingContext(propertyContext, bindingContext, isCreate);
-
-        if (isCreate) {
-            final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
-            if (restoredCaseId != null) {
-                // Selected case id was restored from serialization
-                local.selectedCaseControlId = restoredCaseId;
-                restoredCaseId = null;
-            } else {
-                // Store initial selected case information
-                local.selectedCaseControlId = findDefaultSelectedCaseId();
-            }
+    protected void onCreate(PropertyContext propertyContext) {
+        super.onCreate(propertyContext);
+        final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
+        if (restoredCaseId != null) {
+            // Selected case id was restored from serialization
+            local.selectedCaseControlId = restoredCaseId;
+            restoredCaseId = null;
+        } else {
+            // Store initial selected case information
+            local.selectedCaseControlId = findDefaultSelectedCaseId();
         }
     }
 
@@ -143,16 +139,24 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
      * @return effective id
      */
     public String getSelectedCaseEffectiveId() {
-        final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
-        if (local.selectedCaseControlId != null) {
-            return XFormsUtils.getRelatedEffectiveId(getEffectiveId(), local.selectedCaseControlId);
+        if (isRelevant()) {
+            final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
+            if (local.selectedCaseControlId != null) {
+                return XFormsUtils.getRelatedEffectiveId(getEffectiveId(), local.selectedCaseControlId);
+            } else {
+                throw new OXFException("Selected case was not set for xforms:switch: " + getEffectiveId());
+            }
         } else {
-            throw new OXFException("Selected case was not set for xforms:switch: " + getEffectiveId());
+            return null;
         }
     }
 
     public XFormsCaseControl getSelectedCase() {
-        return (XFormsCaseControl) containingDocument.getControls().getObjectByEffectiveId(getSelectedCaseEffectiveId());
+        if (isRelevant()) {
+            return (XFormsCaseControl) containingDocument.getControls().getObjectByEffectiveId(getSelectedCaseEffectiveId());
+        } else {
+            return null;
+        }
     }
 
     private String findDefaultSelectedCaseId() {
@@ -226,7 +230,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     private boolean compareSelectedCase(XFormsSwitchControl otherSwitchControl) {
-        return getSelectedCaseEffectiveId().equals(getOtherSelectedCaseEffectiveId(otherSwitchControl));
+        return XFormsUtils.compareStrings(getSelectedCaseEffectiveId(), getOtherSelectedCaseEffectiveId(otherSwitchControl));
     }
 
     @Override
@@ -272,7 +276,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     private String getOtherSelectedCaseEffectiveId(XFormsSwitchControl switchControl1) {
-        if (switchControl1 != null) {
+        if (switchControl1 != null && switchControl1.isRelevant()) {
             final String selectedCaseId = ((XFormsSwitchControlLocal) switchControl1.getInitialLocal()).selectedCaseControlId;
             return XFormsUtils.getRelatedEffectiveId(switchControl1.getEffectiveId(), selectedCaseId);
         } else {

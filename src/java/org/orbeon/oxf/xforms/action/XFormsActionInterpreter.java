@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsVariableControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
@@ -98,11 +99,15 @@ public class XFormsActionInterpreter {
             actionBlockContextStack = new XFormsContextStack(container, xpathContextObserver.getBindingContext(propertyContext, containingDocument));
 
             // Check variables in scope for action handlers within controls
-
-            // NOTE: This is not optimal, as variable values are re-evaluated and may have values different from the ones
-            // used by the controls during refresh. Contemplate handling this differently, e.g. see
-            // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements#TOC-Representation-of-outer-action-hand
-            if (xpathContextObserver instanceof XFormsControl) {
+            if (xpathContextObserver instanceof XXFormsVariableControl) {
+                // Special case of a listener within a variable control
+                final XXFormsVariableControl variable = (XXFormsVariableControl) xpathContextObserver;
+                actionBlockContextStack.pushVariable(variable.getControlElement(), variable.getVariableName(), variable.getValue(propertyContext), variable.getResolutionScope());
+            } else if (xpathContextObserver instanceof XFormsControl) {
+                // NOTE: This is not right, as variable values are re-evaluated and may have values different from the ones
+                // used by the controls during refresh. Contemplate handling this differently, e.g. see
+                // http://wiki.orbeon.com/forms/projects/core-xforms-engine-improvements#TOC-Representation-of-outer-action-hand
+                // TODO: here we can scope variables by actually asking the preceding XXFormsVariableControl
                 scopeVariables(propertyContext, container, outerActionElement, ((XFormsControl) xpathContextObserver).getControlElement(), xpathContextObserver.getEffectiveId());
             }
         }

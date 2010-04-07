@@ -42,15 +42,21 @@ public class XXFormsInstance extends XFormsFunction {
         final Expression instanceIdExpression = argument[0];
         final String instanceId = XFormsUtils.namespaceId(containingDocument, instanceIdExpression.evaluateAsString(xpathContext));
 
-        // Search ancestor-or-self containers as suggested here: http://wiki.orbeon.com/forms/projects/xforms-model-scoping-rules
         XFormsInstance instance = null;
-        {
-            XBLContainer currentContainer = getXBLContainer(xpathContext);
-            while (currentContainer != null) {
-                instance = currentContainer.findInstance(instanceId);
-                if (instance != null)
-                    break;
-                currentContainer = currentContainer.getParentXBLContainer();
+        if (argument.length > 1 && argument[1].effectiveBooleanValue(xpathContext)) {
+            // Argument is effective id
+            final Object o = containingDocument.getObjectByEffectiveId(instanceId);
+            instance = (o instanceof XFormsInstance) ? ((XFormsInstance) o) : null;
+        } else {
+            // Search ancestor-or-self containers as suggested here: http://wiki.orbeon.com/forms/projects/xforms-model-scoping-rules
+            {
+                XBLContainer currentContainer = getXBLContainer(xpathContext);
+                while (currentContainer != null) {
+                    instance = currentContainer.findInstance(instanceId);
+                    if (instance != null)
+                        break;
+                    currentContainer = currentContainer.getParentXBLContainer();
+                }
             }
         }
 
@@ -67,6 +73,7 @@ public class XXFormsInstance extends XFormsFunction {
 
     @Override
     public PathMap.PathMapNodeSet addToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet) {
+        // TODO: if argument[0] is true, must search globally
         argument[0].addToPathMap(pathMap, pathMapNodeSet);
         return new PathMap.PathMapNodeSet(pathMap.makeNewRoot(this));
     }

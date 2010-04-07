@@ -129,7 +129,7 @@ public class ControlTree implements ExternalCopyable {
         if (!containingDocument.isRestoringDynamicState(propertyContext)) {
             // Copy list because it can be modified concurrently as events are being dispatched and handled
             final List<String> controlsEffectiveIds = new ArrayList<String>(controlIndex.getEffectiveIdsToControls().keySet());
-            dispatchCreationEvents(propertyContext, controlsEffectiveIds);
+            dispatchRefreshEvents(propertyContext, controlsEffectiveIds);
         }
 
         indentedLogger.endHandleOperation(
@@ -142,18 +142,35 @@ public class ControlTree implements ExternalCopyable {
         return isAllowSendingRefreshEvents;
     }
 
-    private void dispatchCreationEvents(PropertyContext propertyContext, Collection<String> controlsEffectiveIds) {
-        indentedLogger.startHandleOperation("controls", "dispatching creation events");
-        {
-            for (final String effectiveId: controlsEffectiveIds) {
-                final XFormsControl control = controlIndex.getControl(effectiveId);
-                dispatchCreationEvents(propertyContext, control);
-            }
+    public void dispatchRefreshEvents(PropertyContext propertyContext, Collection<String> controlsEffectiveIds) {
+        indentedLogger.startHandleOperation("controls", "dispatching refresh events");
+        for (final String controlEffectiveId: controlsEffectiveIds) {
+            final XFormsControl control = getControl(controlEffectiveId);
+            dispatchRefreshEvents(propertyContext, control);
         }
         indentedLogger.endHandleOperation();
     }
 
-    public void dispatchCreationEvents(PropertyContext propertyContext, XFormsControl control) {
+    private void dispatchRefreshEvents(PropertyContext propertyContext, XFormsControl control) {
+        if (XFormsControl.supportsRefreshEvents(control)) {
+
+            final boolean oldRelevantState = control.wasRelevant();
+            final boolean newRelevantState = control.isRelevant();
+
+            if (newRelevantState && !oldRelevantState) {
+                // Control has become relevant
+                dispatchCreationEvents(propertyContext, control);
+            } else if (!newRelevantState && oldRelevantState) {
+                // Control has become non-relevant
+                dispatchDestructionEvents(propertyContext, control);
+            } else if (newRelevantState) {
+                // Control was and is relevant
+                dispatchChangeEvents(propertyContext, control);
+            }
+        }
+    }
+
+    private void dispatchCreationEvents(PropertyContext propertyContext, XFormsControl control) {
         if (XFormsControl.supportsRefreshEvents(control)) {
             if (control.isRelevant()) {
                 final XBLContainer container = control.getXBLContainer();
@@ -229,7 +246,7 @@ public class ControlTree implements ExternalCopyable {
         // NOTE: We do not need copy the list here because it was created in dispatchDestructionEvents() above
         for (String effectiveId: controlsEffectiveIds) {
             final XFormsControl control = index.getControl(effectiveId);
-            dispatchDestructionEvents(propertyContext, control);
+            dispatchRefreshEvents(propertyContext, control);
         }
         indentedLogger.endHandleOperation();
     }
@@ -252,7 +269,7 @@ public class ControlTree implements ExternalCopyable {
         }
     }
 
-    public void dispatchChangeEvents(PropertyContext propertyContext, XFormsControl control) {
+    private void dispatchChangeEvents(PropertyContext propertyContext, XFormsControl control) {
 
         // NOTE: For the purpose of dispatching value change and MIP events, we used to make a
         // distinction between value controls and plain single-node controls. However it seems that it is
@@ -408,7 +425,7 @@ public class ControlTree implements ExternalCopyable {
         ControlIndex.evaluateAll(indentedLogger, propertyContext, effectiveIdsToControls.values());
 
         // Dispatch initialization events, passing the ids only
-        dispatchCreationEvents(propertyContext, effectiveIdsToControls.keySet());
+        dispatchRefreshEvents(propertyContext, effectiveIdsToControls.keySet());
     }
 
 //    public void createSubTree(PropertyContext propertyContext, XFormsContainerControl containerControl) {
@@ -843,7 +860,6 @@ public class ControlTree implements ExternalCopyable {
     public static class UpdateBindingsListener implements XFormsControls.ControlElementVisitorListener {
 
         private final PropertyContext propertyContext;
-        private final XFormsContainingDocument containingDocument;
         private final Map effectiveIdsToControls;
 
         private final UIDependencies uiDependencies;
@@ -853,7 +869,6 @@ public class ControlTree implements ExternalCopyable {
 
         public UpdateBindingsListener(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Map effectiveIdsToControls) {
             this.propertyContext = propertyContext;
-            this.containingDocument = containingDocument;
             this.effectiveIdsToControls = effectiveIdsToControls;
 
             this.uiDependencies = containingDocument.getUIDependencies();

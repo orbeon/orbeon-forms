@@ -17,7 +17,6 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
@@ -51,15 +50,10 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
-        super.setBindingContext(propertyContext, bindingContext, isCreate);
-    }
-
-    @Override
-    protected void evaluateImpl(PropertyContext propertyContext, boolean isRefresh) {
+    protected void evaluateImpl(PropertyContext propertyContext) {
 
         // Evaluate other aspects of the control if necessary
-        super.evaluateImpl(propertyContext, isRefresh);
+        super.evaluateImpl(propertyContext);
 
         // Evaluate control values
         if (isRelevant()) {
@@ -73,21 +67,6 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
         // NOTE: We no longer evaluate the external value here, instead we do lazy evaluation. This is good in particular when there
         // are multiple refreshes during an Ajax request, and LHHA values are only needed in the end.
-
-        if (!isRefresh) {
-            // Sync values
-            previousValue = value;
-            // Don't need to set external value because not used in isValueChanged()
-        }
-    }
-
-    @Override
-    public void saveValue() {
-        super.saveValue();
-
-        // Keep previous values
-        previousValue = value;
-        // Don't need to save external value because not used in isValueChanged()
     }
 
     @Override
@@ -95,7 +74,6 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         super.markDirty();
 
         isExternalValueEvaluated = false;
-        value = null;
         externalValue = null;
     }
 
@@ -110,7 +88,9 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
     @Override
     public boolean isValueChanged() {
-        return !XFormsUtils.compareStrings(previousValue, value);
+        final boolean result = !XFormsUtils.compareStrings(previousValue, value);
+        previousValue = value;
+        return result;
     }
 
     /**

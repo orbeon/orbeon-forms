@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -132,14 +132,14 @@
                                     </xforms:action>
                                 </xforms:input>
                                 <xhtml:span class="fr-inplace-buttons">
-                                    <xforms:trigger class="fr-inplace-rename">
+                                    <fr:button class="fr-inplace-rename">
                                         <!-- TODO: i18n -->
                                         <xforms:label>Apply</xforms:label>
                                         <xforms:action ev:event="DOMActivate">
                                             <!-- Write value back -->
                                             <xforms:setvalue ref="$result" value="context()"/>
                                         </xforms:action>
-                                    </xforms:trigger>
+                                    </fr:button>
                                     or
                                     <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                                         <!-- TODO: i18n -->

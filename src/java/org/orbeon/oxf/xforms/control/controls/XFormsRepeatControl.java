@@ -41,7 +41,10 @@ import java.util.*;
 public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
     private int startIndex;
-    private transient boolean restoredState;  // used by deserializeLocal() and childrenAdded()
+    private transient boolean restoredState;
+
+    // TODO: this must be handled following the same pattern as usual refresh events
+    private RefreshInfo refreshInfo;
 
     public static class XFormsRepeatControlLocal extends XFormsControlLocal {
         private int index = -1;
@@ -81,18 +84,21 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public void setBindingContext(PropertyContext propertyContext, XFormsContextStack.BindingContext bindingContext, boolean isCreate) {
-        super.setBindingContext(propertyContext, bindingContext, isCreate);
-
-        // Ensure that the initial index is set, unless the state was already restored. In that case, the index was
-        // reset from serialized data and the start index must not be used.
-        if (isCreate && !restoredState) {
-            final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
-            local.index = ensureIndexBounds(getStartIndex());
-        }
+    protected void onCreate(PropertyContext propertyContext) {
+        super.onCreate(propertyContext);
+        readBinding();
 
         // Reset refresh information
         refreshInfo = null;
+    }
+
+    private void readBinding() {
+        // Ensure that the initial index is set, unless the state was already restored. In that case, the index was
+        // reset from serialized data and the start index must not be used.
+        if (!restoredState) {
+            final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
+            local.index = ensureIndexBounds(getStartIndex());
+        }
     }
 
     public int getStartIndex() {
@@ -149,25 +155,29 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
     }
 
     public int getIndex() {
-        final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
-        if (local.index != -1) {
-            return local.index;
+        if (isRelevant()) {
+            final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
+            if (local.index != -1) {
+                return local.index;
+            } else {
+                throw new OXFException("Repeat index was not set for repeat id: " + getEffectiveId());
+            }
         } else {
-            throw new OXFException("Repeat index was not set for repeat id: " + getEffectiveId());
+            return 0;
         }
     }
 
     @Override
-    protected void evaluateImpl(PropertyContext propertyContext, boolean isRefresh) {
+    protected void evaluateImpl(PropertyContext propertyContext) {
         // TODO: don't need this right?
-        super.evaluateImpl(propertyContext, isRefresh);
+        super.evaluateImpl(propertyContext);
 
         // Evaluate iterations
         final List<XFormsControl> children = getChildren();
         if (children != null) {
             for (final XFormsControl child: children) {
                 final XFormsRepeatIterationControl currentRepeatIteration = (XFormsRepeatIterationControl) child;
-                currentRepeatIteration.evaluateImpl(propertyContext, isRefresh);
+                currentRepeatIteration.evaluateImpl(propertyContext);
             }
         }
     }
@@ -328,12 +338,11 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         // Move things around and create new iterations if needed
         if (!compareNodesets(oldRepeatNodeset, newBindingContext.getNodeset())) {
 
-            saveBinding();
-            setBindingContext(propertyContext, newBindingContext, false);
+            setBindingContext(propertyContext, newBindingContext);
 
             // Update iterations
             final List<XFormsRepeatIterationControl> newIterations
-                    = updateIterations(propertyContext, oldRepeatNodeset, insertedNodeInfos, false);
+                    = updateIterations(propertyContext, oldRepeatNodeset, insertedNodeInfos);
             // Initialize all new iterations
             final ControlTree currentControlTree = containingDocument.getControls().getCurrentControlTree();
             for (final XFormsRepeatIterationControl newIteration: newIterations) {
@@ -342,9 +351,8 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             }
             // Perform a very local refresh on the control
             // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events if needed
-            saveValue();
             markDirty();
-            evaluateImpl(propertyContext, true);
+            evaluateImpl(propertyContext);
             containingDocument.getControls().dispatchRefreshEvents(propertyContext, Collections.singletonList(getEffectiveId()));
         }
     }
@@ -359,11 +367,10 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
      * @param propertyContext       current context
      * @param oldRepeatNodeset      old node-set
      * @param insertedNodeInfos     nodes just inserted by xforms:insert if any, or null
-     * @param isRefresh             whether this is called during refresh (as opposed to insert/delete handling)
      * @return                      new iterations if any, or an empty list
      */
     public List<XFormsRepeatIterationControl> updateIterations(PropertyContext propertyContext, List<Item> oldRepeatNodeset,
-                                                               List<Item> insertedNodeInfos, boolean isRefresh) {
+                                                               List<Item> insertedNodeInfos) {
 
         // NOTE: The following assumes the nodesets have changed
 
@@ -524,7 +531,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     // Create repeat iteration with proper binding context
                     contextStack.pushIteration(repeatIndex);
                     final XFormsRepeatIterationControl newIteration
-                            = controls.createRepeatIterationTree(propertyContext, contextStack.getCurrentBindingContext(), this, repeatIndex, isRefresh);
+                            = controls.createRepeatIterationTree(propertyContext, contextStack.getCurrentBindingContext(), this, repeatIndex);
                     contextStack.popBinding();
 
                     updated = true;
@@ -558,7 +565,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
                         // TODO: Then should the bindings for the whole subtree of control be updated at this time? Probably!
                         contextStack.pushIteration(repeatIndex);
-                        existingIteration.setBindingContext(propertyContext, contextStack.getCurrentBindingContext(), false);
+                        existingIteration.setBindingContext(propertyContext, contextStack.getCurrentBindingContext());
                         contextStack.popBinding();
 
                         // Index new iteration
@@ -573,7 +580,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
                         // Set binding context so as to evaluate relevance
                         contextStack.pushIteration(repeatIndex);
-                        existingIteration.setBindingContext(propertyContext, contextStack.getCurrentBindingContext(), false);
+                        existingIteration.setBindingContext(propertyContext, contextStack.getCurrentBindingContext());
                         contextStack.popBinding();
                     }
 
@@ -644,7 +651,10 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
     public void dispatchRefreshEvents(PropertyContext propertyContext) {
         if (isRelevant() && refreshInfo != null) {
-            final RefreshInfo refreshInfo = this.refreshInfo; // copy as dispatching events might clear this.refreshInfo
+
+            final RefreshInfo refreshInfo = this.refreshInfo;
+            this.refreshInfo = null;
+
             if (refreshInfo.isNodesetChanged) {
                 // Dispatch custom event to xforms:repeat to notify that the nodeset has changed
                 getXBLContainer().dispatchEvent(propertyContext, new XXFormsNodesetChangedEvent(containingDocument, this,
@@ -656,11 +666,9 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 getXBLContainer().dispatchEvent(propertyContext, new XXFormsIndexChangedEvent(containingDocument, this,
                         refreshInfo.oldRepeatIndex, getIndex()));
             }
-            this.refreshInfo = null;
         }
     }
 
-    private RefreshInfo refreshInfo;
     private static class RefreshInfo {
         public boolean isNodesetChanged;
         public List<XFormsRepeatIterationControl> newIterations;

@@ -71,8 +71,8 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
 
     // Make public for XFormsRepeatControl
     @Override
-    public void evaluateImpl(PropertyContext propertyContext, boolean isRefresh) {
-        super.evaluateImpl(propertyContext, isRefresh);
+    public void evaluateImpl(PropertyContext propertyContext) {
+        super.evaluateImpl(propertyContext);
     }
 
     @Override

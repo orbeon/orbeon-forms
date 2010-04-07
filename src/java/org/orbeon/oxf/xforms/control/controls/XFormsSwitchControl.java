@@ -240,34 +240,39 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         super.outputAjaxDiff(pipelineContext, ch, other, attributesImpl, isNewlyVisibleSubtree);
 
         // Output switch-specific diff if needed only
-        final XFormsSwitchControl switchControl1 = (XFormsSwitchControl) other;
-        if (!compareSelectedCase(switchControl1)) {
+        final XFormsSwitchControl otherSwitchControl = (XFormsSwitchControl) other;
+        if (!compareSelectedCase(otherSwitchControl)) {
 
-            // Output selected case id
-            final String selectedCaseEffectiveId = getSelectedCaseEffectiveId();
-            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
-                    "id", selectedCaseEffectiveId,
-                    "visibility", "visible"
-            });
+            if (isRelevant()) {
 
-            final String previousSelectedCaseId = getOtherSelectedCaseEffectiveId(switchControl1);
-            if (previousSelectedCaseId != null) {
-                // Output deselected case ids
+                // Output newly selected case id
+                final String selectedCaseEffectiveId = getSelectedCaseEffectiveId();
+                assert selectedCaseEffectiveId != null;
                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
-                        "id", previousSelectedCaseId,
-                        "visibility", "hidden"}
-                );
-            } else {
-                // This is a new switch (can happen with repeat), send all deselected to be sure
-                // TODO: This should not be needed because the repeat template should have a reasonable default.
-                final List<XFormsCaseControl> children = getChildrenCases();
-                if (children != null && children.size() > 0) {
-                    for (final XFormsCaseControl caseControl: children) {
-                        if (!caseControl.getEffectiveId().equals(selectedCaseEffectiveId)) {
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
-                                    "id", caseControl.getEffectiveId(),
-                                    "visibility", "hidden"
-                            });
+                        "id", selectedCaseEffectiveId,
+                        "visibility", "visible"
+                });
+
+                if (otherSwitchControl != null && otherSwitchControl.isRelevant()) {
+                    // Used to be relevant, simply output deselected case ids
+                    final String previousSelectedCaseId = getOtherSelectedCaseEffectiveId(otherSwitchControl);
+                    assert previousSelectedCaseId != null;
+                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
+                            "id", previousSelectedCaseId,
+                            "visibility", "hidden"}
+                    );
+                } else {
+                    // Control was not relevant, send all deselected to be sure
+                    // TODO: This should not be needed because the repeat template should have a reasonable default.
+                    final List<XFormsCaseControl> children = getChildrenCases();
+                    if (children != null && children.size() > 0) {
+                        for (final XFormsCaseControl caseControl: children) {
+                            if (!caseControl.getEffectiveId().equals(selectedCaseEffectiveId)) {
+                                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
+                                        "id", caseControl.getEffectiveId(),
+                                        "visibility", "hidden"
+                                });
+                            }
                         }
                     }
                 }

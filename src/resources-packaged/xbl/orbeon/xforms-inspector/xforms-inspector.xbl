@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -185,7 +185,7 @@
                                         <xforms:delete nodeset="instance('inspector-instance')/xml-output/node()"/>
                                         <xforms:insert if="instance('inspector-instance')/xpath != ''"
                                                 context="instance('inspector-instance')/xml-output"
-                                                origin="xxforms:instance(instance('inspector-instance')/current-instance)/
+                                                origin="xxforms:instance(instance('inspector-instance')/current-instance, true())/
                                                     saxon:evaluate(instance('inspector-instance')/xpath)"/>
                                     </xforms:action>
                                     <xforms:input ref="." id="inspector-xpath">
@@ -232,7 +232,7 @@
                 <xhtml:div class="fr-xforms-inspector-source" id="fr-xforms-inspector">
                     <xforms:group ref="instance('inspector-instance')">
                         <xforms:group ref="if (function = 'evaluate-xpath') then xml-output else
-                                xxforms:instance(instance('inspector-instance')/current-instance)">
+                                xxforms:instance(instance('inspector-instance')/current-instance, true())">
 
                             <!-- Display atomic value -->
                             <xforms:group ref=".[not(self::*)]">

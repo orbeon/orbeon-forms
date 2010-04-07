@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -130,6 +130,9 @@
     <xforms:action ev:event="xforms-ready">
         <!-- In case there is an error, show it (error occurred when the controls are not yet ready) -->
         <xforms:toggle if="instance('fr-persistence-instance')/is-error = 'true'" case="fr-message-fatal-error"/>
+
+        <!-- Set focus on first focusable control -->
+        <!--<xforms:setfocus control="fr-form-group"/>-->
 
         <!-- Force all this so we can safely set the data status -->
         <xforms:rebuild/>
@@ -573,7 +576,8 @@
     -->
     <xforms:submission id="fr-workflow-confirmation-submission"
         resource="{xxforms:property(string-join(('oxf.fr.detail.send.uri', $app, $form), '.'))}"
-        method="post" ref="instance('fr-workflow-confirmation-instance')" replace="all" xxforms:ensure-uploads="false"/>
+        method="post" ref="if (instance('fr-workflow-confirmation-instance') != '') then instance('fr-workflow-confirmation-instance') else xxforms:instance('fr-form-instance')"
+        replace="all" xxforms:ensure-uploads="false"/>
 
     <!-- Call email service -->
     <!--

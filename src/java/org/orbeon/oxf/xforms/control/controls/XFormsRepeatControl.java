@@ -353,7 +353,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events if needed
             markDirty();
             evaluateImpl(propertyContext);
-            containingDocument.getControls().dispatchRefreshEvents(propertyContext, Collections.singletonList(getEffectiveId()));
+            containingDocument.getControls().getCurrentControlTree().dispatchRefreshEvents(propertyContext, Collections.singletonList(getEffectiveId()));
         }
     }
 

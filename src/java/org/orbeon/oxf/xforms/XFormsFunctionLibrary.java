@@ -307,8 +307,9 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
 //        StandardFunction.arg(e, 4, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE);
 
         // xxforms:instance
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}instance", XXFormsInstance.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}instance", XXFormsInstance.class, 0, 1, 2, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.BOOLEAN, StaticProperty.EXACTLY_ONE, null);
 
         // xxforms:index
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}index", XXFormsIndex.class, 0, 0, 1, BuiltInAtomicType.INTEGER, StaticProperty.EXACTLY_ONE);

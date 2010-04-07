@@ -991,6 +991,17 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     @Override
+    public Object resolveObjectById(String sourceEffectiveId, String targetStaticId, Item contextItem) {
+        if (targetStaticId.equals(CONTAINING_DOCUMENT_PSEUDO_ID)) {
+            // Special case of containing document
+            return this;
+        } else {
+            // All other cases
+            return super.resolveObjectById(sourceEffectiveId, targetStaticId, contextItem);
+        }
+    }
+
+    @Override
     public void dispatchEvent(PropertyContext propertyContext, XFormsEvent event) {
         // Ensure that the event uses the proper container to dispatch the event
         final XBLContainer targetContainer = event.getTargetObject().getXBLContainer(this);

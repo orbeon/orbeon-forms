@@ -2009,6 +2009,151 @@
         </output>
     </test>
 
+    <test description="xforms:setvalue upon xforms-enabled dispatches proper xforms-value-change event" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model" xxforms:xforms11-switch="false">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <value>42</value>
+                            </instance>
+                        </xforms:instance>
+
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+
+                        <!-- Toggle -->
+                        <xforms:toggle ev:event="xforms-ready" case="case2"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+
+                    <xforms:insert ev:event="#all"
+                                   context="instance('events')" nodeset="*"
+                                   origin="xxforms:element('event',
+                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+
+                    <!-- 1. Bindings and values are evaluated -->
+                    <xforms:group id="my-group">
+                        <!-- 2. xforms-enabled -->
+                        <xforms:setvalue ev:event="xforms-enabled" ev:target="#observer" ref="value">43</xforms:setvalue>
+                        <!--<xforms:refresh ev:event="xforms-enabled" ev:target="#observer"/>-->
+
+                        <!-- 3. xforms-enabled -->
+                        <!-- 4. xforms-value-changed because value is different than it was during initial evaluation -->
+                        <xforms:input id="my-input" ref="value"/>
+                    </xforms:group>
+
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value>43</value>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xforms-enabled" target="my-group" indexes=""/>
+                                    <event type="xforms-enabled" target="my-input" indexes=""/>
+                                    <event type="xforms-value-changed" target="my-input" indexes=""/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input">43</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xforms:refresh upon xforms-enabled dispatches proper events" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model" xxforms:xforms11-switch="false">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <value>42</value>
+                            </instance>
+                        </xforms:instance>
+
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+
+                        <!-- Toggle -->
+                        <xforms:toggle ev:event="xforms-ready" case="case2"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+
+                    <xforms:insert ev:event="#all"
+                                   context="instance('events')" nodeset="*"
+                                   origin="xxforms:element('event',
+                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+
+                    <!-- 1. Bindings and values are evaluated -->
+                    <xforms:group id="my-group">
+                        <!-- 2. xforms-enabled -->
+                        <xforms:setvalue ev:event="xforms-enabled" ev:target="#observer" ref="value">43</xforms:setvalue>
+                        <!-- 3. Bindings and values are re-evaluated -->
+                        <xforms:refresh ev:event="xforms-enabled" ev:target="#observer"/>
+
+                        <!-- 4. xforms-enabled and NO xforms-value-changed because value at xforms-enabled time is read after setvalue -->
+                        <xforms:input id="my-input" ref="value"/>
+                    </xforms:group>
+
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value>43</value>
+                                </instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event type="xforms-enabled" target="my-input" indexes=""/>
+                                    <event type="xforms-enabled" target="my-group" indexes=""/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input">43</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO:

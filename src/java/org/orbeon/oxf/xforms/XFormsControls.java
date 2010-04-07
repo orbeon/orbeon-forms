@@ -610,7 +610,7 @@ public class XFormsControls implements XFormsObjectResolver {
                     refreshDone();
 
                     // Dispatch events
-                    dispatchRefreshEvents(propertyContext, controlsEffectiveIds);
+                    currentControlTree.dispatchRefreshEvents(propertyContext, controlsEffectiveIds);
 
                 } else {
                     // No UI events to send because there is no event handlers for any of them
@@ -701,30 +701,6 @@ public class XFormsControls implements XFormsObjectResolver {
         return eventsToDispatch;
     }
 
-    public void dispatchRefreshEvents(PropertyContext propertyContext, List<String> controlsEffectiveIds) {
-
-        for (final String controlEffectiveId: controlsEffectiveIds) {
-            final XFormsControl control = currentControlTree.getControl(controlEffectiveId);
-
-            if (XFormsControl.supportsRefreshEvents(control)) {
-
-                final boolean oldRelevantState = control.wasRelevant();
-                final boolean newRelevantState = control.isRelevant();
-
-                if (newRelevantState && !oldRelevantState) {
-                    // Control has become relevant
-                    currentControlTree.dispatchCreationEvents(propertyContext, control);
-                } else if (!newRelevantState && oldRelevantState) {
-                    // Control has become non-relevant
-                    currentControlTree.dispatchDestructionEvents(propertyContext, control);
-                } else if (newRelevantState) {
-                    // Control was and is relevant
-                    currentControlTree.dispatchChangeEvents(propertyContext, control);
-                }
-            }
-        }
-    }
-
     /**
      * Do a refresh of a subtree of controls starting at the given container control.
      *
@@ -752,7 +728,7 @@ public class XFormsControls implements XFormsObjectResolver {
             final List<String> eventsToDispatch = gatherControlsForRefresh(containerControl);
 
             // Dispatch events
-            dispatchRefreshEvents(propertyContext, eventsToDispatch);
+            currentControlTree.dispatchRefreshEvents(propertyContext, eventsToDispatch);
         }
     }
 

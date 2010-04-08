@@ -794,7 +794,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: mandatory resource or action evaluated to an empty sequence for attribute value: " + avtActionOrResource,
                             "resolving resource URI");
                 }
-                actionOrResource = XFormsUtils.encodeHRRI(temp, true);
+                actionOrResource = NetUtils.encodeHRRI(temp, true);
             }
 
             serialization = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtSerialization);

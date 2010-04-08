@@ -713,7 +713,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                                       boolean readonlyHint, boolean cacheHint, long xxformsTimeToLive, String xxformsValidation) {
         try {
             // Perform HHRI encoding
-            final String instanceResourceHHRI = XFormsUtils.encodeHRRI(instanceResource, true);
+            final String instanceResourceHHRI = NetUtils.encodeHRRI(instanceResource, true);
 
             if (cacheHint && ProcessorImpl.getProcessorInputSchemeInputName(instanceResourceHHRI) == null) {
                 // Instance 1) has cache hint and 2) is not input:*, so it can be cached

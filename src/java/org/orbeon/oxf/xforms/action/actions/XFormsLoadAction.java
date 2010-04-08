@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -63,7 +64,7 @@ public class XFormsLoadAction extends XFormsAction {
             // Use single-node binding
             final String tempValue = XFormsUtils.getBoundItemValue(bindingContext.getSingleItem());
             if (tempValue != null) {
-                final String encodedValue = XFormsUtils.encodeHRRI(tempValue, true);
+                final String encodedValue = NetUtils.encodeHRRI(tempValue, true);
                 resolveStoreLoadValue(containingDocument, propertyContext, actionElement, doReplace, encodedValue, target, urlType, urlNorewrite, isShowProgress);
             } else {
                 // The action is a NOP if it's not bound to a node
@@ -78,7 +79,7 @@ public class XFormsLoadAction extends XFormsAction {
 
             // Resolve AVT
             final String resolvedResource = actionInterpreter.resolveAVT(propertyContext, actionElement, "resource", false);
-            final String encodedResource = XFormsUtils.encodeHRRI(resolvedResource, true);
+            final String encodedResource = NetUtils.encodeHRRI(resolvedResource, true);
             resolveStoreLoadValue(containingDocument, propertyContext, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
         } else {

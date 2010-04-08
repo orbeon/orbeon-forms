@@ -161,12 +161,15 @@ public class URLRewriterUtils {
      * @param port              base URL port
      * @param contextPath       base URL context path
      * @param requestPath       base URL request path
-     * @param urlString         URL to rewrite
+     * @param urlString         URL to rewrite (accept human-readable URI)
      * @param rewriteMode       rewrite mode (see ExternalContext.Response)
      * @return                  rewritten URL
      */
     private static String rewriteURL(String scheme, String host, int port, String contextPath, String requestPath, String urlString, int rewriteMode) {
-        // Case where a protocol is specified: the URL is left untouched in any case
+        // Accept human-readable URI
+        urlString = NetUtils.encodeHRRI(urlString, true);
+
+        // Case where a protocol is specified: the URL is left untouched (except for human-readable processing)
         if (NetUtils.urlHasProtocol(urlString))
             return urlString;
 

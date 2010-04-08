@@ -295,18 +295,29 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/config/bar.png", pathMatchers , mode));
     }
 
-//    public void testXMLBase() {
-////        TODO: test XFormsUtils.resolveXMLBase()
-//    }
+    public void testHRRI() {
+        // Test for spaces
+        assertEquals("http://localhost:8080/myapp/a%20b", NetUtils.encodeHRRI("http://localhost:8080/myapp/a b", true));
+        assertEquals("http://localhost:8080/myapp/a b", NetUtils.encodeHRRI("http://localhost:8080/myapp/a b", false));
+        // Test for trim()
+        assertEquals("http://localhost:8080/", NetUtils.encodeHRRI("  http://localhost:8080/  ", true));
+        // Test for other characters
+        assertEquals("http://localhost:8080/myapp/%3C%3E%22%7B%7D%7C%5C%5E%60", NetUtils.encodeHRRI("http://localhost:8080/myapp/<>\"{}|\\^`", true));
+    }
 
-//    public void testHRRI() {
-////        TODO: test XFormsUtils.encodeHRRI()
-//    }
+    public void testResolveURI() {
+        assertEquals("http://localhost:8080/myapp/a%20b", NetUtils.resolveURI("a b", "http://localhost:8080/myapp/"));
+        assertEquals("http://localhost:8080/myapp/a%20b", NetUtils.resolveURI("http://localhost:8080/myapp/a b", null));
+    }
 
 //    public void testXFormsRewrite() {
 //        // TODO
 //        resolveRenderURL()
 //        resolveServiceURL()
 //        resolveResourceURL()
+//    }
+
+//    public void testXMLBase() {
+//        // TODO: test XFormsUtils.resolveXMLBase()
 //    }
 }

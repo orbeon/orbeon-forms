@@ -27,7 +27,6 @@ import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.io.*;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -366,7 +365,6 @@ public class XFormsResourceServer extends ProcessorImpl {
                     content = StringBuilderWriter.toString();
                 }
 
-                final URI unresolvedResourceURI = new URI(resourcePath);
                 {
                     int index = 0;
                     while (true) {
@@ -385,34 +383,33 @@ public class XFormsResourceServer extends ProcessorImpl {
                         }
 
                         // Get URL
-                        String uriString;
+                        String initialURI;
                         {
                             final int closingIndex = content.indexOf(")", newIndex + 4);
                             if (closingIndex == -1)
                                 throw new OXFException("Missing closing parenthesis in url() in resource: " + resource.getResourcePath(isMinimal));
 
-                            uriString = content.substring(newIndex + 4, closingIndex);
+                            initialURI = content.substring(newIndex + 4, closingIndex);
 
                             // Some URLs seem to start and end with quotes
-                            if (uriString.startsWith("\""))
-                                uriString = uriString.substring(1);
+                            if (initialURI.startsWith("\""))
+                                initialURI = initialURI.substring(1);
 
-                            if (uriString.endsWith("\""))
-                                uriString = uriString.substring(0, uriString.length() - 1);
+                            if (initialURI.endsWith("\""))
+                                initialURI = initialURI.substring(0, initialURI.length() - 1);
 
                             index = closingIndex + 1;
                         }
                         // Rewrite URL and output it as an absolute path
                         try {
-                            final URI resolvedResourceURI = unresolvedResourceURI.resolve(uriString.trim()).normalize();// normalize to remove "..", etc.
-
+                            final String resolvedURI = NetUtils.resolveURI(initialURI, resourcePath);
                             final String rewrittenURI = URLRewriterUtils.rewriteResourceURL(externalContext.getRequest(),
-                                    resolvedResourceURI.toString(), matchAllPathMatcher, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
+                                    resolvedURI, matchAllPathMatcher, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
 
                             outputWriter.write("url(" + rewrittenURI + ")");
                         } catch (Exception e) {
-                            indentedLogger.logWarning("resources", "found invalid URI in CSS file", "uri", uriString);
-                            outputWriter.write("url(" + uriString + ")");
+                            indentedLogger.logWarning("resources", "found invalid URI in CSS file", "uri", initialURI);
+                            outputWriter.write("url(" + initialURI + ")");
                         }
                     }
                 }

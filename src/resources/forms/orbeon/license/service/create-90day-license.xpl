@@ -28,6 +28,7 @@
                 <organization><xsl:value-of select="normalize-space(/*/organization)"/></organization>
                 <email><xsl:value-of select="normalize-space(/*/email)"/></email>
                 <issued><xsl:value-of select="adjust-date-to-timezone(current-date(), ())"/></issued>
+                <!--<expiration/>-->
                 <expiration><xsl:value-of select="adjust-date-to-timezone(current-date() + xs:dayTimeDuration('P90D'), ())"/></expiration>
             </license>
         </p:input>

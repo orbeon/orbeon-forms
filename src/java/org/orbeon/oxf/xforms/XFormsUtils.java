@@ -805,7 +805,7 @@ public class XFormsUtils {
     public static String retrieveSrcValue(String src) throws IOException {
 
         // Handle HHRI
-        src = encodeHRRI(src, true);
+        src = NetUtils.encodeHRRI(src, true);
 
         final URL url = URLFactory.createURL(src);
 
@@ -1000,51 +1000,6 @@ public class XFormsUtils {
             return null;
 
         return XPathCache.evaluateAsAvt(propertyContext, xpathContext, contextNode, attributeValue);
-    }
-
-    /**
-     * Encode a Human Readable Resource Identifier to a URI. Leading and trailing spaces are removed first.
-     *
-     * NOTE: See more recent W3C note: http://www.w3.org/TR/2008/NOTE-leiri-20081103/
-     *
-     * @param uriString    URI to encode
-     * @param processSpace whether to process the space character or leave it unchanged
-     * @return             encoded URI, or null if uriString was null
-     */
-    public static String encodeHRRI(String uriString, boolean processSpace) {
-
-        if (uriString == null)
-            return null;
-
-        // Note that the XML Schema spec says "Spaces are, in principle, allowed in the ·lexical space· of anyURI,
-        // however, their use is highly discouraged (unless they are encoded by %20).".
-
-        // We assume that we never want leading or trailing spaces. You can use %20 if you really want this.
-        uriString = uriString.trim();
-
-        // We try below to follow the "Human Readable Resource Identifiers" RFC, in draft as of 2007-06-06.
-        // * the control characters #x0 to #x1F and #x7F to #x9F
-        // * space #x20
-        // * the delimiters "<" #x3C, ">" #x3E, and """ #x22
-        // * the unwise characters "{" #x7B, "}" #x7D, "|" #x7C, "\" #x5C, "^" #x5E, and "`" #x60
-        final FastStringBuffer sb = new FastStringBuffer(uriString.length() * 2);
-        for (int i = 0; i < uriString.length(); i++) {
-            final char currentChar = uriString.charAt(i);
-
-            if (currentChar >= 0
-                    && (currentChar <= 0x1f || (processSpace && currentChar == 0x20) || currentChar == 0x22
-                     || currentChar == 0x3c || currentChar == 0x3e
-                     || currentChar == 0x5c || currentChar == 0x5e || currentChar == 0x60
-                     || (currentChar >= 0x7b && currentChar <= 0x7d)
-                     || (currentChar >= 0x7f && currentChar <= 0x9f))) {
-                sb.append('%');
-                sb.append(NumberUtils.toHexString((byte) currentChar).toUpperCase());
-            } else {
-                sb.append(currentChar);
-            }
-        }
-
-        return sb.toString();
     }
 
     public static interface InstanceWalker {

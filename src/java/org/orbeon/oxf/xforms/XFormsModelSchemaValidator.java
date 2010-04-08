@@ -97,7 +97,7 @@ public class XFormsModelSchemaValidator {
         // Check for external schemas
         final String schemaAttribute = modelElement.attributeValue("schema");
         if (schemaAttribute != null)
-            this.schemaURIs = StringUtils.split(XFormsUtils.encodeHRRI(schemaAttribute, false));
+            this.schemaURIs = StringUtils.split(NetUtils.encodeHRRI(schemaAttribute, false));
 
         // Check for inline schemas
         // "3.3.1 The model Element [...] xs:schema elements located inside the current model need not be listed."

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.controls;
 
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
@@ -42,6 +43,16 @@ public class ControlAnalysis {
 
     public final ContainerAnalysis parentControlAnalysis;
     public final Map<String, ControlAnalysis> inScopeVariables; // variable name -> ControlAnalysis
+    
+    private final Element nestedLabel;
+    private final Element nestedHelp;
+    private final Element nestedHint;
+    private final Element nestedAlert;
+
+    private Element externalLabel;
+    private Element externalHelp;
+    private Element externalHint;
+    private Element externalAlert;
 
     public final String modelPrefixedId;
 
@@ -66,6 +77,11 @@ public class ControlAnalysis {
         this.parentControlAnalysis = parentControlAnalysis;
         this.inScopeVariables = inScopeVariables;
 
+        this.nestedLabel = findNestedLHHAElement(XFormsConstants.LABEL_QNAME);
+        this.nestedHelp = findNestedLHHAElement(XFormsConstants.HELP_QNAME);
+        this.nestedHint = findNestedLHHAElement(XFormsConstants.HINT_QNAME);
+        this.nestedAlert = findNestedLHHAElement(XFormsConstants.ALERT_QNAME);
+
         this.modelPrefixedId = computeModelPrefixedId();
 
         if (staticState.isXPathAnalysis()) {
@@ -75,6 +91,39 @@ public class ControlAnalysis {
             this.bindingAnalysis = null;
             this.valueAnalysis = null;
         }
+    }
+
+    protected Element findNestedLHHAElement(QName qName) {
+        return element.element(qName);
+    }
+
+    public void setExternalLHHA(Element lhhaElement) {
+        final String name = lhhaElement.getName();
+        if (XFormsConstants.LABEL_QNAME.getName().equals(name)) {
+            externalLabel = lhhaElement;
+        } else if (XFormsConstants.HELP_QNAME.getName().equals(name)) {
+            externalHelp = lhhaElement;
+        } else if (XFormsConstants.HINT_QNAME.getName().equals(name)) {
+            externalHint = lhhaElement;
+        } else if (XFormsConstants.ALERT_QNAME.getName().equals(name)) {
+            externalAlert = lhhaElement;
+        }
+    }
+
+    public Element getLabelElement() {
+        return (nestedLabel != null) ? nestedLabel : externalLabel;
+    }
+
+    public Element getHelpElement() {
+        return (nestedHelp != null) ? nestedHelp : externalHelp;
+    }
+
+    public Element getHintElement() {
+        return (nestedHint != null) ? nestedHint : externalHint;
+    }
+
+    public Element getAlertElement() {
+        return (nestedAlert != null) ? nestedAlert : externalAlert;
     }
 
     protected String computeModelPrefixedId() {

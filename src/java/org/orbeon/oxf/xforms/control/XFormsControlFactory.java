@@ -264,6 +264,10 @@ public class XFormsControlFactory {
         return BUILTIN_CONTROLS.contains(getQName(controlURI, controlName));
     }
 
+    public static boolean isLHHA(String controlURI, String controlName) {
+        return XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.contains(controlName) && XFormsConstants.XFORMS_NAMESPACE_URI.equals(controlURI);
+    }
+
     private static QName getQName(String controlURI, String controlName) {
         return QName.get(controlName, Namespace.get("", controlURI));
     }

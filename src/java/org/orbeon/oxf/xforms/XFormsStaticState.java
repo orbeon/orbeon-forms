@@ -129,12 +129,6 @@ public class XFormsStaticState {
     private boolean hasOfflineSupport;                                      // whether the document requires offline support
     private List<String> offlineInsertTriggerIds;                           // List<String triggerPrefixedId> of triggers can do inserts
 
-    // All these are Map<String controlPrefixedId, Element element>
-    private final Map<String, Element> labelsMap = new HashMap<String, Element>();
-    private final Map<String, Element> helpsMap = new HashMap<String, Element>();
-    private final Map<String, Element> hintsMap = new HashMap<String, Element>();
-    private final Map<String, Element> alertsMap = new HashMap<String, Element>();
-
     // Commonly used properties (use getter to access them)
     private boolean propertiesRead;
     private boolean isNoscript;
@@ -807,19 +801,23 @@ public class XFormsStaticState {
     }
 
     public Element getLabelElement(String prefixedId) {
-        return labelsMap.get(prefixedId);
+        final ControlAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
+        return (controlAnalysis == null) ? null : controlAnalysis.getLabelElement();
     }
 
     public Element getHelpElement(String prefixedId) {
-        return helpsMap.get(prefixedId);
+        final ControlAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
+        return (controlAnalysis == null) ? null : controlAnalysis.getHelpElement();
     }
 
     public Element getHintElement(String prefixedId) {
-        return hintsMap.get(prefixedId);
+        final ControlAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
+        return (controlAnalysis == null) ? null : controlAnalysis.getHintElement();
     }
 
     public Element getAlertElement(String prefixedId) {
-        return alertsMap.get(prefixedId);
+        final ControlAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
+        return (controlAnalysis == null) ? null : controlAnalysis.getAlertElement();
     }
 
     /**
@@ -1109,23 +1107,6 @@ public class XFormsStaticState {
         return null;
     }
 
-    private boolean hasAncestorBinding(String prefix, Element element) {
-
-        if (xblBindings == null)
-            return false;
-
-        // Recurse until we find an element which is a binding
-        Element currentAncestor = element.getParent();
-        while (currentAncestor != null) {
-            if (xblBindings.hasBinding(prefix + XFormsUtils.getElementStaticId(currentAncestor))) {
-                return true;
-            }
-            currentAncestor = currentAncestor.getParent();
-        }
-
-        return false;
-    }
-
     /**
      * Return true if the given element is an event observer. Must return true for controls, components, xforms:model,
      * xforms:instance, xforms:submission.
@@ -1160,8 +1141,20 @@ public class XFormsStaticState {
         // Extract scripts for this tree of controls
         extractXFormsScripts(propertyContext, controlsDocumentInfo, prefix);
 
+        final Map<String, Element> deferredExternalLHHA = new LinkedHashMap<String, Element>();
+
         // Visit tree
         visitAllControlStatic(startElement, startControlAnalysis, new XFormsStaticState.ControlElementVisitorListener() {
+
+            public void handleLHHA(Element lhhaElement, String controlStaticId) {
+                // LHHA within a grouping control or at top-level
+
+                assert controlStaticId != null;
+
+                if (!processLHHAElement(lhhaElement, controlStaticId, prefix, deferredExternalLHHA)) {
+                    deferredExternalLHHA.put(controlStaticId, lhhaElement);
+                }
+            }
 
             public ControlAnalysis startVisitControl(Element controlElement, ContainerAnalysis parentControlAnalysis, String controlStaticId, boolean isContainer) {
 
@@ -1296,68 +1289,19 @@ public class XFormsStaticState {
             }
         });
 
+        // Process deferred external LHHA elements
+        for (final Map.Entry<String, Element> entry: deferredExternalLHHA.entrySet()) {
+            // Process
+            if (!processLHHAElement(entry.getValue(), entry.getKey(), prefix, deferredExternalLHHA)) {
+                // Warn if failed
+                indentedLogger.logWarning("", "could not find control associated with LHHA element", "element",
+                        entry.getValue().getName(), "for", entry.getKey());
+            }
+        }
+
         // Extract event handlers for this tree of controls
         // NOTE: Do this after analysing controls above so that XBL bindings are available for detection of nested event handlers.
         extractEventHandlers(propertyContext, xpathConfiguration, controlsDocumentInfo, prefix, true);
-
-        // Gather label, hint, help, alert information
-        {
-            // Search LHHA elements that either:
-            //
-            // o have @for attribute
-            // o are the child of an xforms:* or xxforms:* element that has an id
-            final List lhhaElements = XPathCache.evaluate(propertyContext, controlsDocumentInfo,
-                "//(xforms:label | xforms:help | xforms:hint | xforms:alert)[not(ancestor::xforms:instance) and exists(@for | parent::xforms:*/@id | parent::xxforms:*/@id)]", BASIC_NAMESPACE_MAPPINGS,
-                null, null, null, null, locationData);
-
-            int lhhaCount = 0;
-            for (Iterator i = lhhaElements.iterator(); i.hasNext();) {
-                final NodeInfo currentNodeInfo = (NodeInfo) i.next();
-                final Element lhhaElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
-
-                final Element parentElement = lhhaElement.getParent();
-
-                final String forAttribute = lhhaElement.attributeValue("for");
-                final String controlPrefixedId;
-                if (forAttribute == null || XFormsControlFactory.isCoreControl(parentElement.getNamespaceURI(), parentElement.getName())) {
-                    // Element is directly nested in XForms element OR it has a @for attribute but is within a core control so we ignore the @for attribute
-                    controlPrefixedId = prefix + XFormsUtils.getElementStaticId(lhhaElement.getParent());
-                } else {
-                    // Element has a @for attribute and is not within a core control
-                    if (xblBindings != null) { // mmh, can bindings be null?
-
-                        if (hasAncestorBinding(prefix, lhhaElement)) {
-                            // Ignore content of bound elements
-                            controlPrefixedId = null;
-                        } else {
-                            // Find prefixed id of control with assumption that it is in the same scope as the LHHA element
-                            final XBLBindings.Scope lhhaScope = xblBindings.getResolutionScopeByPrefixedId(prefix + XFormsUtils.getElementStaticId(lhhaElement));
-                            controlPrefixedId = lhhaScope.getPrefixedIdForStaticId(forAttribute);
-                        }
-                    } else {
-                        // Degenerate case where there are no XBL components
-                        controlPrefixedId = prefix + forAttribute;
-                    }
-                }
-
-                if (controlPrefixedId != null) {
-
-                    lhhaCount++;
-
-                    final String elementName = lhhaElement.getName();
-                    if ("label".equals(elementName)) {
-                        labelsMap.put(controlPrefixedId, lhhaElement);
-                    } else if ("help".equals(elementName)) {
-                        helpsMap.put(controlPrefixedId, lhhaElement);
-                    } else if ("hint".equals(elementName)) {
-                        hintsMap.put(controlPrefixedId, lhhaElement);
-                    } else if ("alert".equals(elementName)) {
-                        alertsMap.put(controlPrefixedId, lhhaElement);
-                    }
-                }
-            }
-            indentedLogger.logDebug("", "extracted label, help, hint and alert elements", "count", Integer.toString(lhhaCount));
-        }
 
         // Gather online/offline information
         {
@@ -1435,6 +1379,28 @@ public class XFormsStaticState {
         }
     }
 
+    private boolean processLHHAElement(Element lhhaElement, String controlStaticId, String prefix, Map<String, Element> externalLHHA) {
+        final String forAttribute = lhhaElement.attributeValue("for");
+        if (forAttribute == null) {
+            // NOP: container control handles this itself
+            return true;
+        } else {
+            // Find prefixed id of control with assumption that it is in the same scope as the LHHA element
+            final XBLBindings.Scope lhhaScope = xblBindings.getResolutionScopeByPrefixedId(prefix + controlStaticId);
+            final String controlPrefixedId = lhhaScope.getPrefixedIdForStaticId(forAttribute);
+
+            final ControlAnalysis controlAnalysis = controlAnalysisMap.get(controlPrefixedId);
+            if (controlAnalysis != null) {
+                // Control is already known
+                controlAnalysis.setExternalLHHA(lhhaElement);
+                return true;
+            } else {
+                // Control is not already known or doesn't exist at all, try later
+                return false;
+            }
+        }
+    }
+
     public static List<Document> extractNestedModels(PropertyContext pipelineContext, DocumentWrapper compactShadowTreeWrapper, boolean detach, LocationData locationData) {
 
         final List<Document> result = new ArrayList<Document>();
@@ -1455,10 +1421,6 @@ public class XFormsStaticState {
 
         return result;
     }
-
-//    public boolean isHasOfflineSupport() {
-//        return hasOfflineSupport;
-//    }
     
     public void appendClasses(StringBuilder sb, String prefixedId) {
         final String controlClasses = controlAnalysisMap.get(prefixedId).getClasses();
@@ -1578,22 +1540,26 @@ public class XFormsStaticState {
     }
 
     private void handleControlsStatic(ControlElementVisitorListener controlElementVisitorListener, Element container, ContainerAnalysis containerControlAnalysis) {
-        for (final Element currentControlElement: Dom4jUtils.elements(container)) {
+        for (final Element currentElement: Dom4jUtils.elements(container)) {
 
-            final String controlName = currentControlElement.getName();
-            final String controlStaticId = XFormsUtils.getElementStaticId(currentControlElement);
+            final String elementName = currentElement.getName();
+            final String elementStaticId = XFormsUtils.getElementStaticId(currentElement);
 
-            if (XFormsControlFactory.isContainerControl(currentControlElement.getNamespaceURI(), controlName)) {
+            if (XFormsControlFactory.isContainerControl(currentElement.getNamespaceURI(), elementName)) {
                 // Handle XForms grouping controls
-                final ContainerAnalysis newContainer = (ContainerAnalysis) controlElementVisitorListener.startVisitControl(currentControlElement, containerControlAnalysis, controlStaticId, true);
-                handleControlsStatic(controlElementVisitorListener, currentControlElement, newContainer);
-                controlElementVisitorListener.endVisitControl(currentControlElement, containerControlAnalysis, newContainer, true);
-            } else if (XFormsControlFactory.isCoreControl(currentControlElement.getNamespaceURI(), controlName)
-                    || xblBindings.isComponent(currentControlElement.getQName())
-                    || controlName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
+                final ContainerAnalysis newContainer = (ContainerAnalysis) controlElementVisitorListener.startVisitControl(currentElement, containerControlAnalysis, elementStaticId, true);
+                handleControlsStatic(controlElementVisitorListener, currentElement, newContainer);
+                controlElementVisitorListener.endVisitControl(currentElement, containerControlAnalysis, newContainer, true);
+            } else if (XFormsControlFactory.isCoreControl(currentElement.getNamespaceURI(), elementName)
+                    || xblBindings.isComponent(currentElement.getQName())
+                    || elementName.equals(XFormsConstants.XXFORMS_VARIABLE_NAME)) {
                 // Handle core control, component, or variable
-                final ControlAnalysis newControl = controlElementVisitorListener.startVisitControl(currentControlElement, containerControlAnalysis, controlStaticId, false);
-                controlElementVisitorListener.endVisitControl(currentControlElement, containerControlAnalysis, newControl, false);
+                final ControlAnalysis newControl = controlElementVisitorListener.startVisitControl(currentElement, containerControlAnalysis, elementStaticId, false);
+                controlElementVisitorListener.endVisitControl(currentElement, containerControlAnalysis, newControl, false);
+            } else if (XFormsControlFactory.isLHHA(currentElement.getNamespaceURI(), elementName)) {
+                // LHHA element within container
+                if (!(containerControlAnalysis instanceof ComponentAnalysis))
+                    controlElementVisitorListener.handleLHHA(currentElement, elementStaticId);
             }
         }
     }
@@ -1601,6 +1567,7 @@ public class XFormsStaticState {
     private static interface ControlElementVisitorListener {
         ControlAnalysis startVisitControl(Element controlElement, ContainerAnalysis containerControlAnalysis, String controlStaticId, boolean isContainer);
         void endVisitControl(Element controlElement, ContainerAnalysis containerControlAnalysis, ControlAnalysis newControl, boolean isContainer);
+        void handleLHHA(Element lhhaElement, String controlStaticId);
     }
 
     public static class ItemsInfo {

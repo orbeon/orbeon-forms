@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls;
 
+import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
@@ -21,6 +23,11 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings;
 public class RootAnalysis extends ContainerAnalysis {
     public RootAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, XBLBindings.Scope scope) {
         super(propertyContext, staticState, null, scope, "#controls", null, staticState.getLocationData(), 1, false, false, null, null);
+    }
+
+    @Override
+    protected Element findNestedLHHAElement(QName qName) {
+        return null;
     }
 
     @Override

@@ -36,10 +36,17 @@ public class ControlAnalysisFactory {
 
         ControlAnalysis controlAnalysis;
         if (controlName.equals("repeat")) {
+            // Repeat container
             controlAnalysis = new RepeatAnalysis(propertyContext, staticState, controlsDocumentInfo, controlScope,
                     controlPrefixedId, controlElement, locationData, index, hasNodeBinding,
                     XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, inScopeVariables);
+        } else if (staticState.getXBLBindings().hasBinding(controlPrefixedId)) {
+            // Control with XBL binding
+            controlAnalysis = new ComponentAnalysis(propertyContext, staticState, controlsDocumentInfo, controlScope,
+                    controlPrefixedId, controlElement, locationData, index, hasNodeBinding,
+                    XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, inScopeVariables);
         } else if (isContainer) {
+            // Other container
             controlAnalysis = new ContainerAnalysis(propertyContext, staticState, controlsDocumentInfo, controlScope,
                     controlPrefixedId, controlElement, locationData, index, hasNodeBinding,
                     XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, inScopeVariables);

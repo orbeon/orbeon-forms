@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.controls;
 
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
@@ -29,6 +30,20 @@ public class ContainerAnalysis extends ControlAnalysis {
 
     public ContainerAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo, XBLBindings.Scope scope, String prefixedId, Element element, LocationData locationData, int index, boolean hasNodeBinding, boolean isValueControl, ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
         super(propertyContext, staticState, controlsDocumentInfo, scope, prefixedId, element, locationData, index, hasNodeBinding, isValueControl, parentControlAnalysis, inScopeVariables);
+    }
+
+    @Override
+    protected Element findNestedLHHAElement(QName qName) {
+        // For e.g. <xforms:group>, consider only nested element without @for attribute
+        // NOTE: Should probably be child::xforms:label[not(exists(@for))] to get first such element, but e.g. group
+        // label if any should probably be first anyway.
+        final Element e = element.element(qName);
+        if (e != null) {
+            final String forAttribute = e.attributeValue("for");
+            return (forAttribute == null) ? e : null;
+        } else {
+            return null;
+        }
     }
 
     public void addContainedVariable(String variableName, String variablePrefixedId) {

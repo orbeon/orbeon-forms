@@ -1026,16 +1026,16 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
         // Clone LHHA if not null and not constant
         if (label != null && label != NULL_LHHA) {
-            cloned.label = (LHHA) label.clone();
+            cloned.label = label.clone();
         }
         if (help != null && help != NULL_LHHA) {
-            cloned.help = (LHHA) help.clone();
+            cloned.help = help.clone();
         }
         if (hint != null && hint != NULL_LHHA) {
-            cloned.hint = (LHHA) hint.clone();
+            cloned.hint = hint.clone();
         }
         if (alert != null && alert != NULL_LHHA) {
-            cloned.alert = (LHHA) alert.clone();
+            cloned.alert = alert.clone();
         }
 
         if (this.currentLocal != null) {
@@ -1174,9 +1174,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         public void markDirty() {}
 
         @Override
-        public Object clone() {
+        public LHHA clone() {
             try {
-                return super.clone();
+                return (LHHA) super.clone();
             } catch (CloneNotSupportedException e) {
                 throw new OXFException(e);
             }

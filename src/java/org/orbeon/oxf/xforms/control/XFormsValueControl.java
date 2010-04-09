@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
+import org.orbeon.oxf.xforms.analysis.UIDependencies;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -36,17 +37,30 @@ import java.util.Set;
  */
 public abstract class XFormsValueControl extends XFormsSingleNodeControl {
 
+    // Value
     private String value;
+
+    // Previous value for refresh
+    private String previousValue;
 
     // External value (evaluated lazily)
     private boolean isExternalValueEvaluated;
     private String externalValue;
 
-    // Previous value for refresh
-    private String previousValue;
-
     protected XFormsValueControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
         super(container, parent, element, name, effectiveId);
+    }
+
+    @Override
+    protected void onCreate(PropertyContext propertyContext) {
+        super.onCreate(propertyContext);
+
+        value = null;
+        previousValue = null;
+
+        isExternalValueEvaluated = false;
+        externalValue = null;
+
     }
 
     @Override
@@ -58,7 +72,10 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         // Evaluate control values
         if (isRelevant()) {
             // Control is relevant
-            evaluateValue(propertyContext);
+            if (value == null) {
+                // Only evaluate if the value is not already available
+                evaluateValue(propertyContext);
+            }
         } else {
             // Control is not relevant
             isExternalValueEvaluated = true;
@@ -70,11 +87,17 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
+    protected void markDirtyImpl(UIDependencies uiDependencies) {
+        super.markDirtyImpl(uiDependencies);
 
-        isExternalValueEvaluated = false;
-        externalValue = null;
+        // Handle value update
+        if (uiDependencies.requireValueUpdate(getPrefixedId())) {
+
+            value = null;
+
+            isExternalValueEvaluated = false;
+            externalValue = null;
+        }
     }
 
     protected void evaluateValue(PropertyContext propertyContext) {

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -23,6 +24,7 @@ public interface UIDependencies {
     void markValueChanged(XFormsModel model, NodeInfo nodeInfo);
     void markStructuralChange(XFormsModel model);
     void refreshDone();
-    boolean requireValueUpdate(String controlPrefixedId);
     boolean requireBindingUpdate(String controlPrefixedId);
+    boolean requireValueUpdate(String controlPrefixedId);
+    boolean requireLHHAUpdate(XFormsConstants.LHHA lhha, String controlPrefixedId);
 }

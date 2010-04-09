@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -32,11 +33,18 @@ public class DumbUIDependencies implements UIDependencies {
         // NOP
     }
 
-    public boolean requireValueUpdate(String controlPrefixedId) {
+    public boolean requireBindingUpdate(String controlPrefixedId) {
+        // Always update
         return true;
     }
 
-    public boolean requireBindingUpdate(String controlPrefixedId) {
+    public boolean requireValueUpdate(String controlPrefixedId) {
+        // Always update
+        return true;
+    }
+
+    public boolean requireLHHAUpdate(XFormsConstants.LHHA lhha, String controlPrefixedId) {
+        // Always update
         return true;
     }
 }

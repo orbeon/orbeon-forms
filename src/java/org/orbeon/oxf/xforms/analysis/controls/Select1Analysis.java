@@ -25,8 +25,8 @@ import org.orbeon.saxon.om.NodeInfo;
 import java.util.Map;
 
 public class Select1Analysis extends ControlAnalysis {
-
-    public final XFormsStaticState.ItemsInfo itemsInfo;
+    public final boolean isMultiple;
+    public final boolean hasNonStaticItem;
 
     public Select1Analysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo, XBLBindings.Scope scope, String prefixedId, Element element, LocationData locationData, int index, boolean hasNodeBinding, boolean isValueControl, ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
         super(propertyContext, staticState, controlsDocumentInfo, scope, prefixedId, element, locationData, index, hasNodeBinding, isValueControl, parentControlAnalysis, inScopeVariables);
@@ -42,6 +42,7 @@ public class Select1Analysis extends ControlAnalysis {
                 XFormsStaticState.BASIC_NAMESPACE_MAPPINGS, null, null, null, null, locationData);
 
         // Remember information
-        itemsInfo = new XFormsStaticState.ItemsInfo(element.getName().equals("select"), hasNonStaticItem);
+        this.isMultiple = element.getName().equals("select");
+        this.hasNonStaticItem = hasNonStaticItem;
     }
 }

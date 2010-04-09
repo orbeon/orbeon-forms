@@ -239,7 +239,7 @@ public class XMLUtils {
      * @param element   dom4j Element
      * @return          SAX Attributes
      */
-    public static Attributes convertAttributes(Element element) {
+    public static Attributes getSAXAttributes(Element element) {
         final AttributesImpl result = new AttributesImpl();
         for (Iterator i = element.attributeIterator(); i.hasNext();) {
             final org.dom4j.Attribute attribute = (org.dom4j.Attribute) i.next();

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -36,7 +36,7 @@ public abstract class XFormsGroupHandler extends XFormsControlLifecyleHandler {
             }
 
             // Copy over existing label classes if any
-            final String labelClassAttribute = containingDocument.getStaticState().getLabelElement(getPrefixedId()).attributeValue("class");
+            final String labelClassAttribute = containingDocument.getStaticState().getLabel(getPrefixedId()).element.attributeValue("class");
             if (labelClassAttribute != null) {
                 labelClasses.append(' ');
                 labelClasses.append(labelClassAttribute);

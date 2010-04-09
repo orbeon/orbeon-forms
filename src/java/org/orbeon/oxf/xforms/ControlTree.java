@@ -912,11 +912,9 @@ public class ControlTree implements ExternalCopyable {
                 control.setBindingContext(propertyContext, newBindingContext);
             }
 
-            // Mark the control as dirty so it gets reevaluated
+            // Notify the control that some of its aspects (value, label, etc.) might have changed
             // NOTE: existing repeat iterations are marked dirty below in startRepeatIteration()
-            if (uiDependencies.requireValueUpdate(control.getPrefixedId())) {
-                control.markDirty();
-            }
+            control.markDirty(uiDependencies);
 
             return control;
         }
@@ -931,10 +929,8 @@ public class ControlTree implements ExternalCopyable {
             // Check whether this is an existing iteration as opposed to a newly created iteration
             final boolean isExistingIteration = !newIterationsSet.contains(effectiveIterationId);
             if (isExistingIteration) {
-                // Mark the control as dirty so it gets reevaluated
-                if (uiDependencies.requireValueUpdate(repeatIterationControl.getPrefixedId())) {
-                    repeatIterationControl.markDirty();
-                }
+                // Notify the control that some of its aspects (value, label, etc.) might have changed
+                repeatIterationControl.markDirty(uiDependencies);
                 // NOTE: We don't need to call repeatIterationControl.setBindingContext() because XFormsRepeatControl.updateIterations() does it already
             }
 

@@ -166,21 +166,6 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
             return 0;
         }
     }
-
-    @Override
-    protected void evaluateImpl(PropertyContext propertyContext) {
-        // TODO: don't need this right?
-        super.evaluateImpl(propertyContext);
-
-        // Evaluate iterations
-        final List<XFormsControl> children = getChildren();
-        if (children != null) {
-            for (final XFormsControl child: children) {
-                final XFormsRepeatIterationControl currentRepeatIteration = (XFormsRepeatIterationControl) child;
-                currentRepeatIteration.evaluateImpl(propertyContext);
-            }
-        }
-    }
     
     @Override
     public String getLabel(PropertyContext propertyContext) {
@@ -349,10 +334,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 // This evaluates all controls and then dispatches creation events
                 currentControlTree.initializeRepeatIterationTree(propertyContext, newIteration);
             }
-            // Perform a very local refresh on the control
             // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events if needed
-            markDirty();
-            evaluateImpl(propertyContext);
             containingDocument.getControls().getCurrentControlTree().dispatchRefreshEvents(propertyContext, Collections.singletonList(getEffectiveId()));
         }
     }

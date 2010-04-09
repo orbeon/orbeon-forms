@@ -19,7 +19,12 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.InstanceData;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.analysis.UIDependencies;
+import org.orbeon.oxf.xforms.analysis.controls.Select1Analysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -100,8 +105,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
+    protected void markDirtyImpl(UIDependencies uiDependencies) {
+        super.markDirtyImpl(uiDependencies);
         // Force recalculation of items here
         itemset = null;
     }
@@ -186,8 +191,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * @return                      true iif control has a static set of items
      */
     public static boolean isStaticItemset(XFormsContainingDocument containingDocument, String prefixedId) {
-        final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(prefixedId);
-        return itemsInfo != null && !itemsInfo.hasNonStaticItem();
+        final Select1Analysis analysis = containingDocument.getStaticState().getSelect1Analysis(prefixedId);
+        return analysis != null && !analysis.hasNonStaticItem;
     }
 
     /**
@@ -198,8 +203,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
      * @return                      true iif control is a multiple-selection control
      */
     public static boolean isMultiple(XFormsContainingDocument containingDocument, String prefixedId) {
-        final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(prefixedId);
-        return itemsInfo != null && itemsInfo.isMultiple();
+        final Select1Analysis analysis = containingDocument.getStaticState().getSelect1Analysis(prefixedId);
+        return analysis != null && analysis.isMultiple;
     }
 
     /**
@@ -336,8 +341,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     private boolean mustSendItemsetUpdate(PropertyContext propertyContext, XFormsSelect1Control otherSelect1Control) {
-        final XFormsStaticState.ItemsInfo itemsInfo = containingDocument.getStaticState().getItemsInfo(getPrefixedId());
-        if (itemsInfo != null && !itemsInfo.hasNonStaticItem()) {
+        final Select1Analysis analysis = containingDocument.getStaticState().getSelect1Analysis(getPrefixedId());
+        if (analysis != null && !analysis.hasNonStaticItem) {
             // There is no need to send an update:
             //
             // 1. Items are static...

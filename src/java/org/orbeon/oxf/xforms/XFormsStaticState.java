@@ -800,24 +800,24 @@ public class XFormsStaticState {
         return (controlAnalysis == null) ? false : controlAnalysis.hasNodeBinding;
     }
 
-    public Element getLabelElement(String prefixedId) {
+    public ControlAnalysis.LHHAAnalysis getLabel(String prefixedId) {
         final ControlAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
-        return (controlAnalysis == null) ? null : controlAnalysis.getLabelElement();
+        return (controlAnalysis == null) ? null : controlAnalysis.getLabel();
     }
 
-    public Element getHelpElement(String prefixedId) {
+    public ControlAnalysis.LHHAAnalysis getHelp(String prefixedId) {
         final ControlAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
-        return (controlAnalysis == null) ? null : controlAnalysis.getHelpElement();
+        return (controlAnalysis == null) ? null : controlAnalysis.getHelp();
     }
 
-    public Element getHintElement(String prefixedId) {
+    public ControlAnalysis.LHHAAnalysis getHint(String prefixedId) {
         final ControlAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
-        return (controlAnalysis == null) ? null : controlAnalysis.getHintElement();
+        return (controlAnalysis == null) ? null : controlAnalysis.getHint();
     }
 
-    public Element getAlertElement(String prefixedId) {
+    public ControlAnalysis.LHHAAnalysis getAlert(String prefixedId) {
         final ControlAnalysis controlAnalysis = controlAnalysisMap.get(prefixedId);
-        return (controlAnalysis == null) ? null : controlAnalysis.getAlertElement();
+        return (controlAnalysis == null) ? null : controlAnalysis.getAlert();
     }
 
     /**
@@ -869,8 +869,8 @@ public class XFormsStaticState {
         return controlTypes.get(controlName) != null;
     }
 
-    public ItemsInfo getItemsInfo(String controlPrefixedId) {
-        return ((Select1Analysis) controlAnalysisMap.get(controlPrefixedId)).itemsInfo;
+    public Select1Analysis getSelect1Analysis(String controlPrefixedId) {
+        return ((Select1Analysis) controlAnalysisMap.get(controlPrefixedId));
     }
 
     /**
@@ -1151,7 +1151,7 @@ public class XFormsStaticState {
 
                 assert controlStaticId != null;
 
-                if (!processLHHAElement(lhhaElement, controlStaticId, prefix, deferredExternalLHHA)) {
+                if (!processLHHAElement(propertyContext, controlsDocumentInfo, lhhaElement, controlStaticId, prefix)) {
                     deferredExternalLHHA.put(controlStaticId, lhhaElement);
                 }
             }
@@ -1292,7 +1292,7 @@ public class XFormsStaticState {
         // Process deferred external LHHA elements
         for (final Map.Entry<String, Element> entry: deferredExternalLHHA.entrySet()) {
             // Process
-            if (!processLHHAElement(entry.getValue(), entry.getKey(), prefix, deferredExternalLHHA)) {
+            if (!processLHHAElement(propertyContext, controlsDocumentInfo, entry.getValue(), entry.getKey(), prefix)) {
                 // Warn if failed
                 indentedLogger.logWarning("", "could not find control associated with LHHA element", "element",
                         entry.getValue().getName(), "for", entry.getKey());
@@ -1379,7 +1379,7 @@ public class XFormsStaticState {
         }
     }
 
-    private boolean processLHHAElement(Element lhhaElement, String controlStaticId, String prefix, Map<String, Element> externalLHHA) {
+    private boolean processLHHAElement(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, Element lhhaElement, String controlStaticId, String prefix) {
         final String forAttribute = lhhaElement.attributeValue("for");
         if (forAttribute == null) {
             // NOP: container control handles this itself
@@ -1392,7 +1392,7 @@ public class XFormsStaticState {
             final ControlAnalysis controlAnalysis = controlAnalysisMap.get(controlPrefixedId);
             if (controlAnalysis != null) {
                 // Control is already known
-                controlAnalysis.setExternalLHHA(lhhaElement);
+                controlAnalysis.setExternalLHHA(propertyContext, controlsDocumentInfo, lhhaElement);
                 return true;
             } else {
                 // Control is not already known or doesn't exist at all, try later
@@ -1569,26 +1569,6 @@ public class XFormsStaticState {
         void endVisitControl(Element controlElement, ContainerAnalysis containerControlAnalysis, ControlAnalysis newControl, boolean isContainer);
         void handleLHHA(Element lhhaElement, String controlStaticId);
     }
-
-    public static class ItemsInfo {
-        private boolean isMultiple;
-        private boolean hasNonStaticItem;
-
-        public ItemsInfo(boolean isMultiple, boolean hasNonStaticItem) {
-            this.isMultiple = isMultiple;
-            this.hasNonStaticItem = hasNonStaticItem;
-        }
-
-        public boolean isMultiple() {
-            return isMultiple;
-        }
-
-        public boolean hasNonStaticItem() {
-            return hasNonStaticItem;
-        }
-    }
-
-
 
     /**
      * Find the closest common ancestor repeat given two prefixed ids.

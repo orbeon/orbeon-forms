@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -207,30 +207,26 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandler {
 
     private boolean hasLocalLabel() {
         final XFormsStaticState staticState = containingDocument.getStaticState();
-        return hasLocalElement(staticState, staticState.getLabelElement(prefixedId));
+        final ControlAnalysis.LHHAAnalysis analysis = staticState.getLabel(prefixedId);
+        return analysis != null && analysis.isLocal;
     }
 
     private boolean hasLocalHint() {
         final XFormsStaticState staticState = containingDocument.getStaticState();
-        return hasLocalElement(staticState, staticState.getHintElement(prefixedId));
+        final ControlAnalysis.LHHAAnalysis analysis = staticState.getHint(prefixedId);
+        return analysis != null && analysis.isLocal;
     }
 
     private boolean hasLocalHelp() {
         final XFormsStaticState staticState = containingDocument.getStaticState();
-        return hasLocalElement(staticState, staticState.getHelpElement(prefixedId));
+        final ControlAnalysis.LHHAAnalysis analysis = staticState.getHelp(prefixedId);
+        return analysis != null && analysis.isLocal;
     }
 
     private boolean hasLocalAlert() {
         final XFormsStaticState staticState = containingDocument.getStaticState();
-        return hasLocalElement(staticState, staticState.getAlertElement(prefixedId));
-    }
-
-    private boolean hasLocalElement(XFormsStaticState staticState, Element lhhaElement) {
-        if (lhhaElement == null)
-            return false;
-
-        final Element controlElement = staticState.getControlElement(prefixedId);
-        return lhhaElement.getParent() == controlElement;
+        final ControlAnalysis.LHHAAnalysis analysis = staticState.getAlert(prefixedId);
+        return analysis != null && analysis.isLocal;
     }
 
     protected boolean isMustOutputControl(XFormsControl control) {

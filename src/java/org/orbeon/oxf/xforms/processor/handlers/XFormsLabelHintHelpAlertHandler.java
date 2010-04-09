@@ -79,7 +79,7 @@ public class XFormsLabelHintHelpAlertHandler extends XFormsBaseHandler {
                 final String controlLocalname = controlElement.getName();
                 xformsHandler.init(controlNamespaceURI, controlLocalname,
                         XMLUtils.buildQName(controlPrefix, controlLocalname),
-                        XMLUtils.convertAttributes(controlElement));
+                        XMLUtils.getSAXAttributes(controlElement));
 
                 final String forEffectiveId = xformsHandler.getForEffectiveId();
                 handleLabelHintHelpAlert(controlEffectiveId, forEffectiveId, LHHAC.valueOf(localname.toUpperCase()), (XFormsSingleNodeControl) xformsControl, isTemplate, true);

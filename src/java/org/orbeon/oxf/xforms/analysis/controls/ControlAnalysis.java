@@ -23,12 +23,17 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.Map;
 
+/**
+ * Hold the static analysis for an XForms control.
+ */
 public class ControlAnalysis {
 
     public final XFormsStaticState staticState;
@@ -44,15 +49,15 @@ public class ControlAnalysis {
     public final ContainerAnalysis parentControlAnalysis;
     public final Map<String, ControlAnalysis> inScopeVariables; // variable name -> ControlAnalysis
     
-    private final Element nestedLabel;
-    private final Element nestedHelp;
-    private final Element nestedHint;
-    private final Element nestedAlert;
+    private final LHHAAnalysis nestedLabel;
+    private final LHHAAnalysis nestedHelp;
+    private final LHHAAnalysis nestedHint;
+    private final LHHAAnalysis nestedAlert;
 
-    private Element externalLabel;
-    private Element externalHelp;
-    private Element externalHint;
-    private Element externalAlert;
+    private LHHAAnalysis externalLabel;
+    private LHHAAnalysis externalHelp;
+    private LHHAAnalysis externalHint;
+    private LHHAAnalysis externalAlert;
 
     public final String modelPrefixedId;
 
@@ -60,6 +65,49 @@ public class ControlAnalysis {
     public final XPathAnalysis valueAnalysis;
 
     private String classes;
+
+    public class LHHAAnalysis {
+        public final Element element;
+        public final boolean isLocal;
+        public final boolean hasStaticValue;
+
+        public final XPathAnalysis valueAnalysis;
+
+        public LHHAAnalysis(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, Element element, boolean isLocal) {
+            this.element = element;
+            this.isLocal = isLocal;
+
+            this.hasStaticValue = hasStaticValue(propertyContext, controlsDocumentInfo);
+
+            // TODO: if (staticState.isXPathAnalysis())
+
+            if (!this.hasStaticValue) {
+
+                // 1. <xforms:label model="..." context="..." value|ref="..."/>
+                // 2. <xforms:label>...<xforms:output value|ref=""/>...</xforms:label>
+                // TODO
+                this.valueAnalysis = null;
+            } else {
+                this.valueAnalysis = null;
+            }
+        }
+
+        private boolean hasStaticValue(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo) {
+
+            // Gather itemset information
+            final NodeInfo lhhaNodeInfo = controlsDocumentInfo.wrap(element);
+
+            // Try to figure out if we have a dynamic LHHA element. This attempts to cover all cases, including nested
+            // xforms:output controls. Also check for AVTs ion @class and @style.
+            return (Boolean) XPathCache.evaluateSingle(propertyContext, lhhaNodeInfo,
+                    "exists(descendant-or-self::xforms:*[@ref or @nodeset or @bind or @value or (@class, @style)[contains(., '{')]])",
+                    XFormsStaticState.BASIC_NAMESPACE_MAPPINGS, null, null, null, null, getLocationData());
+        }
+
+        public LocationData getLocationData() {
+            return new ExtendedLocationData((LocationData) element.getData(), "gathering static control information", element);
+        }
+    }
 
     public ControlAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo,
                            XBLBindings.Scope scope, String prefixedId, Element element, LocationData locationData, int index,
@@ -77,11 +125,6 @@ public class ControlAnalysis {
         this.parentControlAnalysis = parentControlAnalysis;
         this.inScopeVariables = inScopeVariables;
 
-        this.nestedLabel = findNestedLHHAElement(XFormsConstants.LABEL_QNAME);
-        this.nestedHelp = findNestedLHHAElement(XFormsConstants.HELP_QNAME);
-        this.nestedHint = findNestedLHHAElement(XFormsConstants.HINT_QNAME);
-        this.nestedAlert = findNestedLHHAElement(XFormsConstants.ALERT_QNAME);
-
         this.modelPrefixedId = computeModelPrefixedId();
 
         if (staticState.isXPathAnalysis()) {
@@ -91,38 +134,49 @@ public class ControlAnalysis {
             this.bindingAnalysis = null;
             this.valueAnalysis = null;
         }
+
+        this.nestedLabel = findNestedLHHA(propertyContext, controlsDocumentInfo, XFormsConstants.LABEL_QNAME);
+        this.nestedHelp = findNestedLHHA(propertyContext, controlsDocumentInfo, XFormsConstants.HELP_QNAME);
+        this.nestedHint = findNestedLHHA(propertyContext, controlsDocumentInfo, XFormsConstants.HINT_QNAME);
+        this.nestedAlert = findNestedLHHA(propertyContext, controlsDocumentInfo, XFormsConstants.ALERT_QNAME);
     }
 
-    protected Element findNestedLHHAElement(QName qName) {
+    private LHHAAnalysis findNestedLHHA(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
+        final Element e = findNestedLHHAElement(propertyContext, controlsDocumentInfo, qName);
+        return (e != null) ? new LHHAAnalysis(propertyContext, controlsDocumentInfo, e, true) : null;
+    }
+
+    protected Element findNestedLHHAElement(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
         return element.element(qName);
     }
 
-    public void setExternalLHHA(Element lhhaElement) {
+    public void setExternalLHHA(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, Element lhhaElement) {
+        assert lhhaElement != null;
         final String name = lhhaElement.getName();
         if (XFormsConstants.LABEL_QNAME.getName().equals(name)) {
-            externalLabel = lhhaElement;
+            externalLabel = new LHHAAnalysis(propertyContext, controlsDocumentInfo, lhhaElement, false);
         } else if (XFormsConstants.HELP_QNAME.getName().equals(name)) {
-            externalHelp = lhhaElement;
+            externalHelp = new LHHAAnalysis(propertyContext, controlsDocumentInfo, lhhaElement, false);
         } else if (XFormsConstants.HINT_QNAME.getName().equals(name)) {
-            externalHint = lhhaElement;
+            externalHint = new LHHAAnalysis(propertyContext, controlsDocumentInfo, lhhaElement, false);
         } else if (XFormsConstants.ALERT_QNAME.getName().equals(name)) {
-            externalAlert = lhhaElement;
+            externalAlert = new LHHAAnalysis(propertyContext, controlsDocumentInfo, lhhaElement, false);
         }
     }
 
-    public Element getLabelElement() {
+    public LHHAAnalysis getLabel() {
         return (nestedLabel != null) ? nestedLabel : externalLabel;
     }
 
-    public Element getHelpElement() {
+    public LHHAAnalysis getHelp() {
         return (nestedHelp != null) ? nestedHelp : externalHelp;
     }
 
-    public Element getHintElement() {
+    public LHHAAnalysis getHint() {
         return (nestedHint != null) ? nestedHint : externalHint;
     }
 
-    public Element getAlertElement() {
+    public LHHAAnalysis getAlert() {
         return (nestedAlert != null) ? nestedAlert : externalAlert;
     }
 

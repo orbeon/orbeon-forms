@@ -4635,34 +4635,6 @@ ORBEON.xforms.Init = {
         if (ORBEON.util.Utils.getProperty(OFFLINE_SUPPORT_PROPERTY))
             ORBEON.xforms.Offline.pageLoad();
 
-        if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
-            if (YAHOO.lang.isUndefined(document.addEventListener)) {
-                // For browsers that don't support the capture mode (IE) register listener for the non-standard
-                // focusin and focusout events (which do bubble), and we'll register the listener for change on the
-                // element on focus
-                YAHOO.util.Event.addListener(document, "focusin", ORBEON.xforms.Events.focus);
-                YAHOO.util.Event.addListener(document, "focusout", ORBEON.xforms.Events.blur);
-            } else {
-                // Register event handlers using capture phase for W3C-compliant browsers
-                document.addEventListener("focus", ORBEON.xforms.Events.focus, true);
-                document.addEventListener("blur", ORBEON.xforms.Events.blur, true);
-                document.addEventListener("change", ORBEON.xforms.Events.change, true);
-            }
-        }
-
-        // Register events that bubble on document for all browsers
-        if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
-            YAHOO.util.Event.addListener(document, "keypress", ORBEON.xforms.Events.keypress);
-            YAHOO.util.Event.addListener(document, "keydown", ORBEON.xforms.Events.keydown);
-            YAHOO.util.Event.addListener(document, "keyup", ORBEON.xforms.Events.keyup);
-            YAHOO.util.Event.addListener(document, "mouseover", ORBEON.xforms.Events.mouseover);
-            YAHOO.util.Event.addListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
-            YAHOO.util.Event.addListener(document, "click", ORBEON.xforms.Events.click);
-            YAHOO.util.Event.addListener(window, "resize", ORBEON.xforms.Events.resize);
-            YAHOO.widget.Overlay.windowScrollEvent.subscribe(ORBEON.xforms.Events.scrollOrResize);
-            YAHOO.widget.Overlay.windowResizeEvent.subscribe(ORBEON.xforms.Events.scrollOrResize);
-        }
-
         // Initialize XForms server URL
         ORBEON.xforms.Init._setBasePaths(document.getElementsByTagName("script"), ORBEON.util.Utils.getProperty(RESOURCES_VERSIONED) == "true");
 
@@ -4942,6 +4914,35 @@ ORBEON.xforms.Init = {
                     }
                 }
             }
+        }
+
+        // Special registration for focus, blur, and change events
+        if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
+            if (YAHOO.lang.isUndefined(document.addEventListener)) {
+                // For browsers that don't support the capture mode (IE) register listener for the non-standard
+                // focusin and focusout events (which do bubble), and we'll register the listener for change on the
+                // element on focus
+                YAHOO.util.Event.addListener(document, "focusin", ORBEON.xforms.Events.focus);
+                YAHOO.util.Event.addListener(document, "focusout", ORBEON.xforms.Events.blur);
+            } else {
+                // Register event handlers using capture phase for W3C-compliant browsers
+                document.addEventListener("focus", ORBEON.xforms.Events.focus, true);
+                document.addEventListener("blur", ORBEON.xforms.Events.blur, true);
+                document.addEventListener("change", ORBEON.xforms.Events.change, true);
+            }
+        }
+
+        // Register events that bubble on document for all browsers
+        if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
+            YAHOO.util.Event.addListener(document, "keypress", ORBEON.xforms.Events.keypress);
+            YAHOO.util.Event.addListener(document, "keydown", ORBEON.xforms.Events.keydown);
+            YAHOO.util.Event.addListener(document, "keyup", ORBEON.xforms.Events.keyup);
+            YAHOO.util.Event.addListener(document, "mouseover", ORBEON.xforms.Events.mouseover);
+            YAHOO.util.Event.addListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
+            YAHOO.util.Event.addListener(document, "click", ORBEON.xforms.Events.click);
+            YAHOO.util.Event.addListener(window, "resize", ORBEON.xforms.Events.resize);
+            YAHOO.widget.Overlay.windowScrollEvent.subscribe(ORBEON.xforms.Events.scrollOrResize);
+            YAHOO.widget.Overlay.windowResizeEvent.subscribe(ORBEON.xforms.Events.scrollOrResize);
         }
 
         // Run code sent by server

@@ -33,7 +33,7 @@ public class ContainerAnalysis extends ControlAnalysis {
     }
 
     @Override
-    protected Element findNestedLHHAElement(QName qName) {
+    protected Element findNestedLHHAElement(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
         // For e.g. <xforms:group>, consider only nested element without @for attribute
         // NOTE: Should probably be child::xforms:label[not(exists(@for))] to get first such element, but e.g. group
         // label if any should probably be first anyway.

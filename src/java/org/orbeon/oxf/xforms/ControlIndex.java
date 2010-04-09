@@ -117,11 +117,9 @@ public class ControlIndex {
      */
     public static void evaluateAll(IndentedLogger indentedLogger, PropertyContext propertyContext, Collection<XFormsControl> effectiveIdsToControls) {
         indentedLogger.startHandleOperation("controls", "evaluating");
-        {
-            // Evaluate all controls
-            for (final XFormsControl currentControl: effectiveIdsToControls) {
-                currentControl.evaluate(propertyContext);
-            }
+        // Evaluate all controls
+        for (final XFormsControl currentControl: effectiveIdsToControls) {
+            currentControl.evaluate(propertyContext);
         }
         indentedLogger.endHandleOperation();
     }

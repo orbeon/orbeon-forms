@@ -402,7 +402,7 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
     public ElementHandler getHandler(Element element) {
         return getHandler(element.getNamespaceURI(),
                 XMLUtils.buildExplodedQName(element.getNamespaceURI(), element.getName()),
-                XMLUtils.convertAttributes(element));
+                XMLUtils.getSAXAttributes(element));
     }
 
     private ElementHandler getHandler(String uri, String explodedQName, Attributes attributes) {

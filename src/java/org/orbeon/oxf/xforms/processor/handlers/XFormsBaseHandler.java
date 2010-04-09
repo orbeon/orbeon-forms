@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -406,25 +406,25 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         {
             // Statically obtain attributes information
             final XFormsStaticState staticState = containingDocument.getStaticState();
-            final Element lhhaElement;
+            final ControlAnalysis.LHHAAnalysis lhhaAnalysis;
             final String forPrefixedId = XFormsUtils.getPrefixedId(controlEffectiveId);
             if (isLabel) {
                 elementName = handlerContext.getLabelElementName();
-                lhhaElement = staticState.getLabelElement(forPrefixedId);
+                lhhaAnalysis = staticState.getLabel(forPrefixedId);
             } else if (isHelp) {
                 elementName = handlerContext.getHelpElementName();
-                lhhaElement = staticState.getHelpElement(forPrefixedId);
+                lhhaAnalysis = staticState.getHelp(forPrefixedId);
             } else if (isHint) {
                 elementName = handlerContext.getHintElementName();
-                lhhaElement = staticState.getHintElement(forPrefixedId);
+                lhhaAnalysis = staticState.getHint(forPrefixedId);
             } else if (isAlert) {
                 elementName = handlerContext.getAlertElementName();
-                lhhaElement = staticState.getAlertElement(forPrefixedId);
+                lhhaAnalysis = staticState.getAlert(forPrefixedId);
             } else {
                 throw new IllegalStateException("Illegal type requested");
             }
 
-            labelHintHelpAlertAttributes = (lhhaElement != null) ? XMLUtils.convertAttributes(lhhaElement) : null;
+            labelHintHelpAlertAttributes = (lhhaAnalysis != null) ? XMLUtils.getSAXAttributes(lhhaAnalysis.element) : null;
         }
 
         if (labelHintHelpAlertAttributes != null || isAlert) {

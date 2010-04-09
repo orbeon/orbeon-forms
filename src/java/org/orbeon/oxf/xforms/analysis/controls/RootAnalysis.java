@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.XPathAnalysis;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
 
 public class RootAnalysis extends ContainerAnalysis {
     public RootAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, XBLBindings.Scope scope) {
@@ -26,7 +27,7 @@ public class RootAnalysis extends ContainerAnalysis {
     }
 
     @Override
-    protected Element findNestedLHHAElement(QName qName) {
+    protected Element findNestedLHHAElement(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
         return null;
     }
 

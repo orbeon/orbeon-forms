@@ -29,7 +29,7 @@ public class ComponentAnalysis extends ContainerAnalysis {
     }
 
     @Override
-    protected Element findNestedLHHAElement(QName qName) {
+    protected Element findNestedLHHAElement(PropertyContext propertyContext, DocumentWrapper controlsDocumentInfo, QName qName) {
         // Nested LHHA elements are handled by XBL template
         return null;
     }

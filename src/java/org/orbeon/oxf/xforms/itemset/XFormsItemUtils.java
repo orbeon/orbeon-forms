@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.controls.Select1Analysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
@@ -95,8 +96,8 @@ public class XFormsItemUtils {
         // Optimize static itemsets
         {
             final boolean isStaticItemset; {
-            final XFormsStaticState.ItemsInfo itemsInfo = container.getContainingDocument().getStaticState().getItemsInfo(select1Control.getPrefixedId());
-                isStaticItemset = itemsInfo != null && !itemsInfo.hasNonStaticItem();
+            final Select1Analysis analysis = container.getContainingDocument().getStaticState().getSelect1Analysis(select1Control.getPrefixedId());
+                isStaticItemset = analysis != null && !analysis.hasNonStaticItem;
             }
 
             if (isStaticItemset)

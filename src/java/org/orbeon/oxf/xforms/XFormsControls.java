@@ -165,14 +165,16 @@ public class XFormsControls implements XFormsObjectResolver {
                 // NOTE: We set this first so that the tree is made available during construction to XPath functions like index() or xxforms:case() 
                 currentControlTree = initialControlTree = new ControlTree(containingDocument, indentedLogger);
 
+                // Set this here so that while initialize() runs below, refresh events will find the flag set
+                initialized = true;
+
                 // Initialize new control tree
                 currentControlTree.initialize(propertyContext, containingDocument, rootContainer);
             }
+        } else {
+            // Consider initialized
+            initialized = true;
         }
-
-//        rootContainer.getContextStack().resetBindingContext(propertyContext);// not sure we actually need to do this here
-
-        initialized = true;
     }
 
     /**

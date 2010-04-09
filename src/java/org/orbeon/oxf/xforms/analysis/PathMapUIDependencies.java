@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsInstance;
-import org.orbeon.oxf.xforms.XFormsModel;
-import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.NodeInfo;
@@ -56,13 +53,17 @@ public class PathMapUIDependencies implements UIDependencies {
         assert nodeInfo instanceof NodeWrapper;
         assert model.getInstanceForNode(nodeInfo).getModel(containingDocument) ==  model;
 
-        Set<NodeInfo> nodeInfos = modifiedNodes.get(model.getPrefixedId());
-        if (nodeInfos == null) {
-            nodeInfos = new HashSet<NodeInfo>();
-            modifiedNodes.put(model.getPrefixedId(), nodeInfos);
-        }
+        if (!structuralChanges.contains(model.getPrefixedId())) {
+            // Only care about path changes if there is no structural change for this model, since structural changes
+            // for now disable any more subtle path-based check.
+            Set<NodeInfo> nodeInfos = modifiedNodes.get(model.getPrefixedId());
+            if (nodeInfos == null) {
+                nodeInfos = new HashSet<NodeInfo>();
+                modifiedNodes.put(model.getPrefixedId(), nodeInfos);
+            }
 
-        nodeInfos.add(nodeInfo);
+            nodeInfos.add(nodeInfo);
+        }
     }
 
     public void markStructuralChange(XFormsModel model) {
@@ -139,6 +140,46 @@ public class PathMapUIDependencies implements UIDependencies {
         return sb.toString();
     }
 
+    public boolean requireBindingUpdate(String controlPrefixedId) {
+
+        final boolean result;
+        final Boolean cached = modifiedBindingCache.get(controlPrefixedId);
+        if (cached != null) {
+            result = cached;
+        } else {
+            final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
+            if (controlAnalysis.bindingAnalysis == null) {
+                // Control does not have an XPath binding
+                result = false;
+            } else if (!controlAnalysis.bindingAnalysis.figuredOutDependencies) {
+                // Binding dependencies are unknown
+                result = true;
+            } else {
+                // Binding dependencies are known
+                if (structuralChanges.isEmpty()) {
+                    // No structural change, just test for paths
+                    result = controlAnalysis.bindingAnalysis.intersectsBinding(getModifiedPaths());
+                } else {
+                    // Structural change, also test for models
+                    result = controlAnalysis.bindingAnalysis.intersectsModels(structuralChanges)
+                            || controlAnalysis.bindingAnalysis.intersectsBinding(getModifiedPaths());
+                }
+            }
+            if (result) {
+                containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "binding modified", "prefixed id", controlPrefixedId,
+                        "XPath", controlAnalysis.bindingAnalysis.xpathString);
+                bindingUpdateCount++;
+            }
+
+            modifiedBindingCache.put(controlPrefixedId, result);
+        }
+
+        if (result) {
+            bindingUpdateCount++;
+        }
+        return result;
+    }
+
     public boolean requireValueUpdate(String controlPrefixedId) {
 
         final boolean result;
@@ -159,11 +200,12 @@ public class PathMapUIDependencies implements UIDependencies {
             } else {
                 // Value dependencies are known
                 if (structuralChanges.isEmpty()) {
-                    // No structural change
+                    // No structural change, just test for paths
                     result = valueAnalysis.intersectsValue(getModifiedPaths());
                 } else {
-                    // Structural change
-                    result = valueAnalysis.intersectsModels(structuralChanges);
+                    // Structural change, also test for models
+                    result = valueAnalysis.intersectsModels(structuralChanges)
+                            || valueAnalysis.intersectsValue(getModifiedPaths());
                 }
             }
             if (result && valueAnalysis != null) {
@@ -180,42 +222,9 @@ public class PathMapUIDependencies implements UIDependencies {
         return result;
     }
 
-    public boolean requireBindingUpdate(String controlPrefixedId) {
-
-        final boolean result;
-        final Boolean cached = modifiedBindingCache.get(controlPrefixedId);
-        if (cached != null) {
-            result = cached;
-        } else {
-            final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
-            if (controlAnalysis.bindingAnalysis == null) {
-                // Control does not have an XPath binding
-                result = false;
-            } else if (!controlAnalysis.bindingAnalysis.figuredOutDependencies) {
-                // Binding dependencies are unknown
-                result = true;
-            } else {
-                // Binding dependencies are known
-                if (structuralChanges.isEmpty()) {
-                    // No structural change
-                    result = controlAnalysis.bindingAnalysis.intersectsBinding(getModifiedPaths());
-                } else {
-                    // Structural change
-                    result = controlAnalysis.bindingAnalysis.intersectsModels(structuralChanges);
-                }
-            }
-            if (result) {
-                containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "binding modified", "prefixed id", controlPrefixedId,
-                        "XPath", controlAnalysis.bindingAnalysis.xpathString);
-                bindingUpdateCount++;
-            }
-
-            modifiedBindingCache.put(controlPrefixedId, result);
-        }
-
-        if (result) {
-            bindingUpdateCount++;
-        }
-        return result;
+    public boolean requireLHHAUpdate(XFormsConstants.LHHA lhha, String controlPrefixedId) {
+        // TODO
+//        final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
+        return true;
     }
 }

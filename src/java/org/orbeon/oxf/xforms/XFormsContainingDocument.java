@@ -803,7 +803,8 @@ public class XFormsContainingDocument extends XBLContainer {
                 
                 // Mark the control as dirty, because we may have done a rebuild/recalculate earlier, and this means
                 // the MIPs need to be re-evaluated before being checked below
-                xformsControl.markDirty();
+                // NOTE: This is almost certainly wrong now (2010-04-08)
+                xformsControl.markDirty(uiDependencies);
             }
 
             if (!handleGoingOnline) {

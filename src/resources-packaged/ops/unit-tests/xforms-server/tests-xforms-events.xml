@@ -2150,7 +2150,7 @@
                         <xxf:control id="my-input">43</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
-            </xxf:event-response>
+            </xxf:event-response>            
         </output>
     </test>
 

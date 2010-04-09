@@ -69,12 +69,6 @@ public class XFormsRepeatIterationControl extends XFormsSingleNodeContainerContr
         return false;
     }
 
-    // Make public for XFormsRepeatControl
-    @Override
-    public void evaluateImpl(PropertyContext propertyContext) {
-        super.evaluateImpl(propertyContext);
-    }
-
     @Override
     public String getLabel(PropertyContext propertyContext) {
         // Don't bother letting superclass handle this

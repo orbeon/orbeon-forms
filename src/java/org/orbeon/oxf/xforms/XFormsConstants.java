@@ -33,6 +33,10 @@ public class XFormsConstants {
     public static final Set<String> ALLOWED_EXFORMS_ELEMENTS = new HashSet<String>();
     public static final Set<String> ALLOWED_XBL_ELEMENTS = new HashSet<String>();
     public static final Set<String> LABEL_HINT_HELP_ALERT_ELEMENT = new HashSet<String>();
+
+    public enum LHHA {
+        LABEL, HELP, HINT, ALERT
+    }
         
     static {
         // TODO: Keeping this static list is not ideal

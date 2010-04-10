@@ -38,6 +38,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         final Map<String, String> namespaces = new HashMap<String, String>();
         namespaces.put("", "");
 
+        // Hold the current list of changes 
         final Set<String> currentChanges = new HashSet<String>();
 
         final PathMapUIDependencies dependencies = new PathMapUIDependencies(staticState.getIndentedLogger(), staticState) {

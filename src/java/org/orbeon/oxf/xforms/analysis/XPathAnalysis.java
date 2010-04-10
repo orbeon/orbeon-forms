@@ -172,7 +172,7 @@ public class XPathAnalysis {
                         final Model model = staticState.getModel(modelPrefixedId);
                         if (model.defaultInstancePrefixedId != null) {
                             sb.append(buildInstanceString(model.defaultInstancePrefixedId));
-                            dependentModels.add(model.defaultInstancePrefixedId);
+                            dependentModels.add(model.prefixedId);
                         } else {
                             // Model does not have a default instance
                             // This is successful, but the path must not be added

@@ -20,7 +20,7 @@
             xmlns:xbl="http://www.w3.org/ns/xbl">
 
     <xh:head>
-        <xf:model xxf:xpath-analysis="true">
+        <xf:model id="model1" xxf:xpath-analysis="true">
             <xf:instance id="default">
                 <instance>
                     <a>1</a>
@@ -44,12 +44,12 @@
         <!--<xxf:variable id="v2" name="field" select="instance('default')/c[position() eq $position]"/>-->
         <!--<xf:input ref="$field/d" appearance="full" id="yyy"/>-->
         
-        <xf:trigger id="insert1">
+        <xf:trigger id="trigger1">
             <xf:label>Insert 1</xf:label>
             <xf:insert ev:event="DOMActivate" nodeset="b"/>
         </xf:trigger>
 
-        <xf:trigger id="insert2" model="model2">
+        <xf:trigger id="trigger2" model="model2">
             <xf:label>Insert 2</xf:label>
             <xf:insert ev:event="DOMActivate" nodeset="b"/>
         </xf:trigger>

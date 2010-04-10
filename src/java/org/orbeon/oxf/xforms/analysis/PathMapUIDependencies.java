@@ -81,6 +81,11 @@ public class PathMapUIDependencies implements UIDependencies {
         structuralChanges.add(model.getPrefixedId());
     }
 
+    // For unit tests
+    public void markStructuralChange(String modelPrefixedId) {
+        structuralChanges.add(modelPrefixedId);
+    }
+
     public void refreshDone() {
 
         logger.logDebug("dependencies", "refresh done",

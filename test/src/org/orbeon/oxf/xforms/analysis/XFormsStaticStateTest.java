@@ -49,9 +49,12 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
         staticState.dumpAnalysis();
 
-        // ================================================================================
+        // == Value change to default ==================================================================================
         currentChanges.clear();
         currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('default')/a"));
+
+        assertFalse(dependencies.requireBindingUpdate("trigger1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger2"));
 
         assertFalse(dependencies.requireBindingUpdate("select1"));
         assertTrue(dependencies.requireValueUpdate("select1"));
@@ -77,9 +80,12 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
         dependencies.refreshDone();
 
-        // ================================================================================
+        // == Value change to default ==================================================================================
         currentChanges.clear();
         currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('default')/b"));
+
+        assertFalse(dependencies.requireBindingUpdate("trigger1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger2"));
 
         assertFalse(dependencies.requireBindingUpdate("select1"));
         assertFalse(dependencies.requireValueUpdate("select1"));
@@ -105,9 +111,12 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
         dependencies.refreshDone();
 
-        // ================================================================================
+        // == Value change to instance2 ================================================================================
         currentChanges.clear();
         currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('instance2')/a"));
+
+        assertFalse(dependencies.requireBindingUpdate("trigger1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger2"));
 
         assertFalse(dependencies.requireBindingUpdate("select1"));
         assertFalse(dependencies.requireValueUpdate("select1"));
@@ -133,9 +142,12 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
         dependencies.refreshDone();
 
-        // ================================================================================
+        // == Value change to instance2 ================================================================================
         currentChanges.clear();
         currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('instance2')/b"));
+
+        assertFalse(dependencies.requireBindingUpdate("trigger1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger2"));
 
         assertFalse(dependencies.requireBindingUpdate("select1"));
         assertFalse(dependencies.requireValueUpdate("select1"));
@@ -157,6 +169,68 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 //        assertFalse(dependencies.requireValueUpdate("group4"));
 
         assertFalse(dependencies.requireBindingUpdate("select4"));
+        assertTrue(dependencies.requireValueUpdate("select4"));
+
+        dependencies.refreshDone();
+
+        // == Structural change to model1 ==============================================================================
+        currentChanges.clear();
+        dependencies.markStructuralChange("model1");
+
+        assertTrue(dependencies.requireBindingUpdate("trigger1"));
+        assertFalse(dependencies.requireBindingUpdate("trigger2"));
+
+        assertTrue(dependencies.requireBindingUpdate("select1"));
+        assertTrue(dependencies.requireValueUpdate("select1"));
+
+        assertTrue(dependencies.requireBindingUpdate("group2"));
+//        assertTrue(dependencies.requireValueUpdate("group2"));
+
+        assertTrue(dependencies.requireBindingUpdate("select2"));
+        assertTrue(dependencies.requireValueUpdate("select2"));
+
+
+        assertFalse(dependencies.requireBindingUpdate("group3"));
+//        assertFalse(dependencies.requireValueUpdate("group3"));
+
+        assertFalse(dependencies.requireBindingUpdate("select3"));
+        assertFalse(dependencies.requireValueUpdate("select3"));
+
+        assertFalse(dependencies.requireBindingUpdate("group4"));
+//        assertFalse(dependencies.requireValueUpdate("group4"));
+
+        assertFalse(dependencies.requireBindingUpdate("select4"));
+        assertFalse(dependencies.requireValueUpdate("select4"));
+
+        dependencies.refreshDone();
+
+        // == Structural change to model2 ==============================================================================
+        currentChanges.clear();
+        dependencies.markStructuralChange("model2");
+
+        assertFalse(dependencies.requireBindingUpdate("trigger1"));
+        assertTrue(dependencies.requireBindingUpdate("trigger2"));
+
+        assertFalse(dependencies.requireBindingUpdate("select1"));
+        assertFalse(dependencies.requireValueUpdate("select1"));
+
+        assertFalse(dependencies.requireBindingUpdate("group2"));
+//        assertFalse(dependencies.requireValueUpdate("group2"));
+
+        assertFalse(dependencies.requireBindingUpdate("select2"));
+        assertFalse(dependencies.requireValueUpdate("select2"));
+
+
+        assertTrue(dependencies.requireBindingUpdate("group3"));
+//        assertTrue(dependencies.requireValueUpdate("group3"));
+
+        assertTrue(dependencies.requireBindingUpdate("select3"));
+        assertTrue(dependencies.requireValueUpdate("select3"));
+
+        assertTrue(dependencies.requireBindingUpdate("group4"));
+//        assertTrue(dependencies.requireValueUpdate("group4"));
+
+        assertTrue(dependencies.requireBindingUpdate("select4"));
         assertTrue(dependencies.requireValueUpdate("select4"));
 
         dependencies.refreshDone();

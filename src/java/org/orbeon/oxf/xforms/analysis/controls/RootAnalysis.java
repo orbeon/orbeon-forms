@@ -23,7 +23,7 @@ import org.orbeon.saxon.dom4j.DocumentWrapper;
 
 public class RootAnalysis extends ContainerAnalysis {
     public RootAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, XBLBindings.Scope scope) {
-        super(propertyContext, staticState, null, scope, "#controls", null, staticState.getLocationData(), 1, false, false, null, null);
+        super(propertyContext, staticState, null, scope, "#controls", null, staticState.getLocationData(), 1, false, null, null);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class RootAnalysis extends ContainerAnalysis {
     }
 
     @Override
-    protected XPathAnalysis computeBindingAnalysis() {
+    protected XPathAnalysis computeBindingAnalysis(Element element) {
         if (staticState.getDefaultModelId() != null) {
             final String defaultInstanceId = staticState.getDefaultInstanceId();
             if (defaultInstanceId != null) {

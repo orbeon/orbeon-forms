@@ -28,7 +28,7 @@ public class ControlAnalysisFactory {
 
     public static ControlAnalysis create(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo,
                                            XBLBindings.Scope controlScope, String controlPrefixedId, Element controlElement, LocationData locationData,
-                                           int index, boolean hasNodeBinding, boolean isContainer, ContainerAnalysis parentControlAnalysis,
+                                           int index, boolean isContainer, ContainerAnalysis parentControlAnalysis,
                                            Map<String, ControlAnalysis> inScopeVariables) {
 
         final String controlName = controlElement.getName();
@@ -38,34 +38,34 @@ public class ControlAnalysisFactory {
         if (controlName.equals("repeat")) {
             // Repeat container
             controlAnalysis = new RepeatAnalysis(propertyContext, staticState, controlsDocumentInfo, controlScope,
-                    controlPrefixedId, controlElement, locationData, index, hasNodeBinding,
+                    controlPrefixedId, controlElement, locationData, index,
                     XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, inScopeVariables);
         } else if (staticState.getXBLBindings().hasBinding(controlPrefixedId)) {
             // Control with XBL binding
             controlAnalysis = new ComponentAnalysis(propertyContext, staticState, controlsDocumentInfo, controlScope,
-                    controlPrefixedId, controlElement, locationData, index, hasNodeBinding,
+                    controlPrefixedId, controlElement, locationData, index,
                     XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, inScopeVariables);
         } else if (isContainer) {
             // Other container
             controlAnalysis = new ContainerAnalysis(propertyContext, staticState, controlsDocumentInfo, controlScope,
-                    controlPrefixedId, controlElement, locationData, index, hasNodeBinding,
+                    controlPrefixedId, controlElement, locationData, index,
                     XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, inScopeVariables);
         } else if (controlName.equals("select") || controlName.equals("select1")) {
             controlAnalysis = new Select1Analysis(propertyContext, staticState, controlsDocumentInfo, controlScope,
-                    controlPrefixedId, controlElement, locationData, index, hasNodeBinding,
+                    controlPrefixedId, controlElement, locationData, index,
                     XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, inScopeVariables);
         } else if ("variable".equals(controlName)) {
             controlAnalysis = new VariableAnalysis(propertyContext, staticState, controlsDocumentInfo, controlScope,
-                    controlPrefixedId, controlElement, locationData, index, hasNodeBinding,
+                    controlPrefixedId, controlElement, locationData, index,
                     XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, inScopeVariables);
         } else if ("attribute".equals(controlName)) {
             controlAnalysis = new AttributeAnalysis(propertyContext, staticState, controlsDocumentInfo, controlScope,
-                    controlPrefixedId, controlElement, locationData, index, hasNodeBinding,
+                    controlPrefixedId, controlElement, locationData, index,
                     XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, inScopeVariables);
         } else {
             // Default
             controlAnalysis = new ControlAnalysis(propertyContext, staticState, controlsDocumentInfo, controlScope,
-                    controlPrefixedId, controlElement, locationData, index, hasNodeBinding,
+                    controlPrefixedId, controlElement, locationData, index,
                     XFormsControlFactory.isValueControl(controlURI, controlName), parentControlAnalysis, inScopeVariables);
         }
         return controlAnalysis;

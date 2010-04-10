@@ -207,15 +207,6 @@ public class XFormsSelect1Control extends XFormsValueControl {
         return analysis != null && analysis.isMultiple;
     }
 
-    /**
-     * Whether this control has a static set of items.
-     *
-     * @return                      true iif control has a static set of items
-     */
-    public boolean isStaticItemset() {
-        return isStaticItemset(containingDocument, getPrefixedId());
-    }
-
     public boolean isOpenSelection() {
         return isOpenSelection;
     }

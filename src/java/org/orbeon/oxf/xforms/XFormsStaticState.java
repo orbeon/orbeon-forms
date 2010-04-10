@@ -1167,42 +1167,12 @@ public class XFormsStaticState {
 
                 // Gather control name
                 final String controlName = controlElement.getName();
-                final String controlURI = controlElement.getNamespaceURI();
 
                 final LocationData locationData = new ExtendedLocationData((LocationData) controlElement.getData(), "gathering static control information", controlElement);
 
                 // If element is not built-in, check XBL and generate shadow content if needed
                 xblBindings.processElementIfNeeded(propertyContext, indentedLogger, controlElement, controlPrefixedId, locationData,
                         controlsDocumentInfo, xpathConfiguration, innerScope, parentControlAnalysis, repeatHierarchyStringBuffer);
-
-                // Check for mandatory and optional bindings
-                // TODO: move these tests to ControlAnalysis
-                final boolean hasNodeBinding;
-                {
-                    final boolean hasBind = controlElement.attribute("bind") != null;
-                    final boolean hasRef = controlElement.attribute("ref") != null;
-                    final boolean hasNodeset = controlElement.attribute("nodeset") != null;
-
-                    if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(controlURI)) {
-//                        if (XFormsControlFactory.MANDATORY_SINGLE_NODE_CONTROLS.get(controlName) != null && !(hasRef || hasBind)) {
-//                            throw new ValidationException("Missing mandatory single node binding for element: " + controlElement.getQualifiedName(), locationData);
-//                        }
-//                        if (XFormsControlFactory.NO_SINGLE_NODE_CONTROLS.get(controlName) != null && (hasRef || hasBind)) {
-//                            throw new ValidationException("Single node binding is prohibited for element: " + controlElement.getQualifiedName(), locationData);
-//                        }
-//                        if (XFormsControlFactory.MANDATORY_NODESET_CONTROLS.get(controlName) != null && !(hasRef || hasNodeset || hasBind)) {
-//                            throw new ValidationException("Missing mandatory nodeset binding for element: " + controlElement.getQualifiedName(), locationData);
-//                        }
-//                        if (XFormsControlFactory.NO_NODESET_CONTROLS.get(controlName) != null && hasNodeset) {
-//                            throw new ValidationException("Node-set binding is prohibited for element: " + controlElement.getQualifiedName(), locationData);
-//                        }
-//                        if (XFormsControlFactory.SINGLE_NODE_OR_VALUE_CONTROLS.get(controlName) != null && !(hasRef || hasBind || controlElement.attribute("value") != null)) {
-//                            throw new ValidationException("Missing mandatory single node binding or value attribute for element: " + controlElement.getQualifiedName(), locationData);
-//                        }
-                    }
-
-                    hasNodeBinding = hasBind || hasRef || hasNodeset;
-                }
 
                 // Create and index static control information
                 final ControlAnalysis controlAnalysis; {
@@ -1211,8 +1181,8 @@ public class XFormsStaticState {
                     final Map<String, ControlAnalysis> inScopeVariables = parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap);
 
                     controlAnalysis = ControlAnalysisFactory.create(propertyContext, XFormsStaticState.this, controlsDocumentInfo,
-                        controlScope, controlPrefixedId, controlElement, locationData,controlIndex, hasNodeBinding,
-                        isContainer, parentControlAnalysis, inScopeVariables);
+                            controlScope, controlPrefixedId, controlElement, locationData,controlIndex, isContainer,
+                            parentControlAnalysis, inScopeVariables);
                 }
 
                 controlAnalysisMap.put(controlPrefixedId, controlAnalysis);
@@ -1650,7 +1620,7 @@ public class XFormsStaticState {
         return controlAnalysisMap.get(prefixedId);
     }
 
-    public void dumpAnalysis() throws Exception {
+    public void dumpAnalysis() {
         if (isXPathAnalysis()) {
             for (final ControlAnalysis info: controlAnalysisMap.values()) {
                 final String pad = "                                           ".substring(0, info.getLevel());

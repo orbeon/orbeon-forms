@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis;
 
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.saxon.dom4j.NodeWrapper;
@@ -27,6 +28,8 @@ import java.util.*;
 public class PathMapUIDependencies implements UIDependencies {
 
     private final XFormsContainingDocument containingDocument;
+    
+    private final IndentedLogger logger;
     private final XFormsStaticState staticState;
 
     private final Map<String, Set<NodeInfo>> modifiedNodes = new HashMap<String, Set<NodeInfo>>();
@@ -44,7 +47,15 @@ public class PathMapUIDependencies implements UIDependencies {
 
     public PathMapUIDependencies(XFormsContainingDocument containingDocument) {
         this.containingDocument = containingDocument;
+        this.logger = containingDocument.getControls().getIndentedLogger();
         this.staticState = containingDocument.getStaticState();
+    }
+
+    // Constructor for unit tests
+    protected PathMapUIDependencies(IndentedLogger logger, XFormsStaticState staticState) {
+        this.containingDocument = null;
+        this.logger = logger;
+        this.staticState = staticState;
     }
 
     public void markValueChanged(XFormsModel model, NodeInfo nodeInfo) {
@@ -72,7 +83,7 @@ public class PathMapUIDependencies implements UIDependencies {
 
     public void refreshDone() {
 
-        containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "refresh done",
+        logger.logDebug("dependencies", "refresh done",
                 "bindings updated", Integer.toString(bindingUpdateCount),
                 "values updated", Integer.toString(valueUpdateCount));
 
@@ -88,7 +99,8 @@ public class PathMapUIDependencies implements UIDependencies {
         valueUpdateCount = 0;
     }
 
-    private Set<String> getModifiedPaths() {
+    // Protected to help with unit tests
+    protected Set<String> getModifiedPaths() {
         if (!modifiedPathsSet) {
 
             assert modifiedNodes.isEmpty();
@@ -166,7 +178,7 @@ public class PathMapUIDependencies implements UIDependencies {
                 }
             }
             if (result) {
-                containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "binding modified", "prefixed id", controlPrefixedId,
+                logger.logDebug("dependencies", "binding modified", "prefixed id", controlPrefixedId,
                         "XPath", controlAnalysis.bindingAnalysis.xpathString);
                 bindingUpdateCount++;
             }
@@ -209,7 +221,7 @@ public class PathMapUIDependencies implements UIDependencies {
                 }
             }
             if (result && valueAnalysis != null) {
-                containingDocument.getControls().getIndentedLogger().logDebug("dependencies", "value modified", "prefixed id", controlPrefixedId,
+                logger.logDebug("dependencies", "value modified", "prefixed id", controlPrefixedId,
                         "XPath", valueAnalysis.xpathString);
             }
 

@@ -18,11 +18,14 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
+import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.function.Instance;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.Axis;
+import org.orbeon.saxon.om.NamePool;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -33,12 +36,12 @@ public class XPathAnalysis {
     public final String xpathString;
     public final PathMap pathmap;
 
-    final Set<String> dependentPaths = new HashSet<String>();
-    final Set<String> returnablePaths = new HashSet<String>();
+    public final Set<String> dependentPaths = new HashSet<String>();
+    public final Set<String> returnablePaths = new HashSet<String>();
 
-    final Set<String> dependentModels = new HashSet<String>();
+    public final Set<String> dependentModels = new HashSet<String>();
 
-    final boolean figuredOutDependencies;
+    public final boolean figuredOutDependencies;
 
     public static XPathAnalysis CONSTANT_ANALYSIS = new XPathAnalysis();
 
@@ -92,6 +95,16 @@ public class XPathAnalysis {
         } catch (Exception e) {
             throw new OXFException("Exception while analyzing XPath expression: " + xpathString, e);
         }
+    }
+
+    public void combine(XPathAnalysis other) {
+
+        assert figuredOutDependencies && other.figuredOutDependencies;
+
+        pathmap.addRoots(other.pathmap.getPathMapRoots());
+        dependentPaths.addAll(other.dependentPaths);
+        returnablePaths.addAll(other.returnablePaths);
+        dependentModels.addAll(other.dependentModels);
     }
 
     public boolean intersectsBinding(Set<String> touchedPaths) {
@@ -155,9 +168,18 @@ public class XPathAnalysis {
 
                     final boolean hasParameter = instanceExpression.getArguments().length > 0;
                     if (!hasParameter) {
-                        // instance() resolves to default model/instance for scope
-                        sb.append(buildInstanceString(staticState.getDefaultInstancePrefixedIdForScope(scope)));
-                        dependentModels.add(staticState.getDefaultModelPrefixedIdForScope(scope));
+                        // instance() resolves to default instance for scope
+                        final Model model = staticState.getModel(modelPrefixedId);
+                        if (model.defaultInstancePrefixedId != null) {
+                            sb.append(buildInstanceString(model.defaultInstancePrefixedId));
+                            dependentModels.add(model.defaultInstancePrefixedId);
+                        } else {
+                            // Model does not have a default instance
+                            // This is successful, but the path must not be added
+                            sb.setLength(0);
+                            success = true;
+                            break;
+                        }
                     } else {
                         final Expression instanceNameExpression = instanceExpression.getArguments()[0];
                         if (instanceNameExpression instanceof StringLiteral) {
@@ -274,7 +296,10 @@ public class XPathAnalysis {
         }
     }
 
-    private String getDisplayPath(String path) {
+    // For debugging/logging
+    private static String getDisplayPath(String path) {
+        final NamePool pool = XPathCache.getGlobalConfiguration().getNamePool();
+
         final StringTokenizer st = new StringTokenizer(path, "/");
         final StringBuilder sb = new StringBuilder();
         while (st.hasMoreTokens()) {
@@ -285,10 +310,42 @@ public class XPathAnalysis {
             }
             try {
                 final int i = Integer.parseInt(token);
-                sb.append(XPathCache.getGlobalConfiguration().getNamePool().getDisplayName(i));
+                sb.append(pool.getDisplayName(i));
             } catch (NumberFormatException e) {
                 sb.append(token);
             }
+            if (st.hasMoreTokens())
+                sb.append('/');
+        }
+        return sb.toString();
+    }
+
+    // For unit tests
+    public static String getInternalPath(Map<String, String> namespaces, String path) {
+        final NamePool pool = XPathCache.getGlobalConfiguration().getNamePool();
+
+        final StringTokenizer st = new StringTokenizer(path, "/");
+        final StringBuilder sb = new StringBuilder();
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+
+            if (token.startsWith("instance(")) {
+                // instance(...)
+                sb.append(token);
+            } else {
+                if (token.startsWith("@")) {
+                    // Attribute
+                    sb.append('@');
+                    token = token.substring(1);
+                }
+
+                // Element or attribute name
+                final String prefix = XMLUtils.prefixFromQName(token);
+                final String localname = XMLUtils.localNameFromQName(token);
+
+                sb.append(pool.allocate(prefix, namespaces.get(prefix), localname));
+            }
+            // Separator
             if (st.hasMoreTokens())
                 sb.append('/');
         }

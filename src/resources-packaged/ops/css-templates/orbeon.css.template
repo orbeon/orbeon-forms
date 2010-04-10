@@ -13,7 +13,7 @@
 */
 body { margin: .71em; padding: 0 }
 
-body, input, button, table {
+body, input, select, button, table {
     font-family: Arial, Helvetica, Geneva, sans-serif;
     font-size: 9pt;
 }

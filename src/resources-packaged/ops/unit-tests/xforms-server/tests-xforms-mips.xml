@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -476,14 +476,14 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-control·1" class="foo-bar-is-not-g">bloody</xxf:control>
-                        <xxf:control id="my-control·2" class="foo-bar-is-not-g">valencia</xxf:control>
-                        <xxf:control id="my-control·3" class="foo-bar-is-g">green</xxf:control>
-                        <xxf:control id="my-control·4" class="foo-bar-is-not-g">red</xxf:control>
-                        <xxf:control id="my-control·5" class="foo-bar-is-not-g">iPod</xxf:control>
-                        <xxf:control id="my-control·6" class="foo-bar-is-g">green</xxf:control>
-                        <xxf:control id="my-control·7" class="foo-bar-is-not-g">williams</xxf:control>
-                        <xxf:control id="my-control·8" class="foo-bar-is-not-g">yellow</xxf:control>
+                        <xxf:control id="my-controlÂ·1" class="foo-bar-is-not-g">bloody</xxf:control>
+                        <xxf:control id="my-controlÂ·2" class="foo-bar-is-not-g">valencia</xxf:control>
+                        <xxf:control id="my-controlÂ·3" class="foo-bar-is-g">green</xxf:control>
+                        <xxf:control id="my-controlÂ·4" class="foo-bar-is-not-g">red</xxf:control>
+                        <xxf:control id="my-controlÂ·5" class="foo-bar-is-not-g">iPod</xxf:control>
+                        <xxf:control id="my-controlÂ·6" class="foo-bar-is-g">green</xxf:control>
+                        <xxf:control id="my-controlÂ·7" class="foo-bar-is-not-g">williams</xxf:control>
+                        <xxf:control id="my-controlÂ·8" class="foo-bar-is-not-g">yellow</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1016,40 +1016,40 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output-relevant·1">true</xxf:control>
-                        <xxf:control id="output-readonly·1">true</xxf:control>
-                        <xxf:control id="output-required·1">true</xxf:control>
-                        <xxf:control id="output-type·1">xs:integer</xxf:control>
-                        <xxf:control id="output-constraint·1">true</xxf:control>
-                        <xxf:control id="output-default·1">42</xxf:control>
-                        <xxf:control id="output-custom·1">42, 43</xxf:control>
-                        <xxf:control id="output-calculate·1">43</xxf:control>
+                        <xxf:control id="output-relevantÂ·1">true</xxf:control>
+                        <xxf:control id="output-readonlyÂ·1">true</xxf:control>
+                        <xxf:control id="output-requiredÂ·1">true</xxf:control>
+                        <xxf:control id="output-typeÂ·1">xs:integer</xxf:control>
+                        <xxf:control id="output-constraintÂ·1">true</xxf:control>
+                        <xxf:control id="output-defaultÂ·1">42</xxf:control>
+                        <xxf:control id="output-customÂ·1">42, 43</xxf:control>
+                        <xxf:control id="output-calculateÂ·1">43</xxf:control>
                         <xxf:repeat-iteration id="repeat" relevant="false" iteration="2"/>
-                        <xxf:control id="output-relevant·2" relevant="false"/>
-                        <xxf:control id="output-readonly·2" relevant="false"/>
-                        <xxf:control id="output-required·2" relevant="false"/>
-                        <xxf:control id="output-type·2" relevant="false"/>
-                        <xxf:control id="output-constraint·2" relevant="false"/>
-                        <xxf:control id="output-default·2" relevant="false"/>
-                        <xxf:control id="output-custom·2" relevant="false"/>
-                        <xxf:control id="output-calculate·2" relevant="false"/>
-                        <xxf:control id="output-relevant·3">true</xxf:control>
-                        <xxf:control id="output-readonly·3">false</xxf:control>
-                        <xxf:control id="output-required·3">false</xxf:control>
-                        <xxf:control id="output-type·3">xs:integer</xxf:control>
-                        <xxf:control id="output-constraint·3">false</xxf:control>
-                        <xxf:control id="output-default·3">44</xxf:control>
-                        <xxf:control id="output-custom·3">44, 45</xxf:control>
-                        <xxf:control id="output-calculate·3">45</xxf:control>
+                        <xxf:control id="output-relevantÂ·2" relevant="false"/>
+                        <xxf:control id="output-readonlyÂ·2" relevant="false"/>
+                        <xxf:control id="output-requiredÂ·2" relevant="false"/>
+                        <xxf:control id="output-typeÂ·2" relevant="false"/>
+                        <xxf:control id="output-constraintÂ·2" relevant="false"/>
+                        <xxf:control id="output-defaultÂ·2" relevant="false"/>
+                        <xxf:control id="output-customÂ·2" relevant="false"/>
+                        <xxf:control id="output-calculateÂ·2" relevant="false"/>
+                        <xxf:control id="output-relevantÂ·3">true</xxf:control>
+                        <xxf:control id="output-readonlyÂ·3">false</xxf:control>
+                        <xxf:control id="output-requiredÂ·3">false</xxf:control>
+                        <xxf:control id="output-typeÂ·3">xs:integer</xxf:control>
+                        <xxf:control id="output-constraintÂ·3">false</xxf:control>
+                        <xxf:control id="output-defaultÂ·3">44</xxf:control>
+                        <xxf:control id="output-customÂ·3">44, 45</xxf:control>
+                        <xxf:control id="output-calculateÂ·3">45</xxf:control>
                         <xxf:repeat-iteration id="repeat" relevant="false" iteration="4"/>
-                        <xxf:control id="output-relevant·4" relevant="false"/>
-                        <xxf:control id="output-readonly·4" relevant="false"/>
-                        <xxf:control id="output-required·4" relevant="false"/>
-                        <xxf:control id="output-type·4" relevant="false"/>
-                        <xxf:control id="output-constraint·4" relevant="false"/>
-                        <xxf:control id="output-default·4" relevant="false"/>
-                        <xxf:control id="output-custom·4" relevant="false"/>
-                        <xxf:control id="output-calculate·4" relevant="false"/>
+                        <xxf:control id="output-relevantÂ·4" relevant="false"/>
+                        <xxf:control id="output-readonlyÂ·4" relevant="false"/>
+                        <xxf:control id="output-requiredÂ·4" relevant="false"/>
+                        <xxf:control id="output-typeÂ·4" relevant="false"/>
+                        <xxf:control id="output-constraintÂ·4" relevant="false"/>
+                        <xxf:control id="output-defaultÂ·4" relevant="false"/>
+                        <xxf:control id="output-customÂ·4" relevant="false"/>
+                        <xxf:control id="output-calculateÂ·4" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1303,17 +1303,17 @@
                         </instances>
                         <controls>
                             <control effective-id="repeat1" index="1"/>
-                            <control effective-id="repeat2·1" index="1"/>
-                            <control effective-id="repeat2·2" index="1"/>
+                            <control effective-id="repeat2Â·1" index="1"/>
+                            <control effective-id="repeat2Â·2" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="input1·1-1">Mickey</xxf:control>
-                        <xxf:control id="input1·1-2">Minnie</xxf:control>
-                        <xxf:control id="input1·2-1">Donald</xxf:control>
-                        <xxf:control id="input1·2-2">Daisy</xxf:control>
+                        <xxf:control id="input1Â·1-1">Mickey</xxf:control>
+                        <xxf:control id="input1Â·1-2">Minnie</xxf:control>
+                        <xxf:control id="input1Â·2-1">Donald</xxf:control>
+                        <xxf:control id="input1Â·2-2">Daisy</xxf:control>
                         <xxf:control id="input2">Mickey</xxf:control>
                     </xxf:control-values>
                 </xxf:action>

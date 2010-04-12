@@ -120,10 +120,6 @@ public class PathMapUIDependencies implements UIDependencies {
                 }
             }
             modifiedPathsSet = true;
-
-            for (String s: modifiedPaths) {
-                System.out.println("xxx: " + s);
-            }
         }
         return modifiedPaths;
     }

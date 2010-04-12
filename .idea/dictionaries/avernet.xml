@@ -1,3 +1,19 @@
 <component name="ProjectDictionaryState">
-  <dictionary name="avernet" />
+  <dictionary name="avernet">
+    <words>
+      <w>concat</w>
+      <w>focusin</w>
+      <w>focusout</w>
+      <w>jdbc</w>
+      <w>myapp</w>
+      <w>nodeset</w>
+      <w>resize</w>
+      <w>subsequence</w>
+      <w>substring</w>
+      <w>tokenize</w>
+      <w>viewport</w>
+      <w>webapps</w>
+      <w>xxforms</w>
+    </words>
+  </dictionary>
 </component>

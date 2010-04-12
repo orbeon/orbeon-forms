@@ -50,27 +50,58 @@
 
                 <xforms:instance id="ui">
                     <ui>
-                        <unknown-word/>
-                        <correction/>
+                        <unknown-word/>     <!-- The current word we're looking at and trying to fix -->
+                        <correction/>       <!-- The current correction being considered -->
+                        <context/>          <!-- Text around the word to fix (HTML) -->
+                        <ignore-all/>       <!-- List of words the user decided to ignore -->
+                        <replacements/>     <!-- List of words the user decided to change -->
+                        <is-change-all/>    <!-- Temporarily set to true|false to know the button pressed -->
                     </ui>
                 </xforms:instance>
-                <xforms:bind nodeset="instance('ui')">
-                    <xforms:bind nodeset="unknown-word" calculate="if (. != '') then . else
-                        for $c in instance('result')/c[1] return
-                        substring(instance('request')/text, $c/@o + 1, $c/@l)"/>
-                    <xforms:bind nodeset="correction" calculate="if (. != '') then . else ../unknown-word"
-                        readonly="false()"/>
-                </xforms:bind>
 
                 <!--  Spell checking -->
                 <xforms:submission method="post" resource="{xxforms:property('oxf.xforms.xbl.fr.spell-checker.service')}"
                         id="spell-check-submission" ref="instance('request')" replace="instance" instance="result">
                     <xforms:action ev:event="xforms-submit-done">
-                        <xforms:setvalue ref="instance('ui')/unknown-word"/>
-                        <xforms:setvalue ref="instance('ui')/correction"/>
                         <xxforms:show dialog="spell-checking-dialog"/>
+                        <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
                     </xforms:action>
                 </xforms:submission>
+
+                <xforms:action ev:event="prepare-next-correction">
+                    <xxforms:variable name="correction" select="instance('result')/c[1]"/>
+                    <xforms:action if="exists($correction)">
+                        <xforms:setvalue ref="instance('ui')/unknown-word" value="substring(instance('request')/text, $correction/@o + 1, $correction/@l)"/>
+                        <xforms:setvalue ref="instance('ui')/correction" value="tokenize(instance('result')/c[1], '\s')[1]"/>
+                        <xxforms:variable name="words-before" select="if ($correction/@o = 0) then () else
+                            tokenize(substring(instance('request')/text, 1, $correction/@o), '\s+')"/>
+                        <xxforms:variable name="words-after" select="if ($correction/@o + $correction/@l = string-length(instance('request')/text)) then () else
+                            tokenize(substring(instance('request')/text, $correction/@o + $correction/@l + 1), '\s+')"/>
+                        <xforms:setvalue ref="instance('ui')/context" value="concat(
+                            string-join(reverse(subsequence(reverse($words-before), 1, 5)), ' '),
+                            '&lt;b&gt;', ../unknown-word, '&lt;/b&gt;',
+                            string-join(subsequence($words-after, 1, 5), ' '))"/>
+                        <xforms:action if="instance('ui')/unknown-word = instance('ui')/ignore-all/word">
+                            <!-- If current word is in the ignore list, go to the next one -->
+                            <xforms:delete nodeset="$correction"/>
+                            <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
+                        </xforms:action>
+                        <xxforms:variable name="change-all" select="instance('ui')/replacements/word[@change-all = 'true' and . = instance('ui')/unknown-word]"/>
+                        <xforms:action if="exists($change-all)">
+                            <!-- If the current word is one for which the user did a change all, add a change for this -->
+                            <xforms:insert context="instance('ui')/replacements"
+                                origin="xxforms:element('word', (
+                                    xxforms:attribute('by', $change-all/@by),
+                                    xxforms:attribute('o', $correction/@o),
+                                    xxforms:attribute('l', $correction/@l),
+                                    xxforms:attribute('change-all', 'false'),
+                                    ../unknown-word/text()
+                                ))"/>
+                            <xforms:delete nodeset="$correction"/>
+                            <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
+                        </xforms:action>
+                    </xforms:action>
+                </xforms:action>
 
             </xforms:model>
         </xbl:implementation>
@@ -90,9 +121,7 @@
                     <xforms:trigger appearance="minimal" ref="." class="xbl-fr-spell-checker-icon">
                         <xforms:label/>
                         <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="instance('request')/text" value="string-join(distinct-values(
-                                for $token in tokenize($binding, '[\s;,.]') return if ($token != '') then $token else ()
-                            ), ' ')"/>
+                            <xforms:setvalue ref="instance('request')/text" value="$binding"/>
                             <xforms:send submission="spell-check-submission"/>
                         </xforms:action>
                     </xforms:trigger>
@@ -101,61 +130,117 @@
                     <xxforms:dialog id="spell-checking-dialog">
                         <xforms:label>Spelling</xforms:label>
                         <xxforms:variable name="has-corrections" select="exists(instance('result')/c)"/>
+
+                        <!-- On open, reset init ui instance -->
                         <xforms:action ev:event="xxforms-dialog-open">
+                            <xforms:delete nodeset="instance('ui')/(ignore-all | replacements)/word"/>
                             <xforms:setfocus if="$has-corrections" control="suggestion"/>
                             <xforms:setfocus if="not($has-corrections)" control="close"/>
                         </xforms:action>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:delete nodeset="instance('result')/c[1]"/>
-                            <xforms:setvalue ref="instance('ui')/unknown-word"/>
-                            <xforms:setvalue ref="instance('ui')/correction"/>
+
+                        <!-- On close, apply replacements -->
+                        <xforms:action ev:event="xxforms-dialog-close">
+                            <xforms:action xxforms:iterate="instance('ui')/replacements/word">
+                                <xxforms:variable name="replacement" select="."/>
+                                <xforms:setvalue ref="$binding" value="concat(
+                                    substring(., 1, $replacement/@o),
+                                    $replacement/@by,
+                                    substring(., $replacement/@o + $replacement/@l + 1))"/>
+                            </xforms:action>
                         </xforms:action>
+
                         <xforms:group ref=".[$has-corrections]">
                             <xhtml:table>
                                 <xhtml:tr>
-                                    <xhtml:td>Unknown word:</xhtml:td>
+                                    <xhtml:td class="label">Not in dictionary:</xhtml:td>
                                     <xhtml:td>
                                         <xforms:output value="instance('ui')/unknown-word"/>
                                     </xhtml:td>
-                                </xhtml:tr>
-                                <xhtml:tr>
-                                    <xhtml:td>Choose suggestion:</xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:repeat nodeset="tokenize(instance('result')/c[1], '\s')">
-                                            <xforms:setfocus ev:event="xxforms-nodeset-changed" control="suggestion"/>
-                                            <xforms:trigger appearance="minimal" id="suggestion">
-                                                <xforms:label value="."/>
-                                                <xforms:setvalue ev:event="DOMActivate" ref="$binding"
-                                                    value="replace($binding, instance('ui')/unknown-word, context())"/>
-                                            </xforms:trigger>
-                                        </xforms:repeat>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                                <xhtml:tr>
-                                    <xhtml:td>Or type correction:</xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:group>
-                                            <xforms:setvalue ev:event="DOMActivate" ref="$binding"
-                                                value="replace($binding, instance('ui')/unknown-word, instance('ui')/correction)"/>
-                                            <xforms:input ref="instance('ui')/correction"/>
-                                            <fr:button>
-                                                <xforms:label>
-                                                    <xhtml:img src="/apps/fr/style/images/silk/script_edit.png"/>
-                                                    Change
-                                                </xforms:label>
-                                            </fr:button>
-                                        </xforms:group>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                                <xhtml:tr>
-                                    <xhtml:td>Or skip this word:</xhtml:td>
-                                    <xhtml:td>
+                                    <xhtml:td rowspan="4">
+                                        <!-- Ignore -->
                                         <fr:button>
                                             <xforms:label>
-                                                <xhtml:img src="/apps/fr/style/images/silk/script_go.png"/>
+                                                <xhtml:img alt="" src="/apps/fr/style/images/silk/script_go.png"/>
                                                 Ignore
                                             </xforms:label>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:delete nodeset="instance('result')/c[1]"/>
+                                                <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
+                                            </xforms:action>
                                         </fr:button>
+                                        <!-- Ignore all -->
+                                        <fr:button>
+                                            <xforms:label>
+                                                <xhtml:img alt="" src="/apps/fr/style/images/silk/script_go.png"/>
+                                                Ignore All
+                                            </xforms:label>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:insert context="instance('ui')/ignore-all" origin="xxforms:element('word', ../unknown-word/text())"/>
+                                                <xforms:delete nodeset="instance('result')/c[1]"/>
+                                                <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
+                                            </xforms:action>
+                                        </fr:button>
+                                        <xforms:group appearance="xxforms:internal">
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:insert context="instance('ui')/replacements"
+                                                    origin="xxforms:element('word', (
+                                                        xxforms:attribute('by', ../correction),
+                                                        xxforms:attribute('o', instance('result')/c[1]/@o),
+                                                        xxforms:attribute('l', instance('result')/c[1]/@l),
+                                                        xxforms:attribute('change-all', instance('ui')/is-change-all),
+                                                        ../unknown-word/text()
+                                                    ))"/>
+                                                <xforms:delete nodeset="instance('result')/c[1]"/>
+                                                <xforms:dispatch name="prepare-next-correction" target="spell-checker-model"/>
+                                            </xforms:action>
+                                            <!-- Change -->
+                                            <fr:button id="change-this">
+                                                <xforms:label>
+                                                    <xhtml:img alt="" src="/apps/fr/style/images/silk/script_edit.png"/>
+                                                    Change
+                                                </xforms:label>
+                                                <xforms:setvalue ev:event="DOMActivate" ref="instance('ui')/is-change-all">false</xforms:setvalue>
+                                            </fr:button>
+                                            <!-- Change all -->
+                                            <fr:button id="change-all">
+                                                <xforms:label>
+                                                    <xhtml:img alt="" src="/apps/fr/style/images/silk/script_edit.png"/>
+                                                    Change All
+                                                </xforms:label>
+                                                <xforms:setvalue ev:event="DOMActivate" ref="instance('ui')/is-change-all">true</xforms:setvalue>
+                                            </fr:button>
+                                        </xforms:group>
+                                        <!-- Close -->
+                                        <fr:button>
+                                            <xforms:label>
+                                                <xhtml:img alt="" src="/apps/fr/style/images/silk/cross.png"/>
+                                                Close
+                                            </xforms:label>
+                                            <xxforms:hide ev:event="DOMActivate" dialog="spell-checking-dialog"/>
+                                        </fr:button>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                                <xhtml:tr>
+                                    <xhtml:td class="label">Change to:</xhtml:td>
+                                    <xhtml:td>
+                                        <xforms:input ref="instance('ui')/correction"/>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                                <xhtml:tr>
+                                    <xhtml:td class="label">Suggestions:</xhtml:td>
+                                    <xhtml:td>
+                                        <xforms:select1 appearance="compact" ref="instance('ui')/correction">
+                                            <xforms:itemset nodeset="for $suggestion in tokenize(instance('result')/c[1], '\s') return xxforms:element('suggestion', $suggestion)">
+                                                <xforms:label value="."/>
+                                                <xforms:value value="."/>
+                                            </xforms:itemset>
+                                        </xforms:select1>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                                <xhtml:tr>
+                                    <xhtml:td class="label">Context:</xhtml:td>
+                                    <xhtml:td>
+                                        <xforms:output value="instance('ui')/context" mediatype="text/html"/>
                                     </xhtml:td>
                                 </xhtml:tr>
                             </xhtml:table>

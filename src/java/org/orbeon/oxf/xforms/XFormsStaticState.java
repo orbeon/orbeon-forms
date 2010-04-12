@@ -605,7 +605,7 @@ public class XFormsStaticState {
      *
      * @return true iif enabled
      */
-    public boolean isNoscript() {
+    public final boolean isNoscript() {
         readPropertiesIfNeeded();
         return isNoscript;
     }
@@ -615,7 +615,7 @@ public class XFormsStaticState {
      *
      * @return true iif enabled
      */
-    public boolean isXPathAnalysis() {
+    public final boolean isXPathAnalysis() {
         readPropertiesIfNeeded();
         return isXPathAnalysis;
     }

@@ -60,9 +60,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         assertFalse(dependencies.requireBindingUpdate("select1"));
         assertTrue(dependencies.requireValueUpdate("select1"));
 
-        // TEMP: for build server
-        dependencies.requireBindingUpdate("group2");
-//        assertTrue(dependencies.requireBindingUpdate("group2"));
+        assertTrue(dependencies.requireBindingUpdate("group2"));
 //        assertTrue(dependencies.requireValueUpdate("group2"));
 
         assertTrue(dependencies.requireBindingUpdate("select2"));

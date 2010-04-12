@@ -1190,7 +1190,7 @@
                                 <!-- Must be non-relevant because the node-set is empty -->
                                 <xforms:input bind="foos" id="input2"/>
 
-                                <!-- Must be non-relevant because the context item matches -->
+                                <!-- Must be relevant because the context item matches -->
                                 <xforms:group bind="companies" id="group1">
                                     <xforms:input bind="employees" id="input3"/>
                                 </xforms:group>
@@ -1232,6 +1232,89 @@
                         <xxf:control id="input2" relevant="false"/>
                         <xxf:control id="group2" relevant="false"/>
                         <xxf:control id="input4" relevant="false"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Use of xforms:bind/@ref and xforms:repeat/@ref" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html>
+                            <xhtml:head>
+                                <xforms:model id="model">
+                                    <xforms:instance id="instance">
+                                        <instance>
+                                            <company>
+                                                <employee>Mickey</employee>
+                                                <employee>Minnie</employee>
+                                            </company>
+                                            <company>
+                                                <employee>Donald</employee>
+                                                <employee>Daisy</employee>
+                                            </company>
+                                        </instance>
+                                    </xforms:instance>
+                                    <xforms:bind ref="company" id="companies">
+                                        <xforms:bind ref="employee" id="employees"/>
+                                    </xforms:bind>
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+                                <xforms:repeat bind="companies" id="repeat1">
+                                    <xforms:repeat bind="employees" id="repeat2">
+                                        <xforms:input ref="." id="input1"/>
+                                    </xforms:repeat>
+                                </xforms:repeat>
+
+                                <xforms:group bind="companies" id="group1">
+                                    <xforms:input bind="employees" id="input2"/>
+                                </xforms:group>
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <company>
+                                        <employee>Mickey</employee>
+                                        <employee>Minnie</employee>
+                                    </company>
+                                    <company>
+                                        <employee>Donald</employee>
+                                        <employee>Daisy</employee>
+                                    </company>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="repeat1" index="1"/>
+                            <control effective-id="repeat2·1" index="1"/>
+                            <control effective-id="repeat2·2" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="input1·1-1">Mickey</xxf:control>
+                        <xxf:control id="input1·1-2">Minnie</xxf:control>
+                        <xxf:control id="input1·2-1">Donald</xxf:control>
+                        <xxf:control id="input1·2-2">Daisy</xxf:control>
+                        <xxf:control id="input2">Mickey</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

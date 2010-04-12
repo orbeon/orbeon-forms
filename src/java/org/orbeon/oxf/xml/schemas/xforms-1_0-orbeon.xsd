@@ -120,8 +120,10 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-                <xsd:element ref="xforms:header"/>
-                <xsd:group ref="xforms:Action"/>
+                <xsd:choice>
+                    <xsd:element ref="xforms:header"/>
+                    <xsd:group ref="xforms:Action"/>
+                </xsd:choice>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attribute name="ref" type="xforms:XPathExpression"/>

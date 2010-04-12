@@ -1,11 +1,15 @@
 .xbl-fr-spell-checker { display: inline; }
 .xbl-fr-spell-checker .xbl-fr-spell-checker-icon { background-image: url('../../../apps/fr/style/images/silk/spellcheck.png'); display: inline-block; width: 16px; height: 16px }
-.xbl-fr-spell-checker .xforms-dialog { width: 30em }
+.xbl-fr-spell-checker .xforms-dialog { width: 35em }
 .xbl-fr-spell-checker .xforms-label { width: 10em; display: inline-block }
 .xbl-fr-spell-checker .xforms-output-output { font-weight: bold }
-.xbl-fr-spell-checker input { width: 8em }
-.xbl-fr-spell-checker td { line-height: 2em; padding-right: 1em }
+.xbl-fr-spell-checker input, .xbl-fr-spell-checker select { width: 12em }
+.xbl-fr-spell-checker td { padding-right: 1em; padding-bottom: .5em; vertical-align: top }
+.xbl-fr-spell-checker .label { white-space: nowrap }
 .xbl-fr-spell-checker .xforms-repeat-selected-item-1,
 .xbl-fr-spell-checker .xforms-repeat-selected-item-2 { background-color: transparent }
 .xbl-fr-spell-checker .xbl-fr-spell-checker-close { display: block; overflow: auto }
 .xbl-fr-spell-checker .xbl-fr-spell-checker-close .xbl-fr-button { float:right; margin-top: 1em }
+.xbl-fr-spell-checker .xbl-fr-button { display: block; margin-bottom: .3em }
+.xbl-fr-spell-checker .xbl-fr-button .first-child { width: 10em }
+.xbl-fr-spell-checker .xbl-fr-button .first-child button { width: 100% }

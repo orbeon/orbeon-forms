@@ -147,7 +147,7 @@ public class XFormsItemUtils {
                         if (currentNodeSet != null) {
 
                             // Node stack tracks the relative position of the current node wrt ancestor nodes
-                            final Stack<NodeInfo> nodeStack = new Stack<NodeInfo>();
+                            final Stack<org.orbeon.saxon.om.Item> nodeStack = new Stack<org.orbeon.saxon.om.Item>();
                             int currentLevel = 0;
 
                             final int iterationCount = currentNodeSet.size();
@@ -156,7 +156,7 @@ public class XFormsItemUtils {
                                 // Push iteration
                                 contextStack.pushIteration(currentPosition);
                                 {
-                                    final NodeInfo currentNodeInfo = (NodeInfo) currentNodeSet.get(currentPosition - 1);
+                                    final org.orbeon.saxon.om.Item currentNodeInfo = currentNodeSet.get(currentPosition - 1);
 
                                     // Handle children of xforms:itemset
 
@@ -165,7 +165,7 @@ public class XFormsItemUtils {
                                     // NOTE: If a node is non-relevant, all its descendants will be non-relevant as
                                     // well. If a node is non-relevant, it should be as if it had not even been part of
                                     // the nodeset.
-                                    final boolean isRelevant = InstanceData.getInheritedRelevant(currentNodeInfo);
+                                    final boolean isRelevant = (currentNodeInfo instanceof NodeInfo) ? InstanceData.getInheritedRelevant((NodeInfo) currentNodeInfo) : true;
                                     if (isRelevant) {
                                         final String label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
                                         final Element valueCopyElement;
@@ -179,9 +179,9 @@ public class XFormsItemUtils {
 
                                         // Update stack and containers
                                         if (nodeStack.size() != 0) {
-                                            final int newLevel = getNodeLevel(currentNodeInfo, nodeStack);
+                                            final int newLevel = getItemLevel(currentNodeInfo, nodeStack);
                                             if (newLevel == currentLevel) {
-                                                //  We are staying at the same level, pop old node
+                                                //  We are staying at the same level, pop old item
                                                 nodeStack.pop();
                                             } else if (newLevel < currentLevel) {
                                                 //  We are going down one or more levels
@@ -195,8 +195,6 @@ public class XFormsItemUtils {
                                                 final List<Item> children = currentContainer.getChildren();
                                                 currentContainer = children.get(children.size() - 1);
                                             }
-                                            if (currentContainer == null)
-                                                System.out.println();
                                             currentLevel = newLevel;
                                         }
 
@@ -217,7 +215,7 @@ public class XFormsItemUtils {
                                             throw new ValidationException("xforms:copy is not yet supported.", select1Control.getLocationData());
                                         }
 
-                                        // Always push the last node to the stack
+                                        // Always push the last item to the stack
                                         nodeStack.push(currentNodeInfo);
 
                                     }
@@ -310,27 +308,39 @@ public class XFormsItemUtils {
             }
 
             /**
-             * Return the node level for the given node. If the stack is emty, the level is 0.
+             * Return the item level for the given item. If the stack is empty, the level is 0.
              *
-             * @param nodeInfo  node to check
+             * @param item      item to check
              * @param stack     stack of potential ancestors
              * @return          node level
              */
-            private int getNodeLevel(NodeInfo nodeInfo, Stack<NodeInfo> stack) {
+            private int getItemLevel(org.orbeon.saxon.om.Item item, Stack<org.orbeon.saxon.om.Item> stack) {
                 // Iterate stack from top to bottom
-                Collections.reverse(stack);
-                int level = stack.size();
-                for (Iterator<NodeInfo> i = stack.iterator(); i.hasNext(); level--) {
-                    final NodeInfo currentNode = i.next();
-                    if (isAncestorNode(nodeInfo, currentNode)) {
-                        // Restore order
-                        Collections.reverse(stack);
-                        return level;
+                if (item instanceof NodeInfo) {
+                    int level = stack.size();
+                    // Only nodes can have ancestor relationship
+                    final NodeInfo nodeInfo = (NodeInfo) item;
+                    // Reverse order
+                    Collections.reverse(stack);
+                    for (Iterator<org.orbeon.saxon.om.Item> i = stack.iterator(); i.hasNext(); level--) {
+                        final org.orbeon.saxon.om.Item currentItem = i.next();
+                        if (currentItem instanceof NodeInfo) {
+                            // Only nodes can have ancestor relationship
+                            final NodeInfo currentNode = (NodeInfo) currentItem;
+                            if (isAncestorNode(nodeInfo, currentNode)) {
+                                // Restore order
+                                Collections.reverse(stack);
+                                return level;
+                            }
+                        }
                     }
+                    // Restore order
+                    Collections.reverse(stack);
+                    return level;
+                } else {
+                    // If it's not a node, stay at current level
+                    return stack.size() - 1;
                 }
-                // Restore order
-                Collections.reverse(stack);
-                return level;
             }
 
             /**

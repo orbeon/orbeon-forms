@@ -234,6 +234,8 @@
                 </xsd:choice>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
+            <!-- XForms 1.2 deprecates @nodeset -->
+            <xsd:attribute name="ref" type="xforms:XPathExpression" use="optional"/>
             <xsd:attribute name="nodeset" type="xforms:XPathExpression" use="optional"/>
             <xsd:attribute name="name" type="xsd:QName" use="optional"/>
             <xsd:attribute name="type" type="xsd:QName" use="optional"/>
@@ -275,6 +277,8 @@
     </xsd:attributeGroup>
     <xsd:attributeGroup name="Nodeset.Binding.Attributes">
         <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>
+        <!-- XForms 1.2 deprecates @nodeset -->
+        <xsd:attribute name="ref" type="xforms:XPathExpression" use="optional"/>
         <xsd:attribute name="nodeset" type="xforms:XPathExpression" use="optional"/>
         <xsd:attribute name="bind" type="xsd:NMTOKEN" use="optional"/>
     </xsd:attributeGroup>
@@ -362,6 +366,8 @@
                 <xsd:element ref="xforms:value"/>
                 <xsd:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
             </xsd:sequence>
+            <!-- XForms 1.2 deprecates @nodeset -->
+            <xsd:attribute name="ref" type="xforms:XPathExpression" use="optional"/>
             <xsd:attribute name="nodeset" type="xforms:XPathExpression" use="optional"/>
         </xsd:complexType>
     </xsd:element>

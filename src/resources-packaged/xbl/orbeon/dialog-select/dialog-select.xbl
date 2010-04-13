@@ -50,7 +50,7 @@
                 </fr:dialog-select>
             </template>
         </metadata>
-        
+
         <xbl:resources>
             <xbl:style>
                 .xbl-fr-dialog-select ul .xforms-repeat-selected-item-1 { background-color: transparent}
@@ -152,7 +152,7 @@
                             <xxforms:show ev:event="DOMActivate" dialog="dialog"/>
                         </fr:button>
 
-                        <xxforms:dialog id="dialog" close="true" neighbor="select" appearance="full" level="modal">
+                        <xxforms:dialog id="dialog" close="true" appearance="full" level="modal">
                             <xforms:label value="$resources/title"/>
 
                             <xforms:action ev:event="xxforms-dialog-open">

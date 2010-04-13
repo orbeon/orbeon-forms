@@ -467,11 +467,11 @@ YAHOO.xbl.fr.Datatable.prototype = {
         }
 
         // Was previously not visible, as we we just remove the fr-datatable-hidden on the header container
-        this.headerHeight = this.table.tHead.clientHeight;
+        this.headerHeight = this.headerContainer.clientHeight;
         if (this.height != 'auto') {
             // Set size of body with remaining space
-            // Set size of body with remaining space
-            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.divContainer.clientHeight - this.headerHeight) + 'px');
+            var newBodyHeight = this.divContainer.clientHeight - this.headerHeight;
+            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', newBodyHeight + 'px');
         }
 
         this.pxWidth = pxWidth;

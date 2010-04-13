@@ -1,0 +1,369 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+            xmlns:xi="http://www.w3.org/2001/XInclude"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:saxon="http://saxon.sf.net/"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:exforms="http://www.exforms.org/exf/1-0"
+            xmlns:sql="http://orbeon.org/oxf/xml/sql"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xhtml:head>
+        <xhtml:title>Your Orbeon Forms PE Trial License</xhtml:title>
+        <xforms:model id="fr-form-model">
+
+
+            <xforms:instance id="fr-form-instance">
+                <form>
+                    <license>
+                        <license-data/>
+                        <licensor/>
+                        <licensee/>
+                        <organization/>
+                        <email/>
+                        <issued/>
+                        <expiration/>
+
+                    </license>
+
+                </form>
+            </xforms:instance>
+
+
+            <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')">
+                <xforms:bind id="license-bind" nodeset="license" name="license">
+                    <xforms:bind id="licensee-bind" nodeset="licensee" name="licensee" type="xs:string"
+                                 required="true()"
+                                 constraint="normalize-space()"
+                                 readonly="true()"/>
+                    <xforms:bind id="organization-bind" nodeset="organization" name="organization"
+                                 type="xs:string"
+                                 required="true()"
+                                 constraint="normalize-space()"
+                                 readonly="true()"/>
+                    <xforms:bind id="email-bind" nodeset="email" name="email" type="xforms:email"
+                                 constraint="normalize-space()"
+                                 readonly="true()"/>
+                    <xforms:bind id="licensor-bind" nodeset="licensor" name="licensor"/>
+                    <xforms:bind id="issued-bind" nodeset="issued" type="xforms:date" name="issued"/>
+                    <xforms:bind id="expiration-bind" nodeset="expiration" type="xforms:date" name="expiration"/>
+                    <xforms:bind id="license-data-bind" nodeset="license-data" type="xforms:string"
+                                 readonly="true()"
+                                 name="license-data"/>
+
+                </xforms:bind>
+
+            </xforms:bind>
+
+
+            <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>license</form-name>
+
+                    <title xml:lang="en">Your Orbeon Forms PE Trial License</title>
+                    <description xml:lang="en"/>
+                    <author/>
+                    <logo mediatype="" filename="" size=""/>
+                </metadata>
+            </xforms:instance>
+
+
+            <xforms:instance id="fr-form-attachments">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xforms:instance>
+
+
+
+            <xforms:instance id="fr-form-resources" xxforms:readonly="false">
+                <resources>
+                    <resource xml:lang="en">
+                        <license-data>
+                            <label>License data</label>
+                            <hint>Copy and paste the license data above, and save it into a file as orbeon-war/WEB-INF/resources/config/license.xml</hint>
+                            <help/>
+                            <alert/>
+                        </license-data>
+                        <licensor>
+                            <label>Licensed by</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </licensor>
+
+
+                        <license>
+                            <label>License Details</label>
+                            <help/>
+                        </license>
+                        <licensee>
+                            <label>Licensed to</label>
+                            <hint>Person name appearing in your license</hint>
+                            <help/>
+                            <alert>Please enter a name</alert>
+                        </licensee>
+                        <organization>
+                            <label>Organization</label>
+                            <hint>Organization name appearing in your license</hint>
+                            <help/>
+                            <alert>Please enter an organization name</alert>
+                        </organization>
+                        <email>
+                            <label>Email Address</label>
+                            <hint>Email address for confirmation (we don't share it!)</hint>
+                            <help/>
+                            <alert>Please enter an email address</alert>
+                        </email>
+                        <issued>
+                            <label>Issue Date</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </issued>
+                        <expiration>
+                            <label>Expiration Date</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </expiration>
+
+                    </resource>
+                </resources>
+            </xforms:instance>
+
+
+            <xforms:instance id="fr-service-request-instance" xxforms:exclude-result-prefixes="#all">
+                <request/>
+            </xforms:instance>
+
+            <xforms:instance id="fr-service-response-instance" xxforms:exclude-result-prefixes="#all">
+                <response/>
+            </xforms:instance>
+            <xforms:instance id="get-license-instance" class="fr-service"
+                             xxforms:exclude-result-prefixes="#all">
+                <body>&lt;license&gt;
+    &lt;licensee/&gt;
+    &lt;organization/&gt;
+    &lt;email/&gt;
+&lt;/license&gt;
+</body>
+            </xforms:instance>
+            <xforms:submission id="get-license-submission" class="fr-service"
+                               ref="instance('fr-service-request-instance')"
+                               resource="/fr/service/custom/orbeon/license/create-90day-license"
+                               method="post"
+                               serialization="application/xml"
+                               mediatype="application/xml"
+                               replace="instance"
+                               instance="fr-service-response-instance"/>
+            <xforms:action id="get-license-binding">
+
+                <xforms:action ev:event="xforms-ready" ev:observer="fr-form-model">
+
+                    <xforms:send submission="get-license-submission"/>
+                </xforms:action>
+
+                <xforms:action ev:event="xforms-submit" ev:observer="get-license-submission">
+
+                    <xxforms:variable name="request-instance-name" select="'get-license-instance'" as="xs:string"/>
+
+                    <xforms:insert nodeset="instance('fr-service-request-instance')"
+                                   origin="saxon:parse(instance($request-instance-name))"/>
+
+
+                    <xforms:action context="instance('fr-service-request-instance')">
+                        <xforms:action class="fr-set-service-value-action">
+
+                            <xxforms:variable name="control-name" select="'licensee'" as="xs:string"/>
+                            <xxforms:variable name="path" select="/*/licensee" as="xs:string"/>
+
+                            <xforms:setvalue ref="$path" value="instance('fr-form-instance')/*/*[name() = $control-name]"/>
+                        </xforms:action>
+                        <xforms:action class="fr-set-service-value-action">
+
+                            <xxforms:variable name="control-name" select="'organization'" as="xs:string"/>
+                            <xxforms:variable name="path" select="/*/organization" as="xs:string"/>
+
+                            <xforms:setvalue ref="$path" value="instance('fr-form-instance')/*/*[name() = $control-name]"/>
+                        </xforms:action>
+                        <xforms:action class="fr-set-service-value-action">
+
+                            <xxforms:variable name="control-name" select="'email'" as="xs:string"/>
+                            <xxforms:variable name="path" select="/*/email" as="xs:string"/>
+
+                            <xforms:setvalue ref="$path" value="instance('fr-form-instance')/*/*[name() = $control-name]"/>
+                        </xforms:action>
+
+                    </xforms:action>
+                </xforms:action>
+
+                <xforms:action ev:event="xforms-submit-done" ev:observer="get-license-submission"
+                               context="instance('fr-service-response-instance')">
+                    <xforms:action class="fr-set-control-value-action">
+
+                        <xxforms:variable name="control-name" select="'license-data'" as="xs:string"/>
+                        <xxforms:variable name="control-value" select="saxon:serialize(/, xxforms:instance('fr-xsl-output-instance'))" as="xs:string"/>
+
+                        <xforms:insert nodeset="instance('fr-form-instance')/*/*"
+                                       origin="xxforms:element($control-name)"/>
+                        <xforms:setvalue ref="instance('fr-form-instance')/*/*[name() = $control-name]"
+                                         value="$control-value"/>
+                    </xforms:action>
+                    <xforms:action class="fr-set-control-value-action">
+
+                        <xxforms:variable name="control-name" select="'licensor'" as="xs:string"/>
+                        <xxforms:variable name="control-value" select="/*/*/*/licensor" as="xs:string"/>
+
+                        <xforms:setvalue ref="instance('fr-form-instance')/*/*[name() = $control-name]"
+                                         value="$control-value"/>
+                    </xforms:action>
+                    <xforms:action class="fr-set-control-value-action">
+
+                        <xxforms:variable name="control-name" select="'issued'" as="xs:string"/>
+                        <xxforms:variable name="control-value" select="/*/*/*/issued" as="xs:string"/>
+
+                        <xforms:setvalue ref="instance('fr-form-instance')/*/*[name() = $control-name]"
+                                         value="$control-value"/>
+                    </xforms:action>
+                    <xforms:action class="fr-set-control-value-action">
+
+                        <xxforms:variable name="control-name" select="'expiration'" as="xs:string"/>
+                        <xxforms:variable name="control-value" select="/*/*/*/expiration" as="xs:string"/>
+
+                        <xforms:setvalue ref="instance('fr-form-instance')/*/*[name() = $control-name]"
+                                         value="$control-value"/>
+                    </xforms:action>
+
+                </xforms:action>
+            </xforms:action>
+
+
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <fr:view>
+            <xforms:label ref="instance('fr-form-metadata')/title"/>
+            <fr:body>
+                <fr:section id="license-section" bind="license-bind">
+                    <xforms:label ref="$form-resources/license/label"/>
+                    <xforms:help ref="$form-resources/license/help"/>
+                    <fr:grid columns="2">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:output xmlns:xbl="http://www.w3.org/ns/xbl"
+                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                               bind="licensor-bind"
+                                               id="licensor-control">
+                                    <xforms:label ref="$form-resources/licensor/label"/>
+                                    <xforms:help ref="$form-resources/licensor/help"/>
+
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:output>
+                            </xhtml:td>
+                            <xhtml:td/>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:output id="licensee-control" class="fr-summary fr-search" bind="licensee-bind">
+                                    <xforms:label ref="$form-resources/licensee/label"/>
+                                    <xforms:hint ref="$form-resources/licensee/hint"/>
+                                    <xforms:help ref="$form-resources/licensee/help"/>
+                                    <xforms:alert ref="$form-resources/licensee/alert"/>
+                                </xforms:output>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:output xmlns:xbl="http://www.w3.org/ns/xbl"
+                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              id="organization-control"
+                                              class="fr-summary fr-search"
+                                              bind="organization-bind">
+                                    <xforms:label ref="$form-resources/organization/label"/>
+                                    <xforms:hint ref="$form-resources/organization/hint"/>
+                                    <xforms:help ref="$form-resources/organization/help"/>
+                                    <xforms:alert ref="$form-resources/organization/alert"/>
+                                </xforms:output>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:output xmlns:xbl="http://www.w3.org/ns/xbl"
+                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              id="email-control"
+                                              class="fr-summary fr-search"
+                                              bind="email-bind">
+                                    <xforms:label ref="$form-resources/email/label"/>
+                                    <xforms:hint ref="$form-resources/email/hint"/>
+                                    <xforms:help ref="$form-resources/email/help"/>
+                                    <xforms:alert ref="$form-resources/email/alert"/>
+                                </xforms:output>
+                            </xhtml:td>
+                            <xhtml:td/>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:output xmlns:xbl="http://www.w3.org/ns/xbl"
+                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                               bind="issued-bind"
+                                               id="issued-control">
+                                    <xforms:label ref="$form-resources/issued/label"/>
+                                    <xforms:help ref="$form-resources/issued/help"/>
+
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:output>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:output xmlns:xbl="http://www.w3.org/ns/xbl"
+                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                               bind="expiration-bind"
+                                               id="expiration-control">
+                                    <xforms:label ref="$form-resources/expiration/label"/>
+                                    <xforms:help ref="$form-resources/expiration/help"/>
+
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:output>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
+                    <fr:grid columns="1">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:textarea bind="license-data-bind" id="license-data-control">
+                                    <xforms:label ref="$form-resources/license-data/label"/>
+                                    <xforms:hint ref="$form-resources/license-data/hint"/>
+                                    <xforms:help ref="$form-resources/license-data/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:textarea>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
+
+                </fr:section>
+                <!--<fr:xforms-inspector/>-->
+            </fr:body>
+        </fr:view>
+    </xhtml:body>
+</xhtml:html>

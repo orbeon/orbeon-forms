@@ -142,7 +142,7 @@
          -->
         <property name="version.number" value="dev-post-3.7.1"/>
         <!-- Can be overridden on command-line to provide different suffix -->
-        <property name="artifact.suffix" value="-CE"/>
+        <property name="artifact.suffix" value="-PE"/>
         <tstamp>
             <format property="time" pattern="yyyyMMddHHmm" timezone="GMT"/>
         </tstamp>
@@ -236,7 +236,6 @@
             <src path="${build.dir}/src"/>
             <src path="${java-src.dir}"/>
             <exclude name="org/orbeon/oxf/common/Version.java"/>
-            <exclude name="org/orbeon/oxf/xforms/analysis/PathMapUIDependencies.java"/>
         </javac>
     </target>
 
@@ -740,7 +739,7 @@
             <arg value="--bwlimit=50"/>
             <arg value="${artifact.name}.war"/>
             <arg value="${artifact.name}.zip"/>
-            <arg value="${artifact.name}-src.zip"/>
+            <!--<arg value="${artifact.name}-src.zip"/>-->
             <arg value="orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops"/>
         </exec>
 

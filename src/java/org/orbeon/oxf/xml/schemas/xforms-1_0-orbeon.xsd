@@ -280,6 +280,7 @@
         <!-- XForms 1.2 deprecates @nodeset -->
         <xsd:attribute name="ref" type="xforms:XPathExpression" use="optional"/>
         <xsd:attribute name="nodeset" type="xforms:XPathExpression" use="optional"/>
+        <xsd:attribute name="ref" type="xforms:XPathExpression" use="optional"/>
         <xsd:attribute name="bind" type="xsd:NMTOKEN" use="optional"/>
     </xsd:attributeGroup>
     <xsd:attributeGroup name="UI.Common.Attrs">
@@ -404,7 +405,6 @@
     </xsd:element>
     <xsd:element name="itemset">
         <xsd:complexType>
-
             <xsd:sequence>
                 <xsd:element ref="xforms:label"/>
                 <xsd:choice>
@@ -414,7 +414,6 @@
                 <xsd:group ref="xforms:UI.Common" minOccurs="0" maxOccurs="unbounded"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-
             <xsd:attributeGroup ref="xforms:Nodeset.Binding.Attributes"/>
         </xsd:complexType>
     </xsd:element>

@@ -230,7 +230,7 @@
                                     <xhtml:td class="label">Suggestions:</xhtml:td>
                                     <xhtml:td>
                                         <xforms:select1 appearance="compact" ref="instance('ui')/correction">
-                                            <xforms:itemset nodeset="for $suggestion in tokenize(instance('result')/c[1], '\s') return xxforms:element('suggestion', $suggestion)">
+                                            <xforms:itemset ref="tokenize(instance('result')/c[1], '\s')">
                                                 <xforms:label value="."/>
                                                 <xforms:value value="."/>
                                             </xforms:itemset>

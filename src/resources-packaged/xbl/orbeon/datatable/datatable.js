@@ -435,13 +435,6 @@ YAHOO.xbl.fr.Datatable.prototype = {
             }
         }
 
-        // Do more resizing
-        //this.headerHeight = this.table.tHead.clientHeight; // might have changed when we redimensioned the table
-        if (this.height != 'auto') {
-            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.divContainer.clientHeight - this.headerHeight) + 'px');
-        }
-
-
         // Reset the yui-dt-bd class if we've removed it earlier on
         if (this.headBodySplit) {
 
@@ -471,6 +464,14 @@ YAHOO.xbl.fr.Datatable.prototype = {
                  YAHOO.util.Dom.addClass(this.table.tHead.rows[iRow], 'fr-datatable-hidden');
              }
              YAHOO.util.Dom.removeClass(this.headerContainer, 'fr-datatable-hidden');
+        }
+
+        // Was previously not visible, as we we just remove the fr-datatable-hidden on the header container
+        this.headerHeight = this.table.tHead.clientHeight;
+        if (this.height != 'auto') {
+            // Set size of body with remaining space
+            // Set size of body with remaining space
+            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', (this.divContainer.clientHeight - this.headerHeight) + 'px');
         }
 
         this.pxWidth = pxWidth;
@@ -784,7 +785,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
      */
     updateRows: function () {
         if (! (this.isInitialized && this.isXformsEnabled())) {
-            return; // we'll receive a new call when/if needed    
+            return; // we'll receive a new call when/if needed
         }
 
         if (this.rowsUpdateUUID == this.getRequestUUID()) {

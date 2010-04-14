@@ -1,18 +1,19 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.serializer.legacy;
 
+import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
@@ -22,7 +23,9 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.util.LoggerFactory;
 
+import java.io.File;
 import java.io.OutputStream;
+import java.net.URL;
 
 public class XSLFOSerializer extends HttpBinarySerializer {
 
@@ -37,8 +40,19 @@ public class XSLFOSerializer extends HttpBinarySerializer {
     protected void readInput(PipelineContext context, ProcessorInput input, Config config, OutputStream outputStream) {
         try {
             // Setup FOP to output PDF
-            FopFactory fopFactory = FopFactory.newInstance();
-            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, outputStream);
+            final FopFactory fopFactory = FopFactory.newInstance();
+            final FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
+
+            final URL configFileUrl = this.getClass().getClassLoader().getResource("fop-userconfig.xml");
+            if (configFileUrl == null) {
+                logger.warn("FOP config file not found. Please put a fop-userconfig.xml file in your classpath for proper display of UTF-8 characters.");
+            } else {
+                final File userConfigXml = new File(configFileUrl.getFile());
+                fopFactory.setUserConfig(userConfigXml);
+            }
+
+            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, outputStream);
+
             // Send data to FOP
             readInputAsSAX(context, INPUT_DATA, fop.getDefaultHandler());
         } catch (Exception e) {

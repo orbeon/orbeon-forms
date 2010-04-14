@@ -57,7 +57,8 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     @Override
     protected void onCreate(PropertyContext propertyContext) {
         super.onCreate(propertyContext);
-        final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
+        final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getLocalForUpdate();
+//        final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
         if (restoredCaseId != null) {
             // Selected case id was restored from serialization
             local.selectedCaseControlId = restoredCaseId;

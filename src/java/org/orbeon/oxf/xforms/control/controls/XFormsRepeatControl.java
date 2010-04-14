@@ -96,8 +96,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         // Ensure that the initial index is set, unless the state was already restored. In that case, the index was
         // reset from serialized data and the start index must not be used.
         if (!restoredState) {
-            final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
-            local.index = ensureIndexBounds(getStartIndex());
+            setIndexInternal(getStartIndex());
         }
     }
 

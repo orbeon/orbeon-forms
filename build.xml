@@ -401,6 +401,7 @@
         <jar destfile="${form-runner.jar.file}" compress="false">
             <fileset dir="${resources.dir}">
                 <include name="apps/fr/**/*.*"/>
+                <exclude name="apps/fr/resource/oracle/**/*.*"/>
             </fileset>
         </jar>
 

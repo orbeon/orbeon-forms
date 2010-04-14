@@ -1402,7 +1402,7 @@
         </output>
     </test>
 
-    <test description="saxon:adjust-to-civil-time() function" name="oxf:pipeline">
+    <test description="saxon:in-summer-time() function" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
         <input name="document">
            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms"
@@ -1428,6 +1428,52 @@
                         <xxf:control id="my-output1">false</xxf:control>
                         <xxf:control id="my-output2">true</xxf:control>
                     </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Top-level last() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+           <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms"
+                       xmlns:saxon="http://saxon.sf.net/">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <xforms:instance>
+                                <value>42</value>
+                                <value>43</value>
+                                <value>45</value>
+                            </xforms:instance>
+                        </xforms:instance>
+
+                        <xforms:insert ev:event="xforms-ready" nodeset="value" at="last()" position="before"
+                                       origin="xxforms:element('value', 44)"/>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body/>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <xforms:instance xmlns:xforms="http://www.w3.org/2002/xforms">
+                                    <value>42</value>
+                                    <value>43</value>
+                                    <value>44</value>
+                                    <value>45</value>
+                                </xforms:instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>

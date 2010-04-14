@@ -14,6 +14,7 @@
 package org.orbeon.oxf.pipeline;
 
 import org.dom4j.Document;
+import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -98,5 +99,9 @@ public class StaticExternalContext {
 
     public static Document decodeXML(String encodedXML) {
         return XFormsUtils.decodeXML(getStaticContext().getPipelineContext(), encodedXML);
+    }
+
+    public static boolean isPE() {
+        return Version.instance().isPE();
     }
 }

@@ -645,21 +645,21 @@ public class Dom4jUtils {
             }
         }
 
-        copyParentNamespaces(parentElement, document.getRootElement());
+        copyMissingNamespaces(parentElement, document.getRootElement());
 
         return document;
     }
 
-    private static void copyParentNamespaces(Element parentElement, Element rootElement) {
-        final Map<String, String> parentNamespaceContext = Dom4jUtils.getNamespaceContext(parentElement);
-        final Map<String, String> rootElementNamespaceContext = Dom4jUtils.getNamespaceContext(rootElement);
+    public static void copyMissingNamespaces(Element sourceElement, Element destinationElement) {
+        final Map<String, String> parentNamespaceContext = Dom4jUtils.getNamespaceContext(sourceElement);
+        final Map<String, String> rootElementNamespaceContext = Dom4jUtils.getNamespaceContext(destinationElement);
 
         for (final String prefix: parentNamespaceContext.keySet()) {
             // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
             // namespace even if there are no namespace nodes
             if (rootElementNamespaceContext.get(prefix) == null) {
                 final String uri = parentNamespaceContext.get(prefix);
-                rootElement.addNamespace(prefix, uri);
+                destinationElement.addNamespace(prefix, uri);
             }
         }
     }
@@ -702,24 +702,8 @@ public class Dom4jUtils {
      * @return              copied element
      */
     public static Element copyElementCopyParentNamespaces(final Element sourceElement) {
-
         final Element newElement = sourceElement.createCopy();
-
-        copyParentNamespaces(sourceElement.getParent(), newElement);
-
-//        final Map sourceElementNamespaceContext = Dom4jUtils.getNamespaceContext(sourceElement);
-//        final Map newElementNamespaceContext = Dom4jUtils.getNamespaceContext(newElement);
-//
-//        for (Iterator k = sourceElementNamespaceContext.keySet().iterator(); k.hasNext();) {
-//            final String prefix = (String) k.next();
-//            // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
-//            // namespace even if there are no namespace nodes
-//            if (newElementNamespaceContext.get(prefix) == null) {
-//                final String uri = (String) sourceElementNamespaceContext.get(prefix);
-//                newElement.addNamespace(prefix, uri);
-//            }
-//        }
-
+        copyMissingNamespaces(sourceElement.getParent(), newElement);
         return newElement;
     }
 

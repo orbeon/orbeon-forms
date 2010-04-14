@@ -119,8 +119,6 @@ public class XFormsConstants {
     public static final QName XBL_RESOURCES_QNAME = new QName("resources", XBL_NAMESPACE);
     public static final QName XBL_STYLE_QNAME = new QName("style", XBL_NAMESPACE);
     public static final QName XBL_TEMPLATE_QNAME = new QName("template", XBL_NAMESPACE);
-    public static final QName XBL_ATTR_QNAME = new QName("attr", XBL_NAMESPACE);
-    public static final QName XBL_CONTENT_QNAME = new QName("content", XBL_NAMESPACE);
     public static final QName XBL_HANDLERS_QNAME = new QName("handlers", XBL_NAMESPACE);
     public static final QName XBL_HANDLER_QNAME = new QName("handler", XBL_NAMESPACE);
     public static final QName XBL_IMPLEMENTATION_QNAME = new QName("implementation", XBL_NAMESPACE);
@@ -135,7 +133,6 @@ public class XFormsConstants {
     public static final String XXBL_PREFIX = "xxbl";
     public static final String XXBL_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xbl";
     public static final Namespace XXBL_NAMESPACE = new Namespace(XXBL_PREFIX, XXBL_NAMESPACE_URI);
-    public static final QName XXBL_ATTR_QNAME = new QName("attr", XXBL_NAMESPACE);
     public static final QName XXBL_TRANSFORM_QNAME = new QName("transform", XXBL_NAMESPACE);
     public static final QName XXBL_SCOPE_QNAME = new QName("scope", XXBL_NAMESPACE);
 

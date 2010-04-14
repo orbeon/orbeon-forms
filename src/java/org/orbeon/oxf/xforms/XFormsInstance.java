@@ -315,6 +315,19 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
         return validation;
     }
 
+    public boolean isLaxValidation() {
+        return validation == null || "lax".equals(validation);
+    }
+
+    public boolean isStrictValidation() {
+        return "strict".equals(validation);
+    }
+
+    public boolean isSchemaValidation() {
+        // NOTE: For now don't validate read-only instances. Might change in future.
+        return (isLaxValidation() || isStrictValidation()) && !isReadOnly();
+    }
+
     public boolean isHandleXInclude() {
         return handleXInclude;
     }

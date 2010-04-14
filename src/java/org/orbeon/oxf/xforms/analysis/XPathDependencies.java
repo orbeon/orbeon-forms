@@ -15,36 +15,19 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.saxon.om.NodeInfo;
 
 /**
- * This implementation of UI dependencies simply says that everything must be updated all the time.
+ * Interface to dependencies implementation.
  */
-public class DumbUIDependencies implements UIDependencies {
-    public void markValueChanged(XFormsModel model, NodeInfo nodeInfo) {
-        // NOP
-    }
-
-    public void markStructuralChange(XFormsModel model) {
-        // NOP
-    }
-
-    public void refreshDone() {
-        // NOP
-    }
-
-    public boolean requireBindingUpdate(String controlPrefixedId) {
-        // Always update
-        return true;
-    }
-
-    public boolean requireValueUpdate(String controlPrefixedId) {
-        // Always update
-        return true;
-    }
-
-    public boolean requireLHHAUpdate(XFormsConstants.LHHA lhha, String controlPrefixedId) {
-        // Always update
-        return true;
-    }
+public interface XPathDependencies {
+    void markValueChanged(XFormsModel model, NodeInfo nodeInfo);
+    void markStructuralChange(XFormsModel model);
+    void refreshDone();
+    boolean requireBindingUpdate(String controlPrefixedId);
+    boolean requireValueUpdate(String controlPrefixedId);
+    boolean requireLHHAUpdate(XFormsConstants.LHHA lhha, String controlPrefixedId);
+    boolean requireBindCalculation(Model model, String instancePrefixedId);
+    boolean requireBindValidation(Model model, String instancePrefixedId);
 }

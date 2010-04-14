@@ -18,7 +18,6 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
-import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.function.Instance;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
@@ -40,6 +39,8 @@ public class XPathAnalysis {
     public final Set<String> returnablePaths = new HashSet<String>();
 
     public final Set<String> dependentModels = new HashSet<String>();
+    public final Set<String> dependentInstances = new HashSet<String>();
+    public final Set<String> returnableInstances = new HashSet<String>();
 
     public final boolean figuredOutDependencies;
 
@@ -54,7 +55,7 @@ public class XPathAnalysis {
 
     public XPathAnalysis(XFormsStaticState staticState, Expression expression, String xpathString,
                          XPathAnalysis baseAnalysis, Map<String, ControlAnalysis> inScopeVariables,
-                         XBLBindings.Scope scope, String modelPrefixedId) {
+                         XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId) {
         
         this.staticState = staticState;
         this.xpathString = xpathString;
@@ -90,7 +91,7 @@ public class XPathAnalysis {
             this.pathmap = pathmap;
 
             // Produce resulting paths
-            figuredOutDependencies = processPaths(scope, modelPrefixedId);
+            figuredOutDependencies = processPaths(scope, modelPrefixedId, defaultInstancePrefixedId);
 
         } catch (Exception e) {
             throw new OXFException("Exception while analyzing XPath expression: " + xpathString, e);
@@ -105,6 +106,8 @@ public class XPathAnalysis {
         dependentPaths.addAll(other.dependentPaths);
         returnablePaths.addAll(other.returnablePaths);
         dependentModels.addAll(other.dependentModels);
+        dependentInstances.addAll(other.dependentInstances);
+        returnableInstances.addAll(other.returnableInstances);
     }
 
     public boolean intersectsBinding(Set<String> touchedPaths) {
@@ -139,11 +142,11 @@ public class XPathAnalysis {
         return false;
     }
 
-    private boolean processPaths(XBLBindings.Scope scope, String modelPrefixedId) {
+    private boolean processPaths(XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId) {
         final List<Expression> stack = new ArrayList<Expression>();
         for (final PathMap.PathMapRoot root: pathmap.getPathMapRoots()) {
             stack.add(root.getRootExpression());
-            final boolean success = processNode(stack, root, scope, modelPrefixedId);
+            final boolean success = processNode(stack, root, scope, modelPrefixedId, defaultInstancePrefixedId);
             if (!success)
                 return false;
             stack.remove(stack.size() - 1);
@@ -155,96 +158,12 @@ public class XPathAnalysis {
         return "instance('" + instanceId.replaceAll("'", "''") + "')";
     }
 
-    private boolean processNode(List<Expression> stack, PathMap.PathMapNode node, XBLBindings.Scope scope, String modelPrefixedId) {
+    private boolean processNode(List<Expression> stack, PathMap.PathMapNode node, XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId) {
         boolean success = true;
         if (node.getArcs().length == 0 || node.isReturnable()) {
 
             final StringBuilder sb = new StringBuilder();
-
-            for (final Expression expression: stack) {
-                if (expression instanceof Instance || expression instanceof XXFormsInstance) {
-                    // Instance function
-                    final FunctionCall instanceExpression = (FunctionCall) expression;
-
-                    final boolean hasParameter = instanceExpression.getArguments().length > 0;
-                    if (!hasParameter) {
-                        // instance() resolves to default instance for scope
-                        final Model model = staticState.getModel(modelPrefixedId);
-                        if (model.defaultInstancePrefixedId != null) {
-                            sb.append(buildInstanceString(model.defaultInstancePrefixedId));
-                            dependentModels.add(model.prefixedId);
-                        } else {
-                            // Model does not have a default instance
-                            // This is successful, but the path must not be added
-                            sb.setLength(0);
-                            success = true;
-                            break;
-                        }
-                    } else {
-                        final Expression instanceNameExpression = instanceExpression.getArguments()[0];
-                        if (instanceNameExpression instanceof StringLiteral) {
-                            final String originalInstanceId = ((StringLiteral) instanceNameExpression).getStringValue();
-                            final boolean searchAncestors = expression instanceof XXFormsInstance;
-
-                            final String prefixedInstanceId;
-                            if (searchAncestors) {
-                                // xxforms:instance()
-                                prefixedInstanceId = staticState.findInstancePrefixedId(scope, originalInstanceId);
-                            } else if (originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1) {
-                                // HACK: datatable e.g. uses instance(prefixedId)!
-                                prefixedInstanceId = originalInstanceId;
-                            } else {
-                                // Normal use of instance()
-                                prefixedInstanceId = scope.getPrefixedIdForStaticId(originalInstanceId);
-                            }
-
-                            if (prefixedInstanceId != null) {
-                                // Instance found
-                                sb.append(buildInstanceString(prefixedInstanceId));
-                                dependentModels.add(modelPrefixedId);
-                            } else {
-                                // Instance not found (could be reference to unknown instance e.g. author typo!)
-                                // TODO: must also catch case where id is found but does not correspond to instance
-                                // TODO: warn in log
-                                // This is successful, but the path must not be added
-                                sb.setLength(0);
-                                success = true;
-                                break;
-                            }
-                        } else {
-                            // Non-literal instance name
-                            success = false;
-                            break;
-                        }
-                    }
-                } else if (expression instanceof AxisExpression) {
-                    final AxisExpression axisExpression = (AxisExpression) expression;
-                    if (axisExpression.getAxis() == Axis.SELF) {
-                        // NOP
-                    } else if (axisExpression.getAxis() == Axis.CHILD || axisExpression.getAxis() == Axis.ATTRIBUTE) {
-                        // Child or attribute axis
-                        if (sb.length() > 0)
-                            sb.append('/');
-                        final int fingerprint = axisExpression.getNodeTest().getFingerprint();
-                        if (fingerprint != -1) {
-                            if (axisExpression.getAxis() == Axis.ATTRIBUTE)
-                                sb.append("@");
-                            sb.append(fingerprint);
-                        } else {
-                            // Unnamed node
-                            success = false;
-                            break;
-                        }
-                    } else {
-                        // Unhandled axis
-                        success = false;
-                        break;
-                    }
-                } else {
-                    success = false;
-                    break;
-                }
-            }
+            success &= createPath(sb, stack, scope, modelPrefixedId, defaultInstancePrefixedId, node.isReturnable());
             if (success) {
                 if (sb.length() > 0) {
                     // A path was created
@@ -267,7 +186,7 @@ public class XPathAnalysis {
         if (node.getArcs().length > 0) {
             for (final PathMap.PathMapArc arc: node.getArcs()) {
                 stack.add(arc.getStep());
-                success &= processNode(stack, arc.getTarget(), scope, modelPrefixedId);
+                success &= processNode(stack, arc.getTarget(), scope, modelPrefixedId, defaultInstancePrefixedId);
                 if (!success) {
                     return false;
                 }
@@ -277,6 +196,100 @@ public class XPathAnalysis {
 
         // We managed to deal with this path
         return true;
+    }
+
+    private boolean createPath(StringBuilder sb, List<Expression> stack, XBLBindings.Scope scope, String modelPrefixedId, String defaultInstancePrefixedId, boolean isReturnable) {
+        boolean success = true;
+        for (final Expression expression: stack) {
+            if (expression instanceof Instance || expression instanceof XXFormsInstance) {
+                // Instance function
+                final FunctionCall instanceExpression = (FunctionCall) expression;
+
+                final boolean hasParameter = instanceExpression.getArguments().length > 0;
+                if (!hasParameter) {
+                    // instance() resolves to default instance for scope
+                    if (defaultInstancePrefixedId != null) {
+                        sb.append(buildInstanceString(defaultInstancePrefixedId));
+                        dependentModels.add(modelPrefixedId);
+                        dependentInstances.add(defaultInstancePrefixedId);
+                        if (isReturnable)
+                            returnableInstances.add(defaultInstancePrefixedId);
+                    } else {
+                        // Model does not have a default instance
+                        // This is successful, but the path must not be added
+                        sb.setLength(0);
+                        success = true;
+                        break;
+                    }
+                } else {
+                    final Expression instanceNameExpression = instanceExpression.getArguments()[0];
+                    if (instanceNameExpression instanceof StringLiteral) {
+                        final String originalInstanceId = ((StringLiteral) instanceNameExpression).getStringValue();
+                        final boolean searchAncestors = expression instanceof XXFormsInstance;
+
+                        final String prefixedInstanceId;
+                        if (searchAncestors) {
+                            // xxforms:instance()
+                            prefixedInstanceId = staticState.findInstancePrefixedId(scope, originalInstanceId);
+                        } else if (originalInstanceId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1) {
+                            // HACK: datatable e.g. uses instance(prefixedId)!
+                            prefixedInstanceId = originalInstanceId;
+                        } else {
+                            // Normal use of instance()
+                            prefixedInstanceId = scope.getPrefixedIdForStaticId(originalInstanceId);
+                        }
+
+                        if (prefixedInstanceId != null) {
+                            // Instance found
+                            sb.append(buildInstanceString(prefixedInstanceId));
+                            dependentModels.add(modelPrefixedId);
+                            dependentInstances.add(prefixedInstanceId);
+                            if (isReturnable)
+                                returnableInstances.add(prefixedInstanceId);
+                        } else {
+                            // Instance not found (could be reference to unknown instance e.g. author typo!)
+                            // TODO: must also catch case where id is found but does not correspond to instance
+                            // TODO: warn in log
+                            // This is successful, but the path must not be added
+                            sb.setLength(0);
+                            success = true;
+                            break;
+                        }
+                    } else {
+                        // Non-literal instance name
+                        success = false;
+                        break;
+                    }
+                }
+            } else if (expression instanceof AxisExpression) {
+                final AxisExpression axisExpression = (AxisExpression) expression;
+                if (axisExpression.getAxis() == Axis.SELF) {
+                    // NOP
+                } else if (axisExpression.getAxis() == Axis.CHILD || axisExpression.getAxis() == Axis.ATTRIBUTE) {
+                    // Child or attribute axis
+                    if (sb.length() > 0)
+                        sb.append('/');
+                    final int fingerprint = axisExpression.getNodeTest().getFingerprint();
+                    if (fingerprint != -1) {
+                        if (axisExpression.getAxis() == Axis.ATTRIBUTE)
+                            sb.append("@");
+                        sb.append(fingerprint);
+                    } else {
+                        // Unnamed node
+                        success = false;
+                        break;
+                    }
+                } else {
+                    // Unhandled axis
+                    success = false;
+                    break;
+                }
+            } else {
+                success = false;
+                break;
+            }
+        }
+        return success;
     }
 
     public void dump(PrintStream out, int indent) {

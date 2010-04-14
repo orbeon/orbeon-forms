@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <xh:head>
+        <xf:model id="model1" xxf:xpath-analysis="true">
+            <xf:instance id="default">
+                <instance>
+                    <a>1</a>
+                    <b>1</b>
+                    <c><d/></c>
+                </instance>
+            </xf:instance>
+        </xf:model>
+        <xf:model id="model2">
+            <xf:instance id="instance2">
+                <instance>
+                    <a>1</a>
+                    <b>1</b>
+                </instance>
+            </xf:instance>
+        </xf:model>
+
+    </xh:head>
+    <xh:body>
+        <!--<xxf:variable id="v1" name="position" select="for $c in c return count($c/preceding-sibling::foobar) + 1"/>-->
+        <!--<xxf:variable id="v2" name="field" select="instance('default')/c[position() eq $position]"/>-->
+        <!--<xf:input ref="$field/d" appearance="full" id="yyy"/>-->
+
+        <xf:trigger id="trigger1">
+            <xf:label>Insert 1</xf:label>
+            <xf:insert ev:event="DOMActivate" nodeset="b"/>
+        </xf:trigger>
+
+        <xf:trigger id="trigger2" model="model2">
+            <xf:label>Insert 2</xf:label>
+            <xf:insert ev:event="DOMActivate" nodeset="b"/>
+        </xf:trigger>
+
+
+        <xf:select1 id="select1" ref="instance()/a">
+            <xf:item>
+                <xf:label>1</xf:label>
+                <xf:value>1</xf:value>
+            </xf:item>
+            <xf:item>
+                <xf:label>2</xf:label>
+                <xf:value>2</xf:value>
+            </xf:item>
+
+            <xf:action ev:event="xforms-value-changed" >
+                <xf:setvalue ref="../b" value="''"/>
+            </xf:action>
+
+        </xf:select1>
+
+        <xf:group ref=".[a = '2']" id="group2">
+            <xf:select1 id="select2" ref="b">
+                <xf:item>
+                    <xf:label>1</xf:label>
+                    <xf:value>1</xf:value>
+                </xf:item>
+                <xf:item>
+                    <xf:label>2</xf:label>
+                    <xf:value>2</xf:value>
+                </xf:item>
+            </xf:select1>
+        </xf:group>
+
+        <xh:br/>
+
+        <xf:group model="model2" id="group3">
+            <xf:select1 id="select3" ref="instance()/a">
+                <xf:item>
+                    <xf:label>1</xf:label>
+                    <xf:value>1</xf:value>
+                </xf:item>
+                <xf:item>
+                    <xf:label>2</xf:label>
+                    <xf:value>2</xf:value>
+                </xf:item>
+
+                <xf:action ev:event="xforms-value-changed" >
+                    <xf:setvalue ref="../b" value="''"/>
+                </xf:action>
+
+            </xf:select1>
+
+            <xf:group ref=".[a = '2']" id="group4">
+                <xf:select1 id="select4" ref="b">
+                    <xf:item>
+                        <xf:label>1</xf:label>
+                        <xf:value>1</xf:value>
+                    </xf:item>
+                    <xf:item>
+                        <xf:label>2</xf:label>
+                        <xf:value>2</xf:value>
+                    </xf:item>
+                </xf:select1>
+            </xf:group>
+        </xf:group>
+    </xh:body>
+</xh:html>

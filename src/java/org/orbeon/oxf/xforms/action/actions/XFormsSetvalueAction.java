@@ -113,7 +113,7 @@ public class XFormsSetvalueAction extends XFormsAction {
             final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
             if (modifiedInstance != null) {// can be null if you set a value in a non-instance doc
 
-                containingDocument.getUIDependencies().markValueChanged(modifiedInstance.getModel(containingDocument), currentNode);
+                containingDocument.getXPathDependencies().markValueChanged(modifiedInstance.getModel(containingDocument), currentNode);
 
                 // Dispatch extension event to instance
                 final XBLContainer modifiedContainer = modifiedInstance.getXBLContainer(containingDocument);

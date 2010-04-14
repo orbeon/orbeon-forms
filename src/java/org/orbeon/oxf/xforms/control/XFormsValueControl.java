@@ -20,7 +20,7 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
-import org.orbeon.oxf.xforms.analysis.UIDependencies;
+import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -87,11 +87,11 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    protected void markDirtyImpl(UIDependencies uiDependencies) {
-        super.markDirtyImpl(uiDependencies);
+    protected void markDirtyImpl(XPathDependencies xpathDependencies) {
+        super.markDirtyImpl(xpathDependencies);
 
         // Handle value update
-        if (uiDependencies.requireValueUpdate(getPrefixedId())) {
+        if (xpathDependencies.requireValueUpdate(getPrefixedId())) {
 
             value = null;
 

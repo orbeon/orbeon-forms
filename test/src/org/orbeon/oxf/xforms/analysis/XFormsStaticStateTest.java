@@ -21,6 +21,7 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.xforms.XFormsStaticState;
+import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -34,8 +35,77 @@ import java.util.Set;
 
 public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
+    public void testLHHAAnalysis() {
+//        if (Version.instance().isPE()) { // only test this feature if we are the PE version
+//            final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/lhha.xml");
+//            final Map<String, String> namespaces = new HashMap<String, String>();
+//            namespaces.put("", "");
+//
+//            // Hold the current list of changes
+//            final Set<String> currentChanges = new HashSet<String>();
+//
+//            final PathMapUIDependencies dependencies = new PathMapUIDependencies(staticState.getIndentedLogger(), staticState) {
+//                @Override
+//                protected Set<String> getModifiedPaths() {
+//                    return currentChanges;
+//                }
+//            };
+//
+//            staticState.dumpAnalysis();
+//        }
+    }
+
+    public void testBindAnalysis() {
+        if (Version.instance().isPE()) { // only test this feature if we are the PE version
+            final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/binds.xml");
+
+            staticState.dumpAnalysis();
+
+            // TODO: test computedBindExpressionsInstances and validationBindInstances
+            {
+                final Model model1 = staticState.getModel("model1");
+                assertTrue(model1.figuredBindAnalysis);
+
+                assertTrue(model1.bindInstances.contains("instance11"));
+                assertTrue(model1.bindInstances.contains("instance12"));
+                assertTrue(model1.bindInstances.contains("instance13"));
+            }
+            {
+                final Model model2 = staticState.getModel("model2");
+                assertTrue(model2.figuredBindAnalysis);
+
+                assertFalse(model2.bindInstances.contains("instance21"));
+            }
+            {
+                final Model model3 = staticState.getModel("model3");
+                assertTrue(model3.figuredBindAnalysis);
+
+                assertFalse(model3.bindInstances.contains("instance31"));
+                assertTrue(model3.bindInstances.contains("instance32"));
+            }
+            {
+                final Model model4 = staticState.getModel("model4");
+                assertTrue(model4.figuredBindAnalysis);
+
+                assertTrue(model4.bindInstances.contains("instance41"));
+                assertFalse(model4.bindInstances.contains("instance42"));
+            }
+            {
+                final Model model5 = staticState.getModel("model5");
+                assertTrue(model5.figuredBindAnalysis);
+
+                assertTrue(model5.validationBindInstances.contains("instance51"));
+                assertFalse(model5.computedBindExpressionsInstances.contains("instance51"));
+
+                assertFalse(model5.validationBindInstances.contains("instance52"));
+                assertTrue(model5.computedBindExpressionsInstances.contains("instance52"));
+            }
+        }
+    }
+
+
     public void testXPathAnalysis() {
-        if (Version.instance().isPE()) { // only test this featuer if we are the PE version
+        if (Version.instance().isPE()) { // only test this feature if we are the PE version
             final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/form.xml");
             final Map<String, String> namespaces = new HashMap<String, String>();
             namespaces.put("", "");
@@ -43,7 +113,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             // Hold the current list of changes
             final Set<String> currentChanges = new HashSet<String>();
 
-            final PathMapUIDependencies dependencies = new PathMapUIDependencies(staticState.getIndentedLogger(), staticState) {
+            final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState) {
                 @Override
                 protected Set<String> getModifiedPaths() {
                     return currentChanges;

@@ -975,12 +975,17 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 indentedLogger.startHandleOperation("validation", "performing revalidate", "model id", getEffectiveId());
 
             // Clear validation state
-            for (XFormsInstance currentInstance: instances) {
-                XFormsUtils.iterateInstanceData(currentInstance, new XFormsUtils.InstanceWalker() {
-                    public void walk(NodeInfo nodeInfo) {
-                        InstanceData.clearValidationState(nodeInfo);
-                    }
-                }, true);
+            for (final XFormsInstance instance: instances) {
+                // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
+                // The reason is that clearing this state can take quite some time
+                final boolean mustSchemaValidateInstance = mustSchemaValidate && instance.isSchemaValidation();
+                if (mustSchemaValidateInstance || containingDocument.getXPathDependencies().requireBindValidation(staticModel, instance.getPrefixedId())) {
+                    XFormsUtils.iterateInstanceData(instance, new XFormsUtils.InstanceWalker() {
+                        public void walk(NodeInfo nodeInfo) {
+                            InstanceData.clearValidationState(nodeInfo);
+                        }
+                    }, true);
+                }
             }
 
             // Run validation
@@ -989,12 +994,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // Validate using schemas if needed
             if (mustSchemaValidate) {
                 // Apply schemas to all instances
-                for (XFormsInstance currentInstance: instances) {
+                for (final XFormsInstance instance: instances) {
                     // Currently we don't support validating read-only instances
-                    if (!currentInstance.isReadOnly()) {
-                        if (!schemaValidator.validateInstance(currentInstance)) {
+                    if (instance.isSchemaValidation()) {
+                        if (!schemaValidator.validateInstance(instance)) {
                             // Remember that instance is invalid
-                            invalidInstances.add(currentInstance.getEffectiveId());
+                            invalidInstances.add(instance.getEffectiveId());
                         }
                     }
                 }
@@ -1007,11 +1012,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // NOTE: It is possible, with binds and the use of xxforms:instance(), that some instances in
             // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
             // algorithm below.
-            for (XFormsInstance currentInstance: instances) {
-                if (invalidInstances.contains(currentInstance.getEffectiveId())) {
-                    container.dispatchEvent(propertyContext, new XXFormsInvalidEvent(containingDocument, currentInstance));
+            for (final XFormsInstance instance: instances) {
+                if (invalidInstances.contains(instance.getEffectiveId())) {
+                    container.dispatchEvent(propertyContext, new XXFormsInvalidEvent(containingDocument, instance));
                 } else {
-                    container.dispatchEvent(propertyContext, new XXFormsValidEvent(containingDocument, currentInstance));
+                    container.dispatchEvent(propertyContext, new XXFormsValidEvent(containingDocument, instance));
                 }
             }
 
@@ -1080,8 +1085,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
         deferredActionContext.setAllDeferredFlags(true);
 
-        // Notify UI dependencies of the change
-        containingDocument.getUIDependencies().markStructuralChange(this);
+        // Notify dependencies of the change
+        containingDocument.getXPathDependencies().markStructuralChange(this);
     }
 
     public void startOutermostActionHandler() {

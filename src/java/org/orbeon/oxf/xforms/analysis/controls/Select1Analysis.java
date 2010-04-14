@@ -18,7 +18,6 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -28,8 +27,8 @@ public class Select1Analysis extends ControlAnalysis {
     public final boolean isMultiple;
     public final boolean hasNonStaticItem;
 
-    public Select1Analysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo, XBLBindings.Scope scope, String prefixedId, Element element, LocationData locationData, int index, boolean isValueControl, ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
-        super(propertyContext, staticState, controlsDocumentInfo, scope, prefixedId, element, locationData, index, isValueControl, parentControlAnalysis, inScopeVariables);
+    public Select1Analysis(PropertyContext propertyContext, XFormsStaticState staticState, DocumentWrapper controlsDocumentInfo, XBLBindings.Scope scope, Element element, int index, boolean isValueControl, ContainerAnalysis parentControlAnalysis, Map<String, ControlAnalysis> inScopeVariables) {
+        super(propertyContext, staticState, controlsDocumentInfo, scope, element, index, isValueControl, parentControlAnalysis, inScopeVariables);
 
         // Gather itemset information
         final NodeInfo controlNodeInfo = controlsDocumentInfo.wrap(element);

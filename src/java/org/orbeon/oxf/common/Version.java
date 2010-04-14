@@ -16,8 +16,8 @@ package org.orbeon.oxf.common;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.analysis.DumbUIDependencies;
-import org.orbeon.oxf.xforms.analysis.UIDependencies;
+import org.orbeon.oxf.xforms.analysis.DumbXPathDependencies;
+import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -112,8 +112,8 @@ public class Version {
         return false;
     }
 
-    public UIDependencies createUIDependencies(XFormsContainingDocument containingDocument) {
-        return new DumbUIDependencies();
+    public XPathDependencies createUIDependencies(XFormsContainingDocument containingDocument) {
+        return new DumbXPathDependencies();
     }
 
     public String toString() {

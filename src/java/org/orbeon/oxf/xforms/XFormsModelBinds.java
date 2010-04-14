@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.collections.map.CompositeMap;
-import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
@@ -24,6 +23,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
+import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -60,11 +60,11 @@ import java.util.*;
 public class XFormsModelBinds {
     
     private final XFormsModel model;                            // model to which we belong
+    private final Model staticModel;
 
     private final IndentedLogger indentedLogger;
     private final XBLContainer container;
     private final XFormsContainingDocument containingDocument;  // current containing document
-    private final boolean computedBindsCalculate;               // whether computed binds (readonly, required, relevant) are evaluated with recalculate or revalidate
 
     private final List<Element> bindElements;
     private List<Bind> topLevelBinds = new ArrayList<Bind>();
@@ -102,9 +102,9 @@ public class XFormsModelBinds {
         this.indentedLogger = model.getIndentedLogger();
         this.container = model.getXBLContainer();
         this.containingDocument = model.getContainingDocument();
-        this.computedBindsCalculate = XFormsProperties.getComputedBinds(containingDocument).equals(XFormsProperties.COMPUTED_BINDS_RECALCULATE_VALUE);
 
-        this.bindElements = model.getStaticModel().bindElements;
+        this.staticModel = model.getStaticModel();
+        this.bindElements = staticModel.bindElements;
 
         // For the lifecycle of an XForms document, new XFormsModelBinds() may be created multiple times, e.g. if the
         // state is deserialized, but we know that new XFormsModelBinds() will occur only once during document
@@ -151,31 +151,35 @@ public class XFormsModelBinds {
         if (indentedLogger.isDebugEnabled())
             indentedLogger.startHandleOperation("model", "performing recalculate", "model id", model.getEffectiveId());
 
-        // Reset context stack just to re-evaluate the variables
-        model.getContextStack().resetBindingContext(propertyContext, model);
+//        PROFILING
+//        final int iterations = Properties.instance().getPropertySet().getInteger("oxf.xforms.profiling.iterations", 1);
+//        for (int i = 0; i < iterations; i++)
+        {
 
-        if (isFirstCalculate) {
-            // Handle default values
+            // Reset context stack just to re-evaluate the variables
+            model.getContextStack().resetBindingContext(propertyContext, model);
+
+            if (isFirstCalculate) {
+                // Handle default values
+                iterateBinds(propertyContext, new BindRunner() {
+                    public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
+                        handleXXFormsDefaultBind(propertyContext, bind, nodeset, position);
+                    }
+                });
+                // This will be false from now on as we have done our first handling of calculate binds
+                isFirstCalculate = false;
+            }
+
+            // Handle calculations
+            // NOTE: we do not correctly handle computational dependencies, but it doesn't hurt
+            // to evaluate "calculate" binds before the other binds.
             iterateBinds(propertyContext, new BindRunner() {
                 public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
-                    handleXXFormsDefaultBind(propertyContext, bind, nodeset, position);
+                    handleCalculateBind(propertyContext, bind, nodeset, position);
                 }
             });
-            // This will be false from now on as we have done our first handling of calculate binds
-            isFirstCalculate = false;
-        }
 
-        // Handle calculations
-        // NOTE: we do not correctly handle computational dependencies, but it doesn't hurt
-        // to evaluate "calculate" binds before the other binds.
-        iterateBinds(propertyContext, new BindRunner() {
-            public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {
-                handleCalculateBind(propertyContext, bind, nodeset, position);
-            }
-        });
-
-        // Update computed expression binds if requested (done here according to XForms 1.1)
-        if (computedBindsCalculate) {
+            // Update computed expression binds if requested (done here according to XForms 1.1)
             applyComputedExpressionBinds(propertyContext);
         }
 
@@ -196,12 +200,16 @@ public class XFormsModelBinds {
         // Clear state
         final List<XFormsInstance> instances = model.getInstances();
         if (instances != null) {
-            for (XFormsInstance instance: instances) {
-                XFormsUtils.iterateInstanceData(instance, new XFormsUtils.InstanceWalker() {
-                    public void walk(NodeInfo nodeInfo) {
-                        InstanceData.clearOtherState(nodeInfo);
-                    }
-                }, true);
+            for (final XFormsInstance instance: instances) {
+                // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
+                // The reason is that clearing this state can take quite some time
+                if (containingDocument.getXPathDependencies().requireBindCalculation(staticModel, instance.getPrefixedId())) {
+                    XFormsUtils.iterateInstanceData(instance, new XFormsUtils.InstanceWalker() {
+                        public void walk(NodeInfo nodeInfo) {
+                            InstanceData.clearOtherState(nodeInfo);
+                        }
+                    }, true);
+                }
             }
 
             iterateBinds(propertyContext, new BindRunner() {
@@ -229,11 +237,6 @@ public class XFormsModelBinds {
                 handleValidationBind(propertyContext, bind, nodeset, position, invalidInstances);
             }
         });
-
-        // Update computed expression binds if requested (done here upon a preference)
-        if (!computedBindsCalculate) {
-            applyComputedExpressionBinds(propertyContext);
-        }
     }
 
     /**
@@ -317,7 +320,7 @@ public class XFormsModelBinds {
             return (result != null) ? new StringValue(result) : null;
         } else {
             // Try custom MIPs
-            final String result = evaluateCustomMIP(propertyContext, bind, buildCustomMIPName(mipType.getQualifiedName()), nodeset, position, currentVariables);
+            final String result = evaluateCustomMIP(propertyContext, bind, Model.buildCustomMIPName(mipType.getQualifiedName()), nodeset, position, currentVariables);
             return (result != null) ? new StringValue(result) : null;
         }
     }
@@ -1130,26 +1133,7 @@ public class XFormsModelBinds {
                 offlineBinds.add(this);
 
             // Remember custom MIPs
-            {
-                for (Iterator iterator = bindElement.attributeIterator(); iterator.hasNext();) {
-                    final Attribute attribute = (Attribute) iterator.next();
-                    final QName attributeQName = attribute.getQName();
-                    final String attributePrefix = attributeQName.getNamespacePrefix();
-                    final String attributeURI = attributeQName.getNamespaceURI();
-                    // NOTE: Also allow for xxforms:events-mode extension MIP
-                    if (attributePrefix != null && attributePrefix.length() > 0
-                            && !(attributeURI.equals(XFormsConstants.XFORMS_NAMESPACE_URI)
-                                     || (attributeURI.equals(XFormsConstants.XXFORMS_NAMESPACE_URI)
-                                            && !attributeQName.getName().equals(XFormsConstants.XXFORMS_EVENT_MODE_QNAME.getName()))
-                                     || attributePrefix.startsWith("xml"))) {
-                        // Any QName-but-not-NCName which is not in the xforms or xxforms namespace
-                        if (customMips == null)
-                            customMips = new HashMap<String, String>();
-                        // E.g. foo:bar="true()" => "foo-bar" -> "true()"
-                        customMips.put(buildCustomMIPName(attribute.getQualifiedName()), attribute.getValue());
-                    }
-                }
-            }
+            customMips = staticModel.customMIPs.get(this.id);
 
             // Compute nodeset for this bind
             model.getContextStack().pushBinding(propertyContext, bindElement, model.getEffectiveId(), model.getResolutionScope());
@@ -1310,9 +1294,5 @@ public class XFormsModelBinds {
             }
             return null;
         }
-    }
-
-    private static String buildCustomMIPName(String qualifiedName) {
-        return qualifiedName.replace(':', '-');
     }
 }

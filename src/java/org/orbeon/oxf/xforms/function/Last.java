@@ -16,14 +16,14 @@ package org.orbeon.oxf.xforms.function;
 import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.SingletonIterator;
+import org.orbeon.saxon.sxpath.XPathExpression;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.Int64Value;
 
 public class Last extends XFormsFunction {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
-        if (xpathContext.getCurrentIterator() instanceof SingletonIterator) {
+        if (xpathContext.getCurrentIterator() instanceof XPathExpression.ContextItemSequenceIterator) {
             // We have a top level expression and Saxon does not know about the context nodeset
             return new Int64Value(getContextStack(xpathContext).getCurrentNodeset().size());
         } else {

@@ -23,7 +23,7 @@ import org.orbeon.saxon.dom4j.DocumentWrapper;
 
 public class RootAnalysis extends ContainerAnalysis {
     public RootAnalysis(PropertyContext propertyContext, XFormsStaticState staticState, XBLBindings.Scope scope) {
-        super(propertyContext, staticState, null, scope, "#controls", null, staticState.getLocationData(), 1, false, null, null);
+        super(propertyContext, staticState, null, scope, null, 1, false, null, null);
     }
 
     @Override

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:xbl="http://www.w3.org/ns/xbl">
+
+    <xh:head>
+        <xf:model id="model1" xxf:xpath-analysis="true">
+            <xf:instance id="instance11">
+                <instance>
+                    <a>1</a>
+                </instance>
+            </xf:instance>
+            <xf:instance id="instance12">
+                <instance>
+                    <a>1</a>
+                </instance>
+            </xf:instance>
+            <xf:instance id="instance13">
+                <instance>
+                    <a>1</a>
+                </instance>
+            </xf:instance>
+
+            <!-- Touch instance11 -->
+            <xf:bind nodeset="." id="bind11">
+                <xf:bind nodeset="a" id="bind12"/>
+                <!-- Touch instance12 -->
+                <xf:bind nodeset="instance('instance12')" id="bind13"/>
+            </xf:bind>
+
+            <!-- Touch instance13 -->
+            <xf:bind nodeset="instance('instance13')" id="bind14"/>
+
+        </xf:model>
+        <xf:model id="model2">
+            <xf:instance id="instance21">
+                <instance>
+                    <a>1</a>
+                </instance>
+            </xf:instance>
+            <!-- Touch nothing -->
+        </xf:model>
+        <xf:model id="model3">
+            <xf:instance id="instance31">
+                <instance>
+                    <a>1</a>
+                </instance>
+            </xf:instance>
+            <xf:instance id="instance32">
+                <instance>
+                    <a>1</a>
+                </instance>
+            </xf:instance>
+            <!-- Touch instance32 only -->
+            <xf:bind nodeset="instance('instance32')" id="bind31"/>
+        </xf:model>
+        <xf:model id="model4">
+            <xf:instance id="instance41">
+                <instance>
+                    <a>1</a>
+                </instance>
+            </xf:instance>
+            <xf:instance id="instance42">
+                <instance>
+                    <a>1</a>
+                </instance>
+            </xf:instance>
+            <!-- Touch instance41 only -->
+            <xf:bind nodeset="instance()" id="bind41"/>
+        </xf:model>
+        <xf:model id="model5">
+            <xf:instance id="instance51">
+                <instance>
+                    <a>1</a>
+                </instance>
+            </xf:instance>
+            <xf:instance id="instance52">
+                <instance>
+                    <a>1</a>
+                </instance>
+            </xf:instance>
+            <!-- Validity MIP -->
+            <xf:bind nodeset="instance()/a" id="bind51" constraint="true()"/>
+            <!-- Calculate MIP -->
+            <xf:bind nodeset="instance('instance52')/a" id="bind52" calculate="42"/>
+        </xf:model>
+    </xh:head>
+    <xh:body/>
+</xh:html>

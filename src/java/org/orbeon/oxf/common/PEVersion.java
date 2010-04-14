@@ -24,8 +24,8 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.analysis.PathMapUIDependencies;
-import org.orbeon.oxf.xforms.analysis.UIDependencies;
+import org.orbeon.oxf.xforms.analysis.PathMapXPathDependencies;
+import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -159,8 +159,8 @@ public class PEVersion extends Version {
     }
 
     @Override
-    public UIDependencies createUIDependencies(XFormsContainingDocument containingDocument) {
+    public XPathDependencies createUIDependencies(XFormsContainingDocument containingDocument) {
         final boolean requested = containingDocument.getStaticState().isXPathAnalysis();
-        return (requested && isPE()) ? new PathMapUIDependencies(containingDocument) : super.createUIDependencies(containingDocument);
+        return (requested && isPE()) ? new PathMapXPathDependencies(containingDocument) : super.createUIDependencies(containingDocument);
     }
 }

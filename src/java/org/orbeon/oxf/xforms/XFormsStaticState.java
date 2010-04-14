@@ -286,11 +286,14 @@ public class XFormsStaticState {
             this.metadata = metadata;
         }
 
-        // Extract controls, models and components documents
-        extractControlsModelsComponents(propertyContext, staticStateElement);
+        final List<Element> topLevelModelsElements = Dom4jUtils.elements(staticStateElement, XFormsConstants.XFORMS_MODEL_QNAME);
 
         // Extract properties information
-        extractProperties(staticStateElement);
+        // Do this first so that e.g. extracted models know about properties
+        extractProperties(staticStateElement, topLevelModelsElements);
+
+        // Extract controls, models and components documents
+        extractControlsModelsComponents(propertyContext, staticStateElement, topLevelModelsElements);
 
         // Extract XHTML if present and requested
         {
@@ -343,7 +346,7 @@ public class XFormsStaticState {
         indentedLogger.endHandleOperation();
     }
 
-    private void extractProperties(Element staticStateElement) {
+    private void extractProperties(Element staticStateElement, List<Element> topLevelModelsElements) {
         // Gather xxforms:* properties
         {
             // Global properties (outside models and controls)
@@ -363,9 +366,8 @@ public class XFormsStaticState {
                 }
             }
             // Properties on top-level xforms:model elements
-            for (final Model model: modelsByScope.get(xblBindings.getTopLevelScope())) {
-                final Document currentModelDocument = model.document;
-                for (Iterator j = currentModelDocument.getRootElement().attributeIterator(); j.hasNext();) {
+            for (final Element modelElement: topLevelModelsElements) {
+                for (Iterator j = modelElement.attributeIterator(); j.hasNext();) {
                     final Attribute currentAttribute = (Attribute) j.next();
                     if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(currentAttribute.getNamespaceURI())) {
                         final String propertyName = currentAttribute.getName();
@@ -435,7 +437,7 @@ public class XFormsStaticState {
         }
     }
 
-    private void extractControlsModelsComponents(PropertyContext pipelineContext, Element staticStateElement) {
+    private void extractControlsModelsComponents(PropertyContext pipelineContext, Element staticStateElement, List<Element> topLevelModelsElements) {
 
         // Extract static components information
         // NOTE: Do this here so that xblBindings is available for scope resolution  
@@ -443,16 +445,13 @@ public class XFormsStaticState {
 
         // Get top-level models from static state document
         {
-            final List modelsElements = staticStateElement.elements(XFormsConstants.XFORMS_MODEL_QNAME);
-            modelsByScope.clear();
-
             // FIXME: we don't get a System ID here. Is there a simple solution?
             int modelsCount = 0;
-            for (Iterator i = modelsElements.iterator(); i.hasNext(); modelsCount++) {
-                final Element modelElement = (Element) i.next();
+            for (final Element modelElement: topLevelModelsElements) {
                 // Copy the element because we may need it in staticStateDocument for encoding
                 final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(modelElement);
                 addModelDocument(xblBindings.getTopLevelScope(), modelDocument);
+                modelsCount++;
             }
 
             indentedLogger.logDebug("", "created top-level model documents", "count", Integer.toString(modelsCount));
@@ -509,7 +508,7 @@ public class XFormsStaticState {
             models = new ArrayList<Model>();
             modelsByScope.put(scope, models);
         }
-        final Model newModel = new Model(scope, modelDocument);
+        final Model newModel = new Model(this, scope, modelDocument);
         models.add(newModel);
         modelsByPrefixedId.put(newModel.prefixedId, newModel);
     }
@@ -625,8 +624,8 @@ public class XFormsStaticState {
             // NOTE: Later can be also based on:
             // o native controls used
             // o XBL hints
-            isNoscript = getBooleanProperty(XFormsProperties.NOSCRIPT_PROPERTY)
-                    && getBooleanProperty(XFormsProperties.NOSCRIPT_SUPPORT_PROPERTY);
+            isNoscript = Version.instance().isPEFeatureEnabled(getBooleanProperty(XFormsProperties.NOSCRIPT_PROPERTY)
+                    && getBooleanProperty(XFormsProperties.NOSCRIPT_SUPPORT_PROPERTY), XFormsProperties.NOSCRIPT_PROPERTY);
 
             isXPathAnalysis = Version.instance().isPEFeatureEnabled(getBooleanProperty(XFormsProperties.XPATH_ANALYSIS_PROPERTY),
                     XFormsProperties.XPATH_ANALYSIS_PROPERTY);
@@ -828,7 +827,7 @@ public class XFormsStaticState {
      */
     public boolean isValueControl(String controlEffectiveId) {
         final ControlAnalysis controlAnalysis = controlAnalysisMap.get(XFormsUtils.getPrefixedId(controlEffectiveId));
-        return (controlAnalysis != null) && controlAnalysis.isValueControl;
+        return (controlAnalysis != null) && controlAnalysis.hasValue;
     }
 
     /**
@@ -1181,11 +1180,10 @@ public class XFormsStaticState {
                     final Map<String, ControlAnalysis> inScopeVariables = parentControlAnalysis.getInScopeVariablesForContained(controlAnalysisMap);
 
                     controlAnalysis = ControlAnalysisFactory.create(propertyContext, XFormsStaticState.this, controlsDocumentInfo,
-                            controlScope, controlPrefixedId, controlElement, locationData,controlIndex, isContainer,
-                            parentControlAnalysis, inScopeVariables);
+                            controlScope, controlElement, controlIndex, isContainer, parentControlAnalysis, inScopeVariables);
                 }
 
-                controlAnalysisMap.put(controlPrefixedId, controlAnalysis);
+                controlAnalysisMap.put(controlAnalysis.prefixedId, controlAnalysis);
                 {
                     Map<String, ControlAnalysis> controlsMap = controlTypes.get(controlName);
                     if (controlsMap == null) {
@@ -1193,7 +1191,7 @@ public class XFormsStaticState {
                         controlTypes.put(controlName, controlsMap);
                     }
 
-                    controlsMap.put(controlPrefixedId, controlAnalysis);
+                    controlsMap.put(controlAnalysis.prefixedId, controlAnalysis);
                 }
 
                 // TODO: move repeat and attribute cases below to RepeatAnalysis and AttributeAnalysis
@@ -1208,7 +1206,7 @@ public class XFormsStaticState {
                         if (repeatHierarchyStringBuffer.length() > 0)
                             repeatHierarchyStringBuffer.append(',');
 
-                        repeatHierarchyStringBuffer.append(controlPrefixedId);
+                        repeatHierarchyStringBuffer.append(controlAnalysis.prefixedId);
 
                         if (ancestorRepeatAnalysis != null) {
                             // If we have a parent, append it
@@ -1226,7 +1224,7 @@ public class XFormsStaticState {
                                 parentRepeatList = new ArrayList<String>();
                                 repeatChildrenMap.put(parentRepeatId, parentRepeatList);
                             }
-                            parentRepeatList.add(controlPrefixedId);
+                            parentRepeatList.add(controlAnalysis.prefixedId);
                         }
 
                     }
@@ -1620,6 +1618,7 @@ public class XFormsStaticState {
         return controlAnalysisMap.get(prefixedId);
     }
 
+    // This for debug only
     public void dumpAnalysis() {
         if (isXPathAnalysis()) {
             for (final ControlAnalysis info: controlAnalysisMap.values()) {
@@ -1634,6 +1633,22 @@ public class XFormsStaticState {
                 if (info.valueAnalysis != null) {
                     System.out.println(pad + "- Value ------------------------------------------------------------------------");
                     info.valueAnalysis.dump(System.out, info.getLevel());
+                }
+            }
+
+            for (final Model model: modelsByPrefixedId.values()) {
+                if (model.figuredBindAnalysis) {
+                    final String pad = "";
+                    System.out.println(pad + "- Model ----------------------------------------------------------------------");
+                    System.out.println(pad + model.prefixedId);
+                    if (model.computedBindExpressionsInstances!= null) {
+                        System.out.println(pad + "- Computed binds instances ----------------------------------------------------------------------");
+                        System.out.println(model.computedBindExpressionsInstances.toString());
+                    }
+                    if (model.validationBindInstances != null) {
+                        System.out.println(pad + "- Validation binds instances ------------------------------------------------------------------------");
+                        System.out.println(model.validationBindInstances.toString());
+                    }
                 }
             }
         }

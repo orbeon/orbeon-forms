@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PropertyContext;
-import org.orbeon.oxf.xforms.analysis.UIDependencies;
+import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -62,7 +62,7 @@ public class XFormsControls implements XFormsObjectResolver {
     
     private Map<String, Itemset> constantItems;
 
-    private final UIDependencies uiDependencies;
+    private final XPathDependencies xpathDependencies;
 
     public XFormsControls(XFormsContainingDocument containingDocument) {
 
@@ -71,7 +71,7 @@ public class XFormsControls implements XFormsObjectResolver {
         this.containingDocument = containingDocument;
         this.rootContainer = this.containingDocument;
 
-        this.uiDependencies = containingDocument.getUIDependencies();
+        this.xpathDependencies = containingDocument.getXPathDependencies();
 
         // Create minimal tree
         initialControlTree = new ControlTree(containingDocument, indentedLogger);
@@ -107,7 +107,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
     public void refreshDone() {
         requireRefresh = false;
-        uiDependencies.refreshDone();
+        xpathDependencies.refreshDone();
     }
 
     public void refreshIfNeeded(PropertyContext propertyContext, XBLContainer container) {
@@ -514,7 +514,7 @@ public class XFormsControls implements XFormsObjectResolver {
     private boolean pushBinding(PropertyContext propertyContext, XFormsContextStack currentContextStack, Element currentControlElement,
                                 String controlPrefixedId, String controlEffectiveId, XBLBindings.Scope newScope) {
 
-        final boolean requireUpdate = uiDependencies.requireBindingUpdate(controlPrefixedId);
+        final boolean requireUpdate = xpathDependencies.requireBindingUpdate(controlPrefixedId);
 
         if (requireUpdate) {
             // Push with evaluation

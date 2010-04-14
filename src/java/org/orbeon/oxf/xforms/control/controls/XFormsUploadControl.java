@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
-import org.orbeon.oxf.xforms.analysis.UIDependencies;
+import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.ExternalCopyable;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -73,8 +73,8 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    protected void markDirtyImpl(UIDependencies uiDependencies) {
-        super.markDirtyImpl(uiDependencies);
+    protected void markDirtyImpl(XPathDependencies xpathDependencies) {
+        super.markDirtyImpl(xpathDependencies);
         fileInfo.markDirty();
     }
 

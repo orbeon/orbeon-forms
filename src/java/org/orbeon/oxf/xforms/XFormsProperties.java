@@ -114,10 +114,6 @@ public class XFormsProperties {
 
     private static final String ASYNC_SUBMISSION_POLL_DELAY = "submission-poll-delay";
 
-    private static final String COMPUTED_BINDS_PROPERTY = "computed-binds";
-    public static final String COMPUTED_BINDS_RECALCULATE_VALUE = "recalculate";
-    public static final String COMPUTED_BINDS_REVALIDATE_VALUE = "revalidate";
-
     public static final String NEW_XHTML_LAYOUT = "new-xhtml-layout";   // deprecated
     public static final String XHTML_LAYOUT = "xhtml-layout";
 
@@ -199,7 +195,6 @@ public class XFormsProperties {
             new PropertyDefinition(AJAX_SHOW_ERRORS_PROPERTY, true, false),
             new PropertyDefinition(MINIMAL_RESOURCES_PROPERTY, true, false),
             new PropertyDefinition(COMBINE_RESOURCES_PROPERTY, true, false),
-            new PropertyDefinition(COMPUTED_BINDS_PROPERTY, COMPUTED_BINDS_RECALCULATE_VALUE, false),
             new PropertyDefinition(DATE_FORMAT_PROPERTY, "if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(DATETIME_FORMAT_PROPERTY, "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
             new PropertyDefinition(TIME_FORMAT_PROPERTY, "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else .", false),
@@ -443,10 +438,6 @@ public class XFormsProperties {
 
     public static boolean isOptimizeRelevance(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, OPTIMIZE_RELEVANCE_PROPERTY);
-    }
-
-    public static String getComputedBinds(XFormsContainingDocument containingDocument) {
-        return getStringProperty(containingDocument, COMPUTED_BINDS_PROPERTY);
     }
 
     public static boolean isSpanHTMLLayout(XFormsContainingDocument containingDocument) {

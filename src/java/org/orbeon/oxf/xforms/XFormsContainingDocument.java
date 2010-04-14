@@ -24,7 +24,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsActions;
-import org.orbeon.oxf.xforms.analysis.UIDependencies;
+import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -127,7 +127,7 @@ public class XFormsContainingDocument extends XBLContainer {
 
     private boolean goingOffline;
 
-    private final UIDependencies uiDependencies;
+    private final XPathDependencies xpathDependencies;
 
     /**
      * Return the global function library.
@@ -157,7 +157,7 @@ public class XFormsContainingDocument extends XBLContainer {
             // Remember static state
             this.xformsStaticState = xformsStaticState;
 
-            this.uiDependencies = Version.instance().createUIDependencies(this);
+            this.xpathDependencies = Version.instance().createUIDependencies(this);
 
             // Remember URI resolver for initialization
             this.uriResolver = uriResolver;
@@ -212,7 +212,7 @@ public class XFormsContainingDocument extends XBLContainer {
             // Make sure there is location data
             setLocationData(this.xformsStaticState.getLocationData());
 
-            this.uiDependencies = Version.instance().createUIDependencies(this);
+            this.xpathDependencies = Version.instance().createUIDependencies(this);
 
             // Restore the containing document's dynamic state
             final String encodedDynamicState = xformsState.getDynamicState();
@@ -274,10 +274,10 @@ public class XFormsContainingDocument extends XBLContainer {
     }
 
     /**
-     * Return UI dependencies implementation.
+     * Return dependencies implementation.
      */
-    public final UIDependencies getUIDependencies() {
-        return uiDependencies;
+    public final XPathDependencies getXPathDependencies() {
+        return xpathDependencies;
     }
 
     /**
@@ -804,7 +804,7 @@ public class XFormsContainingDocument extends XBLContainer {
                 // Mark the control as dirty, because we may have done a rebuild/recalculate earlier, and this means
                 // the MIPs need to be re-evaluated before being checked below
                 // NOTE: This is almost certainly wrong now (2010-04-08)
-                xformsControl.markDirty(uiDependencies);
+                xformsControl.markDirty(xpathDependencies);
             }
 
             if (!handleGoingOnline) {

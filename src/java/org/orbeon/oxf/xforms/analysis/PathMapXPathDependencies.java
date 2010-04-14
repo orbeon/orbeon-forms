@@ -16,21 +16,22 @@ package org.orbeon.oxf.xforms.analysis;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
+import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.*;
 
 /**
- * This implementation of UI dependencies uses static XPath analysis to provide more efficient reevaluation of bindings
+ * This implementation of dependencies uses static XPath analysis to provide more efficient reevaluation of bindings
  * and values.
  */
-public class PathMapUIDependencies implements UIDependencies {
+public class PathMapXPathDependencies implements XPathDependencies {
 
     private final XFormsContainingDocument containingDocument;
-    
-    private final IndentedLogger logger;
     private final XFormsStaticState staticState;
+
+    private IndentedLogger logger;
 
     private final Map<String, Set<NodeInfo>> modifiedNodes = new HashMap<String, Set<NodeInfo>>();
     private final Set<String> structuralChanges = new HashSet<String>();
@@ -45,17 +46,24 @@ public class PathMapUIDependencies implements UIDependencies {
     private int bindingUpdateCount;
     private int valueUpdateCount;
 
-    public PathMapUIDependencies(XFormsContainingDocument containingDocument) {
+    public PathMapXPathDependencies(XFormsContainingDocument containingDocument) {
         this.containingDocument = containingDocument;
-        this.logger = containingDocument.getControls().getIndentedLogger();
         this.staticState = containingDocument.getStaticState();
+        // Defer logger initialization as controls might not have been initialized at time this constructor is called. 
     }
 
     // Constructor for unit tests
-    protected PathMapUIDependencies(IndentedLogger logger, XFormsStaticState staticState) {
+    protected PathMapXPathDependencies(IndentedLogger logger, XFormsStaticState staticState) {
         this.containingDocument = null;
         this.logger = logger;
         this.staticState = staticState;
+    }
+
+    private IndentedLogger getLogger() {
+        if (logger == null) {
+            logger = containingDocument.getControls().getIndentedLogger();
+        }
+        return logger;
     }
 
     public void markValueChanged(XFormsModel model, NodeInfo nodeInfo) {
@@ -88,7 +96,7 @@ public class PathMapUIDependencies implements UIDependencies {
 
     public void refreshDone() {
 
-        logger.logDebug("dependencies", "refresh done",
+        getLogger().logDebug("dependencies", "refresh done",
                 "bindings updated", Integer.toString(bindingUpdateCount),
                 "values updated", Integer.toString(valueUpdateCount));
 
@@ -183,7 +191,7 @@ public class PathMapUIDependencies implements UIDependencies {
                 }
             }
             if (result) {
-                logger.logDebug("dependencies", "binding modified", "prefixed id", controlPrefixedId,
+                getLogger().logDebug("dependencies", "binding modified", "prefixed id", controlPrefixedId,
                         "XPath", controlAnalysis.bindingAnalysis.xpathString);
                 bindingUpdateCount++;
             }
@@ -226,7 +234,7 @@ public class PathMapUIDependencies implements UIDependencies {
                 }
             }
             if (result && valueAnalysis != null) {
-                logger.logDebug("dependencies", "value modified", "prefixed id", controlPrefixedId,
+                getLogger().logDebug("dependencies", "value modified", "prefixed id", controlPrefixedId,
                         "XPath", valueAnalysis.xpathString);
             }
 
@@ -243,5 +251,13 @@ public class PathMapUIDependencies implements UIDependencies {
         // TODO
 //        final ControlAnalysis controlAnalysis = staticState.getControlAnalysis(controlPrefixedId);
         return true;
+    }
+
+    public boolean requireBindCalculation(Model model, String instancePrefixedId) {
+        return !model.figuredBindAnalysis || model.computedBindExpressionsInstances.contains(instancePrefixedId);
+    }
+
+    public boolean requireBindValidation(Model model, String instancePrefixedId) {
+        return !model.figuredBindAnalysis || model.validationBindInstances.contains(instancePrefixedId);
     }
 }

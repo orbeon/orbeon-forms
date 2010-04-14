@@ -23,7 +23,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.analysis.UIDependencies;
+import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
@@ -526,18 +526,18 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
      * Notify the control that some of its aspects (value, label, etc.) might have changed and require re-evaluation. It
      * is left to the control to figure out if this can be optimized.
      */
-    public final void markDirty(UIDependencies uiDependencies) {
-        markDirtyImpl(uiDependencies);
+    public final void markDirty(XPathDependencies xpathDependencies) {
+        markDirtyImpl(xpathDependencies);
     }
 
-    protected void markDirtyImpl(UIDependencies uiDependencies) {
+    protected void markDirtyImpl(XPathDependencies xpathDependencies) {
 
         // Check LHHA
         for (final Map.Entry<XFormsConstants.LHHA, LHHA> entry: lhha.entrySet()) {
             final XFormsConstants.LHHA key = entry.getKey();
             final LHHA value = entry.getValue();
 
-            if (value != null && !value.isDirty() && uiDependencies.requireLHHAUpdate(key, getPrefixedId()))
+            if (value != null && !value.isDirty() && xpathDependencies.requireLHHAUpdate(key, getPrefixedId()))
                 value.markDirty();
         }
 

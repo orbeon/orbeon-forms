@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.analysis.UIDependencies;
+import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.controls.Select1Analysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -105,8 +105,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    protected void markDirtyImpl(UIDependencies uiDependencies) {
-        super.markDirtyImpl(uiDependencies);
+    protected void markDirtyImpl(XPathDependencies xpathDependencies) {
+        super.markDirtyImpl(xpathDependencies);
         // Force recalculation of items here
         itemset = null;
     }

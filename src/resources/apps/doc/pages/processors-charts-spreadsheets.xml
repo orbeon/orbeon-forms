@@ -126,9 +126,29 @@
                         </tr>
                         <tr>
                             <th>
+                                <code>category-label-angle</code>
+                            </th>
+                            <td>
+                                Controls the angle of horizontal axis labels. This value is a positive angle in
+                                degree. For <code>time-series</code> charts, this value has to be either 0 (horizontal)
+                                or 90 (vertical).
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
                                 <code>serie-title</code>
                             </th>
                             <td>The label printed on the vertical (Y) axis</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>serie-auto-range-include-zero</code>
+                            </th>
+                            <td>
+                                Whether the vertical (Y) axis should include the value 0. This is true by default, and
+                                you might want to set it to false if all the values are in a "small" range "far" from 0,
+                                to avoid having all the values shown as being grouped together.
+                            </td>
                         </tr>
                         <tr>
                             <th>
@@ -149,15 +169,6 @@
                                 <code>tick-unit</code>
                             </th>
                             <td>The vertical (Y) axis unit</td>
-                        </tr>
-                        <tr>
-                            <th>
-                                <code>category-label-angle</code>
-                            </th>
-                            <td>
-                                Controls the angle of the category axis labels. This value is a positive angle in degree. For 
-                                <code>time-series</code> charts, this value has to be either 0 (horizontal) or 90 (vertical).
-                            </td>
                         </tr>
                         <tr>
                             <th>
@@ -357,7 +368,7 @@
                                                 <data type="positiveInteger"/>
                                             </element>
                                         </optional>
-                                        
+
                                         <optional>
                                             <element name="legend">
                                                 <optional>

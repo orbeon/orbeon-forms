@@ -6,6 +6,15 @@
     <scope name="Samples" pattern="file[Orbeon Forms]:src/resources/apps/xforms-sandbox/samples/*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
+  <component name="FacetAutodetectingManager">
+    <autodetection-disabled>
+      <facet-type id="web">
+        <modules>
+          <module name="Orbeon Forms" />
+        </modules>
+      </facet-type>
+    </autodetection-disabled>
+  </component>
   <component name="IdProvider" IDEtalkID="11F1F6BCFCEF250CF8C992303A792A29" />
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />

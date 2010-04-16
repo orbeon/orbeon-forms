@@ -19,6 +19,7 @@
 .xbl-fr-spell-checker input, .xbl-fr-spell-checker select { width: 12em }
 .xbl-fr-spell-checker td { padding-right: 1em; padding-bottom: .5em; vertical-align: top }
 .xbl-fr-spell-checker .label { white-space: nowrap }
+.xbl-fr-spell-checker .unknown-word { font-weight: bold; background: url('unknown-word.png') repeat-x left bottom }
 .xbl-fr-spell-checker .xforms-repeat-selected-item-1,
 .xbl-fr-spell-checker .xforms-repeat-selected-item-2 { background-color: transparent }
 .xbl-fr-spell-checker .xbl-fr-spell-checker-close { display: block; overflow: auto }

@@ -78,9 +78,11 @@
                         <xxforms:variable name="words-after" select="if ($correction/@o + $correction/@l = string-length(instance('request')/text)) then () else
                             tokenize(substring(instance('request')/text, $correction/@o + $correction/@l + 1), '\s+')"/>
                         <xforms:setvalue ref="instance('ui')/context" value="concat(
-                            string-join(reverse(subsequence(reverse($words-before), 1, 5)), ' '),
-                            '&lt;b&gt;', ../unknown-word, '&lt;/b&gt;',
-                            string-join(subsequence($words-after, 1, 5), ' '))"/>
+                            substring(instance('request')/text, 1, $correction/@o),
+                            '&lt;span class=''unknown-word''&gt;',
+                            ../unknown-word,
+                            '&lt;/span&gt;',
+                            substring(instance('request')/text,  $correction/@o + $correction/@l + 1))"/>
                         <xforms:action if="instance('ui')/unknown-word = instance('ui')/ignore-all/word">
                             <!-- If current word is in the ignore list, go to the next one -->
                             <xforms:delete nodeset="$correction"/>
@@ -154,7 +156,7 @@
                                 <xhtml:tr>
                                     <xhtml:td class="label">Not in dictionary:</xhtml:td>
                                     <xhtml:td>
-                                        <xforms:output value="instance('ui')/unknown-word"/>
+                                        <xforms:output value="instance('ui')/context" mediatype="text/html"/>
                                     </xhtml:td>
                                     <xhtml:td rowspan="4">
                                         <!-- Ignore -->
@@ -235,12 +237,6 @@
                                                 <xforms:value value="."/>
                                             </xforms:itemset>
                                         </xforms:select1>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                                <xhtml:tr>
-                                    <xhtml:td class="label">Context:</xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="instance('ui')/context" mediatype="text/html"/>
                                     </xhtml:td>
                                 </xhtml:tr>
                             </xhtml:table>

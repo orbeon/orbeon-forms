@@ -260,6 +260,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             chart.setCategoryMargin(Double.parseDouble(catMargin));
 
         chart.setSerieTitle(XPathUtils.selectStringValueNormalize(doc, "/chart/serie-title"));
+        chart.setSerieAutoRangeIncludeZero(XPathUtils.selectBooleanValue(doc, "not(/chart/serie-auto-range-include-zero = 'false')").booleanValue());
         chart.setxSize(XPathUtils.selectIntegerValue(doc, "/chart/x-size").intValue());
         chart.setySize(XPathUtils.selectIntegerValue(doc, "/chart/y-size").intValue());
 
@@ -354,7 +355,8 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             categoryAxis = new CategoryAxis(chartConfig.getCategoryTitle());
             ((CategoryAxis)categoryAxis).setCategoryLabelPositions(chartConfig.getCategoryLabelPosition());
         }
-        Axis valueAxis = new RestrictedNumberAxis(chartConfig.getSerieTitle());
+        NumberAxis valueAxis = new RestrictedNumberAxis(chartConfig.getSerieTitle());
+        valueAxis.setAutoRangeIncludesZero(chartConfig.getSerieAutoRangeIncludeZero());
         AbstractRenderer renderer = null;
         Plot plot = null;
 
@@ -582,6 +584,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         private String map;
         private String categoryTitle;
         private String serieTitle;
+        private boolean serieAutoRangeIncludeZero;
         private double categoryMargin;
         private Color titleColor;
         private Color backgroundColor;
@@ -628,6 +631,14 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
         public void setSerieTitle(String serieTitle) {
             this.serieTitle = serieTitle;
+        }
+
+        public boolean getSerieAutoRangeIncludeZero() {
+            return serieAutoRangeIncludeZero;
+        }
+
+        public void setSerieAutoRangeIncludeZero(boolean serieAutoRangeIncludeZero) {
+            this.serieAutoRangeIncludeZero = serieAutoRangeIncludeZero;
         }
 
         public int getxSize() {
@@ -1194,8 +1205,9 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         }
     }
 
-    protected static class RestrictedNumberAxis extends NumberAxis{
+    protected static class RestrictedNumberAxis extends NumberAxis {
         private int maxTicks = NumberAxis.MAXIMUM_TICK_COUNT;
+
         /**
          * Creates a Number axis with the specified label.
          *
@@ -1205,23 +1217,15 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             super(label);
         }
 
-        public int getMaxTicks() {
-            return maxTicks;
-        }
-
         public void setMaxTicks(int maxTicks) {
             this.maxTicks = maxTicks;
         }
 
-        protected int getVisibleTickCount() {
+        protected void adjustTickUnits() {
             double unit = getTickUnit().getSize();
             Range range = getRange();
-            return (int)(Math.floor(range.getUpperBound() / unit)
+            int tickUnit = (int)(Math.floor(range.getUpperBound() / unit)
                     - Math.ceil(range.getLowerBound() / unit) + 1);
-
-        }
-        protected void adjustTickUnits() {
-            int tickUnit = getVisibleTickCount()/maxTicks;
             if(tickUnit != 0) {
                 super.setTickUnit(new NumberTickUnit(tickUnit));
             }

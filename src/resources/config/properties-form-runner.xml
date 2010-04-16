@@ -96,9 +96,12 @@
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.register.form"            value="/fr/service/resource"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.register"                      value="refresh workflow-send"/>
     <property as="xs:string"  name="oxf.fr.detail.send.uri.orbeon.register"                     value="/fr/orbeon/license/view/bc3b89cdb12968bb96a8dd6b69fbf85a"/>
+    <property as="xs:boolean" name="oxf.fr.email.attach-pdf.orbeon.register"                    value="false"/>
+
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.license.form"             value="/fr/service/resource"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.license"                       value="close"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.license"                  value="close"/>
+    <property as="xs:boolean" name="oxf.fr.email.attach-pdf.orbeon.license"                     value="false"/>
 
     <!-- The following shows how you can use the "Submit" button instead of the "Save" button -->
     <!--<property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.bookshelf"                     value="refresh back clear pdf email submit collapse-all expand-all"/>-->

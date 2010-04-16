@@ -4,7 +4,9 @@
       <root url="file://$PROJECT_DIR$/lib" />
       <root url="file://$PROJECT_DIR$/lib/oracle" />
     </CLASSES>
-    <JAVADOC />
+    <JAVADOC>
+      <root url="http://www.jfree.org/jfreechart/api/javadoc" />
+    </JAVADOC>
     <SOURCES>
       <root url="file://$PROJECT_DIR$/../Saxon" />
       <root url="file://$PROJECT_DIR$/../Xerces/src" />

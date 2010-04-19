@@ -86,18 +86,17 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
     @Override
     protected void onCreate(PropertyContext propertyContext) {
         super.onCreate(propertyContext);
-        readBinding();
+
+        // Ensure that the initial state is set, either from default value, or for state deserialization.
+        if (!restoredState) {
+            setIndexInternal(getStartIndex());
+        } else {
+            // NOTE: state deserialized -> state previously serialized -> control was relevant -> onCreate() called 
+            restoredState = false;
+        }
 
         // Reset refresh information
         refreshInfo = null;
-    }
-
-    private void readBinding() {
-        // Ensure that the initial index is set, unless the state was already restored. In that case, the index was
-        // reset from serialized data and the start index must not be used.
-        if (!restoredState) {
-            setIndexInternal(getStartIndex());
-        }
     }
 
     public int getStartIndex() {
@@ -694,7 +693,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
         local.index = Integer.parseInt(element.attributeValue("index"));
 
-        // Indicate to childrenAdded() that default index must not be set
+        // Indicate that deserialized state must be used
         restoredState = true;
     }
 

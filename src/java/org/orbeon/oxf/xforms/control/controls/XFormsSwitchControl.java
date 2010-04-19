@@ -41,7 +41,7 @@ import java.util.Map;
  */
 public class XFormsSwitchControl extends XFormsValueContainerControl {
 
-    private transient String restoredCaseId;    // used by deserializeLocal() and childrenAdded()
+    private transient boolean restoredState;
 
     public static class XFormsSwitchControlLocal extends XFormsControlLocal {
         private String selectedCaseControlId;
@@ -57,15 +57,14 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     @Override
     protected void onCreate(PropertyContext propertyContext) {
         super.onCreate(propertyContext);
-        final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getLocalForUpdate();
-//        final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
-        if (restoredCaseId != null) {
-            // Selected case id was restored from serialization
-            local.selectedCaseControlId = restoredCaseId;
-            restoredCaseId = null;
-        } else {
-            // Store initial selected case information
+
+        // Ensure that the initial state is set, either from default value, or for state deserialization.
+        if (!restoredState) {
+            final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getLocalForUpdate();
             local.selectedCaseControlId = findDefaultSelectedCaseId();
+        } else {
+            // NOTE: state deserialized -> state previously serialized -> control was relevant -> onCreate() called
+            restoredState = false;
         }
     }
 
@@ -205,7 +204,13 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     @Override
     public void deserializeLocal(Element element) {
         // Deserialize case id
-        this.restoredCaseId = element.attributeValue("case-id");
+        final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
+
+        // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
+        local.selectedCaseControlId = element.attributeValue("case-id");
+
+        // Indicate that deserialized state must be used
+        restoredState = true;
     }
 
     @Override

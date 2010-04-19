@@ -213,9 +213,9 @@ public class XFormsInputControl extends XFormsValueControl {
                 }
                 public String handle(MatchProcessor.Result result) {
 
-                    final String year = (String) result.groups.get(2);
-                    final String month = (String) result.groups.get(0);
-                    final String day = (String) result.groups.get(1);
+                    final String year = result.groups.get(2);
+                    final String month = result.groups.get(0);
+                    final String day = result.groups.get(1);
                     // TODO: year on 2 or 3 digits
                     final DateValue value = new DateValue(Integer.parseInt(year), Byte.parseByte(month), Byte.parseByte(day));
                     return value.getStringValue();
@@ -229,8 +229,8 @@ public class XFormsInputControl extends XFormsValueControl {
                 public String handle(MatchProcessor.Result result) {
 
                     final String year = Integer.toString(new GregorianCalendar().get(Calendar.YEAR));// current year
-                    final String month = (String) result.groups.get(0);
-                    final String day = (String) result.groups.get(1);
+                    final String month = result.groups.get(0);
+                    final String day = result.groups.get(1);
                     final DateValue value = new DateValue(Integer.parseInt(year), Byte.parseByte(month), Byte.parseByte(day));
                     return value.getStringValue();
                 }
@@ -242,9 +242,9 @@ public class XFormsInputControl extends XFormsValueControl {
                 }
                 public String handle(MatchProcessor.Result result) {
 
-                    final String year = (String) result.groups.get(2);
-                    final String month = (String) result.groups.get(1);
-                    final String day = (String) result.groups.get(0);
+                    final String year = result.groups.get(2);
+                    final String month = result.groups.get(1);
+                    final String day = result.groups.get(0);
                     // TODO: year on 2 or 3 digits
                     final DateValue value = new DateValue(Integer.parseInt(year), Byte.parseByte(month), Byte.parseByte(day));
                     return value.getStringValue();
@@ -257,9 +257,9 @@ public class XFormsInputControl extends XFormsValueControl {
                 }
                 public String handle(MatchProcessor.Result result) {
 
-                    final String year = (String) result.groups.get(0);
-                    final String month = (String) result.groups.get(1);
-                    final String day = (String) result.groups.get(2);
+                    final String year = result.groups.get(0);
+                    final String month = result.groups.get(1);
+                    final String day = result.groups.get(2);
                     // TODO: year on 2 or 3 digits
                     final DateValue value = new DateValue(Integer.parseInt(year), Byte.parseByte(month), Byte.parseByte(day));
                     return value.getStringValue();
@@ -279,11 +279,11 @@ public class XFormsInputControl extends XFormsValueControl {
                     return "^(\\d{1,2}):(\\d{1,2}):(\\d{1,2}) ?(p|pm|p\\.\\m\\.)$";
                 }
                 public String handle(MatchProcessor.Result result) {
-                    byte hoursByte = Byte.parseByte((String) result.groups.get(0));
+                    byte hoursByte = Byte.parseByte(result.groups.get(0));
                     if (hoursByte < 12) hoursByte += 12;
 
-                    final String minutes = (String) result.groups.get(1);
-                    final String seconds = (String) result.groups.get(2);
+                    final String minutes = result.groups.get(1);
+                    final String seconds = result.groups.get(2);
                     final TimeValue value = new TimeValue(hoursByte, Byte.parseByte(minutes), Byte.parseByte(seconds), 0, CalendarValue.NO_TIMEZONE);
                     return value.getStringValue();
                 }
@@ -294,10 +294,10 @@ public class XFormsInputControl extends XFormsValueControl {
                     return "^(\\d{1,2}):(\\d{1,2}) ?(p|pm|p\\.\\m\\.)$";
                 }
                 public String handle(MatchProcessor.Result result) {
-                    byte hoursByte = Byte.parseByte((String) result.groups.get(0));
+                    byte hoursByte = Byte.parseByte(result.groups.get(0));
                     if (hoursByte < 12) hoursByte += 12;
 
-                    final String minutes = (String) result.groups.get(1);
+                    final String minutes = result.groups.get(1);
                     final TimeValue value = new TimeValue(hoursByte, Byte.parseByte(minutes), (byte) 0, 0, CalendarValue.NO_TIMEZONE);
                     return value.getStringValue();
                 }
@@ -308,7 +308,7 @@ public class XFormsInputControl extends XFormsValueControl {
                     return "^(\\d{1,2}) ?(p|pm|p\\.\\m\\.)$";
                 }
                 public String handle(MatchProcessor.Result result) {
-                    byte hoursByte = Byte.parseByte((String) result.groups.get(0));
+                    byte hoursByte = Byte.parseByte(result.groups.get(0));
                     if (hoursByte < 12) hoursByte += 12;
 
                     final TimeValue value = new TimeValue(hoursByte, (byte) 0, (byte) 0, 0, CalendarValue.NO_TIMEZONE);
@@ -321,9 +321,9 @@ public class XFormsInputControl extends XFormsValueControl {
                     return "^(\\d{1,2}):(\\d{1,2}):(\\d{1,2}) ?(a|am|a\\.\\m\\.)?$";
                 }
                 public String handle(MatchProcessor.Result result) {
-                    final String hours = (String) result.groups.get(0);
-                    final String minutes = (String) result.groups.get(1);
-                    final String seconds = (String) result.groups.get(2);
+                    final String hours = result.groups.get(0);
+                    final String minutes = result.groups.get(1);
+                    final String seconds = result.groups.get(2);
                     final TimeValue value = new TimeValue(Byte.parseByte(hours), Byte.parseByte(minutes), Byte.parseByte(seconds), 0, CalendarValue.NO_TIMEZONE);
                     return value.getStringValue();
                 }
@@ -335,8 +335,8 @@ public class XFormsInputControl extends XFormsValueControl {
                 }
                 public String handle(MatchProcessor.Result result) {
 
-                    final String hours = (String) result.groups.get(0);
-                    final String minutes = (String) result.groups.get(1);
+                    final String hours = result.groups.get(0);
+                    final String minutes = result.groups.get(1);
                     final TimeValue value = new TimeValue(Byte.parseByte(hours), Byte.parseByte(minutes), (byte) 0, 0, CalendarValue.NO_TIMEZONE);
                     return value.getStringValue();
                 }
@@ -348,7 +348,7 @@ public class XFormsInputControl extends XFormsValueControl {
                 }
                 public String handle(MatchProcessor.Result result) {
 
-                    final String hours = (String) result.groups.get(0);
+                    final String hours = result.groups.get(0);
                     final TimeValue value = new TimeValue(Byte.parseByte(hours), (byte) 0, (byte) 0, 0, CalendarValue.NO_TIMEZONE);
                     return value.getStringValue();
                 }
@@ -361,7 +361,7 @@ public class XFormsInputControl extends XFormsValueControl {
                 }
                 public String handle(MatchProcessor.Result result) {
 
-                    final String all = (String) result.groups.get(0);
+                    final String all = result.groups.get(0);
 
 //                    var d = new Date();
 //                    var h = bits[1].substring(0,2);
@@ -374,7 +374,7 @@ public class XFormsInputControl extends XFormsValueControl {
 //                    d.setSeconds(parseInt(s, 10));
 
 
-                    final String minutes = (String) result.groups.get(1);
+                    final String minutes = result.groups.get(1);
                     final TimeValue value = new TimeValue(Byte.parseByte(hours), Byte.parseByte(minutes), (byte) 0, 0, CalendarValue.NO_TIMEZONE);
                     return value.getStringValue();
                 }

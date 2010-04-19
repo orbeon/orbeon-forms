@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.properties;
 
@@ -40,7 +40,7 @@ import java.util.Set;
  */
 public class Properties {
 
-    private static Logger logger = LoggerFactory.createLogger(Properties.class);
+    private static final Logger logger = LoggerFactory.createLogger(Properties.class);
 
     public static final String DEFAULT_PROPERTIES_URI = "oxf:/properties.xml";
     public static final String PROPERTIES_SCHEMA_URI = "http://www.orbeon.com/oxf/properties";
@@ -74,6 +74,13 @@ public class Properties {
     public static void init(String propertiesURI) {
         Properties.propertiesURI = propertiesURI;
         instance();
+    }
+
+    /**
+     * Invalidate all properties (for testing).
+     */
+    public static void invalidate() {
+        instance = null;
     }
 
     /**

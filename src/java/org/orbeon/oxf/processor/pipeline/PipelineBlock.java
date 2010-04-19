@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.pipeline;
 
@@ -137,7 +137,7 @@ public class PipelineBlock {
             final Document aggregatorConfig = new NonLazyUserDataDocument();
             final Element configElement = aggregatorConfig.addElement("config");
             configElement.addElement("root").addText(hrefAggregate.getRoot());
-            addNamespaces(configElement, node);
+            addNamespaces(configElement, node, false);
 
             final String sid = locationData == null 
                              ? DOMGenerator.DefaultContext 
@@ -179,10 +179,10 @@ public class PipelineBlock {
             final ASTHrefXPointer hrefXPointer = (ASTHrefXPointer) href;
 
             // Create config for XPath processor
-            final Document xpthCfg = new NonLazyUserDataDocument();
-            final Element configElement = xpthCfg.addElement("config");
+            final Document xpathConfig = new NonLazyUserDataDocument();
+            final Element configElement = xpathConfig.addElement("config");
             configElement.addElement("xpath").addText(hrefXPointer.getXpath());
-            addNamespaces(configElement, node);
+            addNamespaces(configElement, node, true);
 
             // Connect XPath processor to config
             final Processor xpathProcessor = new XPathProcessor();
@@ -191,7 +191,7 @@ public class PipelineBlock {
                              ? DOMGenerator.DefaultContext 
                              : locationData.getSystemID();
             final DOMGenerator configGenerator = new DOMGenerator
-                ( xpthCfg, "xpath config", DOMGenerator.ZeroValidity, sid );
+                ( xpathConfig, "xpath config", DOMGenerator.ZeroValidity, sid );
             PipelineUtils.connect(configGenerator, ProcessorImpl.OUTPUT_DATA, xpathProcessor, ProcessorImpl.INPUT_CONFIG);
 
             // Connect data input to XPath processor
@@ -208,16 +208,21 @@ public class PipelineBlock {
         return processorInput;
     }
 
-    private void addNamespaces(Element configElement, Node node) {
+    private void addNamespaces(Element configElement, Node node, boolean addPipelineNamespace) {
         if (node != null) {
-            final Map namespaces = Dom4jUtils.getNamespaceContextNoDefault((Element) node);
-            for (Iterator i = namespaces.keySet().iterator(); i.hasNext();) {
-                final String prefix = (String) i.next();
-                final String uri = (String) namespaces.get(prefix);
+            final Map<String, String> namespaces = Dom4jUtils.getNamespaceContextNoDefault((Element) node);
+            for (final Map.Entry<String, String> entry: namespaces.entrySet()) {
+                final String prefix = entry.getKey();
+                final String uri = entry.getValue();
                 final Element namespaceElement = configElement.addElement("namespace");
                 namespaceElement.addAttribute("prefix", prefix);
                 namespaceElement.addAttribute("uri", uri);
             }
+        } else if (addPipelineNamespace) {
+            // HACK: we do this just to facilitate the job of the PFC
+            final Element namespaceElement = configElement.addElement("namespace");
+            namespaceElement.addAttribute("prefix", "p");
+            namespaceElement.addAttribute("uri", PipelineProcessor.PIPELINE_NAMESPACE_URI);
         }
     }
 

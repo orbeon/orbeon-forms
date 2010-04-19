@@ -1,16 +1,16 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
@@ -29,10 +29,10 @@
 
     <property as="xs:boolean" name="oxf.xforms.host-language-avts"                   value="true"/>
 
+    <property as="xs:string"  name="oxf.url-rewriting.platform-paths"                value="^/(ops/|config/|xbl/orbeon/|forms/orbeon/|apps/fr/|xforms-server)(.*)$"/>
     <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"              value="http://example.org/cool/service"/>
 
-    <!-- Test versioned resources -->
-    <property as="xs:boolean" name="oxf.resources.versioned"                         value="true"/>
-    <property as="xs:string"  name="oxf.resources.version-number"                    value="42"/>
+    <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug"
+              value="document model submission submission-details control event action analysis server html analysis-xbl-tree server-body submission-body"/>
 
 </properties>

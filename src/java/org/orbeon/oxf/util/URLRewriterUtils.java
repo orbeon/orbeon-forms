@@ -18,10 +18,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.processor.MatchProcessor;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorFactory;
-import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -41,6 +38,7 @@ public class URLRewriterUtils {
     public static final String RESOURCES_VERSIONED_PROPERTY = "oxf.resources.versioned";
     public static final boolean RESOURCES_VERSIONED_DEFAULT = false;
 
+    private static final String REWRITING_PLATFORM_PATHS_PROPERTY = "oxf.url-rewriting.platform-paths";
     private static final String REWRITING_STRATEGY_PROPERTY_PREFIX = "oxf.url-rewriting.strategy.";
     private static final String REWRITING_CONTEXT_PROPERTY_PREFIX = "oxf.url-rewriting.";
     private static final String REWRITING_CONTEXT_PROPERTY_SUFFIX = ".context";
@@ -324,11 +322,6 @@ public class URLRewriterUtils {
         }
     }
 
-    // TODO: add test for /forms/orbeon; should make this a property!
-    public static final String[] PLATFORM_PATHS = {
-        "/ops/", "/config/", "/xbl/orbeon/", "/xforms-server"
-    };
-
     /**
      * Check if the given path is a platform path (as opposed to a user application path).
      *
@@ -336,24 +329,43 @@ public class URLRewriterUtils {
      * @return                      true iif path is a platform path
      */
     public static boolean isPlatformPath(String absolutePathNoContext) {
-        for (final String path: PLATFORM_PATHS) {
-            if (absolutePathNoContext.startsWith(path))
-                return true;
-        }
-        return false;
+        final String regexp = Properties.instance().getPropertySet().getString(REWRITING_PLATFORM_PATHS_PROPERTY, null);
+        // TODO: do not compile the regexp every time
+        return regexp != null && new Perl5MatchProcessor().match(regexp, absolutePathNoContext).matches;
     }
 
-//    public static String getPlatformPathsAsSequence() {
-//        final StringBuilder sb = new StringBuilder("(");
-//        for (final String path: PLATFORM_PATHS) {
-//            sb.append('\'');
-//            sb.append(path);
-//            sb.append('\'');
-//        }
-//        sb.append(')');
-//        return sb.toString();
-//        // XXX issue: PFC tests tokenize($path, '/')[3] = ('ops', 'config'), need better way
-//    }
+    /**
+     * Decode a versioned absolute path with no context, depending on whether there is an app version or not.
+     *
+     * @param absolutePathNoContext path
+     * @return                      decoded path, or initial path if no decoding needed
+     */
+    public static String decodeResourceURI(String absolutePathNoContext) {
+        final boolean hasApplicationVersion = URLRewriterUtils.getApplicationResourceVersion() != null;
+        if (hasApplicationVersion) {
+            // Remove version on any path
+            return removeVersionPrefix(absolutePathNoContext);
+        } else {
+            // Try to remove version then test for platform path
+            final String pathWithVersionRemoved = removeVersionPrefix(absolutePathNoContext);
+            if (isPlatformPath(pathWithVersionRemoved)) {
+                // This was a versioned platform path
+                return pathWithVersionRemoved;
+            } else {
+                // Not a versioned platform path, return as is
+                return absolutePathNoContext;
+            }
+        }
+    }
+
+    private static String removeVersionPrefix(String absolutePathNoContext) {
+        if (absolutePathNoContext.length() == 0) {
+            return absolutePathNoContext;
+        } else {
+            final int slashIndex = absolutePathNoContext.indexOf('/', 1);
+            return (slashIndex != -1) ? absolutePathNoContext.substring(slashIndex) : absolutePathNoContext;
+        }
+    }
 
     public static boolean isResourcesVersioned() {
         final boolean requested = Properties.instance().getPropertySet().getBoolean(RESOURCES_VERSIONED_PROPERTY, RESOURCES_VERSIONED_DEFAULT);

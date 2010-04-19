@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.pipeline.functions;
 
-import org.orbeon.oxf.pipeline.StaticExternalContext;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.ExpressionVisitor;
 import org.orbeon.saxon.expr.XPathContext;
@@ -22,7 +22,7 @@ import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
-public class RewriteResourceURI extends SystemFunction {
+public class DecodeResourceURI extends SystemFunction {
 
     /**
      * preEvaluate: this method suppresses compile-time evaluation by doing nothing
@@ -35,22 +35,12 @@ public class RewriteResourceURI extends SystemFunction {
 
     @Override
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
-
         // Get URI
         final Expression uriExpression = argument[0];
         final String uri = uriExpression.evaluateAsString(xpathContext).toString();
 
-        // Get mode
-        final Expression modeExpression = (argument.length < 2) ? null : argument[1];
-        final boolean absolute = (modeExpression != null) && modeExpression.effectiveBooleanValue(xpathContext);
-
         // Get property value
-        final String rewrittenURI = rewriteResourceURI(uri, absolute);
-
+        final String rewrittenURI = URLRewriterUtils.decodeResourceURI(uri);
         return StringValue.makeStringValue(rewrittenURI);
-    }
-
-    public static String rewriteResourceURI(String uri, boolean absolute) {
-        return StaticExternalContext.rewriteResourceURL(uri, absolute);
     }
 }

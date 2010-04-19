@@ -63,16 +63,16 @@ public class XPathProcessor extends ProcessorImpl {
 
                Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                     public Object read(PipelineContext context, final ProcessorInput input) {
-                        Document config = readInputAsDOM4J(context, INPUT_CONFIG);
+                        final Document config = readInputAsDOM4J(context, INPUT_CONFIG);
 
                         // Get declared namespaces
-                        Map<String, String> namespaces = new HashMap<String, String>();
+                        final Map<String, String> namespaces = new HashMap<String, String>();
                         for (Iterator i = config.getRootElement().selectNodes("/config/namespace").iterator(); i.hasNext();) {
                             Element namespaceElement = (Element) i.next();
                             namespaces.put(namespaceElement.attributeValue("prefix"),
                                     namespaceElement.attributeValue("uri"));
                         }
-                        return  new Config(namespaces, (String) config.selectObject("string(/config/xpath)"));
+                        return new Config(namespaces, (String) config.selectObject("string(/config/xpath)"));
                     }
                 });
 
@@ -150,8 +150,8 @@ public class XPathProcessor extends ProcessorImpl {
     }
 
     protected static class Config {
-        private Map<String, String> namespaces;
-        private String expression;
+        private final Map<String, String> namespaces;
+        private final String expression;
 
         public Config(Map<String, String> namespaces, String expression) {
             this.namespaces = namespaces;
@@ -162,17 +162,8 @@ public class XPathProcessor extends ProcessorImpl {
             return expression;
         }
 
-        public void setExpression(String expression) {
-            this.expression = expression;
-        }
-
         public Map<String, String> getNamespaces() {
             return namespaces;
         }
-
-        public void setNamespaces(Map<String, String> namespaces) {
-            this.namespaces = namespaces;
-        }
-
     }
 }

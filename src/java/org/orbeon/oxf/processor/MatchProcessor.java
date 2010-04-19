@@ -1,28 +1,27 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
 import org.dom4j.Document;
 import org.orbeon.oro.text.regex.*;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public abstract class MatchProcessor extends ProcessorImpl {
@@ -53,14 +52,13 @@ public abstract class MatchProcessor extends ProcessorImpl {
 
                     // <matches>
                     contentHandler.startElement("", "matches", "matches", XMLUtils.EMPTY_ATTRIBUTES);
-                    final String matches = new Boolean(result.matches).toString();
+                    final String matches = Boolean.toString(result.matches);
                     contentHandler.characters(matches.toCharArray(), 0, matches.length());
                     contentHandler.endElement("", "matches", "matches");
 
                     // <group>
-                    for (Iterator i = result.groups.iterator(); i.hasNext();) {
+                    for (final String group: result.groups) {
                         contentHandler.startElement("", "group", "group", XMLUtils.EMPTY_ATTRIBUTES);
-                        final String group = (String) i.next();
                         if (group != null)
                             contentHandler.characters(group.toCharArray(), 0, group.length());
                         contentHandler.endElement("", "group", "group");
@@ -79,7 +77,7 @@ public abstract class MatchProcessor extends ProcessorImpl {
 
     public static class Result {
         public boolean matches;
-        public List groups = new ArrayList();
+        public List<String> groups = new ArrayList<String>();
     }
 
     /**
@@ -92,7 +90,7 @@ public abstract class MatchProcessor extends ProcessorImpl {
      */
     protected static Result oroMatch(String regexp, String text, PatternCompiler compiler, PatternMatcher matcher) {
         try {
-            // Note: It looks like the compiler is not thread safe
+            // NOTE: It looks like the compiler is not thread safe
             final Pattern pattern;
             synchronized (compiler) {
                 pattern = compiler.compile(regexp, Perl5Compiler.READ_ONLY_MASK);

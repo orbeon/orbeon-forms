@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.test.TestExternalContext;
+import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 
 import java.util.List;
@@ -54,6 +55,10 @@ public class URLRewriterTest extends ResourceManagerTestBase {
             // NOTE: PipelineContext is not really used by TestExternalContext in this test suite
             pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
         }
+
+        // Reinitialize properties to enable versioned resources
+        Properties.invalidate();
+		org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties-versioned-all.xml");
     }
 
     public void testServiceRewrite() {
@@ -293,6 +298,62 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         assertEquals("/myapp/42/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteResourceURL(filterRequest, "?a=1&amp;b=2", pathMatchers , mode));
         assertEquals("/myapp/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/ops/bar.png", pathMatchers , mode));
         assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/config/bar.png", pathMatchers , mode));
+    }
+
+    public void testDecodeResourceURI() {
+
+        // NOTE: Unclear case: /xforms-server/foobar. URLRewriterUtils.rewriteResourceURL() does not rewrite
+        // /xforms-server/foobar as a resource URL and it is not clear why.
+
+        final String orbeonVersion = Version.getVersionNumber();
+        final String[] propertiesURLs = { "oxf:/ops/unit-tests/properties-versioned-all.xml", "oxf:/ops/unit-tests/properties-versioned-orbeon.xml" };
+        final String[] platformPaths = { "/ops/bar", "/config/bar", "/xbl/orbeon/bar", "/forms/orbeon/bar", "/apps/fr/bar", "/xforms-server" };
+
+        for (final String propertiesURL: propertiesURLs) {
+
+            // Reinitialize properties
+            Properties.invalidate();
+            org.orbeon.oxf.properties.Properties.init(propertiesURL);
+    
+            // Check platform paths
+            for (final String path: platformPaths) {
+                final String versionedPath = "/" + orbeonVersion + path;
+                // Make sure this is recognized as a platform path
+                assertTrue(URLRewriterUtils.isPlatformPath(path));
+                // Just decoding
+                assertEquals(path, URLRewriterUtils.decodeResourceURI(versionedPath));
+                // Encoding/decoding
+                assertEquals(path, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path,
+                        URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)));
+            }
+
+            // Check non-platform paths
+            final String[] customPaths = { "/opsla", "/configuration", "/xbl/acme/bar", "/forms/acme/bar", "/apps/myapp/bar", "/xforms-foo" };
+            final String appVersion = URLRewriterUtils.getApplicationResourceVersion();
+            for (final String path: customPaths) {
+                // Make sure this is recognized as a non-platform path
+                assertFalse(URLRewriterUtils.isPlatformPath(path));
+
+                if (appVersion != null) {
+                    // Case where there is an app version number
+
+                    final String versionedPath = "/" + appVersion + path;
+                    // Just decoding
+                    assertEquals(path, URLRewriterUtils.decodeResourceURI(versionedPath));
+                    // Encoding/decoding
+                    assertEquals(path, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path,
+                            URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)));
+                } else {
+                    // Case where there is NO app version number
+
+                    // Just decoding
+                    assertEquals(path, URLRewriterUtils.decodeResourceURI(path));
+                    // Encoding/decoding
+                    assertEquals(path, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path,
+                            URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)));
+                }
+            }
+        }
     }
 
     public void testHRRI() {

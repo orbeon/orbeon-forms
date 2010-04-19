@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -53,22 +53,28 @@
                         <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
 
                         <xxforms:script ev:event="xforms-enabled">
-                            var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
-                            if (button == null) {
-                                button = new YAHOO.widget.Button(event.target.parentNode.parentNode);
-                                <!-- TODO: once we can pass values from XForms to JavaScript we'll be able to get rid of the XSLT used here -->
-                                <xsl:if test="/fr:button/@tabindex">button.set("tabindex", <xsl:value-of select="/fr:button/@tabindex"/>);</xsl:if>
+                            if (event.target) {
+                                var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
+                                if (button == null) {
+                                    button = new YAHOO.widget.Button(event.target.parentNode.parentNode);
+                                    <!-- TODO: once we can pass values from XForms to JavaScript we'll be able to get rid of the XSLT used here -->
+                                    <xsl:if test="/fr:button/@tabindex">button.set("tabindex", <xsl:value-of select="/fr:button/@tabindex"/>);</xsl:if>
+                                }
                             }
                         </xxforms:script>
                         <xxforms:script ev:event="xforms-readonly">
-                            var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
-                            if (button != null)
-                                button.set("disabled", true);
+                            if (event.target) {
+                                var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
+                                if (button != null)
+                                    button.set("disabled", true);
+                            }
                         </xxforms:script>
                         <xxforms:script ev:event="xforms-readwrite">
-                            var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
-                            if (button != null)
-                                button.set("disabled", false);
+                            if (event.target) {
+                                var button = YAHOO.widget.Button.getButton(event.target.parentNode.parentNode.id);
+                                if (button != null)
+                                    button.set("disabled", false);
+                            }
                         </xxforms:script>
                     </xforms:trigger>
                 </xhtml:span>

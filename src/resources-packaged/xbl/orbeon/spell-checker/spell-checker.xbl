@@ -53,9 +53,9 @@
                         <unknown-word/>     <!-- The current word we're looking at and trying to fix -->
                         <correction/>       <!-- The current correction being considered -->
                         <context/>          <!-- Text around the word to fix (HTML) -->
+                        <is-change-all/>    <!-- Temporarily set to true|false to know the button pressed -->
                         <ignore-all/>       <!-- List of words the user decided to ignore -->
                         <replacements/>     <!-- List of words the user decided to change -->
-                        <is-change-all/>    <!-- Temporarily set to true|false to know the button pressed -->
                     </ui>
                 </xforms:instance>
 
@@ -79,10 +79,15 @@
                             tokenize(substring(instance('request')/text, $correction/@o + $correction/@l + 1), '\s+')"/>
                         <xforms:setvalue ref="instance('ui')/context" value="concat(
                             substring(instance('request')/text, 1, $correction/@o),
-                            '&lt;span class=''unknown-word''&gt;',
+                            '&lt;span id=''fr-spell-checker-unknown-word'' class=''unknown-word''&gt;',
                             ../unknown-word,
                             '&lt;/span&gt;',
                             substring(instance('request')/text,  $correction/@o + $correction/@l + 1))"/>
+                        <xxforms:script>
+                            var unknownWord = document.getElementById("fr-spell-checker-unknown-word");
+                            var notInDictionaryDiv = unknownWord.parentNode;
+                            notInDictionaryDiv.scrollTop = Math.max(0, unknownWord.offsetTop - unknownWord.offsetHeight);
+                        </xxforms:script>
                         <xforms:action if="instance('ui')/unknown-word = instance('ui')/ignore-all/word">
                             <!-- If current word is in the ignore list, go to the next one -->
                             <xforms:delete nodeset="$correction"/>
@@ -133,14 +138,13 @@
                         <xforms:label>Spelling</xforms:label>
                         <xxforms:variable name="has-corrections" select="exists(instance('result')/c)"/>
 
-                        <!-- On open, reset init ui instance -->
+                        <!-- On open, set focus -->
                         <xforms:action ev:event="xxforms-dialog-open">
-                            <xforms:delete nodeset="instance('ui')/(ignore-all | replacements)/word"/>
                             <xforms:setfocus if="$has-corrections" control="suggestion"/>
                             <xforms:setfocus if="not($has-corrections)" control="close"/>
                         </xforms:action>
 
-                        <!-- On close, apply replacements -->
+                        <!-- On close, apply replacements and do cleanup -->
                         <xforms:action ev:event="xxforms-dialog-close">
                             <xforms:action xxforms:iterate="instance('ui')/replacements/word">
                                 <xxforms:variable name="replacement" select="."/>
@@ -149,6 +153,8 @@
                                     $replacement/@by,
                                     substring(., $replacement/@o + $replacement/@l + 1))"/>
                             </xforms:action>
+                            <xforms:delete nodeset="instance('ui')/(ignore-all | replacements)/word"/>
+                            <xforms:setvalue xxforms:iterate="instance('ui')/*" ref="."/>
                         </xforms:action>
 
                         <xforms:group ref=".[$has-corrections]">
@@ -156,7 +162,7 @@
                                 <xhtml:tr>
                                     <xhtml:td class="label">Not in dictionary:</xhtml:td>
                                     <xhtml:td>
-                                        <xforms:output value="instance('ui')/context" mediatype="text/html"/>
+                                        <xforms:output value="instance('ui')/context" mediatype="text/html" class="not-in-dictionary"/>
                                     </xhtml:td>
                                     <xhtml:td rowspan="4">
                                         <!-- Ignore -->

@@ -5887,6 +5887,10 @@ ORBEON.xforms.Server = {
     },
 
     handleFailure: function(o) {
+        // Here when o.status == 0, it might not be an error if the UE is Safari. This might be caused by users clicking
+        // on a link to download a file, and Safari stopping the current Ajax request before it knows that new page is
+        // loaded (vs. a file being downloaded). At this point, we are not handling this situation.
+
         if (ORBEON.xforms.Globals.requestRetries > 0) {
             // If the request fails, we are trying again up to 3 times
             ORBEON.xforms.Globals.requestRetries--;

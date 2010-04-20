@@ -40,11 +40,11 @@
                 <xsl:variable name="app" as="xs:string" select="$instance/app"/>
                 <xsl:variable name="form" as="xs:string" select="$instance/form"/>
 
-                <!-- The property names that are overriden -->
+                <!-- The property names that are overridden -->
                 <xsl:variable name="property-names" as="xs:string*" select="pipeline:propertiesStartsWith(concat('oxf.fr.resource.', $app, '.', $form))"/>
 
                 <!-- Get ID of nodes we override followed by their new value -->
-                <xsl:variable name="overriden-elements-and-values" as="xs:string*">
+                <xsl:variable name="overridden-elements-and-values" as="xs:string*">
                     <xsl:for-each select="$property-names">
                         <xsl:variable name="name" as="xs:string" select="."/>
                         <xsl:variable name="name-without-prefix" as="xs:string" select="substring-after(substring-after(substring-after($name, 'oxf.fr.resource.'), '.'), '.')"/>
@@ -64,15 +64,15 @@
                     </xsl:for-each>
                 </xsl:variable>
                 <!-- ID of nodes we override -->
-                <xsl:variable name="overriden-elements" select="$overriden-elements-and-values[position() mod 2 = 1]"/>
-                <xsl:variable name="overriden-values" select="$overriden-elements-and-values[position() mod 2 = 0]"/>
+                <xsl:variable name="overridden-elements" select="overridden-elements-and-values[position() mod 2 = 1]"/>
+                <xsl:variable name="overridden-values" select="overridden-elements-and-values[position() mod 2 = 0]"/>
 
                 <!-- Override node -->
-                <xsl:template match="*[generate-id() = $overriden-elements]">
+                <xsl:template match="*[generate-id() = $overridden-elements]">
                     <xsl:variable name="id" as="xs:string" select="generate-id()"/>
                      <!-- Tricky: index-of() may return more than one positions. We take the first one as
                           propertiesStartsWith() returns more specific items first. -->
-                    <xsl:variable name="value" as="xs:string" select="$overriden-values[index-of($overriden-elements, $id)[1]]"/>
+                    <xsl:variable name="value" as="xs:string" select="$overridden-values[index-of($overridden-elements, $id)[1]]"/>
                     <xsl:copy>
                         <xsl:value-of select="$value"/>
                     </xsl:copy>

@@ -28,8 +28,18 @@
                 <organization><xsl:value-of select="normalize-space(/*/organization)"/></organization>
                 <email><xsl:value-of select="normalize-space(/*/email)"/></email>
                 <issued><xsl:value-of select="adjust-date-to-timezone(current-date(), ())"/></issued>
-                <!--<expiration/>-->
-                <expiration><xsl:value-of select="adjust-date-to-timezone(current-date() + xs:dayTimeDuration('P90D'), ())"/></expiration>
+                <expiration>
+                    <xsl:choose>
+                        <xsl:when test="/*/type = '90day'">
+                            <xsl:value-of select="adjust-date-to-timezone(current-date() + xs:dayTimeDuration('P90D'), ())"/>
+                        </xsl:when>
+                        <xsl:when test="/*/type = 'perpetual'"/>
+                        <xsl:otherwise>
+                            <!-- Shouldn't happen -->
+                            <xsl:value-of select="adjust-date-to-timezone(current-date(), ())"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </expiration>
             </license>
         </p:input>
         <p:output name="data" id="unsigned-license"/>

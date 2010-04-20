@@ -42,9 +42,9 @@
                         <data type="date"/>
                     </element>
                     <element name="expiration">
-                        <!--<optional>-->
+                        <optional>
                             <data type="date"/>
-                        <!--</optional>-->
+                        </optional>
                     </element>
                 </element>
             </element>

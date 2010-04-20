@@ -39,7 +39,6 @@
                         <email/>
                         <issued/>
                         <expiration/>
-
                     </license>
 
                 </form>
@@ -164,12 +163,13 @@
     &lt;licensee/&gt;
     &lt;organization/&gt;
     &lt;email/&gt;
+    &lt;type/&gt;
 &lt;/license&gt;
 </body>
             </xforms:instance>
             <xforms:submission id="get-license-submission" class="fr-service"
                                ref="instance('fr-service-request-instance')"
-                               resource="/fr/service/custom/orbeon/license/create-90day-license"
+                               resource="/fr/service/custom/orbeon/license/create-license"
                                method="post"
                                serialization="application/xml"
                                mediatype="application/xml"
@@ -209,6 +209,13 @@
 
                             <xxforms:variable name="control-name" select="'email'" as="xs:string"/>
                             <xxforms:variable name="path" select="/*/email" as="xs:string"/>
+
+                            <xforms:setvalue ref="$path" value="instance('fr-form-instance')/*/*[name() = $control-name]"/>
+                        </xforms:action>
+                        <xforms:action class="fr-set-service-value-action">
+
+                            <xxforms:variable name="control-name" select="'type'" as="xs:string"/>
+                            <xxforms:variable name="path" select="/*/type" as="xs:string"/>
 
                             <xforms:setvalue ref="$path" value="instance('fr-form-instance')/*/*[name() = $control-name]"/>
                         </xforms:action>

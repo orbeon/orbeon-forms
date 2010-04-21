@@ -2749,6 +2749,13 @@ ORBEON.xforms.Controls = {
         var divElement = ORBEON.util.Dom.getElementById(controlId);
         var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
 
+        // Take out the focus from the current control. This is particularly important with non-modal dialogs
+        // opened with a minimal trigger, otherwise we have a dotted line around the link after it opens.
+        if (ORBEON.xforms.Globals.currentFocusControlId != null) {
+            var focusedElement = ORBEON.util.Dom.getElementById(ORBEON.xforms.Globals.currentFocusControlId);
+            if (focusedElement != null) focusedElement.blur();
+        }
+
         // Render the dialog if needed
         if (YAHOO.util.Dom.hasClass(divElement, "xforms-initially-hidden")) {
             ORBEON.util.Dom.removeClass(divElement, "xforms-initially-hidden");
@@ -2776,12 +2783,6 @@ ORBEON.xforms.Controls = {
             // Align dialog relative to neighbor
             yuiDialog.cfg.setProperty("context", [neighbor, "tl", "bl"]);
             yuiDialog.align();
-        }
-        // Take out the focus from the current control. This is particulary important with non-modal dialogs
-        // opened with a minimal trigger, otherwise we have a dotted line around the link after it opens.
-        if (ORBEON.xforms.Globals.currentFocusControlId != null) {
-            var focusedElement = ORBEON.util.Dom.getElementById(ORBEON.xforms.Globals.currentFocusControlId);
-            if (focusedElement != null) focusedElement.blur();
         }
     },
 
@@ -6042,7 +6043,7 @@ ORBEON.xforms.Server = {
      */
     handleResponseDom: function(responseXML, formID) {
 
-        try {
+//        try {
             if (responseXML && responseXML.documentElement
                     && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
 
@@ -7292,12 +7293,12 @@ ORBEON.xforms.Server = {
                 ORBEON.xforms.Globals.lastRequestIsError = true;
                 ORBEON.xforms.Server.showError("Server didn't respond with valid XML", "Server didn't respond with valid XML", formID);
             }
-        } catch (e) {
-            // Show dialog with error to the user, as they won't be able to continue using the UI anyway
-            ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
-            // Rethrow, so the exception isn't lost (can be shown by Firebug, or a with little icon on the bottom left of the IE window)
-            throw e;
-        }
+//        } catch (e) {
+//            // Show dialog with error to the user, as they won't be able to continue using the UI anyway
+//            ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
+//            // Rethrow, so the exception isn't lost (can be shown by Firebug, or a with little icon on the bottom left of the IE window)
+//            throw e;
+//        }
     },
 
     callUserScript: function(functionName, targetId, observerId) {

@@ -5351,8 +5351,6 @@ ORBEON.xforms.Init = {
         var isDraggable = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-draggable-true");
         var isVisible = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-visible-true");
         var isMinimal = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-appearance-minimal");
-        // Make the dialog "visible", otherwise it doesn't initialize correctly
-
         // Create dialog object
         var yuiDialog;
         if (isMinimal) {
@@ -5383,6 +5381,14 @@ ORBEON.xforms.Init = {
             // Register listener for when the dialog is closed by a click on the "x"
             yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
         }
+
+        // Move the dialog under the form element, as if the dialog is inside another absolute block it can be cropped
+        // (can't escape that block), and in some cases the mask can show on top of the dialog (even if the z-index
+        // for the dialog is higher than the z-index for the mask). See:
+        // http://forge.ow2.org/tracker/index.php?func=detail&aid=314943&group_id=168&atid=350207
+        var form = ORBEON.xforms.Controls.getForm(yuiDialog.element);
+        if (yuiDialog.element.parentNode != form)
+            form.appendChild(yuiDialog.element);
 
         ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
         if (isVisible)

@@ -134,7 +134,7 @@
                     </xforms:trigger>
 
                     <!-- Spell checking dialog -->
-                    <xxforms:dialog id="spell-checking-dialog">
+                    <xxforms:dialog id="spell-checking-dialog" class="fr-spell-checker-dialog">
                         <xforms:label>Spelling</xforms:label>
                         <xxforms:variable name="has-corrections" select="exists(instance('result')/c)"/>
 

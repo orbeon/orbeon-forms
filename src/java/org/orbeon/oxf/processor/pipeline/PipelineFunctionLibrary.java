@@ -112,8 +112,9 @@ public class PipelineFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
         // p:decode-resource-uri()
-        e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}decode-resource-uri", DecodeResourceURI.class, 0, 1, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
+        e = register("{" + PipelineProcessor.PIPELINE_NAMESPACE_URI + "}decode-resource-uri", DecodeResourceURI.class, 0, 2, 2, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 1, BuiltInAtomicType.BOOLEAN, StaticProperty.EXACTLY_ONE, null);
 
         // === XSLT 2.0 function
         e = register("format-date", FormatDate.class, StandardNames.XS_DATE, 2, 5, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);

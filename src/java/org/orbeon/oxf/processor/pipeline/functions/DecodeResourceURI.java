@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.pipeline.functions;
 
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.ExpressionTool;
 import org.orbeon.saxon.expr.ExpressionVisitor;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.functions.SystemFunction;
@@ -35,12 +36,12 @@ public class DecodeResourceURI extends SystemFunction {
 
     @Override
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
-        // Get URI
-        final Expression uriExpression = argument[0];
-        final String uri = uriExpression.evaluateAsString(xpathContext).toString();
+        // Evaluate parameters
+        final String uri = argument[0].evaluateAsString(xpathContext).toString();
+        final boolean isVersioned = ExpressionTool.effectiveBooleanValue(argument[1].iterate(xpathContext));
 
         // Get property value
-        final String rewrittenURI = URLRewriterUtils.decodeResourceURI(uri);
+        final String rewrittenURI = URLRewriterUtils.decodeResourceURI(uri, isVersioned);
         return StringValue.makeStringValue(rewrittenURI);
     }
 }

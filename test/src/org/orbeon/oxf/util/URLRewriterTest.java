@@ -321,37 +321,42 @@ public class URLRewriterTest extends ResourceManagerTestBase {
                 // Make sure this is recognized as a platform path
                 assertTrue(URLRewriterUtils.isPlatformPath(path));
                 // Just decoding
-                assertEquals(path, URLRewriterUtils.decodeResourceURI(versionedPath));
+                assertEquals(path, URLRewriterUtils.decodeResourceURI(versionedPath, true));
                 // Encoding/decoding
                 assertEquals(path, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path,
-                        URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)));
+                        URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT), true));
             }
 
             // Check non-platform paths
             final String[] customPaths = { "/opsla", "/configuration", "/xbl/acme/bar", "/forms/acme/bar", "/apps/myapp/bar", "/xforms-foo" };
+            final String[] decodedCustomPaths = { "/apps/opsla", "/apps/configuration", "/xbl/acme/bar", "/forms/acme/bar", "/apps/myapp/bar", "/apps/xforms-foo" };
             final String appVersion = URLRewriterUtils.getApplicationResourceVersion();
+            int i = 0;
             for (final String path: customPaths) {
                 // Make sure this is recognized as a non-platform path
                 assertFalse(URLRewriterUtils.isPlatformPath(path));
+
+                final String decodedCustomPath = decodedCustomPaths[i];
 
                 if (appVersion != null) {
                     // Case where there is an app version number
 
                     final String versionedPath = "/" + appVersion + path;
                     // Just decoding
-                    assertEquals(path, URLRewriterUtils.decodeResourceURI(versionedPath));
+                    assertEquals(decodedCustomPath, URLRewriterUtils.decodeResourceURI(versionedPath, true));
                     // Encoding/decoding
-                    assertEquals(path, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path,
-                            URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)));
+                    assertEquals(decodedCustomPath, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path,
+                            URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT), true));
                 } else {
                     // Case where there is NO app version number
 
                     // Just decoding
-                    assertEquals(path, URLRewriterUtils.decodeResourceURI(path));
+                    assertEquals(decodedCustomPath, URLRewriterUtils.decodeResourceURI(path, true));
                     // Encoding/decoding
-                    assertEquals(path, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path,
-                            URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)));
+                    assertEquals(decodedCustomPath, URLRewriterUtils.decodeResourceURI(URLRewriterUtils.rewriteResourceURL(directRequest, path,
+                            URLRewriterUtils.MATCH_ALL_PATH_MATCHERS, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT), true));
                 }
+                i++;
             }
         }
     }

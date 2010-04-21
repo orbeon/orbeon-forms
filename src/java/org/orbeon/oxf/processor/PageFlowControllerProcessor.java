@@ -1129,13 +1129,13 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 // Use XPath function to decode the resource URI before passing it to the resource server
                 addInput(new ASTInput("config",
                             new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request),
-                                    "p:decode-resource-uri(/request/request-path)"))
+                                    "p:decode-resource-uri(/request/request-path, true())"))
                 ));
             } else {
-                // Pass the path as is
+                // Path is not versioned
                 addInput(new ASTInput("config",
                             new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request),
-                                    "string(/request/request-path)"))
+                                    "p:decode-resource-uri(/request/request-path, false())"))
                 ));
             }
 

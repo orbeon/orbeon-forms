@@ -23,7 +23,10 @@
     <property as="xs:boolean" name="oxf.resources.versioned"                         value="false"/>
     <property as="xs:string"  name="oxf.resources.version-number"                    value="3.1415"/>
 
-    <property as="xs:string"  name="oxf.url-rewriting.platform-paths"                value="^/(ops/|config/|xbl/orbeon/|forms/orbeon/|apps/fr/|xforms-server)(.*)$"/>
+    <property as="xs:string"  name="oxf.url-rewriting.platform-paths"                value="^/(ops/|config/|xbl/orbeon/|forms/orbeon/|apps/fr/|xforms-server).*$"/>
+    <!-- TODO: Uncomment this properties once we are confident -->
+    <!--<property as="xs:string"  name="oxf.url-rewriting.app-paths"                     value="^/(apps|xbl|forms)/.*$"/>-->
+    <!--<property as="xs:string"  name="oxf.url-rewriting.app-prefix"                    value="/apps"/>-->
     <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"              value=""/>
     <property as="xs:string"  name="oxf.url-rewriting.strategy.servlet"              value="servlet"/>
     <!-- TODO: support for base context for servlet rewriting strategy -->

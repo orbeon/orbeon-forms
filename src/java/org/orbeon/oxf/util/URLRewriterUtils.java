@@ -39,6 +39,8 @@ public class URLRewriterUtils {
     public static final boolean RESOURCES_VERSIONED_DEFAULT = false;
 
     private static final String REWRITING_PLATFORM_PATHS_PROPERTY = "oxf.url-rewriting.platform-paths";
+    private static final String REWRITING_APP_PATHS_PROPERTY = "oxf.url-rewriting.app-paths";
+    private static final String REWRITING_APP_PREFIX_PROPERTY = "oxf.url-rewriting.app-prefix";
     private static final String REWRITING_STRATEGY_PROPERTY_PREFIX = "oxf.url-rewriting.strategy.";
     private static final String REWRITING_CONTEXT_PROPERTY_PREFIX = "oxf.url-rewriting.";
     private static final String REWRITING_CONTEXT_PROPERTY_SUFFIX = ".context";
@@ -335,26 +337,56 @@ public class URLRewriterUtils {
     }
 
     /**
-     * Decode a versioned absolute path with no context, depending on whether there is an app version or not.
+     * Check if the given path is an application path, assuming it is not already a platform path.
+     *
+     * @param absolutePathNoContext path to check
+     * @return                      true iif path is a platform path
+     */
+    public static boolean isNonPlatformPathAppPath(String absolutePathNoContext) {
+        final String regexp = Properties.instance().getPropertySet().getString(REWRITING_APP_PATHS_PROPERTY, null);
+        // TODO: do not compile the regexp every time
+        return regexp != null && new Perl5MatchProcessor().match(regexp, absolutePathNoContext).matches;
+    }
+
+    /**
+     * Decode an absolute path with no context, depending on whether there is an app version or not.
      *
      * @param absolutePathNoContext path
+     * @param isVersioned           whether the resource is versioned or not
      * @return                      decoded path, or initial path if no decoding needed
      */
-    public static String decodeResourceURI(String absolutePathNoContext) {
-        final boolean hasApplicationVersion = URLRewriterUtils.getApplicationResourceVersion() != null;
-        if (hasApplicationVersion) {
-            // Remove version on any path
-            return removeVersionPrefix(absolutePathNoContext);
-        } else {
-            // Try to remove version then test for platform path
-            final String pathWithVersionRemoved = removeVersionPrefix(absolutePathNoContext);
-            if (isPlatformPath(pathWithVersionRemoved)) {
-                // This was a versioned platform path
-                return pathWithVersionRemoved;
+    public static String decodeResourceURI(String absolutePathNoContext, boolean isVersioned) {
+        if (isVersioned) {
+            // Versioned case
+            final boolean hasApplicationVersion = URLRewriterUtils.getApplicationResourceVersion() != null;
+            if (hasApplicationVersion) {
+                // Remove version on any path
+                return prependAppPathIfNeeded(removeVersionPrefix(absolutePathNoContext));
             } else {
-                // Not a versioned platform path, return as is
-                return absolutePathNoContext;
+                // Try to remove version then test for platform path
+                final String pathWithVersionRemoved = removeVersionPrefix(absolutePathNoContext);
+                if (isPlatformPath(pathWithVersionRemoved)) {
+                    // This was a versioned platform path
+                    return pathWithVersionRemoved;
+                } else {
+                    // Not a versioned platform path
+                    // Don't remove version
+                    return prependAppPathIfNeeded(absolutePathNoContext);
+                }
             }
+        } else {
+            // Non-versioned case
+            return prependAppPathIfNeeded(absolutePathNoContext);
+        }
+    }
+
+    private static String prependAppPathIfNeeded(String path) {
+        if (isPlatformPath(path) || isNonPlatformPathAppPath(path)) {
+            // Path doesn't need adjustment
+            return path;
+        } else {
+            // Adjust to make an app path
+            return Properties.instance().getPropertySet().getString(REWRITING_APP_PREFIX_PROPERTY, "") + path;
         }
     }
 

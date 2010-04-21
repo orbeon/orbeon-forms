@@ -61,17 +61,11 @@
                     width: auto;
                 }
 
-                .xbl-fr-dialog-select td { vertical-align: top; padding: .5em }
-
-                .xbl-fr-dialog-select select {
-                    height: 10em;
-                    width: 15em;
-                }
-
-                .xbl-fr-dialog-select table .xbl-fr-button { display: block; margin: .5em }
-                .xbl-fr-dialog-select .xforms-label { display: block; font-weight: bold }
-
-                .xbl-fr-dialog-select .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
+                .xbl-fr-dialog-select .xforms-dialog td { vertical-align: top; padding: .5em }
+                .xbl-fr-dialog-select .xforms-dialog select { height: 10em; width: 15em }
+                .xbl-fr-dialog-select .xforms-dialog table .xbl-fr-button { display: block; margin: .5em }
+                .xbl-fr-dialog-select .xforms-dialog .xforms-label { display: block; font-weight: bold }
+                .xbl-fr-dialog-select .xforms-dialog .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
 
             </xbl:style>
         </xbl:resources>

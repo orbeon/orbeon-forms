@@ -27,8 +27,8 @@
         <xforms:model>
             <xforms:instance id="instance">
                 <instance>
-                    <value1/>
-                    <value2>1 2 4 8</value2>
+                    <value1>1 2 4 8</value1>
+                    <value2>1 2 4 5</value2>
                 </instance>
             </xforms:instance>
             <xforms:instance id="items">
@@ -41,12 +41,26 @@
                     <item label="Six" value="6"/>
                     <item label="Seven" value="7"/>
                     <item label="Eight" value="8"/>
+                    <item label="Nine" value="9"/>
+                    <item label="Ten" value="10"/>
+                    <item label="Eleven" value="11"/>
+                    <item label="Twelve" value="12"/>
+                    <item label="Thirteen" value="13"/>
+                    <item label="Fourteen" value="14"/>
                 </items>
             </xforms:instance>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .with-comma .xbl-fr-dialog-select .xforms-label { vertical-align: top }
+            .with-comma .xbl-fr-dialog-select .xbl-fr-button { vertical-align: top }
+            .with-comma .xbl-fr-dialog-select .xforms-output {
+                border: 1px solid #999; padding: 2px; display: inline-block;
+                margin: 0 .5em 0 1em; overflow-y: scroll; width: 10em; height: 5em  }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
 
+        <xhtml:h2>No separator (generates a list)</xhtml:h2>
         <fr:dialog-select ref="value1" id="dialog-select-1">
             <xforms:label>Selection 1:</xforms:label>
             <xforms:itemset nodeset="instance('items')/item">
@@ -55,14 +69,16 @@
             </xforms:itemset>
         </fr:dialog-select>
 
-        <fr:dialog-select ref="value2" id="dialog-select-2" separator=", ">
-            <xforms:label>Selection 2:</xforms:label>
-            <xforms:itemset nodeset="instance('items')/item">
-                <xforms:label ref="@label"/>
-                <xforms:value ref="@value"/>
-            </xforms:itemset>
-        </fr:dialog-select>
+        <xhtml:div class="with-comma">
+            <xhtml:h2>Separator set to comma</xhtml:h2>
+            <fr:dialog-select ref="value2" id="dialog-select-2" separator=", ">
+                <xforms:label>Selection 2:</xforms:label>
+                <xforms:itemset nodeset="instance('items')/item">
+                    <xforms:label ref="@label"/>
+                    <xforms:value ref="@value"/>
+                </xforms:itemset>
+            </fr:dialog-select>
+        </xhtml:div>
 
-        <fr:xforms-inspector/>
     </xhtml:body>
 </xhtml:html>

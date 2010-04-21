@@ -14,7 +14,7 @@
   -->
 <resources>
     <resource xml:lang="en">
-        <select>Select</select>
+        <select>...</select>
         <title>Selection</title>
         <available>Available</available>
         <selected>Selected</selected>
@@ -22,7 +22,7 @@
         <cancel>Cancel</cancel>
     </resource>
     <resource xml:lang="fr">
-        <select>Sélectionner</select>
+        <select>...</select>
         <title>Sélection</title>
         <available>Disponible</available>
         <selected>Sélectionné</selected>

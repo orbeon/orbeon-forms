@@ -1,16 +1,16 @@
-/*
-    Copyright (C) 2008 Orbeon, Inc.
-
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
-
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-*/
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 
 /* Overwrite definition in form-runner-orbeon.css if any */
 html { overflow: hidden }
@@ -425,6 +425,8 @@ td:hover .fb-click-message { display: block }
 .xforms-readonly .xforms-input-input { background-image: none; background-color: #CCCCCC }
 .xforms-readonly textarea { background-image: none; background-color: #CCCCCC }
 
+.fr-buttons-placeholder .xforms-output { color: gray }
+
 /* ***** Accordion Menu ********************************************************************************************* */
 
 dl.accordion-menu { margin: 0; padding: 0; width: 100% }
@@ -526,7 +528,7 @@ html.accordion-menu-js dd.a-m-d-anim {
 #fb-layout .yui-layout-unit-bottom .yui-layout-bd { border-top: 2px solid #004B92; background-color: #E8F2FF }
 #top1 { padding: 0.4em .5em 0 .5em }
 
-/* Always show vertial scrollbar so that there is no reflow of the left pannel when it becomes shorter/taller */
+/* Always show vertical scrollbar so that there is no reflow of the left panel when it becomes shorter/taller */
 .yui-layout .yui-layout-unit-left div.yui-layout-bd {
     overflow-y: scroll;
 }

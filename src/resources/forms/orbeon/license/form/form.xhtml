@@ -37,6 +37,7 @@
                         <licensee/>
                         <organization/>
                         <email/>
+                        <version/>
                         <issued/>
                         <expiration/>
                     </license>
@@ -65,6 +66,9 @@
                     <xforms:bind id="license-data-bind" nodeset="license-data" type="xforms:string"
                                  readonly="true()"
                                  name="license-data"/>
+                    <xforms:bind id="version-bind"
+                                 nodeset="version"
+                                 name="version"/>
 
                 </xforms:bind>
 
@@ -132,6 +136,12 @@
                             <help/>
                             <alert>Please enter an email address</alert>
                         </email>
+                        <version>
+                            <label>Orbeon Forms Version</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </version>
                         <issued>
                             <label>Issue Date</label>
                             <hint/>
@@ -163,6 +173,7 @@
     &lt;licensee/&gt;
     &lt;organization/&gt;
     &lt;email/&gt;
+    &lt;version/&gt;
     &lt;type/&gt;
 &lt;/license&gt;
 </body>
@@ -214,6 +225,13 @@
                         </xforms:action>
                         <xforms:action class="fr-set-service-value-action">
 
+                            <xxforms:variable name="control-name" select="'version'" as="xs:string"/>
+                            <xxforms:variable name="path" select="/*/version" as="xs:string"/>
+
+                            <xforms:setvalue ref="$path" value="instance('fr-form-instance')/*/*[name() = $control-name]"/>
+                        </xforms:action>
+                        <xforms:action class="fr-set-service-value-action">
+
                             <xxforms:variable name="control-name" select="'type'" as="xs:string"/>
                             <xxforms:variable name="path" select="/*/type" as="xs:string"/>
 
@@ -228,7 +246,9 @@
                     <xforms:action class="fr-set-control-value-action">
 
                         <xxforms:variable name="control-name" select="'license-data'" as="xs:string"/>
-                        <xxforms:variable name="control-value" select="saxon:serialize(/, xxforms:instance('fr-xsl-output-instance'))" as="xs:string"/>
+                        <xxforms:variable name="control-value"
+                                          select="saxon:serialize(/, xxforms:instance('fr-xsl-output-instance'))"
+                                          as="xs:string"/>
 
                         <xforms:insert nodeset="instance('fr-form-instance')/*/*"
                                        origin="xxforms:element($control-name)"/>
@@ -259,9 +279,18 @@
                         <xforms:setvalue ref="instance('fr-form-instance')/*/*[name() = $control-name]"
                                          value="$control-value"/>
                     </xforms:action>
+                    <xforms:action class="fr-set-control-value-action">
+
+                        <xxforms:variable name="control-name" select="'version'" as="xs:string"/>
+                        <xxforms:variable name="control-value" select="/*/*/*/version" as="xs:string"/>
+
+                        <xforms:setvalue ref="instance('fr-form-instance')/*/*[name() = $control-name]"
+                                         value="$control-value"/>
+                    </xforms:action>
 
                 </xforms:action>
             </xforms:action>
+
 
 
         </xforms:model>
@@ -300,11 +329,11 @@
                             </xhtml:td>
                             <xhtml:td>
                                 <xforms:output xmlns:xbl="http://www.w3.org/ns/xbl"
-                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                              id="organization-control"
-                                              class="fr-summary fr-search"
-                                              bind="organization-bind">
+                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                               id="organization-control"
+                                               class="fr-summary fr-search"
+                                               bind="organization-bind">
                                     <xforms:label ref="$form-resources/organization/label"/>
                                     <xforms:hint ref="$form-resources/organization/hint"/>
                                     <xforms:help ref="$form-resources/organization/help"/>
@@ -315,18 +344,30 @@
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:output xmlns:xbl="http://www.w3.org/ns/xbl"
-                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                              id="email-control"
-                                              class="fr-summary fr-search"
-                                              bind="email-bind">
+                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                               id="email-control"
+                                               class="fr-summary fr-search"
+                                               bind="email-bind">
                                     <xforms:label ref="$form-resources/email/label"/>
                                     <xforms:hint ref="$form-resources/email/hint"/>
                                     <xforms:help ref="$form-resources/email/help"/>
                                     <xforms:alert ref="$form-resources/email/alert"/>
                                 </xforms:output>
                             </xhtml:td>
-                            <xhtml:td/>
+                            <xhtml:td>
+                                <xforms:output xmlns:xbl="http://www.w3.org/ns/xbl"
+                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                               bind="version-bind"
+                                               id="version-control"
+                                               class="fr-summary fr-search">
+                                    <xforms:label ref="$form-resources/version/label"/>
+                                    <xforms:help ref="$form-resources/version/help"/>
+
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:output>
+                            </xhtml:td>
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:td>

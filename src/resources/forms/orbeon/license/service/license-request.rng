@@ -31,13 +31,14 @@
                     <param name="minLength">1</param>
                 </data>
             </element>
+            <element name="version">
+                <data type="string"/>
+            </element>
             <element name="type">
-                <data type="string">
-                    <choice>
-                        <value>90day</value>
-                        <value>perpetual</value>
-                    </choice>
-                </data>
+                <choice>
+                    <value>90day</value>
+                    <value>perpetual</value>
+                </choice>
             </element>
         </element>
     </start>

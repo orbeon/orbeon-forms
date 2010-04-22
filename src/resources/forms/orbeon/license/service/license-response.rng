@@ -41,6 +41,9 @@
                     <element name="issued">
                         <data type="date"/>
                     </element>
+                    <element name="version">
+                        <data type="string"/>
+                    </element>
                     <element name="expiration">
                         <optional>
                             <data type="date"/>

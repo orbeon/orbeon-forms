@@ -28,6 +28,7 @@
                 <organization><xsl:value-of select="normalize-space(/*/organization)"/></organization>
                 <email><xsl:value-of select="normalize-space(/*/email)"/></email>
                 <issued><xsl:value-of select="adjust-date-to-timezone(current-date(), ())"/></issued>
+                <version><xsl:value-of select="normalize-space(/*/version)"/></version>
                 <expiration>
                     <xsl:choose>
                         <xsl:when test="/*/type = '90day'">

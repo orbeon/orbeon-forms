@@ -841,6 +841,14 @@ public class ControlTree implements ExternalCopyable {
             return true;
         }
 
+        public boolean pushBinding(PropertyContext propertyContext, XFormsContextStack currentContextStack, Element currentControlElement,
+                                   String controlPrefixedId, String controlEffectiveId, XBLBindings.Scope newScope) {
+
+            // When creating controls, always evaluate the binding
+            currentContextStack.pushBinding(propertyContext, currentControlElement, controlEffectiveId, newScope);
+            return true;
+        }
+
         public void endRepeatIteration(int iteration) {
             currentControlsContainer = currentControlsContainer.getParent();
         }
@@ -860,14 +868,18 @@ public class ControlTree implements ExternalCopyable {
     public static class UpdateBindingsListener implements XFormsControls.ControlElementVisitorListener {
 
         private final PropertyContext propertyContext;
-        private final Map effectiveIdsToControls;
+        private final Map<String, XFormsControl> effectiveIdsToControls;
 
         private final XPathDependencies xpathDependencies;
 
+        private int level;
+        private int newlyRelevantLevel = -1;
+
+        private transient int visitedCount;
         private transient int updateCount;
         private transient int iterationCount;
 
-        public UpdateBindingsListener(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Map effectiveIdsToControls) {
+        public UpdateBindingsListener(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Map<String, XFormsControl> effectiveIdsToControls) {
             this.propertyContext = propertyContext;
             this.effectiveIdsToControls = effectiveIdsToControls;
 
@@ -878,9 +890,10 @@ public class ControlTree implements ExternalCopyable {
 
         public XFormsControl startVisitControl(XBLContainer container, Element controlElement, String effectiveControlId) {
 
-            updateCount++;
+            visitedCount++;
 
-            final XFormsControl control = (XFormsControl) effectiveIdsToControls.get(effectiveControlId);
+            final XFormsControl control = effectiveIdsToControls.get(effectiveControlId);
+            final boolean wasRelevant = control.isRelevant();
 
             final XFormsContextStack.BindingContext newBindingContext = container.getContextStack().getCurrentBindingContext();
 
@@ -912,11 +925,27 @@ public class ControlTree implements ExternalCopyable {
                 control.setBindingContext(propertyContext, newBindingContext);
             }
 
+            // Update newly relevant subtree level
+            enterLevel(control, wasRelevant);
+
             // Notify the control that some of its aspects (value, label, etc.) might have changed
             // NOTE: existing repeat iterations are marked dirty below in startRepeatIteration()
             control.markDirty(xpathDependencies);
 
             return control;
+        }
+
+        private void enterLevel(XFormsControl control, boolean wasRelevant) {
+            level++;
+            if (newlyRelevantLevel == -1 && control instanceof XFormsContainerControl && !wasRelevant && control.isRelevant()) {
+                newlyRelevantLevel = level; // entering level of containing
+            }
+        }
+
+        private void exitLevel() {
+            if (newlyRelevantLevel == level)
+                newlyRelevantLevel = -1; // exiting level of containing control becoming relevant
+            level--;
         }
 
         public boolean startRepeatIteration(XBLContainer container, int iteration, String effectiveIterationId) {
@@ -925,6 +954,10 @@ public class ControlTree implements ExternalCopyable {
 
             // Get reference to iteration control
             final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl) effectiveIdsToControls.get(effectiveIterationId);
+            final boolean wasRelevant = repeatIterationControl.isRelevant();
+
+            // Update newly relevant subtree level
+            enterLevel(repeatIterationControl, wasRelevant);
 
             // Check whether this is an existing iteration as opposed to a newly created iteration
             final boolean isExistingIteration = !newIterationsSet.contains(effectiveIterationId);
@@ -938,6 +971,38 @@ public class ControlTree implements ExternalCopyable {
             return isExistingIteration;
         }
 
+        public boolean pushBinding(PropertyContext propertyContext, XFormsContextStack currentContextStack, Element currentControlElement,
+                                   String controlPrefixedId, String controlEffectiveId, XBLBindings.Scope newScope) {
+
+            // Update is required if:
+            //
+            // o we are within a newly relevant container
+            // o or dependencies tell us an update is required
+            final boolean requireUpdate = (newlyRelevantLevel != -1 && level >= newlyRelevantLevel) || xpathDependencies.requireBindingUpdate(controlPrefixedId);
+            if (requireUpdate) {
+                // Push with evaluation
+                currentContextStack.pushBinding(propertyContext, currentControlElement, controlEffectiveId, newScope);
+                updateCount++;
+            } else {
+                final XFormsControl currentControl = effectiveIdsToControls.get(controlEffectiveId);
+                // TODO: do this better: null in create mode for now; what about with relevance optimization?
+                if (currentControl != null) {
+                    // Push existing binding without re-evaluating
+                    currentContextStack.pushBinding(currentControl.getBindingContext());
+                } else {
+                    // Push with evaluation
+                    currentContextStack.pushBinding(propertyContext, currentControlElement, controlEffectiveId, newScope);
+                    updateCount++;
+                }
+            }
+
+            return requireUpdate;
+        }
+
+        public int getVisitedCount() {
+            return visitedCount;
+        }
+
         public int getUpdateCount() {
             return updateCount;
         }
@@ -946,7 +1011,12 @@ public class ControlTree implements ExternalCopyable {
             return iterationCount;
         }
 
-        public void endVisitControl(Element controlElement, String effectiveControlId) {}
-        public void endRepeatIteration(int iteration) {}
+        public void endVisitControl(Element controlElement, String effectiveControlId) {
+            exitLevel();
+        }
+
+        public void endRepeatIteration(int iteration) {
+            exitLevel();
+        }
     }
 }

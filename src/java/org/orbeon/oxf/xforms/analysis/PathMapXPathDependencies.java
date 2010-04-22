@@ -193,7 +193,6 @@ public class PathMapXPathDependencies implements XPathDependencies {
             if (result) {
                 getLogger().logDebug("dependencies", "binding modified", "prefixed id", controlPrefixedId,
                         "XPath", controlAnalysis.bindingAnalysis.xpathString);
-                bindingUpdateCount++;
             }
 
             modifiedBindingCache.put(controlPrefixedId, result);

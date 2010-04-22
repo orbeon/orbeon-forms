@@ -509,7 +509,6 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             categoryAxis.setTickMarkPaint(chartConfig.getTitleColor());
             if(categoryAxis instanceof RestrictedNumberAxis) {
                 ((RestrictedNumberAxis)categoryAxis).setMaxTicks(chartConfig.getMaxNumOfLabels());
-                ((RestrictedNumberAxis)categoryAxis).adjustTickUnits();
             }
             if (categoryAxis instanceof CategoryAxis && chartConfig.getCategoryMargin() != 0)
                 ((CategoryAxis)categoryAxis).setCategoryMargin(chartConfig.getCategoryMargin());
@@ -520,7 +519,6 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
             valueAxis.setTickLabelPaint(chartConfig.getTitleColor());
             valueAxis.setTickMarkPaint(chartConfig.getTitleColor());
             ((RestrictedNumberAxis)valueAxis).setMaxTicks(chartConfig.getMaxNumOfLabels());
-            ((RestrictedNumberAxis)valueAxis).adjustTickUnits();
         }
 
         if (renderer != null) {
@@ -1206,7 +1204,6 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
     }
 
     protected static class RestrictedNumberAxis extends NumberAxis {
-        private int maxTicks = NumberAxis.MAXIMUM_TICK_COUNT;
 
         /**
          * Creates a Number axis with the specified label.
@@ -1218,14 +1215,11 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         }
 
         public void setMaxTicks(int maxTicks) {
-            this.maxTicks = maxTicks;
-        }
-
-        protected void adjustTickUnits() {
             double unit = getTickUnit().getSize();
             Range range = getRange();
-            int tickUnit = (int)(Math.floor(range.getUpperBound() / unit)
+            int visibleTickCount = (int)(Math.floor(range.getUpperBound() / unit)
                     - Math.ceil(range.getLowerBound() / unit) + 1);
+            int tickUnit = visibleTickCount/maxTicks;
             if(tickUnit != 0) {
                 super.setTickUnit(new NumberTickUnit(tickUnit));
             }

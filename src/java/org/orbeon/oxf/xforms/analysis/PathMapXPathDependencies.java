@@ -116,8 +116,6 @@ public class PathMapXPathDependencies implements XPathDependencies {
     protected Set<String> getModifiedPaths() {
         if (!modifiedPathsSet) {
 
-            assert modifiedNodes.isEmpty();
-
             if (modifiedNodes.size() != 0) {
                 for (final Map.Entry<String, Set<NodeInfo>> entry: modifiedNodes.entrySet()) {
                     for (final NodeInfo node: entry.getValue()) {

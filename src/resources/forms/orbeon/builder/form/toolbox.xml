@@ -22,12 +22,10 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-      xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"
 
       id="fb-toolbox">
 
     <xxforms:variable name="lang" select="xxforms:instance('fr-language-instance')"/>
-    <xxforms:variable name="is-pe" select="context:isPE()" as="xs:boolean"/>
 
     <xhtml:div class="fb-toolbox-inside">
 
@@ -356,7 +354,7 @@
                     <!-- Actions toolbox -->
                     <xhtml:div class="fb-tools">
                         <xhtml:div class="fb-tool">
-                            <xforms:group ref=".[$is-pe and xxforms:property('oxf.fb.menu.schema')]">
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/schema">
                                 <!-- Upload XML Schema -->
                                 <fr:button>
                                     <xforms:label>
@@ -368,21 +366,19 @@
                                     <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
                                 </fr:button>
                             </xforms:group>
-                            <xforms:group ref=".[xxforms:property('oxf.fb.menu.css')]">
-                                <!--<xhtml:div class="fb-tool">-->
-                                    <!-- Upload CSS -->
-                                    <fr:button>
-                                        <xforms:label>
-                                            <xhtml:img src="/apps/fr/style/images/silk/css.png" alt=""/>
-                                            <xhtml:span>
-                                                <xforms:output value="if (xxforms:bind('css-attachment-bind') = '') then $form-resources/upload-css/label else $form-resources/change-css/label"/>
-                                            </xhtml:span>
-                                        </xforms:label>
-                                        <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
-                                    </fr:button>
-                                <!--</xhtml:div>-->
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/css">
+                                <!-- Upload CSS -->
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/css.png" alt=""/>
+                                        <xhtml:span>
+                                            <xforms:output value="if (xxforms:bind('css-attachment-bind') = '') then $form-resources/upload-css/label else $form-resources/change-css/label"/>
+                                        </xhtml:span>
+                                    </xforms:label>
+                                    <xxforms:show ev:event="DOMActivate" dialog="fb-css-upload-dialog"/>
+                                </fr:button>
                             </xforms:group>
-                            <xforms:group ref=".[$is-pe and xxforms:property('oxf.fb.menu.pdf')]">
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/pdf">
                                 <!-- Upload PDF Template -->
                                 <fr:button>
                                     <xforms:label>
@@ -394,7 +390,7 @@
                                     <xxforms:show ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
                                 </fr:button>
                             </xforms:group>
-                            <xforms:group ref=".[xxforms:property('oxf.fb.menu.view-source')]">
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/view-source">
                                 <!-- Show XML -->
                                 <fr:button>
                                     <xforms:label>
@@ -404,7 +400,7 @@
                                     <xxforms:show ev:event="DOMActivate" dialog="fb-xml-dialog"/>
                                 </fr:button>
                             </xforms:group>
-                            <xforms:group ref=".[xxforms:property('oxf.fb.menu.edit-source')]">
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/edit-source">
                                 <!-- Edit Source -->
                                 <fr:button>
                                     <xforms:label>
@@ -418,7 +414,9 @@
                     </xhtml:div>
                 </xhtml:div>
             </xhtml:dd>
-            <xforms:group ref=".[$is-pe]">
+            <!-- To facilitate marking buttons read-only -->
+            <xxforms:variable name="trigger" select="instance('fb-metadata-instance')/toolbox/services-actions" as="element()"/>
+            <xforms:group>
                 <xhtml:dt class="a-m-t"><xforms:output value="$form-resources/services-actions/label"/></xhtml:dt>
                 <xhtml:dd class="a-m-d">
                     <xhtml:div class="bd">
@@ -432,7 +430,7 @@
                                     <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-service']">
                                         <xhtml:li>
                                             <xxforms:variable name="submission-name" select="substring-before(@id, '-submission')"/>
-                                            <xforms:trigger appearance="minimal">
+                                            <xforms:trigger ref="$trigger" appearance="minimal">
                                                 <xforms:label>
                                                     <xhtml:img src="/apps/fr/style/edit.gif" alt="{$form-resources/edit/label}" title="{$form-resources/edit/label}"/>
                                                 </xforms:label>
@@ -440,7 +438,7 @@
                                                     <xxforms:context name="submission-name" select="$submission-name"/>
                                                 </xxforms:show>
                                             </xforms:trigger>
-                                            <xforms:trigger appearance="minimal" id="fb-submission-remove">
+                                            <xforms:trigger ref="$trigger" appearance="minimal" id="fb-submission-remove">
                                                 <xforms:label>
                                                     <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/remove/label}" title="{$form-resources/remove/label}"/></xforms:label>
                                                 </xforms:label>
@@ -465,7 +463,7 @@
                                     </xforms:repeat>
                                 </xhtml:ul>
                                 <xforms:group>
-                                    <xforms:trigger appearance="minimal">
+                                    <xforms:trigger ref="$trigger" appearance="minimal">
                                         <xforms:label>
                                             <xhtml:img src="/apps/fr/style/images/silk/add.png" alt=""/>
                                             <xhtml:span><xforms:output value="$form-resources/add/label"/></xhtml:span>
@@ -485,7 +483,7 @@
                                     <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-database-service']">
                                         <xhtml:li>
                                             <xxforms:variable name="submission-name" select="substring-before(@id, '-submission')"/>
-                                            <xforms:trigger appearance="minimal">
+                                            <xforms:trigger ref="$trigger" appearance="minimal">
                                                 <xforms:label>
                                                     <xhtml:img src="/apps/fr/style/edit.gif" alt="{$form-resources/edit/label}" title="{$form-resources/edit/label}"/>
                                                 </xforms:label>
@@ -493,7 +491,7 @@
                                                     <xxforms:context name="submission-name" select="$submission-name"/>
                                                 </xxforms:show>
                                             </xforms:trigger>
-                                            <xforms:trigger appearance="minimal" id="fb-database-service-remove">
+                                            <xforms:trigger ref="$trigger" appearance="minimal" id="fb-database-service-remove">
                                                 <xforms:label>
                                                     <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/remove/label}" title="{$form-resources/remove/label}"/></xforms:label>
                                                 </xforms:label>
@@ -518,7 +516,7 @@
                                     </xforms:repeat>
                                 </xhtml:ul>
                                 <xforms:group>
-                                    <xforms:trigger appearance="minimal">
+                                    <xforms:trigger ref="$trigger" appearance="minimal">
                                         <xforms:label>
                                             <xhtml:img src="/apps/fr/style/images/silk/add.png" alt=""/>
                                             <xhtml:span><xforms:output value="$form-resources/add/label"/></xhtml:span>
@@ -538,7 +536,7 @@
                                     <xforms:repeat nodeset="$model/xforms:action[ends-with(@id, '-binding')]">
                                         <xhtml:li>
                                             <xxforms:variable name="binding-name" select="substring-before(@id, '-binding')"/>
-                                            <xforms:trigger appearance="minimal">
+                                            <xforms:trigger ref="$trigger" appearance="minimal">
                                                 <xforms:label>
                                                     <xhtml:img src="/apps/fr/style/edit.gif" alt="{$form-resources/edit/label}" title="{$form-resources/edit/label}"/>
                                                 </xforms:label>
@@ -546,7 +544,7 @@
                                                     <xxforms:context name="binding-name" select="$binding-name"/>
                                                 </xxforms:show>
                                             </xforms:trigger>
-                                            <xforms:trigger appearance="minimal" id="fb-binding-remove">
+                                            <xforms:trigger ref="$trigger" appearance="minimal" id="fb-binding-remove">
                                                 <xforms:label>
                                                     <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/remove/label}" title="{$form-resources/remove/label}"/></xforms:label>
                                                 </xforms:label>
@@ -570,7 +568,7 @@
                                     </xforms:repeat>
                                 </xhtml:ul>
                                 <xforms:group>
-                                    <xforms:trigger appearance="minimal">
+                                    <xforms:trigger ref="$trigger" appearance="minimal">
                                         <xforms:label>
                                             <xhtml:img src="/apps/fr/style/images/silk/add.png" alt=""/>
                                             <xhtml:span><xforms:output value="$form-resources/add/label"/></xhtml:span>

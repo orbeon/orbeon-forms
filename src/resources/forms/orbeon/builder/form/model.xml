@@ -24,6 +24,7 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:xbl="http://www.w3.org/ns/xbl"
+      xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"
 
       xxforms:external-events="show-fb-test-dialog"
       xxforms:noscript-support="false"
@@ -32,6 +33,8 @@
     <!-- Variable pointing to the current language -->
     <xxforms:variable name="fb-lang" select="instance('fb-language-instance')"/>
     <xxforms:variable name="form-resources" model="fr-resources-model" select="$fr-form-resources" as="element(resource)?"/>
+    
+    <xxforms:variable name="is-pe" select="context:isPE()" as="xs:boolean"/>
 
     <!-- Other variables -->
     <xxforms:variable name="model" select="xhtml:head/xforms:model[@id = 'fr-form-model']"/>
@@ -756,6 +759,15 @@
             <application-name/>
             <form-name/>
             <next-trigger/>
+
+            <toolbox>
+                <schema/>
+                <css/>
+                <pdf/>
+                <view-source/>
+                <edit-source/>
+                <services-actions/>
+            </toolbox>
         </metadata>
     </xforms:instance>
 
@@ -770,6 +782,12 @@
         <xforms:bind nodeset="form-name" required="true()" type="xs:NCName" constraint="normalize-space() = ."/>
         <!-- Triggers -->
         <xforms:bind nodeset="next-trigger" readonly=". = 'disabled'"/>
+        <xforms:bind nodeset="toolbox/schema" readonly="not($is-pe)" relevant="xxforms:property('oxf.fb.menu.schema')"/>
+        <xforms:bind nodeset="toolbox/css" relevant="xxforms:property('oxf.fb.menu.css')"/>
+        <xforms:bind nodeset="toolbox/pdf" readonly="not($is-pe)" relevant="xxforms:property('oxf.fb.menu.pdf')"/>
+        <xforms:bind nodeset="toolbox/view-source" relevant="xxforms:property('oxf.fb.menu.view-source')"/>
+        <xforms:bind nodeset="toolbox/edit-source" relevant="xxforms:property('oxf.fb.menu.edit-source')"/>
+        <xforms:bind nodeset="toolbox/services-actions" readonly="not($is-pe)"/>
     </xforms:bind>
 
 

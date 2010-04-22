@@ -103,6 +103,7 @@ public class XFormsSubmissionUtils {
                 private boolean checkInstanceData(Node node) {
                     // Check "valid" MIP
                     if (checkValid && !InstanceData.getValid(node)) return false;
+                    // TODO: should remove the code below, as required-but-empty is now included in notion of validity 
                     // Check "required" MIP
                     if (checkRequired) {
                         final boolean isRequired = InstanceData.getRequired(node);

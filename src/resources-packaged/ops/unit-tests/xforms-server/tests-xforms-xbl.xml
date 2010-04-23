@@ -3508,6 +3508,79 @@
             </xxf:event-response>
         </output>
     </test>
+
+    <test description="Non-relevant XBL control containing models and instances" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>42</instance>
+                        </xforms:instance>
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:message value="string-join(for $m in xxforms:list-models() return xxforms:list-instances($m), ', ')"/>
+                            <xforms:setvalue ref=".">43</xforms:setvalue>
+                            <xforms:refresh/>
+                            <xforms:message value="string-join(for $m in xxforms:list-models() return xxforms:list-instances($m), ', ')"/>
+                        </xforms:action>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:implementation>
+                                <xforms:model id="my-xbl-model">
+                                    <xforms:instance id="my-xbl-instance">
+                                        <instance/>
+                                    </xforms:instance>
+                                </xforms:model>
+                            </xbl:implementation>
+                            <xbl:template>
+                                <xforms:output id="my-output"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:foo id="my-foo1"/>
+                    <xforms:group ref="()" id="my-group1">
+                        <fr:foo id="my-foo2"/>
+                    </xforms:group>
+                    <xforms:group ref=".[. = '43']" id="my-group2">
+                        <fr:foo id="my-foo3"/>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>43</instance>
+                            </instance>
+                            <instance id="my-xbl-instance" model-id="my-foo1$my-xbl-model">
+                                <instance/>
+                            </instance>
+                            <instance id="my-xbl-instance" model-id="my-foo3$my-xbl-model">
+                                <instance/>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-group1" relevant="false"/>
+                        <xxf:control id="my-foo2$my-output" relevant="false"/>
+                    </xxf:control-values>
+                    <xxf:message level="modal">instance, my-foo1$my-xbl-instance</xxf:message>
+                    <xxf:message level="modal">instance, my-foo1$my-xbl-instance, my-foo3$my-xbl-instance</xxf:message>
+                </xxf:action>
+            </xxf:event-response>            
+        </output>
+    </test>
     <!--
 
     TODO: more XLB ids tests:

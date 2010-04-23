@@ -407,7 +407,7 @@
         <jar destfile="${form-runner.jar.file}" compress="false">
             <fileset dir="${resources.dir}">
                 <include name="apps/fr/**/*.*"/>
-                <exclude name="apps/fr/resource/oracle/**/*.*"/>
+                <exclude name="apps/fr/persistence/oracle/**/*.*"/>
                 <exclude name="apps/fr/alfresco/**/*.*"/>
                 <exclude name="apps/fr/print/print-pdf-template.xpl"/>
             </fileset>

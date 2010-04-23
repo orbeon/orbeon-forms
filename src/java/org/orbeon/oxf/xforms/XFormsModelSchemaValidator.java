@@ -364,11 +364,11 @@ public class XFormsModelSchemaValidator {
             final Datatype datatype = datatypeRef.types[0];
             if (datatype instanceof XSDatatype) {
                 final XSDatatype xsDatatype = (XSDatatype) datatype;
-                final String datatTypeURI = xsDatatype.getNamespaceUri();
-                final String datatTypeName = xsDatatype.getName();
+                final String dataTypeURI = xsDatatype.getNamespaceUri();
+                final String dataTypeName = xsDatatype.getName();
 
-                if (datatTypeName != null && !datatTypeName.equals(""))
-                    InstanceData.setType(element, XMLUtils.buildExplodedQName(datatTypeURI, datatTypeName));
+                if (dataTypeName != null && !dataTypeName.equals(""))
+                    InstanceData.setType(element, XMLUtils.buildExplodedQName(dataTypeURI, dataTypeName));
             }
         }
 

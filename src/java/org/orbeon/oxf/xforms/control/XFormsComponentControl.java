@@ -38,7 +38,7 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
         super(container, parent, element, name, effectiveId);
 
         // Create container and nested models if any
-        nestedContainer = container.createChildContainer(effectiveId);
+        nestedContainer = container.createChildContainer(this);
         nestedContainer.addAllModels();// NOTE: there may or may not be nested models
 
         // Make sure there is location data

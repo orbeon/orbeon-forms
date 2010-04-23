@@ -154,10 +154,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     public void updateEffectiveId(String effectiveId) {
         this.effectiveId = effectiveId;
 
-        // Update effective ids of all nested instances
-        for (XFormsInstance currentInstance: instances) {
-            // NOTE: we pass the new model id, not the instance id
-            currentInstance.updateModelEffectiveId(effectiveId);
+        // NOTE: We shouldn't even be called if the parent control is not relevant.
+        if (container.isRelevant()) {
+            // Update effective ids of all nested instances
+            for (final XFormsInstance currentInstance: instances) {
+                // NOTE: we pass the new model id, not the instance id
+                currentInstance.updateModelEffectiveId(effectiveId);
+            }
         }
     }
 
@@ -278,9 +281,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         final DocumentInfo documentInfo = nodeInfo.getDocumentRoot();
 
-        for (XFormsInstance currentInstance: instances) {
-            if (currentInstance.getDocumentInfo().isSameNodeInfo(documentInfo))
-                return currentInstance;
+        // NOTE: We shouldn't even be called if the parent control is not relevant.
+        if (container.isRelevant()) {
+            for (final XFormsInstance currentInstance: instances) {
+                if (currentInstance.getDocumentInfo().isSameNodeInfo(documentInfo))
+                    return currentInstance;
+            }
         }
 
         return null;
@@ -407,7 +413,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      * @param instancesElement  container element for serialized instances
      */
     public void serializeInstances(Element instancesElement) {
-        for (XFormsInstance currentInstance: instances) {
+        for (final XFormsInstance currentInstance: instances) {
 
             // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
 

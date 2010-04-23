@@ -1215,14 +1215,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
         }
 
         public void setMaxTicks(int maxTicks) {
-            double unit = getTickUnit().getSize();
-            Range range = getRange();
-            int visibleTickCount = (int)(Math.floor(range.getUpperBound() / unit)
-                    - Math.ceil(range.getLowerBound() / unit) + 1);
-            int tickUnit = visibleTickCount/maxTicks;
-            if(tickUnit != 0) {
-                super.setTickUnit(new NumberTickUnit(tickUnit));
-            }
+            super.setTickUnit(new NumberTickUnit(getRange().getLength() / maxTicks));
         }
     }
 }

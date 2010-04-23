@@ -83,22 +83,25 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     private List<XFormsModel> models = new ArrayList<XFormsModel>();
     private Map<String, XFormsModel> modelsMap = new HashMap<String, XFormsModel>();    // Map<String, XFormsModel> of effective model id to model
 
+    // Containing control if any
+    private final XFormsComponentControl componentControl;
+
     /**
-     * Create a new container child of the control with id effectiveId.
+     * Create a new container child of the given control
      *
-     * @param effectiveId   effective id of the containing control
-     * @return              new XFormsContainer
+     * @param componentControl  containing control
+     * @return                  new XFormsContainer
      */
-    public XBLContainer createChildContainer(String effectiveId) {
-        return new XBLContainer(effectiveId, this);
+    public XBLContainer createChildContainer(XFormsComponentControl componentControl) {
+        return new XBLContainer(componentControl, this);
     }
 
-    protected XBLContainer(String effectiveId, XBLContainer parentXBLContainer) {
-        this(XFormsUtils.getStaticIdFromId(effectiveId), effectiveId, XFormsUtils.getPrefixedId(effectiveId),
-                XFormsUtils.getPrefixedId(effectiveId) + XFormsConstants.COMPONENT_SEPARATOR, parentXBLContainer);
+    protected XBLContainer(XFormsComponentControl componentControl, XBLContainer parentXBLContainer) {
+        this(XFormsUtils.getStaticIdFromId(componentControl.getEffectiveId()), componentControl.getEffectiveId(), XFormsUtils.getPrefixedId(componentControl.getEffectiveId()),
+                XFormsUtils.getPrefixedId(componentControl.getEffectiveId()) + XFormsConstants.COMPONENT_SEPARATOR, parentXBLContainer, componentControl);
     }
 
-    protected XBLContainer(String staticId, String effectiveId, String prefixedId, String fullPrefix, XBLContainer parentXBLContainer) {
+    protected XBLContainer(String staticId, String effectiveId, String prefixedId, String fullPrefix, XBLContainer parentXBLContainer, XFormsComponentControl componentControl) {
         this.staticId = staticId;
         this.effectiveId = effectiveId;
         this.prefixedId = prefixedId;
@@ -121,6 +124,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
 
         this.contextStack = new XFormsContextStack(this);
+
+        this.componentControl = componentControl;
     }
 
     public XBLBindings.Scope getResolutionScope() {
@@ -161,7 +166,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         modelsMap.clear();
 
         // Update effective ids of all nested models
-        for (XFormsModel currentModel: models) {
+        for (final XFormsModel currentModel: models) {
             // E.g. foo$bar$my-model.1-2 => foo$bar$my-model.1-3
             final String newModelEffectiveId = XFormsUtils.getPrefixedId(currentModel.getEffectiveId()) + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
             currentModel.updateEffectiveId(newModelEffectiveId);
@@ -631,19 +636,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      *
      * @return  true iif container is relevant
      */
-    private boolean isRelevant() {
-        final XFormsComponentControl componentControl = getComponentControl();
+    public boolean isRelevant() {
         // componentControl will be null if we are at the top-level
         return (componentControl == null) || componentControl.isRelevant();
-    }
-
-    /**
-     * Find the enclosing component control if any.
-     *
-     * @return enclosing component control or null if we are a top-level container
-     */
-    private XFormsComponentControl getComponentControl() {
-        return (XFormsComponentControl) containingDocument.getControls().getObjectByEffectiveId(effectiveId);
     }
 
     public void restoreModelsState(PropertyContext propertyContext) {

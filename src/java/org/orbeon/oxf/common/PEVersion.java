@@ -33,6 +33,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 import static org.orbeon.oxf.processor.ProcessorImpl.OUTPUT_DATA;
 
@@ -95,6 +96,7 @@ public class PEVersion extends Version {
         final String organization = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/organization");
         final String email = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/email");
         final String issued = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/issued");
+        final String version = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/version");
         final Date expiration;
         try {
             final String expireStr = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/expiration");
@@ -108,6 +110,16 @@ public class PEVersion extends Version {
             throw new OXFException(e);
         }
 
+        // Check version
+        if (StringUtils.isNotBlank(version)) {
+            if (isVersionExpired(getVersionNumber(), version)) {
+                final String message = "License version doesn't match. License version is: " + version + ", Orbeon Forms version is: " + getVersionNumber();
+                logger.error(message);
+                throw new OXFException(message);
+            }
+        }
+
+        // Check expiration
         if (expiration != null) {
             if (new Date().after(expiration)) {
                 final String message = "License has expired on " + DateFormat.getDateInstance().format(expiration);
@@ -116,7 +128,28 @@ public class PEVersion extends Version {
             }
         }
 
-        return new LicenseInfo(licensor, licensee, organization, email, issued, expiration);
+        return new LicenseInfo(licensor, licensee, organization, email, issued, version, expiration);
+    }
+
+    public static boolean isVersionExpired(String currentVersion, String licenseVersion) {
+        final int[] currentVersionParts = parseVersionNumber(currentVersion);
+        final int[] licenseVersionParts = parseVersionNumber(licenseVersion);
+
+        return currentVersionParts == null
+                || currentVersionParts[0] > licenseVersionParts[0]
+                || (currentVersionParts[0] == licenseVersionParts[0] && currentVersionParts[1] > licenseVersionParts[1]);
+    }
+
+    private static int[] parseVersionNumber(String versionString) {
+        final StringTokenizer st = new StringTokenizer(versionString, ".");
+        if (st.hasMoreTokens()) {
+            final int major = Integer.parseInt(st.nextToken());
+            if (st.hasMoreTokens()) {
+                final int minor = Integer.parseInt(st.nextToken());
+                return new int[] { major, minor };
+            }
+        }
+        return null;
     }
 
     private static class LicenseInfo {
@@ -125,21 +158,24 @@ public class PEVersion extends Version {
         public final String organization;
         public final String email;
         public final String issued;
+        public final String version;
         public final Date expiration;
 
-        private LicenseInfo(String licensor, String licensee, String organization, String email, String issued, Date expiration) {
+        private LicenseInfo(String licensor, String licensee, String organization, String email, String issued, String version, Date expiration) {
             this.licensor = licensor;
             this.licensee = licensee;
             this.organization = organization;
             this.email = email;
             this.issued = issued;
+            this.version = version;
             this.expiration = expiration;
         }
 
         @Override
         public String toString() {
             final String expires = (expiration != null) ? " and expires on " + DateFormat.getDateInstance().format(expiration) : "";
-            return licensee + " / " + organization + " / " + email + expires;
+            final String version = (this.version != null) ? " for version " + this.version : "";
+            return licensee + " / " + organization + " / " + email + version + expires;
         }
     }
 

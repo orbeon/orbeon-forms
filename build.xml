@@ -127,17 +127,22 @@
 
         <tstamp/>
         <!--
-            Version number examples:
+            Past version numbers:
 
             dev-3.7.1       => released dev version
             dev-post-3.7.1  => post-release nightly build
-            beta1-3.8.0     => beta for 3.8.0
-            rc1-3.8.0       => release candidate for 3.8.0
+
+            Future version numbers:
+
+            3.8.0.beta      => beta for 3.8.0
+            3.8.0.rc1       => release candidate for 3.8.0
             3.8.0           => final 3.8.0
 
             Full release number example:
 
             3.8.0.201004010558 => final 3.8.0
+
+            Suffix CE or PE is separate from the version number.
          -->
         <property name="version.number" value="dev-post-3.7.1"/>
         <!-- Can be overridden on command-line to provide different suffix -->

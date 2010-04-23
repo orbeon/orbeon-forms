@@ -29,4 +29,40 @@ public class VersionTest extends TestCase {
             assertFalse(Version.instance().isPEFeatureEnabled(true, "foobar"));
         }
     }
+    public void testVersionExpired() {
+        assertFalse(PEVersion.isVersionExpired("3.8", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("3.8.1", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("3.8.0", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("3.8.2", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("3.8.10", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("3.8.foo.bar", "3.8"));
+
+        assertFalse(PEVersion.isVersionExpired("3.7", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("3.7.1", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("3.7.0", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("3.7.2", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("3.7.10", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("3.7.foo.bar", "3.8"));
+
+        assertFalse(PEVersion.isVersionExpired("2.0", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("2.0.1", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("2.0.0", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("2.0.2", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("2.0.10", "3.8"));
+        assertFalse(PEVersion.isVersionExpired("2.0.foo.bar", "3.8"));
+
+        assertTrue(PEVersion.isVersionExpired("3.9", "3.8"));
+        assertTrue(PEVersion.isVersionExpired("3.9.1", "3.8"));
+        assertTrue(PEVersion.isVersionExpired("3.9.0", "3.8"));
+        assertTrue(PEVersion.isVersionExpired("3.9.2", "3.8"));
+        assertTrue(PEVersion.isVersionExpired("3.9.10", "3.8"));
+        assertTrue(PEVersion.isVersionExpired("3.9.foo.bar", "3.8"));
+
+        assertTrue(PEVersion.isVersionExpired("4.0", "3.8"));
+        assertTrue(PEVersion.isVersionExpired("4.0.1", "3.8"));
+        assertTrue(PEVersion.isVersionExpired("4.0.0", "3.8"));
+        assertTrue(PEVersion.isVersionExpired("4.0.2", "3.8"));
+        assertTrue(PEVersion.isVersionExpired("4.0.10", "3.8"));
+        assertTrue(PEVersion.isVersionExpired("4.0.foo.bar", "3.8"));
+    }
 }

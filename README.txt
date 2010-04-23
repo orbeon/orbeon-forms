@@ -4,7 +4,7 @@
 
 =====================================================
 
-Last updated for Orbeon Forms 3.8, February 2010
+Last updated for Orbeon Forms 3.8, April 2010
 
 This README.TXT file covers the following topics:
 

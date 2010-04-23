@@ -346,13 +346,12 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                     // Execute transformation
                     try {
-                        if (XSLTTransformer.this.getConnectedInputs().size() > 3) {
-                            // When other inputs are connected, they can be read
-                            // with the doc() function in XSLT. Reading those
-                            // documents might happen before the whole input
-                            // document is read, which is not compatible with
-                            // our processing model. So in this case, we first
-                            // read the data in a SAX store.
+                        if (XSLTTransformer.this.getConnectedInputs().size() > 4) {
+                            // The default inputs are data, config, transformer, and attributes. When other inputs
+                            // (i.e. more than 4) are connected, they can be read with the doc() function in XSLT.
+                            // Reading those documents might happen before the whole input document is read, which
+                            // is not compatible with our processing model. So in this case, we first read the
+                            // data in a SAX store.
                             final SAXStore dataSaxStore = new SAXStore();
                             readInputAsSAX(pipelineContext, INPUT_DATA, dataSaxStore);
                             dataSaxStore.replay(transformerHandler);
@@ -832,7 +831,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             ExpressionTool.make(xpathString, dummySaxonXPathContext, 0, -1, 0, false);
 
                             // NOTE: *If* we wanted to use Saxon to parse the whole Stylesheet:
-                            
+
                             // MK: "In Saxon 9.0 there's a method explain() on PreparedStylesheet that writes an XML
                             // representation of the compiled stylesheet to a user-supplied Receiver as a sequence of
                             // events. You could call this with your own Receiver and just watch for the events

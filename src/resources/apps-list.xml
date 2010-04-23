@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -35,7 +35,6 @@
         <application id="xforms-translate" label="Instant Translation"/>
         <application id="xforms-calculator" label="Calculator"/>
         <application id="xforms-flickr-resize" label="Flickr Resize"/>
-        <application id="xforms-google-suggests" label="Google Suggests"/>
         <application id="xforms-wizard-switch" label="Wizard w/ Switch"/>
     </section>
     <section label="Sandboxes">

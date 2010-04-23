@@ -1320,4 +1320,52 @@
             </xxf:event-response>
         </output>
     </test>
+
+    <test description="Output classes for custom types" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:foo="http://orbeon.org/oxf/xml/foo">
+                <xhtml:head>
+                    <xforms:model id="model">
+
+                        <xs:schema targetNamespace="http://orbeon.org/oxf/xml/foo" attributeFormDefault="unqualified" elementFormDefault="qualified">
+                            <xs:element name="myElement" type="foo:myType"/>
+                            <xs:complexType name="myType">
+                                <xs:simpleContent>
+                                    <xs:restriction base="xs:string">
+                                        <xs:minLength value="1"/>
+                                    </xs:restriction>
+                                </xs:simpleContent>
+                            </xs:complexType>
+                        </xs:schema>
+
+                        <xforms:instance id="instance">
+                            <instance>
+                                <!-- Will be picked by LAX validation -->
+                                <foo:myElement>cA</foo:myElement>
+                                <!-- Explicitly associated with type -->
+                                <bar>CA</bar>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:bind id="bind1" nodeset="bar" type="foo:myType"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <!-- NOTE: A possible MSV bug: it doesn't return the type name in this case. So we don't get the right class name on my-input1 -->
+                    <xforms:input ref="foo:myElement" id="my-input1"/>
+                    <xforms:input ref="bar" id="my-input2"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:span id="my-input1" class="xforms-control xforms-input">
+                    <xhtml:input id="my-input1$xforms-input-1" type="text" name="my-input1$xforms-input-1" value="cA" class="xforms-input-input"/>
+                </xhtml:span>
+                <xhtml:span id="my-input2" class="xforms-control xforms-input xforms-type-custom-myType">
+                    <xhtml:input id="my-input2$xforms-input-1" type="text" name="my-input2$xforms-input-1" value="CA" class="xforms-input-input"/>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
 </group>

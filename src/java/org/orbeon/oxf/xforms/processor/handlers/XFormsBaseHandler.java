@@ -165,6 +165,17 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
                         sb.append("xforms-type-");
                         sb.append(typeName);
+                    } else {
+                        // Output custom type class
+                       final String customTypeName = singleNodeControl.getTypeLocalName();
+                       if (customTypeName != null) {
+                           // Control is bound to a custom schema type
+                           if (sb.length() > 0)
+                               sb.append(' ');
+
+                           sb.append("xforms-type-custom-");
+                           sb.append(customTypeName);
+                       }
                     }
                 }
             } else if (!handlerContext.isTemplate()) {

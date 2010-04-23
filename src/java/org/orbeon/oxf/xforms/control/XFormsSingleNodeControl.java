@@ -242,6 +242,21 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         }
     }
 
+    /**
+     * Convenience method to return the local name of the XML Schema type.
+     *
+     * @return the local name of the type, or null if not found
+     */
+    public String getTypeLocalName() {
+        final String type = getType();
+
+        if (type != null) {
+            return type.substring(type.indexOf('}') + 1);
+        } else {
+            return null;
+        }
+    }     
+
     public boolean isValid() {
         return valid;
     }

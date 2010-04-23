@@ -63,6 +63,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
         this.processorOutput = processorOutput;
     }
 
+    @Override
     public Source resolve(String href, String base) throws TransformerException {
         // Use global definition for headers to forward
         return resolve(href, base, null, null, Connection.getForwardHeaders());

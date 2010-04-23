@@ -610,18 +610,40 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      * @param instancesElement  container element
      */
     protected void serializeInstances(Element instancesElement) {
+        // Only serialize if we are relevant
+        if (isRelevant()) {
+            // Serialize this container's model's
+            for (final XFormsModel currentModel: models) {
+                currentModel.serializeInstances(instancesElement);
+            }
 
-        // Serialize this container's model's
-        for (XFormsModel currentModel: models) {
-            currentModel.serializeInstances(instancesElement);
-        }
-
-        // Recurse into children containers
-        if (childrenXBLContainers != null) {
-            for (XBLContainer currentContainer: childrenXBLContainers.values()) {
-                currentContainer.serializeInstances(instancesElement);
+            // Recurse into children containers
+            if (childrenXBLContainers != null) {
+                for (final XBLContainer currentContainer: childrenXBLContainers.values()) {
+                    currentContainer.serializeInstances(instancesElement);
+                }
             }
         }
+    }
+
+    /**
+     * Whether this container is relevant, i.e. either is a top-level container OR is within a relevant container control.
+     *
+     * @return  true iif container is relevant
+     */
+    private boolean isRelevant() {
+        final XFormsComponentControl componentControl = getComponentControl();
+        // componentControl will be null if we are at the top-level
+        return (componentControl == null) || componentControl.isRelevant();
+    }
+
+    /**
+     * Find the enclosing component control if any.
+     *
+     * @return enclosing component control or null if we are a top-level container
+     */
+    private XFormsComponentControl getComponentControl() {
+        return (XFormsComponentControl) containingDocument.getControls().getObjectByEffectiveId(effectiveId);
     }
 
     public void restoreModelsState(PropertyContext propertyContext) {

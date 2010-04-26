@@ -62,10 +62,10 @@
                                  constraint="normalize-space()"/>
                     <xforms:bind id="type-bind" nodeset="type" name="type" type="xs:string" required="true()"
                                  constraint="normalize-space()"
-                                 relevant="xxforms:is-user-in-role('orbeon')"/>
+                                 readonly="not(xxforms:is-user-in-role('orbeon'))"/>
                     <xforms:bind id="version-bind" nodeset="version" name="version" type="xforms:string"
                                  constraint="normalize-space()"
-                                 relevant="xxforms:is-user-in-role('orbeon')"/>
+                                 readonly="not(xxforms:is-user-in-role('orbeon'))"/>
                 </xforms:bind>
             </xforms:bind>
 

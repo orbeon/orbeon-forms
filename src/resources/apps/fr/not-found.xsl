@@ -13,62 +13,61 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <?oxf-serializer status-code="404"?>
-<xhtml:html xsl:version="2.0"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+<xh:html xsl:version="2.0"
+         xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <xsl:variable name="has-version" select="pipeline:property('oxf.fr.version.*.*')" as="xs:boolean?"/>
-    <xsl:variable name="default-logo-uri" select="pipeline:property('oxf.fr.default-logo.uri.*.*')" as="xs:string?"/>
     <xsl:variable name="css-uri" select="tokenize(normalize-space(pipeline:property('oxf.fr.css.uri.*.*')), '\s+')" as="xs:string*"/>
 
-    <xhtml:head>
-        <xhtml:title>Not Found</xhtml:title>
+    <xh:head>
+        <xh:title>Not Found</xh:title>
 
         <!-- Form Runner CSS stylesheets -->
         <xsl:for-each select="$css-uri">
-            <xhtml:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
+            <xh:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
         </xsl:for-each>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:div id="fr-view">
-            <xhtml:div id="doc4">
-                <xhtml:div class="fr-header">
+    </xh:head>
+    <xh:body>
+        <xh:div id="fr-view">
+            <xh:div id="doc4">
+                <xh:div class="fr-header">
                     <!-- Logo -->
-                    <xhtml:div class="fr-logo">
-                        <xhtml:img src="{$default-logo-uri}" alt="Logo"/>
-                    </xhtml:div>
-                </xhtml:div>
-                <xhtml:div id="hd" class="fr-shadow">&#160;</xhtml:div>
-                <xhtml:div id="bd" class="fr-container">
-                    <xhtml:div id="yui-main">
-                        <xhtml:div class="yui-b">
-                            <xhtml:div class="yui-g fr-top">
-                                <xhtml:h1 class="fr-form-title">
+                    <xh:div class="fr-logo">
+                        <xh:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-30.png" alt="Logo"/>
+                    </xh:div>
+                </xh:div>
+                <xh:div id="hd" class="fr-shadow">&#160;</xh:div>
+                <xh:div id="bd" class="fr-container">
+                    <xh:div id="yui-main">
+                        <xh:div class="yui-b">
+                            <xh:div class="yui-g fr-top">
+                                <xh:h1 class="fr-form-title">
                                     Not Found
-                                </xhtml:h1>
-                            </xhtml:div>
-                            <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
-                            <xhtml:div class="yui-g fr-body">
-                                <xhtml:div class="fr-not-found">
-                                    <xhtml:a name="fr-form"/>
-                                    <xhtml:p>
+                                </xh:h1>
+                            </xh:div>
+                            <xh:div class="yui-g fr-separator">&#160;</xh:div>
+                            <xh:div class="yui-g fr-body">
+                                <xh:div class="fr-error-message">
+                                    <xh:a name="fr-form"/>
+                                    <xh:p>
                                         Oops, the page requested was not found!
-                                    </xhtml:p>
-                                </xhtml:div>
-                            </xhtml:div>
-                            <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
-                        </xhtml:div>
-                    </xhtml:div>
-                </xhtml:div>
-                <xhtml:div id="ft" class="fr-footer">
+                                    </xh:p>
+                                </xh:div>
+                            </xh:div>
+                            <xh:div class="yui-g fr-separator">&#160;</xh:div>
+                        </xh:div>
+                    </xh:div>
+                </xh:div>
+                <xh:div id="ft" class="fr-footer">
                     <xsl:if test="not($has-version = false())">
                         <xsl:variable xmlns:version="java:org.orbeon.oxf.common.Version" name="orbeon-forms-version" select="version:getVersionString()" as="xs:string"/>
-                        <xhtml:div class="fr-orbeon-version"><xsl:value-of select="$orbeon-forms-version"/></xhtml:div>
+                        <xh:div class="fr-orbeon-version"><xsl:value-of select="$orbeon-forms-version"/></xh:div>
                     </xsl:if>
-                </xhtml:div>
-            </xhtml:div>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+                </xh:div>
+            </xh:div>
+        </xh:div>
+    </xh:body>
+</xh:html>

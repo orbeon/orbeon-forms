@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -27,7 +27,10 @@
                 </p>
                 <ul>
                     <li>
-                        With Firefox and Safari: hold down the <code>shift</code> key and click the Reload button in your browser toolbar.
+                        With Firefox: hold down the <code>shift</code> key and click the Reload button in your browser toolbar.
+                    </li>
+                    <li>
+                        With Safari and Chrome: click the Reload button in your browser toolbar.
                     </li>
                     <li>
                         With Internet Explorer: hold down the <code>control</code> key and click the Reload button in your browser toolbar.

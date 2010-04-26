@@ -116,7 +116,10 @@
                             If the above does not work, try reloading the page:
                             <ul>
                                 <li>
-                                    With Firefox and Safari: hold down the <code>shift</code> key and click the Reload button in your browser toolbar.
+                                    With Firefox: hold down the <code>shift</code> key and click the Reload button in your browser toolbar.
+                                </li>
+                                <li>
+                                    With Safari and Chrome: click the Reload button in your browser toolbar.
                                 </li>
                                 <li>
                                     With Internet Explorer: hold down the <code>control</code> key and click the Reload button in your browser toolbar.

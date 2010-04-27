@@ -26,6 +26,22 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <xhtml:head>
         <xhtml:title>Your Orbeon Forms PE Trial License</xhtml:title>
+
+        <!--
+        <xhtml:link rel="stylesheet" href="/ops/syntaxhighlighter/styles/shCore.css" type="text/css" media="all"/>
+        <xhtml:link rel="stylesheet" href="/ops/syntaxhighlighter/styles/shThemeDefault.css" type="text/css" media="all"/>
+        <xhtml:script type="text/javascript" src="/ops/syntaxhighlighter/scripts/shCore.js"/>
+        <xhtml:script type="text/javascript" src="/ops/syntaxhighlighter/scripts/shBrushXml.js"/>
+        <xhtml:script type="text/javascript">
+            SyntaxHighlighter.all();
+        </xhtml:script>
+        -->
+        <xhtml:style type="text/css">
+            #fr-form-group .xforms-label { font-weight: bold }
+            .fr-status-icons { display: none }
+            .fr-section-title { display: none }
+        </xhtml:style>
+
         <xforms:model id="fr-form-model">
 
 
@@ -399,7 +415,7 @@
                     <fr:grid columns="1">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:textarea bind="license-data-bind" id="license-data-control">
+                                <xforms:textarea bind="license-data-bind" id="license-data-control" class="brush: xml">
                                     <xforms:label ref="$form-resources/license-data/label"/>
                                     <xforms:hint ref="$form-resources/license-data/hint"/>
                                     <xforms:help ref="$form-resources/license-data/help"/>

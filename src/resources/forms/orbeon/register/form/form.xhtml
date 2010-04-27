@@ -26,8 +26,17 @@
             xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <xhtml:head>
         <xhtml:title>Orbeon Forms PE Trial License</xhtml:title>
+        <xhtml:style type="text/css">
+            #fr-form-group .xforms-label { font-weight: bold }
+            .fr-status-icons .fr-data-icon { display: none }
+            #license-section-group .xforms-output { background-color: yellow }
+            .fr-grid .xforms-input input, .xforms-layout-nospan .fr-grid .xforms-select1-appearance-minimal { width: 25em }
+            .fr-section-title { display: none }
+            /*#doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content { width: 25em }*/
+        </xhtml:style>
         <xforms:model id="fr-form-model">
 
+            <xforms:setfocus ev:event="xforms-ready" control="licensee-control"/>
 
             <xforms:instance id="fr-form-instance">
                 <form>
@@ -40,7 +49,6 @@
                         <email/>
                         <issued/>
                         <expiration/>
-                        <instructions>After you have entered your information above, press the "Send" button. You will then receive your trial license.</instructions>
                     </license>
                 </form>
             </xforms:instance>
@@ -55,7 +63,6 @@
                     <xforms:bind id="email-bind" nodeset="email" name="email" type="xforms:email"
                                  required="true()"
                                  constraint="normalize-space()"/>
-                    <xforms:bind id="instructions-bind" nodeset="instructions" name="instructions"/>
                     <xforms:bind id="organization-bind" nodeset="organization" name="organization"
                                  type="xs:string"
                                  required="true()"
@@ -95,19 +102,13 @@
             <xforms:instance id="fr-form-resources" xxforms:readonly="false">
                 <resources>
                     <resource xml:lang="en">
-                        <instructions>
-                            <label>What next?</label>
-                            <hint/>
-                            <help/>
-                            <alert/>
-                        </instructions>
                         <license>
                             <label>Personal Information</label>
                             <help/>
                         </license>
                         <licensee>
-                            <label>Name</label>
-                            <hint>Person name appearing in your license</hint>
+                            <label>Your Name</label>
+                            <hint>Name of the person appearing in your license</hint>
                             <help/>
                             <alert>Please enter a name</alert>
                         </licensee>
@@ -126,13 +127,13 @@
                             </item>
                         </type>
                         <organization>
-                            <label>Organization</label>
-                            <hint>Organization name appearing in your license</hint>
+                            <label>Your Organization</label>
+                            <hint>Name of the organization appearing in your license</hint>
                             <help/>
                             <alert>Please enter an organization name</alert>
                         </organization>
                         <version>
-                            <label>Version</label>
+                            <label>Orbeon Forms Version</label>
                             <hint/>
                             <help/>
                             <alert/>
@@ -143,7 +144,7 @@
                         </version>
 
                         <email>
-                            <label>Email Address</label>
+                            <label>Your Email Address</label>
                             <hint>Email address for confirmation (we don't share it!)</hint>
                             <help/>
                             <alert>Please enter an email address</alert>
@@ -244,24 +245,6 @@
                                     <xforms:help ref="$form-resources/email/help"/>
                                     <xforms:alert ref="$form-resources/email/alert"/>
                                 </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </fr:grid>
-                    <fr:grid columns="2">
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:output xmlns:xbl="http://www.w3.org/ns/xbl"
-                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                               id="instructions-control"
-                                               bind="instructions-bind">
-                                    <xforms:label ref="$form-resources/instructions/label"/>
-                                    <xforms:help ref="$form-resources/instructions/help"/>
-
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:output>
                             </xhtml:td>
                             <xhtml:td>
                             </xhtml:td>

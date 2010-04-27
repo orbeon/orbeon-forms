@@ -50,22 +50,27 @@
                                     <xsl:apply-templates select="fr:header/node()"/>
                                 </xforms:group>
                             </xsl:when>
-                            <xsl:otherwise>
+                            <xsl:when test="$mode = 'view'">
+                                <!-- View header -->
+                                <xsl:variable name="default-objects" as="element()+">
+                                    <fr:logo/>
+                                </xsl:variable>
+
+                                <xsl:apply-templates select="$default-objects"/>
+                            </xsl:when>
+                            <xsl:when test="not($mode = ('email'))">
                                 <!-- Standard header -->
-                                <xsl:if test="not($mode = ('view', 'email'))">
+                                <xsl:variable name="default-objects" as="element()+">
+                                    <fr:logo/>
+                                    <fr:language-selector/>
+                                    <fr:noscript-selector/>
+                                    <fr:form-builder-doc/>
+                                    <fr:goto-content/>
+                                </xsl:variable>
 
-                                    <xsl:variable name="default-objects" as="element()+">
-                                        <fr:logo/>
-                                        <fr:language-selector/>
-                                        <fr:noscript-selector/>
-                                        <fr:form-builder-doc/>
-                                        <fr:goto-content/>
-                                    </xsl:variable>
-
-                                    <xsl:apply-templates select="$default-objects"/>
-
-                                </xsl:if>
-                            </xsl:otherwise>
+                                <xsl:apply-templates select="$default-objects"/>
+                            </xsl:when>
+                            <xsl:otherwise/>
                         </xsl:choose>
                     </xhtml:div>
                     <xhtml:div id="hd" class="fr-shadow">&#160;</xhtml:div>
@@ -463,12 +468,12 @@
                     <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/exclamation.png" alt="{{$fr-resources/errors/some}}" title="{{$fr-resources/errors/some}}"/>-->
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/warning_16.png" alt="{{$message}}" title="{{$message}}"/>
                 </xforms:group>
-                <xforms:group model="fr-error-summary-model" ref=".[valid = 'true']">
+                <xforms:group model="fr-error-summary-model" ref=".[valid = 'true']" class="fr-validity-icon">
                     <!-- Form is valid -->
                     <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/tick.png" alt="{{$fr-resources/errors/none}}" title="{{$fr-resources/errors/none}}"/>-->
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/tick_16.png" alt="{{$fr-resources/errors/none}}" title="{{$fr-resources/errors/none}}"/>
                 </xforms:group>
-                <xforms:group model="fr-persistence-model" ref="instance('fr-persistence-instance')[data-status = 'dirty']">
+                <xforms:group model="fr-persistence-model" ref="instance('fr-persistence-instance')[data-status = 'dirty']" class="fr-data-icon">
                     <!-- Data is dirty -->
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt="{{$fr-resources/errors/unsaved}}" title="{{$fr-resources/errors/unsaved}}"/>
                     <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/save_16.png" alt="{{$fr-resources/errors/unsaved}}" title="{{$fr-resources/errors/unsaved}}"/>-->

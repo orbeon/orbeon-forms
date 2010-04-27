@@ -52,8 +52,8 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 var thisTagElement = thisTagElements[thisTagElementIndex];
                 if (YAHOO.util.Dom.getAncestorByClassName(thisTagElement, "xforms-repeat-template") == null)
                     formElements.push(thisTagElement);
-            };
-        };
+            }
+        }
         return formElements;
     },
 
@@ -62,7 +62,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
             var element = elements[elementIndex];
             YAHOO.util.Assert.areEqual(disabled, element.disabled, "element " + element.id + " supposed to have disabled = " + disabled);
-        };
+        }
     },
 
     testReadonly: function() {
@@ -145,7 +145,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     },
 
     testOutOfRange: function() {
-        function valueOfRadio() { return ORBEON.xforms.Document.getValue("flavor-select1-full" + XFORMS_SEPARATOR_1 + "1") };
+        function valueOfRadio() { return ORBEON.xforms.Document.getValue("flavor-select1-full" + XFORMS_SEPARATOR_1 + "1") }
 
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
            YAHOO.util.UserAction.click("set-out-of-range" + XFORMS_SEPARATOR_1 + "1");
@@ -232,7 +232,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     testTwoDigitClose: function() { this.checkDateConversion ("02", "2002"); },
     testTwoDigitTwentyFirst: function() { this.checkDateConversion ("40", "2040"); },
     testTwoDigitTwentieth: function() { this.checkDateConversion ("85", "1985"); },
-    
+
     testDateOverflow: function() {
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             // Enter invalid date

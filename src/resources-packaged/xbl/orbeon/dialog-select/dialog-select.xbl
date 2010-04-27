@@ -219,17 +219,6 @@
                             </xhtml:table>
 
                             <xhtml:div class="fr-dialog-buttons">
-                                <!-- Cancel button -->
-                                <fr:button>
-                                    <xforms:label>
-                                        <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
-                                        <xhtml:span><xforms:output value="$resources/cancel"/></xhtml:span>
-                                    </xforms:label>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <!-- Just close -->
-                                        <xxforms:hide dialog="dialog"/>
-                                    </xforms:action>
-                                </fr:button>
                                 <!-- Confirm button -->
                                 <fr:button>
                                     <xforms:label>
@@ -241,6 +230,17 @@
                                         <xforms:setvalue ref="$binding"
                                                          value="for $selected-itemset in instance()/selected-itemset
                                                                 return string-join($items/value/string()[. = tokenize($selected-itemset, '\s+')], ' ')"/>
+                                        <xxforms:hide dialog="dialog"/>
+                                    </xforms:action>
+                                </fr:button>
+                                <!-- Cancel button -->
+                                <fr:button>
+                                    <xforms:label>
+                                        <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
+                                        <xhtml:span><xforms:output value="$resources/cancel"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <!-- Just close -->
                                         <xxforms:hide dialog="dialog"/>
                                     </xforms:action>
                                 </fr:button>

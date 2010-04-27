@@ -50,9 +50,15 @@
                     <output-file>
                         <uri>file:///tmp/dummy</uri>
                     </output-file>
+                    <type-change>
+                        <input/>
+                        <type>date</type>
+                    </type-change>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="input | textarea | secret | input-boolean | date | time | date-time" constraint="false()"/>
+            <xforms:bind nodeset="type-change[type = 'date']/input" type="xs:date"/>
+            <xforms:bind nodeset="type-change[type = 'float']/input" type="xs:float"/>
             <xforms:instance id="flavors">
                 <flavors>
                     <flavor label="Fruits" color="red">
@@ -307,6 +313,29 @@
                         <xforms:output ref="uri" appearance="xxforms:download" id="output-file-value" xxforms:target="gaga">
                             <xforms:label>Download file</xforms:label>
                         </xforms:output>
+                    </xhtml:p>
+                </xforms:group>
+
+                <!-- Type change -->
+                <xhtml:h2>Type change</xhtml:h2>
+                <xforms:group ref="type-change">
+                    <xhtml:p>
+                        <xforms:input ref="input" id="type-change-input"/>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:trigger appearance="minimal" id="set-type-reset">
+                            <xforms:label>Reset type</xforms:label>
+                            <xforms:setvalue ev:event="DOMActivate" ref="type"/>
+                        </xforms:trigger> |
+                        <xforms:trigger appearance="minimal" id="set-type-date">
+                            <xforms:label>Set to date</xforms:label>
+                            <xforms:setvalue ev:event="DOMActivate" ref="type">date</xforms:setvalue>
+                        </xforms:trigger> |
+                        <xforms:trigger appearance="minimal" id="set-type-float">
+                            <xforms:label>Set to float</xforms:label>
+                            <xforms:setvalue ev:event="DOMActivate" ref="input">2</xforms:setvalue>
+                            <xforms:setvalue ev:event="DOMActivate" ref="type">float</xforms:setvalue>
+                        </xforms:trigger>
                     </xhtml:p>
                 </xforms:group>
             </xforms:repeat>

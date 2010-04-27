@@ -3211,11 +3211,10 @@ ORBEON.xforms.Events = {
                 // NOTE: control may be null if we have <div for="">. Using target.getAttribute("for") returns a proper
                 // for, but then tooltips sometimes fail later with Ajax portlets in particular. So for now, just don't
                 // do anything if there is no control found.
-
                 var control = ORBEON.xforms.Controls.getControlForLHHA(target, "alert");
                 if (control) {
                     // The 'for' can point to a form field which is inside the element representing the control
-                    if (! YAHOO.util.Dom.hasClass(control, "xforms-control"))
+                    if (! (YAHOO.util.Dom.hasClass(control, "xforms-control") || YAHOO.util.Dom.hasClass(control, "xforms-group")))
                         control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
                     if (control) {
                         var message = ORBEON.xforms.Controls.getAlertMessage(control);

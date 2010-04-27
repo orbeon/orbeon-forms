@@ -15,8 +15,8 @@ package org.orbeon.oxf.util;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.orbeon.oxf.common.OXFException;
 
-import java.io.PrintWriter;
 import java.util.Stack;
 
 /**
@@ -140,7 +140,7 @@ public class IndentedLogger {
     }
 
     public void logDebug(String type, String message, Throwable throwable) {
-        log(Level.DEBUG, indentation.indentation, type, message, "throwable", throwableToString(throwable));
+        log(Level.DEBUG, indentation.indentation, type, message, "throwable", OXFException.throwableToString(throwable));
     }
 
     public static void logWarningStatic(Logger logger, String prefix, String type, String message, String... parameters) {
@@ -148,7 +148,7 @@ public class IndentedLogger {
     }
 
     public static void logErrorStatic(Logger logger, String prefix, String type, String message, Throwable throwable) {
-        log(logger, Level.ERROR, 0, prefix, type, message, "throwable", throwableToString(throwable));
+        log(logger, Level.ERROR, 0, prefix, type, message, "throwable", OXFException.throwableToString(throwable));
     }
 
     public void logWarning(String type, String message, String... parameters) {
@@ -160,11 +160,11 @@ public class IndentedLogger {
     }
 
     public void logInfo(String type, String message, Throwable throwable) {
-        log(Level.INFO, indentation.indentation, type, message, "throwable", throwableToString(throwable));
+        log(Level.INFO, indentation.indentation, type, message, "throwable", OXFException.throwableToString(throwable));
     }
 
     public void logWarning(String type, String message, Throwable throwable) {
-        log(Level.WARN, indentation.indentation, type, message, "throwable", throwableToString(throwable));
+        log(Level.WARN, indentation.indentation, type, message, "throwable", OXFException.throwableToString(throwable));
     }
 
     public void logError(String type, String message, String... parameters) {
@@ -172,7 +172,7 @@ public class IndentedLogger {
     }
 
     public void logError(String type, String message, Throwable throwable) {
-        log(Level.ERROR, indentation.indentation, type, message, "throwable", throwableToString(throwable));
+        log(Level.ERROR, indentation.indentation, type, message, "throwable", OXFException.throwableToString(throwable));
     }
 
     private void log(Level level, int indentLevel, String type, String message, String... parameters) {
@@ -225,13 +225,6 @@ public class IndentedLogger {
         public Indentation(int indentation) {
             this.indentation = indentation;
         }
-    }
-
-    private static String throwableToString(Throwable throwable) {
-        final StringBuilderWriter sb = new StringBuilderWriter();
-        final PrintWriter writer = new PrintWriter(sb);
-        throwable.printStackTrace(writer);
-        return sb.toString();
     }
 
     private class Operation {

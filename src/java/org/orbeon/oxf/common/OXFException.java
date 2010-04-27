@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.common;
 
+import org.orbeon.oxf.util.StringBuilderWriter;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.TransformerException;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -41,6 +43,19 @@ public class OXFException extends RuntimeException {
     private static final String[] exceptionFields = {
         "com.sun.msv.verifier.jarv.FactoryImpl$WrapperException", "e" // This doesn't work because the class is private
     };
+
+    /**
+     * Return a throwable stack trace as a string.
+     *
+     * @param throwable throwable
+     * @return          stack trace
+     */
+    public static String throwableToString(Throwable throwable) {
+        final StringBuilderWriter sb = new StringBuilderWriter();
+        final PrintWriter writer = new PrintWriter(sb);
+        throwable.printStackTrace(writer);
+        return sb.toString();
+    }
 
     /**
      * Returns the exception directly nested in <code>e</code>.

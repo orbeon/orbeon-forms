@@ -29,7 +29,7 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
      */
     init: function() {
         // We don't support the autocomplete in readonly mode, so completely skip the initialization in that case
-        var container  = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-container xforms-group xforms-readonly", null, this.container)[0];
+        var container  = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-container", null, this.container)[0];
         if (YAHOO.util.Dom.hasClass(container, "xforms-readonly")) return;
 
         this.searchControl = YAHOO.util.Dom.getElementsByClassName("fr-autocomplete-search", null, this.container)[0];
@@ -43,7 +43,10 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
         if (this.isDynamicItemset()) {
             // If the itemset changes dynamically, update list when we have response to an Ajax request
             dataSource = this.buildNullDataSource();
-            ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(this.ajaxResponseProcessed, this, true);
+            ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(function() {
+                // We are not directly calling this.ajaxResponseProcessed() as this might not anymore correspond to the right element in the DOM
+                YAHOO.xbl.fr.Autocomplete.instance(container).ajaxResponseProcessed();
+            });
         } else {
             // Simply get
             var autoComplete = this;

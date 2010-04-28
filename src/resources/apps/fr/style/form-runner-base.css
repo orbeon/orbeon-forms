@@ -285,6 +285,9 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 .fr-repeat-table .fr-repeat-column-trigger { width: 1.5em; text-align: center }
 .fr-grid .fr-grid-content .fr-repeat-table .fr-repeat-column-trigger .xforms-trigger { margin-top: 0 }/* because there is a margin set for triggers in grids below */
 
+/* Avoid funny background color in view mode */
+.fr-mode-view .fr-repeat-table .fr-grid-content { background-color: inherit }
+
 /* ***** Dialogs **************************************************************************************************** */
 
 /* Dialogs */

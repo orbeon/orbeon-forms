@@ -681,7 +681,7 @@
     </xforms:instance>
 
     <!-- Template for outer bind -->
-    <xforms:instance id="fb-bind-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi ev xi xxi xxforms fr fb saxon xbl exforms">
+    <xforms:instance id="fb-bind-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi ev xi xxi xxforms fr fb saxon xbl exforms context">
         <xforms:bind id="fr-form-binds" nodeset="."/>
     </xforms:instance>
 
@@ -715,7 +715,7 @@
         </xforms:action>
     </xforms:action>
 
-    <xforms:instance id="fb-section-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xs xsi ev xi xxi xxforms fb saxon xbl exforms">
+    <xforms:instance id="fb-section-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xs xsi ev xi xxi xxforms fb saxon xbl exforms context">
         <fr:section id="" bind="">
             <xforms:label ref=""/>
             <xforms:help ref=""/>
@@ -727,7 +727,7 @@
         </fr:section>
     </xforms:instance>
 
-    <xforms:instance id="fb-resource-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xforms xs xsi ev xi xxi xxforms fr fb saxon xbl exforms">
+    <xforms:instance id="fb-resource-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xforms xs xsi ev xi xxi xxforms fr fb saxon xbl exforms context">
         <template>
             <label/>
             <hint/>
@@ -736,7 +736,7 @@
         </template>
     </xforms:instance>
 
-    <xforms:instance id="fb-grid-1-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xforms xs xsi ev xi xxi xxforms fb saxon xbl exforms">
+    <xforms:instance id="fb-grid-1-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xforms xs xsi ev xi xxi xxforms fb saxon xbl exforms context">
         <fr:grid columns="1">
             <xhtml:tr>
                 <xhtml:td/>
@@ -744,7 +744,7 @@
         </fr:grid>
     </xforms:instance>
 
-    <xforms:instance id="fb-lhha-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi ev xi xxi xxforms fr fb saxon xbl exforms">
+    <xforms:instance id="fb-lhha-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi ev xi xxi xxforms fr fb saxon xbl exforms context">
         <xforms:input>
             <xforms:label ref=""/>
             <xforms:hint ref=""/>

@@ -21,6 +21,11 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
     <head>
         <title>Bookshelf Form</title>
+        <style type="text/css">
+            <!-- To prevent the first grid to become too tall -->
+            #image-output-control.xforms-mediatype-image { max-height: 200px }
+            .fr-mode-view .fr-grid-content { padding: 0 }
+        </style>
         <xforms:model id="fr-form-model" xxforms:help-tooltip="false" xxforms:noscript-support="false">
             <!-- Inline schema -->
             <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
@@ -380,10 +385,6 @@
             </xforms:instance>
 
         </xforms:model>
-        <style type="text/css">
-            <!-- To prevent the first grid to become too tall -->
-            #image-output-control.xforms-mediatype-image { max-height: 200px }
-        </style>
     </head>
     <body>
         <fr:view>

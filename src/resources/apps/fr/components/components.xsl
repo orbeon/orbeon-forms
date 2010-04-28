@@ -104,7 +104,7 @@
     <xsl:template match="/xhtml:html/xhtml:body">
 
         <xsl:copy>
-            <xsl:attribute name="class" select="string-join((if ($is-inline-hints) then 'xforms-disable-hint-as-tooltip' else (), 'xforms-disable-alert-as-tooltip', @class, if ($mode = 'view') then 'fr-mode-view' else ()), ' ')"/>
+            <xsl:attribute name="class" select="string-join((if ($is-inline-hints) then 'xforms-disable-hint-as-tooltip' else (), 'xforms-disable-alert-as-tooltip', @class), ' ')"/>
             <xsl:apply-templates select="@* except @class"/>
             <xforms:group model="fr-form-model" appearance="xxforms:internal">
                 <xsl:choose>

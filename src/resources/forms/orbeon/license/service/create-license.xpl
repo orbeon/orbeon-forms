@@ -31,6 +31,9 @@
                 <version><xsl:value-of select="normalize-space(/*/version)"/></version>
                 <expiration>
                     <xsl:choose>
+                        <xsl:when test="/*/type = '30day'">
+                            <xsl:value-of select="adjust-date-to-timezone(current-date() + xs:dayTimeDuration('P30D'), ())"/>
+                        </xsl:when>
                         <xsl:when test="/*/type = '90day'">
                             <xsl:value-of select="adjust-date-to-timezone(current-date() + xs:dayTimeDuration('P90D'), ())"/>
                         </xsl:when>

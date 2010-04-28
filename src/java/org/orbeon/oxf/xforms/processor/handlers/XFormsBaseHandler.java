@@ -374,14 +374,9 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
     protected void handleLabelHintHelpAlert(String controlEffectiveId, String forEffectiveId, LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean addIds) throws SAXException {
 
+        // NOTE: We used to not handle alerts and help in read-only mode. We now prefer to controls this with CSS.
         final boolean isHint = lhhaType == LHHAC.HINT;
         final boolean isAlert = lhhaType == LHHAC.ALERT;
-
-        // Don't handle alerts and help in read-only mode
-        // TODO: Removing hints and help could be optional depending on appearance
-        if (isStaticReadonly(control) && (isAlert || isHint))
-            return;
-
         final boolean isLabel = lhhaType == LHHAC.LABEL;
         final boolean isHelp = lhhaType == LHHAC.HELP;
 

@@ -447,6 +447,8 @@
             <workflow-send/>
             <!-- Discard button -->
             <discard/>
+            <!-- Other buttons (bind here to make sure they are not read-only) -->
+            <other/>
         </triggers>
     </xforms:instance>
 

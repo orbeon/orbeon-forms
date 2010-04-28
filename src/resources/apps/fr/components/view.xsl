@@ -40,7 +40,7 @@
 
             <xforms:group id="fr-view">
                 <xhtml:div id="{if ($width = '750px') then 'doc' else if ($width = '950px') then 'doc2' else if ($width = '1154px') then 'doc-fb' else if ($width = '100%') then 'doc3' else 'doc4'}"
-                           class="{if (fr:left) then 'yui-t2 ' else ''}{if ($mode = ('view', 'pdf', 'email')) then ' fr-print-mode' else ''}">
+                           class="{if (fr:left) then 'yui-t2 ' else ''}{concat(' fr-mode-', $mode)}">
                     <!-- Header -->
                     <xhtml:div class="fr-header">
                         <xsl:choose>
@@ -161,14 +161,10 @@
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <!-- Standard bottom -->
-
-                                            <xsl:variable name="default-objects" as="element()+">
-                                                <fr:messages/>
-                                                <fr:status-icons/>
-                                                <fr:buttons-bar/>
-                                            </xsl:variable>
-
-                                            <xsl:apply-templates select="$default-objects"/>
+                                            <!-- NOTE: Call instead of apply so that current context is kept -->
+                                            <xsl:call-template name="fr:messages"/>
+                                            <xsl:call-template name="fr:status-icons"/>
+                                            <xsl:call-template name="fr:buttons-bar"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </xhtml:div>
@@ -450,7 +446,7 @@
         <xhtml:div class="fr-separator">&#160;</xhtml:div>
     </xsl:template>
 
-    <xsl:template match="fr:status-icons">
+    <xsl:template match="fr:status-icons" name="fr:status-icons">
         <!-- Status icons for detail page -->
         <xsl:if test="$is-detail">
             <xhtml:div class="fr-status-icons">
@@ -482,7 +478,7 @@
         </xsl:if>
     </xsl:template>
 
-    <xsl:template match="fr:messages">
+    <xsl:template match="fr:messages" name="fr:messages">
         <!-- Display messages -->
         <xforms:switch class="fr-messages" model="fr-persistence-model" ref=".[instance('fr-persistence-instance')/message != '']">
             <xforms:case id="fr-message-none">
@@ -521,7 +517,7 @@
         </xforms:switch>
     </xsl:template>
 
-    <xsl:template match="fr:buttons-bar">
+    <xsl:template match="fr:buttons-bar" name="fr:buttons-bar">
         <!-- Buttons -->
         <xhtml:div class="fr-buttons">
             <xsl:choose>

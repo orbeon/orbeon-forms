@@ -40,6 +40,8 @@
             #fr-form-group .xforms-label { font-weight: bold }
             .fr-status-icons { display: none }
             .fr-section-title { display: none }
+            /* Change default and allow hints to show in preview mode */
+            .fr-mode-view .xforms-hint { display: block }
         </xhtml:style>
 
         <xforms:model id="fr-form-model">
@@ -48,14 +50,15 @@
             <xforms:instance id="fr-form-instance">
                 <form>
                     <license>
-                        <license-data/>
                         <licensor/>
                         <licensee/>
                         <organization/>
                         <email/>
-                        <version/>
                         <issued/>
+                        <version/>
                         <expiration/>
+                        <license-data/>
+                        <license-data-base64/>
                     </license>
 
                 </form>
@@ -82,6 +85,9 @@
                     <xforms:bind id="license-data-bind" nodeset="license-data" type="xforms:string"
                                  readonly="true()"
                                  name="license-data"/>
+                    <xforms:bind id="license-data-base64-bind" nodeset="license-data-base64" type="xforms:base64Binary"
+                                 calculate="saxon:string-to-base64Binary(../license-data, 'UTF-8')"
+                                 name="license-data-base64"/>
                     <xforms:bind id="version-bind"
                                  nodeset="version"
                                  name="version"/>
@@ -118,10 +124,16 @@
                     <resource xml:lang="en">
                         <license-data>
                             <label>License data</label>
-                            <hint>Copy and paste the license data above, and save it into a file as orbeon-war/WEB-INF/resources/config/license.xml</hint>
+                            <hint>You can copy and paste the license data above and save it into a file as orbeon-war/WEB-INF/resources/config/license.xml, or use the download link below</hint>
                             <help/>
                             <alert/>
                         </license-data>
+                        <license-data-base64>
+                            <label>Download license file</label>
+                            <hint>Save the license file under orbeon-war/WEB-INF/resources/config/license.xml</hint>
+                            <help/>
+                            <alert/>
+                        </license-data-base64>
                         <licensor>
                             <label>Licensed by</label>
                             <hint/>
@@ -154,7 +166,7 @@
                         </email>
                         <version>
                             <label>Orbeon Forms Version</label>
-                            <hint/>
+                            <hint>The version of Orbeon Forms for which this license is produced</hint>
                             <help/>
                             <alert/>
                         </version>
@@ -268,6 +280,8 @@
 
                         <xforms:insert nodeset="instance('fr-form-instance')/*/*"
                                        origin="xxforms:element($control-name)"/>
+                        <xforms:insert nodeset="instance('fr-form-instance')/*/*"
+                                       origin="xxforms:element('license-data-base64', (xxforms:attribute('filename', 'license.xml'), xxforms:attribute('mediatype', 'application/xml')))"/>
                         <xforms:setvalue ref="instance('fr-form-instance')/*/*[name() = $control-name]"
                                          value="$control-value"/>
                     </xforms:action>
@@ -379,8 +393,8 @@
                                                id="version-control"
                                                class="fr-summary fr-search">
                                     <xforms:label ref="$form-resources/version/label"/>
+                                    <xforms:hint ref="$form-resources/version/hint"/>
                                     <xforms:help ref="$form-resources/version/help"/>
-
                                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xforms:output>
                             </xhtml:td>
@@ -423,11 +437,32 @@
                                 </xforms:textarea>
                             </xhtml:td>
                         </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:output bind="license-data-base64-bind" id="license-data-base64-control" appearance="xxforms:download">
+                                    <xforms:label ref="$form-resources/license-data-base64/label"/>
+                                    <xforms:hint ref="$form-resources/license-data-base64/hint"/>
+                                    <xforms:help ref="$form-resources/license-data-base64/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xforms:filename ref="@filename"/>
+                                    <xforms:mediatype ref="@mediatype"/>
+                                </xforms:output>
+                            </xhtml:td>
+                        </xhtml:tr>
                     </fr:grid>
 
                 </fr:section>
                 <!--<fr:xforms-inspector/>-->
             </fr:body>
+            <fr:buttons>
+                <fr:button id="fr-home-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
+                    <xforms:label>
+                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/house.png" alt=""/>
+                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/home"/></xhtml:span>
+                    </xforms:label>
+                    <xforms:load ev:event="DOMActivate" resource="http://www.orbeon.com/"/>
+                </fr:button>
+            </fr:buttons>
         </fr:view>
     </xhtml:body>
 </xhtml:html>

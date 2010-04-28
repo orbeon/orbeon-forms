@@ -101,7 +101,7 @@
 
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.license.form"             value="/fr/service/resource"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.license"                       value="close"/>
-    <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.license"                  value="close"/>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.license"                  value="home"/>
     <property as="xs:boolean" name="oxf.fr.email.attach-pdf.orbeon.license"                     value="false"/>
 
     <!-- The following shows how you can use the "Submit" button instead of the "Save" button -->

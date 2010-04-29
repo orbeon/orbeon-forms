@@ -4904,12 +4904,11 @@ ORBEON.xforms.Init = {
                     var serverEvents = formInitData["server-events"];
                     if (YAHOO.lang.isArray(serverEvents)) {
                         // For now just take the id of the first XForms form; this will need to be changed to support multiple forms
-                        var formId = document.getElementsByClassName("xforms-form")[0].id;
                         for (var serverEventIndex = 0; serverEventIndex < serverEvents.length; serverEventIndex++) {
                             var serverEvent = serverEvents[serverEventIndex];
                             var discardable = ! YAHOO.lang.isUndefined(serverEvent["discardable"]) && serverEvent["discardable"];
                             ORBEON.xforms.Server.createDelayedServerEvent(serverEvent["event"], serverEvent["delay"],
-                                serverEvent["show-progress"], serverEvent["progress-message"], discardable, formId);
+                                serverEvent["show-progress"], serverEvent["progress-message"], discardable, form.id);
                         }
                     }
                 }
@@ -6048,7 +6047,7 @@ ORBEON.xforms.Server = {
      */
     handleResponseDom: function(responseXML, formID) {
 
-//        try {
+        try {
             if (responseXML && responseXML.documentElement
                     && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
 
@@ -7298,12 +7297,12 @@ ORBEON.xforms.Server = {
                 ORBEON.xforms.Globals.lastRequestIsError = true;
                 ORBEON.xforms.Server.showError("Server didn't respond with valid XML", "Server didn't respond with valid XML", formID);
             }
-//        } catch (e) {
-//            // Show dialog with error to the user, as they won't be able to continue using the UI anyway
-//            ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
-//            // Rethrow, so the exception isn't lost (can be shown by Firebug, or a with little icon on the bottom left of the IE window)
-//            throw e;
-//        }
+        } catch (e) {
+            // Show dialog with error to the user, as they won't be able to continue using the UI anyway
+            ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formID);
+            // Rethrow, so the exception isn't lost (can be shown by Firebug, or a with little icon on the bottom left of the IE window)
+            throw e;
+        }
     },
 
     callUserScript: function(functionName, targetId, observerId) {
@@ -8467,3 +8466,4 @@ if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
         ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime();
     }
 }
+//ORBEON.util.Test.startFirebugLite();

@@ -32,10 +32,7 @@ import org.orbeon.oxf.xml.dom4j.*;
 import org.xml.sax.SAXException;
 
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PageFlowControllerProcessor extends ProcessorImpl {
 
@@ -446,7 +443,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             + Dom4jUtils.domToString(astDocumentHandler.getDocument()));
                 }
 
-                return new PageFlow(new PipelineProcessor(astPipeline), pathMatchers);
+                return new PageFlow(new PipelineProcessor(astPipeline), Collections.unmodifiableList(pathMatchers));
             }
         });
 
@@ -455,13 +452,17 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         // actually know what a "resource" is.
         final List<URLRewriterUtils.PathMatcher> pathMatchers = pageFlow.getPathMatchers();
         if (pathMatchers != null && pathMatchers.size() > 0) {
-            final List<URLRewriterUtils.PathMatcher> existingFileInfos = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
-            if (existingFileInfos == null) {
+            final List<URLRewriterUtils.PathMatcher> existingPathMatchers = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PipelineContext.PATH_MATCHERS);
+            if (existingPathMatchers == null) {
                 // Set if we are the first
                 pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, pathMatchers);
             } else {
                 // Add if we come after others (in case of nested page flows)
-                existingFileInfos.addAll(pathMatchers);
+                final List<URLRewriterUtils.PathMatcher> allMatchers = new ArrayList<URLRewriterUtils.PathMatcher>() {{
+                    addAll(existingPathMatchers);
+                    addAll(pathMatchers);
+                }};
+                pipelineContext.setAttribute(PipelineContext.PATH_MATCHERS, Collections.unmodifiableList(allMatchers));
             }
         }
 

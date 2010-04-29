@@ -269,7 +269,7 @@ public class URLRewriterUtils {
             }
 
             // 3. Iterate through matchers and see if we get a match
-            for (PathMatcher pathMatcher: pathMatchers) {
+            for (final PathMatcher pathMatcher: pathMatchers) {
 
                 final boolean isMatch;
                 if (pathMatcher.matcher == null) {

@@ -73,19 +73,22 @@ YAHOO.xbl.fr.DatatableManager = {
         // Reset
         for (var id in YAHOO.xbl.fr.Datatable._instances) {
             var datatable = YAHOO.xbl.fr.Datatable._instances[id];
-            datatable.reset();
+            if (datatable.isDisplayed())
+                datatable.reset();
         }
         // And draw again
         for (var id in YAHOO.xbl.fr.Datatable._instances) {
             var datatable = YAHOO.xbl.fr.Datatable._instances[id];
-            datatable.isInitialized = false;
-            datatable.draw(datatable.innerTableWidth);
+            if (datatable.isDisplayed()) {
+                datatable.isInitialized = false;
+                datatable.draw(datatable.innerTableWidth);
+            }
         }
 
     }  ,
 
     EOO: ''                                                     // End Of Object!
-}
+};
 
 // Set the event listener for window resize events
 YAHOO.util.Event.addListener(window, "resize", YAHOO.xbl.fr.DatatableManager.resize);
@@ -144,7 +147,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
         this.innerTableWidth = innerTableWidth;
 
         // We don't care about datatable that are disabled (we'll receive a new event when they'll be enabled again)
-        // TODO: check if this test is still neeeded
+        // TODO: check if this test is still needed
         if (this.isXformsEnabled()) {
             if (!this.isInitialized) {
                 // We need to postpone the initialization of datatables that are hidden by an xforms:switch
@@ -158,7 +161,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
                     this.rowsUpdateUUID = this.columnsUpdateUUID;
                 } else {
                     // Hack!!! We are here if the datatable is hidden unselected in an xforms:switch/xforms:case...
-                    thiss = this;
+                    var thiss = this;
                     setTimeout(function() {
                         thiss.draw(innerTableWidth);
                     }, 100);
@@ -607,7 +610,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
                 liner.className = "yui-dt-liner";
             }
         }
-        // Remove column widths
+        // Remove column width
         for (var icol = 0; icol < this.bodyColumns.length; icol++) {
             var col = this.bodyColumns[icol];
             for (var irow = 0; irow < col.length; irow++) {

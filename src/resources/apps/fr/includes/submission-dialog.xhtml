@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -31,9 +31,9 @@
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group>
-            <xforms:repeat nodeset="instance('fr-submission-buttons-instance')/*">
+            <xforms:repeat ref="tokenize(xxforms:property(string-join(('oxf.fr.detail.submit.buttons', $app, $form), '.')), '\s+')">
                 <!-- Clear button -->
-                <fr:button ref=".[local-name() = 'clear']">
+                <fr:button ref=".[. = 'clear']">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-clear"/></xhtml:span>
@@ -51,7 +51,7 @@
                     </xforms:action>
                 </fr:button>
                 <!-- Keep button -->
-                <fr:button ref=".[local-name() = 'keep']">
+                <fr:button ref=".[. = 'keep']">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-keep"/></xhtml:span>
@@ -62,7 +62,7 @@
                     </xforms:action>
                 </fr:button>
                 <!-- Go button -->
-                <fr:button ref=".[local-name() = 'go']">
+                <fr:button ref=".[. = 'go']">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-go"/></xhtml:span>
@@ -73,7 +73,7 @@
                     </xforms:action>
                 </fr:button>
                 <!-- Close window button -->
-                <fr:button ref=".[local-name() = 'close-window']">
+                <fr:button ref=".[. = 'close-window']">
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-close-window"/></xhtml:span>
@@ -92,18 +92,6 @@
         <xforms:instance id="fr-submission-result-instance">
             <content xmlns=""/>
         </xforms:instance>
-
-        <xforms:instance id="fr-submission-buttons-instance">
-            <buttons xmlns=""/>
-        </xforms:instance>
-
-        <!-- Create list of buttons -->
-        <xforms:action ev:event="xforms-model-construct-done">
-            <!-- Buttons in the dialog -->
-            <xxforms:variable name="submit-buttons" select="tokenize(xxforms:property(string-join(('oxf.fr.detail.submit.buttons', $app, $form), '.')), '\s+')" as="xs:string*"/>
-            <xforms:insert context="instance('fr-submission-buttons-instance')"
-                           origin="(for $b in $submit-buttons return xxforms:element($b))"/>
-        </xforms:action>
 
         <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
         <xxforms:variable name="app" select="$parameters/app"/>

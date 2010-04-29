@@ -147,7 +147,6 @@
         <property name="version.number" value="3.8.0.beta"/>
         <property name="edition" value="PE"/>
         <!-- Can be overridden on command-line to provide different suffix -->
-
         <property name="artifact.suffix" value="-${edition}"/>
         <property name="version.suffix" value=""/>
         <tstamp>

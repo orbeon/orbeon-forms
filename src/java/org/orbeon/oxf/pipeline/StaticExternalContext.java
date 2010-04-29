@@ -102,6 +102,6 @@ public class StaticExternalContext {
     }
 
     public static boolean isPE() {
-        return Version.instance().isPE();
+        return Version.isPE();
     }
 }

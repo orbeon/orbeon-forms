@@ -24,6 +24,7 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.analysis.DumbXPathDependencies;
 import org.orbeon.oxf.xforms.analysis.PathMapXPathDependencies;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -43,11 +44,9 @@ public class PEVersion extends Version {
     public static final String LICENSE_URL = "oxf:" + LICENSE_PATH;
     public static final String ORBEON_PUBLIC_KEY = "oxf:/config/orbeon-public.xml";
 
-    private final LicenseInfo licenseInfo;
-
     public PEVersion() {
         try {
-            licenseInfo = check();
+            final LicenseInfo licenseInfo = check();
             logger.info("This installation of " + getLocalVersionString() + " is licensed to: " + licenseInfo.toString());
         } catch (Exception e) {
             logger.error("License check failed for " + getLocalVersionString());
@@ -56,7 +55,7 @@ public class PEVersion extends Version {
     }
 
     private String getLocalVersionString() {
-        return "Orbeon Forms " + RELEASE_NUMBER + ' ' + getCode();
+        return "Orbeon Forms " + VERSION_NUMBER + ' ' + getEdition();
     }
 
     private final LicenseInfo check() {
@@ -180,23 +179,13 @@ public class PEVersion extends Version {
     }
 
     @Override
-    public String getCode() {
-        return "PE";
-    }
-
-    @Override
-    public boolean isPE() {
-        return licenseInfo != null;
-    }
-
-    @Override
     public boolean isPEFeatureEnabled(boolean featureRequested, String featureName) {
-        return featureRequested && isPE();
+        return featureRequested;
     }
 
     @Override
     public XPathDependencies createUIDependencies(XFormsContainingDocument containingDocument) {
         final boolean requested = containingDocument.getStaticState().isXPathAnalysis();
-        return (requested && isPE()) ? new PathMapXPathDependencies(containingDocument) : super.createUIDependencies(containingDocument);
+        return requested ? new PathMapXPathDependencies(containingDocument) : new DumbXPathDependencies();
     }
 }

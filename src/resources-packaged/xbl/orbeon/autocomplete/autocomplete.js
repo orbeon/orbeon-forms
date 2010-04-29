@@ -118,14 +118,14 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
         var oldList = this.lastSuggestionList;
         var newList = this.getCurrentValues(query);
 
-        var doUdateSuggestionList =
-                // If the user just selected something before which triggered an Ajax query,
-                // don't show the suggestion list
-                ! this.justMadeSelection
-                // Update the list only of the control has the focus, as updating the list will show the suggestion list
-                // and we only want to show the suggestion list if the user happens to be in that field
-                && this.yuiAutoComplete.isFocused();
-        if (doUdateSuggestionList)
+        var doUpdateSuggestionList =
+            // If the user just selected something before which triggered an Ajax query,
+            // don't show the suggestion list
+            ! this.justMadeSelection
+            // Update the list only of the control has the focus, as updating the list will show the suggestion list
+            // and we only want to show the suggestion list if the user happens to be in that field
+            && ORBEON.xforms.Globals.currentFocusControlId == this.searchControl.id;
+        if (doUpdateSuggestionList)
             this.yuiAutoComplete._populateList(query, { results: newList }, { query: query });
         this.justMadeSelection = false;
     },
@@ -152,7 +152,7 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
             }
         });
 
-        return new WaitAjaxResponseDataSource(function(query) { return autoComplete.getCurrentValues(query); });
+        return new WaitAjaxResponseDataSource(function(query) { return autoComplete.getCurrentValues(query); }, {});
     },
 
     /**
@@ -171,7 +171,6 @@ YAHOO.xbl.fr.Autocomplete.prototype = {
      * Returns the content the values from the select1
      */
     getCurrentValues: function(query) {
-        var autoComplete = this;
         var result = [];
 
         // YUI autocomplete give us an escaped string

@@ -202,9 +202,9 @@ public class OPS {
 
     public static void main(String[] args) {
         try {
-            final OPS oxf = new OPS(args);
-            oxf.init();
-            oxf.start();
+            final OPS orbeon = new OPS(args);
+            orbeon.init();
+            orbeon.start();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             OXFException.getRootThrowable(e).printStackTrace();

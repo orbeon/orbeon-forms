@@ -16,52 +16,56 @@ package org.orbeon.oxf.common;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.analysis.DumbXPathDependencies;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Product version information.
  */
-public class Version {
+public abstract class Version {
 
-    protected static final String RELEASE_NUMBER = "@RELEASE@";
+    protected static final String VERSION_NUMBER = "@RELEASE@";
+    protected static final String EDITION = "@EDITION@";
 
     protected static final Logger logger = LoggerFactory.createLogger(Version.class);
-    private static final Set<String> WARNED_FEATURES = new HashSet<String>();
+
 
     private static Version version;
-    static {
-        ClassLoader classLoader = null;
-        try {
-            classLoader = Thread.currentThread().getContextClassLoader();
-        } catch (Exception e) {
-            logger.error("Failed calling getContextClassLoader(), trying Class.forName()");
-        }
-        try {
-            final String versionClassName = "org.orbeon.oxf.common.PEVersion";
-            Class<?> versionClass;
-            if (classLoader != null) {
-                try {
-                    versionClass = classLoader.loadClass(versionClassName);
-                } catch (Exception ex) {
-                    versionClass = Class.forName(versionClassName);
-                }
-            } else {
-                versionClass = Class.forName(versionClassName);
-            }
-            version = (Version) versionClass.newInstance();
-        } catch (Exception e) {
-            logger.info("Did not find PE Version, using CE Version");
-            version = new Version();
-        }
-    }
 
     protected Version() {}
     
     public static Version instance() {
+        if (version == null) {
+            if (isPE()) {
+                // Create a PEVersion instance
+                ClassLoader classLoader = null;
+                try {
+                    classLoader = Thread.currentThread().getContextClassLoader();
+                } catch (Exception e) {
+                    logger.error("Failed calling getContextClassLoader(), trying Class.forName()");
+                }
+                try {
+                    final String versionClassName = "org.orbeon.oxf.common.PEVersion";
+                    Class<?> versionClass;
+                    if (classLoader != null) {
+                        try {
+                            versionClass = classLoader.loadClass(versionClassName);
+                        } catch (Exception ex) {
+                            versionClass = Class.forName(versionClassName);
+                        }
+                    } else {
+                        versionClass = Class.forName(versionClassName);
+                    }
+                    version = (Version) versionClass.newInstance();
+                } catch (Exception e) {
+                    final String message = "Loading " + getVersionString() + " configuration failed. Please make sure a license file is in place.";
+                    logger.error(message);
+                    throw new OXFException(message);
+                }
+            } else {
+                // Just create a CEVersion instance
+                version = new CEVersion();
+            }
+        }
         return version;
     }
 
@@ -71,7 +75,7 @@ public class Version {
      * @return product version number
      */
     public static String getVersionNumber() {
-        return RELEASE_NUMBER;
+        return VERSION_NUMBER;
     }
 
     // For backward compatibility only (if called from third-party XSLT)
@@ -85,36 +89,24 @@ public class Version {
      * @return product version string
      */
     public static String getVersionString() {
-        return "Orbeon Forms " + RELEASE_NUMBER + ' ' + instance().getCode();
+        return "Orbeon Forms " + VERSION_NUMBER + ' ' + EDITION;
     }
 
     /**
-     * Version code, e.g. "CE" or "PE".
+     * Product edition, e.g. "CE" or "PE".
      *
      * @return
      */
-    public String getCode() {
-        return "CE";
+    public static final String getEdition() {
+        return EDITION;
     }
 
-    public boolean isPE() {
-        return false;
+    public static final boolean isPE() {
+        return "PE".equals(EDITION);
     }
 
-    public boolean isPEFeatureEnabled(boolean featureRequested, String featureName) {
-        if (featureRequested) {
-            // Feature is requested but disallowed
-            if (!WARNED_FEATURES.contains(featureName)) { // just warn the first time
-                logger.warn("Feature is not enabled in this version of the product: " + featureName);
-                WARNED_FEATURES.add(featureName);
-            }
-        }
-        return false;
-    }
-
-    public XPathDependencies createUIDependencies(XFormsContainingDocument containingDocument) {
-        return new DumbXPathDependencies();
-    }
+    public abstract boolean isPEFeatureEnabled(boolean featureRequested, String featureName);
+    public abstract XPathDependencies createUIDependencies(XFormsContainingDocument containingDocument);
 
     public String toString() {
         return getVersionString();

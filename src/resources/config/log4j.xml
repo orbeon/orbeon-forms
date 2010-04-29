@@ -48,6 +48,7 @@
     <appender name="RollingFileAppender" class="org.apache.log4j.RollingFileAppender">
         <param name="File" value="../logs/orbeon.log"/>
         <param name="MaxFileSize" value="5MB"/>
+        <param name="maxBackupIndex" value="200"/>
         <param name="Append" value="false" />
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d{ISO8601} %-5p %c{1} %x - %m%n"/>

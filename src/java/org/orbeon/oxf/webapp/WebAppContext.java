@@ -105,13 +105,14 @@ public class WebAppContext {
             if (propertiesFile != null)
                 org.orbeon.oxf.properties.Properties.init(propertiesFile);
 
-            // 3. Initialize log4j with a DOMConfiguration
+            // 3. Initialize Version object (depends on resource manager)
+            // Better to do it here so that log messages will go to the same place as the above logs
+            Version.instance();
+
+            // 4. Initialize log4j with a DOMConfiguration
             if (initializeLogging) {
                 LoggerFactory.initLogger();
             }
-
-            // 4. Initialize Version object (depends on resource manager)
-            Version.instance();
 
             // 5. Register processor definitions with the default XML Processor Registry
             InitUtils.initializeProcessorDefinitions();

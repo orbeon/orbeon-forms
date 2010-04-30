@@ -100,9 +100,6 @@ public class WebAppContext {
 
             ResourceManagerWrapper.init(properties);
 
-            // Initialize Version object (depends on resource manager)
-            Version.instance();
-
             // 2. Initialize properties
             final String propertiesFile = getServletInitParametersMap().get(PROPERTIES_PROPERTY);
             if (propertiesFile != null)
@@ -113,7 +110,10 @@ public class WebAppContext {
                 LoggerFactory.initLogger();
             }
 
-            // 4. Register processor definitions with the default XML Processor Registry
+            // 4. Initialize Version object (depends on resource manager)
+            Version.instance();
+
+            // 5. Register processor definitions with the default XML Processor Registry
             InitUtils.initializeProcessorDefinitions();
 
         } catch (Exception e) {

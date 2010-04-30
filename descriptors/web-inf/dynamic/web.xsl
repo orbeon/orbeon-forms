@@ -17,13 +17,13 @@
                  version="2.4" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
             <display-name>Orbeon Forms <xsl:value-of select="concat($version-number, ' ', $edition)"/></display-name>
             <description>
-                Orbeon Forms is an open source, standard-based web forms solution, which
-                includes Form Builder, a WYSIWYG browser-based authoring tool, and Form
-                Runner, a runtime environment which facilitates the deployment and
-                integration of a large number of complex forms. Orbeon Forms implements
-                different technologies, such as XForms and Ajax, with no need for
-                client-side software or plug-ins.
-            </description>
+        Orbeon Forms is an open source, standard-based web forms solution, which
+        includes Form Builder, a WYSIWYG browser-based authoring tool, and Form
+        Runner, a runtime environment which facilitates the deployment and
+        integration of a large number of complex forms. Orbeon Forms implements
+        different technologies, such as XForms and Ajax, with no need for
+        client-side software or plug-ins.
+    </description>
             <xsl:comment>Initialize main resource manager</xsl:comment>
             <context-param>
                 <param-name>oxf.resources.factory</param-name>
@@ -41,7 +41,12 @@
                     </context-param>
                     <context-param>
                         <param-name>oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory</param-name>
-                        <param-value><xsl:value-of select="$build-root"/>/src/resources</param-value>
+                        <param-value>
+                            <xsl:choose>
+                                <xsl:when test="$target = 'devel'"><xsl:value-of select="$build-root"/>/src/resources</xsl:when>
+                                <xsl:otherwise>/path/to/orbeon/src/resources</xsl:otherwise>
+                            </xsl:choose>
+                        </param-value>
                     </context-param>
                     <xsl:comment>Web application resource manager</xsl:comment>
                     <context-param>
@@ -58,7 +63,12 @@
                     </context-param>
                     <context-param>
                         <param-name>oxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory</param-name>
-                        <param-value><xsl:value-of select="$build-root"/>/src/resources-packaged</param-value>
+                        <param-value>
+                            <xsl:choose>
+                                <xsl:when test="$target = 'devel'"><xsl:value-of select="$build-root"/>/src/resources-packaged</xsl:when>
+                                <xsl:otherwise>/path/to/orbeon/src/resources-packaged</xsl:otherwise>
+                            </xsl:choose>
+                        </param-value>
                     </context-param>
                     <xsl:comment>Classloader resource manager</xsl:comment>
                     <context-param>

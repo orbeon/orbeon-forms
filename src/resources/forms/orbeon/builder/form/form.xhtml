@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -303,7 +303,7 @@
                             </fr:link-select1>
 
                             <!-- Add/remove language -->
-                            <xforms:group class="fb-language-triggers">
+                            <xforms:group class="fb-language-triggers" ref=".[context:isPE()]" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
                                 <xforms:trigger appearance="minimal">
                                     <xforms:label>
                                         <xhtml:img src="/apps/fr/style/images/silk/add.png" alt="" title="{$form-resources/dialog-add-language/add-language/label}"/>

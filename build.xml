@@ -144,7 +144,7 @@
 
             Suffix CE or PE is separate from the version number.
          -->
-        <property name="version.number" value="3.8.0.beta"/>
+        <property name="version.number" value="3.8.0.rc1"/>
         <property name="edition" value="CE"/>
         <!-- Can be overridden on command-line to provide different suffix -->
         <property name="artifact.suffix" value="-${edition}"/>

@@ -726,7 +726,7 @@
         <echo message="Using artifact name: ${artifact.name}"/>
 
         <!-- Move to generic file name so that rsync overwrites -->
-        <move file="${deployDir}/${project.name}-${release.number}.zip" tofile="${deployDir}/${artifact.name}.zip"/>
+        <move file="${deployDir}/${project.name}-${release.number}-${edition}.zip" tofile="${deployDir}/${artifact.name}.zip"/>
         <move file="${deployDir}/${project.name}.war" tofile="${deployDir}/${artifact.name}.war"/>
         <move file="${deployDir}/${project.name}-src.zip" tofile="${deployDir}/${artifact.name}-src.zip"/>
 

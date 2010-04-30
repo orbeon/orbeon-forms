@@ -4,7 +4,7 @@
 
 =====================================================
 
-Last updated for Orbeon Forms 3.8, April 2010
+Last updated for Orbeon Forms 3.8, May 2010
 
 This README.TXT file covers the following topics:
 
@@ -80,11 +80,7 @@ A complete list of changes can be found online at:
 The system requirements and installation procedure are detailed online
 at:
 
-  http://www.orbeon.com/orbeon/doc/intro-install
-
-or in this distribution under:
-
-  doc/intro-install
+  http://wiki.orbeon.com/forms/doc/developer-guide/admin/installing
 
 In addition, the Orbeon Forms tutorial also tackles installation. Online
 version:
@@ -103,7 +99,7 @@ or in this distribution under:
 You usually don't have to compile Orbeon Forms yourself, but for
 information about compiling Orbeon Forms from sources, please visit:
 
-  http://wiki.orbeon.com/forms/doc/contributor-guide/java-development
+  http://wiki.orbeon.com/forms/doc/contributor-guide/development-environment/java-development
 
 
 ****************************************
@@ -134,10 +130,9 @@ Here are some pointers to useful information related to this release.
 7. Known Issues
 ****************************************
 
-For a list of known issues ordered by priority, consult the OW2 issue
-tracking system:
+For a list of known issues, consult the OW2 issue tracking system:
 
-  http://tinyurl.com/kycl3
+  http://tinyurl.com/ppqyt6
 
 
 ****************************************

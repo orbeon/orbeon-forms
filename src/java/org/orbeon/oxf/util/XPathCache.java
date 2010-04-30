@@ -54,17 +54,7 @@ import java.util.*;
 public class XPathCache {
 
     private static NamePool NAME_POOL = new NamePool();
-    private static Configuration CONFIGURATION = new Configuration() {
-        @Override
-        public void setAllowExternalFunctions(boolean allowExternalFunctions) {
-            super.setAllowExternalFunctions(allowExternalFunctions);
-
-            if (!allowExternalFunctions) {
-                // XXX DEBUG
-                logger.error("xxx caught setAllowExternalFunctions: " + OXFException.throwableToString(new RuntimeException().fillInStackTrace()));
-            }
-        }
-    };
+    private static Configuration CONFIGURATION = new Configuration();
     static {
         CONFIGURATION.setNamePool(NAME_POOL);
     }
@@ -470,12 +460,6 @@ public class XPathCache {
             this.pool = pool;
 
             this.xpathConfiguration = (xpathConfiguration != null) ? xpathConfiguration : XPathCache.getGlobalConfiguration();
-            if (!this.xpathConfiguration.isAllowExternalFunctions()) {
-                // XXX DEBUG
-                logger.error("xxx caught incorrect XPath config: " + this.xpathConfiguration.toString());
-                logger.error("xxx                                " + xpathString);
-                logger.error("xxx                                " + OXFException.throwableToString(new RuntimeException().fillInStackTrace()));
-            }
 
             this.xpathString = xpathString;
             this.prefixToURIMap = prefixToURIMap;
@@ -507,13 +491,6 @@ public class XPathCache {
 
             // Create context
             final IndependentContext independentContext = new XPathCacheStaticContext(xpathConfiguration, allowAllVariables);
-
-            if (!this.xpathConfiguration.isAllowExternalFunctions()) {
-                // XXX DEBUG
-                logger.error("xxx using incorrect XPath config: " + this.xpathConfiguration.toString());
-                logger.error("xxx                               " + xpathString);
-                logger.error("xxx                               " + OXFException.throwableToString(new RuntimeException().fillInStackTrace()));
-            }
 
             // Set the base URI if specified
             if (baseURI != null)

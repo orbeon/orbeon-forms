@@ -95,7 +95,7 @@
     <!-- Register and license forms -->
     <property as="xs:anyURI"  name="oxf.fr.persistence.app.uri.orbeon.register.form"            value="/fr/service/resource"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.register"                      value="refresh workflow-review"/>
-    <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.register"                 value="refresh workflow-send"/>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.register"                 value="refresh workflow-edit workflow-send"/>
     <property as="xs:string"  name="oxf.fr.detail.send.uri.orbeon.register"                     value="/fr/orbeon/license/view/bc3b89cdb12968bb96a8dd6b69fbf85a"/>
     <property as="xs:boolean" name="oxf.fr.email.attach-pdf.orbeon.register"                    value="false"/>
 

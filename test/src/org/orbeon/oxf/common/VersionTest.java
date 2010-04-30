@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.common;
 
-import junit.framework.TestCase;
+import org.orbeon.oxf.test.ResourceManagerTestBase;
 
-public class VersionTest extends TestCase {
+public class VersionTest extends ResourceManagerTestBase {
     public void testProductConfiguration() {
         if (Version.isPE()) {
             assertEquals("PE", Version.getEdition());

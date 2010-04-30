@@ -471,7 +471,7 @@
             <param name="target" expression="${target}"/>
             <param name="build-root" expression="${build.root}"/>
             <param name="build-root" expression="${build.root}"/>
-            <param name="version-number" expression="${release.number}"/>
+            <param name="version" expression="${release.number} ${edition}"/>
             <param name="edition" expression="${edition}"/>
         </xslt>
     </target>
@@ -839,14 +839,14 @@
     </target>
 
     <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-doc, orbeon-javadoc, orbeon-src">
-        <property name="prefix" value="${project.name}-${release.number}"/>
+        <property name="prefix" value="${project.name}-${release.number}-${edition}"/>
         <!-- Create temporary zip file -->
-        <property name="tmp-zip" value="${build.distrib.dir}/${project.name}-${release.number}-tmp.zip"/>
+        <property name="tmp-zip" value="${build.distrib.dir}/${prefix}-tmp.zip"/>
         <zip zipfile="${tmp-zip}">
             <zipfileset dir="${build.distrib.dir}" prefix="${prefix}">
                 <include name="${project.name}.war"/>
             </zipfileset>
-            <zipfileset file="README.txt"/>
+            <zipfileset file="README.txt" prefix="${prefix}"/>
             <zipfileset dir="${build.doc.dir}" prefix="${prefix}/doc"/>
             <zipfileset dir="doc/dist" prefix="${prefix}"/>
             <zipfileset dir="${examples-cli-src.dir}" prefix="${prefix}/examples-cli"/>
@@ -872,7 +872,7 @@
             <include name="**/*.xhtml"/>
             <include name="**/*.wsdl"/>
         </fixcrlf>
-        <zip zipfile="${build.distrib.dir}/${project.name}-${release.number}.zip" basedir="${build.temp.dir}/distrib"/>
+        <zip zipfile="${build.distrib.dir}/${prefix}.zip" basedir="${build.temp.dir}/distrib"/>
         <!-- Fix EOL for Unix platform -->
         <fixcrlf srcDir="${build.temp.dir}/distrib" eol="lf">
             <include name="**/*.txt"/>
@@ -891,22 +891,10 @@
             <include name="**/*.xhtml"/>
             <include name="**/*.wsdl"/>
         </fixcrlf>
-        <tar tarfile="${build.distrib.dir}/${project.name}-${release.number}.tar.gz" compression="gzip" basedir="${build.temp.dir}/distrib"/>
+        <tar tarfile="${build.distrib.dir}/${prefix}.tar.gz" compression="gzip" basedir="${build.temp.dir}/distrib"/>
         <delete file="${tmp-zip}"/>
     </target>
 
     <target name="orbeon-dist" depends="orbeon-dist-packages"/>
-
-    <target name="post-update" depends="orbeon-css-templates">
-        <chmod dir="${war.dir}/WEB-INF/exist-data" perm="a+rw"/>
-    </target>
-
-    <target name="copy-distrib" depends="orbeon-dist">
-        <copy todir="/home/httpd/html/public/oxf/secret">
-            <fileset dir="${build.distrib.dir}">
-                <include name="${project.name}-${release.number}.*"/>
-            </fileset>
-        </copy>
-    </target>
 
 </project>

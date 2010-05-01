@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -62,12 +62,17 @@
                     </li>
                     <li>
                         <p>
-                            Opera 9 or greater.
+                            Google Chrome.
                         </p>
                     </li>
                     <li>
                         <p>
-                            Internet Explorer 6 or 7 or greater.
+                            Opera 9, 10 or greater.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Internet Explorer 6, 7, 8 or greater.
                         </p>
                     </li>
                 </ul>

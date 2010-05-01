@@ -438,16 +438,8 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 .fr-grid-td .fb-grid-content { width: 64em; *width: 62.4576em }
 
 .fr-grid-2-columns .fr-grid-td { width: 50% }
-#doc .fr-grid-2-columns .fr-grid-td .fr-grid-content { width: 25em; *width: 24.4em }
-#doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content { width: 34em; *width: 33.1806em }
-
 .fr-grid-3-columns .fr-grid-td { width: 33.3% }
-#doc .fr-grid-3-columns .fr-grid-td .fr-grid-content { width: 16em; *width: 15.6em }
-#doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content { width: 22em; *width: 21.4698em }
-
 .fr-grid-4-columns .fr-grid-td { width: 25% }
-#doc .fr-grid-4-columns .fr-grid-td .fr-grid-content { width: 11.5em; *width: 11.2em }
-#doc4 .fr-grid-4-columns .fr-grid-td .fr-grid-content { width: 16.5em; *width: 15.5em }
 
 /* Hand-tuned control widths for IE <= 7 */
 /* TODO: more controls */
@@ -458,12 +450,18 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 
 #doc4 .fr-grid .fr-grid-td .fr-grid-content img.xforms-input-input { *width: auto } /* Undo effect of previous rule for image in minimal date picker */
 
+#doc  .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-date,
+#doc  .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-time,
+#doc2 .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-date,
+#doc2 .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-time,
 #doc4 .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-date,
-    #doc4 .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-time { *width: 7.3em }
+#doc4 .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-time
+    { *width: 6.3em }
 
 /* Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
    http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
 #doc  .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input,
+#doc2 .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input,
 #doc4 .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input
     { *width: 13em }
 

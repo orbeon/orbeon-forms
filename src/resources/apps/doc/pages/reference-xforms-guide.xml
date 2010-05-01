@@ -77,7 +77,7 @@
                     href="home-faq#xforms">FAQ</a>.
                 </p>
                 <p>
-                    Mainstream browsers (Internet Explorer, Mozilla / Firefox, Opera, Safari) do not support XForms
+                    Mainstream browsers (Internet Explorer, Firefox, Safari, Google Chrome, Opera) do not support XForms
                     natively, although XForms support in Mozilla is under way and plugins are available for Internet
                     Explorer. However you can leverage the benefits of XForms today by using an Ajax-based XForms
                     engine like the one provided in Orbeon Forms. The Orbeon Forms XForms engine transparently generates

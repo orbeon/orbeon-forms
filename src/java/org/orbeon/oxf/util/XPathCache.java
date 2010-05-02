@@ -54,7 +54,17 @@ import java.util.*;
 public class XPathCache {
 
     private static NamePool NAME_POOL = new NamePool();
-    private static Configuration CONFIGURATION = new Configuration();
+    private static Configuration CONFIGURATION = new Configuration() {
+        @Override
+        public void setAllowExternalFunctions(boolean allowExternalFunctions) {
+            throw new IllegalStateException("Global XPath configuration is be read-only");
+        }
+
+        @Override
+        public void setConfigurationProperty(String name, Object value) {
+            throw new IllegalStateException("Global XPath configuration is be read-only");
+        }
+    };
     static {
         CONFIGURATION.setNamePool(NAME_POOL);
     }

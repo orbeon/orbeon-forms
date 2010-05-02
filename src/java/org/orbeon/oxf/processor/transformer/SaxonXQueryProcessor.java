@@ -24,7 +24,6 @@ import org.orbeon.oxf.processor.transformer.xslt.StringErrorListener;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.properties.PropertyStore;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
@@ -72,9 +71,10 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     // Create XQuery configuration (depends on attributes input)
                     final URIResolver uriResolver = new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
                     // TODO: once caching is in place, make sure cached object does not contain a reference to the URIResolver
-                    final Configuration config = XPathCache.getGlobalConfiguration();
+                    // NOTE: Don't use global configuration, which is immutable
+                    final Configuration configuration = new Configuration();
                     {
-                        config.setErrorListener(new StringErrorListener(logger));
+                        configuration.setErrorListener(new StringErrorListener(logger));
 
                         // 2007-07-05 MK says: "fetching of query modules is done by the ModuleURIResolver in the
                         // static context, fetching of doc() is done by the URIResolver in the dynamic context; the
@@ -82,12 +82,12 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
 //                        config.setURIResolver(uriResolver);
 
                         // Read attributes
-                        Map attributes = null;
+                        Map<String, Object> attributes = null;
                         {
                             // Read attributes input only if connected
                             if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
                                 // Read input as an attribute Map and cache it
-                                attributes = (Map) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
+                                attributes = (Map<String, Object>) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
                                     public Object read(PipelineContext context, ProcessorInput input) {
                                         final Document preferencesDocument = readInputAsDOM4J(context, input);
                                         final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
@@ -99,17 +99,17 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                         }
                         // Set configuration attributes if any
                         if (attributes != null) {
-                            for (Iterator i = attributes.keySet().iterator(); i.hasNext();) {
-                                String key = (String) i.next();
-                                Object value = attributes.get(key);
+                            for (Map.Entry<String, Object> entry: attributes.entrySet()) {
+                                final String key = entry.getKey();
+                                final Object value = entry.getValue();
 
-                                config.setConfigurationProperty(key, value);
+                                configuration.setConfigurationProperty(key, value);
                             }
                         }
                     }
 
                     // Create static context
-                    final StaticQueryContext staticContext = new StaticQueryContext(config);
+                    final StaticQueryContext staticContext = new StaticQueryContext(configuration);
 
                     // Create XQuery expression (depends on config input and static context)
                     // TODO: caching of query must also depend on attributes input
@@ -153,7 +153,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     });
 
                     // Create dynamic context and run query
-                    DynamicQueryContext dynamicContext =  new DynamicQueryContext(config);
+                    final DynamicQueryContext dynamicContext =  new DynamicQueryContext(configuration);
                     dynamicContext.setContextItem(staticContext.buildDocument(new DocumentSource(dataDocument)));
                     dynamicContext.setURIResolver(uriResolver);
                     // TODO: use xqueryExpression.getStaticContext() when Saxon is upgraded

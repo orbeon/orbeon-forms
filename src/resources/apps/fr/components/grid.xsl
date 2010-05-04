@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright (C) 2008 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
-    This program is free software; you can redistribute it and/or modify it under the terms of the
-    GNU Lesser General Public License as published by the Free Software Foundation; either version
-    2.1 of the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
 
-    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
--->
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xsl:stylesheet version="2.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -74,9 +74,12 @@
             <xsl:otherwise>
                 <xhtml:td class="{string-join(('fr-grid-td', @class), ' ')}">
                     <xsl:apply-templates select="@*"/>
-                    <xhtml:div class="fr-grid-content">
-                        <xsl:apply-templates select="node()"/>
-                    </xhtml:div>
+                    <!-- For now don't put div if content is empty. This facilitates styling with IE 6. -->
+                    <xsl:if test="exists(*) or normalize-space() != ''">
+                        <xhtml:div class="fr-grid-content">
+                            <xsl:apply-templates select="node()"/>
+                        </xhtml:div>
+                    </xsl:if>
                 </xhtml:td>
             </xsl:otherwise>
         </xsl:choose>
@@ -98,9 +101,12 @@
                 <xsl:copy>
                     <xsl:copy-of select="@*"/>
                     <xsl:attribute name="class" select="string-join(('fr-grid-td', @class), ' ')"/>
-                    <xhtml:div class="fr-grid-content">
-                        <xsl:apply-templates/>
-                    </xhtml:div>
+                    <!-- For now don't put div if content is empty. This facilitates styling with IE 6. -->
+                    <xsl:if test="exists(*) or normalize-space() != ''">
+                        <xhtml:div class="fr-grid-content">
+                            <xsl:apply-templates/>
+                        </xhtml:div>
+                    </xsl:if>
                 </xsl:copy>
             </xsl:otherwise>
         </xsl:choose>

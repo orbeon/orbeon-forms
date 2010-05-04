@@ -491,11 +491,8 @@
         <zip zipfile="${build.distrib.dir}/${project.name}-src.zip">
             <zipfileset dir="${build.root}">
                 <exclude name="build/**"/>
-                <exclude name="src/examples/**"/>
-                <exclude name="tools/*.zip"/>
-                <exclude name="tools/*.sh"/>
-                <exclude name="tools/dom4j-1_4/**"/>
-                <exclude name="tools/commons-httpclient-3.2/**"/>
+                <exclude name="tools/**"/>
+                <exclude name="src/scala/**"/>
             </zipfileset>
         </zip>
     </target>

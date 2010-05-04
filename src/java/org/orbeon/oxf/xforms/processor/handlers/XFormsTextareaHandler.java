@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -72,23 +71,27 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName);
             } else {
                 // Static readonly
-                final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
 
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
+                // For now the mediatype is known statically
+                final boolean isHTMLMediaType = "text/html".equals(attributes.getValue("mediatype"));
+
+                // Use <pre> in text/plain so that spaces are kept by the serializer
+                final String containerName = isHTMLMediaType ? "span" : "pre";
+                final String containerQName = XMLUtils.buildQName(xhtmlPrefix, containerName);
+
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName, containerAttributes);
                 if (isConcreteControl) {
                     final String value = textareaControl.getExternalValue(pipelineContext);
                     if (value != null) {
-                        final boolean isHTMLMediaType = "text/html".equals(textareaControl.getMediatype());
                         if (!isHTMLMediaType) {
-                            // Output and replace spaces with &nbsp; so that spaces are preserved in the resulting HTML
-                            final String replaced = StringUtils.replace(value, " ", XMLConstants.NBSP);
-                            contentHandler.characters(replaced.toCharArray(), 0, replaced.length());
+                            // NOTE: Don't replace spaces with &nbsp;, as this is not the right algorithm for all cases
+                            contentHandler.characters(value.toCharArray(), 0, value.length());
                         } else {
                             XFormsUtils.streamHTMLFragment(contentHandler, value, textareaControl.getLocationData(), xhtmlPrefix);
                         }
                     }
                 }
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName);
             }
         }
     }

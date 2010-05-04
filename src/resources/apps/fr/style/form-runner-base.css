@@ -339,14 +339,12 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
     margin: 0; /* We used to add space before grid, so grid is not right below title or previous grid, but it's better like this now right? */
 }
 .fr-grid tr th { text-align: left }
-.fr-grid .fr-grid-content { *overflow: hidden }/* IE HACK so that scrollable images work in the table */
-
 .fr-grid .fr-layout-table tr td { width: auto }
 
 /* Cell content */
 .fr-grid-content {
-    padding: 0 0.5em 0 0.5em;      /* Add some space around control */
-    *padding-right: 6px; /* To help IE move back controls within .fr-grid-content */
+    margin: 0 0.5em 0.5em;      /* Add some space around control */
+    *padding-right: 6px;        /* To help IE move back controls within .fr-grid-content */
 }
 
 .fr-grid-content .xforms-label {
@@ -404,7 +402,6 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 /* Checkboxes */
 .fr-grid .xforms-select-appearance-full span input { float: left }
 .fr-grid .xforms-select-appearance-full span label { float: left; margin-right: 0 }
-
 /* Size of text for checkboxes; needs to be set for every page width / columns number combination */
 #doc .fr-grid-1-columns .xforms-select-appearance-full span label { width: 50em; *width: 48.8em }
 #doc .fr-grid-2-columns .xforms-select-appearance-full span label { width: 22.5em; *width: 21.9em }
@@ -441,6 +438,24 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 .fr-grid-3-columns .fr-grid-td { width: 33.3% }
 .fr-grid-4-columns .fr-grid-td { width: 25% }
 
+/*.fr-grid-content { border: 1px solid red }*/
+
+/* Size images within cells so that they don't impact the sizing of the grid. */
+.fr-grid .fr-grid-content .xforms-mediatype-image { overflow: hidden; display: block }
+#doc .fr-grid-2-columns .fr-grid-td .xforms-mediatype-image { width: 29em; *width: 28.3011em }
+#doc .fr-grid-3-columns .fr-grid-td .xforms-mediatype-image { width: 18.8em; *width: 18.34692em }
+#doc .fr-grid-4-columns .fr-grid-td .xforms-mediatype-image { width: 13.8em; *width: 13.46742em }
+#doc2 .fr-grid-2-columns .fr-grid-td .xforms-mediatype-image { width: 34.2em; *width: 33.37578em }
+#doc2 .fr-grid-3-columns .fr-grid-td .xforms-mediatype-image { width: 22.2em; *width: 21.66498em }
+#doc2 .fr-grid-4-columns .fr-grid-td .xforms-mediatype-image { width: 16.2em; *width: 15.80958em }
+/* NOTE: for now doc3 copies doc4 */
+#doc3 .fr-grid-2-columns .fr-grid-td .xforms-mediatype-image { width: 35.2em; *width: 34.35168em }
+#doc3 .fr-grid-3-columns .fr-grid-td .xforms-mediatype-image { width: 23em; *width: 22.4457em }
+#doc3 .fr-grid-4-columns .fr-grid-td .xforms-mediatype-image { width: 16.8em; *width: 16.39512em }
+#doc4 .fr-grid-2-columns .fr-grid-td .xforms-mediatype-image { width: 35.2em; *width: 34.35168em }
+#doc4 .fr-grid-3-columns .fr-grid-td .xforms-mediatype-image { width: 23em; *width: 22.4457em }
+#doc4 .fr-grid-4-columns .fr-grid-td .xforms-mediatype-image { width: 16.8em; *width: 16.39512em }
+
 /* Hand-tuned control widths for IE <= 7 */
 /* TODO: more controls */
 #doc4 .fr-grid-td .fr-grid-content .xforms-textarea { *width: 98% }
@@ -469,11 +484,10 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 .fr-buttons-placeholder { width: 100%; display: block; text-align: center }
 .fr-buttons-placeholder div { margin: .5em }
 
-/* ***** Print and PDF ********************************************************************************************** */
+/* ***** View, PDF, email ******************************************************************************************* */
 
-/* Textarea in output mode can contain line breaks so keep them */
-
-span.xforms-textarea { white-space: -moz-pre-wrap; white-space: pre-wrap; *white-space: pre }
+/* Textarea in output mode can contain line breaks so try to keep them */
+pre.xforms-textarea { white-space: -moz-pre-wrap; white-space: pre-wrap; *white-space: normal }
 
 .fr-mode-view .xforms-hint, .fr-mode-pdf .xforms-hint, .fr-mode-email .xforms-hint { display: none }
 .fr-mode-view .xforms-alert, .fr-mode-pdf .xforms-alert, .fr-mode-email .xforms-alert { display: none }

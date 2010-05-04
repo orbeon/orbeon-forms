@@ -37,9 +37,10 @@
         </xhtml:script>
         -->
         <xhtml:style type="text/css">
-            #fr-form-group .xforms-label { font-weight: bold }
             .fr-status-icons { display: none }
             .fr-section-title { display: none }
+            /* To help IE which doesn't support pre-wrap */
+            .fr-mode-view .xforms-textarea { white-space: pre }
             /* Change default and allow hints to show in preview mode */
             .fr-mode-view .xforms-hint { display: block }
         </xhtml:style>
@@ -342,7 +343,7 @@
                                                id="licensor-control">
                                     <xforms:label ref="$form-resources/licensor/label"/>
                                     <xforms:help ref="$form-resources/licensor/help"/>
-
+                                    
                                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xforms:output>
                             </xhtml:td>

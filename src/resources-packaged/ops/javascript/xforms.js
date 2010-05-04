@@ -2462,12 +2462,12 @@ ORBEON.xforms.Controls = {
             } else {
                 // Message used not to be empty: we had a YUI tooltip
                 if (message == "") {
-                    // We don't the tooltip anymore
-                    currentTooltip.destroy();
-                    tooltipForControl[control.id] = true;
+                    // Disable this tooltip, but keep the object tied to the control
+                    currentTooltip.cfg.setProperty("disabled", true);
                 } else {
                     // Update the tooltip message
                     currentTooltip.cfg.setProperty("text", message);
+                    currentTooltip.cfg.setProperty("disabled", false);
                 }
             }
         }

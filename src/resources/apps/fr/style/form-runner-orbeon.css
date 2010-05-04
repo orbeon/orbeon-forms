@@ -169,7 +169,7 @@ p, fieldset, table { margin-bottom: 1em }
 }
 
 .xforms-label {
-    /* bold seems too much in general*/
+    font-weight: bold
 }
 
 .xforms-noscript .xforms-help-panel .xforms-help-group { list-style-type: square }

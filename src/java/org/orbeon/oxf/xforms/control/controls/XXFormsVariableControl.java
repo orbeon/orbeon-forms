@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.Variable;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -48,6 +49,26 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
     }
 
     @Override
+    protected void onCreate(PropertyContext propertyContext) {
+        super.onCreate(propertyContext);
+
+        // Case should be caught by the requireValueUpdate() below, but it's more fail-safe to mark things dirty here too
+        value = null;
+        variable.markDirty();
+    }
+
+    @Override
+    protected void markDirtyImpl(XPathDependencies xpathDependencies) {
+        super.markDirtyImpl(xpathDependencies);
+
+        // Handle value update
+        if (xpathDependencies.requireValueUpdate(getPrefixedId())) {
+            value = null;
+            variable.markDirty();
+        }
+    }
+
+    @Override
     protected void evaluateImpl(PropertyContext propertyContext) {
 
         // Evaluate other aspects of the control if necessary
@@ -57,7 +78,6 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
         if (isRelevant()) {
             // Control is relevant
             getContextStack().setBinding(this);
-            variable.markDirty();
             value = variable.getVariableValue(propertyContext, getEffectiveId(), false, true);
         } else {
             // Control is not relevant

@@ -22,7 +22,7 @@ import org.orbeon.saxon.om.Item;
 import java.util.*;
 
 /**
- * Constants useful for the XForms engine. 
+ * Constants useful for the XForms engine.
  */
 public class XFormsConstants {
 
@@ -37,7 +37,7 @@ public class XFormsConstants {
     public enum LHHA {
         LABEL, HELP, HINT, ALERT
     }
-        
+
     static {
         // TODO: Keeping this static list is not ideal
         ALLOWED_XXFORMS_ELEMENTS.add("dialog");
@@ -138,7 +138,7 @@ public class XFormsConstants {
 
     public enum XXBLScope { inner, outer }
     public enum DeploymentType { separate, integrated, plain }
-    
+
     // Variables
     public static final String XXFORMS_VARIABLE_NAME = "variable"; // don't use QName so we can support exforms/xxforms/xforms
     public static final QName EXFORMS_VARIABLE_QNAME = new QName("variable", EXFORMS_NAMESPACE);
@@ -271,6 +271,7 @@ public class XFormsConstants {
 
     public static final QName XXFORMS_USERNAME_QNAME = new QName("username", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_PASSWORD_QNAME = new QName("password", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_DOMAIN_QNAME = new QName("domain", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_SHARED_QNAME = new QName("shared", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_CACHE_QNAME = new QName("cache", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_TIME_TO_LIVE_QNAME = new QName("ttl", XXFORMS_NAMESPACE);
@@ -303,7 +304,7 @@ public class XFormsConstants {
     public static final String XFORMS_TIME_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "time");
     public static final String XFORMS_ANYURI_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "anyURI");
     public static final String XFORMS_BASE64BINARY_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_NAMESPACE_URI, "base64Binary");
-    
+
     public static final QName XXFORMS_EVENT_MODE_QNAME = new QName("events-mode", XXFORMS_NAMESPACE);
 
     public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7;

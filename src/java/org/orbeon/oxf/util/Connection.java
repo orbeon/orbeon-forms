@@ -39,17 +39,17 @@ public class Connection {
     public enum StateScope {
         NONE, REQUEST, SESSION, APPLICATION
     }
-    
+
     public enum Method {
         GET, PUT, POST
     }
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
-    
+
     private static final StateScope DEFAULT_STATE_SCOPE = StateScope.SESSION;
     private static final String LOG_TYPE = "connection";
 
-    public static final String HTTP_FORWARD_HEADERS_PROPERTY = "oxf.http.forward-headers";    
+    public static final String HTTP_FORWARD_HEADERS_PROPERTY = "oxf.http.forward-headers";
 
     public static final String HTTP_STATE_PROPERTY = "oxf.http.state";
     private static final String HTTP_STATE_ATTRIBUTE = HTTP_STATE_PROPERTY;
@@ -70,8 +70,9 @@ public class Connection {
      * o managing SOAP POST and GET a la XForms 1.1 (should this be here?)
      */
     public ConnectionResult open(ExternalContext externalContext, IndentedLogger indentedLogger, boolean logBody,
-                                 String httpMethod, final URL connectionURL, String username, String password, String contentType,
-                                 byte[] messageBody, Map<String, String[]> headerNameValues, String headersToForward) {
+                                 String httpMethod, final URL connectionURL, String username, String password, String domain,
+                                 String contentType, byte[] messageBody, Map<String, String[]> headerNameValues,
+                                 String headersToForward) {
 
         indentedLogger.startHandleOperation(LOG_TYPE, "opening connection");
         try {
@@ -88,9 +89,9 @@ public class Connection {
             // Get  the headers to forward if any
             final Map<String, String[]> headersMap = (externalContext.getRequest() != null) ?
                     getHeadersMap(externalContext, indentedLogger, username, headerNameValues, headersToForward) : headerNameValues;
-            
+
             // Open the connection
-            final ConnectionResult result = connect(indentedLogger, logBody, httpMethod, connectionURL, username, password, contentType, messageBody, headersMap);
+            final ConnectionResult result = connect(indentedLogger, logBody, httpMethod, connectionURL, username, password, domain, contentType, messageBody, headersMap);
 
             // Save state if possible
             if (isHTTPOrHTTPS)
@@ -354,7 +355,7 @@ public class Connection {
      */
     private ConnectionResult connect(IndentedLogger indentedLogger, boolean logBody,
                                      String httpMethod, final URL connectionURL, String username, String password,
-                                     String contentType, byte[] messageBody, Map<String, String[]> headersMap) {
+                                     String domain, String contentType, byte[] messageBody, Map<String, String[]> headersMap) {
 
         final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
 
@@ -389,6 +390,8 @@ public class Connection {
                         httpURLConnection.setUsername(username);
                         if (password != null)
                            httpURLConnection.setPassword(password);
+                        if (domain != null)
+                        	httpURLConnection.setDomain(domain);
                     }
                 }
 
@@ -498,7 +501,7 @@ public class Connection {
                     }
                 };
 
-                // Get response information that needs to be forwarded                
+                // Get response information that needs to be forwarded
                 {
                     // Status code
                     connectionResult.statusCode = (httpURLConnection != null) ? httpURLConnection.getResponseCode() : 200;

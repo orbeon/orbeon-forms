@@ -95,7 +95,7 @@ public class RegularSubmission extends BaseSubmission {
                 ConnectionResult connectionResult = null;
                 try {
                     connectionResult = new Connection().open(externalContext, detailsLogger, isLogBody(),
-                        p.actualHttpMethod, absoluteResolvedURL, p2.username, p2.password,
+                        p.actualHttpMethod, absoluteResolvedURL, p2.username, p2.password, p2.domain,
                         sp.actualRequestMediatype, sp.messageBody,
                         customHeaderNameValues, newForwardSubmissionHeaders);
 

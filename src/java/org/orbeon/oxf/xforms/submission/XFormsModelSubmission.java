@@ -82,7 +82,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     private String targetref;// this is an XPath expression when used with replace="instance|text" (other meaning possible post-XForms 1.1 for replace="all")
     private String avtMode;
 
-    private String avtVersion;  
+    private String avtVersion;
     private String avtEncoding;
     private String avtMediatype;
     private String avtIndent;
@@ -98,6 +98,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
     private String avtXXFormsUsername;
     private String avtXXFormsPassword;
+    private String avtXXFormsDomain;
     private String avtXXFormsReadonly;
     private String avtXXFormsShared;
     private String avtXXFormsCache;
@@ -227,6 +228,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // Extension attributes
             avtXXFormsUsername = submissionElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
             avtXXFormsPassword = submissionElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
+            avtXXFormsDomain = submissionElement.attributeValue(XFormsConstants.XXFORMS_DOMAIN_QNAME);
 
             avtXXFormsReadonly = submissionElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME);
             avtXXFormsShared = submissionElement.attributeValue(XFormsConstants.XXFORMS_SHARED_QNAME);
@@ -659,14 +661,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         Item submissionElementContextItem;
 
         final boolean hasBoundRelevantUploadControl;
-        
+
         final String resolvedMethod;
         final String actualHttpMethod;
         final String resolvedMediatype;
-    
+
         final boolean resolvedValidate;
         final boolean resolvedRelevant;
-        
+
         final boolean isHandlingClientGetAll;
 
         // XPath function library and namespace mappings
@@ -675,15 +677,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         // XPath context
         XPathCache.XPathContext xpathContext;
-        
+
         final boolean isNoscript;
         final boolean isAllowDeferredSubmission;
-    
+
         final boolean isPossibleDeferredSubmission;
         final boolean isDeferredSubmission;
         final boolean isDeferredSubmissionFirstPass;
         final boolean isDeferredSubmissionSecondPass;
-        
+
         final boolean isDeferredSubmissionSecondPassReplaceAll;
 
         public void initializeXPathContext(PropertyContext propertyContext) {
@@ -696,7 +698,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             refInstance = bindingContext.getInstance();
             xpathContext = new XPathCache.XPathContext(prefixToURIMap, bindingContext.getInScopeVariables(), functionLibrary, functionContext, null, getLocationData());
         }
-        
+
         public SubmissionParameters(PropertyContext propertyContext, String eventName) {
 
             initializeXPathContext(propertyContext);
@@ -710,7 +712,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding",
                         new XFormsSubmitErrorEvent(containingDocument, propertyContext, XFormsModelSubmission.this, XFormsSubmitErrorEvent.ErrorType.NO_DATA, null));
             }
-    
+
             // Determine if the instance to submit has one or more bound and relevant upload controls
             //
             // o we don't check if we are currently initializing the document because at that point the
@@ -725,41 +727,41 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             hasBoundRelevantUploadControl = refInstance != null && !containingDocument.isInitializing()
                     && !containingDocument.isGotSubmissionSecondPass() && xxfFormsEnsureUploads && !isReplaceAll
                     && serialize && XFormsSubmissionUtils.hasBoundRelevantUploadControls(containingDocument, refInstance);
-            
+
             {
                 // Resolved method AVT
                 final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo , avtMethod);
                 resolvedMethod = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractTextValueQName(prefixToURIMap, resolvedMethodQName, true));
-        
+
                 // Get actual method based on the method attribute
                 actualHttpMethod = getActualHttpMethod(resolvedMethod);
-        
+
                 // Get mediatype
                 resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo , avtMediatype);
-        
+
                 // Resolve validate and relevant AVTs
                 final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo , avtValidate);
                 resolvedValidate = !"false".equals(resolvedValidateString);
-        
+
                 final String resolvedRelevantString = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo , avtRelevant);
                 resolvedRelevant = !"false".equals(resolvedRelevantString);
             }
-        
+
             isHandlingClientGetAll = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && actualHttpMethod.equals("GET")
                     && isReplaceAll
                     && (resolvedMediatype == null || !resolvedMediatype.startsWith(NetUtils.APPLICATION_SOAP_XML)) // can't let SOAP requests be handled by the browser
                     && avtXXFormsUsername == null // can't optimize if there are authentication credentials
                     && avtXXFormsTarget == null;  // can't optimize if there is a target
-        
+
             // In noscript mode, or in "Ajax portlet" mode, there is no deferred submission process
             isNoscript = containingDocument.getStaticState().isNoscript();
             isAllowDeferredSubmission = !isNoscript && !XFormsProperties.isAjaxPortlet(containingDocument);
-        
+
             isPossibleDeferredSubmission = (isReplaceAll && !isHandlingClientGetAll) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);
             isDeferredSubmission = isAllowDeferredSubmission && isPossibleDeferredSubmission;
             isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
             isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
-            
+
             isDeferredSubmissionSecondPassReplaceAll = isDeferredSubmissionSecondPass && isReplaceAll;
         }
     }
@@ -779,6 +781,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final Boolean standalone;
         final String username;
         final String password;
+        final String domain;
         final boolean isReadonly;
         final boolean isCache;
         final long timeToLive;
@@ -818,6 +821,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
             username = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsUsername);
             password = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsPassword);
+            domain = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsDomain);
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(propertyContext, p.xpathContext, p.refNodeInfo, avtXXFormsReadonly);
                 isReadonly = (temp != null) ? Boolean.valueOf(temp) : false;
@@ -873,6 +877,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             this.standalone = other.standalone;
             this.username = other.username;
             this.password = other.password;
+            this.domain = other.domain;
             this.isCache = other.isCache;
             this.timeToLive = other.timeToLive;
             this.isHandleXInclude = other.isHandleXInclude;

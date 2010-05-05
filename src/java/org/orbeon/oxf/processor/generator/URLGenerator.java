@@ -53,7 +53,7 @@ import java.util.*;
 
 /**
  * Generates SAX events from a document fetched from an URL.
- * 
+ *
  * NOTE: For XML content-type and encoding related questions, check out the following draft
  * document:
  *
@@ -325,7 +325,7 @@ public class URLGenerator extends ProcessorImpl {
 
                                     headerNameValues.put(currentHeaderName, new String[]{currentHeaderValue});
                                 }
-                                
+
                                 final String forwardHeaders; {
                                     // Get from configuration first, otherwise use global default
                                     final String configForwardHeaders = XPathUtils.selectStringValueNormalize(configElement, "/config/forward-headers");
@@ -806,7 +806,7 @@ public class URLGenerator extends ProcessorImpl {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 // TODO: pass logging callback
                 connectionResult = new Connection().open(externalContext, indentedLogger, false, Connection.Method.GET.name(),
-                        config.getURL(), null, null, null, null, config.getHeaderNameValues(), config.getForwardHeaders());
+                        config.getURL(), null, null, null, null, null, config.getHeaderNameValues(), config.getForwardHeaders());
                 inputStream = connectionResult.getResponseInputStream();
             }
         }

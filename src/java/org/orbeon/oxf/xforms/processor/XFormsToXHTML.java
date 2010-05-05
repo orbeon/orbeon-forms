@@ -304,7 +304,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                     if (indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("", "adding document cache dependency for schema", "schema URI", currentSchemaURI);
 
-                    stage1CacheableState.addReference(null, currentSchemaURI, null, null,
+                    stage1CacheableState.addReference(null, currentSchemaURI, null, null, null,
                             XFormsProperties.getForwardSubmissionHeaders(containingDocument));// TODO: support username / password on schema refs
                 }
             }
@@ -320,7 +320,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                             if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", "adding document cache dependency for non-cacheable instance", "instance URI", instanceSourceURI);
 
-                            stage1CacheableState.addReference(null, instanceSourceURI, currentInstance.getUsername(), currentInstance.getPassword(),
+                            stage1CacheableState.addReference(null, instanceSourceURI, currentInstance.getUsername(), currentInstance.getPassword(), null,
                                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
                         } else {
                             // Don't add the dependency as we don't want the instance URI to be hit
@@ -341,7 +341,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             final List<String> includes = metadata.getBindingsIncludes();
             if (includes != null) {
                 for (final String include: includes) {
-                    stage1CacheableState.addReference(null, "oxf:" + include, null, null, null);
+                    stage1CacheableState.addReference(null, "oxf:" + include, null, null, null, null);
                 }
             }
         }

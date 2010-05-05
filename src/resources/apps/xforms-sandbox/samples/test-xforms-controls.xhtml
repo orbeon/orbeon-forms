@@ -52,7 +52,7 @@
                     </output-file>
                     <type-change>
                         <input/>
-                        <type>date</type>
+                        <type/>
                     </type-change>
                 </instance>
             </xforms:instance>
@@ -325,16 +325,24 @@
                     <xhtml:p>
                         <xforms:trigger appearance="minimal" id="set-type-reset">
                             <xforms:label>Reset type</xforms:label>
-                            <xforms:setvalue ev:event="DOMActivate" ref="type"/>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="type"/>
+                                <xforms:rebuild/>
+                            </xforms:action>
                         </xforms:trigger> |
                         <xforms:trigger appearance="minimal" id="set-type-date">
                             <xforms:label>Set to date</xforms:label>
-                            <xforms:setvalue ev:event="DOMActivate" ref="type">date</xforms:setvalue>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="type">date</xforms:setvalue>
+                                <xforms:rebuild/>
+                            </xforms:action>
                         </xforms:trigger> |
                         <xforms:trigger appearance="minimal" id="set-type-float">
                             <xforms:label>Set to float</xforms:label>
-                            <xforms:setvalue ev:event="DOMActivate" ref="input">2</xforms:setvalue>
-                            <xforms:setvalue ev:event="DOMActivate" ref="type">float</xforms:setvalue>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="type">float</xforms:setvalue>
+                                <xforms:rebuild/>
+                            </xforms:action>
                         </xforms:trigger>
                     </xhtml:p>
                 </xforms:group>

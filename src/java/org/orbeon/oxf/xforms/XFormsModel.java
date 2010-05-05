@@ -791,7 +791,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
             final ConnectionResult connectionResult = new Connection().open(externalContext,
-                    indentedLogger, BaseSubmission.isLogBody(), Connection.Method.GET.name(), sourceURL, null, null, null, null, null,
+                    indentedLogger, BaseSubmission.isLogBody(), Connection.Method.GET.name(), sourceURL, null, null, null, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 
             // Handle connection errors
@@ -826,11 +826,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Connect using external protocol
 
-        // Extension: username and password
+        // Extension: username and password and domain
         // NOTE: Those don't use AVTs for now, because XPath expressions in those could access
         // instances that haven't been loaded yet.
         final String xxformsUsername = instanceContainer.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
         final String xxformsPassword = instanceContainer.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
+        final String xxformsDomain = instanceContainer.attributeValue(XFormsConstants.XXFORMS_DOMAIN_QNAME);
 
         final Object instanceDocument;// Document or DocumentInfo
         if (containingDocument.getURIResolver() == null) {
@@ -850,7 +851,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             }
 
             final ConnectionResult connectionResult = new Connection().open(externalContext, indentedLogger, BaseSubmission.isLogBody(),
-                    Connection.Method.GET.name(), absoluteResolvedURL, xxformsUsername, xxformsPassword, null, null, null,
+                    Connection.Method.GET.name(), absoluteResolvedURL, xxformsUsername, xxformsPassword, xxformsDomain, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 
             try {
@@ -883,11 +884,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             if (!isReadonlyHint) {
                 instanceDocument = containingDocument.getURIResolver().readURLAsDocument(absoluteURLString, xxformsUsername, xxformsPassword,
-                        XFormsProperties.getForwardSubmissionHeaders(containingDocument));
+                		xxformsDomain, XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             } else {
-                instanceDocument = containingDocument.getURIResolver().readURLAsDocumentInfo(containingDocument.getStaticState().getXPathConfiguration(),
-                        absoluteURLString, xxformsUsername, xxformsPassword,
-                        XFormsProperties.getForwardSubmissionHeaders(containingDocument));
+                instanceDocument = containingDocument.getURIResolver().readURLAsDocumentInfo(containingDocument.getStaticState().getXPathConfiguration(), absoluteURLString, xxformsUsername, xxformsPassword,
+                		xxformsDomain, XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             }
         }
 
@@ -937,7 +937,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // NOTE: No XInclude supported to read instances with @src for now
         setInstanceDocument(instanceDocument, effectiveId, instanceId, resourceAbsolutePathOrAbsoluteURL, null, null, false, -1, xxformsValidation, false);
     }
-    
+
     public void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {
         // NOP
     }

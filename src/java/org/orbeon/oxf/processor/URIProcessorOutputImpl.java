@@ -205,7 +205,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
 
                     final URIReferencesState state = (URIReferencesState) processorImpl.getState(pipelineContext);
                     final String urlString = url.toExternalForm();
-                    readURLToStateIfNeeded(pipelineContext, url, state, uriReference.username, uriReference.password, uriReference.headersToForward);
+                    readURLToStateIfNeeded(pipelineContext, url, state, uriReference.username, uriReference.password, uriReference.domain, uriReference.headersToForward);
                     return state.getLastModified(urlString, uriReference.username, uriReference.password);
 
                 } else  {
@@ -253,11 +253,13 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
     }
 
     public static class URIReference {
-        public URIReference(String context, String spec, String username, String password, String headersToForward) {
+        public URIReference(String context, String spec, String username, String password,
+        					String domain, String headersToForward) {
             this.context = context;
             this.spec = spec;
             this.username = username;
             this.password = password;
+            this.domain = domain;
             this.headersToForward = headersToForward;
         }
 
@@ -265,6 +267,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         public String spec;
         public String username;
         public String password;
+        public String domain;
         public String headersToForward;
 
         @Override
@@ -323,15 +326,17 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
          * @param spec              URL spec
          * @param username          optional username
          * @param password          optional password
+         * @param domain			optional domain
          * @param headersToForward  headers to forward
          */
-        public void addReference(String context, String spec, String username, String password, String headersToForward) {
+        public void addReference(String context, String spec, String username, String password,
+        							String domain, String headersToForward) {
             if (references == null)
                 references = new ArrayList<URIReference>();
 
 //            logger.info("URIProcessorOutputImpl: adding reference: context = " + context + ", spec = " + spec);
 
-            references.add(new URIReference(context, spec, username, password, headersToForward));
+            references.add(new URIReference(context, spec, username, password, domain, headersToForward));
         }
 
         /**
@@ -375,9 +380,11 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
      * @param state             state to read to
      * @param username          optional username
      * @param password          optional password
+     * @param domain          	optional domain
      * @param headersToForward  headers to forward
      */
-    public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, String username, String password, String headersToForward) {
+    public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, String username, String password,
+    									String domain, String headersToForward) {
 
         final String urlString = url.toExternalForm();
 
@@ -400,7 +407,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 // Open connection
                 final ConnectionResult connectionResult
                     = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
-                        submissionURL, username, password, null, null, null, headersToForward);
+                        submissionURL, username, password, domain, null, null, null, headersToForward);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode != 200)

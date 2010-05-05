@@ -72,7 +72,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                 // requests from this processor should not go through it. So we rewrite as a service URL instead. But in
                 // addition to that, we must still rewrite the path as a resource, so that versioned resources are
                 // handled properly.
-                
+
                 final String path = externalContext.getResponse().rewriteResourceURL(uri, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
                 return externalContext.rewriteServiceURL(path, true);
             }
@@ -83,7 +83,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                     // TODO: Use xforms:submission code instead
                     final ConnectionResult connectionResult
                         = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
-                            new URL(resolvedURI), null, null, null, null, null, Connection.getForwardHeaders());
+                            new URL(resolvedURI), null, null, null, null, null, null, Connection.getForwardHeaders());
 
                     if (connectionResult.statusCode != 200) {
                         connectionResult.close();

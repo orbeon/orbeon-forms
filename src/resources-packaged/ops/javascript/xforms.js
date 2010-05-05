@@ -6575,120 +6575,118 @@ ORBEON.xforms.Server = {
                                         // NOTE: This is not ideal: in the future, we would like a template-based mechanism instead.
                                         var recreatedInput = false;
                                         if (type != null && ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
-                                            var isDateType = type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date";
-                                            var isTimeType = type == "{http://www.w3.org/2001/XMLSchema}time" || type == "{http://www.w3.org/2002/xforms}time";
-                                            var isDateTimeType = type == "{http://www.w3.org/2001/XMLSchema}dateTime" || type == "{http://www.w3.org/2002/xforms}dateTime";
-                                            var isBooleanType = type == "{http://www.w3.org/2001/XMLSchema}boolean" || type == "{http://www.w3.org/2002/xforms}boolean";
-                                            var isStringType = type == "" || type == "{http://www.w3.org/2001/XMLSchema}string" || type == "{http://www.w3.org/2002/xforms}string";
+                                            var isDateType = false, isTimeType = false, isDateTimeType = false, isBooleanType = false, isStringType = false;
+                                            if (type == "{http://www.w3.org/2001/XMLSchema}date" || type == "{http://www.w3.org/2002/xforms}date") isDateType = true;
+                                            else if (type == "{http://www.w3.org/2001/XMLSchema}time" || type == "{http://www.w3.org/2002/xforms}time") isTimeType = true;
+                                            else if (type == "{http://www.w3.org/2001/XMLSchema}dateTime" || type == "{http://www.w3.org/2002/xforms}dateTime") isDateTimeType = true;
+                                            else if (type == "{http://www.w3.org/2001/XMLSchema}boolean" || type == "{http://www.w3.org/2002/xforms}boolean") isBooleanType = true;
+                                            else isStringType = true;
 
                                             var isRecognizedType = isDateType || isTimeType || isDateTimeType || isBooleanType || isStringType;
-                                            if (isRecognizedType) { // just ignore if we don't know the type
+                                            // Remember that this input has be recreated which means we need to update its value
+                                            recreatedInput = true;
 
-                                                // Remember that this input has be recreated which means we need to update its value
-                                                recreatedInput = true;
+                                            // Clean-up document element by removing type classes
+                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-type-string");
+                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-type-date");
+                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-type-time");
+                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-type-dateTime");
+                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-type-boolean");
+                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-incremental");
 
-                                                // Clean-up document element by removing type classes
-                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-string");
-                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-date");
-                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-time");
-                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-dateTime");
-                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-type-boolean");
-                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-incremental");
+                                            // Minimal control content can be different
+                                            var isMinimal = ORBEON.util.Dom.hasClass(documentElement, "xforms-input-appearance-minimal");
 
-                                                // Minimal control content can be different
-                                                var isMinimal = ORBEON.util.Dom.hasClass(documentElement, "xforms-input-appearance-minimal");
-
-                                                // Find the position of the last label before the control "actual content"
-                                                // and remove all elements that are not labels
-                                                var lastLabelPosition = -1;
-                                                var childElements = YAHOO.util.Dom.getChildren(documentElement);
-                                                for (var childIndex = 0; childIndex < childElements.length; childIndex++) {
-                                                    var childElement = childElements[childIndex];
-                                                    var childTagName = childElement.tagName.toLowerCase();
-                                                    if (! YAHOO.util.Dom.hasClass(childElement, "xforms-label")
-                                                            && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help")
-                                                            && ! YAHOO.util.Dom.hasClass(childElement, "xforms-hint")
-                                                            && ! YAHOO.util.Dom.hasClass(childElement, "xforms-alert")
-                                                            && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help-image")) {
-                                                        documentElement.removeChild(childElement);
-                                                        if (lastLabelPosition == -1)
-                                                            lastLabelPosition = childIndex - 1;
-                                                    }
+                                            // Find the position of the last label before the control "actual content"
+                                            // and remove all elements that are not labels
+                                            var lastLabelPosition = -1;
+                                            var childElements = YAHOO.util.Dom.getChildren(documentElement);
+                                            for (var childIndex = 0; childIndex < childElements.length; childIndex++) {
+                                                var childElement = childElements[childIndex];
+                                                var childTagName = childElement.tagName.toLowerCase();
+                                                if (! YAHOO.util.Dom.hasClass(childElement, "xforms-label")
+                                                        && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help")
+                                                        && ! YAHOO.util.Dom.hasClass(childElement, "xforms-hint")
+                                                        && ! YAHOO.util.Dom.hasClass(childElement, "xforms-alert")
+                                                        && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help-image")) {
+                                                    documentElement.removeChild(childElement);
+                                                    if (lastLabelPosition == -1)
+                                                        lastLabelPosition = childIndex - 1;
                                                 }
+                                            }
 
-                                                function insertIntoDocument(nodes) {
-                                                    if (ORBEON.util.Utils.isNewXHTMLLayout()) {
-                                                        // New markup: insert after "last label" (we remembered the position of the label after which there is real content)
-                                                        if (YAHOO.util.Dom.getChildren(documentElement).length == 0) {
-                                                            for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
-                                                                documentElement.appendChild(nodes[nodeIndex]);
-                                                        } else if (lastLabelPosition == -1) {
-                                                            var firstChild = YAHOO.util.Dom.getFirstChild(documentElement);
-                                                            for (var nodeIndex = nodes.length - 1; nodeIndex >= 0; nodeIndex--)
-                                                                YAHOO.util.Dom.insertBefore(nodes[nodeIndex], firstChild);
-                                                        } else {
-                                                            for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
-                                                                YAHOO.util.Dom.insertAfter(nodes[nodeIndex], childElements[lastLabelPosition]);
-                                                        }
-                                                    } else {
-                                                        // Old markup: insert in container, which will be empty
+                                            function insertIntoDocument(nodes) {
+                                                if (ORBEON.util.Utils.isNewXHTMLLayout()) {
+                                                    // New markup: insert after "last label" (we remembered the position of the label after which there is real content)
+                                                    if (YAHOO.util.Dom.getChildren(documentElement).length == 0) {
                                                         for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
                                                             documentElement.appendChild(nodes[nodeIndex]);
+                                                    } else if (lastLabelPosition == -1) {
+                                                        var firstChild = YAHOO.util.Dom.getFirstChild(documentElement);
+                                                        for (var nodeIndex = nodes.length - 1; nodeIndex >= 0; nodeIndex--)
+                                                            YAHOO.util.Dom.insertBefore(nodes[nodeIndex], firstChild);
+                                                    } else {
+                                                        for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
+                                                            YAHOO.util.Dom.insertAfter(nodes[nodeIndex], childElements[lastLabelPosition]);
                                                     }
+                                                } else {
+                                                    // Old markup: insert in container, which will be empty
+                                                    for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
+                                                        documentElement.appendChild(nodes[nodeIndex]);
                                                 }
+                                            }
 
-                                                function createInput(typeClassName, inputIndex) {
-                                                    var newInputElement = document.createElement("input");
-                                                    newInputElement.setAttribute("type", "text");
-                                                    newInputElement.className = "xforms-input-input " + typeClassName;
-                                                    newInputElement.name = ORBEON.util.Utils.appendToEffectiveId(controlId, "$xforms-input-" + inputIndex);
-                                                    newInputElement.id = newInputElement.name;
-                                                    return newInputElement;
-                                                }
+                                            function createInput(typeClassName, inputIndex) {
+                                                var newInputElement = document.createElement("input");
+                                                newInputElement.setAttribute("type", "text");
+                                                newInputElement.className = "xforms-input-input " + typeClassName;
+                                                newInputElement.name = ORBEON.util.Utils.appendToEffectiveId(controlId, "$xforms-input-" + inputIndex);
+                                                newInputElement.id = newInputElement.name;
+                                                return newInputElement;
+                                            }
 
-                                                if (isStringType) {
-                                                    insertIntoDocument([createInput("xforms-type-string", 1)]);
-                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-string");
-                                                } else if (isDateType && !isMinimal) {
-                                                    insertIntoDocument([createInput("xforms-type-date", 1)]);
-                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
-                                                } else if (isDateType && isMinimal) {
-                                                    // Create image element
-                                                    var image = document.createElement("img");
-                                                    image.setAttribute("src", ORBEON.xforms.Globals.resourcesBaseURL + "/ops/images/xforms/calendar.png");
-                                                    image.className = "xforms-input-input xforms-type-date xforms-input-appearance-minimal";
-                                                    insertIntoDocument([image]);
-                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
-                                                } else if (isTimeType) {
-                                                    insertIntoDocument([createInput("xforms-type-time", 1)]);
-                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-time");
-                                                } else if (isDateTimeType) {
-                                                    insertIntoDocument([createInput("xforms-type-date", 1), createInput("xforms-type-time", 2)]);
-                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-dateTime");
-                                                } else if (isBooleanType) {
+                                            if (isStringType) {
+                                                insertIntoDocument([createInput("xforms-type-string", 1)]);
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-string");
+                                            } else if (isDateType && !isMinimal) {
+                                                insertIntoDocument([createInput("xforms-type-date", 1)]);
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
+                                            } else if (isDateType && isMinimal) {
+                                                // Create image element
+                                                var image = document.createElement("img");
+                                                image.setAttribute("src", ORBEON.xforms.Globals.resourcesBaseURL + "/ops/images/xforms/calendar.png");
+                                                image.className = "xforms-input-input xforms-type-date xforms-input-appearance-minimal";
+                                                insertIntoDocument([image]);
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-date");
+                                            } else if (isTimeType) {
+                                                insertIntoDocument([createInput("xforms-type-time", 1)]);
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-time");
+                                            } else if (isDateTimeType) {
+                                                insertIntoDocument([createInput("xforms-type-date", 1), createInput("xforms-type-time", 2)]);
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-dateTime");
+                                            } else if (isBooleanType) {
 
-                                                    // Make copy of the template
-                                                    var template = ORBEON.util.Dom.getElementById("xforms-select-full-template");
-                                                    template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
-                                                    var templateClone = template.cloneNode(true);
+                                                // Make copy of the template
+                                                var template = ORBEON.util.Dom.getElementById("xforms-select-full-template");
+                                                template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
+                                                var templateClone = template.cloneNode(true);
 
-                                                    // Remove the label we have in the template for each individual checkbox/radio button
-                                                    var templateLabelElement = templateClone.getElementsByTagName("label")[0];
-                                                    templateLabelElement.parentNode.removeChild(templateLabelElement);
+                                                // Remove the label we have in the template for each individual checkbox/radio button
+                                                var templateLabelElement = templateClone.getElementsByTagName("label")[0];
+                                                templateLabelElement.parentNode.removeChild(templateLabelElement);
 
-                                                    // Replace placeholders
-                                                    insertIntoDocument([templateClone]);
-                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", "true");
-                                                    var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e0");
-                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-effective-id$", itemEffectiveId);
-                                                    ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
+                                                // Replace placeholders
+                                                insertIntoDocument([templateClone]);
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", "true");
+                                                var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e0");
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-effective-id$", itemEffectiveId);
+                                                ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
 
-                                                    // Update classes
-                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
-                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-input-appearance-minimal");
-                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
-                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-incremental");
-                                                }
+                                                // Update classes
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-input-appearance-minimal");
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-incremental");
                                             }
                                         }
 

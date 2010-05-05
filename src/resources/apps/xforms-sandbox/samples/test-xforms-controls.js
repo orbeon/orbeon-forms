@@ -362,6 +362,27 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     }
 }));
 
+YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
+
+    name: "Type change",
+
+    testChangeToDate: function() {
+        var input = YAHOO.util.Dom.get("type-change-input" + XFORMS_SEPARATOR_1 + "1");
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            YAHOO.util.UserAction.click("set-type-date" + XFORMS_SEPARATOR_1 + "1");
+        }, function() {
+            var inputInput = ORBEON.util.Dom.getChildElementByClass(input, "xforms-input-input");
+            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(inputInput, "xforms-type-date"));
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                YAHOO.util.UserAction.click("set-type-float" + XFORMS_SEPARATOR_1 + "1");
+            }, function() {
+                var inputInput = ORBEON.util.Dom.getChildElementByClass(input, "xforms-input-input");
+                YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(inputInput, "xforms-type-string"));
+            });
+        });
+    }
+}));
+
 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
     if (parent && parent.TestManager) {
         parent.TestManager.load();

@@ -42,16 +42,9 @@
             <menu-item label="Introduction to XPL" href="reference-xpl-pipelines"/>
             <menu-item label="XPL 1.0 W3C Submission" href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/"/>
         </menu>
-        <!--
-        <menu label="Core XML Technologies">
-            <menu-item label="XML in Orbeon Forms" href="reference-xml"/>
-            <menu-item label="XHTML in Orbeon Forms" href="reference-xhtml"/>
-            <menu-item label="XSLT in Orbeon Forms" href="reference-xslt"/>
-        </menu>
-        -->
     </menu>
     <menu label="Other Technologies Reference">
-        <menu-item label="Resource Managers" href="reference-resource-managers"/>
+        <menu-item label="Resource Managers" href="http://wiki.orbeon.com/forms/doc/developer-guide/resource-managers"/>
         <menu-item label="Configuration Properties" href="reference-properties"/>
         <menu-item label="Non-XML Documents" href="reference-formats"/>
         <menu-item label="Error Page and Dialog" href="reference-error-pipeline"/>

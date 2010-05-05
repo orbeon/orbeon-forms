@@ -11,15 +11,23 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-/*
- *  JavaScript implementation for the datatable component
+/**
+ * JavaScript implementation for the datatable component.
  *
+ * During a typical initialization, the following steps run:
+ *
+ *      1.  updateColumns() and updateRows() - don't do anything at this point as the datatable hasn't been initialized yet.
+ *      2.  draw() is called (xforms-enabled).
+ *      3.      initProperties()
+ *      4.          getAndSetColumns()
+ *      5.      finish()
+ *      6.          setSizes()
+ *      7.          initColumns()
  */
 
 YAHOO.namespace("xbl.fr");
 
-YAHOO.xbl.fr.Datatable = function() {
-};
+YAHOO.xbl.fr.Datatable = function() {};
 
 /**
  * Used to manage the datatables that are located in a page
@@ -46,7 +54,6 @@ YAHOO.xbl.fr.DatatableManager = {
      * and resize all the datatables that are in the page
      */
     resizeWhenStabilized: function () {
-
         var width = YAHOO.util.Dom.getViewportWidth();
 
         if (YAHOO.xbl.fr.DatatableManager.previousBodyWidth != width) {
@@ -84,8 +91,7 @@ YAHOO.xbl.fr.DatatableManager = {
                 datatable.draw(datatable.innerTableWidth);
             }
         }
-
-    }  ,
+    },
 
     EOO: ''                                                     // End Of Object!
 };
@@ -93,9 +99,7 @@ YAHOO.xbl.fr.DatatableManager = {
 // Set the event listener for window resize events
 YAHOO.util.Event.addListener(window, "resize", YAHOO.xbl.fr.DatatableManager.resize);
 
-
 ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Datatable, "xbl-fr-datatable");
-
 
 /*
  * Datatable class
@@ -132,14 +136,15 @@ YAHOO.xbl.fr.Datatable.prototype = {
     tableWidth: null,
     tableHeight: null,
     headerHeight: null,
-    innerTableWidth: null,
     colResizers: [],
     colSorters: [],
     masterRow: null,                                            // Header "master" row
     headerColumns: [],
 
     /**
-     * Initialize a datatable
+     * Initialize a datatable.
+     * Runs on xforms-enabled.
+     *
      * @param innerTableWidth
      */
     draw: function (innerTableWidth) {
@@ -151,7 +156,6 @@ YAHOO.xbl.fr.Datatable.prototype = {
         if (this.isXformsEnabled()) {
             if (!this.isInitialized) {
                 // We need to postpone the initialization of datatables that are hidden by an xforms:switch
-                //var table = YAHOO.util.Selector.query('table', target.parentNode, false)[0];
                 if (this.isDisplayed()) {
                     this.initProperties();
                     this.finish();
@@ -171,7 +175,6 @@ YAHOO.xbl.fr.Datatable.prototype = {
             }
         }
         // if not xforms-enabled, we'll receive a new call when we'll become xforms-enabled
-
     },
 
     /**
@@ -204,10 +207,9 @@ YAHOO.xbl.fr.Datatable.prototype = {
     },
 
     /**
-     * Initialize a buch of datatable's properties
+     * Initialize a bunch of datatable's properties
      */
     initProperties: function () {
-
         this.divContainer = YAHOO.util.Dom.getElementsByClassName('yui-dt', 'div', this.container)[0];
 
         YAHOO.util.Dom.addClass(this.divContainer, 'fr-dt-initialized');
@@ -265,14 +267,12 @@ YAHOO.xbl.fr.Datatable.prototype = {
             node.savedHeight = node.style.height;
             node.savedClassName = node.className;
         }
-
-    }                                      ,
+    },
 
     /**
      * Finish the datatable initialization
      */
     finish: function () {
-
         this.setSizes();
 
         if (this.scrollH) {
@@ -287,8 +287,16 @@ YAHOO.xbl.fr.Datatable.prototype = {
 
         this.initColumns();
 
-        // Now that the table has been properly sized, reconsider its
-        // "resizeability"
+        // Set size of body with remaining space
+        // We do this after initColumns(), as changing the size of the columns can change the amount of space taken by
+        // the header, and hence the space remaining for the body.
+        this.headerHeight = this.headerContainer.clientHeight;
+        if (this.height != 'auto') {
+            var newBodyHeight = this.divContainer.clientHeight - this.headerHeight;
+            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', newBodyHeight + 'px');
+        }
+
+        // Now that the table has been properly sized, reconsider its "resizability"
 
         if (this.hasFixedWidthContainer && this.hasFixedWidthTable) {
             // These are fixed width tables without horizontal scroll bars
@@ -301,10 +309,11 @@ YAHOO.xbl.fr.Datatable.prototype = {
         // Sometimes, in IE / quirks mode, the height or width is miscalculated and that forces an horizontal scroll bar...
 
         if (YAHOO.env.ua.ie > 0 && (YAHOO.env.ua.ie < 8 || document.compatMode == "BackCompat")) {
+            var limit;
 
             // Make sure we don't have a vertical bar if not required
             if (this.scrollH && ! this.scrollV) {
-                var limit = 1000;
+                limit = 1000;
                 while (limit > 0 && this.table.parentNode.clientWidth < this.pxWidth - 2) {
                     this.tableHeight += 1;
                     this.height = this.tableHeight + "px";
@@ -315,7 +324,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
 
             // Make sure we don't have an horizontal bar if not required
             if (this.scrollV && ! this.scrollH) {
-                var limit = 50;
+                limit = 50;
                 while (limit > 0 && this.table.clientWidth > this.table.parentNode.clientWidth) {
                     this.tableWidth -= 1;
                     var w = this.tableWidth + "px";
@@ -325,7 +334,6 @@ YAHOO.xbl.fr.Datatable.prototype = {
                 }
             }
         }
-
     },
 
     /**
@@ -379,7 +387,6 @@ YAHOO.xbl.fr.Datatable.prototype = {
                     } else {
                         minWidth = this.tableWidth;
                     }
-
                 }
                 this.tableWidth = this.optimizeWidth(minWidth);
             }
@@ -469,14 +476,6 @@ YAHOO.xbl.fr.Datatable.prototype = {
              YAHOO.util.Dom.removeClass(this.headerContainer, 'fr-datatable-hidden');
         }
 
-        // Was previously not visible, as we we just remove the fr-datatable-hidden on the header container
-        this.headerHeight = this.headerContainer.clientHeight;
-        if (this.height != 'auto') {
-            // Set size of body with remaining space
-            var newBodyHeight = this.divContainer.clientHeight - this.headerHeight;
-            YAHOO.util.Dom.setStyle(this.bodyContainer, 'height', newBodyHeight + 'px');
-        }
-
         this.pxWidth = pxWidth;
 
     },
@@ -495,7 +494,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
             var colResizer = null;
             if (YAHOO.util.Dom.hasClass(this.headerColumns[j], 'yui-dt-resizeable')) {
                 liner = YAHOO.xbl.fr.Datatable.utils.getFirstChildByTagName(childDiv, 'div');
-                colResizer = new YAHOO.xbl.fr.Datatable.colResizer(j, this.headerColumns[j], this)
+                colResizer = new YAHOO.xbl.fr.Datatable.colResizer(j, this.headerColumns[j], this);
                 this.colResizers[j] = colResizer;
             } else {
                 liner = childDiv;
@@ -506,11 +505,11 @@ YAHOO.xbl.fr.Datatable.prototype = {
             // See _setColumnWidth in YUI datatable.js...
             if (YAHOO.env.ua.ie == 0) {
                 var className = 'dt-' + this.id + '-col-' + (j + 1);
-                className = className.replace('\$', '-', 'g');
+                className = className.replace('\$', '-');
                 YAHOO.util.Dom.addClass(liner, className);
                 for (var k = 0; k < this.bodyColumns[j].length; k++) {
                     var cell = this.bodyColumns[j][k];
-                    var liner = YAHOO.util.Selector.query('div', cell, true);
+                    liner = YAHOO.util.Selector.query('div', cell, true);
                     YAHOO.util.Dom.addClass(liner, className);
 
                 }
@@ -736,30 +735,11 @@ YAHOO.xbl.fr.Datatable.prototype = {
      */
     needsRedraw: function() {
         return  this.headerColumns[0].parentNode === null;
-        for (var icol = 0; icol < this.headerColumns.length; icol++) {
-            var headerColumn = this.headerColumns[icol];
-            if (headerColumn.parentNode === null) {
-                return true;
-            }
-            var divs = YAHOO.util.Dom.getElementsByClassName('yui-dt-liner', 'div', headerColumn);
-            if (divs.length > 0) {
-                var div = divs[0];
-                if (div === undefined) {
-                    return true;
-                } else {
-                    var className = 'dt-' + this.id + '-col-' + (icol + 1);
-                    if (div.style.width === "" && ! YAHOO.util.Dom.hasClass(div, className)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-
     },
 
     /**
-     *  Update the datatable when its columns sets have changed
+     * Update the datatable when its columns sets have changed.
+     * Runs on xxforms-nodeset-changed xforms-enabled xforms-disabled.
      */
     updateColumns: function () {
         if (! (this.isInitialized && this.isXformsEnabled())) {
@@ -784,7 +764,8 @@ YAHOO.xbl.fr.Datatable.prototype = {
     },
 
     /**
-     * Update the datatable when its rows have changed
+     * Update the datatable when its rows have changed.
+     * Runs on xxforms-nodeset-changed xforms-enabled xforms-disabled.
      */
     updateRows: function () {
         if (! (this.isInitialized && this.isXformsEnabled())) {
@@ -918,10 +899,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
 
 
     EOO: ''                                                     // End Of Object!
-
-
-}
-
+};
 
 /**
  *
@@ -968,7 +946,7 @@ YAHOO.xbl.fr.Datatable.utils = {
 
     EOO: ''                                                     // End Of Object!
 
-}
+};
 
 YAHOO.xbl.fr.Datatable.colSorter = function (th) {
     var liner = YAHOO.util.Selector.query('div.yui-dt-liner', th, true);
@@ -979,7 +957,7 @@ YAHOO.xbl.fr.Datatable.colSorter = function (th) {
             ORBEON.xforms.Document.dispatchEvent(a.id, "DOMActivate");
         }
     });
-}
+};
 
 /**
  * Implementation of datatable.colResizer constructor. Creates the YAHOO.util.DD object.
@@ -1002,7 +980,7 @@ YAHOO.xbl.fr.Datatable.colResizer = function (index, th, datatable) {
 
     this.resizer = childrenDivs[1];
 
-}
+};
 
 
 YAHOO.extend(YAHOO.xbl.fr.Datatable.colResizer, YAHOO.util.DDProxy, {
@@ -1062,8 +1040,7 @@ YAHOO.extend(YAHOO.xbl.fr.Datatable.colResizer, YAHOO.util.DDProxy, {
      * if it had lost it!
      *
      * @method onMouseUp
-     * @param e
-     *            {string} The mousedown event
+     * @param ev {string} The mousedown event
      */
     onMouseUp: function (ev) {
         this.resizer.style.left = "auto";
@@ -1097,6 +1074,3 @@ YAHOO.extend(YAHOO.xbl.fr.Datatable.colResizer, YAHOO.util.DDProxy, {
         this.datatable.table.style.display = '';
     }
 });
-
-
-

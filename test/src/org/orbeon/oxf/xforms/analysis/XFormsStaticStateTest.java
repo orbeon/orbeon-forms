@@ -56,7 +56,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
     }
 
     public void testBindAnalysis() {
-        if (Version.instance().isPE()) { // only test this feature if we are the PE version
+        if (Version.isPE()) { // only test this feature if we are the PE version
             final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/binds.xml");
 
             staticState.dumpAnalysis();
@@ -105,7 +105,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
 
     public void testXPathAnalysis() {
-        if (Version.instance().isPE()) { // only test this feature if we are the PE version
+        if (Version.isPE()) { // only test this feature if we are the PE version
             final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/form.xml");
             final Map<String, String> namespaces = new HashMap<String, String>();
             namespaces.put("", "");
@@ -307,6 +307,41 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
             assertTrue(dependencies.requireValueUpdate("select4"));
 
             dependencies.refreshDone();
+        }
+    }
+
+    public void testVariables() {
+        if (Version.isPE()) { // only test this feature if we are the PE version
+            final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/variables.xml");
+            final Map<String, String> namespaces = new HashMap<String, String>();
+            namespaces.put("", "");
+
+            // Hold the current list of changes
+            final Set<String> currentChanges = new HashSet<String>();
+
+            final PathMapXPathDependencies dependencies = new PathMapXPathDependencies(staticState.getIndentedLogger(), staticState) {
+                @Override
+                protected Set<String> getModifiedPaths() {
+                    return currentChanges;
+                }
+            };
+
+            staticState.dumpAnalysis();
+
+            // == Value change to default ==================================================================================
+            currentChanges.clear();
+            currentChanges.add(XPathAnalysis.getInternalPath(namespaces, "instance('default')/value"));
+
+            assertFalse(dependencies.requireBindingUpdate("values"));
+            assertTrue(dependencies.requireValueUpdate("values"));
+
+            assertFalse(dependencies.requireBindingUpdate("repeat"));
+
+            assertFalse(dependencies.requireBindingUpdate("value"));
+            assertTrue(dependencies.requireValueUpdate("value"));
+
+            assertFalse(dependencies.requireBindingUpdate("input"));
+            assertTrue(dependencies.requireValueUpdate("input"));
         }
     }
 

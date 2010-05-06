@@ -118,15 +118,15 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         this.effectiveId = effectiveId;
     }
 
-    public String getId() {
+    public final String getId() {
         return id;
     }
 
-    public XBLContainer getXBLContainer() {
+    public final XBLContainer getXBLContainer() {
         return container;
     }
 
-    public XBLContainer getXBLContainer(XFormsContainingDocument containingDocument) {
+    public final XBLContainer getXBLContainer(XFormsContainingDocument containingDocument) {
         return getXBLContainer();
     }
 
@@ -142,7 +142,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         // NOP, can be overridden
     }
 
-    public XBLBindings.Scope getResolutionScope() {
+    public final XBLBindings.Scope getResolutionScope() {
         return containingDocument.getStaticState().getXBLBindings().getResolutionScopeByPrefixedId(getPrefixedId());
     }
 
@@ -169,7 +169,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return effectiveId;
     }
 
-    public String getPrefixedId() {
+    public final String getPrefixedId() {
         return prefixedId;
     }
 
@@ -205,7 +205,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         }
     }
 
-    public boolean isRelevant() {
+    public final boolean isRelevant() {
         return relevant;
     }
 
@@ -353,11 +353,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         return true;
     }
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
-    public XFormsControl getParent() {
+    public final XFormsControl getParent() {
         return parent;
     }
 
@@ -369,7 +369,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         this.parent = null;
     }
 
-    public Element getControlElement() {
+    public final Element getControlElement() {
         return controlElement;
     }
 

@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.xforms.control.controls;
 
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 
@@ -23,12 +25,8 @@ import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 public class XXFormsRootControl extends XFormsNoSingleNodeContainerControl implements XFormsPseudoControl {
     public XXFormsRootControl(XFormsContainingDocument containingDocument) {
         super(containingDocument, null, null, "root", null);
-    }
-
-    @Override
-    public boolean isRelevant() {
-        // Root control is always relevant
-        return true;
+        // Call this to set initial relevance to true
+        setBindingContext(null, null);
     }
 
     @Override

@@ -404,7 +404,8 @@ public class XFormsControls implements XFormsObjectResolver {
                 // Iterate over current xforms:repeat nodeset
                 final List<Item> currentNodeSet = currentContextStack.getCurrentNodeset();
                 if (currentNodeSet != null) {
-                    for (int iterationIndex = 1; iterationIndex <= currentNodeSet.size(); iterationIndex++) {
+                    final int nodesetSize = currentNodeSet.size();
+                    for (int iterationIndex = 1; iterationIndex <= nodesetSize; iterationIndex++) {
                         // Push "artificial" binding with just current node in nodeset
                         currentContextStack.pushIteration(iterationIndex);
                         {

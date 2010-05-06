@@ -127,11 +127,11 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
      *
      * @return bound item or null
      */
-    public Item getBoundItem() {
+    public final Item getBoundItem() {
         return boundItem;
     }
 
-    public boolean isReadonly() {
+    public final boolean isReadonly() {
         return readonly;
     }
 
@@ -151,23 +151,23 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         return true;
     }
 
-    public boolean isRequired() {
+    public final boolean isRequired() {
         return required;
     }
 
-    public boolean wasReadonly() {
+    public final boolean wasReadonly() {
         final boolean result = wasReadonly;
         wasReadonly = readonly;
         return result;
     }
 
-    public boolean wasRequired() {
+    public final boolean wasRequired() {
         final boolean result = wasRequired;
         wasRequired = required;
         return result;
     }
 
-    public boolean wasValid() {
+    public final boolean wasValid() {
         final boolean result = wasValid;
         wasValid = valid;
         return result;

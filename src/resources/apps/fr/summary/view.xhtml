@@ -361,7 +361,7 @@
                     <xforms:action ev:event="xforms-value-changed" ev:propagate="stop"/>
 
                     <xforms:group class="fr-summary-search">
-                        
+
                         <!-- Search also when user presses "enter" in a field -->
                         <xforms:action ev:event="DOMActivate">
                             <!-- Reset search selection and navigation -->
@@ -385,7 +385,6 @@
                                             <!-- Search button -->
                                             <fr:button>
                                                 <xforms:label>
-                                                    <!--<xhtml:img width="10" height="14" src="/apps/fr/style/search.gif" alt=""/>-->
                                                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/search_16.png" alt=""/>
                                                     <xforms:output value="$fr-resources/summary/search/search-forms"/>
                                                 </xforms:label>
@@ -587,7 +586,7 @@
                                             <th fr:sortable="false" fr:resizeable="true">
                                                 <!-- Output showing as the header of the column -->
                                                 <xforms:output value="
-                                                    for 
+                                                    for
                                                         (: Current node is a control, such as xforms:input :)
                                                         $control-info in .,
                                                         (: Control has id='title-control', $resource-id = 'title' :)
@@ -596,9 +595,9 @@
                                                         $resource in ($form-resources/*[local-name() = $resource-id], '')[1]
                                                     return
                                                         (: If we found a resource, use its label :)
-                                                        if ($resource instance of element()) then $resource/label 
+                                                        if ($resource instance of element()) then $resource/label
                                                         (: If no resource is found, try to use the inline label :)
-                                                        else if (normalize-space($control-info/xforms:label) != '') then $control-info/xforms:label 
+                                                        else if (normalize-space($control-info/xforms:label) != '') then $control-info/xforms:label
                                                         (: If everything fails, display the name of the control between brakets :)
                                                         else concat('[', $resource-id, ']')"/>
                                             </th>

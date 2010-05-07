@@ -404,7 +404,8 @@ public class XFormsControls implements XFormsObjectResolver {
                 // Iterate over current xforms:repeat nodeset
                 final List<Item> currentNodeSet = currentContextStack.getCurrentNodeset();
                 if (currentNodeSet != null) {
-                    for (int iterationIndex = 1; iterationIndex <= currentNodeSet.size(); iterationIndex++) {
+                    final int nodesetSize = currentNodeSet.size();
+                    for (int iterationIndex = 1; iterationIndex <= nodesetSize; iterationIndex++) {
                         // Push "artificial" binding with just current node in nodeset
                         currentContextStack.pushIteration(iterationIndex);
                         {
@@ -474,19 +475,23 @@ public class XFormsControls implements XFormsObjectResolver {
                 // Handle xxforms:variable as a leaf control
 
                 listener.pushBinding(propertyContext, currentContextStack, currentControlElement, controlPrefixedId, controlEffectiveId, newScope);
-                final XXFormsVariableControl control = (XXFormsVariableControl) listener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
+                final XXFormsVariableControl variable = (XXFormsVariableControl) listener.startVisitControl(currentXBLContainer, currentControlElement, controlEffectiveId);
                 listener.endVisitControl(currentControlElement, controlEffectiveId);
 
-                // Evaluate variable right away in case it is used by further bindings
-                control.evaluate(propertyContext);
+                // What startVisitControl() above does:
+                //
+                // o get existing variable control
+                // o call markDirty() on it
+                // o this will only reset the value of the variables if dependencies want that
+                // o evaluate() below will only cause the variable to be re-evaluated if it was marked as dirty above 
 
-                // Handle variable value dependencies
-                // TODO: UI-DEPENDENCIES
+                // Evaluate variable right away in case it is used by further bindings
+                variable.evaluate(propertyContext);
 
                 currentContextStack.popBinding();
 
                 // Push variable value on the stack
-                currentContextStack.pushVariable(currentControlElement, control.getVariableName(), control.getValue(propertyContext), newScope);
+                currentContextStack.pushVariable(currentControlElement, variable.getVariableName(), variable.getValue(propertyContext), newScope);
                 variablesCount++;
             } else if (staticState.getXBLBindings().isComponent(currentControlElement.getQName())) {
                 // Handle components

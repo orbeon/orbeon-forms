@@ -1,7 +1,6 @@
 package org.orbeon.oxf.xml.xerces;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xml.TomcatClasspathFix;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 
@@ -41,11 +40,6 @@ public class XercesSAXParserFactoryImpl extends SAXParserFactory {
     private static final Map defaultFeaturesValidatingNoXInclude;
 
     static {
-        try {
-            TomcatClasspathFix.applyIfNeedBe();
-        } catch (Throwable t) {
-            // ignore
-        }
         {
             final OrbeonParserConfiguration configuration = XercesSAXParser.makeConfig(false, true);
             final Collection features = configuration.getRecognizedFeatures();

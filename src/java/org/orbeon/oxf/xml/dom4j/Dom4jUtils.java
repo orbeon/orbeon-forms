@@ -508,7 +508,7 @@ public class Dom4jUtils {
      * @param unprefixedIsNoNamespace   if true, an unprefixed value is in no namespace; if false, it is in the default namespace
      * @return                          a QName object or null if not found
      */
-    public static QName extractTextValueQName(Map namespaces, String qNameString, boolean unprefixedIsNoNamespace) {
+    public static QName extractTextValueQName(Map<String, String> namespaces, String qNameString, boolean unprefixedIsNoNamespace) {
         if (qNameString == null)
             return null;
         qNameString = qNameString.trim();
@@ -526,7 +526,7 @@ public class Dom4jUtils {
                 namespaceURI = "";
             } else {
 
-                final String nsURI = (String) namespaces.get(prefix);
+                final String nsURI = namespaces.get(prefix);
                 namespaceURI = nsURI == null ? "" : nsURI;
             }
         } else if (colonIndex == 0) {
@@ -534,7 +534,7 @@ public class Dom4jUtils {
         } else {
             prefix = qNameString.substring(0, colonIndex);
             localName = qNameString.substring(colonIndex + 1);
-            namespaceURI = (String) namespaces.get(prefix);
+            namespaceURI = namespaces.get(prefix);
             if (namespaceURI == null) {
                 throw new OXFException("No namespace declaration found for prefix: " + prefix);
             }

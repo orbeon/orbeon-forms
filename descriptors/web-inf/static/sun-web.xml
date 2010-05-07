@@ -18,4 +18,6 @@
         <jndi-name>jdbc/db</jndi-name>
     </resource-ref>
 
+    <class-loader delegate="false"/>
+
 </sun-web-app>

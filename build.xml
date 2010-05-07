@@ -38,6 +38,7 @@
         <include name="xerces-resolver-2_9_orbeon_20070711.jar"/>
         <include name="xerces-serializer-2_9_orbeon_20070711.jar"/>
         <include name="xerces-xml-apis-2_9_orbeon_20070711.jar"/>
+        <include name="xerces-xercesImpl-2_9_orbeon_20070711.jar"/>
 
         <include name="commons-collections-3_1.jar"/>
         <include name="commons-lang-2_3.jar"/>
@@ -52,6 +53,7 @@
 
         <include name="commons-digester-1_5.jar"/>
         <include name="commons-validator-1_0_2.jar"/>
+        <include name="commons-logging-1_0_4.jar"/>
 
         <include name="axis_1_2_1-axis.jar"/>
         <include name="axis_1_2_1-jaxrpc.jar"/>
@@ -117,10 +119,6 @@
         <!-- For SSH support (currently in oxf:file processor) -->
         <include name="ant-jsch-1_6_5.jar"/>
         <include name="jsch-0.1.42.jar"/>
-    </fileset>
-    <fileset id="war.libs.private" dir="${lib.dir}">
-        <include name="xerces-xercesImpl-2_9_orbeon_20070711.jar"/>
-        <include name="commons-logging-1_0_4.jar"/>
     </fileset>
 
     <target name="init">
@@ -283,14 +281,7 @@
 
     <!-- JARs -->
     <target name="jars" depends="classes,transform,orbeon-css-templates,orbeon-minify-js">
-      <pathconvert dirsep="/" pathsep=" " property="jar.mf.cp" refid="war.libs.private">
-        <map from="${lib.dir}" to="private"/>
-      </pathconvert>
-
       <jar destfile="${jar.file}" compress="false">
-          <manifest>
-              <attribute name="Class-Path" value="${jar.mf.cp}"/>
-          </manifest>
           <fileset dir="${java-src.dir}">
               <include name="**/*.xml"/>
               <include name="**/*.rng"/>
@@ -438,10 +429,6 @@
         <copy file="${resources-public.jar.file}" todir="${war.lib}"/>
         <copy file="${form-runner.jar.file}" todir="${war.lib}"/>
         <copy file="${form-builder.jar.file}" todir="${war.lib}"/>
-
-        <copy todir="${war.lib}/private">
-          <fileset refid="war.libs.private"/>
-        </copy>
 
         <copy todir="${war.inf}">
             <fileset dir="${lib.dir}">

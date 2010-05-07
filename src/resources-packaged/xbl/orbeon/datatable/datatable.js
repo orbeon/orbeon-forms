@@ -505,7 +505,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
             // See _setColumnWidth in YUI datatable.js...
             if (YAHOO.env.ua.ie == 0) {
                 var className = 'dt-' + this.id + '-col-' + (j + 1);
-                className = className.replace('\$', '-');
+                className = className.replace(/\$/g, "-");
                 YAHOO.util.Dom.addClass(liner, className);
                 for (var k = 0; k < this.bodyColumns[j].length; k++) {
                     var cell = this.bodyColumns[j][k];

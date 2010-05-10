@@ -320,7 +320,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                             if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", "adding document cache dependency for non-cacheable instance", "instance URI", instanceSourceURI);
 
-                            stage1CacheableState.addReference(null, instanceSourceURI, currentInstance.getUsername(), currentInstance.getPassword(), null,
+                            stage1CacheableState.addReference(null, instanceSourceURI, currentInstance.getUsername(), currentInstance.getPassword(), currentInstance.getDomain(),
                                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
                         } else {
                             // Don't add the dependency as we don't want the instance URI to be hit

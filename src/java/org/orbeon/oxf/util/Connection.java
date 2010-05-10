@@ -572,7 +572,7 @@ public class Connection {
                     final String charsetParameter = parameters.get("charset");
                     if (charsetParameter != null) {
                         // Append charset parameter
-                        sb.append("; ");
+                        sb.append("; charset=");
                         sb.append(charsetParameter);
                     }
                 }
@@ -611,7 +611,7 @@ public class Connection {
                     final String charsetParameter = parameters.get("charset");
                     if (charsetParameter != null) {
                         // Append charset parameter
-                        sb.append("; ");
+                        sb.append("; charset=");
                         sb.append(charsetParameter);
                     }
                 }

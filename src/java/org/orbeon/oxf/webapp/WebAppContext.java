@@ -20,7 +20,6 @@ import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.WebAppResourceManagerImpl;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.TomcatClasspathFix;
 
 import javax.servlet.ServletContext;
 import java.util.Collections;
@@ -40,14 +39,6 @@ import java.util.Map;
  * 4. Initialize the processor registry
  */
 public class WebAppContext {
-    
-    static {
-        try {
-            TomcatClasspathFix.applyIfNeedBe();
-        } catch (Throwable t) {
-            // ignore
-        }
-    }
 
     public static final String PROPERTIES_PROPERTY = "oxf.properties";
     public static final String LOGGING_PROPERTY = "oxf.initialize-logging";
@@ -78,7 +69,7 @@ public class WebAppContext {
         try {
             // Remember Servlet context
             this.servletContext = servletContext;
-            
+
             // Check whether logging initialization is disabled
             final boolean initializeLogging = !"false".equals(getServletInitParametersMap().get(LOGGING_PROPERTY));
 

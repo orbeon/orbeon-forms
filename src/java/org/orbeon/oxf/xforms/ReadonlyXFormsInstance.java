@@ -42,7 +42,7 @@ public class ReadonlyXFormsInstance extends XFormsInstance {
     public XFormsInstance createMutableInstance() {
         final Document mutableDocument = TransformerUtils.tinyTreeToDom4j2(getDocumentInfo());
         return new XFormsInstance(getDocumentInfo().getConfiguration(), modelEffectiveId, instanceStaticId, mutableDocument,
-                getSourceURI(), getRequestBodyHash(), getUsername(), getPassword(),
+                getSourceURI(), getRequestBodyHash(), getUsername(), getPassword(), getDomain(),
                 isCache(), getTimeToLive(), getValidation(), isHandleXInclude(), isExposeXPathTypes());
     }
 }

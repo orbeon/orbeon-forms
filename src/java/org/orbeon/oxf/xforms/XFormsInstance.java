@@ -67,6 +67,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     private long timeToLive;
     private String username;
     private String password;
+    private String domain;
     private String validation;
     private boolean handleXInclude;
     private boolean exposeXPathTypes;
@@ -105,6 +106,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
         this.username = containerElement.attributeValue("username");
         this.password = containerElement.attributeValue("password");
+        this.domain = containerElement.attributeValue("domain");
         this.validation = containerElement.attributeValue("validation");
         this.handleXInclude = "true".equals(containerElement.attributeValue("xinclude"));
         this.exposeXPathTypes = "true".equals(containerElement.attributeValue("types"));
@@ -142,7 +144,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     }
 
     public XFormsInstance(Configuration configuration, String modelEffectiveId, String instanceStaticId, Document instanceDocument,
-                          String instanceSourceURI, String requestBodyHash, String username, String password,
+                          String instanceSourceURI, String requestBodyHash, String username, String password, String domain,
                           boolean cache, long timeToLive, String validation, boolean handleXInclude, boolean exposeXPathTypes) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
         // NOTE: Make a typed document wrapper
@@ -171,6 +173,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
         this.username = username;
         this.password = password;
+        this.domain = domain;
         this.validation = validation;
         this.handleXInclude = handleXInclude;
         this.exposeXPathTypes = exposeXPathTypes;
@@ -210,6 +213,8 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
             instanceElement.addAttribute("username", username);
         if (password != null)
             instanceElement.addAttribute("password", password);
+        if (domain != null)
+            instanceElement.addAttribute("domain", domain);
         if (validation != null)
             instanceElement.addAttribute("validation", validation);
         if (handleXInclude)
@@ -309,6 +314,10 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getDomain() {
+        return domain;
     }
 
     public String getValidation() {

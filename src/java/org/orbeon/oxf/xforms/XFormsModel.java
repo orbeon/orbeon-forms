@@ -297,7 +297,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      * have an associated id that identifies it.
      */
     public XFormsInstance setInstanceDocument(Object instanceDocument, String modelEffectiveId, String instanceStaticId, String instanceSourceURI,
-                                              String username, String password, boolean cached, long timeToLive, String validation, boolean handleXInclude) {
+                                              String username, String password, String domain, boolean cached, long timeToLive, String validation, boolean handleXInclude) {
 
         // Prepare and set instance
         final int instancePosition = instanceIds.indexOf(instanceStaticId);
@@ -305,7 +305,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         {
             if (instanceDocument instanceof Document) {
                 newInstance = new XFormsInstance(containingDocument.getStaticState().getXPathConfiguration(), modelEffectiveId, instanceStaticId, (Document) instanceDocument, instanceSourceURI,
-                        null, username, password, cached, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+                        null, username, password, domain, cached, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
             } else if (instanceDocument instanceof DocumentInfo) {
                 newInstance = new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, (DocumentInfo) instanceDocument, instanceSourceURI,
                         null, username, password, cached, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
@@ -478,7 +478,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                         children.get(0), xxformsExcludeResultPrefixes, isReadonlyHint);
 
                 // Set instance and associated information
-                setInstanceDocument(instanceDocument, effectiveId, instanceStaticId, null, null, null, false, -1, xxformsValidation, false);
+                setInstanceDocument(instanceDocument, effectiveId, instanceStaticId, null, null, null, null, false, -1, xxformsValidation, false);
             }
         }
     }
@@ -692,7 +692,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                     // Set instance and associated information if everything went well
                     // NOTE: No XInclude supported to read instances with @src for now
-                    setInstanceDocument(instanceDocument, effectiveId, instanceStaticId, null, null, null, false, -1, xxformsValidation, false);
+                    setInstanceDocument(instanceDocument, effectiveId, instanceStaticId, null, null, null, null, false, -1, xxformsValidation, false);
                 } catch (Exception e) {
                     final LocationData extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", instanceContainer);
                     final Throwable throwable = new ValidationException("Error extracting or setting inline instance", extendedLocationData);
@@ -893,7 +893,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Set instance and associated information if everything went well
         // NOTE: No XInclude supported to read instances with @src for now
-        setInstanceDocument(instanceDocument, effectiveId, instanceId, absoluteURLString, xxformsUsername, xxformsPassword, false, -1, xxformsValidation, false);
+        setInstanceDocument(instanceDocument, effectiveId, instanceId, absoluteURLString, xxformsUsername, xxformsPassword, xxformsDomain, false, -1, xxformsValidation, false);
     }
 
     private void loadInstanceOptimized(PropertyContext propertyContext, ExternalContext externalContext, Element instanceContainer,
@@ -935,7 +935,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Set instance and associated information if everything went well
         // NOTE: No XInclude supported to read instances with @src for now
-        setInstanceDocument(instanceDocument, effectiveId, instanceId, resourceAbsolutePathOrAbsoluteURL, null, null, false, -1, xxformsValidation, false);
+        setInstanceDocument(instanceDocument, effectiveId, instanceId, resourceAbsolutePathOrAbsoluteURL, null, null, null, false, -1, xxformsValidation, false);
     }
 
     public void performTargetAction(PropertyContext propertyContext, XBLContainer container, XFormsEvent event) {

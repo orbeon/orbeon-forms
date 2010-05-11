@@ -336,17 +336,6 @@
                 <!--</xxforms:script>-->
             </xforms:submission>
 
-            <!-- List of buttons -->
-            <xforms:instance id="fr-buttons-instance">
-                <buttons xmlns=""/>
-            </xforms:instance>
-
-            <!-- Create list of buttons -->
-            <xforms:action ev:event="xforms-model-construct-done">
-                <xxforms:variable name="buttons" select="tokenize(xxforms:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')), '\s+')" as="xs:string*"/>
-                <xforms:insert context="instance('fr-buttons-instance')" origin="(for $b in $buttons return xxforms:element($b))"/>
-            </xforms:action>
-
         </xforms:model>
     </head>
     <body>
@@ -766,10 +755,11 @@
             <fr:bottom>
                 <!-- Custom buttons for the summary page -->
                 <xforms:group model="fr-form-model" class="fr-buttons">
-                    <xforms:repeat nodeset="instance('fr-buttons-instance')/*">
+                    <!-- Directly iterate over the tokenized propety -->
+                    <xforms:repeat ref="tokenize(xxforms:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')), '\s+')">
                         <xhtml:span class="fr-button">
                             <!-- New button -->
-                            <xforms:group ref="if (name() = 'new') then instance('fr-summary-triggers-instance')/new else ()">
+                            <xforms:group ref="if (. = 'new') then instance('fr-summary-triggers-instance')/new else ()">
                                 <fr:button>
                                     <xforms:label>
                                         <!--<xhtml:img src="/apps/fr/style/add.gif" alt=""/>-->
@@ -782,7 +772,7 @@
                                 </fr:button>
                             </xforms:group>
                             <!-- Print button -->
-                            <xforms:group ref="if (name() = 'print') then instance('fr-summary-triggers-instance')/view else ()">
+                            <xforms:group ref="if (. = 'print') then instance('fr-summary-triggers-instance')/view else ()">
                                 <fr:button>
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/eye.png" alt=""/>
@@ -798,7 +788,7 @@
                                 </fr:button>
                             </xforms:group>
                             <!-- PDF button -->
-                            <xforms:group ref="if (name() = 'pdf') then instance('fr-summary-triggers-instance')/pdf else ()">
+                            <xforms:group ref="if (. = 'pdf') then instance('fr-summary-triggers-instance')/pdf else ()">
                                 <fr:button>
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
@@ -812,7 +802,7 @@
                                 </fr:button>
                             </xforms:group>
                             <!-- Test button -->
-                            <xforms:group ref="if (name() = 'test') then instance('fr-summary-triggers-instance')/view else ()">
+                            <xforms:group ref="if (. = 'test') then instance('fr-summary-triggers-instance')/view else ()">
                                 <fr:button>
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/forms/orbeon/builder/images/play.png" alt="" title="Test Form"/>
@@ -826,7 +816,7 @@
                                 </fr:button>
                             </xforms:group>
                             <!-- Delete button -->
-                            <xforms:group ref="if (name() = 'delete') then instance('fr-summary-triggers-instance')/delete else ()">
+                            <xforms:group ref="if (. = 'delete') then instance('fr-summary-triggers-instance')/delete else ()">
                                 <fr:button>
                                     <xforms:label>
                                         <!--<xhtml:img src="/apps/fr/style/delete.gif" alt=""/>-->

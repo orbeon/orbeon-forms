@@ -237,7 +237,7 @@
                                                 insert into <xsl:value-of select="$table-name"/>
                                                     (created, last_modified, username, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted, xml)
                                                 select
-                                                    created, 
+                                                    created,
                                                     <sql:param type="xs:dateTime" select="/request/timestamp"/>,
                                                     <sql:param type="xs:string" select="/request/username"/>,
                                                     app, form, <xsl:if test="$is-data">document_id,</xsl:if>
@@ -285,66 +285,70 @@
                                                 <xsl:variable name="table-name" as="xs:string" select="concat(
                                                     if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition',
                                                     if ($is-attachment) then '_attach' else '')"/>
-                                                    <!-- If we don't, insert one -->
                                                     insert
                                                         into <xsl:value-of select="$table-name"/>
-                                                        (created, last_modified, username, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted,
+                                                        (
+                                                            created, last_modified, username, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted,
                                                             <xsl:if test="$is-attachment">file_name, file_content</xsl:if>
-                                                            <xsl:if test="not($is-attachment)">xml</xsl:if>)
-                                                               select case when last_deleted is null or last_deleted = 'Y' then 
-    	<sql:param type="xs:dateTime" select="/request/timestamp"/>
-    	else
-    	last_created
-    	end as lc,
-	 
-                                                            <sql:param type="xs:dateTime" select="/request/timestamp"/>,
+                                                            <xsl:if test="not($is-attachment)">xml</xsl:if>
+                                                        )
+                                                        select
+                                                            case when last_deleted is null or last_deleted = 'Y'
+                                                                then <sql:param type="xs:dateTime" select="/request/timestamp"/>
+                                                                else last_created end as lc,
+	                                                        <sql:param type="xs:dateTime" select="/request/timestamp"/>,
                                                             <sql:param type="xs:string" select="/request/username"/>,
                                                             <sql:param type="xs:string" select="/request/app"/>,
                                                             <sql:param type="xs:string" select="/request/form"/>,
                                                             <xsl:if test="$is-data">
                                                                 <sql:param type="xs:string" select="/request/document-id"/>,
-                                                            </xsl:if>
-                                                            'N',
+                                                            </xsl:if> 'N',
                                                             <xsl:if test="$is-attachment">
                                                                 <sql:param type="xs:string" select="/request/filename"/>,
                                                                 <sql:param type="xs:anyURI" sql-type="blob" select="/request/body" />
                                                             </xsl:if>
                                                             <xsl:if test="not($is-attachment)">
 																<sql:param type="odt:xmlFragment" sql-type="clob" select="/request/document/*" />
-                                                                <!-- See comments above -->
-                                                                <!--XMLType(<sql:param type="odt:xmlFragment" sql-type="clob" select="saxon:parse(/request/document)"/>)-->
                                                             </xsl:if>
-	from (
-    select v1.*,  (	
-	select deleted 
-	from <xsl:value-of select="$table-name"/>
-	where
-	    app = <sql:param type="xs:string" select="/request/app"/>
-	    and form = <sql:param type="xs:string" select="/request/form"/>
-	    <xsl:if test="$is-data">
-		and document_id = <sql:param type="xs:string" select="/request/document-id"/>
-	    </xsl:if>
-	    <xsl:if test="$is-attachment">
-		and file_name = <sql:param type="xs:string" select="/request/filename"/>
-	    </xsl:if>
-	    and last_modified = v1.last_last_modified 
-	    ) last_deleted
-	    from 
-    (select max(last_modified) last_last_modified , max(created) last_created
-    from (
-	    select max(last_modified) last_modified, max(created) created
-	    from <xsl:value-of select="$table-name"/>
-	    where
-		app = <sql:param type="xs:string" select="/request/app"/>
-		and form = <sql:param type="xs:string" select="/request/form"/>
-		<xsl:if test="$is-data">
-		    and document_id = <sql:param type="xs:string" select="/request/document-id"/>
-		</xsl:if>
-		<xsl:if test="$is-attachment">
-		    and file_name = <sql:param type="xs:string" select="/request/filename"/>
-		</xsl:if>
-	 union all  select null last_modified, null created from dual 
-    )v2) v1 )v;
+                                                        from
+                                                        (
+                                                            select
+                                                                v1.*,
+                                                                (
+                                                                    select deleted
+                                                                    from <xsl:value-of select="$table-name"/>
+                                                                    where
+                                                                        app = <sql:param type="xs:string" select="/request/app"/>
+                                                                        and form = <sql:param type="xs:string" select="/request/form"/>
+                                                                        <xsl:if test="$is-data">
+                                                                            and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                                        </xsl:if>
+                                                                        <xsl:if test="$is-attachment">
+                                                                            and file_name = <sql:param type="xs:string" select="/request/filename"/>
+                                                                        </xsl:if>
+                                                                        and last_modified = v1.last_last_modified
+                                                                ) last_deleted
+                                                            from
+                                                                (
+                                                                    select
+                                                                        max(last_modified) last_last_modified , max(created) last_created
+                                                                    from
+                                                                    (
+                                                                        select max(last_modified) last_modified, max(created) created
+                                                                        from <xsl:value-of select="$table-name"/>
+                                                                        where
+                                                                        app = <sql:param type="xs:string" select="/request/app"/>
+                                                                        and form = <sql:param type="xs:string" select="/request/form"/>
+                                                                        <xsl:if test="$is-data">
+                                                                            and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                                        </xsl:if>
+                                                                        <xsl:if test="$is-attachment">
+                                                                            and file_name = <sql:param type="xs:string" select="/request/filename"/>
+                                                                        </xsl:if>
+                                                                        union all select null last_modified, null created from dual
+                                                                    ) v2
+                                                                ) v1
+                                                        ) v;
                                             </sql:update>
                                         </sql:execute>
                                     </sql:connection>

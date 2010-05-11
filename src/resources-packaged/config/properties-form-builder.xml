@@ -46,4 +46,7 @@
     <!-- Don't animate section collapse -->
     <property as="xs:boolean" name="oxf.fr.detail.ajax.section.animate.orbeon.builder"  value="false"/>
 
+    <!-- Form Builder summary page  -->
+    <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.builder"           value="new edit test delete"/>
+
 </properties>

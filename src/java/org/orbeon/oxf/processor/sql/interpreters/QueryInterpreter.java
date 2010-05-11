@@ -566,7 +566,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                     stmt.setDouble(index, Double.parseDouble(stringValue));
                                             } else if (SQLProcessor.qNameToexplodedQName(XMLConstants.XS_ANYURI_QNAME).equals(xmlType)) {
                                                 String sqlType = parameter.getSqlType();
-                                                if (sqlType != null && !SQL_TYPE_CLOB.equals(sqlType))
+                                                if (sqlType != null && !(SQL_TYPE_BLOB.equals(sqlType) || SQL_TYPE_CLOB.equals(sqlType)))
                                                     throw new OXFException("Invalid sql-type attribute: " + sqlType);
                                                 if (stringValue == null) {
                                                     stmt.setNull(index, Types.BLOB);

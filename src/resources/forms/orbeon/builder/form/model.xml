@@ -782,12 +782,11 @@
         <xforms:bind nodeset="form-name" required="true()" type="xs:NCName" constraint="normalize-space() = ."/>
         <!-- Triggers -->
         <xforms:bind nodeset="next-trigger" readonly=". = 'disabled'"/>
-        <xforms:bind nodeset="toolbox/schema" readonly="not($is-pe)" relevant="xxforms:property('oxf.fb.menu.schema')"/>
+        <xforms:bind nodeset="toolbox/schema" relevant="xxforms:property('oxf.fb.menu.schema')"/>
         <xforms:bind nodeset="toolbox/css" relevant="xxforms:property('oxf.fb.menu.css')"/>
-        <xforms:bind nodeset="toolbox/pdf" readonly="not($is-pe)" relevant="xxforms:property('oxf.fb.menu.pdf')"/>
+        <xforms:bind nodeset="toolbox/pdf" relevant="xxforms:property('oxf.fb.menu.pdf')"/>
         <xforms:bind nodeset="toolbox/view-source" relevant="xxforms:property('oxf.fb.menu.view-source')"/>
         <xforms:bind nodeset="toolbox/edit-source" relevant="xxforms:property('oxf.fb.menu.edit-source')"/>
-        <xforms:bind nodeset="toolbox/services-actions" readonly="not($is-pe)"/>
     </xforms:bind>
 
 

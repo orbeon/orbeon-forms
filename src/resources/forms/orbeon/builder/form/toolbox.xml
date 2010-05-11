@@ -363,7 +363,8 @@
                                             <xforms:output value="if (exists($model/xs:schema)) then $form-resources/change-schema/label else $form-resources/upload-schema/label"/>
                                         </xhtml:span>
                                     </xforms:label>
-                                    <xxforms:show ev:event="DOMActivate" dialog="fb-schema-upload-dialog"/>
+                                    <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-schema-upload-dialog"/>
+                                    <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
                                 </fr:button>
                             </xforms:group>
                             <xforms:group ref="instance('fb-metadata-instance')/toolbox/css">
@@ -387,7 +388,8 @@
                                             <xforms:output value="if (xxforms:bind('pdf-attachment-bind') = '') then $form-resources/upload-pdf/label else $form-resources/change-pdf/label"/>
                                         </xhtml:span>
                                     </xforms:label>
-                                    <xxforms:show ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
+                                    <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-pdf-upload-dialog"/>
+                                    <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
                                 </fr:button>
                             </xforms:group>
                             <xforms:group ref="instance('fb-metadata-instance')/toolbox/view-source">
@@ -468,7 +470,8 @@
                                             <xhtml:img src="/apps/fr/style/images/silk/add.png" alt=""/>
                                             <xhtml:span><xforms:output value="$form-resources/add/label"/></xhtml:span>
                                         </xforms:label>
-                                        <xxforms:show ev:event="DOMActivate" dialog="fb-service-dialog"/>
+                                        <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-service-dialog"/>
+                                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
                                     </xforms:trigger>
                                 </xforms:group>
                             </xforms:group>
@@ -521,7 +524,8 @@
                                             <xhtml:img src="/apps/fr/style/images/silk/add.png" alt=""/>
                                             <xhtml:span><xforms:output value="$form-resources/add/label"/></xhtml:span>
                                         </xforms:label>
-                                        <xxforms:show ev:event="DOMActivate" dialog="fb-database-service-dialog"/>
+                                        <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-database-service-dialog"/>
+                                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
                                     </xforms:trigger>
                                 </xforms:group>
                             </xforms:group>
@@ -573,7 +577,8 @@
                                             <xhtml:img src="/apps/fr/style/images/silk/add.png" alt=""/>
                                             <xhtml:span><xforms:output value="$form-resources/add/label"/></xhtml:span>
                                         </xforms:label>
-                                        <xxforms:show ev:event="DOMActivate" dialog="fb-action-dialog"/>
+                                        <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-action-dialog"/>
+                                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
                                     </xforms:trigger>
                                 </xforms:group>
                             </xforms:group>
@@ -585,5 +590,14 @@
         <!-- Orbeon Forms version -->
         <fr:version/>
     </xhtml:div>
+
+    <!-- Dialog to tell the user that the feature is PE-only -->
+    <fr:alert-dialog id="fb-pe-dialog">
+        <fr:label ref="$form-resources/dialog-pe/dialog-title"/>
+        <fr:message>
+            <xforms:output value="xxforms:serialize($form-resources/dialog-pe/message/*[1], 'html')" mediatype="text/html"/>
+        </fr:message>
+        <fr:neutral-choice/>
+    </fr:alert-dialog>
 
 </xhtml:div>

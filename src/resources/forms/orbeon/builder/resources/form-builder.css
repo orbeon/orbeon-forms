@@ -188,6 +188,10 @@ h1.fr-form-title {
 .fb-test-dialog .fb-test-iframe { width: 100%; border: 1px solid #666; }
 .fb-test-dialog .xbl-fr-button { float: right; padding-top: .5em }
 
+/* PE dialog */
+/* NOTE: This should not be needed because alert dialog should not use label for message content */
+.xbl-fr-alert-dialog-message .xforms-label { font-weight: normal }
+
 /* ***** In-Place Editing ******************************************************************************************* */
 
 /* Title and description */

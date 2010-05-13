@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -62,81 +62,86 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
         final int DEFAULT_DOTS_PER_PIXEL = 14;
 
         final ITextRenderer renderer = new ITextRenderer(DEFAULT_DOTS_PER_POINT, DEFAULT_DOTS_PER_PIXEL);
-        final ITextUserAgent callback = new ITextUserAgent(renderer.getOutputDevice()) {
-            public String resolveURI(String uri) {
-                // Our own resolver
+        try {
+            final ITextUserAgent callback = new ITextUserAgent(renderer.getOutputDevice()) {
+                public String resolveURI(String uri) {
+                    // Our own resolver
 
-                // When the browser retrieves resources, they are obviously resource URLs, including the use of the
-                // incoming host and port.
-                // In this case, things are a bit different, because when deploying with e.g. an Apache front-end,
-                // requests from this processor should not go through it. So we rewrite as a service URL instead. But in
-                // addition to that, we must still rewrite the path as a resource, so that versioned resources are
-                // handled properly.
+                    // When the browser retrieves resources, they are obviously resource URLs, including the use of the
+                    // incoming host and port.
+                    // In this case, things are a bit different, because when deploying with e.g. an Apache front-end,
+                    // requests from this processor should not go through it. So we rewrite as a service URL instead. But in
+                    // addition to that, we must still rewrite the path as a resource, so that versioned resources are
+                    // handled properly.
 
-                final String path = externalContext.getResponse().rewriteResourceURL(uri, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
-                return externalContext.rewriteServiceURL(path, true);
-            }
+                    final String path = externalContext.getResponse().rewriteResourceURL(uri, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+                    return externalContext.rewriteServiceURL(path, true);
+                }
 
-            protected InputStream resolveAndOpenStream(String uri) {
-                try {
-                    final String resolvedURI = resolveURI(uri);
-                    // TODO: Use xforms:submission code instead
-                    final ConnectionResult connectionResult
-                        = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
-                            new URL(resolvedURI), null, null, null, null, null, null, Connection.getForwardHeaders());
+                protected InputStream resolveAndOpenStream(String uri) {
+                    try {
+                        final String resolvedURI = resolveURI(uri);
+                        // TODO: Use xforms:submission code instead
+                        final ConnectionResult connectionResult
+                            = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
+                                new URL(resolvedURI), null, null, null, null, null, null, Connection.getForwardHeaders());
 
-                    if (connectionResult.statusCode != 200) {
-                        connectionResult.close();
-                        throw new OXFException("Got invalid return code while loading resource: " + uri + ", " + connectionResult.statusCode);
-                    }
-
-                    pipelineContext.addContextListener(new PipelineContext.ContextListener() {
-                        public void contextDestroyed(boolean success) {
+                        if (connectionResult.statusCode != 200) {
                             connectionResult.close();
+                            throw new OXFException("Got invalid return code while loading resource: " + uri + ", " + connectionResult.statusCode);
                         }
-                    });
 
-                    return connectionResult.getResponseInputStream();
+                        pipelineContext.addContextListener(new PipelineContext.ContextListener() {
+                            public void contextDestroyed(boolean success) {
+                                connectionResult.close();
+                            }
+                        });
 
+                        return connectionResult.getResponseInputStream();
+
+                    } catch (IOException e) {
+                        throw new OXFException(e);
+                    }
+                }
+
+                public ImageResource getImageResource(String uri) {
+                    final InputStream is = resolveAndOpenStream(uri);
+                    final String localURI = NetUtils.inputStreamToAnyURI(pipelineContext, is, NetUtils.REQUEST_SCOPE);
+                    return super.getImageResource(localURI);
+                }
+            };
+            callback.setSharedContext(renderer.getSharedContext());
+            renderer.getSharedContext().setUserAgentCallback(callback);
+    //        renderer.getSharedContext().setDPI(150);
+
+            // Set the document to process
+            renderer.setDocument(domDocument,
+                // No base URL if can't get request URL from context
+                externalContext.getRequest() == null ? null : externalContext.getRequest().getRequestURL());
+
+            // Do the layout and create the resulting PDF
+            renderer.layout();
+            final List pages = renderer.getRootBox().getLayer().getPages();
+            try {
+                // Page count might be zero, and if so createPDF
+                if (pages != null && pages.size() > 0) {
+                    renderer.createPDF(outputStream);
+                } else {
+                    // TODO: log?
+                }
+            } catch (Exception e) {
+                throw new OXFException(e);
+            } finally {
+                try {
+                    outputStream.close();
                 } catch (IOException e) {
-                    throw new OXFException(e);
+                    // NOP
+                    // TODO: log?
                 }
             }
-
-            public ImageResource getImageResource(String uri) {
-                final InputStream is = resolveAndOpenStream(uri);
-                final String localURI = NetUtils.inputStreamToAnyURI(pipelineContext, is, NetUtils.REQUEST_SCOPE);
-                return super.getImageResource(localURI);
-            }
-        };
-        callback.setSharedContext(renderer.getSharedContext());
-        renderer.getSharedContext().setUserAgentCallback(callback);
-//        renderer.getSharedContext().setDPI(150);
-
-        // Set the document to process
-        renderer.setDocument(domDocument,
-            // No base URL if can't get request URL from context
-            externalContext.getRequest() == null ? null : externalContext.getRequest().getRequestURL());
-
-        // Do the layout and create the resulting PDF
-        renderer.layout();
-        final List pages = renderer.getRootBox().getLayer().getPages();
-        try {
-            // Page count might be zero, and if so createPDF
-            if (pages != null && pages.size() > 0) {
-                renderer.createPDF(outputStream);
-            } else {
-                // TODO: log?
-            }
-        } catch (Exception e) {
-            throw new OXFException(e);
         } finally {
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                // NOP
-                // TODO: log?
-            }
+            // Free resources associated with the rendering context
+            renderer.getSharedContext().reset();
         }
     }
 }

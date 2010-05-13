@@ -1,10 +1,7 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE weblogic-web-app PUBLIC
- "-//BEA Systems, Inc.//DTD Web Application 6.0//EN"
- "http://www.bea.com/servers/wls600/dtd/weblogic-web-jar.dtd">
-
-<weblogic-web-app>
+<!-- See documentation at: http://download.oracle.com/docs/cd/E12840_01/wls/docs103/webapp/weblogic_xml.html -->
+<weblogic-web-app xmlns="http://www.bea.com/ns/weblogic/weblogic-web-app">
 
     <!-- Uncomment this for the authentication example -->
     <!--
@@ -14,12 +11,16 @@
     </security-role-assignment>
     -->
     <!-- End authentication example -->
+    <resource-description>
+        <res-ref-name>jdbc/db</res-ref-name>
+        <jndi-name>weblogic.jdbc.jts.oxf</jndi-name>
+    </resource-description>
 
-    <reference-descriptor>
-        <resource-description>
-            <res-ref-name>jdbc/db</res-ref-name>
-            <jndi-name>weblogic.jdbc.jts.oxf</jndi-name>
-        </resource-description>
-    </reference-descriptor>
+    <!-- Untested, might solve cases where WebLogic uses a class other than the one packaged with Orbeon Forms -->
+    <!--
+    <container-descriptor>
+        <prefer-web-inf-classes>true</prefer-web-inf-classes>
+    </container-descriptor>
+    -->
 
 </weblogic-web-app>

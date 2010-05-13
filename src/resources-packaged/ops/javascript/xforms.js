@@ -4988,6 +4988,9 @@ ORBEON.xforms.Init = {
                            && ORBEON.util.Dom.hasClass(element, "xforms-mediatype-text-html")) {
                 // HTML area
                 ORBEON.xforms.Init._htmlArea(element);
+            } else if (ORBEON.util.Dom.hasClass(element, "xforms-dialog")) {
+                // Dialog
+                ORBEON.xforms.Init._dialog(element);
             }
             // Recurse
             for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {

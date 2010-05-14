@@ -38,6 +38,7 @@
                 <choice>
                     <value>30day</value>
                     <value>90day</value>
+                    <value>1year</value>
                     <value>perpetual</value>
                 </choice>
             </element>

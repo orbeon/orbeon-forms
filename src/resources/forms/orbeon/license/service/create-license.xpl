@@ -37,6 +37,9 @@
                         <xsl:when test="/*/type = '90day'">
                             <xsl:value-of select="adjust-date-to-timezone(current-date() + xs:dayTimeDuration('P90D'), ())"/>
                         </xsl:when>
+                        <xsl:when test="/*/type = '1year'">
+                            <xsl:value-of select="adjust-date-to-timezone(current-date() + xs:dayTimeDuration('P1Y'), ())"/>
+                        </xsl:when>
                         <xsl:when test="/*/type = 'perpetual'"/>
                         <xsl:otherwise>
                             <!-- Shouldn't happen -->

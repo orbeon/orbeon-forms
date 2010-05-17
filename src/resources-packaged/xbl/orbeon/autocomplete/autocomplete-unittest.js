@@ -130,7 +130,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-        
+
         /**
          * Test that when we type the full value "Switzerland", the value of the node becomes "sz",
          * because "Switzerland" shows in the list of possible values, so the value should be selected
@@ -146,7 +146,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-        
+
         /**
          * Test that entering a partial match "Sw", we get the expected list of countries in the suggestion list.
          */
@@ -220,7 +220,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-        
+
         testDoubleSpaceInLabel: function() {
             this.runForStaticDynamic(function(staticDynamic, continuation) {
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
@@ -268,7 +268,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-        
+
         /**
          * Test that the left border of the suggestion box is aligned with the left border of the text field.
          */
@@ -289,7 +289,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-        
+
         testSetLabel: function() {
             this.runForStaticDynamic(function(staticDynamic, continuation) {
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
@@ -305,7 +305,8 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                 });
             });
         },
-        testSetfocus: function() {
+
+        testSetFocus: function() {
             var staticAutocompleteInput = YAHOO.util.Dom.getElementsByClassName("yui-ac-input", null, "static-autocomplete")[0];
             var dynamicAutocompleteInput = YAHOO.util.Dom.getElementsByClassName("yui-ac-input", null, "dynamic-autocomplete")[0];
             var staticGotFocus = false;
@@ -325,7 +326,17 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                     YAHOO.util.Assert.isTrue(dynamicGotFocus);
                 });
             });
-        }
+        },
+
+        testValueForStatic: function() {
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                YAHOO.util.UserAction.click(YAHOO.util.Dom.get("static-set-to-sz"));
+            }, function() {
+                this.checkSearchValue("static", "Switzerland");
+            });
+        },
+
+        EOO: {}
     }));
 
     if (parent && parent.TestManager) {

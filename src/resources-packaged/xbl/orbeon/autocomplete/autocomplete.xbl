@@ -88,14 +88,22 @@
                                 <xsl:apply-templates select="xforms:itemset | xforms:item" mode="copy-value"/>
                             </xforms:select1>
                             <!-- Input with external value -->
-                            <xforms:input id="external-value" ref="$external-value" class="fr-autocomplete-external-value" style="display: none"/>
+                            <xxforms:variable name="textfield-value" model="autocomplete-model" select="textfield-value"/>
+                            <xforms:input id="external-value" ref="$external-value" class="fr-autocomplete-external-value" style="display: none">
+                                <xforms:action ev:event="xforms-enabled xforms-value-changed" if="not($dynamic-itemset = 'true')">
+                                    <xxforms:variable name="select-items" select="xxforms:itemset('select1', 'xml')//item"/>
+                                    <xxforms:variable name="values" select="($select-items/value)[position() > count($select-items) div 2]/text()"/>
+                                    <xxforms:variable name="label" select="$select-items[index-of($values, $external-value)]/label"/>
+                                    <xforms:setvalue if="exists($label)" ref="$textfield-value" value="$label"/>
+                                </xforms:action>
+                            </xforms:input>
                             <!-- Bridge so the JS code can notify the XForms code the user typed in the field -->
                             <xforms:trigger id="value-selected" class="fr-autocomplete-value-selected" style="display: none">
                                 <xforms:label/>
                             </xforms:trigger>
                             <!-- Markup with input for the YUI autocomplete -->
                             <xhtml:div xbl:attr="class style">
-                                <xforms:input id="search" model="autocomplete-model" ref="textfield-value" incremental="true" class="fr-autocomplete-search"  xbl:attr="tabindex accesskey">
+                                <xforms:input id="search" ref="$textfield-value" incremental="true" class="fr-autocomplete-search"  xbl:attr="tabindex accesskey">
                                     <xforms:action ev:event="xforms-value-changed">
                                         <!-- If the search value is empty, set the external value to empty as well -->
                                         <xforms:action if=". = ''">

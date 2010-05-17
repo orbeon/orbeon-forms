@@ -12,10 +12,10 @@
 .fr-spell-checker-dialog .unknown-word { font-weight: bold; background: url('unknown-word.png') repeat-x left bottom }
 .fr-spell-checker-dialog .xforms-repeat-selected-item-1,
 .fr-spell-checker-dialog .xforms-repeat-selected-item-2 { background-color: transparent }
-.fr-spell-checker-dialog .fr-spell-checker-dialog-close { display: block; overflow: auto }
-.fr-spell-checker-dialog .fr-spell-checker-dialog-close .xbl-fr-button { float: right; margin-top: 1em }
-.fr-spell-checker-dialog .xbl-fr-button { display: block; margin-bottom: .3em }
-.fr-spell-checker-dialog .xbl-fr-button button { text-align: left }
-.fr-spell-checker-dialog .xbl-fr-button button img { padding-right: 1em }
+.fr-spell-checker-dialog .xbl-fr-spell-checker-correcting .xbl-fr-button { display: block; margin-bottom: .3em }
+.fr-spell-checker-dialog .xbl-fr-spell-checker-correcting .xbl-fr-button button { text-align: left }
+.fr-spell-checker-dialog .xbl-fr-spell-checker-correcting .xbl-fr-button button img { padding-right: 1em }
 .fr-spell-checker-dialog .xbl-fr-button .first-child { width: 10em }
 .fr-spell-checker-dialog .xbl-fr-button .first-child button { width: 100% }
+.fr-spell-checker-dialog .xbl-fr-spell-checker-close { display: block; overflow: auto }
+.fr-spell-checker-dialog .xbl-fr-spell-checker-close .xbl-fr-button { float: right; margin-top: 1em }

@@ -157,7 +157,7 @@
                             <xforms:setvalue xxforms:iterate="instance('ui')/*" ref="."/>
                         </xforms:action>
 
-                        <xforms:group ref=".[$has-corrections]">
+                        <xforms:group ref=".[$has-corrections]" class="xbl-fr-spell-checker-correcting">
                             <xhtml:table>
                                 <xhtml:tr>
                                     <xhtml:td class="label">Not in dictionary:</xhtml:td>

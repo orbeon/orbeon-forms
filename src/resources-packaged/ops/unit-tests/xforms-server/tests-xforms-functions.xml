@@ -1479,4 +1479,51 @@
         </output>
     </test>
 
+    <test description="saxon:evaluate() function in AVT" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+           <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms"
+                       xmlns:saxon="http://saxon.sf.net/">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <expressions>
+                                <expression>'gaga'</expression>
+                                <expression>concat('The message is ', expression[1])</expression>
+                            </expressions>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xforms:load resource="{saxon:evaluate(expression[1])}"/>
+                            <xforms:load resource="{saxon:evaluate(expression[2])}"/>
+                        </xforms:action>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <expressions>
+                                    <expression>'gaga'</expression>
+                                    <expression>concat('The message is ', expression[1])</expression>
+                                </expressions>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:load resource="/orbeon/gaga" show="replace"/>
+                    <xxf:load resource="/orbeon/The%20message%20is%20'gaga'" show="replace"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

@@ -544,8 +544,8 @@ public class XPathCache {
         try {
             final XPathExpression expression;
             if (isAvt) {
-                Expression tempExpression = AttributeValueTemplate.make(xpathString, -1, independentContext);
                 // AVT
+                final Expression tempExpression = AttributeValueTemplate.make(xpathString, -1, independentContext);
                 expression = prepareExpression(independentContext, tempExpression);
             } else {
                 // Regular expression
@@ -561,22 +561,22 @@ public class XPathCache {
     }
 
     // Ideally: add this to Saxon XPathEvaluator
-    public static XPathExpression prepareExpression(IndependentContext independentContext, Expression tempExpression) throws XPathException {
+    public static XPathExpression prepareExpression(IndependentContext independentContext, Expression expression) throws XPathException {
         // Based on XPathEvaluator.createExpression()
-        //                    exp.setContainer(staticContext);
+        expression.setContainer(independentContext);
         ExpressionVisitor visitor = ExpressionVisitor.make(independentContext);
         visitor.setExecutable(independentContext.getExecutable());
-        tempExpression = visitor.typeCheck(tempExpression, Type.ITEM_TYPE);
-        tempExpression = visitor.optimize(tempExpression, Type.ITEM_TYPE);
+        expression = visitor.typeCheck(expression, Type.ITEM_TYPE);
+        expression = visitor.optimize(expression, Type.ITEM_TYPE);
         final SlotManager map = independentContext.getStackFrameMap();
         final int numberOfExternalVariables = map.getNumberOfVariables();
-        ExpressionTool.allocateSlots(tempExpression, numberOfExternalVariables, map);
+        ExpressionTool.allocateSlots(expression, numberOfExternalVariables, map);
 
         // Set an evaluator as later it might be requested
         final XPathEvaluator evaluator = new XPathEvaluator();
         evaluator.setStaticContext(independentContext);
 
-        return new CustomXPathExpression(evaluator, tempExpression, map, numberOfExternalVariables);
+        return new CustomXPathExpression(evaluator, expression, map, numberOfExternalVariables);
     }
 
     private static class CustomXPathExpression extends XPathExpression {

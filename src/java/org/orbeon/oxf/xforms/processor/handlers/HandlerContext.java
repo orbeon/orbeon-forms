@@ -25,7 +25,6 @@ import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
-import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -47,7 +46,6 @@ public class HandlerContext {
     private final ElementHandlerController controller;
     private final PipelineContext pipelineContext;
     private final XFormsContainingDocument containingDocument;
-    private final XFormsState encodedClientState;
     private final ExternalContext externalContext;
     private final String topLevelControlEffectiveId;
 
@@ -74,13 +72,11 @@ public class HandlerContext {
 //    private int currentTabIndex = 0;
 
     public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext,
-                          XFormsContainingDocument containingDocument, XFormsState encodedClientState,
-                          ExternalContext externalContext, String topLevelControlEffectiveId) {
+                          XFormsContainingDocument containingDocument, ExternalContext externalContext, String topLevelControlEffectiveId) {
 
         this.controller = controller;
         this.pipelineContext = pipelineContext;
         this.containingDocument = containingDocument;
-        this.encodedClientState = encodedClientState;
         this.externalContext = externalContext;
         this.topLevelControlEffectiveId = topLevelControlEffectiveId;
 
@@ -104,10 +100,6 @@ public class HandlerContext {
 
     final public XFormsContainingDocument getContainingDocument() {
         return containingDocument;
-    }
-
-    final public XFormsState getEncodedClientState() {
-        return encodedClientState;
     }
 
     final public ExternalContext getExternalContext() {

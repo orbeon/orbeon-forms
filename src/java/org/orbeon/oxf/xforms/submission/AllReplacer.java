@@ -42,9 +42,18 @@ public class AllReplacer extends BaseReplacer {
         // Remember that we got a submission producing output
         containingDocument.setGotSubmissionReplaceAll();
 
-        // Get response from containing document
-        final ExternalContext.Response response = containingDocument.getResponse();
+        replace(connectionResult, containingDocument.getResponse());
 
+        // "the event xforms-submit-done may be dispatched"
+        // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
+        if (!p.isDeferredSubmissionSecondPassReplaceAll) {
+            return dispatchSubmitDone(propertyContext, connectionResult);
+        } else {
+            return null;
+        }
+    }
+
+    public static void replace(ConnectionResult connectionResult, final ExternalContext.Response response) throws IOException {
         // Set content-type
         response.setContentType(connectionResult.getResponseContentType());
 
@@ -63,13 +72,5 @@ public class AllReplacer extends BaseReplacer {
         // http://forge.objectweb.org/tracker/index.php?func=detail&aid=306918&group_id=168&atid=350207
         // Suggestion is to write either binary or XML to processor output ContentHandler,
         // and make sure the code which would output the XHTML+XForms is disabled.
-
-        // "the event xforms-submit-done may be dispatched"
-        // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
-        if (!p.isDeferredSubmissionSecondPassReplaceAll) {
-            return dispatchSubmitDone(propertyContext, connectionResult);
-        } else {
-            return null;
-        }
     }
 }

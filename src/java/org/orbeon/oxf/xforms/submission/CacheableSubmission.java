@@ -192,7 +192,7 @@ public class CacheableSubmission extends BaseSubmission {
             };
 
             // Submit the callable
-            // This returns null if the execution is asynchronous
+            // This returns null if the execution is deferred
             return submitCallable(propertyContext, p, p2, callable);
         }
     }

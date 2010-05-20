@@ -22,10 +22,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.EmailProcessor;
 import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.StringUtils;
-import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -49,7 +46,9 @@ public class TestExternalContext implements ExternalContext  {
     private Request request;
     private Response response;
 
-    private Map<String, Object> attributesMap;
+    // Make this static so that multiple TestExternalContext run in the same application scope. This is not 100% ideal
+    // because it breaks test isolation.
+    private static Map<String, Object> attributesMap;
 
     public TestExternalContext(PipelineContext pipelineContext, Document requestDocument) {
         this.pipelineContext = pipelineContext;
@@ -225,7 +224,7 @@ public class TestExternalContext implements ExternalContext  {
                     for (Iterator j = XPathUtils.selectIterator(e, "value"); j.hasNext();) {
                         final Element valueElement = (Element) j.next();
                         final String value = XPathUtils.selectStringValueNormalize(valueElement, ".");
-                        StringUtils.addValueToStringArrayMap(map, name, value);
+                        StringConversions.addValueToStringArrayMap(map, name, value);
                     }
                 }
                 headerValuesMap = Collections.unmodifiableMap(map);
@@ -256,7 +255,7 @@ public class TestExternalContext implements ExternalContext  {
                     for (Iterator j = XPathUtils.selectIterator(e, "value"); j.hasNext();) {
                         final Element valueElement = (Element) j.next();
                         final String value = XPathUtils.selectStringValueNormalize(valueElement, ".");
-                        StringUtils.addValueToObjectArrayMap(map, name, value);
+                        StringConversions.addValueToObjectArrayMap(map, name, value);
                     }
                 }
                 parameterMap = Collections.unmodifiableMap(map);
@@ -467,59 +466,94 @@ public class TestExternalContext implements ExternalContext  {
 
     public ExternalContext.Session getSession(boolean create) {
         if (session == null && create) {
-            session = new ExternalContext.Session() {
-                final Map<String, Object> attributes = new LinkedHashMap<String, Object>();
-                public long getCreationTime() {
-                    return System.currentTimeMillis();
-                }
-
-                public String getId() {
-                    // TODO
-                    return null;
-                }
-
-                public long getLastAccessedTime() {
-                    // TODO
-                    return 0;
-                }
-
-                public int getMaxInactiveInterval() {
-                    // TODO
-                    return 0;
-                }
-
-                public void invalidate() {
-                    // TODO
-                }
-
-                public boolean isNew() {
-                    // TODO
-                    return false;
-                }
-
-                public void setMaxInactiveInterval(int interval) {
-                    // TODO
-                }
-
-                public Map<String, Object> getAttributesMap() {
-                    return attributes;
-                }
-
-                public Map<String, Object> getAttributesMap(int scope) {
-                    return attributes;
-                }
-
-                public void addListener(SessionListener sessionListener) {
-                    // TODO
-                }
-
-                public void removeListener(SessionListener sessionListener) {
-                    // TODO
-                }
-            };
+            session = new TestSession(UUIDUtils.createPseudoUUID());
         }
         return session;
     }
+
+    public void setSession(Session session) {
+        this.session = session;
+    }
+
+    public static class TestSession implements ExternalContext.Session {
+
+		private String sessionId;
+        private long creationTime;
+		private Set<SessionListener> sessionListeners = new LinkedHashSet<SessionListener>();
+		private Map attributesMap = new LinkedHashMap();
+        private boolean expired;
+
+		public TestSession(String sessionId) {
+			this.sessionId = sessionId;
+            this.creationTime = System.currentTimeMillis();
+		}
+
+		public void expireSession() {
+            for (final SessionListener listener: sessionListeners) {
+                listener.sessionDestroyed();
+            }
+            expired = true;
+		}
+
+		public void addListener(SessionListener sessionListener) {
+            checkExpired();
+            sessionListeners.add(sessionListener);
+		}
+
+        public Map getAttributesMap() {
+            checkExpired();
+            return attributesMap;
+		}
+
+		public Map getAttributesMap(int scope) {
+            checkExpired();
+            return getAttributesMap();
+		}
+
+		public long getCreationTime() {
+            checkExpired();
+            return creationTime;
+		}
+
+		public String getId() {
+            checkExpired();
+            return sessionId;
+		}
+
+		public long getLastAccessedTime() {
+            checkExpired();
+            return 0;// TODO
+		}
+
+		public int getMaxInactiveInterval() {
+            checkExpired();
+            return 0;// TODO
+		}
+
+		public void invalidate() {
+            checkExpired();
+            // TODO
+        }
+
+		public boolean isNew() {
+            checkExpired();
+            return false;// TODO
+		}
+
+		public void removeListener(SessionListener sessionListener) {
+            checkExpired();
+            sessionListeners.remove(sessionListener);
+		}
+
+		public void setMaxInactiveInterval(int interval) {
+            checkExpired();// TODO
+        }
+
+        private void checkExpired() {
+            if (expired)
+                throw new OXFException("Cannot call methods on expired session.");
+        }
+	}
 
     public ExternalContext.Application getApplication() {
         // NIY

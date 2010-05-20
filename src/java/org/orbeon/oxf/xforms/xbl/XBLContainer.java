@@ -313,7 +313,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
     }
 
-    public void initializeModels(PipelineContext pipelineContext) {
+    protected void initializeModels(PipelineContext pipelineContext) {
 
         // 4.2 Initialization Events
 

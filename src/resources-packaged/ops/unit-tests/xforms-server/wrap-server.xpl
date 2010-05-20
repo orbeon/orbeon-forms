@@ -37,8 +37,10 @@
         <p:input name="config">
             <xsl:transform version="2.0">
                 <xsl:output method="xml" name="xml"/>
+                <xsl:variable name="uuid" select="uuid:createPseudoUUID()" xmlns:uuid="org.orbeon.oxf.util.UUIDUtils"/>
                 <xsl:template match="/">
                     <xxforms:event-request xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                        <xxforms:uuid><xsl:value-of select="$uuid"/></xxforms:uuid>
                         <xxforms:static-state>
                             <xsl:variable name="static-state" as="document-node()">
                                 <xsl:document>
@@ -57,7 +59,7 @@
                             <xsl:if test="doc('input:instances')/instances/instance">
                                 <xsl:variable name="dynamic-state" as="document-node()">
                                     <xsl:document>
-                                        <dynamic-state xmlns="">
+                                        <dynamic-state uuid="{$uuid}" sequence="0" xmlns="">
                                             <instances>
                                                 <xsl:for-each select="doc('input:instances')/instances/instance">
                                                     <xsl:copy>
@@ -91,23 +93,7 @@
     <!-- Decode -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#encoded-response"/>
-        <p:input name="config">
-            <xsl:stylesheet version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
-                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-                <xsl:template match="xxforms:static-state|xxforms:dynamic-state">
-                    <xsl:copy>
-                        <xsl:apply-templates select="context:decodeXML(normalize-space(.))/*"/>
-                    </xsl:copy>
-                </xsl:template>
-                <xsl:template match="instances/instance">
-                    <xsl:copy>
-                        <xsl:copy-of select="@*"/>
-                        <!-- Not sure why we can have the instance either serialized as text or directly inline! -->
-                        <xsl:copy-of select="if (*) then * else saxon:parse(string(.))"/>
-                    </xsl:copy>
-                </xsl:template>
-            </xsl:stylesheet>
-        </p:input>
+        <p:input name="config" href="wrap-server-decode.xsl"/>
         <p:output name="data" ref="response"/>
     </p:processor>
 

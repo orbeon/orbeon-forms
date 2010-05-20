@@ -413,17 +413,16 @@ public class XFormsStaticState {
         // Check validity of properties of known type
         {
             {
-                final String stateHandling = getStringProperty(XFormsProperties.STATE_HANDLING_PROPERTY);
-                if (!(stateHandling.equals(XFormsProperties.STATE_HANDLING_CLIENT_VALUE)
-                                || stateHandling.equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE)))
-                    throw new ValidationException("Invalid xxforms:" + XFormsProperties.STATE_HANDLING_PROPERTY + " attribute value: " + stateHandling, getLocationData());
+                if (!isClientStateHandling() && !isServerStateHandling())
+                    throw new ValidationException("Invalid xxforms:" + XFormsProperties.STATE_HANDLING_PROPERTY
+                            + " attribute value: " + getStringProperty(XFormsProperties.STATE_HANDLING_PROPERTY), getLocationData());
             }
-
             {
                 final String readonlyAppearance = getStringProperty(XFormsProperties.READONLY_APPEARANCE_PROPERTY);
                 if (!(readonlyAppearance.equals(XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE)
                                 || readonlyAppearance.equals(XFormsProperties.READONLY_APPEARANCE_DYNAMIC_VALUE)))
-                    throw new ValidationException("Invalid xxforms:" + XFormsProperties.READONLY_APPEARANCE_PROPERTY + " attribute value: " + readonlyAppearance, getLocationData());
+                    throw new ValidationException("Invalid xxforms:" + XFormsProperties.READONLY_APPEARANCE_PROPERTY
+                            + " attribute value: " + readonlyAppearance, getLocationData());
             }
         }
 
@@ -435,6 +434,20 @@ public class XFormsStaticState {
                 allowedExternalEvents.add(st.nextToken());
             }
         }
+    }
+
+    public boolean isCacheDocument() {
+        return getBooleanProperty(XFormsProperties.CACHE_DOCUMENT_PROPERTY);
+    }
+
+    public boolean isClientStateHandling() {
+        final String stateHandling = getStringProperty(XFormsProperties.STATE_HANDLING_PROPERTY);
+        return stateHandling.equals(XFormsProperties.STATE_HANDLING_CLIENT_VALUE);
+    }
+
+    public boolean isServerStateHandling() {
+        final String stateHandling = getStringProperty(XFormsProperties.STATE_HANDLING_PROPERTY);
+        return stateHandling.equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE);
     }
 
     private void extractControlsModelsComponents(PropertyContext pipelineContext, Element staticStateElement, List<Element> topLevelModelsElements) {
@@ -549,10 +562,10 @@ public class XFormsStaticState {
      * Get a serialized static state. If an encodedStaticState was provided during restoration, return that. Otherwise,
      * return a serialized static state computed from models, instances, and XHTML documents.
      *
-     * @param pipelineContext   current PropertyContext
+     * @param propertyContext   current PropertyContext
      * @return                  serialized static sate
      */
-    public String getEncodedStaticState(PropertyContext pipelineContext) {
+    public String getEncodedStaticState(PropertyContext propertyContext) {
 
         if (!initialized) {
 
@@ -579,8 +592,7 @@ public class XFormsStaticState {
             }
 
             // Remember encoded state and discard Document
-            final boolean isStateHandlingClient = getStringProperty(XFormsProperties.STATE_HANDLING_PROPERTY).equals(XFormsProperties.STATE_HANDLING_CLIENT_VALUE);
-            encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingClient ? XFormsProperties.getXFormsPassword() : null, true);
+            encodedStaticState = XFormsUtils.encodeXML(propertyContext, staticStateDocument, isClientStateHandling() ? XFormsProperties.getXFormsPassword() : null, true);
 
             staticStateDocument = null;
             initialized = true;

@@ -18,7 +18,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
-public class StringUtils {
+public class StringConversions {
 
     /**
      * Convert an Enumeration of String into an array.

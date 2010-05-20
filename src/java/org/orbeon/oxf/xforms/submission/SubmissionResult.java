@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.submission;
 import org.orbeon.oxf.util.ConnectionResult;
 
 public class SubmissionResult {
+
     private String submissionEffectiveId;
     private Replacer replacer;
 

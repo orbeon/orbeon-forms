@@ -1,39 +1,46 @@
 package org.orbeon.oxf.cache;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
  * This is a minimal linked list optimized for the cache.
  */
-public class CacheLinkedList {
+public class CacheLinkedList<E> implements Iterable<E> {
 
-    public static class ListEntry {
-        public Object element;
-        public ListEntry next;
-        public ListEntry prev;
+    public static class ListEntry<E> {
+        public E element;
+        public ListEntry<E> next;
+        public ListEntry<E> prev;
 
         public ListEntry() {
         }
 
-        public ListEntry(Object element, ListEntry next, ListEntry previous) {
+        public ListEntry(E element, ListEntry next, ListEntry previous) {
             this.element = element;
             this.next = next;
             this.prev = previous;
         }
     }
 
-    private ListEntry listHeader = new ListEntry();
+    private ListEntry<E> listHeader;
     private int size;
 
     public CacheLinkedList() {
-        listHeader.next = listHeader.prev = listHeader;
+        clear();
     }
 
-    public Object getFirst() {
+    public void clear() {
+        listHeader = new ListEntry<E>();
+        listHeader.next = listHeader.prev = listHeader;
+        size = 0;
+    }
+
+    public E getFirst() {
         return listHeader.next.element;
     }
 
-    public Object getLast() {
+    public E getLast() {
         return listHeader.prev.element;
     }
 
@@ -41,25 +48,25 @@ public class CacheLinkedList {
         return listHeader.prev;
     }
 
-    public Object removeLast() {
-        final Object last = listHeader.prev.element;
+    public E removeLast() {
+        final E last = listHeader.prev.element;
         remove(listHeader.prev);
         return last;
     }
 
-    public ListEntry addFirst(Object o) {
+    public ListEntry<E> addFirst(E o) {
         return addBefore(o, listHeader.next);
     }
 
-    private ListEntry addBefore(Object o, ListEntry e) {
-        final ListEntry newEntry = new ListEntry(o, e, e.prev);
+    private ListEntry<E> addBefore(E o, ListEntry<E> e) {
+        final ListEntry<E> newEntry = new ListEntry<E>(o, e, e.prev);
         newEntry.prev.next = newEntry;
         newEntry.next.prev = newEntry;
         size++;
         return newEntry;
     }
 
-    public void remove(ListEntry e) {
+    public void remove(ListEntry<E> e) {
         if (e == listHeader)
             throw new NoSuchElementException();
 
@@ -70,5 +77,26 @@ public class CacheLinkedList {
 
     public int size() {
         return size;
+    }
+
+    public Iterator<E> iterator() {
+        return new Iterator<E>() {
+
+            private ListEntry<E> currentEntry = listHeader.next;
+
+            public boolean hasNext() {
+                return currentEntry != null && currentEntry.element != null;
+            }
+
+            public E next() {
+                final E result = currentEntry.element;
+                currentEntry = currentEntry.next;
+                return result;
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 }

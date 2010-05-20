@@ -367,7 +367,7 @@
                     <p:input name="document">
                         <xhtml:html xmlns:exforms="http://www.exforms.org/exf/1-0">
                             <xhtml:head>
-                                <xforms:model id="my-model">
+                                <xforms:model id="my-model" xxforms:encrypt-item-values="false">
                                     <xforms:instance id="value">
                                         <value/>
                                     </xforms:instance>
@@ -461,8 +461,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-select">+s85RSYyKV8=</xxf:control>
-                        <xxf:itemset id="my-select">[["Select...",""],["One","A21R1qCnPIg="],["Two","+s85RSYyKV8="],["Three","PAIYFi0+row="]]</xxf:itemset>
+                        <xxf:control id="my-select">2</xxf:control>
+                        <xxf:itemset id="my-select">[["Select...",""],["One","1"],["Two","2"],["Three","3"]]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1519,8 +1519,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
-                    <xxf:load resource="/orbeon/gaga" show="replace"/>
-                    <xxf:load resource="/orbeon/The%20message%20is%20'gaga'" show="replace"/>
+                    <xxf:load resource="/orbeon/doc/gaga" show="replace"/>
+                    <xxf:load resource="/orbeon/doc/The%20message%20is%20'gaga'" show="replace"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

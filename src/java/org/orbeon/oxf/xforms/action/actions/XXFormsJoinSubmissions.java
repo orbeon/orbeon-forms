@@ -30,11 +30,11 @@ public class XXFormsJoinSubmissions extends XFormsAction {
                         XFormsEventObserver eventObserver, Element actionElement, XBLBindings.Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         // Process all pending async submissions. The action will block until the method returns.
-        if (Version.instance().isPE()) {
+        if (Version.isPE()) {
             // Only supported in PE version
-            final AsynchronousSubmissionManager asynchronousSubmissionManager = actionInterpreter.getContainingDocument().getAsynchronousSubmissionManager(false);
-            if (asynchronousSubmissionManager != null)
-                asynchronousSubmissionManager.processAllAsynchronousSubmissions(propertyContext);
+            final AsynchronousSubmissionManager manager = actionInterpreter.getContainingDocument().getAsynchronousSubmissionManager(false);
+            if (manager != null)
+                manager.processAllAsynchronousSubmissions(propertyContext);
         } else {
             // It's better to throw an exception since this action can have an impact on application behavior, not only performance
             throw new OXFException("xxforms:join-submissions extension action is only supported in Orbeon Forms PE.");

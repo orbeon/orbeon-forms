@@ -194,13 +194,14 @@ public abstract class BaseSubmission implements Submission {
                                               final Callable<SubmissionResult> callable) throws Exception {
         if (p2.isAsynchronous) {
 
-            // This is probably a temporary setting: we run replace="none" in the foreground later, and
-            // replace="instance|text" in the background.
-            final boolean isRunInBackground = !p.isReplaceNone;
-
             // Tell XFCD that we have one more async submission
-            containingDocument.getAsynchronousSubmissionManager(true).addAsynchronousSubmission(propertyContext, callable, isRunInBackground);
+            containingDocument.getAsynchronousSubmissionManager(true).addAsynchronousSubmission(propertyContext, callable);
 
+            // Tell caller he doesn't need to do anything
+            return null;
+        } else if (p.isDeferredSubmissionSecondPass) {
+            // Tell XFCD that we have a submission ready for a second pass
+            containingDocument.setActiveSubmissionSecondPass(callable);
             // Tell caller he doesn't need to do anything
             return null;
         } else {

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.junit.Test;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.IndentedLogger;
@@ -32,6 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static junit.framework.Assert.*;
+
 public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTestBase {
 
     public static final HashMap<String, String> BASIC_NAMESPACE_MAPPINGS = new HashMap<String, String>();
@@ -42,6 +45,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
         BASIC_NAMESPACE_MAPPINGS.put(XMLConstants.XHTML_PREFIX, XMLConstants.XHTML_NAMESPACE_URI);
     }
 
+    @Test
     public void testFormNamespaceElements() {
 
         final Map<String, Map<String, String>> mappings = new HashMap<String, Map<String, String>>();
@@ -101,6 +105,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
     }
 
     // Test that xxforms:attribute elements with @id and @for were created for
+    @Test
     public void testXXFormsAttribute() {
 
         final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);

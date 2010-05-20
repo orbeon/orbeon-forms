@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.analysis;
 
 import org.dom4j.Document;
+import org.junit.Test;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -33,8 +34,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static junit.framework.Assert.*;
+
 public class XFormsStaticStateTest extends ResourceManagerTestBase {
 
+    @Test
     public void testLHHAAnalysis() {
 //        if (Version.instance().isPE()) { // only test this feature if we are the PE version
 //            final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/lhha.xml");
@@ -55,6 +59,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
 //        }
     }
 
+    @Test
     public void testBindAnalysis() {
         if (Version.isPE()) { // only test this feature if we are the PE version
             final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/binds.xml");
@@ -103,7 +108,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         }
     }
 
-
+    @Test
     public void testXPathAnalysis() {
         if (Version.isPE()) { // only test this feature if we are the PE version
             final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/form.xml");
@@ -310,6 +315,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         }
     }
 
+    @Test
     public void testVariables() {
         if (Version.isPE()) { // only test this feature if we are the PE version
             final XFormsStaticState staticState = getStaticState("oxf:/org/orbeon/oxf/xforms/analysis/variables.xml");
@@ -351,7 +357,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
      * @param documentURL   URL to read and analyze
      * @return              static state
      */
-    private XFormsStaticState getStaticState(String documentURL) {
+    public static XFormsStaticState getStaticState(String documentURL) {
         final PipelineContext pipelineContext = new PipelineContext();
         final Document requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/xforms/analysis/request.xml", null);
         final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);

@@ -17,18 +17,18 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitSerializeEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsSubmitEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsSubmitReplaceEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -52,6 +52,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 /**
  * Represents an XForms model submission instance.
@@ -329,7 +330,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 // If a submission requiring a second pass was already set, then we ignore a subsequent submission but
                 // issue a warning
                 {
-                    final XFormsModelSubmission existingSubmission = containingDocument.getClientActiveSubmission();
+                    final XFormsModelSubmission existingSubmission = containingDocument.getClientActiveSubmissionFirstPass();
                     if (p.isDeferredSubmission && existingSubmission != null) {
                         indentedLogger.logWarning("", "another submission requiring a second pass already exists",
                                 "existing submission", existingSubmission.getEffectiveId(),
@@ -365,13 +366,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 // Deferred submission: end of the first pass
                 if (p.isDeferredSubmissionFirstPass) {
 
-                    // Create document to submit here because in case of error, an Ajax response will still be produced
+                    // Create (but abandon) document to submit here because in case of error, an Ajax response will still be produced
                     if (serialize) {
                         createDocumentToSubmit(propertyContext, indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant);
                     }
 
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
-                    containingDocument.setClientActiveSubmission(this);
+                    containingDocument.setActiveSubmissionFirstPass(this);
                     return;
                 }
 
@@ -388,17 +389,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 final Document documentToSubmit;
                 if (serialize) {
-                    // Handle uploaded files if any
-                    final Element filesElement = (event instanceof XXFormsSubmitEvent) ? ((XXFormsSubmitEvent) event).getFilesElement() : null;
-                    if (filesElement != null) {
-                        // Handle all file elements
-
-                        // NOTE: We used to request handling of temp files only if NOT replace="all". Guessing the
-                        // rationale was that user would be navigating to new page anyway. However, this was not a
-                        // correct assumption: the page might load in another window/tab, result in an file being
-                        // downloaded, or simply the file might be used by the next page.
-                        XFormsUploadControl.handleFileElement(propertyContext, containingDocument, filesElement, null, true);
-                    }
 
                     // Check if a submission requires file upload information
                     if (requestedSerialization.startsWith("multipart/")) {
@@ -540,6 +530,44 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             }
         }
         return submitDoneRunnable;
+    }
+
+    /**
+     * Run the given submission callable. This must be a callable for a replace="all" submission.
+     *
+     * @param callable          callable run
+     * @param response          response to write to if needed
+     */
+    public static void runDeferredSubmission(Callable<SubmissionResult> callable, ExternalContext.Response response) {
+        // Run submission
+        try {
+            final SubmissionResult result = callable.call();
+            if (result != null) {
+                // Callable did not do all the work, completed it here
+                try {
+                    if (result.getReplacer() != null) {
+                        // Replacer provided, perform replacement
+
+                        // This has to be a replace="all" otherwise we shouldn't get here
+                        assert result.getReplacer() instanceof AllReplacer;
+
+                        // Replace
+                        AllReplacer.replace(result.getConnectionResult(), response);
+
+                    } else if (result.getThrowable() != null) {
+                        // Propagate throwable, which might have come from a separate thread
+                        throw new OXFException(result.getThrowable());
+                    } else {
+                        // Should not happen
+                    }
+                } finally {
+                    result.close();
+                }
+            }
+        } catch (Exception e) {
+            // Something bad happened
+            throw new OXFException(e);
+        }
     }
 
     private void sendSubmitError(PropertyContext propertyContext, Throwable throwable, SubmissionResult submissionResult) {

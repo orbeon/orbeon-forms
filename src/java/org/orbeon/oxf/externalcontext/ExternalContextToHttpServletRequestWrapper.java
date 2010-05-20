@@ -16,7 +16,7 @@ package org.orbeon.oxf.externalcontext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.FastHttpDateFormat;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.StringUtils;
+import org.orbeon.oxf.util.StringConversions;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
@@ -149,7 +149,7 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
 
     public String[] getParameterValues(String name) {
         // Convert as parameters MAY contain FileItem values
-        return StringUtils.objectArrayToStringArray(request.getParameterMap().get(name));
+        return StringConversions.objectArrayToStringArray(request.getParameterMap().get(name));
     }
 
     /* SUPPORTED: request body */

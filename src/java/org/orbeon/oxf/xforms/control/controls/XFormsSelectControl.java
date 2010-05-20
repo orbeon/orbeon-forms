@@ -48,10 +48,9 @@ public class XFormsSelectControl extends XFormsSelect1Control {
      * @param propertyContext   current context
      * @param value             list of tokens from the UI
      * @param type              should probably be null
-     * @param filesElement
      */
     @Override
-    public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
+    public void storeExternalValue(PropertyContext propertyContext, String value, String type) {
 
         final String controlValue = getValue(propertyContext);
 
@@ -121,7 +120,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         // "newValue" is created so as to ensure that if a value is NOT in the itemset AND we are a closed selection
         // then we do NOT store the value in instance.
         // NOTE: At the moment we don't support open selection here anyway
-        super.storeExternalValue(propertyContext, newValue, type, filesElement);
+        super.storeExternalValue(propertyContext, newValue, type);
     }
 
     @Override

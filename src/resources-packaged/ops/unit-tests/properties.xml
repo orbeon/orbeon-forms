@@ -18,7 +18,7 @@
     <property as="xs:string"  name="oxf.schemas.urn://adress-book"                   value="oxf:/ops/unit-tests/address-book-schema.xml"/>
     <property as="xs:boolean" name="oxf.xforms.encrypt-hidden"                       value="true"/>
     <property as="xs:boolean" name="oxf.xforms.encrypt-names"                        value="true"/>
-    <property as="xs:string"  name="oxf.xforms.password"                             value="Password used for encryption"/>
+    <property as="xs:string"  name="oxf.xforms.password"                             value="UnitTestsOrbeonPassword"/>
 
     <property as="xs:string"  name="oxf.xforms.state-handling"                       value="server"/>
     <property as="xs:integer" name="oxf.xforms.store.application.size"               value="20000"/>

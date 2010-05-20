@@ -13,10 +13,12 @@
  */
 package org.orbeon.oxf.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.dom4j.*;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestName;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -26,60 +28,58 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.servlet.*;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.Principal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
-public class ProcessorTest extends TestCase {
+import static org.junit.Assert.fail;
+
+@RunWith(Parameterized.class)
+public class ProcessorTest extends ResourceManagerTestBase {
 
     private static Context jndiContext;
     private static PipelineContext pipelineContext;
-
 
     private static final int THREAD_COUNT = 1;
     private static final int REPEAT_COUNT = 1;
     private static final String TEST_CONFIG = "oxf.test.config";
 
-    public static void main(String args[]) {
-        junit.textui.TestRunner.run(ProcessorTest.suite());
+    @Test
+    public void runTest() throws Throwable {
+        test();
     }
 
-    static {
+    @Rule
+        public TestName name= new TestName() {
+        @Override
+        public String getMethodName() {
+            return getName();
+        }
+    };
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+    private static void setupContext() {
         try {
             // Initialize log4j
             LoggerFactory.initBasicLogger();
 
-            jndiContext = new InitialContext();
-
-            // Setup resource manager
-            Map props = new HashMap();
-            java.util.Properties properties = System.getProperties();
-            for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
-                String name = (String) e.nextElement();
-                if (name.startsWith("oxf.resources."))
-                    props.put(name, properties.getProperty(name));
-            }
-            ResourceManagerWrapper.init(props);
             ResourceManager resourceManager = ResourceManagerWrapper.instance();
-
-            org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties.xml");
             pipelineContext = new PipelineContext();
+            jndiContext = new InitialContext();
             pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
 
             // Initialize log4j with a DOMConfiguration
@@ -102,14 +102,18 @@ public class ProcessorTest extends TestCase {
         }
     }
 
-    public static Test suite() {
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+
         String currentTestError = null;
         try {
-            TestSuite suite = new TestSuite();
-
-            final boolean useParserXinclude = true;
+            staticSetup();
+            setupContext();
+            
+            final List<Object[]> parameters = new ArrayList<Object[]>();
+            final boolean useParserXInclude = true;
             final Document tests;
-            if (useParserXinclude) {
+            if (useParserXInclude) {
                 final URLGenerator urlGenerator = new URLGenerator(System.getProperty(TEST_CONFIG), true);
                 final DOMSerializer domSerializer = new DOMSerializer();
                 PipelineUtils.connect(urlGenerator, "data", domSerializer, "data");
@@ -177,9 +181,9 @@ public class ProcessorTest extends TestCase {
                     domSerializers.add(domSerializer);
                 }
 
-                suite.addTest(new ProcessorTest(description, processor, domSerializers, expectedDocuments));
+                parameters.add(new Object[] { description, processor, domSerializers, expectedDocuments });
             }
-            return suite;
+            return parameters;
         } catch (Exception e) {
             System.err.println(currentTestError);
             e.printStackTrace();
@@ -196,8 +200,7 @@ public class ProcessorTest extends TestCase {
     private List domSerializers;
     private List expectedDocuments;
 
-    private ProcessorTest(String description, Processor processor, List domSerializers, List expectedDocuments) {
-        super("test");
+    public ProcessorTest(String description, Processor processor, List domSerializers, List expectedDocuments) {
         this.description = description;
         this.processor = processor;
         this.domSerializers = domSerializers;
@@ -205,7 +208,6 @@ public class ProcessorTest extends TestCase {
     }
 
     protected ProcessorTest(String name) {
-        super(name);
         this.description = name;
     }
 
@@ -216,7 +218,7 @@ public class ProcessorTest extends TestCase {
     /**
      * Run test and compare to expected result
      */
-    public void test() throws Throwable {
+    private void test() throws Throwable {
 
         // Create threads
         TestThread[] threads = new TestThread[THREAD_COUNT];
@@ -253,7 +255,7 @@ public class ProcessorTest extends TestCase {
      * Remove the element the namespace declaration that are not used
      * in this element or child elements.
      */
-    synchronized private void removeUnusedNamespaceDeclarations(Element element) {
+    private synchronized void removeUnusedNamespaceDeclarations(Element element) {
         List usedNamespaces = new ArrayList();
         getUsedNamespaces(usedNamespaces, element);
         List declaredNamespaces = element.declaredNamespaces();
@@ -275,7 +277,7 @@ public class ProcessorTest extends TestCase {
      *
      * @param result List of String (URI)
      */
-    synchronized private void getUsedNamespaces(List result, Element element) {
+    private synchronized void getUsedNamespaces(List result, Element element) {
         if (element != null) {
             if (!"".equals(element.getNamespaceURI()))
                 result.add(element.getNamespaceURI());
@@ -311,20 +313,12 @@ public class ProcessorTest extends TestCase {
             try {
                 for (; executionCount < REPEAT_COUNT; executionCount++) {
                     // Create pipeline context
-                    final PipelineContext pipelineContext = new PipelineContext();
+                    final PipelineContext pipelineContext = createPipelineContextWithExternalContext();
                     pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
 
-                    // Create ExternalContext
-                    // TODO: wondering why we use ServletExternalContext here
-                    final ExternalContext externalContext = new ServletExternalContext(new TestServletContext(), pipelineContext, new HashMap(), new TestHttpServletRequest(), new TestHttpServletResponse()) {
-                        public String getRealPath(String path) {
-                            if (path.equals("WEB-INF/exist-conf.xml")) {
-                                return ResourceManagerWrapper.instance().getRealPath("/ops/unit-tests/exist-conf.xml");
-                            } else {
-                                return super.getRealPath(path);
-                            }
-                        }
-                    };
+                    // Get ExternalContext
+                    final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
+
                     StaticExternalContext.setStaticContext(new StaticExternalContext.StaticContext(externalContext, pipelineContext));
                     pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
 
@@ -395,429 +389,5 @@ public class ProcessorTest extends TestCase {
         public String getActualDataStringFormatted() {
             return actualDataStringFormatted;
         }
-    }
-}
-
-class TestServletContext implements ServletContext {
-
-    // Implement all attribute-related methods so that the application context works
-    private Map attributes = new HashMap();
-
-    public Object getAttribute(String s) {
-        return attributes.get(s);
-    }
-
-    public Enumeration getAttributeNames() {
-        return Collections.enumeration(attributes.keySet());
-    }
-
-    public void removeAttribute(String s) {
-        attributes.remove(s);
-    }
-
-    public void setAttribute(String s, Object o) {
-        attributes.put(s, o);
-    }
-
-    public ServletContext getContext(String s) {
-        return null;
-    }
-
-    public String getInitParameter(String s) {
-        return null;
-    }
-
-    public Enumeration getInitParameterNames() {
-        return null;
-    }
-
-    public int getMajorVersion() {
-        return 0;
-    }
-
-    public String getMimeType(String s) {
-        return null;
-    }
-
-    public int getMinorVersion() {
-        return 0;
-    }
-
-    public RequestDispatcher getNamedDispatcher(String s) {
-        return null;
-    }
-
-    public String getRealPath(String s) {
-        return null;
-    }
-
-    public RequestDispatcher getRequestDispatcher(String s) {
-        return null;
-    }
-
-    public URL getResource(String s) throws MalformedURLException {
-        return null;
-    }
-
-    public InputStream getResourceAsStream(String s) {
-        return null;
-    }
-
-    public Set getResourcePaths(String s) {
-        return null;
-    }
-
-    public String getServerInfo() {
-        return null;
-    }
-
-    public Servlet getServlet(String s) throws ServletException {
-        return null;
-    }
-
-    public String getServletContextName() {
-        return null;
-    }
-
-    public Enumeration getServletNames() {
-        return null;
-    }
-
-    public Enumeration getServlets() {
-        return null;
-    }
-
-    public void log(Exception e, String s) {
-    }
-
-    public void log(String s) {
-    }
-
-    public void log(String s, Throwable throwable) {
-    }
-}
-
-class TestHttpServletRequest implements HttpServletRequest {
-    public String getAuthType() {
-        return null;
-    }
-
-    public String getContextPath() {
-        return "/orbeon";
-    }
-
-    public Cookie[] getCookies() {
-        return new Cookie[0];
-    }
-
-    public long getDateHeader(String s) {
-        return 0;
-    }
-
-    public String getHeader(String s) {
-        return null;
-    }
-
-    public Enumeration getHeaderNames() {
-        return Collections.enumeration(Collections.EMPTY_LIST);
-    }
-
-    public Enumeration getHeaders(String s) {
-        return Collections.enumeration(Collections.EMPTY_LIST);
-    }
-
-    public int getIntHeader(String s) {
-        return 0;
-    }
-
-    public String getMethod() {
-        return "POST";
-    }
-
-    public String getPathInfo() {
-        return "/some-path";
-    }
-
-    public String getPathTranslated() {
-        return null;
-    }
-
-    public String getQueryString() {
-        return null;
-    }
-
-    public String getRemoteUser() {
-        return null;
-    }
-
-    public String getRequestedSessionId() {
-        return null;
-    }
-
-    public String getRequestURI() {
-        return "http://www.orbeon.com/oxf/some-path";
-    }
-
-    public StringBuffer getRequestURL() {
-        return new StringBuffer("http://www.orbeon.com/oxf/some-path");
-    }
-
-    public String getServletPath() {
-        return "";
-    }
-
-    public HttpSession getSession() {
-        return null;
-    }
-
-    public HttpSession getSession(boolean b) {
-        return null;
-    }
-
-    public Principal getUserPrincipal() {
-        return null;
-    }
-
-    public boolean isRequestedSessionIdFromCookie() {
-        return false;
-    }
-
-    public boolean isRequestedSessionIdFromURL() {
-        return false;
-    }
-
-    public boolean isRequestedSessionIdFromUrl() {
-        return false;
-    }
-
-    public boolean isRequestedSessionIdValid() {
-        return false;
-    }
-
-    public boolean isUserInRole(String s) {
-        return false;
-    }
-
-    public Object getAttribute(String s) {
-        return null;
-    }
-
-    public Enumeration getAttributeNames() {
-        return null;
-    }
-
-    public String getCharacterEncoding() {
-        return null;
-    }
-
-    public int getContentLength() {
-        return 0;
-    }
-
-    public String getContentType() {
-        return null;
-    }
-
-    public ServletInputStream getInputStream() throws IOException {
-        return null;
-    }
-
-    public Locale getLocale() {
-        return null;
-    }
-
-    public Enumeration getLocales() {
-        return null;
-    }
-
-    public String getParameter(String s) {
-        return null;
-    }
-
-    public Map getParameterMap() {
-        return null;
-    }
-
-    public Enumeration getParameterNames() {
-        return null;
-    }
-
-    public String[] getParameterValues(String s) {
-        return new String[0];
-    }
-
-    public String getProtocol() {
-        return null;
-    }
-
-    public BufferedReader getReader() throws IOException {
-        return null;
-    }
-
-    public String getRealPath(String s) {
-        return null;
-    }
-
-    public String getRemoteAddr() {
-        return null;
-    }
-
-    public String getRemoteHost() {
-        return null;
-    }
-
-    public RequestDispatcher getRequestDispatcher(String s) {
-        return null;
-    }
-
-    public String getScheme() {
-        return null;
-    }
-
-    public String getServerName() {
-        return null;
-    }
-
-    public int getServerPort() {
-        return 0;
-    }
-
-    public boolean isSecure() {
-        return false;
-    }
-
-    public void removeAttribute(String s) {
-    }
-
-    public void setAttribute(String s, Object o) {
-    }
-
-    public void setCharacterEncoding(String s) throws UnsupportedEncodingException {
-    }
-
-    public int getRemotePort() {
-        return 0;
-    }
-
-    public String getLocalName() {
-        return null;
-    }
-
-    public String getLocalAddr() {
-        return null;
-    }
-
-    public int getLocalPort() {
-        return 0;
-    }
-}
-
-class TestHttpServletResponse implements HttpServletResponse {
-    public void addCookie(Cookie cookie) {
-    }
-
-    public void addDateHeader(String s, long l) {
-    }
-
-    public void addHeader(String s, String s1) {
-    }
-
-    public void addIntHeader(String s, int i) {
-    }
-
-    public boolean containsHeader(String s) {
-        return false;
-    }
-
-    public String encodeRedirectURL(String s) {
-        return null;
-    }
-
-    public String encodeRedirectUrl(String s) {
-        return null;
-    }
-
-    public String encodeURL(String s) {
-        return null;
-    }
-
-    public String encodeUrl(String s) {
-        return null;
-    }
-
-    public void sendError(int i) throws IOException {
-    }
-
-    public void sendError(int i, String s) throws IOException {
-    }
-
-    public void sendRedirect(String s) throws IOException {
-    }
-
-    public void setDateHeader(String s, long l) {
-    }
-
-    public void setHeader(String s, String s1) {
-    }
-
-    public void setIntHeader(String s, int i) {
-    }
-
-    public void setStatus(int i) {
-    }
-
-    public void setStatus(int i, String s) {
-    }
-
-    public void flushBuffer() throws IOException {
-    }
-
-    public int getBufferSize() {
-        return 0;
-    }
-
-    public String getCharacterEncoding() {
-        return null;
-    }
-
-    public Locale getLocale() {
-        return null;
-    }
-
-    public ServletOutputStream getOutputStream() throws IOException {
-        return null;
-    }
-
-    public PrintWriter getWriter() throws IOException {
-        return null;
-    }
-
-    public boolean isCommitted() {
-        return false;
-    }
-
-    public void reset() {
-    }
-
-    public void resetBuffer() {
-    }
-
-    public void setBufferSize(int i) {
-    }
-
-    public void setContentLength(int i) {
-    }
-
-    public void setContentType(String s) {
-    }
-
-    public void setLocale(Locale locale) {
-    }
-
-    public void setCharacterEncoding(String s) {
-    }
-
-    public String getContentType() {
-        return null;
     }
 }

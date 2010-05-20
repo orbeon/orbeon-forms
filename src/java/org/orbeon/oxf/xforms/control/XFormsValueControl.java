@@ -123,9 +123,8 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
      * @param propertyContext   current context
      * @param value             the new external value
      * @param type
-     * @param filesElement      special filesElement construct for controls that need it
      */
-    public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
+    public void storeExternalValue(PropertyContext propertyContext, String value, String type) {
         // Set value into the instance
 
         final Item boundItem = getBoundItem();

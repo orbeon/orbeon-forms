@@ -106,7 +106,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
                 for (Enumeration e = portletRequest.getPropertyNames(); e.hasMoreElements();) {
                     String name = (String) e.nextElement();
                     // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
-                    headerValuesMap.put(name.toLowerCase(), StringUtils.stringEnumerationToArray(portletRequest.getProperties(name)));
+                    headerValuesMap.put(name.toLowerCase(), StringConversions.stringEnumerationToArray(portletRequest.getProperties(name)));
                 }
             }
             return headerValuesMap;

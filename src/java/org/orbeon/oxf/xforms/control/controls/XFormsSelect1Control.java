@@ -249,7 +249,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
+    public void storeExternalValue(PropertyContext propertyContext, String value, String type) {
 
         if (!(this instanceof XFormsSelectControl)) {// kind of a HACK due to the way our class hierarchy is setup
             // Handle xforms:select1-specific logic
@@ -305,11 +305,11 @@ public class XFormsSelect1Control extends XFormsValueControl {
             if (hasSelectedItem || isOpenSelection()) {
                 // Only then do we store the external value. This ensures that if the value is NOT in the itemset AND
                 // we are a closed selection then we do NOT store the value in instance.
-                super.storeExternalValue(propertyContext, value, type, filesElement);
+                super.storeExternalValue(propertyContext, value, type);
             }
         } else {
             // Forward to superclass
-            super.storeExternalValue(propertyContext, value, type, filesElement);
+            super.storeExternalValue(propertyContext, value, type);
         }
     }
 

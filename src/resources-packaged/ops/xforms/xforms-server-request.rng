@@ -21,12 +21,17 @@
 
     <start>
         <element name="xxforms:event-request">
-            <element name="xxforms:static-state">
+            <element name="xxforms:uuid">
                 <data type="string"/>
             </element>
-            <element name="xxforms:dynamic-state">
-                <data type="string"/>
-            </element>
+            <optional>
+                <element name="xxforms:static-state">
+                    <data type="string"/>
+                </element>
+                <element name="xxforms:dynamic-state">
+                    <data type="string"/>
+                </element>
+            </optional>
             <optional>
                 <element name="xxforms:initial-dynamic-state">
                     <data type="string"/>

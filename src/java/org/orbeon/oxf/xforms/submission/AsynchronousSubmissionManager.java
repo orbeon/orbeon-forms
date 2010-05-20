@@ -43,8 +43,6 @@ public class AsynchronousSubmissionManager {
 
     private final XFormsContainingDocument containingDocument;
 
-//    private List<AsynchronousSubmission> foregroundAsynchronousSubmissions;
-
     public AsynchronousSubmissionManager(XFormsContainingDocument containingDocument) {
         this.containingDocument = containingDocument;
     }
@@ -64,98 +62,40 @@ public class AsynchronousSubmissionManager {
         }
     }
 
-    private String getSessionKey() {
-        return ASYNC_SUBMISSIONS_SESSION_KEY_PREFIX + containingDocument.getUUID();
+    private static String getSessionKey(XFormsContainingDocument containingDocument) {
+        return getSessionKey(containingDocument.getUUID());
     }
 
-    @SuppressWarnings("unchecked")
-    private AsynchronousSubmissions getAsynchronousSubmissions(PropertyContext propertyContext, boolean create) {
+    private static String getSessionKey(String documentUUID) {
+        return ASYNC_SUBMISSIONS_SESSION_KEY_PREFIX + documentUUID;
+    }
+
+    private static AsynchronousSubmissions getAsynchronousSubmissions(PropertyContext propertyContext, boolean create, String sessionKey) {
         final Map<String, Object> sessionMap = XFormsUtils.getExternalContext(propertyContext).getSession(true).getAttributesMap();
-        final AsynchronousSubmissions existingAsynchronousSubmissions = (AsynchronousSubmissions) sessionMap.get(getSessionKey());
+        final AsynchronousSubmissions existingAsynchronousSubmissions = (AsynchronousSubmissions) sessionMap.get(sessionKey);
         if (existingAsynchronousSubmissions != null) {
             return existingAsynchronousSubmissions;
         } else if (create) {
             final AsynchronousSubmissions asynchronousSubmissions = new AsynchronousSubmissions();
-            sessionMap.put(getSessionKey(), asynchronousSubmissions);
+            sessionMap.put(sessionKey, asynchronousSubmissions);
             return asynchronousSubmissions;
         } else {
             return null;
         }
     }
 
-    public void addAsynchronousSubmission(final PropertyContext propertyContext, final Callable<SubmissionResult> callable, boolean isBackground) {
+    public void addAsynchronousSubmission(final PropertyContext propertyContext, final Callable<SubmissionResult> callable) {
 
-        final AsynchronousSubmissions asynchronousSubmissions = getAsynchronousSubmissions(propertyContext, true);
+        final AsynchronousSubmissions asynchronousSubmissions = getAsynchronousSubmissions(propertyContext, true, getSessionKey(containingDocument));
 
         // NOTE: If we want to re-enable foreground async submissions, we must:
         // o do a better detection: !(xf-submit-done/xf-submit-error listener) && replace="none"
         // o OR provide an explicit hint on xf:submission
         asynchronousSubmissions.submit(callable);
-
-        // Add submission future
-//        if (isBackground) {
-//            // Background async submission
-//            asynchronousSubmissions.submit(callable);
-//        } else {
-//            // Foreground async submission
-//            final Future<SubmissionResult> future = new Future<SubmissionResult>() {
-//
-//                private boolean isDone;
-//                private boolean isCanceled;
-//
-//                private SubmissionResult result;
-//
-//                public boolean cancel(boolean b) {
-//                    if (isDone)
-//                        return false;
-//                    isCanceled = true;
-//                    return true;
-//                }
-//
-//                public boolean isCancelled() {
-//                    return isCanceled;
-//                }
-//
-//                public boolean isDone() {
-//                    return isDone;
-//                }
-//
-//                public SubmissionResult get() throws InterruptedException, ExecutionException {
-//                    if (isCanceled)
-//                        throw new CancellationException();
-//
-//                    if (!isDone) {
-//                        try {
-//                            result = callable.call();
-//                        } catch (Exception e) {
-//                            throw new ExecutionException(e);
-//                        }
-//
-//                        isDone = true;
-//                    }
-//
-//                    return result;
-//                }
-//
-//                public SubmissionResult get(long l, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
-//                    return get();
-//                }
-//            };
-//
-//            if (foregroundAsynchronousSubmissions == null)
-//                foregroundAsynchronousSubmissions = new ArrayList<AsynchronousSubmission>();
-//            foregroundAsynchronousSubmissions.add(new AsynchronousSubmission(future, completionService));
-//
-//            // NOTE: In this very basic level of support, we don't support
-//            // xforms-submit-done / xforms-submit-error handlers
-//
-//            // TODO: Do something with result, e.g. log?
-//            // final ConnectionResult connectionResult = ...
-//        }
     }
 
     public boolean hasPendingAsynchronousSubmissions(PropertyContext propertyContext) {
-        final AsynchronousSubmissions asynchronousSubmissions = getAsynchronousSubmissions(propertyContext, false);
+        final AsynchronousSubmissions asynchronousSubmissions = getAsynchronousSubmissions(propertyContext, false, getSessionKey(containingDocument));
         return asynchronousSubmissions != null && asynchronousSubmissions.getPendingCount() > 0;
     }
 
@@ -169,7 +109,7 @@ public class AsynchronousSubmissionManager {
      * @param propertyContext   current context
      */
     public void processAllAsynchronousSubmissions(PropertyContext propertyContext) {
-        final AsynchronousSubmissions asynchronousSubmissions = getAsynchronousSubmissions(propertyContext, false);
+        final AsynchronousSubmissions asynchronousSubmissions = getAsynchronousSubmissions(propertyContext, false, getSessionKey(containingDocument));
         if (asynchronousSubmissions != null && asynchronousSubmissions.getPendingCount() > 0) {
 
             final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
@@ -211,7 +151,7 @@ public class AsynchronousSubmissionManager {
      * @param propertyContext   current context
      */
     public void processCompletedAsynchronousSubmissions(PropertyContext propertyContext) {
-        final AsynchronousSubmissions asynchronousSubmissions = getAsynchronousSubmissions(propertyContext, false);
+        final AsynchronousSubmissions asynchronousSubmissions = getAsynchronousSubmissions(propertyContext, false, getSessionKey(containingDocument));
         if (asynchronousSubmissions != null && asynchronousSubmissions.getPendingCount() > 0) {
             final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
             indentedLogger.startHandleOperation("", "processing completed background asynchronous submissions");
@@ -272,50 +212,4 @@ public class AsynchronousSubmissionManager {
             return pendingCount;
         }
     }
-
-
-//    private boolean hasForegroundAsynchronousSubmissions() {
-//        return foregroundAsynchronousSubmissions != null && foregroundAsynchronousSubmissions.size() > 0;
-//    }
-
-    /**
-     * Process all current foreground submissions if any. Submissions are processed in the order in which they were
-     * executed.
-     */
-    public void processForegroundAsynchronousSubmissions() {
-//        if (hasForegroundAsynchronousSubmissions()) {
-//            final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
-//            indentedLogger.startHandleOperation("", "processing foreground asynchronous submissions");
-//            int count = 0;
-//            try {
-//                for (Iterator<AsynchronousSubmission> i = foregroundAsynchronousSubmissions.iterator(); i.hasNext(); count++) {
-//                    final AsynchronousSubmission asyncSubmission = i.next();
-//                    try {
-//                        // Submission is run at this point
-//                        asyncSubmission.future.get();
-//
-//                        // NOTE: We do not process the response at all
-//
-//                    } catch (Throwable throwable) {
-//                        // Something happened but we swallow the exception and keep going
-//                        indentedLogger.logError("", "asynchronous submission: throwable caught", throwable);
-//                    }
-//                    // Remove submission from list of submission so we can gc the Runnable
-//                    i.remove();
-//                }
-//            } finally {
-//                indentedLogger.endHandleOperation("count", Integer.toString(count));
-//            }
-//        }
-    }
-
-//    private static class AsynchronousSubmission {
-//        public final Future<SubmissionResult> future;
-//
-//
-//        public AsynchronousSubmission(Future<SubmissionResult> future, CompletionService<SubmissionResult> completionService) {
-//            this.future = future;
-//            this.completionService = completionService;
-//        }
-//    }
 }

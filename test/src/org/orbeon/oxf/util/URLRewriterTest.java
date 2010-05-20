@@ -14,6 +14,8 @@
 package org.orbeon.oxf.util;
 
 import org.dom4j.Document;
+import org.junit.Before;
+import org.junit.Test;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -24,13 +26,17 @@ import org.orbeon.oxf.test.ResourceManagerTestBase;
 
 import java.util.List;
 
+import static junit.framework.Assert.*;
+
 public class URLRewriterTest extends ResourceManagerTestBase {
 
     private ExternalContext.Request directRequest;
     private ExternalContext.Request forwardRequest;
     private ExternalContext.Request filterRequest;
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
+
         {
             final PipelineContext pipelineContext = new PipelineContext();
             final Document requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/util/url-rewriter-test-request.xml", null);
@@ -61,6 +67,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
 		org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties-versioned-all.xml");
     }
 
+    @Test
     public void testServiceRewrite() {
 
         // Test with oxf.url-rewriting.service.base-uri is set to http://example.org/cool/service
@@ -73,8 +80,10 @@ public class URLRewriterTest extends ResourceManagerTestBase {
 
         // TODO: test with oxf.url-rewriting.service.base-uri set to absolute path
         // TODO: test without oxf.url-rewriting.service.base-uri set
+
     }
 
+    @Test
     public void testRewrite() {
         // Test against request
         int mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE;
@@ -110,6 +119,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         assertEquals("/orbeon/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteURL(directRequest, "?a=1&amp;b=2", mode));
     }
 
+    @Test
     public void testResourceRewrite() {
 
         final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
@@ -156,7 +166,8 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         assertEquals("/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(directRequest, "/ops/bar.png", pathMatchers , mode));
         assertEquals("/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(directRequest, "/config/bar.png", pathMatchers , mode));
     }
-    
+
+    @Test
     public void testServiceRewriteForward() {
 
         // Test with oxf.url-rewriting.service.base-uri is set to http://example.org/cool/service
@@ -171,6 +182,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         // TODO: test without oxf.url-rewriting.service.base-uri set
     }
 
+    @Test
     public void testRewriteForward() {
         // Test against request
         int mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE;
@@ -206,6 +218,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         assertEquals("/myapp/doc/home-welcome?a=1&amp;b=2", URLRewriterUtils.rewriteURL(forwardRequest, "?a=1&amp;b=2", mode));
     }
 
+    @Test
     public void testResourceRewriteForward() {
 
         final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
@@ -252,7 +265,8 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         assertEquals("/orbeon/" + version + "/ops/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/ops/bar.png", pathMatchers , mode));
         assertEquals("/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(forwardRequest, "/config/bar.png", pathMatchers , mode));
     }
-    
+
+    @Test
     public void testResourceRewriteFilter() {
 
         final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
@@ -300,6 +314,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         assertEquals("/myapp/orbeon/" + version + "/config/bar.png", URLRewriterUtils.rewriteResourceURL(filterRequest, "/config/bar.png", pathMatchers , mode));
     }
 
+    @Test
     public void testDecodeResourceURI() {
 
         // NOTE: Unclear case: /xforms-server/foobar. URLRewriterUtils.rewriteResourceURL() does not rewrite
@@ -361,6 +376,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         }
     }
 
+    @Test
     public void testHRRI() {
         // Test for spaces
         assertEquals("http://localhost:8080/myapp/a%20b", NetUtils.encodeHRRI("http://localhost:8080/myapp/a b", true));
@@ -371,6 +387,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         assertEquals("http://localhost:8080/myapp/%3C%3E%22%7B%7D%7C%5C%5E%60", NetUtils.encodeHRRI("http://localhost:8080/myapp/<>\"{}|\\^`", true));
     }
 
+    @Test
     public void testResolveURI() {
         assertEquals("http://localhost:8080/myapp/a%20b", NetUtils.resolveURI("a b", "http://localhost:8080/myapp/"));
         assertEquals("http://localhost:8080/myapp/a%20b", NetUtils.resolveURI("http://localhost:8080/myapp/a b", null));

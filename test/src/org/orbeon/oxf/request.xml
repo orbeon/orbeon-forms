@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -72,12 +72,6 @@
             <value>JSESSIONID=DA6E64FC1E6DFF0499B5D6F46A32186A</value>
         </header>
     </headers>
-    <attributes>
-        <attribute>
-            <name>javax.servlet.forward.context_path</name>
-            <value>/myapp</value>
-        </attribute>
-    </attributes>
     <method>GET</method>
     <path-info>/doc/home-welcome</path-info>
     <request-path>/doc/home-welcome</request-path>

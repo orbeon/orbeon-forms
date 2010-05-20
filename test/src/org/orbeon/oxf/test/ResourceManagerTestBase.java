@@ -13,28 +13,67 @@
  */
 package org.orbeon.oxf.test;
 
-import junit.framework.TestCase;
+import org.dom4j.Document;
+import org.junit.BeforeClass;
+import org.orbeon.oxf.pipeline.StaticExternalContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.ProcessorUtils;
+import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
-public abstract class ResourceManagerTestBase extends TestCase {
+public abstract class ResourceManagerTestBase {
 
-	// See also ProcessorTest
-    static {
-		// Setup resource manager
-		final Map props = new HashMap();
-		final java.util.Properties properties = System.getProperties();
-		for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
-			final String name = (String) e.nextElement();
-			if (name.startsWith("oxf.resources."))
-				props.put(name, properties.getProperty(name));
+    public ResourceManagerTestBase() {}
+
+    private static boolean staticSetupDone;
+
+    @BeforeClass
+    public static void staticSetup() throws Exception {
+        if (!staticSetupDone) {
+
+            // Setup resource manager
+            final Map props = new HashMap();
+            final java.util.Properties properties = System.getProperties();
+            for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
+                final String name = (String) e.nextElement();
+                if (name.startsWith("oxf.resources."))
+                    props.put(name, properties.getProperty(name));
+            }
+            ResourceManagerWrapper.init(props);
+            // Initialize properties
+            org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties.xml");
+
+            staticSetupDone  = true;
+        }
+	}
+
+    protected PipelineContext createPipelineContextWithExternalContext() {
+        final PipelineContext pipelineContext = new PipelineContext();
+        final Document requestDocument = ProcessorUtils.createDocumentFromURL("oxf:/org/orbeon/oxf/request.xml", null);
+        final ExternalContext externalContext = new ExtendedTestExternalContext(pipelineContext, requestDocument);
+        pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
+
+        StaticExternalContext.setStaticContext(new StaticExternalContext.StaticContext(externalContext, pipelineContext));
+
+        return pipelineContext;
+    }
+
+    protected static class ExtendedTestExternalContext extends TestExternalContext {
+
+		public ExtendedTestExternalContext(PipelineContext pipelineContext, Document requestDocument) {
+			super(pipelineContext, requestDocument);
 		}
-		ResourceManagerWrapper.init(props);
-        // Initialize properties
-		org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties.xml");
+
+        @Override
+		public String getRealPath(String path) {
+            if (path.equals("WEB-INF/exist-conf.xml")) {
+                return ResourceManagerWrapper.instance().getRealPath("/ops/unit-tests/exist-conf.xml");
+            }
+			return super.getRealPath(path);
+		}
 	}
 }

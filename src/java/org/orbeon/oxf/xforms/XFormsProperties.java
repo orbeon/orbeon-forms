@@ -124,6 +124,9 @@ public class XFormsProperties {
     private static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
     public static final String XPATH_ANALYSIS_PROPERTY = "xpath-analysis";
 
+    public static final String CACHE_DOCUMENT_PROPERTY = "cache.document";
+    private static final boolean CACHE_DOCUMENT_DEFAULT = true;
+
     public static class PropertyDefinition {
 
         private String name;
@@ -209,6 +212,7 @@ public class XFormsProperties {
             new PropertyDefinition(AJAX_UPDATE_FULL_THRESHOLD, 20, false),
             new PropertyDefinition(XFORMS11_SWITCH_PROPERTY, false, false), // false for now, but default should change at some point
             new PropertyDefinition(XPATH_ANALYSIS_PROPERTY, false, false),
+            new PropertyDefinition(CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT, false),
 
             // Properties to propagate to the client
             new PropertyDefinition(NEW_XHTML_LAYOUT, false, true),
@@ -253,8 +257,6 @@ public class XFormsProperties {
 
     // Global properties
     private static final String PASSWORD_PROPERTY = XFORMS_PROPERTY_PREFIX + "password";
-    private static final String CACHE_DOCUMENT_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache.document";
-    private static final boolean CACHE_DOCUMENT_DEFAULT = true;
 
     private static final String STORE_APPLICATION_SIZE_PROPERTY = XFORMS_PROPERTY_PREFIX + "store.application.size";
     private static final int STORE_APPLICATION_SIZE_DEFAULT = 20 * 1024 * 1024;
@@ -280,10 +282,6 @@ public class XFormsProperties {
 
     private static final String TEST_AJAX_PROPERTY = XFORMS_PROPERTY_PREFIX + "test.ajax";
     private static final boolean TEST_AJAX_DEFAULT = false;
-
-    // The following global properties are deprecated in favor of the persistent application store
-    private static final String CACHE_APPLICATION_SIZE_PROPERTY = XFORMS_PROPERTY_PREFIX + "cache.application.size";
-    private static final int CACHE_APPLICATION_SIZE_DEFAULT = 1024 * 1024;
 
     private static final String DEBUG_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.debug";
     private static final String ERROR_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.error";
@@ -337,11 +335,6 @@ public class XFormsProperties {
     public static int getApplicationStateStoreSize() {
         return Properties.instance().getPropertySet().getInteger
                 (STORE_APPLICATION_SIZE_PROPERTY, STORE_APPLICATION_SIZE_DEFAULT);
-    }
-
-    public static int getApplicationCacheSize() {
-        return Properties.instance().getPropertySet().getInteger
-                (CACHE_APPLICATION_SIZE_PROPERTY, CACHE_APPLICATION_SIZE_DEFAULT);
     }
 
     public static boolean isGZIPState() {

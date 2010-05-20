@@ -24,14 +24,14 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  * Internal xxforms-value-change-with-focus-change event.
  */
 public class XXFormsValueChangeWithFocusChangeEvent extends XFormsEvent {
+
     private String newValue;
-    private Element filesElement;
     private XFormsEventTarget otherTargetObject;
-    public XXFormsValueChangeWithFocusChangeEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, String newValue, Element filesElement) {
+
+    public XXFormsValueChangeWithFocusChangeEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, String newValue) {
         super(containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, targetObject, false, false);
         this.otherTargetObject = otherTargetObject;
         this.newValue = newValue;
-        this.filesElement = filesElement;
     }
 
     public XFormsEventTarget getOtherTargetObject() {
@@ -40,9 +40,5 @@ public class XXFormsValueChangeWithFocusChangeEvent extends XFormsEvent {
 
     public String getNewValue() {
         return newValue;
-    }
-
-    public Element getFilesElement() {
-        return filesElement;
     }
 }

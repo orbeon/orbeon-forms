@@ -19,6 +19,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -102,11 +103,23 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         {
             // Output encoded static and dynamic state
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
-                    "type", "hidden", "name", "$static-state", "value", handlerContext.getEncodedClientState().getStaticState()
+                    "type", "hidden", "name", "$uuid", "value", containingDocument.getUUID()
             });
-            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                    "type", "hidden", "name", "$dynamic-state", "value", handlerContext.getEncodedClientState().getDynamicState()
-            });
+            // NOTE: Keep empty static state and dynamic state until client is able to deal without them
+            final String clientEncodedStaticState = XFormsStateManager.instance().getClientEncodedStaticState(pipelineContext, containingDocument);
+//            if (clientEncodedStaticState != null) {
+                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
+                        "type", "hidden", "name", "$static-state",
+                        "value", clientEncodedStaticState
+                });
+//            }
+            final String clientEncodedDynamicState = XFormsStateManager.instance().getClientEncodedDynamicState(pipelineContext, containingDocument);
+//            if (clientEncodedDynamicState != null) {
+                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
+                        "type", "hidden", "name", "$dynamic-state",
+                        "value", clientEncodedDynamicState
+                });
+//            }
         }
 
         if (!handlerContext.isNoScript()) {

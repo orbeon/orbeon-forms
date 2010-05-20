@@ -50,9 +50,11 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:output name="xml-output" method="xml" version="1.0" encoding="UTF-8" indent="no" omit-xml-declaration="no"/>
+                <xsl:variable name="uuid" select="uuid:createPseudoUUID()" xmlns:uuid="org.orbeon.oxf.util.UUIDUtils"/>
                 <xsl:template match="/">
                     <xsl:variable name="is-shared-result" select="exists(doc('input:submission')/xforms:submission[@xxforms:shared = 'application' or @xxforms:cache = 'true'])" as="xs:boolean"/>
                     <xxforms:event-request xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                        <xxforms:uuid><xsl:value-of select="$uuid"/></xxforms:uuid>
                         <xxforms:static-state>
                             <xsl:variable name="static-state" as="document-node()">
                                 <xsl:document>
@@ -89,7 +91,7 @@
                         <xxforms:dynamic-state>
                             <xsl:variable name="dynamic-state" as="document-node()">
                                 <xsl:document>
-                                    <dynamic-state>
+                                    <dynamic-state uuid="{$uuid}" sequence="0">
                                         <instances>
                                             <instance id="default-instance" model-id="default-model">
                                                 <xsl:value-of select="saxon:serialize(doc('input:request'), 'xml-output')"/>

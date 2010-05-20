@@ -373,7 +373,7 @@ public class NetUtils {
                     final String name = URLDecoder.decode(matcher.group(1), NetUtils.STANDARD_PARAMETER_ENCODING);
                     final String value = URLDecoder.decode(matcher.group(2), NetUtils.STANDARD_PARAMETER_ENCODING);
 
-                    StringUtils.addValueToStringArrayMap(result, name, value);
+                    StringConversions.addValueToStringArrayMap(result, name, value);
                 } catch (UnsupportedEncodingException e) {
                     // Should not happen as we are using a required encoding
                     throw new OXFException(e);
@@ -998,10 +998,10 @@ public class NetUtils {
                     if (fileItem.isFormField()) {
                         // Simple form field
                         // Assume that form fields are in UTF-8. Can they have another encoding? If so, how is it specified?
-                        StringUtils.addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString(STANDARD_PARAMETER_ENCODING));
+                        StringConversions.addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString(STANDARD_PARAMETER_ENCODING));
                     } else {
                         // File
-                        StringUtils.addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem);
+                        StringConversions.addValueToObjectArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem);
                     }
                 }
             } catch (FileUploadBase.SizeLimitExceededException e) {

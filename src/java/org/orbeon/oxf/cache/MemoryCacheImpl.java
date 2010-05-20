@@ -82,7 +82,7 @@ public class MemoryCacheImpl implements Cache {
                 entry = (CacheEntry) linkedList.getLast();
 
                 // Notify object
-                expire(propertyContext, entry.cacheable);
+                notifyEvicted(propertyContext, entry.cacheable);
 
                 keyToEntryMap.remove(entry.key);
                 linkedList.removeLast();
@@ -98,6 +98,10 @@ public class MemoryCacheImpl implements Cache {
             entry.cacheable = cacheable;
             keyToEntryMap.put(key, entry);
             entry.listEntry = linkedList.addFirst(entry);
+
+            // Notify object
+            notifyAdded(propertyContext, entry.cacheable);
+
         } else {
             // Update validity and move to the front
             entry.validity = validity;
@@ -108,11 +112,20 @@ public class MemoryCacheImpl implements Cache {
     }
 
     public synchronized void remove(PropertyContext propertyContext, CacheKey key) {
+        remove(propertyContext, key, false); // don't consider this an eviction
+    }
+
+    private synchronized void remove(PropertyContext propertyContext, CacheKey key, boolean isEvict) {
         final CacheEntry entry = keyToEntryMap.get(key);
         if (entry != null) {
 
-            // Notify object
-            expire(propertyContext, entry.cacheable);
+            if (isEvict) {
+                // Notify object
+                notifyEvicted(propertyContext, entry.cacheable);
+            } else {
+                // Notify object
+                notifyRemoved(propertyContext, entry.cacheable);
+            }
 
             keyToEntryMap.remove(key);
             linkedList.remove(entry.listEntry);
@@ -120,9 +133,21 @@ public class MemoryCacheImpl implements Cache {
         }
     }
 
-    private void expire(PropertyContext propertyContext, Object object) {
+    private void notifyAdded(PropertyContext propertyContext, Object object) {
         if (object instanceof Cacheable) {
-            ((Cacheable) object).evict(propertyContext);
+            ((Cacheable) object).added(propertyContext);
+        }
+    }
+
+    private void notifyRemoved(PropertyContext propertyContext, Object object) {
+        if (object instanceof Cacheable) {
+            ((Cacheable) object).removed(propertyContext);
+        }
+    }
+
+    private void notifyEvicted(PropertyContext propertyContext, Object object) {
+        if (object instanceof Cacheable) {
+            ((Cacheable) object).evicted(propertyContext);
         }
     }
 
@@ -131,7 +156,7 @@ public class MemoryCacheImpl implements Cache {
 
         // Notify objects
         for (final Iterator i = iterateCacheObjects(propertyContext); i.hasNext();) {
-            expire(propertyContext, i.next());
+            notifyEvicted(propertyContext, i.next());
         }
 
         keyToEntryMap = new HashMap<CacheKey, CacheEntry>();
@@ -164,7 +189,7 @@ public class MemoryCacheImpl implements Cache {
         if (maxSize != this.maxSize) {
             // Decrease size if necessary
             while(currentSize > maxSize)
-                remove(propertyContext, ((CacheEntry) linkedList.getLast()).key);
+                remove(propertyContext, ((CacheEntry) linkedList.getLast()).key, true);
             this.maxSize = maxSize;
         }
     }

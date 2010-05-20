@@ -55,26 +55,7 @@
     <!-- Decode -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#encoded-response"/>
-        <p:input name="config">
-            <xsl:stylesheet version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
-                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-                <xsl:template match="xxforms:static-state|xxforms:dynamic-state">
-                    <xsl:copy>
-                        <xsl:apply-templates select="context:decodeXML(normalize-space(.))"/>
-                    </xsl:copy>
-                </xsl:template>
-                <!-- Filter out @uuid so that unit tests are reproducible -->
-                <xsl:template match="/dynamic-state/@uuid"/>
-                <xsl:template match="instances/instance">
-                    <xsl:copy>
-                        <xsl:copy-of select="@*"/>
-                        <xsl:if test="normalize-space(.) != ''">
-                            <xsl:copy-of select="saxon:parse(string(.))"/>
-                        </xsl:if>
-                    </xsl:copy>
-                </xsl:template>
-            </xsl:stylesheet>
-        </p:input>
+        <p:input name="config" href="wrap-server-decode.xsl"/>
         <p:output name="data" ref="response"/>
     </p:processor>
 

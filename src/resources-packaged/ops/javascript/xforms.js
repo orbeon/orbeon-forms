@@ -4634,6 +4634,7 @@ ORBEON.xforms.Init = {
             formHelpPanelMessageDiv: {},         // Help dialog: div containing the help message
             formHelpPanelCloseButton: {},        // Help dialog: close button
             formLoadingNone: {},                 // HTML element with the markup displayed when nothing is displayed
+            formUUID: {},                        // UUID of the form/containing document
             formStaticState: {},                 // State that does not change for the life of the page
             formDynamicState: {},                // State that changes at every request
             formServerEvents: {},                // Server events information
@@ -4765,7 +4766,9 @@ ORBEON.xforms.Init = {
                 var xformsRepeatIndices;
                 for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
                     var element = elements[elementIndex];
-                    if (element.name.indexOf("$static-state") != -1) {
+                    if (element.name.indexOf("$uuid") != -1) {
+                        ORBEON.xforms.Globals.formUUID[formID] = element;
+                    } else if (element.name.indexOf("$static-state") != -1) {
                         ORBEON.xforms.Globals.formStaticState[formID] = element;
                     } else if (element.name.indexOf("$dynamic-state") != -1) {
                         ORBEON.xforms.Globals.formDynamicState[formID] = element;
@@ -5799,17 +5802,29 @@ ORBEON.xforms.Server = {
                         // Start request
                         requestDocumentString.push('<xxforms:event-request xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">\n');
 
-                        // Add static state
+                        // Add form UUID
                         requestDocumentString.push(indent);
-                        requestDocumentString.push('<xxforms:static-state>');
-                        requestDocumentString.push(ORBEON.xforms.Globals.formStaticState[formID].value);
-                        requestDocumentString.push('</xxforms:static-state>\n');
+                        requestDocumentString.push('<xxforms:uuid>');
+                        requestDocumentString.push(ORBEON.xforms.Globals.formUUID[formID].value);
+                        requestDocumentString.push('</xxforms:uuid>\n');
+
+                        // Add static state
+                        var staticState = ORBEON.xforms.Globals.formStaticState[formID].value;
+                        if (staticState != null && staticState != "") {
+                            requestDocumentString.push(indent);
+                            requestDocumentString.push('<xxforms:static-state>');
+                            requestDocumentString.push(staticState);
+                            requestDocumentString.push('</xxforms:static-state>\n');
+                        }
 
                         // Add dynamic state
-                        requestDocumentString.push(indent);
-                        requestDocumentString.push('<xxforms:dynamic-state>');
-                        requestDocumentString.push(ORBEON.xforms.Globals.formDynamicState[formID].value);
-                        requestDocumentString.push('</xxforms:dynamic-state>\n');
+                        var dynamicState = ORBEON.xforms.Globals.formDynamicState[formID].value;
+                        if (dynamicState != null && dynamicState != "") {
+                            requestDocumentString.push(indent);
+                            requestDocumentString.push('<xxforms:dynamic-state>');
+                            requestDocumentString.push(dynamicState);
+                            requestDocumentString.push('</xxforms:dynamic-state>\n');
+                        }
 
                         // Add initial dynamic state if needed
                         if (sendInitialDynamicState) {

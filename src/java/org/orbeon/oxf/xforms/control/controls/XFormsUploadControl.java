@@ -94,71 +94,96 @@ public class XFormsUploadControl extends XFormsValueControl {
      *   </xxforms:files>
      *
      * @param propertyContext       current context
-     * @param containingDocument    containing document
-     * @param filesElement          xxforms:files element
-     * @param forControl            control to handle, null for all controls specified
+     * @param containingDocument    document
+     * @param filesElement          <xxforms:files> element
      * @param handleTemporaryFiles  whether to set listeners for file deletion
      */
-    public static void handleFileElement(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Element filesElement, XFormsUploadControl forControl, boolean handleTemporaryFiles) {
-        for (Object o: filesElement.elements()) {
-            final Element parameterElement = (Element) o;
-            final String name = parameterElement.element("name").getTextTrim();
+    public static void handleUploadedFiles(PropertyContext propertyContext, XFormsContainingDocument containingDocument, Element filesElement, boolean handleTemporaryFiles) {
+        if (filesElement != null) {
+            for (final Element parameterElement: Dom4jUtils.elements(filesElement)) {
 
-            final XFormsUploadControl uploadControl = (XFormsUploadControl) containingDocument.getObjectByEffectiveId(name);
+                final XFormsUploadControl uploadControl; {
+                    final String controlEffectiveId = parameterElement.element("name").getTextTrim();
+                    uploadControl = (XFormsUploadControl) containingDocument.getObjectByEffectiveId(controlEffectiveId);
 
-            // In case of xforms:repeat, the name of the template will not match an existing control
-            // In addition, only set value on forControl control if specified
-            if (uploadControl == null || forControl != null && forControl != uploadControl)
-                continue;
+                    // In case of xforms:repeat, the name of the template will not match an existing control
+                    // In addition, only set value on forControl control if specified
+                    if (uploadControl == null)
+                        continue;
+                }
 
-            final Element valueElement = parameterElement.element("value");
-            final String value = valueElement.getTextTrim();
+                final Element valueElement = parameterElement.element("value");
+                final String value = valueElement.getTextTrim();
 
-            final String filename;
-            {
-                final Element filenameElement = parameterElement.element("filename");
-                filename = (filenameElement != null) ? filenameElement.getTextTrim() : "";
-            }
-            final String mediatype;
-            {
-                final Element mediatypeElement = parameterElement.element("content-type");
-                mediatype = (mediatypeElement != null) ? mediatypeElement.getTextTrim() : "";
-            }
-            final String size = parameterElement.element("content-length").getTextTrim();
+                final String filename;
+                {
+                    final Element filenameElement = parameterElement.element("filename");
+                    filename = (filenameElement != null) ? filenameElement.getTextTrim() : "";
+                }
+                final String mediatype;
+                {
+                    final Element mediatypeElement = parameterElement.element("content-type");
+                    mediatype = (mediatypeElement != null) ? mediatypeElement.getTextTrim() : "";
+                }
+                final String size = parameterElement.element("content-length").getTextTrim();
 
-            if (size.equals("0") && filename.equals("")) {
-                // No file was selected in the UI
-            } else {
-                // A file was selected in the UI (note that the file may be empty)
-                // TODO: should pass true?
-                final String paramValueType = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME, false));
+                if (size.equals("0") && filename.equals("")) {
+                    // No file was selected in the UI
+                } else {
+                    // A file was selected in the UI (note that the file may be empty)
+                    // TODO: should pass true?
+                    final String paramValueType = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME, false));
 
-                // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
-                uploadControl.setExternalValue(propertyContext, value, paramValueType, handleTemporaryFiles);
+                    // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
+                    uploadControl.setExternalValue(propertyContext, value, paramValueType, handleTemporaryFiles);
 
-                // Handle filename, mediatype and size if necessary
-                uploadControl.setFilename(propertyContext, filename);
-                uploadControl.setMediatype(propertyContext, mediatype);
-                uploadControl.setSize(propertyContext, size);
+                    // Handle filename, mediatype and size if necessary
+                    uploadControl.setFilename(propertyContext, filename);
+                    uploadControl.setMediatype(propertyContext, mediatype);
+                    uploadControl.setSize(propertyContext, size);
+                }
             }
         }
     }
 
-    @Override
-    public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
-        if (containingDocument.getStaticState().isNoscript() && filesElement != null) {
-            // Must handle file elements
-            XFormsUploadControl.handleFileElement(propertyContext, containingDocument, filesElement, this, true);// seems reasonable to set handleTemporaryFiles = true
-        } else {
-            // Set value and handle temporary files
-            setExternalValue(propertyContext, value, type, true);
+    /**
+     * Check if an <xxforms:files> element actually contains file uploads to process.
+     *
+     * @param filesElement  <xxforms:files> element
+     * @return              true iif file uploads to process
+     */
+    public static boolean hasUploadedFiles(Element filesElement) {
+        if (filesElement != null) {
+            for (final Element parameterElement: Dom4jUtils.elements(filesElement)) {
+                final String filename;
+                {
+                    final Element filenameElement = parameterElement.element("filename");
+                    filename = (filenameElement != null) ? filenameElement.getTextTrim() : "";
+                }
+                final String size = parameterElement.element("content-length").getTextTrim();
 
-            // If the value is being cleared, also clear the metadata
-            if (value.equals("")) {
-                setFilename(propertyContext, "");
-                setMediatype(propertyContext, "");
-                setSize(propertyContext, "");
+                if (size.equals("0") && filename.equals("")) {
+                    // No file was selected in the UI
+                } else {
+                    // A file was selected in the UI (note that the file may be empty)
+                    return true;
+                }
             }
+        }
+        return false;
+    }
+
+    @Override
+    public void storeExternalValue(PropertyContext propertyContext, String value, String type) {
+
+        // Set value and handle temporary files
+        setExternalValue(propertyContext, value, type, true);
+
+        // If the value is being cleared, also clear the metadata
+        if (value.equals("")) {
+            setFilename(propertyContext, "");
+            setMediatype(propertyContext, "");
+            setSize(propertyContext, "");
         }
     }
 
@@ -236,7 +261,7 @@ public class XFormsUploadControl extends XFormsValueControl {
             }
 
             // Call the super method
-            super.storeExternalValue(propertyContext, newValue, type, null);
+            super.storeExternalValue(propertyContext, newValue, type);
 
             // When a value is set, make sure associated file information is cleared, because even though the control might
             // not be re-evaluated, a submission might attempt to access file name, etc. information for bound upload

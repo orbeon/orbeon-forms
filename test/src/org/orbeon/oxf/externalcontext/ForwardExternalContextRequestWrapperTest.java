@@ -14,6 +14,8 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.dom4j.Document;
+import org.junit.Before;
+import org.junit.Test;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -25,11 +27,14 @@ import org.orbeon.oxf.util.NetUtils;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
+import static org.junit.Assert.*;
+
 public class ForwardExternalContextRequestWrapperTest extends ResourceManagerTestBase {
 
     private ExternalContext.Request request;
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
 
         final PipelineContext pipelineContext = new PipelineContext();
 
@@ -39,6 +44,7 @@ public class ForwardExternalContextRequestWrapperTest extends ResourceManagerTes
         request = externalContext.getRequest();
     }
 
+    @Test
     public void testGetParameterMap() {
 
         final byte[] messageBody;

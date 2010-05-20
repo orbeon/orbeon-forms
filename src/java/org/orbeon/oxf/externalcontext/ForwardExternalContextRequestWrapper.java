@@ -17,7 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.StringUtils;
+import org.orbeon.oxf.util.StringConversions;
 
 import java.io.*;
 import java.util.HashMap;
@@ -134,7 +134,7 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
                 final Map<String, String[]> queryParameters = NetUtils.decodeQueryString(getQueryString(), false);
                 this.queryParameters = new HashMap<String, Object[]>(queryParameters.size());
                 for (Map.Entry<String, String[]> entry: queryParameters.entrySet()) {
-                    this.queryParameters.put(entry.getKey(), StringUtils.stringArrayToObjectArray(entry.getValue()));
+                    this.queryParameters.put(entry.getKey(), StringConversions.stringArrayToObjectArray(entry.getValue()));
                 }
             }
             // Handle post body form parameters
@@ -145,13 +145,13 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
                 // SRV.4.1.1 When Parameters Are Available
                 final String bodyString;
                 try {
-                    bodyString = new String(messageBody, ServletExternalContext.DEFAULT_FORM_CHARSET);
+                    bodyString = new String(messageBody, ServletExternalContext.getDefaultFormCharset());
                 } catch (UnsupportedEncodingException e) {
                     throw new OXFException(e);
                 }
                 final Map<String, String[]> bodyParameters = NetUtils.decodeQueryString(bodyString, false);
                 for (Map.Entry<String, String[]> entry: bodyParameters.entrySet()) {
-                    StringUtils.addValuesToObjectArrayMap(queryParameters, entry.getKey(), entry.getValue());
+                    StringConversions.addValuesToObjectArrayMap(queryParameters, entry.getKey(), entry.getValue());
                 }
             }
         }

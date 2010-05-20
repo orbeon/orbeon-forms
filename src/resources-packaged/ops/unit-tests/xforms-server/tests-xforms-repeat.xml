@@ -524,7 +524,27 @@
                     </p:input>
                     <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
                     <p:input name="instances">
-                        <instances/>
+                        <instances>
+                            <instance model-id="main-model" id="main-instance">
+                                <form>
+                                    <company>
+                                        <department>
+                                            <employee first="f11" last="l11"/>
+                                            <employee first="f12" last="l12"/>
+                                        </department>
+                                        <department>
+                                            <employee first="f21" last="l21"/>
+                                        </department>
+                                        <department>
+                                            <employee first="f31" last="l31"/>
+                                            <employee first="f32" last="l32"/>
+                                            <employee first="f33" last="l33"/>
+                                            <employee first="f34" last="l34"/>
+                                        </department>
+                                    </company>
+                                </form>
+                            </instance>
+                        </instances>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>

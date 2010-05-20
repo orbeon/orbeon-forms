@@ -64,7 +64,7 @@ public class XFormsTextareaControl extends XFormsValueControl {
      * a stylesheet that removes all unknown or dangerous content.
      */
     @Override
-    public void storeExternalValue(PropertyContext propertyContext, String value, String type, Element filesElement) {
+    public void storeExternalValue(PropertyContext propertyContext, String value, String type) {
         if ("text/html".equals(getMediatype())) {
             final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
             final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
@@ -88,6 +88,6 @@ public class XFormsTextareaControl extends XFormsValueControl {
             if (isDebugEnabled)
                 indentedLogger.endHandleOperation("value", value);
         }
-        super.storeExternalValue(propertyContext, value, type, filesElement);
+        super.storeExternalValue(propertyContext, value, type);
     }
 }

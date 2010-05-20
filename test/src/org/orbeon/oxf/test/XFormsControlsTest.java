@@ -14,6 +14,7 @@
 package org.orbeon.oxf.test;
 
 import org.dom4j.QName;
+import org.junit.Test;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 import org.xml.sax.helpers.AttributesImpl;
@@ -21,8 +22,11 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static junit.framework.Assert.*;
+
 public class XFormsControlsTest extends ResourceManagerTestBase {
 
+    @Test
     public void testDiffCustomMIPsChanges() {
 
         final AttributesImpl attributes = new AttributesImpl();
@@ -63,7 +67,8 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
         XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, false, control1, control2);
         assertEquals("-name2-value2 -name3-value3 +name3-newvalue3", attributes.getValue("class"));
     }
-    
+
+    @Test
     public void testDiffCustomMIPsNew() {
 
         final AttributesImpl attributes = new AttributesImpl();
@@ -87,6 +92,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
         assertEquals("name1-value1 name2-value2 name3-value3 name4-value4", attributes.getValue("class"));
     }
 
+    @Test
     public void testDiffClassAVT() {
         final AttributesImpl attributes = new AttributesImpl();
 
@@ -108,6 +114,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
         assertEquals("-foo -gaga +toto", attributes.getValue("class"));
     }
 
+    @Test
     public void testDiffClassAVTNew() {
         final AttributesImpl attributes = new AttributesImpl();
 
@@ -123,6 +130,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
     }
 
     // NOTE: started writing this test, but just using an XFormsOutputControl without the context of an XFormsContainingDocument seems a dead-end!
+//    @Test
 //    public void testOutputControlRewrite() {
 //
 //        final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);

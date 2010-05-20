@@ -149,6 +149,9 @@
                 <p:input name="data" href="#request-params"/>
                 <p:input name="config">
                     <xxforms:event-request xsl:version="2.0" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                        <xxforms:uuid>
+                            <xsl:value-of select="/*/parameters/parameter[name = '$uuid']/value"/>
+                        </xxforms:uuid>
                         <xxforms:static-state>
                             <xsl:value-of select="/*/parameters/parameter[name = '$static-state']/value"/>
                         </xxforms:static-state>

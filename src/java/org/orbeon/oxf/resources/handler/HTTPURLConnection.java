@@ -20,7 +20,7 @@ import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.Connection;
-import org.orbeon.oxf.util.StringUtils;
+import org.orbeon.oxf.util.StringConversions;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -273,7 +273,7 @@ public class HTTPURLConnection extends URLConnection {
     @Override
     public void addRequestProperty(String key, String value) {
         super.addRequestProperty(key, value);
-        StringUtils.addValueToStringArrayMap(requestProperties, key, value);
+        StringConversions.addValueToStringArrayMap(requestProperties, key, value);
     }
 
     @Override

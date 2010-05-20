@@ -15,7 +15,7 @@ package org.orbeon.oxf.portlet;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.StringUtils;
+import org.orbeon.oxf.util.StringConversions;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import javax.portlet.*;
@@ -89,7 +89,7 @@ public class WSRP2Utils extends WSRPUtils {
 
         // Check URL type and create URL
         try {
-            final String urlTypeValue = StringUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(URL_TYPE_PARAM));
+            final String urlTypeValue = StringConversions.getStringFromObjectArray((Object[]) wsrpParameters.get(URL_TYPE_PARAM));
             if (urlTypeValue == null)
                 throw new OXFException("Missing URL type for WSRP encoded URL: " + encodedURL);
 
@@ -108,14 +108,14 @@ public class WSRP2Utils extends WSRPUtils {
             if (baseURL instanceof PortletURL) {
                 // Get portlet mode
                 final PortletURL portletURL = (PortletURL) baseURL;
-                final String portletModeValue = StringUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(MODE_PARAM));
+                final String portletModeValue = StringConversions.getStringFromObjectArray((Object[]) wsrpParameters.get(MODE_PARAM));
                 if (portletModeValue != null) {
                     final String portletMode = portletModeValue.startsWith("amp;") ? portletModeValue.substring(4) : portletModeValue;
                     portletURL.setPortletMode(new PortletMode(portletMode));
                 }
 
                 // Get window state
-                final String windowStateValue = StringUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(WINDOW_STATE_PARAM));
+                final String windowStateValue = StringConversions.getStringFromObjectArray((Object[]) wsrpParameters.get(WINDOW_STATE_PARAM));
                 if (windowStateValue != null) {
                     final String windowState = windowStateValue.startsWith("amp;") ? windowStateValue.substring(4) : windowStateValue;
                     portletURL.setWindowState(new WindowState(windowState));
@@ -126,7 +126,7 @@ public class WSRP2Utils extends WSRPUtils {
             }
 
             // Get navigational state
-            final String navigationalStateValue = StringUtils.getStringFromObjectArray((Object[]) wsrpParameters.get(NAVIGATIONAL_STATE_PARAM));
+            final String navigationalStateValue = StringConversions.getStringFromObjectArray((Object[]) wsrpParameters.get(NAVIGATIONAL_STATE_PARAM));
             if (navigationalStateValue != null) {
                 final String decodedNavigationalState;
                 try {

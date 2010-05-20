@@ -14,6 +14,8 @@
 package org.orbeon.oxf.test;
 
 import org.dom4j.Document;
+import org.junit.Before;
+import org.junit.Test;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
@@ -27,6 +29,8 @@ import org.orbeon.oxf.xml.XMLConstants;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static org.junit.Assert.*;
+
 public class NetUtilsTest extends ResourceManagerTestBase {
 
     private PipelineContext pipelineContext;
@@ -34,7 +38,8 @@ public class NetUtilsTest extends ResourceManagerTestBase {
     private ExternalContext.Request request;
     private ExternalContext.Response response;
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
 
         pipelineContext = new PipelineContext();
 
@@ -45,6 +50,7 @@ public class NetUtilsTest extends ResourceManagerTestBase {
         response = externalContext.getResponse();
     }
 
+    @Test
     public void testCheckIfModifiedSince() {
 
         // Get long value for If-Modified-Since present in request
@@ -71,11 +77,13 @@ public class NetUtilsTest extends ResourceManagerTestBase {
         assertEquals(NetUtils.checkIfModifiedSince(httpServletRequest, ifModifiedHeaderLong + 1001), true);
     }
 
+    @Test
     public void testProxyURI() {
         assertEquals("/xforms-server/dynamic/87c938edbc170d5038192ca5ab9add97", NetUtils.proxyURI(pipelineContext, "/foo/bar.png", null, null, -1));
         assertEquals("/xforms-server/dynamic/674c2ff956348155ff60c01c0c0ec2e0", NetUtils.proxyURI(pipelineContext, "http://example.org/foo/bar.png", null, null, -1));
     }
 
+    @Test
     public void testConvertUploadTypes() {
 
         final String testDataURI = "oxf:/org/orbeon/oxf/test/anyuri-test-content.xml";

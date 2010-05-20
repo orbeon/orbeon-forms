@@ -32,10 +32,11 @@
                 </element>
             </optional>
             <optional>
-                <!-- Dynamic state must be sent if there are actions, otherwise content is optional -->
-                <element name="xxforms:dynamic-state">
-                    <data type="string"/>
-                </element>
+                <optional>
+                    <element name="xxforms:dynamic-state">
+                        <data type="string"/>
+                    </element>
+                </optional>
                 <element name="xxforms:action">
                     <optional>
                         <element name="xxforms:control-values">

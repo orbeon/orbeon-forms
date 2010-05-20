@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * Optimized submission doesn't issue HTTP requests but goes through the Servlet API.
@@ -139,7 +140,8 @@ public class OptimizedSubmission extends BaseSubmission {
         return true;
     }
 
-    public SubmissionResult connect(PropertyContext propertyContext, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) throws Exception {
+    public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
+                                    final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
         // This is an "optimized" submission, i.e. one that does not use an actual protocol handler to
         // access the resource, but instead uses servlet forward/include for servlets, or a local
         // mechanism for portlets.
@@ -168,31 +170,72 @@ public class OptimizedSubmission extends BaseSubmission {
         final String[] headersToForward = p.isReplaceAll ? STANDARD_HEADERS_TO_FORWARD : MINIMAL_HEADERS_TO_FORWARD;
         // TODO: Harmonize with HTTP submission handling of headers
 
+        final IndentedLogger timingLogger = getTimingLogger(p, p2);
+        final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
+
         // Evaluate headers if any
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(propertyContext, p.contextStack);
 
-        final ConnectionResult connectionResult
-                = openOptimizedConnection(propertyContext, XFormsUtils.getExternalContext(propertyContext),
-                containingDocument, getDetailsLogger(p, p2), p.isDeferredSubmissionSecondPassReplaceAll ? null : submission,
-                p.actualHttpMethod, resolvedURI.toString(), submission.isURLNorewrite(), sp.actualRequestMediatype, sp.messageBody,
-                sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues);
+        final String submissionEffectiveId = submission.getEffectiveId();
 
-        if (connectionResult.dontHandleResponse) {
-            // This means we got a submission with replace="all"
-            containingDocument.setGotSubmissionReplaceAll();
+        // Pack external call into a Runnable so it can be run:
+        // o now and synchronously
+        // o now and asynchronously
+        // o later as a "foreground" asynchronous submission
+        final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
+            public SubmissionResult call() throws Exception {
 
-            // Caller has nothing to do
-            return null;
-        } else {
-            // Obtain replacer
-            final Replacer replacer = submission.getReplacer(propertyContext, connectionResult, p);
+                // TODO: This refers to PropertyContext, XFormsContainingDocument, and Submission. FIXME!
 
-            // Deserialize
-            replacer.deserialize(propertyContext, connectionResult, p, p2);
+                // Open the connection
+                final boolean[] status = { false , false};
+                ConnectionResult connectionResult = null;
+                try {
+                    connectionResult = openOptimizedConnection(propertyContext, XFormsUtils.getExternalContext(propertyContext),
+                        containingDocument, detailsLogger, p.isDeferredSubmissionSecondPassReplaceAll ? null : submission,
+                        p.actualHttpMethod, resolvedURI.toString(), submission.isURLNorewrite(), sp.actualRequestMediatype, sp.messageBody,
+                        sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues);
 
-            // Return result
-            return new SubmissionResult(submission.getEffectiveId(), replacer, connectionResult);
-        }
+                    // Update status
+                    status[0] = true;
+
+                    if (connectionResult.dontHandleResponse) {
+                        // This means we got a submission with replace="all" and openOptimizedConnection() already did all the work
+                        // TODO: Could this be done in a Replacer instead?
+                        containingDocument.setGotSubmissionReplaceAll();
+
+                        // Update status
+                        status[1] = true;
+
+                        // Caller has nothing to do
+                        return null;
+                    } else {
+                        // Obtain replacer
+                        final Replacer replacer = submission.getReplacer(propertyContext, connectionResult, p);
+
+                        // Deserialize
+                        replacer.deserialize(propertyContext, connectionResult, p, p2);
+
+                        // Update status
+                        status[1] = true;
+
+                        // Return result
+                        return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
+                    }
+                } catch (Throwable throwable) {
+                    // Exceptions are handled further down
+                    return new SubmissionResult(submissionEffectiveId, throwable, connectionResult);
+                } finally {
+                    if (p2.isAsynchronous && timingLogger.isDebugEnabled())
+                        timingLogger.endHandleOperation("id", submissionEffectiveId, "asynchronous", Boolean.toString(p2.isAsynchronous),
+                                "connected", Boolean.toString(status[0]), "deserialized", Boolean.toString(status[1]));
+                }
+            }
+        };
+
+        // Submit the callable
+        // This returns null if the execution is deferred
+        return submitCallable(propertyContext, p, p2, callable);
     }
 
     /**

@@ -13,9 +13,14 @@
  */
 package org.orbeon.oxf.common;
 
+import org.junit.Test;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 
+import static junit.framework.Assert.*;
+
 public class VersionTest extends ResourceManagerTestBase {
+
+    @Test
     public void testProductConfiguration() {
         if (Version.isPE()) {
             assertEquals("PE", Version.getEdition());
@@ -29,6 +34,8 @@ public class VersionTest extends ResourceManagerTestBase {
             assertFalse(Version.instance().isPEFeatureEnabled(true, "foobar"));
         }
     }
+
+    @Test
     public void testVersionExpired() {
         assertFalse(PEVersion.isVersionExpired("3.8", "3.8"));
         assertFalse(PEVersion.isVersionExpired("3.8.1", "3.8"));

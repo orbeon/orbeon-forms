@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -14,175 +14,273 @@
 package org.orbeon.oxf.xforms.state;
 
 import org.orbeon.oxf.cache.CacheLinkedList;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.StaticExternalContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.UUIDUtils;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * Base class for XFormsState stores. This store only deals with storing items in memory
+ * Base class for XForms state stores. This store deals with storing items in memory.
  */
 public abstract class XFormsStateStore {
 
-    private int currentStoreSize = 0;
+    private static final String XFORMS_STATE_STORE_LISTENER_STATE_KEY = "oxf.xforms.state.store.has-session-listeners-key";
 
-    private Map<String, CacheLinkedList.ListEntry> keyToEntryMap = new HashMap<String, CacheLinkedList.ListEntry>();
-    private CacheLinkedList linkedList = new CacheLinkedList();
+    // Current size of store in bytes
+    private int currentStoreBytes = 0;
+
+    // Store entries
+    private Map<String, CacheLinkedList.ListEntry<StoreEntry>> keyToEntryMap = new HashMap<String, CacheLinkedList.ListEntry<StoreEntry>>();
+    private final CacheLinkedList<StoreEntry> linkedList = new CacheLinkedList<StoreEntry>();
+
+    // Map session ids -> Map of keys
+    private final Map<String, Set<String>> sessionToKeysMap = new HashMap<String, Set<String>>();
 
     protected XFormsStateStore() {
         debug("created new store.");
     }
 
-    protected abstract int getMaxSize();
-
-    protected abstract String getStoreDebugName();
-
     /**
-     * Add an XForms state to the store.
-     *
-     * @param pageGenerationId  page generation id
-     * @param oldRequestId      old request id if available
-     * @param newRequestId      new request id
-     * @param xformsState       state to store
-     * @param currentSessionId  current session id
-     * @param isInitialEntry    whether this is an initial dynamic state entry which has preferential treatment
+     * Clear the store entirely.
      */
-    public synchronized void add(String pageGenerationId, String oldRequestId, String newRequestId, XFormsState xformsState, String currentSessionId, boolean isInitialEntry) {
-
-        // Remove old dynamic state if present as we keep only one entry per page generation
-        // NOTE: We try to keep the initial dynamic state entry in the store however, because the client is still likely to request it
-
-        // Here we attempt to remove the "previous previous" dynamic state. The idea is that we want to keep the last
-        // two dynamic states to handle funny synchronization cases between client and server, including two-pass
-        // submission and clicks on links when a concurrent Ajax request is fired. Example:
-        //
-        // o Submission with replace="all" is started.
-        // o Ajax response reaches the client with dynamic state "foo".
-        // o Client does HTML form submission (second pass of submission) with dynamic state "foo".
-        // o While this is happening user triggers new Ajax request with dynamic state "foo", replaced on the server by "bar" (and possibly other states).
-        // o The new page finally shows up. The server will have "bar", but the client may not have it.
-        // o User does a page back. This requests "foo", which has disappeared if we just expired it when replacing it with "bar".
-        //
-        // A smart algorithm to fix this could be:
-        //
-        // o Pin state for second pass (pin "foo")
-        // o Unpin the state (but do not delete it) when the second pass reaches the server.
-        //   NOTE: the HTML submission could be very slow and arrive to the server before or after the series of Ajax requests
-        // o If a submission is going on for a state (i.e. state was created while processing first pass), then keep last two states,
-        //   otherwise keep just one last state + initial.
-        //   NOTE: "second pass going on" for a state should be kept in the dynamic state.
-        // o Once second pass reaches the server, the "second pass going on" flag can be removed for the document.
-        //   NOTE: The document can have evolved since then - and you may not be able to find it. So the flag may never be cleared. This can also
-        //   happen if the HTML submission gets lost. But this should not happen too often.
-        //
-        // But we prefer the simpler solution:
-        //
-        // o Just keep the last two dynamic states
-        //   -> drawback is this uses more memory, but it solves the problem
-        //
-        // A non-working solution: you would think that you could prevent any user input on the client using a mask
-        // (container.js) and preventing Ajax requests while a submission is going on. BUT this wouldn't work for
-        // cases where the submission results in a new tab/window, it would only work when the target == '' AND the
-        // browser decides to create a new history entry. You can STILL have cases where the browser picks either
-        // way (case of PDF file with or w/o Adobe plugin). So this does not seem to be a real solution.
-
-        // NOTE: We don't remove old entries if they are already persisted. Is this a good strategy?
-        if (!isInitialEntry) {
-            final CacheLinkedList.ListEntry previousListEntry = keyToEntryMap.get(oldRequestId);
-            if (previousListEntry != null) {
-                // Found previous entry
-                final StoreEntry previousStoredEntry = (StoreEntry) previousListEntry.element;
-
-                if (previousStoredEntry.previousKey != null) {
-                    // Found "previous previous" entry
-                    final CacheLinkedList.ListEntry previousPreviousListEntry = keyToEntryMap.get(previousStoredEntry.previousKey);
-                    if (previousPreviousListEntry != null) {
-                        final StoreEntry previousPreviousStoredEntry = (StoreEntry) previousPreviousListEntry.element;
-
-                        if (!previousPreviousStoredEntry.isPinned)// remove unless pinned
-                            removeStoreEntry(previousPreviousListEntry);
-                    }
-                }
-            }
-        }
-
-        // Add static state and move it to the front
-        addOrReplaceOne(pageGenerationId, xformsState.getStaticState(), false, currentSessionId, null);
-
-        // Add new dynamic state and move it to the front
-        addOrReplaceOne(newRequestId, xformsState.getDynamicState(), isInitialEntry, currentSessionId, oldRequestId);
-
-        if (isDebugEnabled()) {
-            debug("store size after adding: " + currentStoreSize + " bytes.");
-            debugDumpKeys();
-        }
+    public synchronized void clear() {
+        sessionToKeysMap.clear();
+        currentStoreBytes = 0;
+        keyToEntryMap.clear();
+        linkedList.clear();
     }
 
-    public synchronized XFormsState find(String pageGenerationId, String requestId) {
+    /**
+     * Store the current state of the given document.
+     *
+     * @param propertyContext       current context
+     * @param containingDocument    document
+     * @param sessionId             current session id
+     * @param isInitialState        whether this is the document's initial state
+     */
+    public synchronized void storeDocumentState(PropertyContext propertyContext, XFormsContainingDocument containingDocument,
+                                                String sessionId, boolean isInitialState) {
+
+        assert sessionId != null;
+
         if (isDebugEnabled()) {
-            debug("store size before finding: " + currentStoreSize + " bytes.");
+            debug("store size before storing: " + currentStoreBytes + " bytes.");
             debugDumpKeys();
         }
 
-        final String staticState = findOne(pageGenerationId);
+        final String documentUUID = containingDocument.getUUID();
+        final String staticStateUUID = containingDocument.getStaticState().getUUID();
+        final String dynamicStateKey = getDynamicStateKey(documentUUID, isInitialState);
+
+        // Mapping (UUID -> static state key : dynamic state key)
+        addOrReplaceOne(documentUUID, staticStateUUID + ":" + dynamicStateKey, sessionId);
+
+        // Static state
+        addOrReplaceOne(staticStateUUID, containingDocument.getStaticState().getEncodedStaticState(propertyContext), sessionId);
+
+        // Dynamic state
+        addOrReplaceOne(dynamicStateKey, containingDocument.createEncodedDynamicState(propertyContext, false), sessionId);
+    }
+
+    private String getDynamicStateKey(String documentUUID, boolean isInitialState) {
+        return documentUUID + (isInitialState ? "-I" : "-C");
+    }
+
+    /**
+     * Find the current state for the given document UUID.
+     *
+     * @param documentUUID      document UUID
+     * @param isInitialState    whether this is the document's initial state
+     * @return                  encoded static and dynamic state
+     */
+    public synchronized XFormsState findState(String documentUUID, boolean isInitialState) {
+
+        if (isDebugEnabled()) {
+            debug("store size before finding: " + currentStoreBytes + " bytes.");
+            debugDumpKeys();
+        }
+
+        final String staticStateKey;
+        final String dynamicStateKey;
+        {
+            final String keys = findOne(documentUUID);
+            if (keys == null)
+                return null;
+
+            final int colonIndex = keys.indexOf(':');
+            assert colonIndex == UUIDUtils.UUID_LENGTH;
+            staticStateKey = keys.substring(0, colonIndex);
+            // If isInitialState == true, force finding the initial state. Otherwise, use current state stored in mapping.
+            dynamicStateKey = isInitialState ? getDynamicStateKey(documentUUID, true) : keys.substring(colonIndex + 1);
+        }
+
+        final String staticState = findOne(staticStateKey);
         if (staticState == null)
             return null;
-        final String dynamicState = findOne(requestId);
+
+        final String dynamicState = findOne(dynamicStateKey);
         if (dynamicState == null)
             return null;
+
         return new XFormsState(staticState, dynamicState);
     }
 
-    protected void addOrReplaceOne(String key, String value, boolean isPinned, String currentSessionId, String previousKey) {
+    private synchronized void addOrReplaceOne(String key, String value, String sessionId) {
 
-        final CacheLinkedList.ListEntry existingListEntry = keyToEntryMap.get(key);
+        assert sessionId != null;
+
+        final CacheLinkedList.ListEntry<StoreEntry> existingListEntry = keyToEntryMap.get(key);
         if (existingListEntry != null) {
-            // Entry already exists, move to the front
-            if (linkedList.getFirst() != existingListEntry.element) {
-                linkedList.remove(existingListEntry);
-                final CacheLinkedList.ListEntry listEntry = linkedList.addFirst(existingListEntry.element);
-                keyToEntryMap.put(key, listEntry);
+            // Entry already exists, remove it
+            removeStoreEntry(existingListEntry);
 
-                // Add session information
-                ((StoreEntry) existingListEntry.element).addSessionId(currentSessionId);
-            }
+            // Add new session information
+            existingListEntry.element.addSessionId(sessionId);
+
+            // Re-add entry
+            addOne(key, value, existingListEntry.element.sessionIds);
 
             if (isDebugEnabled())
                 debug("added and refreshed entry for key: " + key);
         } else {
             // Entry doesn't exist, add it
-            final Map<String, String> sessionIds = new HashMap<String, String>();
-            if (currentSessionId != null)
-                sessionIds.put(currentSessionId, "");
-            addOne(key, value, isPinned, sessionIds, previousKey);
+            final Set<String> sessionIds = new HashSet<String>();
+            sessionIds.add(sessionId);
+            addOne(key, value, sessionIds);
+        }
+
+        // Ensure that a session listener is registered
+        ensureSessionListenerRegistered(sessionId);
+    }
+
+    private void ensureSessionListenerRegistered(final String sessionId) {
+
+        assert sessionId != null;
+
+        final ExternalContext.Session session = getExternalContext().getSession(XFormsStateManager.FORCE_SESSION_CREATION);
+        if (session != null) {
+
+            // Just a consistency check
+            if (!session.getId().equals(sessionId))
+                throw new OXFException("Inconsistent session ids when persisting XForms state store entry (entry session id: " + sessionId + ", actual session id: " + session.getId() + ").");
+
+            // We want to register only one expiration listener per session
+            final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);
+            if (sessionAttributes.get(XFORMS_STATE_STORE_LISTENER_STATE_KEY) == null) {
+                session.addListener(new ExternalContext.Session.SessionListener() {
+                    public void sessionDestroyed() {
+                        // Expire
+                        expireBySessionId(sessionId);
+                    }
+                });
+                sessionAttributes.put(XFORMS_STATE_STORE_LISTENER_STATE_KEY, "");
+            }
         }
     }
 
-    protected void addOne(String key, String value, boolean isPinned, Map<String, String> sessionIds, String previousKey) {
-        // Make room if needed
-        final int size = value.length() * 2;
-        final int storeSizeBeforeExpire = currentStoreSize;
-        int expiredCount = 0;
-        while (currentStoreSize != 0 && (currentStoreSize + size) > getMaxSize()) {
-            expireOne();
-            expiredCount++;
-        }
+    /**
+     * Remove all entries which have the given session id.
+     *
+     * @param sessionId     session id
+     */
+    protected synchronized void expireBySessionId(String sessionId) {
 
-        if (storeSizeBeforeExpire != currentStoreSize && isDebugEnabled())
-           debug("expired " + expiredCount + " entries (" + (storeSizeBeforeExpire - currentStoreSize) + " bytes).");
+        assert sessionId != null;
+
+        final Set<String> sessionSet = sessionToKeysMap.get(sessionId);
+        if (sessionSet != null) {
+            final int storeSizeBeforeExpire = getCurrentStoreBytes();
+            int expiredCount = 0;
+            for (final String currentKey: sessionSet) {
+                final CacheLinkedList.ListEntry currentListEntry = findEntry(currentKey);
+                final StoreEntry currentStoreEntry = (StoreEntry) currentListEntry.element;
+
+                // Remove session id from list of session ids
+                currentStoreEntry.sessionIds.remove(sessionId);
+
+                // Remove entry once there is no more associated session
+                if (currentStoreEntry.sessionIds.size() == 0) {
+                    removeStoreEntry(currentListEntry);
+                    expiredCount++;
+                }
+            }
+            sessionToKeysMap.remove(sessionId);
+
+            if (expiredCount > 0 && isDebugEnabled())
+                debug("expired " + expiredCount + " entries for session " + sessionId + " (" + (storeSizeBeforeExpire - getCurrentStoreBytes()) + " bytes).");
+        }
+    }
+
+    protected PipelineContext getPipelineContext() {
+        // NOTE: We may not have a StaticContext when we are called from a session listener, but that should be ok
+        // (PipelineContext is used further down the line to ensure that the db drive is registered, but it should
+        // be.)
+        final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
+        return (staticContext != null) ? staticContext.getPipelineContext() : null;
+    }
+
+    protected ExternalContext getExternalContext() {
+        final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
+        return (staticContext != null) ? staticContext.getExternalContext() : null;
+    }
+
+    protected void addOne(String key, String value, Set<String> sessionIds) {
+
+        assert keyToEntryMap.get(key) == null;
+
+        final int newValueSize = value.length() * 2;
+
+        // Make room if needed
+        {
+            final int storeSizeBeforeExpire = currentStoreBytes;
+            int expiredCount = 0;
+            while (currentStoreBytes != 0 && (currentStoreBytes + newValueSize) > getMaxSize()) {
+                expireOne();
+                expiredCount++;
+            }
+
+            if (storeSizeBeforeExpire != currentStoreBytes && isDebugEnabled())
+               debug("expired " + expiredCount + " entries (" + (storeSizeBeforeExpire - currentStoreBytes) + " bytes).");
+        }
 
         // Add new element to store
-        final CacheLinkedList.ListEntry listEntry = linkedList.addFirst(new StoreEntry(key, value, isPinned, sessionIds, previousKey));
+        final CacheLinkedList.ListEntry<StoreEntry> listEntry = linkedList.addFirst(new StoreEntry(key, value, sessionIds));
         keyToEntryMap.put(key, listEntry);
 
+        // Associate they key to the sessions
+        for (final String sessionId: sessionIds) {
+            mapKeyToSession(key, sessionId);
+        }
+
         // Update store size
-        currentStoreSize += size;
+        currentStoreBytes += newValueSize;
 
         if (isDebugEnabled())
-            debug("added new entry of " + size + " bytes for key: " + key);
+            debug("added new entry of " + newValueSize + " bytes for key: " + key);
     }
 
-    protected String findOne(String key) {
-        final CacheLinkedList.ListEntry existingListEntry = keyToEntryMap.get(key);
+    private void mapKeyToSession(String key, String sessionId) {
+        Set<String> sessionSet = sessionToKeysMap.get(sessionId);
+        if (sessionSet == null) {
+            sessionSet = new HashSet<String>();
+            sessionToKeysMap.put(sessionId, sessionSet);
+        }
+        sessionSet.add(key);
+    }
+
+    private String findOne(String key) {
+        final CacheLinkedList.ListEntry<StoreEntry> existingListEntry = keyToEntryMap.get(key);
         if (existingListEntry != null) {
             // Found, move to the front
             if (linkedList.getFirst() != existingListEntry.element) {
@@ -194,24 +292,29 @@ public abstract class XFormsStateStore {
             return ((StoreEntry) existingListEntry.element).value;
         } else {
             // Not found, try persistent store
-            final String persistedEntry = findPersistedEntry(key);
-            if (persistedEntry != null) {
-                return persistedEntry;
+            final StoreEntry persistedStoreEntry = findPersistedEntry(key);
+
+            // Handle result
+            if (persistedStoreEntry != null) {
+                // Add the key to the list in memory
+                addOne(persistedStoreEntry.key, persistedStoreEntry.value, persistedStoreEntry.sessionIds);
+                debug("migrated persisted entry for key: " + key);
+                return persistedStoreEntry.value;
             } else {
                 // Not found
-                debug("did not find entry for key: " + key);
+                debug("did not find entry in persistent store for key: " + key);
                 return null;
             }
         }
     }
 
-    protected CacheLinkedList.ListEntry findEntry(String key) {
+    private CacheLinkedList.ListEntry findEntry(String key) {
         return keyToEntryMap.get(key);
     }
 
-    protected void removeStoreEntry(CacheLinkedList.ListEntry existingListEntry) {
+    private void removeStoreEntry(CacheLinkedList.ListEntry<StoreEntry> existingListEntry) {
 
-        final StoreEntry existingStoreEntry = (StoreEntry) existingListEntry.element;
+        final StoreEntry existingStoreEntry = existingListEntry.element;
 
         final int stateSize = existingStoreEntry.value.length() * 2;
 
@@ -219,7 +322,15 @@ public abstract class XFormsStateStore {
         keyToEntryMap.remove(existingStoreEntry.key);
 
         // Update store size
-        currentStoreSize -= stateSize;
+        currentStoreBytes -= stateSize;
+
+        // Remove the session id -> key mappings related to this entry
+        for (final String sessionId: existingStoreEntry.sessionIds) {
+            final Set<String> sessionSet = sessionToKeysMap.get(sessionId);
+            if (sessionSet != null) {
+                sessionSet.remove(existingStoreEntry.key);
+            }
+        }
 
         if (isDebugEnabled())
             debug("removed entry of " + stateSize + " bytes for key: " + existingStoreEntry.key);
@@ -236,18 +347,32 @@ public abstract class XFormsStateStore {
         }
     }
 
-    protected void persistEntry(StoreEntry storeEntry) {
-        // NOP by default
+    private int getMaxSize() {
+        return XFormsProperties.getApplicationStateStoreSize();
     }
 
-    protected String findPersistedEntry(String key) {
-        // NOP by default
-        return null;
+    private String getStoreDebugName() {
+        return "state store";
     }
 
-    protected int getCurrentStoreSize() {
-        return currentStoreSize;
+    private int getCurrentStoreBytes() {
+        return currentStoreBytes;
     }
+
+    /**
+     * Persist entry into external storage.
+     *
+     * @param storeEntry    entry to persist
+     */
+    protected abstract void persistEntry(StoreEntry storeEntry);
+
+    /**
+     * Find entry in persistent storage.
+     *
+     * @param key   key for entry
+     * @return      entry if found, null otherwise
+     */
+    protected abstract StoreEntry findPersistedEntry(String key);
 
     protected final boolean isDebugEnabled() {
         return XFormsStateManager.getIndentedLogger().isDebugEnabled();
@@ -259,34 +384,76 @@ public abstract class XFormsStateStore {
 
     protected void debugDumpKeys() {
 //        int index = 1;
-//        for (final Iterator i = linkedList.iterator(); i.hasNext(); index++) {
-//            final StoreEntry currentEntry = (StoreEntry) i.next();
-//            debug("key in store: " + index + ": " + currentEntry.key);
+//        for (final StoreEntry entry: linkedList) {
+//            debug("store entry: " + index + ": " + entry.toString());
+//            index++;
 //        }
     }
 
+    // Only for unit tests
+    public synchronized void addStateCombined(String staticStateUUID, String dynamicStateUUID, XFormsState xformsState, String sessionId) {
+
+        assert sessionId != null;
+
+        // Add static state and move it to the front
+        addOrReplaceOne(staticStateUUID, xformsState.getStaticState(), sessionId);
+
+        // Add new dynamic state and move it to the front
+        addOrReplaceOne(dynamicStateUUID, xformsState.getDynamicState(), sessionId);
+
+        if (isDebugEnabled()) {
+            debug("store size after adding: " + currentStoreBytes + " bytes.");
+            debugDumpKeys();
+        }
+    }
+
+    // Only for unit tests
+    public synchronized XFormsState findStateCombined(String staticStateUUID, String dynamicStateUUID) {
+
+        if (isDebugEnabled()) {
+            debug("store size before finding: " + currentStoreBytes + " bytes.");
+            debugDumpKeys();
+        }
+
+        final String staticState = findOne(staticStateUUID);
+        if (staticState == null)
+            return null;
+        final String dynamicState = findOne(dynamicStateUUID);
+        if (dynamicState == null)
+            return null;
+
+        return new XFormsState(staticState, dynamicState);
+    }
+
     protected static class StoreEntry {
-        public String key;
-        public String value;
-        public boolean isPinned;
-        public Map<String, String> sessionIds;
+        public final String key;
+        public final String value;
+        public final Set<String> sessionIds;
 
-        public String previousKey; // link to the previous key (for dynamic state only)
+        public StoreEntry(String key, String value, Set<String> sessionIds) {
 
-        public StoreEntry(String key, String value, boolean isPinned, Map<String, String> sessionIds, String previousKey) {
+            assert sessionIds != null;
+
             this.key = key;
             this.value = value;
-            this.isPinned = isPinned;
             this.sessionIds = sessionIds;
-            this.previousKey = previousKey;
         }
 
         public void addSessionId(String sessionId) {
-            if (sessionId != null) {
-                if (sessionIds == null)
-                    sessionIds = new HashMap<String, String>();
-                sessionIds.put(sessionId, "");
+            sessionIds.add(sessionId);
+        }
+
+        @Override
+        public String toString() {
+
+            String decodedValue;
+            try {
+                decodedValue = Dom4jUtils.domToPrettyString(XFormsUtils.decodeXML(null, value));
+            } catch (Exception e) {
+                decodedValue = value;
             }
+
+            return key + " -> " + decodedValue;
         }
     }
 }

@@ -24,7 +24,6 @@
             <value>false</value>
         </parameter>
     </parameters>
-<!--    <body/>-->
     <protocol>HTTP/1.1</protocol>
     <remote-addr>127.0.0.1</remote-addr>
     <remote-host>localhost</remote-host>

@@ -49,7 +49,6 @@ public class RegularSubmission extends BaseSubmission {
     public SubmissionResult connect(final PropertyContext propertyContext, final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
 
-        final ExternalContext externalContext = XFormsUtils.getExternalContext(propertyContext);
         final URL absoluteResolvedURL;
         try {
             absoluteResolvedURL = URLFactory.createURL(getAbsoluteSubmissionURL(propertyContext, p2.actionOrResource, sp.queryString));
@@ -80,6 +79,9 @@ public class RegularSubmission extends BaseSubmission {
         // o later as a "foreground" asynchronous submission
         final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
             public SubmissionResult call() throws Exception {
+
+                // TODO: This refers to PropertyContext, XFormsContainingDocument, and Submission. FIXME!
+
                 // Here we just want to run the submission and not touch the XFCD. Remember, we can't change XFCD
                 // because it may get out of the caches and not be picked up by further incoming Ajax requests.
 
@@ -88,13 +90,13 @@ public class RegularSubmission extends BaseSubmission {
                 // ExternalContext, so we still use it.
 
                 if (p2.isAsynchronous && timingLogger.isDebugEnabled())
-                    timingLogger.startHandleOperation("", "running asynchronous submission", "id", submission.getEffectiveId());
+                    timingLogger.startHandleOperation("", "running asynchronous submission", "id", submissionEffectiveId);
 
                 // Open the connection
                 final boolean[] status = { false , false};
                 ConnectionResult connectionResult = null;
                 try {
-                    connectionResult = new Connection().open(externalContext, detailsLogger, isLogBody(),
+                    connectionResult = new Connection().open(XFormsUtils.getExternalContext(propertyContext), detailsLogger, isLogBody(),
                         p.actualHttpMethod, absoluteResolvedURL, p2.username, p2.password, p2.domain,
                         sp.actualRequestMediatype, sp.messageBody,
                         customHeaderNameValues, newForwardSubmissionHeaders);
@@ -104,12 +106,13 @@ public class RegularSubmission extends BaseSubmission {
 
                     // Obtain replacer
                     final Replacer replacer = submission.getReplacer(propertyContext, connectionResult, p);
+                    if (replacer != null) {
+                        // Deserialize here so it can run in parallel
+                        replacer.deserialize(propertyContext, connectionResult, p, p2);
 
-                    // Deserialize here so it can run in parallel
-                    replacer.deserialize(propertyContext, connectionResult, p, p2);
-
-                    // Update status
-                    status[1] = true;
+                        // Update status
+                        status[1] = true;
+                    }
 
                     return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
                 } catch (Throwable throwable) {
@@ -117,14 +120,14 @@ public class RegularSubmission extends BaseSubmission {
                     return new SubmissionResult(submissionEffectiveId, throwable, connectionResult);
                 } finally {
                     if (p2.isAsynchronous && timingLogger.isDebugEnabled())
-                        timingLogger.endHandleOperation("id", submission.getEffectiveId(), "asynchronous", Boolean.toString(p2.isAsynchronous),
+                        timingLogger.endHandleOperation("id", submissionEffectiveId, "asynchronous", Boolean.toString(p2.isAsynchronous),
                                 "connected", Boolean.toString(status[0]), "deserialized", Boolean.toString(status[1]));
                 }
             }
         };
 
         // Submit the callable
-        // This returns null if the execution is asynchronous
+        // This returns null if the execution is deferred 
         return submitCallable(propertyContext, p, p2, callable);
     }
 }

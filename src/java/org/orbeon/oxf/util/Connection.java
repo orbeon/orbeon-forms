@@ -198,7 +198,7 @@ public class Connection {
                             indentedLogger.logDebug(LOG_TYPE, "forwarding cookies",
                                     "cookie", cookieString,
                                     "requested session id", externalContext.getRequest().getRequestedSessionId());
-                            StringUtils.addValueToStringArrayMap(headersMap, "Cookie", cookieString );
+                            StringConversions.addValueToStringArrayMap(headersMap, "Cookie", cookieString );
                         }
                     }
                 }
@@ -212,7 +212,7 @@ public class Connection {
                 if (session != null) {
 
                     // This will work with Tomcat, but may not work with other app servers
-                    StringUtils.addValueToStringArrayMap(headersMap, "Cookie", "JSESSIONID=" + session.getId());
+                    StringConversions.addValueToStringArrayMap(headersMap, "Cookie", "JSESSIONID=" + session.getId());
 
                     if (indentedLogger.isDebugEnabled()) {
 
@@ -270,7 +270,7 @@ public class Connection {
                         // Only forward Authorization header if there is no username provided
                         indentedLogger.logDebug(LOG_TYPE, "forwarding header",
                                 "name", currentHeaderName, "value", currentIncomingHeaderValues.toString());
-                        StringUtils.addValuesToStringArrayMap(headersMap, currentHeaderName, currentIncomingHeaderValues);
+                        StringConversions.addValuesToStringArrayMap(headersMap, currentHeaderName, currentIncomingHeaderValues);
                     } else {
                         // Just log this information
                         indentedLogger.logDebug(LOG_TYPE,

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.validation;
 
 import org.dom4j.Document;
-import org.orbeon.oxf.cache.Cacheable;
+import org.orbeon.oxf.cache.CacheableInputOutput;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.*;
@@ -140,15 +140,15 @@ public class ValidationProcessor extends ProcessorImpl {
                         // Forward to config input
                         @Override
                         protected OutputCacheKey getKeyImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {
-                            return schemaInput instanceof Cacheable
-                                    ? ((Cacheable) schemaInput).getKey(context) : null;
+                            return schemaInput instanceof CacheableInputOutput
+                                    ? ((CacheableInputOutput) schemaInput).getKey(context) : null;
                         }
 
                         // Forward to config input
                         @Override
                         protected Object getValidityImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {
-                            return schemaInput instanceof Cacheable
-                                    ? ((Cacheable) schemaInput).getValidity(context) : null;
+                            return schemaInput instanceof CacheableInputOutput
+                                    ? ((CacheableInputOutput) schemaInput).getValidity(context) : null;
                         }
                     });
                 }

@@ -525,7 +525,7 @@ public abstract class ProcessorImpl implements Processor {
                 + input.getName() + ", " + input.getProcessorClass() + "]"
                 : null;
 
-        if (output instanceof Cacheable) {
+        if (output instanceof CacheableInputOutput) {
             // Get cache instance
             final Cache cache = ObjectCache.instance();
 
@@ -577,7 +577,7 @@ public abstract class ProcessorImpl implements Processor {
         // Get associated output
         final ProcessorOutput output = processorInput.getOutput();
 
-        if (output instanceof Cacheable) {
+        if (output instanceof CacheableInputOutput) {
             // Get cache instance
             final Cache cache = ObjectCache.instance();
 
@@ -897,7 +897,7 @@ public abstract class ProcessorImpl implements Processor {
     /**
      * Basic implementation of ProcessorOutput.
      */
-    public abstract static class ProcessorOutputImpl implements ProcessorOutput, Cacheable {
+    public abstract static class ProcessorOutputImpl implements ProcessorOutput, CacheableInputOutput {
 
         private final Class clazz;
         private final String name;
@@ -979,7 +979,7 @@ public abstract class ProcessorImpl implements Processor {
         /**
          * All the methods implemented here should never be called.
          */
-        private abstract class ProcessorFilter implements ProcessorOutput, Cacheable {
+        private abstract class ProcessorFilter implements ProcessorOutput, CacheableInputOutput {
             public void setInput(ProcessorInput processorInput) {
             }
 
@@ -1047,13 +1047,13 @@ public abstract class ProcessorImpl implements Processor {
                 }
 
                 public OutputCacheKey getKey(PipelineContext context) {
-                    return previousProcessorOutput instanceof Cacheable
-                            ? ((Cacheable) previousProcessorOutput).getKey(context) : null;
+                    return previousProcessorOutput instanceof CacheableInputOutput
+                            ? ((CacheableInputOutput) previousProcessorOutput).getKey(context) : null;
                 }
 
                 public Object getValidity(PipelineContext context) {
-                    return previousProcessorOutput instanceof Cacheable
-                            ? ((Cacheable) previousProcessorOutput).getValidity(context) : null;
+                    return previousProcessorOutput instanceof CacheableInputOutput
+                            ? ((CacheableInputOutput) previousProcessorOutput).getValidity(context) : null;
                 }
 
             }
@@ -1071,13 +1071,13 @@ public abstract class ProcessorImpl implements Processor {
             }
 
             public OutputCacheKey getKey(PipelineContext context) {
-                return processorOutput instanceof Cacheable
-                        ? ((Cacheable) processorOutput).getKey(context) : null;
+                return processorOutput instanceof CacheableInputOutput
+                        ? ((CacheableInputOutput) processorOutput).getKey(context) : null;
             }
 
             public Object getValidity(PipelineContext context) {
-                return processorOutput instanceof Cacheable
-                        ? ((Cacheable) processorOutput).getValidity(context) : null;
+                return processorOutput instanceof CacheableInputOutput
+                        ? ((CacheableInputOutput) processorOutput).getValidity(context) : null;
             }
         }
 
@@ -1264,12 +1264,12 @@ public abstract class ProcessorImpl implements Processor {
 
     protected static OutputCacheKey getInputKey(PipelineContext context, ProcessorInput input) {
         final ProcessorOutput output = input.getOutput();
-        return (output instanceof Cacheable) ? ((Cacheable) output).getKey(context) : null;
+        return (output instanceof CacheableInputOutput) ? ((CacheableInputOutput) output).getKey(context) : null;
     }
 
     protected static Object getInputValidity(PipelineContext context, ProcessorInput input) {
         final ProcessorOutput output = input.getOutput();
-        return (output instanceof Cacheable) ? ((Cacheable) output).getValidity(context) : null;
+        return (output instanceof CacheableInputOutput) ? ((CacheableInputOutput) output).getValidity(context) : null;
     }
 
     /**

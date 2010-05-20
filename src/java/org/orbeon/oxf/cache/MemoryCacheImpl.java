@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -70,7 +70,7 @@ public class MemoryCacheImpl implements Cache {
         public void incrementExpirationCount() { expirationCount++; }
     }
 
-    public synchronized void add(PropertyContext propertyContext, CacheKey key, Object validity, Object object) {
+    public synchronized void add(PropertyContext propertyContext, CacheKey key, Object validity, Object cacheable) {
         if (key == null || validity == null || maxSize == 0) return;
         final MemoryCacheStatistics statistics = (propertyContext != null) ? (MemoryCacheStatistics) getStatistics(propertyContext) : null;
         if (statistics != null)
@@ -80,8 +80,13 @@ public class MemoryCacheImpl implements Cache {
             // No existing entry found
             if (currentSize == maxSize) {
                 entry = (CacheEntry) linkedList.getLast();
+
+                // Notify object
+                expire(propertyContext, entry.cacheable);
+
                 keyToEntryMap.remove(entry.key);
                 linkedList.removeLast();
+
                 if (statistics != null)
                     statistics.incrementExpirationCount();
             } else {
@@ -90,13 +95,13 @@ public class MemoryCacheImpl implements Cache {
             }
             entry.key = key;
             entry.validity = validity;
-            entry.object = object;
+            entry.cacheable = cacheable;
             keyToEntryMap.put(key, entry);
             entry.listEntry = linkedList.addFirst(entry);
         } else {
             // Update validity and move to the front
             entry.validity = validity;
-            entry.object = object;
+            entry.cacheable = cacheable;
             linkedList.remove(entry.listEntry);
             entry.listEntry = linkedList.addFirst(entry);
         }
@@ -105,14 +110,30 @@ public class MemoryCacheImpl implements Cache {
     public synchronized void remove(PropertyContext propertyContext, CacheKey key) {
         final CacheEntry entry = keyToEntryMap.get(key);
         if (entry != null) {
+
+            // Notify object
+            expire(propertyContext, entry.cacheable);
+
             keyToEntryMap.remove(key);
             linkedList.remove(entry.listEntry);
             currentSize--;
         }
     }
 
+    private void expire(PropertyContext propertyContext, Object object) {
+        if (object instanceof Cacheable) {
+            ((Cacheable) object).evict(propertyContext);
+        }
+    }
+
     public synchronized int removeAll(PropertyContext propertyContext) {
         final int previousSize = currentSize;
+
+        // Notify objects
+        for (final Iterator i = iterateCacheObjects(propertyContext); i.hasNext();) {
+            expire(propertyContext, i.next());
+        }
+
         keyToEntryMap = new HashMap<CacheKey, CacheEntry>();
         linkedList = new CacheLinkedList();
         currentSize = 0;
@@ -121,7 +142,7 @@ public class MemoryCacheImpl implements Cache {
 
     public synchronized Object findValid(PropertyContext propertyContext, CacheKey key, Object validity) {
 
-        CacheEntry entry = keyToEntryMap.get(key);
+        final CacheEntry entry = keyToEntryMap.get(key);
         if (entry != null && lowerOrEqual(validity, entry.validity)) {
             // Place in first position and return
             if (propertyContext != null)
@@ -130,45 +151,13 @@ public class MemoryCacheImpl implements Cache {
                 linkedList.remove(entry.listEntry);
                 entry.listEntry = linkedList.addFirst(entry);
             }
-            return entry.object;
+            return entry.cacheable;
         } else {
             // Not latest validity
             if (propertyContext != null)
                 ((MemoryCacheStatistics) getStatistics(propertyContext)).incrementMissCount();
             return null;
         }
-    }
-
-    public synchronized Object findValidWithExpiration(PropertyContext propertyContext, CacheKey key, long expiration) {
-
-        Object result = null;
-        CacheEntry entry = keyToEntryMap.get(key);
-        if (entry != null && entry.validity instanceof Long) {
-            if (expiration == EXPIRATION_NO_EXPIRATION) {
-                // Cache hit whatever the last modified date was
-                result = entry.object;
-            } else if (expiration != EXPIRATION_NO_CACHE) {
-                // Get last modified date
-                long lastModified = (Long) entry.validity;
-                if (System.currentTimeMillis() < lastModified + expiration)
-                    result = entry.object;
-            }
-        }
-
-        if (result != null) {
-            // Place in first position and return
-            if (propertyContext != null)
-                ((MemoryCacheStatistics) getStatistics(propertyContext)).incrementHitsCount();
-            if (linkedList.getFirst() != entry) {
-                linkedList.remove(entry.listEntry);
-                entry.listEntry = linkedList.addFirst(entry);
-            }
-        } else {
-            // Cache miss
-            if (propertyContext != null)
-                ((MemoryCacheStatistics) getStatistics(propertyContext)).incrementMissCount();
-        }
-        return result;
     }
 
     public synchronized void setMaxSize(PropertyContext propertyContext, int maxSize) {
@@ -187,7 +176,7 @@ public class MemoryCacheImpl implements Cache {
     public Iterator iterateCacheObjects(PropertyContext propertyContext) {
         return new TransformIterator(keyToEntryMap.keySet().iterator(), new Transformer() {
             public Object transform(Object o) {
-                return (keyToEntryMap.get(o)).object;
+                return (keyToEntryMap.get(o)).cacheable;
             }
         });
     }

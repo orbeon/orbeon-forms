@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.cache;
 
-public class CacheEntry {
-    public CacheKey key;
-    public Object cacheable;
-    public Object validity;
-    public CacheLinkedList.ListEntry listEntry;
+public interface CacheableInputOutput {
+    OutputCacheKey getKey(org.orbeon.oxf.pipeline.api.PipelineContext context);
+    Object getValidity(org.orbeon.oxf.pipeline.api.PipelineContext context);
 }

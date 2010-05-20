@@ -15,7 +15,7 @@ package org.orbeon.oxf.processor.pipeline.choose;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
-import org.orbeon.oxf.cache.Cacheable;
+import org.orbeon.oxf.cache.CacheableInputOutput;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -133,8 +133,8 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                     if (!state.started)
                         start(context);
                     ProcessorOutput branchOutput = state.selectedBranchOutputs.get(_name);
-                    if (branchOutput instanceof Cacheable)
-                        return ((Cacheable) branchOutput).getKey(context);
+                    if (branchOutput instanceof CacheableInputOutput)
+                        return ((CacheableInputOutput) branchOutput).getKey(context);
                     else
                         return null;
                 } else
@@ -147,8 +147,8 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                     if (!state.started)
                         start(context);
                     ProcessorOutput branchOutput = state.selectedBranchOutputs.get(_name);
-                    if (branchOutput instanceof Cacheable)
-                        return ((Cacheable) branchOutput).getValidity(context);
+                    if (branchOutput instanceof CacheableInputOutput)
+                        return ((CacheableInputOutput) branchOutput).getValidity(context);
                     else
                         return null;
                 } else

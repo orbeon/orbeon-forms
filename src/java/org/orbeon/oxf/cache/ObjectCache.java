@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -29,7 +29,7 @@ public class ObjectCache {
     private static final String CACHE_PROPERTY_NAME_PREFIX = "oxf.";
     private static final String CACHE_PROPERTY_NAME_SIZE_SUFFIX = ".size";
 
-    private static Map<String, Cache> namedObjectCaches = new HashMap<String, Cache>();
+    private static final Map<String, Cache> namedObjectCaches = new HashMap<String, Cache>();
 
     static {
         namedObjectCaches.put(DEFAULT_CACHE_NAME, new MemoryCacheImpl(DEFAULT_CACHE_NAME, DEFAULT_SIZE));
@@ -38,7 +38,7 @@ public class ObjectCache {
     private ObjectCache() {}
 
     /**
-     * Get the intance of the main object cache.
+     * Get the instance of the main object cache.
      *
      * @return instance of cache
      */

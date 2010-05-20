@@ -1,21 +1,21 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.test;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.orbeon.oxf.cache.Cacheable;
+import org.orbeon.oxf.cache.CacheableInputOutput;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -218,7 +218,7 @@ public class TestScriptProcessor extends ProcessorImpl {
             ProcessorInput input = getInputByName(inputName);
             ProcessorOutput output = input.getOutput();
 
-            if (output instanceof Cacheable) {
+            if (output instanceof CacheableInputOutput) {
                 // As for KeyValidity as does ProcessorImpl.readCacheInputAsObject()
                 KeyValidity keyValidity = getInputKeyValidity(pipelineContext, input);
                 // Read input in every case (we ignore the content)

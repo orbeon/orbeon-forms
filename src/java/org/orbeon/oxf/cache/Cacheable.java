@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,7 +13,16 @@
  */
 package org.orbeon.oxf.cache;
 
+import org.orbeon.oxf.util.PropertyContext;
+
+/**
+ * Interface that cacheable objects can optionally implement to support callback methods.
+ */
 public interface Cacheable {
-    OutputCacheKey getKey(org.orbeon.oxf.pipeline.api.PipelineContext context);
-    Object getValidity(org.orbeon.oxf.pipeline.api.PipelineContext context);
+    /**
+     * Called when the object is being evicted from cache.
+     *
+     * @param propertyContext   current context
+     */
+    void evict(PropertyContext propertyContext);
 }

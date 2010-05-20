@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.pipeline.foreach;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.orbeon.oxf.cache.Cacheable;
+import org.orbeon.oxf.cache.CacheableInputOutput;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -349,12 +349,12 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
 
         protected OutputCacheKey getKeyImpl(PipelineContext context) {
             final State state = (State) getState(context);
-            return ((Cacheable) state.domGenerator.getOutputByName(OUTPUT_DATA)).getKey(context);
+            return ((CacheableInputOutput) state.domGenerator.getOutputByName(OUTPUT_DATA)).getKey(context);
         }
 
         protected Object getValidityImpl(PipelineContext context) {
             final State state = (State) getState(context);
-            return ((Cacheable) state.domGenerator.getOutputByName(OUTPUT_DATA)).getValidity(context);
+            return ((CacheableInputOutput) state.domGenerator.getOutputByName(OUTPUT_DATA)).getValidity(context);
         }
     }
 

@@ -30,7 +30,6 @@ import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.ExternalCopyable;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
@@ -300,7 +299,7 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    public boolean addCustomAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl other, AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
+    protected boolean addAjaxCustomAttributes(PipelineContext pipelineContext, AttributesImpl attributesImpl, boolean isNewRepeatIteration, XFormsControl other) {
 
         final XFormsUploadControl uploadControl1 = (XFormsUploadControl) other;
         final XFormsUploadControl uploadControl2 = this;

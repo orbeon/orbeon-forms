@@ -74,14 +74,16 @@ public class XXFormsDialogHandler extends XFormsBaseHandler {
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, getAttributes(attributes, classes.toString(), effectiveDialogId));
 
         // Child xhtml:div for label
+        reusableAttributes.clear();
+        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "hd xxforms-dialog-head");
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+
         final String labelValue = (dialogXFormsControl != null) ? dialogXFormsControl.getLabel(pipelineContext) : null;
         if (labelValue != null) {
-            reusableAttributes.clear();
-            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "hd xxforms-dialog-head");
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
             contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
         }
+
+        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
         // Child xhtml:div for body
         reusableAttributes.clear();

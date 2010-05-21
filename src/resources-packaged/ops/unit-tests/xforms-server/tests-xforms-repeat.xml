@@ -815,12 +815,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="title-control·1" required="true" label="Title">Don Quixote de la Mancha</xxf:control>
-                        <xxf:control id="author-control·1" required="true" label="Author">Miguel de Cervantes Saavedra</xxf:control>
-                        <xxf:control id="title-control·2" required="true" label="Title">Jacques le fataliste et son maître</xxf:control>
-                        <xxf:control id="author-control·2" required="true" label="Author">Denis Diderot</xxf:control>
-                        <xxf:control id="title-control·3" required="true" label="Title">Childhood's End</xxf:control>
-                        <xxf:control id="author-control·3" required="true" label="Author">Arthur C. Clarke</xxf:control>
+                        <xxf:control id="title-control·1" label="Title" required="true">Don Quixote de la Mancha</xxf:control>
+                        <xxf:control id="author-control·1" label="Author" required="true">Miguel de Cervantes Saavedra</xxf:control>
+                        <xxf:control id="title-control·2" label="Title" required="true">Jacques le fataliste et son maître</xxf:control>
+                        <xxf:control id="author-control·2" label="Author" required="true">Denis Diderot</xxf:control>
+                        <xxf:control id="title-control·3" label="Title" required="true">Childhood's End</xxf:control>
+                        <xxf:control id="author-control·3" label="Author" required="true">Arthur C. Clarke</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -876,11 +876,11 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input·1" readonly="true" label="City: ">San Francisco</xxf:control>
+                        <xxf:control id="my-input·1" label="City: " readonly="true">San Francisco</xxf:control>
                         <xxf:control id="my-output·1" label="Position: ">1</xxf:control>
-                        <xxf:control id="my-input·2" readonly="true" label="City: ">Los Angeles</xxf:control>
+                        <xxf:control id="my-input·2" label="City: " readonly="true">Los Angeles</xxf:control>
                         <xxf:control id="my-output·2" label="Position: ">2</xxf:control>
-                        <xxf:control id="my-input·3" readonly="true" label="City: ">San Diego</xxf:control>
+                        <xxf:control id="my-input·3" label="City: " readonly="true">San Diego</xxf:control>
                         <xxf:control id="my-output·3" label="Position: ">3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
@@ -1137,9 +1137,9 @@
                     <xxf:control-values>
                         <xxf:control id="approvalStatus-input·2">bbb</xxf:control>
                         <xxf:repeat-iteration id="condition-repeat·2" relevant="true" iteration="1"/>
-                        <xxf:control id="description-textarea·2-1" relevant="true" label="Condition:"/>
+                        <xxf:control id="description-textarea·2-1" label="Condition:" relevant="true"/>
                         <xxf:repeat-iteration id="condition-repeat·2" relevant="true" iteration="2"/>
-                        <xxf:control id="description-textarea·2-2" relevant="true" label="Condition:"/>
+                        <xxf:control id="description-textarea·2-2" label="Condition:" relevant="true"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="authorization-repeat" old-index="1" new-index="2"/>

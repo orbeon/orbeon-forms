@@ -75,7 +75,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                         <xxf:control id="id2" readonly="true" label="test noFoundData:">1</xxf:control>
+                        <xxf:control id="id2" label="test noFoundData:" readonly="true">1</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -656,8 +656,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="first-name-control" valid="false" label="First name"/>
-                        <xxf:control id="submit-trigger" readonly="true" label="Submit"/>
+                        <xxf:control id="first-name-control" label="First name" valid="false"/>
+                        <xxf:control id="submit-trigger" label="Submit" readonly="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1146,7 +1146,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="title-input" label="Note">Cool title</xxf:control>
-                        <xxf:control id="save-trigger" readonly="true" label="Save"/>
+                        <xxf:control id="save-trigger" label="Save" readonly="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

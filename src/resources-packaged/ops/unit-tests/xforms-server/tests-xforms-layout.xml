@@ -1339,7 +1339,7 @@
         </output>
     </test>
 
-    <test description="Output of @class without and with AVT on controls" name="oxf:pipeline">
+    <test description="Output of @class without and with AVT on controls (controls)" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-controls.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -1397,7 +1397,7 @@
         </output>
     </test>
 
-    <test description="Output of @class without and with AVT on controls" name="oxf:pipeline">
+    <test description="Output of @class without and with AVT on controls (response)" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -1452,7 +1452,7 @@
                         <xxf:control id="input1a" class="my-static">XML</xxf:control>
                         <xxf:control id="group1a" class="my-static"/>
                         <xxf:control id="group2a" relevant="false"/>
-                        <xxf:control id="input2a" relevant="false" class="my-static"/>
+                        <xxf:control id="input2a" class="my-static" relevant="false"/>
                         <xxf:control id="input1b" class="my-odd">XML</xxf:control>
                         <xxf:control id="group1b" class="my-odd"/>
                         <xxf:control id="input2b" class="my-odd">XML</xxf:control>

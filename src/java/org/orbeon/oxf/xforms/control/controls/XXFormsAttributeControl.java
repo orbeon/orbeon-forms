@@ -162,7 +162,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         }
 
         // Output element
-        outputElement(pipelineContext, ch, attributeControl2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "attribute");
+        outputValueElement(pipelineContext, ch, attributeControl2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "attribute");
     }
 
     @Override

@@ -132,13 +132,13 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-inplace-input$xf-4" readonly="true" class="fr-component-group" label="Label me!"/>
+                        <xxf:control id="my-inplace-input$xf-4" class="fr-component-group" label="Label me!" readonly="true"/>
                         <xxf:div id="my-inplace-input$fr-inplace-view" visibility="visible"/>
                         <xxf:div id="my-inplace-input$fr-inplace-edit" visibility="hidden"/>
                         <xxf:control id="my-inplace-input$xf-8" readonly="true">42</xxf:control>
-                        <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" relevant="false" class="fr-inplace-content fr-inplace-edit"/>
+                        <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" class="fr-inplace-content fr-inplace-edit" relevant="false"/>
                         <xxf:control id="my-inplace-input$fr-inplace-input" relevant="false"/>
-                        <xxf:control id="my-inplace-input$xf-18" relevant="false" class="fr-inplace-cancel"/>
+                        <xxf:control id="my-inplace-input$xf-18" class="fr-inplace-cancel" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -544,23 +544,23 @@
                         <xxf:control id="my-summary$body" class="fr-error-summary-body"/>
                         <xxf:control id="my-summary$xf-107·1" relevant="false"/>
                         <xxf:attribute id="my-summary$xf-109·1" for="my-summary$xf-108·1" name="href"/>
-                        <xxf:control id="my-summary$xf-110·1" relevant="false" class="fr-error-label"/>
+                        <xxf:control id="my-summary$xf-110·1" class="fr-error-label" relevant="false"/>
                         <xxf:control id="my-summary$xf-111·1" class="fr-error-label" label="Note"/>
                         <xxf:control id="my-summary$io·1" class="fr-error-row">[3]</xxf:control>
                         <xxf:control id="my-summary$xf-119·1" class="fr-error-dash">-</xxf:control>
                         <xxf:control id="my-summary$ao·1" class="fr-error-alert">Invalid note</xxf:control>
                         <xxf:control id="my-summary$xf-107·2" relevant="false"/>
                         <xxf:attribute id="my-summary$xf-109·2" for="my-summary$xf-108·2" name="href"/>
-                        <xxf:control id="my-summary$xf-110·2" relevant="false" class="fr-error-label"/>
+                        <xxf:control id="my-summary$xf-110·2" class="fr-error-label" relevant="false"/>
                         <xxf:control id="my-summary$xf-111·2" class="fr-error-label" label="Last name"/>
-                        <xxf:control id="my-summary$io·2" relevant="false" class="fr-error-row"/>
+                        <xxf:control id="my-summary$io·2" class="fr-error-row" relevant="false"/>
                         <xxf:control id="my-summary$xf-119·2" class="fr-error-dash">-</xxf:control>
                         <xxf:control id="my-summary$ao·2" class="fr-error-alert">Invalid last name</xxf:control>
-                        <xxf:control id="first-name-control" required="true" valid="false" label="First name" alert="Invalid first name"/>
-                        <xxf:control id="note-control·1" required="true" valid="false" label="Note" alert="Invalid note"/>
-                        <xxf:control id="note-control·2" required="true" valid="false" label="Note" alert="Invalid note"/>
-                        <xxf:control id="note-control·3" required="true" valid="false" label="Note" alert="Invalid note"/>
-                        <xxf:control id="last-name-control" required="true" valid="false" label="Last name" alert="Invalid last name"/>
+                        <xxf:control id="first-name-control" label="First name" alert="Invalid first name" required="true" valid="false"/>
+                        <xxf:control id="note-control·1" label="Note" alert="Invalid note" required="true" valid="false"/>
+                        <xxf:control id="note-control·2" label="Note" alert="Invalid note" required="true" valid="false"/>
+                        <xxf:control id="note-control·3" label="Note" alert="Invalid note" required="true" valid="false"/>
+                        <xxf:control id="last-name-control" label="Last name" alert="Invalid last name" required="true" valid="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

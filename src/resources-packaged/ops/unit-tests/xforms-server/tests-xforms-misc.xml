@@ -586,7 +586,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-trigger·1" label="Do Stuff"/>
-                        <xxf:control id="my-trigger·2" readonly="true" label="Do Stuff"/>
+                        <xxf:control id="my-trigger·2" label="Do Stuff" readonly="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -772,6 +772,124 @@
                         <xxf:control id="my-input·3">Clara</xxf:control>
                     </xxf:control-values>
                     <xxf:setfocus control-id="my-input·2"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Label change on xxforms:dialog" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <label xmlns="">Banana</label>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xxforms:show dialog="dialog-1"/>
+                            <xforms:setvalue ref=".">Potato</xforms:setvalue>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xxforms:dialog id="dialog-1">
+                        <xforms:label ref="."/>
+                    </xxforms:dialog>
+                    <xxforms:dialog id="dialog-2">
+                        <xforms:label>Strawberry</xforms:label>
+                    </xxforms:dialog>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <label>Potato</label>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="dialog-1" visible="true" constrain="true"/>
+                            <control effective-id="dialog-2" visible="false"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="dialog-1" label="Potato"/>
+                        <xxf:div id="dialog-1" visibility="visible" constrain="true"/>
+                        <xxf:control id="dialog-2" label="Strawberry"/>
+                        <xxf:div id="dialog-2" visibility="hidden"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Label change on xxforms:dialog" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <labels xmlns="">
+                                <label>Banana</label>
+                                <label>Strawberry</label>
+                            </labels>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <xxforms:show dialog="dialog-1"/>
+                            <xforms:insert nodeset="label" origin="xxforms:element('label', 'Vanilla')"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat ref="label">
+                        <xxforms:dialog id="dialog-1">
+                            <xforms:label ref="."/>
+                        </xxforms:dialog>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <labels>
+                                    <label>Banana</label>
+                                    <label>Strawberry</label>
+                                    <label>Vanilla</label>
+                                </labels>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="xf-4" index="3"/>
+                            <control effective-id="dialog-1·1" visible="true" constrain="true"/>
+                            <control effective-id="dialog-1·2" visible="false"/>
+                            <control effective-id="dialog-1·3" visible="false"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="dialog-1·1" label="Banana"/>
+                        <xxf:div id="dialog-1·1" visibility="visible" constrain="true"/>
+                        <xxf:control id="dialog-1·2" label="Strawberry"/>
+                        <xxf:div id="dialog-1·2" visibility="hidden"/>
+                        <xxf:control id="dialog-1·3" label="Vanilla"/>
+                        <xxf:div id="dialog-1·3" visibility="hidden"/>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>

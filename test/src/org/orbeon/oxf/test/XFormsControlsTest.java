@@ -60,7 +60,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
             }
         };
 
-        XFormsSingleNodeControl.diffCustomMIPs(attributes, control1, control2, false, false);
+        XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, false, control1, control2);
         assertEquals("-name2-value2 -name3-value3 +name3-newvalue3", attributes.getValue("class"));
     }
     
@@ -83,7 +83,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
             }
         };
 
-        XFormsSingleNodeControl.diffCustomMIPs(attributes, null, control2, false, false);
+        XFormsSingleNodeControl.addAjaxCustomMIPs(attributes, false, null, control2);
         assertEquals("name1-value1 name2-value2 name3-value3 name4-value4", attributes.getValue("class"));
     }
 
@@ -104,7 +104,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
             }
         };
 
-        XFormsSingleNodeControl.diffClassAVT(attributes, control1, control2, false, false);
+        XFormsSingleNodeControl.addAjaxClass(attributes, false, control1, control2);
         assertEquals("-foo -gaga +toto", attributes.getValue("class"));
     }
 
@@ -118,7 +118,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
             }
         };
 
-        XFormsSingleNodeControl.diffClassAVT(attributes, null, control2, false, false);
+        XFormsSingleNodeControl.addAjaxClass(attributes, false, null, control2);
         assertEquals("foo bar", attributes.getValue("class"));
     }
 

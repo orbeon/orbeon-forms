@@ -717,94 +717,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     /**
-     * Add attributes differences for custom attributes.
-     *
-     * @param pipelineContext       current pipeline context
-     * @param originalControl       original control, possibly null
-     * @param attributesImpl        attributes to add to
-     * @param isNewRepeatIteration  whether the current controls is within a new repeat iteration
-     * @return                      true if any attribute was added, false otherwise
-     */
-    public boolean addCustomAttributesDiffs(PipelineContext pipelineContext, XFormsSingleNodeControl originalControl,
-                                            AttributesImpl attributesImpl, boolean isNewRepeatIteration) {
-
-        final QName[] extensionAttributes = getExtensionAttributes();
-        // By default, diff only attributes in the xxforms:* namespace
-        return extensionAttributes != null && addAttributesDiffs(originalControl, attributesImpl, isNewRepeatIteration, extensionAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
-    }
-
-    private boolean addAttributesDiffs(XFormsControl control1, AttributesImpl attributesImpl, boolean isNewRepeatIteration, QName[] attributeQNames, String namespaceURI) {
-
-        final XFormsControl control2 = this;
-
-        boolean added = false;
-
-        for (final QName avtAttributeQName: attributeQNames) {
-            // Skip if namespace URI is excluded
-            if (namespaceURI != null && !namespaceURI.equals(avtAttributeQName.getNamespaceURI()))
-                continue;
-
-            final String value1 = (control1 == null) ? null : control1.getExtensionAttributeValue(avtAttributeQName);
-            final String value2 = control2.getExtensionAttributeValue(avtAttributeQName);
-
-            if (!XFormsUtils.compareStrings(value1, value2)) {
-                final String attributeValue = value2 != null ? value2 : "";
-                // NOTE: For now we use the local name; may want to use a full name?
-                added |= addAttributeIfNeeded(attributesImpl, avtAttributeQName.getName(), attributeValue, isNewRepeatIteration, attributeValue.equals(""));
-            }
-        }
-
-        return added;
-    }
-
-    public void addStandardAttributesDiffs(XFormsSingleNodeControl originalControl, ContentHandlerHelper ch, boolean isNewRepeatIteration) {
-        final QName[] extensionAttributes = STANDARD_EXTENSION_ATTRIBUTES;
-        if (extensionAttributes != null) {
-            final XFormsControl control2 = this;
-
-            for (final QName avtAttributeQName: extensionAttributes) {
-
-                // Skip @class because this is handled separately
-                if (avtAttributeQName.equals(XFormsConstants.CLASS_QNAME))
-                    continue;
-
-                final String value1 = (originalControl == null) ? null : originalControl.getExtensionAttributeValue(avtAttributeQName);
-                final String value2 = control2.getExtensionAttributeValue(avtAttributeQName);
-
-                if (!XFormsUtils.compareStrings(value1, value2)) {
-                    final String attributeValue = value2 != null ? value2 : "";
-
-                    final AttributesImpl attributesImpl = new AttributesImpl();
-                    // Control id
-                    attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, control2.getEffectiveId());
-
-                    // The client does not store an HTML representation of the xxforms:attribute control, so we
-                    // have to output these attributes.
-
-                    // HTML element id
-                    addAttributeIfNeeded(attributesImpl, "for", control2.getEffectiveId(), isNewRepeatIteration, false);
-
-                    // Attribute name
-                    addAttributeIfNeeded(attributesImpl, "name", avtAttributeQName.getName(), isNewRepeatIteration, false);
-
-                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", attributesImpl);
-                    ch.text(attributeValue);
-                    ch.endElement();
-                }
-            }
-        }
-    }
-
-    protected static boolean addAttributeIfNeeded(AttributesImpl attributesImpl, String name, String value, boolean isNewRepeatIteration, boolean isDefaultValue) {
-        if (isNewRepeatIteration && isDefaultValue) {
-            return false;
-        } else {
-            attributesImpl.addAttribute("", name, name, ContentHandlerHelper.CDATA, value);
-            return true;
-        }
-    }
-
-    /**
      * Evaluate an attribute of the control as an AVT.
      *
      * @param propertyContext   current context
@@ -1352,5 +1264,240 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     public void outputAjaxDiff(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControl other,
                                AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
         // NOP
+    }
+
+    protected boolean addAjaxAttributes(PipelineContext pipelineContext, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree, XFormsControl other) {
+
+        final XFormsControl control1 = (XFormsSingleNodeControl) other;
+        final XFormsControl control2 = this;
+
+        boolean added = false;
+
+        // Control id
+        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, control2.getEffectiveId());
+
+        // Class attribute
+        added |= addAjaxClass(attributesImpl, isNewlyVisibleSubtree, control1, control2);
+
+        // Label, help, hint, alert, etc.
+        added |= addAjaxLHHA(pipelineContext, attributesImpl, isNewlyVisibleSubtree, control1, control2);
+
+        // Output control-specific attributes
+        added |= control2.addAjaxCustomAttributes(pipelineContext, attributesImpl, isNewlyVisibleSubtree, control1);
+
+        return added;
+    }
+
+    // public for unit tests
+    public static boolean addAjaxClass(AttributesImpl attributesImpl, boolean newlyVisibleSubtree,
+                                       XFormsControl control1, XFormsControl control2) {
+
+        boolean added = false;
+
+        final String class1 = (control1 == null) ? null : control1.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME);
+        final String class2 = control2.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME);
+
+        if (newlyVisibleSubtree || !XFormsUtils.compareStrings(class1, class2)) {
+            // Custom MIPs changed
+
+            final String attributeValue;
+            if (class1 == null) {
+                attributeValue = class2;
+            } else {
+                final StringBuilder sb = new StringBuilder(100);
+
+                final Set<String> classes1 = tokenize(class1);
+                final Set<String> classes2 = tokenize(class2);
+
+                // Classes to remove
+                for (final String currentClass: classes1) {
+                    if (!classes2.contains(currentClass)) {
+
+                        if (sb.length() > 0)
+                            sb.append(' ');
+
+                        sb.append('-');
+                        sb.append(currentClass);
+                    }
+                }
+
+                // Classes to add
+                for (final String currentClass: classes2) {
+                    if (!classes1.contains(currentClass)) {
+
+                        if (sb.length() > 0)
+                            sb.append(' ');
+
+                        sb.append('+');
+                        sb.append(currentClass);
+                    }
+                }
+
+                attributeValue = sb.toString();
+            }
+            // This attribute is a space-separate list of class names prefixed with either '-' or '+'
+            if (attributeValue != null)
+                added |= addOrAppendToAttributeIfNeeded(attributesImpl, "class", attributeValue, newlyVisibleSubtree, attributeValue.equals(""));
+        }
+        return added;
+    }
+
+    private static Set<String> tokenize(String value) {
+        final Set<String> result;
+        if (value != null) {
+            result = new LinkedHashSet<String>();
+            for (final StringTokenizer st = new StringTokenizer(value); st.hasMoreTokens();) {
+                result.add(st.nextToken());
+            }
+        } else {
+            result = Collections.emptySet();
+        }
+        return result;
+    }
+
+    private boolean addAjaxLHHA(PipelineContext pipelineContext, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree,
+                                  XFormsControl control1, XFormsControl control2) {
+
+        boolean added = false;
+        {
+            final String labelValue1 = isNewlyVisibleSubtree ? null : control1.getLabel(pipelineContext);
+            final String labelValue2 = control2.getLabel(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(labelValue1, labelValue2)) {
+                final String escapedLabelValue2 = control2.getEscapedLabel(pipelineContext);
+                final String attributeValue = escapedLabelValue2 != null ? escapedLabelValue2 : "";
+                added |= addOrAppendToAttributeIfNeeded(attributesImpl, "label", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
+            }
+        }
+
+        {
+            final String helpValue1 = isNewlyVisibleSubtree ? null : control1.getHelp(pipelineContext);
+            final String helpValue2 = control2.getHelp(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(helpValue1, helpValue2)) {
+                final String escapedHelpValue2 = control2.getEscapedHelp(pipelineContext);
+                final String attributeValue = escapedHelpValue2 != null ? escapedHelpValue2 : "";
+                added |= addOrAppendToAttributeIfNeeded(attributesImpl, "help", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
+            }
+        }
+
+        {
+            final String hintValue1 = isNewlyVisibleSubtree ? null : control1.getHint(pipelineContext);
+            final String hintValue2 = control2.getHint(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(hintValue1, hintValue2)) {
+                final String escapedHintValue2 = control2.getEscapedHint(pipelineContext);
+                final String attributeValue = escapedHintValue2 != null ? escapedHintValue2 : "";
+                added |= addOrAppendToAttributeIfNeeded(attributesImpl, "hint", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
+            }
+        }
+
+        {
+            final String alertValue1 = isNewlyVisibleSubtree ? null : control1.getAlert(pipelineContext);
+            final String alertValue2 = control2.getAlert(pipelineContext);
+
+            if (!XFormsUtils.compareStrings(alertValue1, alertValue2)) {
+                final String escapedAlertValue2 = control2.getEscapedAlert(pipelineContext);
+                final String attributeValue = escapedAlertValue2 != null ? escapedAlertValue2 : "";
+                added |= addOrAppendToAttributeIfNeeded(attributesImpl, "alert", attributeValue, isNewlyVisibleSubtree, attributeValue.equals(""));
+            }
+        }
+        return added;
+    }
+
+    protected static boolean addOrAppendToAttributeIfNeeded(AttributesImpl attributesImpl, String name, String value, boolean isNewRepeatIteration, boolean isDefaultValue) {
+        if (isNewRepeatIteration && isDefaultValue) {
+            return false;
+        } else {
+            XMLUtils.addOrAppendToAttribute(attributesImpl, name, value);
+            return true;
+        }
+    }
+
+    /**
+     * Add attributes differences for custom attributes.
+     *
+     * @param pipelineContext       current context
+     * @param attributesImpl        attributes to add to
+     * @param isNewRepeatIteration  whether the current controls is within a new repeat iteration
+     * @param other                 original control, possibly null
+     * @return                      true if any attribute was added, false otherwise
+     */
+    protected boolean addAjaxCustomAttributes(PipelineContext pipelineContext, AttributesImpl attributesImpl, boolean isNewRepeatIteration, XFormsControl other) {
+
+        final QName[] extensionAttributes = getExtensionAttributes();
+        // By default, diff only attributes in the xxforms:* namespace
+        return extensionAttributes != null && addAttributesDiffs(other, attributesImpl, isNewRepeatIteration, extensionAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
+    }
+
+    private boolean addAttributesDiffs(XFormsControl control1, AttributesImpl attributesImpl, boolean isNewRepeatIteration, QName[] attributeQNames, String namespaceURI) {
+
+        final XFormsControl control2 = this;
+
+        boolean added = false;
+
+        for (final QName avtAttributeQName: attributeQNames) {
+            // Skip if namespace URI is excluded
+            if (namespaceURI != null && !namespaceURI.equals(avtAttributeQName.getNamespaceURI()))
+                continue;
+
+            final String value1 = (control1 == null) ? null : control1.getExtensionAttributeValue(avtAttributeQName);
+            final String value2 = control2.getExtensionAttributeValue(avtAttributeQName);
+
+            if (!XFormsUtils.compareStrings(value1, value2)) {
+                final String attributeValue = value2 != null ? value2 : "";
+                // NOTE: For now we use the local name; may want to use a full name?
+                added |= addAttributeIfNeeded(attributesImpl, avtAttributeQName.getName(), attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+            }
+        }
+
+        return added;
+    }
+
+    protected void addAjaxStandardAttributes(XFormsSingleNodeControl originalControl, ContentHandlerHelper ch, boolean isNewRepeatIteration) {
+        final QName[] extensionAttributes = STANDARD_EXTENSION_ATTRIBUTES;
+        if (extensionAttributes != null) {
+            final XFormsControl control2 = this;
+
+            for (final QName avtAttributeQName: extensionAttributes) {
+
+                // Skip @class because this is handled separately
+                if (avtAttributeQName.equals(XFormsConstants.CLASS_QNAME))
+                    continue;
+
+                final String value1 = (originalControl == null) ? null : originalControl.getExtensionAttributeValue(avtAttributeQName);
+                final String value2 = control2.getExtensionAttributeValue(avtAttributeQName);
+
+                if (!XFormsUtils.compareStrings(value1, value2)) {
+                    final String attributeValue = value2 != null ? value2 : "";
+
+                    final AttributesImpl attributesImpl = new AttributesImpl();
+                    // Control id
+                    attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, control2.getEffectiveId());
+
+                    // The client does not store an HTML representation of the xxforms:attribute control, so we
+                    // have to output these attributes.
+
+                    // HTML element id
+                    addAttributeIfNeeded(attributesImpl, "for", control2.getEffectiveId(), isNewRepeatIteration, false);
+
+                    // Attribute name
+                    addAttributeIfNeeded(attributesImpl, "name", avtAttributeQName.getName(), isNewRepeatIteration, false);
+
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", attributesImpl);
+                    ch.text(attributeValue);
+                    ch.endElement();
+                }
+            }
+        }
+    }
+
+    protected static boolean addAttributeIfNeeded(AttributesImpl attributesImpl, String name, String value, boolean isNewRepeatIteration, boolean isDefaultValue) {
+        if (isNewRepeatIteration && isDefaultValue) {
+            return false;
+        } else {
+            attributesImpl.addAttribute("", name, name, ContentHandlerHelper.CDATA, value);
+            return true;
+        }
     }
 }

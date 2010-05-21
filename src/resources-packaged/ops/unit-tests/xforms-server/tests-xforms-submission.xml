@@ -271,7 +271,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" readonly="true" label="Value:">2</xxf:control>
+                        <xxf:control id="my-input" label="Value:" readonly="true">2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

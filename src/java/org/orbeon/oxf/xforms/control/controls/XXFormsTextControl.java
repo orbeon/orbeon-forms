@@ -67,7 +67,7 @@ public class XXFormsTextControl extends XFormsOutputControl implements XFormsPse
         }
 
         // Output element
-        outputElement(pipelineContext, ch, textControl2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "text");
+        outputValueElement(pipelineContext, ch, textControl2, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "text");
     }
 
     @Override

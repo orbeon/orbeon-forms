@@ -1268,22 +1268,19 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
 
     protected boolean addAjaxAttributes(PipelineContext pipelineContext, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree, XFormsControl other) {
 
-        final XFormsControl control1 = (XFormsSingleNodeControl) other;
-        final XFormsControl control2 = this;
-
         boolean added = false;
 
         // Control id
-        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, control2.getEffectiveId());
+        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getEffectiveId());
 
         // Class attribute
-        added |= addAjaxClass(attributesImpl, isNewlyVisibleSubtree, control1, control2);
+        added |= addAjaxClass(attributesImpl, isNewlyVisibleSubtree, other, this);
 
         // Label, help, hint, alert, etc.
-        added |= addAjaxLHHA(pipelineContext, attributesImpl, isNewlyVisibleSubtree, control1, control2);
+        added |= addAjaxLHHA(pipelineContext, attributesImpl, isNewlyVisibleSubtree, other, this);
 
         // Output control-specific attributes
-        added |= control2.addAjaxCustomAttributes(pipelineContext, attributesImpl, isNewlyVisibleSubtree, control1);
+        added |= addAjaxCustomAttributes(pipelineContext, attributesImpl, isNewlyVisibleSubtree, other);
 
         return added;
     }

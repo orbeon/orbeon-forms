@@ -1,21 +1,21 @@
 .xbl-fr-spell-checker { display: inline; }
 .xbl-fr-spell-checker .xbl-fr-spell-checker-icon { background-image: url('../../../apps/fr/style/images/silk/spellcheck.png'); display: inline-block; width: 16px; height: 16px }
-.fr-spell-checker-dialog { width: 38em }
-.fr-spell-checker-dialog .xforms-label { width: 10em; display: inline-block }
+.fr-spell-checker-dialog { width: 460px }
+.fr-spell-checker-dialog .xforms-label { width: 90px; display: inline-block }
 .fr-spell-checker-dialog .xforms-output-output { font-weight: bold }
 .fr-spell-checker-dialog .not-in-dictionary    { width: 180px; *width: 178px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
 .fr-spell-checker-dialog input                 { width: 180px; *width: 174px }
 .fr-spell-checker-dialog select                { width: 180px }
-.fr-spell-checker-dialog td { padding-right: 1em; padding-bottom: .5em; vertical-align: top }
-.fr-spell-checker-dialog .label { white-space: nowrap }
-.fr-spell-checker-dialog .not-in-dictionary { height: 5em; overflow-y: scroll; display: block; border: 1px solid #999 }
+.fr-spell-checker-dialog td { padding-right: 10px; padding-bottom: 5px; vertical-align: top }
+.fr-spell-checker-dialog .label { width: 90px }
+.fr-spell-checker-dialog .not-in-dictionary { height: 60px; overflow-y: scroll; display: block; border: 1px solid #999 }
 .fr-spell-checker-dialog .unknown-word { font-weight: bold; background: url('unknown-word.png') repeat-x left bottom }
 .fr-spell-checker-dialog .xforms-repeat-selected-item-1,
 .fr-spell-checker-dialog .xforms-repeat-selected-item-2 { background-color: transparent }
-.fr-spell-checker-dialog .xbl-fr-spell-checker-correcting .xbl-fr-button { display: block; margin-bottom: .3em }
+.fr-spell-checker-dialog .xbl-fr-spell-checker-correcting .xbl-fr-button { display: block; margin-bottom: 3px }
 .fr-spell-checker-dialog .xbl-fr-spell-checker-correcting .xbl-fr-button button { text-align: left }
-.fr-spell-checker-dialog .xbl-fr-spell-checker-correcting .xbl-fr-button button img { padding-right: 1em }
-.fr-spell-checker-dialog .xbl-fr-button .first-child { width: 10em }
+.fr-spell-checker-dialog .xbl-fr-spell-checker-correcting .xbl-fr-button button img { padding-right: 10px }
+.fr-spell-checker-dialog .xbl-fr-button .first-child { width: 120px }
 .fr-spell-checker-dialog .xbl-fr-button .first-child button { width: 100% }
 .fr-spell-checker-dialog .xbl-fr-spell-checker-close { display: block; overflow: auto }
-.fr-spell-checker-dialog .xbl-fr-spell-checker-close .xbl-fr-button { float: right; margin-top: 1em }
+.fr-spell-checker-dialog .xbl-fr-spell-checker-close .xbl-fr-button { float: right; margin-top: 10px }

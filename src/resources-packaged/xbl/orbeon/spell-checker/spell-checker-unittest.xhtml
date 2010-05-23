@@ -27,7 +27,6 @@
                 <instance>
                     <text>Ths is a tst.</text>
                     <text>Ths is a tst with tst spelled incorrectly twice.</text>
-                    <text>helloo helloo worlrd</text>
                     <text>To be or not to be– that is the question: Whether 'tis nobler in the mind to suffer The slings
                         and arrows of outrageous fortune, Or to take arms against a sea of troubles And, by opposing,
                         end them. To die, to sleep No more – and by a sleep to say we end The heartache and the thousand
@@ -45,10 +44,12 @@
                         pitch and moment With this regard their currents turn awry, And lose the name of action.—Soft
                         you now! The fair Ophelia! Nymph, in thy orisons Be all my sins remembered.
                     </text>
+                    <text>helloo helloo worlrd</text>
+                    <text>helloo helloo worlrd</text>
                 </instance>
             </xforms:instance>
         </xforms:model>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:link type="text/cs   s" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
         <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
         <!-- <xhtml:script type="text/javascript" src="/xbl/orbeon/spell-checker/spell-checker-unittest.js"/> -->
@@ -66,6 +67,10 @@
             <xhtml:div class="block">
                 <xforms:textarea ref="."/>
                 <fr:spell-checker ref="."/>
+                <xforms:trigger appearance="minimal">
+                    <xforms:label>Remove line</xforms:label>
+                    <xforms:delete ev:event="DOMActivate" nodeset="."/>
+                </xforms:trigger>
             </xhtml:div>
         </xforms:repeat>
     </xhtml:body>

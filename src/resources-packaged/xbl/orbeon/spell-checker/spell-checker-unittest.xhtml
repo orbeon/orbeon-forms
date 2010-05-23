@@ -58,6 +58,10 @@
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
+        <xforms:trigger>
+            <xforms:label>Add</xforms:label>
+            <xforms:insert nodeset="text" ev:event="DOMActivate"/>
+        </xforms:trigger>
         <xforms:repeat nodeset="text">
             <xhtml:div class="block">
                 <xforms:textarea ref="."/>

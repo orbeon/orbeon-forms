@@ -5352,6 +5352,12 @@ ORBEON.xforms.Init = {
         var isDraggable = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-draggable-true");
         var isVisible = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-visible-true");
         var isMinimal = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-appearance-minimal");
+
+        // If we already have a dialog for the same id, first destroy it, as this is an object left behind
+        // by a deleted repeat iteration
+        if (ORBEON.xforms.Globals.dialogs[dialog.id])
+            ORBEON.xforms.Globals.dialogs[dialog.id].destroy();
+
         // Create dialog object
         var yuiDialog;
         if (isMinimal) {
@@ -6251,8 +6257,7 @@ ORBEON.xforms.Server = {
                                                         // Exiting nested repeat
                                                         nestedRepeatLevel--;
                                                     } else {
-                                                        wasDelimiter = nestedRepeatLevel == 0 &&
-                                                                       ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter");
+                                                        wasDelimiter = nestedRepeatLevel == 0 && ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter");
                                                     }
                                                 }
                                                 var previous = lastElementToDelete.previousSibling;

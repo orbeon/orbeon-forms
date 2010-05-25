@@ -114,7 +114,7 @@
                 <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-new-boolean-input-2$$a·1">My alert</xhtml:span>
                 <xhtml:span id="my-new-input" class="xforms-control xforms-input xforms-repeat-template">
                     <xhtml:label class="xforms-label" for="my-new-input$xforms-input-1"/>
-                    <xhtml:input id="my-new-input$xforms-input-1" type="text" name="my-new-input$xforms-input-1" value="" class="xforms-input-input"/>
+                    <xhtml:input id="my-new-input$xforms-input-1" type="text" name="my-new-input$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
                     <xhtml:img class="xforms-disabled xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
                     <xhtml:span class="xforms-disabled xforms-help"/>
                     <xhtml:span class="xforms-alert-inactive xforms-alert"/>
@@ -122,7 +122,7 @@
                 </xhtml:span>
                 <xhtml:span id="my-new-boolean-input" class="xforms-control xforms-input xforms-repeat-template">
                     <xhtml:label class="xforms-label" for="my-new-boolean-input$xforms-input-1"/>
-                    <xhtml:input id="my-new-boolean-input$xforms-input-1" type="text" name="my-new-boolean-input$xforms-input-1" value="" class="xforms-input-input"/>
+                    <xhtml:input id="my-new-boolean-input$xforms-input-1" type="text" name="my-new-boolean-input$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
                     <xhtml:img class="xforms-disabled xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
                     <xhtml:span class="xforms-disabled xforms-help"/>
                     <xhtml:span class="xforms-alert-inactive xforms-alert"/>
@@ -131,7 +131,7 @@
                 <xhtml:label class="xforms-label xforms-repeat-template" id="my-new-input-2$$l" for="my-new-input-2$xforms-input-1"/>
                 <xhtml:span class="xforms-hint xforms-repeat-template" id="my-new-input-2$$t"/>
                 <xhtml:span id="my-new-input-2" class="xforms-control xforms-input xforms-repeat-template">
-                    <xhtml:input id="my-new-input-2$xforms-input-1" type="text" name="my-new-input-2$xforms-input-1" value="" class="xforms-input-input"/>
+                <xhtml:input id="my-new-input-2$xforms-input-1" type="text" name="my-new-input-2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
                 </xhtml:span>
                 <xhtml:img id="my-new-input-2$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-input-2$$p"/>
@@ -139,7 +139,7 @@
                 <xhtml:label class="xforms-label xforms-repeat-template" id="my-new-boolean-input-2$$l" for="my-new-boolean-input-2$xforms-input-1"/>
                 <xhtml:span class="xforms-hint xforms-repeat-template" id="my-new-boolean-input-2$$t"/>
                 <xhtml:span id="my-new-boolean-input-2" class="xforms-control xforms-input xforms-repeat-template">
-                    <xhtml:input id="my-new-boolean-input-2$xforms-input-1" type="text" name="my-new-boolean-input-2$xforms-input-1" value="" class="xforms-input-input"/>
+                <xhtml:input id="my-new-boolean-input-2$xforms-input-1" type="text" name="my-new-boolean-input-2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
                 </xhtml:span>
                 <xhtml:img id="my-new-boolean-input-2$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-boolean-input-2$$p"/>
@@ -235,7 +235,7 @@
                 <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-old-boolean-input-2$$a·1">My alert</xhtml:span>
                 <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-input$$l" for="my-old-input$xforms-input-1"/>
                 <xhtml:span id="my-old-input" class="xforms-control xforms-input xforms-repeat-template">
-                    <xhtml:input id="my-old-input$xforms-input-1" type="text" name="my-old-input$xforms-input-1" value="" class="xforms-input-input"/>
+                <xhtml:input id="my-old-input$xforms-input-1" type="text" name="my-old-input$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
                 </xhtml:span>
                 <xhtml:img id="my-old-input$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-input$$p"/>
@@ -243,7 +243,7 @@
                 <xhtml:span class="xforms-hint xforms-repeat-template" id="my-old-input$$t"/>
                 <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-boolean-input$$l" for="my-old-boolean-input$xforms-input-1"/>
                 <xhtml:span id="my-old-boolean-input" class="xforms-control xforms-input xforms-repeat-template">
-                    <xhtml:input id="my-old-boolean-input$xforms-input-1" type="text" name="my-old-boolean-input$xforms-input-1" value="" class="xforms-input-input"/>
+                <xhtml:input id="my-old-boolean-input$xforms-input-1" type="text" name="my-old-boolean-input$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
                 </xhtml:span>
                 <xhtml:img id="my-old-boolean-input$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-boolean-input$$p"/>
@@ -252,7 +252,7 @@
                 <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-input-2$$l" for="my-old-input-2$xforms-input-1"/>
                 <xhtml:span class="xforms-hint xforms-repeat-template" id="my-old-input-2$$t"/>
                 <xhtml:span id="my-old-input-2" class="xforms-control xforms-input xforms-repeat-template">
-                    <xhtml:input id="my-old-input-2$xforms-input-1" type="text" name="my-old-input-2$xforms-input-1" value="" class="xforms-input-input"/>
+                <xhtml:input id="my-old-input-2$xforms-input-1" type="text" name="my-old-input-2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
                 </xhtml:span>
                 <xhtml:img id="my-old-input-2$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-input-2$$p"/>
@@ -260,7 +260,7 @@
                 <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-boolean-input-2$$l" for="my-old-boolean-input-2$xforms-input-1"/>
                 <xhtml:span class="xforms-hint xforms-repeat-template" id="my-old-boolean-input-2$$t"/>
                 <xhtml:span id="my-old-boolean-input-2" class="xforms-control xforms-input xforms-repeat-template">
-                    <xhtml:input id="my-old-boolean-input-2$xforms-input-1" type="text" name="my-old-boolean-input-2$xforms-input-1" value="" class="xforms-input-input"/>
+                <xhtml:input id="my-old-boolean-input-2$xforms-input-1" type="text" name="my-old-boolean-input-2$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
                 </xhtml:span>
                 <xhtml:img id="my-old-boolean-input-2$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-boolean-input-2$$p"/>
@@ -316,7 +316,7 @@
                 </xhtml:span>
                 <xhtml:span id="my-new-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-template">
                     <xhtml:label class="xforms-label" for="my-new-select1$$c"/>
-                    <xhtml:select id="my-new-select1$$c" name="my-new-select1">
+                    <xhtml:select id="my-new-select1$$c" name="my-new-select1" disabled="disabled">
                         <xhtml:option value="b3iUb0x15AA=">Apple</xhtml:option>
                         <xhtml:option value="2KtpnvqzFEE=">Orange</xhtml:option>
                     </xhtml:select>
@@ -373,7 +373,7 @@
                 <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-old-select1$$a·1">My alert</xhtml:span>
                 <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-old-select1$$t·1">My hint</xhtml:span>
                 <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-select1$$l" for="my-old-select1"/>
-                <xhtml:select id="my-old-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-template" name="my-old-select1">
+                <xhtml:select id="my-old-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-template" name="my-old-select1" disabled="disabled">
                     <xhtml:option value="b3iUb0x15AA=">Apple</xhtml:option>
                     <xhtml:option value="2KtpnvqzFEE=">Orange</xhtml:option>
                 </xhtml:select>
@@ -767,7 +767,7 @@
                     <xhtml:span class="xforms-help">My help</xhtml:span>
                 </xhtml:span>
                 <xhtml:span id="my-new-trigger" class="xforms-control xforms-trigger xforms-repeat-template">
-                    <xhtml:button id="my-new-trigger$$c" type="button"/>
+                    <xhtml:button id="my-new-trigger$$c" type="button" disabled="disabled"/>
                     <xhtml:img class="xforms-disabled xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
                     <xhtml:span class="xforms-disabled xforms-help"/>
                 </xhtml:span>
@@ -777,7 +777,7 @@
                     <xhtml:span class="xforms-disabled xforms-help"/>
                 </xhtml:span>
                 <xhtml:span id="my-new-modal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-modal xforms-repeat-template">
-                    <xhtml:button id="my-new-modal-trigger$$c" type="button"/>
+                    <xhtml:button id="my-new-modal-trigger$$c" type="button" disabled="disabled"/>
                     <xhtml:img class="xforms-disabled xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
                     <xhtml:span class="xforms-disabled xforms-help"/>
                 </xhtml:span>
@@ -847,13 +847,13 @@
                 <xhtml:a id="my-new-modal-minimal-trigger·1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-invalid xforms-required xforms-type-NCName xforms-trigger-appearance-modal xforms-repeat-selected-item-1" title="My hint" href="#">My label</xhtml:a>
                 <xhtml:img id="my-new-modal-minimal-trigger$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-modal-minimal-trigger$$p·1">My help</xhtml:span>
-                <xhtml:button id="my-old-trigger" class="xforms-control xforms-trigger xforms-repeat-template" type="button"/>
+                <xhtml:button id="my-old-trigger" class="xforms-control xforms-trigger xforms-repeat-template" type="button" disabled="disabled"/>
                 <xhtml:img id="my-old-trigger$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-trigger$$p"/>
                 <xhtml:a id="my-old-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-repeat-template" href="#"/>
                 <xhtml:img id="my-old-minimal-trigger$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-minimal-trigger$$p"/>
-                <xhtml:button id="my-new-modal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-modal xforms-repeat-template" type="button"/>
+                <xhtml:button id="my-new-modal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-modal xforms-repeat-template" type="button" disabled="disabled"/>
                 <xhtml:img id="my-new-modal-trigger$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-modal-trigger$$p"/>
                 <xhtml:a id="my-new-modal-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-trigger-appearance-modal xforms-repeat-template" href="#"/>
@@ -1031,7 +1031,7 @@
                 </xhtml:span>
                 <xhtml:span id="my-new-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-repeat-template">
                     <xhtml:label class="xforms-label" for="my-new-select$$c"/>
-                    <xhtml:select id="my-new-select$$c" name="my-new-select" multiple="multiple">
+                    <xhtml:select id="my-new-select$$c" name="my-new-select" multiple="multiple" disabled="disabled">
                         <xhtml:option value="b3iUb0x15AA=">Apple</xhtml:option>
                         <xhtml:option value="2KtpnvqzFEE=">Orange</xhtml:option>
                     </xhtml:select>
@@ -1042,7 +1042,7 @@
                 </xhtml:span>
                 <xhtml:span id="my-new-compact-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-repeat-template">
                     <xhtml:label class="xforms-label" for="my-new-compact-select$$c"/>
-                    <xhtml:select id="my-new-compact-select$$c" name="my-new-compact-select" multiple="multiple">
+                    <xhtml:select id="my-new-compact-select$$c" name="my-new-compact-select" multiple="multiple" disabled="disabled">
                         <xhtml:option value="b3iUb0x15AA=">Apple</xhtml:option>
                         <xhtml:option value="2KtpnvqzFEE=">Orange</xhtml:option>
                     </xhtml:select>
@@ -1122,7 +1122,7 @@
                 <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-new-compact-select$$a·1">My alert</xhtml:span>
                 <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-new-compact-select$$t·1">My hint</xhtml:span>
                 <xhtml:label class="xforms-label xforms-repeat-template" id="my-new-select$$l" for="my-new-select"/>
-                <xhtml:select id="my-new-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-repeat-template" name="my-new-select" multiple="multiple">
+                <xhtml:select id="my-new-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-repeat-template" name="my-new-select" multiple="multiple" disabled="disabled">
                     <xhtml:option value="b3iUb0x15AA=">Apple</xhtml:option>
                     <xhtml:option value="2KtpnvqzFEE=">Orange</xhtml:option>
                 </xhtml:select>
@@ -1131,7 +1131,7 @@
                 <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-new-select$$a"/>
                 <xhtml:span class="xforms-hint xforms-repeat-template" id="my-new-select$$t"/>
                 <xhtml:label class="xforms-label xforms-repeat-template" id="my-new-compact-select$$l" for="my-new-compact-select"/>
-                <xhtml:select id="my-new-compact-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-repeat-template" name="my-new-compact-select" multiple="multiple">
+                <xhtml:select id="my-new-compact-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-repeat-template" name="my-new-compact-select" multiple="multiple" disabled="disabled">
                     <xhtml:option value="b3iUb0x15AA=">Apple</xhtml:option>
                     <xhtml:option value="2KtpnvqzFEE=">Orange</xhtml:option>
                 </xhtml:select>
@@ -1381,7 +1381,7 @@
                 <xhtml:span id="group1a" class="my-static xforms-group"/>
                 <xhtml:span id="group2a" class="xforms-group xforms-disabled">
                     <xhtml:span id="input2a" class="my-static xforms-control xforms-input xforms-disabled">
-                        <xhtml:input id="input2a$xforms-input-1" type="text" name="input2a$xforms-input-1" value="" class="xforms-input-input"/>
+                        <xhtml:input id="input2a$xforms-input-1" type="text" name="input2a$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
                     </xhtml:span>
                 </xhtml:span>
                 <xhtml:span id="input1b" class="my-even xforms-control xforms-input">
@@ -1390,7 +1390,7 @@
                 <xhtml:span id="group1b" class="my-even xforms-group"/>
                 <xhtml:span id="group2b" class="xforms-group xforms-disabled">
                     <xhtml:span id="input2b" class="xforms-control xforms-input xforms-disabled">
-                        <xhtml:input id="input2b$xforms-input-1" type="text" name="input2b$xforms-input-1" value="" class="xforms-input-input"/>
+                        <xhtml:input id="input2b$xforms-input-1" type="text" name="input2b$xforms-input-1" value="" class="xforms-input-input" disabled="disabled"/>
                     </xhtml:span>
                 </xhtml:span>
             </controls>
@@ -1757,24 +1757,24 @@
             </instances>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <image>    </image>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
-                </xxf:dynamic-state>
-                <xxf:action>
-                    <xxf:control-values>
-                        <xxf:attribute id="my-src-avt" for="my-image" name="src">/orbeon/ops/images/xforms/spacer.gif</xxf:attribute>
-                    </xxf:control-values>
-                </xxf:action>
-            </xxf:event-response>
+<xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+    <xxf:dynamic-state>
+        <dynamic-state>
+            <instances>
+                <instance id="instance" model-id="model">
+                    <instance>
+                        <image>    </image>
+                    </instance>
+                </instance>
+            </instances>
+        </dynamic-state>
+    </xxf:dynamic-state>
+    <xxf:action>
+        <xxf:control-values>
+            <xxf:attribute id="my-src-avt" for="my-image" name="src">/orbeon/ops/images/xforms/spacer.gif</xxf:attribute>
+        </xxf:control-values>
+    </xxf:action>
+</xxf:event-response>
         </output>
     </test>
 

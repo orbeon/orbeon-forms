@@ -60,7 +60,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                     textareaControl.addExtensionAttributes(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
                 }
 
-                handleReadOnlyAttribute(reusableAttributes, containingDocument, textareaControl);
+                handleDisabledAttribute(reusableAttributes, containingDocument, textareaControl);
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, containerAttributes);
                 if (isConcreteControl) {

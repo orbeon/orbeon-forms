@@ -192,7 +192,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, inputClasses.toString());
 
-                            handleReadOnlyAttribute(reusableAttributes, containingDocument, inputControl);
+                            handleDisabledAttribute(reusableAttributes, containingDocument, inputControl);
 
                             // Handle accessibility attributes
                             handleAccessibilityAttributes(attributes, reusableAttributes);
@@ -240,7 +240,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, inputClasses.toString());
 
-                            handleReadOnlyAttribute(reusableAttributes, containingDocument, inputControl);
+                            handleDisabledAttribute(reusableAttributes, containingDocument, inputControl);
 
                             // TODO: set @size and @maxlength
 

@@ -172,7 +172,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                 final String value = (xformsSelect1Control == null) ? null : xformsSelect1Control.getValue(pipelineContext);
                                 // NOTE: With open selection, we send all values to the client but not encrypt them because the client matches on values
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
-                                handleReadOnlyAttribute(reusableAttributes, containingDocument, xformsSelect1Control);
+                                handleDisabledAttribute(reusableAttributes, containingDocument, xformsSelect1Control);
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
 
                                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
@@ -219,7 +219,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     // Create xhtml:div with tree info
                     final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
 
-                    handleReadOnlyAttribute(containerAttributes, containingDocument, xformsSelect1Control);
+                    handleDisabledAttribute(containerAttributes, containingDocument, xformsSelect1Control);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, containerAttributes);
                     if (itemset != null) { // can be null if the control is non-relevant
                         outputJSONTreeInfo(xformsSelect1Control, itemset, isMultiple, contentHandler);
@@ -235,7 +235,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     final String liQName = XMLUtils.buildQName(xhtmlPrefix, "li");
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
 
-                    handleReadOnlyAttribute(containerAttributes, containingDocument, xformsSelect1Control);
+                    handleDisabledAttribute(containerAttributes, containingDocument, xformsSelect1Control);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, containerAttributes);
                     if (itemset != null) { // can be null if the control is non-relevant
                         // Create xhtml:div with initial menu entries
@@ -332,7 +332,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     // Handle accessibility attributes
                     handleAccessibilityAttributes(attributes, containerAttributes);
 
-                    handleReadOnlyAttribute(containerAttributes, containingDocument, xformsSelect1Control);
+                    handleDisabledAttribute(containerAttributes, containingDocument, xformsSelect1Control);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, containerAttributes);
                     {
                         final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
@@ -546,7 +546,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     }
                 }
 
-                handleReadOnlyAttribute(reusableAttributes, containingDocument, xformsControl);
+                handleDisabledAttribute(reusableAttributes, containingDocument, xformsControl);
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
             }

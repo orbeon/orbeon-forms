@@ -99,8 +99,10 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return control != null && !control.isRelevant() || control == null && !handlerContext.isTemplate();
     }
 
-    public static void  handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsContainingDocument containingDocument, XFormsSingleNodeControl xformsControl) {
-        if (xformsControl != null && xformsControl.isReadonly() && !XFormsProperties.isStaticReadonlyAppearance(containingDocument)) {
+    public static void handleDisabledAttribute(AttributesImpl newAttributes, XFormsContainingDocument containingDocument, XFormsSingleNodeControl xformsControl) {
+        if ((xformsControl != null && xformsControl.isReadonly() && !XFormsProperties.isStaticReadonlyAppearance(containingDocument))
+                || (xformsControl == null || !xformsControl.isRelevant())) {
+
             // @disabled="disabled"
 
             // HTML 4: @disabled supported on: input, button, select, optgroup, option, and textarea. 

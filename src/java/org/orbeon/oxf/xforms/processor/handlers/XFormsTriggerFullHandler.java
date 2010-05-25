@@ -121,7 +121,7 @@ public class XFormsTriggerFullHandler extends XFormsTriggerHandler {
 
         // xhtml:button or xhtml:input
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
-        handleReadOnlyAttribute(containerAttributes, containingDocument, triggerControl);
+        handleDisabledAttribute(containerAttributes, containingDocument, triggerControl);
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, spanQName, containerAttributes);
         {
             if ("button".equals(elementName)) {

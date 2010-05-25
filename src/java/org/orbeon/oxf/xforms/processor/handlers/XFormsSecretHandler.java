@@ -62,7 +62,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
                     secretControl.addExtensionAttributes(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
                 }
 
-                handleReadOnlyAttribute(reusableAttributes, containingDocument, secretControl);
+                handleDisabledAttribute(reusableAttributes, containingDocument, secretControl);
 
                 // Output element
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, containerAttributes);

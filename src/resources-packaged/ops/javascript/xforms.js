@@ -1163,16 +1163,27 @@ ORBEON.util.Utils = {
         }
     },
 
-    addSuffixToIds: function(element, idSuffix, repeatDepth) {
+    addSuffixToIdsAndRemoveDisabled: function(element, idSuffix, repeatDepth) {
+
+        // Remove disabled, as form fields have a 'disabled' attribute so tabbing skips over form elements in the repeat template
+        element.removeAttribute("disabled");
+
+        // Compute new id
         var idSuffixWithDepth = idSuffix;
         for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
             idSuffixWithDepth += XFORMS_SEPARATOR_2 + "1";
+
+        // Update id attribute
         if (element.id) {
             element.id = ORBEON.util.Utils.appendRepeatSuffix(element.id, idSuffixWithDepth);
             ORBEON.xforms.Globals.idToElement[element.id] = element;
         }
+
+        // Update for attribute
         if (element.htmlFor)
             element.htmlFor = ORBEON.util.Utils.appendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
+
+        // Update name attribute
         if (element.name) {
             var newName = ORBEON.util.Utils.appendRepeatSuffix(element.name, idSuffixWithDepth);
             if (element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio"
@@ -1195,12 +1206,13 @@ ORBEON.util.Utils = {
                 element.name = newName;
             }
         }
-        // Remove references to LHHA as they might have changed
+
+        // Recurse through children
         for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
             var childNode = element.childNodes[childIndex];
             if (childNode.nodeType == ELEMENT_TYPE) {
                 if (childNode.id && childNode.id.indexOf("repeat-end-") == 0) repeatDepth--;
-                ORBEON.util.Utils.addSuffixToIds(childNode, idSuffix, repeatDepth);
+                ORBEON.util.Utils.addSuffixToIdsAndRemoveDisabled(childNode, idSuffix, repeatDepth);
                 if (childNode.id && childNode.id.indexOf("repeat-begin-") == 0) repeatDepth++;
             }
         }
@@ -2206,6 +2218,14 @@ ORBEON.xforms.Controls = {
         }
     },
 
+    setDisabledOnFormElement: function(element, disabled) {
+        if (disabled) {
+            element.setAttribute("disabled", "disabled");
+        } else {
+            element.removeAttribute("disabled");
+        }
+    },
+
     setRelevant: function(control, isRelevant) {
 
         // Case of group delimiters
@@ -2285,6 +2305,8 @@ ORBEON.xforms.Controls = {
             // Also show hint if message is not empty
             if (!isRelevant || (isRelevant && ORBEON.xforms.Controls.getHintMessage(control) != ""))
                 elementsToUpdate.push(ORBEON.xforms.Controls._getControlLHHA(control, "hint"));
+
+            // Go through elements to update, and update classes
             for (var elementIndex = 0; elementIndex < elementsToUpdate.length; elementIndex++) {
                 var element = elementsToUpdate[elementIndex];
                 if (element != null) {
@@ -2297,6 +2319,16 @@ ORBEON.xforms.Controls = {
                     }
                 }
             }
+
+            // Add/remove the disabled attribute on form controls
+            function handleFormElement(element) {
+                var tagName = element.tagName.toLowerCase();
+                if (tagName == "input" || tagName == "textarea" || tagName == "select" || tagName == "button")
+                    ORBEON.xforms.Controls.setDisabledOnFormElement(element, ! isRelevant);
+                return false;
+            }
+            handleFormElement(control);
+            YAHOO.util.Dom.getElementsBy(handleFormElement, null, control);
         }
     },
 
@@ -2318,13 +2350,6 @@ ORBEON.xforms.Controls = {
     },
 
     setReadonly: function(control, isReadonly) {
-        function setReadonlyOnFormElement(element, isReadonly) {
-            if (isReadonly) {
-                element.setAttribute("disabled", "disabled");
-            } else {
-                element.removeAttribute("disabled");
-            }
-        }
 
         // Update class
         if (isReadonly) {
@@ -2356,10 +2381,10 @@ ORBEON.xforms.Controls = {
             var inputs = control.getElementsByTagName("input");
             for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
                 var input = inputs[inputIndex];
-                setReadonlyOnFormElement(input, isReadonly);
+                ORBEON.xforms.Controls.setDisabledOnFormElement(input, isReadonly);
             }
             if (control.tagName.toLowerCase() == "input")
-                setReadonlyOnFormElement(control, isReadonly);
+                ORBEON.xforms.Controls.setDisabledOnFormElement(control, isReadonly);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-minimal")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-compact")
@@ -2368,7 +2393,7 @@ ORBEON.xforms.Controls = {
             // Lists
             var select = ORBEON.util.Utils.isNewXHTMLLayout()
                 ? control.getElementsByTagName("select")[0] : control;
-            setReadonlyOnFormElement(select, isReadonly);
+            ORBEON.xforms.Controls.setDisabledOnFormElement(select, isReadonly);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-output")
                 || ORBEON.util.Dom.hasClass(control, "xforms-group")) {
             // XForms output and group
@@ -2377,7 +2402,7 @@ ORBEON.xforms.Controls = {
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-autocomplete")) {
             // Auto-complete field
             var input = ORBEON.util.Dom.getChildElementByIndex(control, 0);
-            setReadonlyOnFormElement(input, isReadonly);
+            ORBEON.xforms.Controls.setDisabledOnFormElement(input, isReadonly);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea") && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
             // XForms HTML area
             var htmlEditor = FCKeditorAPI.GetInstance(control.name);
@@ -2390,19 +2415,19 @@ ORBEON.xforms.Controls = {
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-upload")) {
             // Upload control
-            setReadonlyOnFormElement(
+            ORBEON.xforms.Controls.setDisabledOnFormElement(
                     ORBEON.util.Dom.getChildElementByClass(control, "xforms-upload-select"), isReadonly);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")) {
             // Textarea
             var textarea = ORBEON.util.Utils.isNewXHTMLLayout()
                 ? control.getElementsByTagName("textarea")[0] : control;
-            setReadonlyOnFormElement(textarea, isReadonly);
+            ORBEON.xforms.Controls.setDisabledOnFormElement(textarea, isReadonly);
         } else if ((ORBEON.util.Dom.hasClass(control, "xforms-trigger")
                 && ! ORBEON.util.Dom.hasClass(control, "xforms-trigger-appearance-minimal"))
                 || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
             // Button
             var button = ORBEON.util.Dom.getElementByTagName(control, "button");;
-            setReadonlyOnFormElement(button, isReadonly);
+            ORBEON.xforms.Controls.setDisabledOnFormElement(button, isReadonly);
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-trigger-appearance-minimal")) {
             // Also update class xforms-trigger-readonly to style the a inside the span (in span layout, for IE6)
             if (isReadonly) ORBEON.util.Dom.addClass(control, "xforms-trigger-readonly");
@@ -6177,8 +6202,8 @@ ORBEON.xforms.Server = {
                                                     cursor = cursor.previousSibling;
                                                 }
                                                 afterInsertionPoint = cursor;
-                                                    // Nested repeat: does not contain a template
                                             } else {
+                                                // Nested repeat: does not contain a template
                                                 var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + ORBEON.util.Utils.appendRepeatSuffix(repeatId, parentIndexes));
                                                 afterInsertionPoint = repeatEnd;
                                             }
@@ -6202,7 +6227,7 @@ ORBEON.xforms.Server = {
                                                     // Decrement nestedRepeatLevel when we we exit a nested repeat
                                                     if (ORBEON.util.Dom.hasClass(newTemplateNode, "xforms-repeat-begin-end") && templateNode.id.indexOf("repeat-end-") == 0)
                                                         nestedRepeatLevel--;
-                                                    ORBEON.util.Utils.addSuffixToIds(newTemplateNode, parentIndexes == "" ? String(suffix) : parentIndexes + XFORMS_SEPARATOR_2 + suffix, nestedRepeatLevel);
+                                                    ORBEON.util.Utils.addSuffixToIdsAndRemoveDisabled(newTemplateNode, parentIndexes == "" ? String(suffix) : parentIndexes + XFORMS_SEPARATOR_2 + suffix, nestedRepeatLevel);
                                                     // Increment nestedRepeatLevel when we enter a nested repeat
                                                     if (ORBEON.util.Dom.hasClass(newTemplateNode, "xforms-repeat-begin-end") && templateNode.id.indexOf("repeat-begin-") == 0)
                                                         nestedRepeatLevel++;
@@ -6471,10 +6496,14 @@ ORBEON.xforms.Server = {
                                                 }
 
                                                 // Restore checked state after copy
+                                                var inputCheckboxOrRadio = templateClone.getElementsByTagName("input")[0];
                                                 if (valueToChecked[itemElement[1]] == true) {
-                                                    var inputToCheck = templateClone.getElementsByTagName("input")[0];
-                                                    inputToCheck.checked = true;
+                                                    inputCheckboxOrRadio.checked = true;
                                                 }
+
+                                                // Remove the disabled attribute from the template, which is there so tab would skip over form elements in template
+                                                inputCheckboxOrRadio.removeAttribute("disabled");
+
                                                 itemIndex++;
                                             }
                                         }

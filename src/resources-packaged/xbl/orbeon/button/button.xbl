@@ -49,7 +49,10 @@
             <xforms:group class="yui-button yui-push-button" xbl:attr="model context ref bind" xxbl:scope="outer" xsl:version="2.0">
                 <xhtml:span class="first-child">
                     <!-- Bind trigger so it can handle read-only -->
-                    <xforms:trigger ref="." xbl:attr="xxforms:modal">
+                    <xforms:trigger xbl:attr="xxforms:modal">
+                        <xsl:if test="exists(/fr:button/(@ref, @bind))">
+                            <xsl:attribute name="ref">.</xsl:attribute>
+                        </xsl:if>
                         <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
 
                         <xxforms:script ev:event="xforms-enabled">

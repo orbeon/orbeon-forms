@@ -26,6 +26,7 @@
                     <xs:any namespace="##other" processContents="lax"/>
                 </xs:choice>
             </xs:sequence>
+            <xs:attribute name="script-type" type="xs:string"/>
         </xs:complexType>
     </xs:element>
 
@@ -34,6 +35,7 @@
             <xs:simpleContent>
                 <xs:extension base="xs:string">
                     <xs:attribute name="src" type="xs:string"/>
+                    <xs:attribute name="type" type="xs:string"/>
                 </xs:extension>
             </xs:simpleContent>
         </xs:complexType>

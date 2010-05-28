@@ -450,7 +450,7 @@
     <xsd:element name="input">
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:element ref="xforms:label"/>
+                <xsd:element ref="xforms:label" minOccurs="0"/>
                 <xsd:group ref="xforms:UI.Common" minOccurs="0" maxOccurs="unbounded"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>

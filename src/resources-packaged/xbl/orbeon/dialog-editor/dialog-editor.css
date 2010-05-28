@@ -1,0 +1,38 @@
+/* Styling for the part of the control visible to users in the form */
+@media all {
+
+    /* Align label and button to the top of the area showing the text */
+    .xbl-fr-dialog-editor .xforms-label { vertical-align: top }
+    .xbl-fr-dialog-editor .xbl-fr-button { vertical-align: top }
+
+    /* Styling for the area showing the text */
+    .xbl-fr-dialog-editor .xforms-output-output {
+        border: 1px solid #999; padding: 2px; display: inline-block;
+        margin: 0 .5em 0 1em; overflow-y: scroll; width: 20em; height: 5em;
+        background-color: #eee }
+
+    /* Icons for buttons */
+    .xbl-fr-dialog-editor .xbl-fr-button .fr-dialog-editor-open-edit button {
+        background: url(../../../apps/fr/style/images/silk/pencil.png) no-repeat 5px; padding: 0 10px 0 25px;}
+    .xbl-fr-dialog-editor .xbl-fr-button .fr-dialog-editor-open-view button {
+        background: url(../../../apps/fr/style/images/silk/magnifier.png) no-repeat 5px; padding: 0 10px 0 25px;}
+}
+
+/* Styling for the dialog and its content */
+@media all {
+
+    .fr-dialog-editor-dialog { width: 400px }
+    .fr-dialog-editor-dialog textarea { width: 100%; height: 200px }
+    .fr-dialog-editor-dialog .xforms-label { display: none }
+    .fr-dialog-editor-dialog .fr-dialog-editor-buttons {
+        text-align: right; padding-right: .5em; padding-top: .5em;
+        padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
+    .fr-dialog-editor-dialog .fr-dialog-editor-buttons button img { margin-right: .5em; }
+    .fr-dialog-editor-dialog .xbl-fr-button .fr-dialog-editor-positive button {
+        background: url(../../../apps/fr/style/images/silk/tick.png) no-repeat 5px; padding: 0 10px 0 25px;}
+    .fr-dialog-editor-dialog .xbl-fr-button .fr-dialog-editor-negative button {
+        background: url(../../../apps/fr/style/images/silk/cross.png) no-repeat 5px; padding: 0 10px 0 25px;}
+    .fr-dialog-editor-dialog .xbl-fr-button .fr-dialog-editor-close button {
+        background: url(../../../apps/fr/style/images/silk/cross_bw.png) no-repeat 5px; padding: 0 10px 0 25px;}
+
+}

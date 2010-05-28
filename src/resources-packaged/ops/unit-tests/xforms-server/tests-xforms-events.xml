@@ -2242,6 +2242,68 @@
         </output>
     </test>
 
+    <test description="Destruction events upon iteration removal" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance><text/></instance>
+                        </xforms:instance>
+                        <xforms:delete ev:event="xforms-ready" nodeset="text"/>
+                    </xforms:model>
+                    <xforms:model id="events-model">
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events-instance">
+                            <events/>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+
+                    <xforms:insert ev:event="#all"
+                                   model="events-model" context="." nodeset="*"
+                                   origin="xxforms:element('event',
+                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+
+                    <xforms:repeat nodeset="text" id="my-repeat">
+                        <xforms:input ref="." id="my-input"/>
+                        <xforms:trigger id="my-trigger"/>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance/>
+                            </instance>
+                            <instance id="events-instance" model-id="events-model">
+                                <events>
+                                    <event type="xforms-enabled" target="my-repeat" indexes=""/>
+                                    <event type="xforms-enabled" target="my-input" indexes="1"/>
+                                    <event type="xforms-enabled" target="my-trigger" indexes="1"/>
+                                    <event type="xforms-disabled" target="my-input" indexes="1"/>
+                                    <event type="xforms-disabled" target="my-trigger" indexes="1"/>
+                                    <event type="xforms-disabled" target="my-repeat" indexes=""/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO:

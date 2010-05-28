@@ -217,7 +217,10 @@ public class ControlTree implements ExternalCopyable {
         }
     }
 
-    public void dispatchDestructionEvents(PropertyContext propertyContext, XFormsRepeatIterationControl removedIteration) {
+    public void dispatchDestructionEventsForRemovedIteration(PropertyContext propertyContext, XFormsRepeatIterationControl removedIteration) {
+
+        indentedLogger.startHandleOperation("controls", "dispatching destruction events");
+
         // Gather ids of controls to handle
         final List<String> controlsEffectiveIds = new ArrayList<String>();
         visitControls(removedIteration, true, new XFormsControls.XFormsControlVisitorAdapter() {
@@ -238,20 +241,16 @@ public class ControlTree implements ExternalCopyable {
         });
 
         // Dispatch events
-        dispatchDestructionEvents(propertyContext, controlIndex, controlsEffectiveIds);
-    }
-
-    private void dispatchDestructionEvents(PropertyContext propertyContext, ControlIndex index, List<String> controlsEffectiveIds) {
-        indentedLogger.startHandleOperation("controls", "dispatching destruction events");
-        // NOTE: We do not need copy the list here because it was created in dispatchDestructionEvents() above
-        for (String effectiveId: controlsEffectiveIds) {
-            final XFormsControl control = index.getControl(effectiveId);
-            dispatchRefreshEvents(propertyContext, control);
+        for (final String effectiveId: controlsEffectiveIds) {
+            final XFormsControl control = controlIndex.getControl(effectiveId);
+            // Directly call destruction events as we know the iteration is going away
+            dispatchDestructionEvents(propertyContext, control);
         }
+
         indentedLogger.endHandleOperation();
     }
 
-    public void dispatchDestructionEvents(PropertyContext propertyContext, XFormsControl control) {
+    private void dispatchDestructionEvents(PropertyContext propertyContext, XFormsControl control) {
         if (XFormsControl.supportsRefreshEvents(control)) {
             final XBLContainer container = control.getXBLContainer();
             final XFormsContainingDocument containingDocument = container.getContainingDocument();

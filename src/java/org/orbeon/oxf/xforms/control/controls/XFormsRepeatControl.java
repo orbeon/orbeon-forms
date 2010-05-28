@@ -399,7 +399,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                         }
 
                         // Dispatch destruction events
-                        currentControlTree.dispatchDestructionEvents(propertyContext, movedOrRemovedIteration);
+                        currentControlTree.dispatchDestructionEventsForRemovedIteration(propertyContext, movedOrRemovedIteration);
 
                         // Indicate to iteration that it is being removed
                         movedOrRemovedIteration.iterationRemoved(propertyContext);
@@ -587,7 +587,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                     final XFormsRepeatIterationControl removedIteration = (XFormsRepeatIterationControl) oldChildren.get(i);
 
                     // Dispatch destruction events
-                    currentControlTree.dispatchDestructionEvents(propertyContext, removedIteration);
+                    currentControlTree.dispatchDestructionEventsForRemovedIteration(propertyContext, removedIteration);
 
                     // Deindex old iteration
                     currentControlTree.deindexSubtree(removedIteration, true);

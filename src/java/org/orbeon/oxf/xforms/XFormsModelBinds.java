@@ -144,9 +144,10 @@ public class XFormsModelBinds {
     /**
      * Apply calculate binds.
      *
-     * @param propertyContext   current context
+     * @param propertyContext       current context
+     * @param applyInitialValues    whether to apply initial values (@xxforms:default="...")
      */
-    public void applyCalculateBinds(final PropertyContext propertyContext) {
+    public void applyCalculateBinds(final PropertyContext propertyContext, boolean applyInitialValues) {
 
         if (indentedLogger.isDebugEnabled())
             indentedLogger.startHandleOperation("model", "performing recalculate", "model id", model.getEffectiveId());
@@ -159,7 +160,7 @@ public class XFormsModelBinds {
             // Reset context stack just to re-evaluate the variables
             model.getContextStack().resetBindingContext(propertyContext, model);
 
-            if (isFirstCalculate) {
+            if (isFirstCalculate || applyInitialValues) {
                 // Handle default values
                 iterateBinds(propertyContext, new BindRunner() {
                     public void applyBind(PropertyContext propertyContext, Bind bind, List<Item> nodeset, int position) {

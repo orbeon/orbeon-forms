@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -25,7 +25,19 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  * Target: model / Bubbles: Yes / Cancelable: Yes / Context Info: None
  */
 public class XFormsRecalculateEvent extends XFormsEvent {
+
+    private final boolean applyInitialValues;
+
     public XFormsRecalculateEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
+        this(containingDocument, targetObject, false);
+    }
+
+    public XFormsRecalculateEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, boolean applyInitialValues) {
         super(containingDocument, XFormsEvents.XFORMS_RECALCULATE, targetObject, true, true);
+        this.applyInitialValues = applyInitialValues;
+    }
+
+    public boolean isApplyInitialValues() {
+        return applyInitialValues;
     }
 }

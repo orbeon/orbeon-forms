@@ -1368,4 +1368,60 @@
             </controls>
         </output>
     </test>
+
+    <test description="xforms:recalculate/action forcing recalculation of initial values" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <date/>
+                                <date1/>
+                                <date2/>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:bind id="date-bind" ref="date" type="xs:date" xxforms:default="xs:date('2001-01-01')"/>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <!-- Copy first initial value -->
+                            <xforms:setvalue ref="date1" value="xxforms:bind('date-bind')"/>
+                            <!-- Override initial value and copy it -->
+                            <xforms:setvalue bind="date-bind" value="xs:date('2010-05-28')"/>
+                            <xforms:setvalue ref="date2" value="xxforms:bind('date-bind')"/>
+                            <!-- Recalculate must restore initial value -->
+                            <xforms:recalculate xxforms:defaults="true"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:input bind="date-bind" id="my-input"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <date>2001-01-01</date>
+                                    <date1>2001-01-01</date1>
+                                    <date2>2010-05-28</date2>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input" type="{http://www.w3.org/2001/XMLSchema}date">2001-01-01</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 </group>

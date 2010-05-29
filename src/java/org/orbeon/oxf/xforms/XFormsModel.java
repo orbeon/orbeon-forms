@@ -503,7 +503,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         } else if (XFormsEvents.XFORMS_RECALCULATE.equals(eventName)) {
             // 4.3.6 The xforms-recalculate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
-            doRecalculate(propertyContext);
+            final XFormsRecalculateEvent recalculateEvent = (XFormsRecalculateEvent) event;
+            doRecalculate(propertyContext, recalculateEvent.isApplyInitialValues());
         } else if (XFormsEvents.XFORMS_REVALIDATE.equals(eventName)) {
             // 4.3.5 The xforms-revalidate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
@@ -607,7 +608,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         deferredActionContext.revalidate = true;
 
         doRebuild(propertyContext);
-        doRecalculate(propertyContext);
+        doRecalculate(propertyContext, false);
         doRevalidate(propertyContext);
     }
 
@@ -958,12 +959,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         deferredActionContext.rebuild = false;
     }
 
-    public void doRecalculate(PropertyContext propertyContext) {
+    public void doRecalculate(PropertyContext propertyContext, boolean applyInitialValues) {
 
         // Recalculate only if needed
         if (instances.size() > 0 && binds != null && deferredActionContext.recalculate) {
             // Apply calculate binds
-            binds.applyCalculateBinds(propertyContext);
+            binds.applyCalculateBinds(propertyContext, applyInitialValues);
         }
 
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
@@ -1128,7 +1129,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public void rebuildRecalculateIfNeeded(PropertyContext propertyContext) {
         doRebuild(propertyContext);
-        doRecalculate(propertyContext);
+        doRecalculate(propertyContext, false);
     }
 
     public XFormsEventObserver getParentEventObserver(XBLContainer container) {

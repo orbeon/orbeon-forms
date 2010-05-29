@@ -134,6 +134,7 @@
             3.8.0.beta      => beta for 3.8.0
             3.8.0.rc1       => release candidate for 3.8.0
             3.8.0           => final 3.8.0
+            3.8.0.post      => builds post 3.8.0
 
             Full release number example:
 
@@ -141,7 +142,7 @@
 
             Suffix CE or PE is separate from the version number.
          -->
-        <property name="version.number" value="3.8.0"/>
+        <property name="version.number" value="3.8.0.post"/>
         <property name="edition" value="CE"/>
         <!-- Can be overridden on command-line to provide different suffix -->
         <property name="artifact.suffix" value="-${edition}"/>

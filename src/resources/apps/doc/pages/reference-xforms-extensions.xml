@@ -112,64 +112,19 @@
         <section>
             <title>Custom Model Item Properties</title>
             <p>
-                You can place user-defined Model Item Properties (MIP) on the <code>&lt;xforms:bind></code> element. Any
-                attribute not in a standard Orbeon namespace is interpreted as a custom MIP:
-            </p>
-            <xml-source xmlns:foo="http://orbeon.org/oxf/xml/foo">
-                <xforms:bind nodeset="*" foo:bar="if (starts-with(., 'g')) then 'is-g' else 'is-not-g'"/>
-            </xml-source>
-            <p>
-                The value of the attribute must be a valid XPath expression. The expression result is converted to a
-                string to set the MIP value.
-            </p>
-            <p>
-                Custom MIPs have the side effect of placing CSS classes on controls bound to affected nodes. Class
-                names are computed as the concatenation of:  
-            </p>
-            <ul>
-                <li>MIP attribute prefix</li>
-                <li>"-"</li>
-                <li>MIP attribute local name</li>
-                <li>"-"</li>
-                <li>MIP value</li>
-            </ul>
-            <p>
-                With the example above, the following class names can be set: <code>foo-bar-is-g</code> or
-                <code>foo-bar-is-not-g</code>.
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-validation-and-mips">migrated
+                to the wiki</a>.
             </p>
         </section>
         <a name="xxforms-default-mip"/>
         <section>
             <title>Extension Model Item Property to Specify default instance values</title>
             <p>
-                In XForms, default or initial values can be set by pre-populating an instance document's elements
-                and attributes with initial data, for example:
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-validation-and-mips">migrated
+                to the wiki</a>.
             </p>
-            <xml-source>
-                <xforms:instance>
-                    <form>
-                        <username>jdoe</username>
-                        ...
-                    </form>
-                </xforms:instance>
-            </xml-source>
-            <p>
-                For dynamic values, for example coming from request parameters or session values, there is no
-                declarative notation and you must use <code>xforms-submit-done</code> or
-                <code>xforms-submit-ready</code>, which is sometimes cumbersome:
-            </p>
-            <xml-source>
-                <xforms:setvalue ev:event="xforms-model-construct-done" ref="username" value="xxforms:get-request-header('MY_USER')"/>
-            </xml-source>
-            <p>
-                For convenience, Orbeon Forms support an extension model item property:
-                <code>xxforms:default</code>. It works like the standard <code>calculate</code>, except that it is
-                evaluated only once, just before the first evaluation of the <code>calculate</code> expressions if
-                any.
-            </p>
-            <xml-source>
-                <xforms:bind nodeset="username" xxforms:default="xxforms:get-request-header('MY_USER')"/>
-            </xml-source>
         </section>
         <a name="lhha-for"/>
         <section>
@@ -208,53 +163,11 @@
         <a name="readonly-mode"/>
         <section>
             <title>Read-Only Mode</title>
-            <section>
-                <title>Making an Entire Instance Read-Only</title>
-                <p>
-                    You often want to present a form without allowing the user to enter data. An easy solution is to use
-                    the <code>readonly</code> MIP in the model. By making for example the root element of an instance
-                    read-only, all the controls bound to any node of that instance will appear read-only (because the
-                    read-only property is inherited in an instance):
-                </p>
-                <xml-source>
-                    <xforms:instance id="my-form">
-                        <form>
-                            ...
-                        </form>
-                    </xforms:instance>
-                    <xforms:bind nodeset="instance('my-form')" readonly="true()"/>
-                </xml-source>
-            </section>
-            <section>
-                <title>Static Appearance for Read-Only Mode</title>
-                <p>
-                    Sometimes, read-only controls don't appear very nicely in web browsers. For example, a combo box
-                    will appear grayed out. It maybe be hard to read, and there is not much point showing a combo box
-                    since the user can't interact with it. Furthermore, with some browsers, like IE 6 and earlier, it
-                    is not even possible to make disabled controls appear nicer with CSS. In order to make read-only
-                    versions of forms look nicer, Orbeon Forms supports a special extention attribute that allows you
-                    to produce a "static" appearance for read-only controls. You enable this on your first XForms model:
-                </p>
-                <xml-source>
-                    <xforms:model xxforms:readonly-appearance="static">
-                        ...
-                    </xforms:model>
-                </xml-source>
-                <p>
-                    The attribute takes one of two vales: <code>static</code> or <code>dynamic</code> (the default).
-                    When using the value <code>static</code>, read-only controls do not produce disabled HTML form
-                    controls. This has one major limitation: you can't switch a control back to being read-write once
-                    it is displayed as read-only.
-                </p>
-                <p>
-                    You can also set the <code>xxforms:readonly-appearance</code> attribute directly on individual
-                    XForms controls.
-                </p>
-                <p>
-                    See the <a href="/forms/">Government Forms</a> sample application's <i>View Read-Only</i> option for
-                    an example of this feature in action.
-                </p>
-            </section>
+            <p>
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-validation-and-mips">migrated
+                to the wiki</a>.
+            </p>
         </section>
         <a name="xforms-formatting"/>
         <section>
@@ -501,101 +414,11 @@
         <a name="validation-extensions"/>
         <section>
             <title>Validation Extensions</title>
-            <a name="validation-extensions-events"/>
-            <section>
-                <title>Extension Events</title>
-                <p>
-                    Orbeon Forms supports extensions events dispatched to an instance when it becomes valid or
-                    invalid: <code>xxforms-valid</code> and <code>xxforms-invalid</code>. These events are
-                    dispatched just before <code>xforms-revalidate</code> completes, to all instances of the model
-                    being revalidated. For a given instance, either <code>xxforms-valid</code> or
-                    <code>xxforms-invalid</code> is dispatched for a given revalidation.
-                </p>
-                <p>
-                    These events can be used, for example, to toggle the appearance of icons indicating that a form
-                    is valid or invalid:
-                </p>
-                <xml-source>
-                    <xforms:instance id="my-instance">
-                        ...
-                    </xforms:instance>
-                    <xforms:action ev:event="xxforms-invalid" ev:observer="my-instance">
-                        <xforms:toggle case="invalid-form-case"/>
-                    </xforms:action>
-                    <xforms:action ev:event="xxforms-valid" ev:observer="my-instance">
-                        <xforms:toggle case="valid-form-case"/>
-                    </xforms:action>
-                </xml-source>
-            </section>
-            <a name="validation-extensions-types"/>
-            <section>
-                <title>Extension Types</title>
-                <p>
-                    Orbeon Forms supports the built-in <code>xxforms:xml</code> extension type. This types checks
-                    that the value is well-formed XML:
-                </p>
-                <xml-source>
-                    <xforms:bind nodeset="my-xml" type="xxforms:xml"/>
-                </xml-source>
-                <p>
-                    Note that this checks the <b>string value</b> of the node, which means that the node must
-                    contain escaped XML.
-                </p>
-                <p>
-                    Orbeon Forms supports the built-in <code>xxforms:xpath2</code> extension type. This types
-                    checks that the value is well-formed XPath 2.0. Any variable used by the expression is assumed
-                    to be in scope:
-                </p>
-                <xml-source>
-                    <xforms:bind nodeset="my-xpath" type="xxforms:xpath2"/>
-                </xml-source>
-                <note>
-                    <p>
-                        In both these cases, Orbeon Forms checks for the <code>required</code> MIP: if it evaluates
-                        to <code>false()</code> and the value is the empty string, then the instance data node is
-                        considered valid. This is contrary to XForms 1.1 as of August 2008.
-                    </p>
-                </note>
-            </section>
-            <a name="validation-extensions-schema"/>
-            <section>
-                <title>Controlling the XML Schema Validation Mode</title>
-                <p>
-                    When an XML Schema is provided, Orbeon Forms supports controlling whether a particular instance
-                    is validated in "lax" mode, "strict" mode, or not validated at all.
-                </p>
-                <p>
-                    Orbeon Forms implements a "lax" validation mode by default, where only elements that have
-                    definitions in the imported schemas are validated. Other elements are not considered for
-                    validation. This is in line with XML Schema and XSLT 2.0 lax validation modes, and with the
-                    default validation mode as specified in XForms 1.1
-                </p>
-                <p>
-                    In addition, the author can specify the validation mode directly on each instance with the
-                    extension <code>xxforms:validation</code> attribute, which takes values <code>lax</code>
-                    (the default), <code>strict</code> (the root element has to have a definition in the schema
-                    and must be valid), or <code>skip</code> (no validation at all for that instance).
-                </p>
-                <xml-source>
-                    <xforms:model schema="my-schema.xsd">
-                        <xforms:instance id="my-form" xxforms:validation="strict">
-                            <my-form>
-                                ...
-                            </my-form>
-                        </xforms:instance>
-                        <xforms:instance id="items" xxforms:validation="skip">
-                            <items>
-                                ...
-                            </items>
-                        </xforms:instance>
-                    </xforms:model>
-                </xml-source>
-                <p>
-                    Nodes validated through a schema receive datatype annotations, which means that if an element
-                    or attribute is validated against <code>xs:date</code> in a schema, an XForms control bound to
-                    that node will display a date picker.
-                </p>
-            </section>
+            <p>
+                This section has <a
+                href="http://wiki.orbeon.com/forms/doc/developer-guide/xforms-validation-and-mips">migrated
+                to the wiki</a>.
+            </p>
         </section>
         <a name="xforms-javascript"/>
         <section>

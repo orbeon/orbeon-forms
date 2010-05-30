@@ -657,6 +657,13 @@
 	    <delete dir="${test.exist-db.dir}"/>
     	<mkdir dir="${test.exist-db.dir}"/>
 
+        <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
+            <classpath>
+                <pathelement location="${lib.dir}/junit-4.8.2.jar"/>
+                <pathelement location="${lib.dir}/ant-junit-1.7.1.jar"/>
+            </classpath>
+        </taskdef>
+
         <junit fork="true" haltonerror="yes" haltonfailure="yes">
             <!-- Enable assertions -->
             <jvmarg value="-ea"/>

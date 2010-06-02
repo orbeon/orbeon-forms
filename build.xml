@@ -379,8 +379,7 @@
                 <exclude name="ops/fckeditor/editor/_source/**"/>
                 <exclude name="ops/fckeditor/_testcases"/>
                 <exclude name="ops/fckeditor/_testcases/**"/>
-                <exclude name="config/theme"/>
-                <exclude name="config/theme/**"/>
+                <include name="config/theme/**/*.*"/>
             </fileset>
             <zipfileset dir="${build.temp.dir}/theme" prefix="config/theme">
                 <include name="*.css"/>

@@ -26,6 +26,7 @@
     <property name="war.inf" value="${war.dir}/WEB-INF"/>
     <property name="war.classes" value="${war.inf}/classes"/>
     <property name="war.lib" value="${war.inf}/lib"/>
+    <property name="deploy.dir" value="${build.dir}/deploy"/>
 
     <property name="src.dir" location="src"/>
 
@@ -242,22 +243,6 @@
             <exclude name="org/orbeon/oxf/common/Version.java"/>
             <exclude name="org/orbeon/oxf/xforms/analysis/PathMapUIDependencies.java"/>
         </javac>
-    </target>
-
-    <!-- Compile with hotswap -->
-    <target name="hotswap" depends="init">
-        <!-- Usage: get the hotswap task (http://code.google.com/p/hotswap/).
-             On Mac OS X add the jar file in /usr/share/ant/lib -->
-        <taskdef name="hotswap" classname="dak.ant.taskdefs.Hotswap"/>
-        <tstamp>
-            <format property="class.tstamp" pattern="MM/dd/yyyy kk:mm:ss" />
-        </tstamp>
-        <antcall target="classes"/>
-        <hotswap verbose="true" port="61155">
-            <fileset dir="${build.classes.dir}" includes="**/*.class">
-                <date datetime="${class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
-            </fileset>
-        </hotswap>
     </target>
 
     <!-- Compile test source -->
@@ -719,49 +704,6 @@
         </junit>
     </target>
 
-    <target name="teamcity-release" depends="clean, orbeon-dist, test-classes, debug-enabled, debug-disabled, test">
-
-        <property name="deployDir" value="${build.dir}/deploy"/>
-        <mkdir dir="${deployDir}"/>
-        <copy todir="${deployDir}">
-            <fileset dir="${build.distrib.dir}">
-                <include name="*"/>
-            </fileset>
-        </copy>
-
-        <!--<copy file='${deployDir}/buildLogs/ops-${version}-build.log' tofile='${deployDir}/${release.number}/build.log'/>-->
-
-        <property name="artifact.name" value="${project.name}${artifact.suffix}"/>
-        <echo message="Using artifact name: ${artifact.name}"/>
-
-        <!-- Move to generic file name so that rsync overwrites -->
-        <move file="${deployDir}/${project.name}-${release.number}-${edition}.zip" tofile="${deployDir}/${artifact.name}.zip"/>
-        <move file="${deployDir}/${project.name}.war" tofile="${deployDir}/${artifact.name}.war"/>
-        <move file="${deployDir}/${project.name}-src.zip" tofile="${deployDir}/${artifact.name}-src.zip"/>
-
-        <!-- Create md5 for all files -->
-        <checksum algorithm="MD5">
-            <fileset dir="${deployDir}">
-                <include name="*.*"/>
-            </fileset>
-        </checksum>
-
-        <!-- Post the unstable build -->
-        <exec executable="rsync" failonerror="true" dir="${deployDir}">
-            <arg value="-vv"/>
-            <arg value="--stats"/>
-            <arg value="-z"/>
-            <arg value="-c"/>
-            <arg value="--rsh=/usr/bin/ssh"/>
-            <arg value="--bwlimit=50"/>
-            <arg value="${artifact.name}.war"/>
-            <arg value="${artifact.name}.zip"/>
-            <arg value="${artifact.name}-src.zip"/>
-            <arg value="orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops"/>
-        </exec>
-
-    </target>
-
     <!--<target name="test-checksum" depends="init">-->
         <!--<checksum>-->
             <!--<fileset dir="${build.dir}/lib">-->
@@ -801,24 +743,9 @@
                 <include name="*.css"/>
             </fileset>
         </copy>
-        <!--<copy todir="${build.doc.dir}" file="doc/OPS Tutorial.pdf"/>-->
-        <!--<copy todir="${build.doc.dir}" file="doc/OPS User Guide.pdf"/>-->
     </target>
 
-    <target name="orbeon-pdf-doc" depends="jars">
-        <mkdir dir="${build.doc.dir}/reference"/>
-        <java classname="org.orbeon.oxf.main.OPS" fork="false" failonerror="true">
-            <classpath>
-                <path refid="class.path"/>
-                <pathelement location="${resources-private.jar.file}"/>
-            </classpath>
-            <arg value="-r"/>
-            <arg value="${resources.dir}"/>
-            <arg value="oxf:/apps/doc/generate-single-static-html.xpl"/>
-        </java>
-    </target>
-
-    <target name="orbeon-dist-war" depends="init">
+    <target name="orbeon-dist-war" depends="jars">
         <mkdir dir="${build.distrib.dir}"/>
 
         <antcall target="war"/>
@@ -908,5 +835,51 @@
     </target>
 
     <target name="orbeon-dist" depends="orbeon-dist-packages"/>
+
+    <target name="teamcity-release" depends="clean, orbeon-dist, test">
+
+        <mkdir dir="${deploy.dir}"/>
+        <copy todir="${deploy.dir}">
+            <fileset dir="${build.distrib.dir}">
+                <include name="*"/>
+            </fileset>
+        </copy>
+
+        <!--<copy file='${deploy.dir}/buildLogs/ops-${version}-build.log' tofile='${deploy.dir}/${release.number}/build.log'/>-->
+
+        <property name="artifact.name" value="${project.name}${artifact.suffix}"/>
+        <echo message="Using artifact name: ${artifact.name}"/>
+
+        <!-- Move to generic file name so that rsync overwrites -->
+        <move file="${deploy.dir}/${project.name}-${release.number}-${edition}.zip" tofile="${deploy.dir}/${artifact.name}.zip"/>
+        <move file="${deploy.dir}/${project.name}.war" tofile="${deploy.dir}/${artifact.name}.war"/>
+        <move file="${deploy.dir}/${project.name}-src.zip" tofile="${deploy.dir}/${artifact.name}-src.zip"/>
+
+        <!-- Create md5 for all files -->
+        <checksum algorithm="MD5">
+            <fileset dir="${deploy.dir}">
+                <include name="*.*"/>
+            </fileset>
+        </checksum>
+
+    </target>
+
+    <target name="rsync" depends="teamcity-release">
+
+        <!-- Post the unstable build -->
+        <exec executable="rsync" failonerror="true" dir="${deploy.dir}">
+            <arg value="-vv"/>
+            <arg value="--stats"/>
+            <arg value="-z"/>
+            <arg value="-c"/>
+            <arg value="--rsh=/usr/bin/ssh"/>
+            <arg value="--bwlimit=50"/>
+            <arg value="${artifact.name}.war"/>
+            <arg value="${artifact.name}.zip"/>
+            <!--<arg value="${artifact.name}-src.zip"/>-->
+            <arg value="orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops"/>
+        </exec>
+
+    </target>
 
 </project>

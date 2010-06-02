@@ -135,7 +135,8 @@
             3.8.0.beta      => beta for 3.8.0
             3.8.0.rc1       => release candidate for 3.8.0
             3.8.0           => final 3.8.0
-            3.8.0.post      => builds post 3.8.0
+            3.8.0.post      => post 3.8.0
+            3.8.0.stable    => stable branch post 3.8.0
 
             Full release number example:
 

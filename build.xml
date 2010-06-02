@@ -332,8 +332,10 @@
                 <include name="xbl/**/*.xsl"/>
                 <include name="xbl/**/*.xml"/>
                 <include name="ops/**"/>
+                <exclude name="ops/unit-tests"/>
                 <exclude name="ops/unit-tests/**"/>
-                <exclude name="ops/css-templates/**/*.*"/>
+                <exclude name="ops/css-templates"/>
+                <exclude name="ops/css-templates/**"/>
                 <exclude name="ops/**/*.css"/>
                 <exclude name="ops/**/*.js"/>
                 <exclude name="ops/**/*.gif"/>
@@ -342,8 +344,11 @@
                 <exclude name="ops/**/*.jpg"/>
                 <exclude name="ops/**/*.html"/>
                 <exclude name="ops/**/*.htc"/>
+                <exclude name="ops/fckeditor/_samples"/>
                 <exclude name="ops/fckeditor/_samples/**"/>
+                <exclude name="ops/fckeditor/editor/_source"/>
                 <exclude name="ops/fckeditor/editor/_source/**"/>
+                <exclude name="ops/fckeditor/_testcases"/>
                 <exclude name="ops/fckeditor/_testcases/**"/>
                 <exclude name="ops/fckeditor/**/*.cfm"/>
                 <exclude name="ops/fckeditor/**/*.cfc"/>
@@ -357,6 +362,7 @@
                 <exclude name="ops/fckeditor/**/*.lasso"/>
                 <include name="oxf/**"/>
                 <include name="config/**"/>
+                <exclude name="config/theme"/>
                 <exclude name="config/theme/**"/>
                 <!-- We keep these in orbeon.jar -->
                 <exclude name="config/*-processors.xml"/>
@@ -382,10 +388,14 @@
                 <include name="ops/**/*.jpg"/>
                 <include name="ops/**/*.html"/>
                 <include name="ops/**/*.htc"/>
+                <exclude name="ops/fckeditor/_samples"/>
                 <exclude name="ops/fckeditor/_samples/**"/>
+                <exclude name="ops/fckeditor/editor/_source"/>
                 <exclude name="ops/fckeditor/editor/_source/**"/>
+                <exclude name="ops/fckeditor/_testcases"/>
                 <exclude name="ops/fckeditor/_testcases/**"/>
-                <include name="config/theme/**/*.*"/>
+                <exclude name="config/theme"/>
+                <exclude name="config/theme/**"/>
             </fileset>
             <zipfileset dir="${build.temp.dir}/theme" prefix="config/theme">
                 <include name="*.css"/>
@@ -480,12 +490,14 @@
         <mkdir dir="${build.distrib.dir}"/>
         <zip zipfile="${build.distrib.dir}/${project.name}-src.zip">
             <zipfileset dir="${build.root}">
+                <exclude name="**/.git"/>
+                <exclude name="**/.git/**"/>
+                <exclude name="build"/>
                 <exclude name="build/**"/>
-                <exclude name="src/examples/**"/>
-                <exclude name="tools/*.zip"/>
-                <exclude name="tools/*.sh"/>
-                <exclude name="tools/dom4j-1_4/**"/>
-                <exclude name="tools/commons-httpclient-3.2/**"/>
+                <exclude name="tools"/>
+                <exclude name="tools/**"/>
+                <exclude name="src/scala/"/>
+                <exclude name="src/scala/**"/>
             </zipfileset>
         </zip>
     </target>
@@ -817,6 +829,7 @@
         <zip zipfile="${build.distrib.dir}/${project.name}.war">
             <zipfileset dir="${war.dir}">
                 <!-- This is already added to orbeon-resources-public.jar -->
+                <exclude name="WEB-INF/resources/ops"/>
                 <exclude name="WEB-INF/resources/ops/**"/>
                 <!-- These shouldn't be there, but just in case filter them out -->
                 <exclude name="WEB-INF/exist-data/*.dbx"/>
@@ -828,8 +841,10 @@
                 <exclude name="apps/doc/**/*.cdr"/>
                 <exclude name="apps/doc/**/*.cpl"/>
                 <!-- Form Runner is packaged as a JAR -->
+                <exclude name="apps/fr"/>
                 <exclude name="apps/fr/**"/>
                 <!-- Form Builder is packaged as a JAR -->
+                <exclude name="forms/orbeon/builder"/>
                 <exclude name="forms/orbeon/builder/**"/>
             </zipfileset>
         </zip>

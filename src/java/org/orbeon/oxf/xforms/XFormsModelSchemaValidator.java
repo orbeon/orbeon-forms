@@ -101,13 +101,12 @@ public class XFormsModelSchemaValidator {
 
         // Check for inline schemas
         // "3.3.1 The model Element [...] xs:schema elements located inside the current model need not be listed."
-        for (Object o: modelElement.elements(XMLConstants.XML_SCHEMA_QNAME)) {
-            final Element currentSchemaElement = (Element) o;
+        for (final Element schemaElement: Dom4jUtils.elements( modelElement, XMLConstants.XML_SCHEMA_QNAME)) {
 
             if (schemaElements == null)
                 schemaElements = new ArrayList<Element>();
 
-            schemaElements.add(currentSchemaElement);
+            schemaElements.add(schemaElement);
         }
     }
 

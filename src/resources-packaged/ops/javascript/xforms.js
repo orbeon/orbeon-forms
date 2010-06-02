@@ -5947,7 +5947,6 @@ ORBEON.xforms.Server = {
 
         if (ORBEON.xforms.Globals.requestRetries > 0) {
             // If the request fails, we try again
-            ORBEON.xforms.Globals.requestRetries--;
             ORBEON.xforms.Server.asyncRequest();
         } else {
             // We have tried this 3 times, give up.

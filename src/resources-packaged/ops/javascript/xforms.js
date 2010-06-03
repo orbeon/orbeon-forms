@@ -6733,20 +6733,24 @@ ORBEON.xforms.Server = {
                                         } else if (isBooleanType) {
 
                                             // Make copy of the template
-                                            var template = ORBEON.util.Dom.getElementById("xforms-select-full-template");
-                                            template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
-                                            var templateClone = template.cloneNode(true);
+                                            var booleanTemplate = ORBEON.util.Dom.getElementById("xforms-select-full-template");
+                                            booleanTemplate = ORBEON.util.Dom.getChildElementByIndex(booleanTemplate, 0);
+                                            var booleanTemplateClone = booleanTemplate.cloneNode(true);
 
                                             // Remove the label we have in the template for each individual checkbox/radio button
-                                            var templateLabelElement = templateClone.getElementsByTagName("label")[0];
+                                            var templateLabelElement = booleanTemplateClone.getElementsByTagName("label")[0];
                                             templateLabelElement.parentNode.removeChild(templateLabelElement);
 
+                                            // Remove the disabled attribute from the template, which is there so tab would skip over form elements in template
+                                            var booleanInput = ORBEON.util.Dom.getElementByTagName(booleanTemplateClone, "input");
+                                            booleanInput.removeAttribute("disabled");
+
                                             // Replace placeholders
-                                            insertIntoDocument([templateClone]);
-                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", "true");
-                                            var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e0");
-                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-effective-id$", itemEffectiveId);
-                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
+                                            insertIntoDocument([booleanTemplateClone]);
+                                            ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-template-value$", "true");
+                                            var booleanEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e0");
+                                            ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-item-effective-id$", booleanEffectiveId);
+                                            ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-effective-id$", controlId);
 
                                             // Update classes
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");

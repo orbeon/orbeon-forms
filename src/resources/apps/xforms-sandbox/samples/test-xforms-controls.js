@@ -24,6 +24,9 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 ORBEON.xforms.Document.setValue("repeat-shown", "true");
             }, function() {
+                var control = YAHOO.util.Dom.get(fullId);
+                var formElement = ORBEON.util.Dom.getElementByTagName(control, ["input", "textarea"]);
+                YAHOO.util.Assert.isFalse(formElement.disabled, "form element must not be disabled after recreation");
                 YAHOO.util.Assert.areEqual("true", ORBEON.xforms.Document.getValue(fullId));
                 YAHOO.util.Assert.areEqual("Label", ORBEON.xforms.Controls.getLabelMessage(YAHOO.util.Dom.get(fullId)));
             });

@@ -239,7 +239,7 @@
 
                 <!-- Create elements holding structured search data -->
                 <xforms:action xxforms:iterate="$summary-elements">
-                    <xxforms:variable name="control" select="."/>
+                    <xxforms:variable name="control" select="." as="element()"/>
 
                     <!-- Insert empty template -->
                     <xforms:insert context="instance('fr-search-instance')" nodeset="query" origin="instance('fr-search-template')"/>
@@ -251,13 +251,30 @@
                     <!-- Add whether we must show the search field -->
                     <xforms:setvalue ref="$query/@search-field" value="tokenize($control/@class, '\s+') = ('fr-search')"/>
 
+                    <!-- All the control's "ancestor" @ref, @context or @bind -->
+                    <xxforms:variable name="all-ancestors" select="$control/ancestor-or-self::*/(@ref | @context | @bind)" as="attribute()*"/>
+                    <!-- First control @bind ancestor and its own ancestors with @ref, @context or @bind  -->
+                    <xxforms:variable name="bind-ancestors" select="reverse($all-ancestors)[name() = 'bind'][1]/ancestor-or-self::*/(@ref | @context | @bind)" as="attribute()*"/>
+
+                    <!-- All control's ancestors based on a path (@ref or @context) up to the first @bind if any -->
+                    <xxforms:variable name="path-ancestors" select="reverse($all-ancestors except $bind-ancestors)" as="attribute()*"/>
+                    <!-- First ancestor @bind if any -->
+                    <xxforms:variable name="bind-ancestor" select="reverse($bind-ancestors)[1]" as="attribute()?"/>
 
                     <!-- Add meta-information to template -->
-                    <xforms:action if="$control/@bind">
-                        <xxforms:variable name="bind" select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
+                    <!-- First, try paths -->
+                    <xforms:action if="exists($path-ancestors)">
+                        <xforms:setvalue ref="$query/@name" value="$path-ancestors[1]"/>
+                        <xforms:setvalue ref="$query/@path" value="string-join($path-ancestors, '/')"/>
+                    </xforms:action>
+                    <!-- Then, try binds -->
+                    <xforms:action if="exists($bind-ancestor)">
+                        <xxforms:variable name="bind" select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = $bind-ancestor]"/>
 
-                        <xforms:setvalue ref="$query/@name" value="substring-before($bind/@id, '-bind')"/>
-                        <xforms:setvalue ref="$query/@path" value="string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')"/>
+                        <!-- Set control name if not already done with @ref -->
+                        <xforms:setvalue if="empty($path-ancestors)" ref="$query/@name" value="substring-before($bind-ancestor, '-bind')"/>
+                        <!-- Prepend path from binds -->
+                        <xforms:setvalue ref="$query/@path" value="string-join((($bind/ancestor-or-self::xforms:bind/(@nodeset | @ref))[position() gt 1], if (normalize-space()) then . else ()), '/')"/>
 
                         <!--<xforms:message level="xxforms:log-info">XXX Bind: <xforms:output value="saxon:serialize($bind, 'xml')"/></xforms:message>-->
                         <!--<xforms:message level="xxforms:log-info">XXX Path: <xforms:output value="$query/@path"/></xforms:message>-->
@@ -271,10 +288,6 @@
                         <xforms:delete nodeset="$query/xforms:bind"/>
 
                         <xforms:setvalue ref="$query/@type" value="if ($bind/@type) then $bind/@type else 'xs:string'"/>
-                    </xforms:action>
-                    <xforms:action if="$control/@ref">
-                        <xforms:setvalue ref="$query/@name" value="$control/@ref"/>
-                        <xforms:setvalue ref="$query/@path" value="string-join(($control/ancestor-or-self::*/(@ref | @context)), '/')"/>
                     </xforms:action>
 
                     <!-- Compute label information -->

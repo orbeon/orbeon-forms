@@ -120,7 +120,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
     // Client state
     private XFormsModelSubmission activeSubmissionFirstPass;
-    private Callable<SubmissionResult> secondPassCallable;
+    private Callable<SubmissionResult> replaceAllCallable;
     private boolean gotSubmissionSecondPass;
     private boolean gotSubmissionReplaceAll;
     private List<Message> messagesToRun;
@@ -366,8 +366,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         return activeSubmissionFirstPass;
     }
 
-    public Callable<SubmissionResult> getActiveSubmissionSecondPass() {
-        return secondPassCallable;
+    public Callable<SubmissionResult> getReplaceAllCallable() {
+        return replaceAllCallable;
     }
 
     /**
@@ -377,7 +377,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         this.isInitializing = false;
 
         this.activeSubmissionFirstPass = null;
-        this.secondPassCallable = null;
+        this.replaceAllCallable = null;
         this.gotSubmissionSecondPass = false;
         this.gotSubmissionReplaceAll = false;
 
@@ -418,8 +418,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         this.activeSubmissionFirstPass = submission;
     }
 
-    public void setActiveSubmissionSecondPass(Callable<SubmissionResult> callable) {
-        this.secondPassCallable = callable;
+    public void setReplaceAllCallable(Callable<SubmissionResult> callable) {
+        this.replaceAllCallable = callable;
     }
 
     public void setGotSubmission() {}

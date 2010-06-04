@@ -199,9 +199,9 @@ public abstract class BaseSubmission implements Submission {
 
             // Tell caller he doesn't need to do anything
             return null;
-        } else if (p.isDeferredSubmissionSecondPass) {
-            // Tell XFCD that we have a submission ready for a second pass
-            containingDocument.setActiveSubmissionSecondPass(callable);
+        } else if (p.isDeferredSubmissionSecondPass && p.isReplaceAll) {
+            // Tell XFCD that we have a submission replace="all" ready for a second pass
+            containingDocument.setReplaceAllCallable(callable);
             // Tell caller he doesn't need to do anything
             return null;
         } else {

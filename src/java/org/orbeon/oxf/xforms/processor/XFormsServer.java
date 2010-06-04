@@ -199,7 +199,7 @@ public class XFormsServer extends ProcessorImpl {
         // risk?
 
 //        final Object documentSynchronizationObject = (contentHandler != null) ? containingDocument : new Object();
-        Callable<SubmissionResult> secondPassCallable = null;
+        Callable<SubmissionResult> replaceAllCallable = null;
         synchronized (containingDocument) {
             final IndentedLogger eventsIndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
             try {
@@ -253,8 +253,8 @@ public class XFormsServer extends ProcessorImpl {
                     allEvents = false;
                 }
 
-                // Check if there is a second pass that will need processing
-                secondPassCallable = containingDocument.getActiveSubmissionSecondPass();
+                // Check if there is a submission with replace="all" that needs processing
+                replaceAllCallable = containingDocument.getReplaceAllCallable();
 
                 // TODO: UI-DEPENDENCIES TEMP
 //                containingDocument.getStaticState().dumpAnalysis();
@@ -262,41 +262,44 @@ public class XFormsServer extends ProcessorImpl {
                 // Notify the state manager that we will send the response
                 XFormsStateManager.instance().beforeUpdateResponse(pipelineContext, containingDocument);
 
-                if (contentHandler != null) {
-                    // Create resulting document if there is a ContentHandler
-                    if (containingDocument.isGotSubmissionReplaceAll() && (isNoscript || XFormsProperties.isAjaxPortlet(containingDocument))) {
-                        // NOP: Response already sent out by a submission
-                        indentedLogger.logDebug("response", "handling noscript or Ajax portlet response for submission with replace=\"all\"");
-                    } else if (!isNoscript) {
-                        // This is an Ajax response
-                        indentedLogger.startHandleOperation("response", "handling regular Ajax response");
+                if (replaceAllCallable == null) {
+                    // Handle response here (if not null, is handled after synchronized block)
+                    if (contentHandler != null) {
+                        // Create resulting document if there is a ContentHandler
+                        if (containingDocument.isGotSubmissionReplaceAll() && (isNoscript || XFormsProperties.isAjaxPortlet(containingDocument))) {
+                            // NOP: Response already sent out by a submission
+                            indentedLogger.logDebug("response", "handling noscript or Ajax portlet response for submission with replace=\"all\"");
+                        } else if (!isNoscript) {
+                            // This is an Ajax response
+                            indentedLogger.startHandleOperation("response", "handling regular Ajax response");
 
-                        // Hook-up debug content handler if we must log the response document
-                        final ContentHandler responseContentHandler;
-                        final LocationSAXContentHandler debugContentHandler;
-                        if (logRequestResponse) {
-                            debugContentHandler = new LocationSAXContentHandler();
-                            responseContentHandler = new TeeContentHandler(contentHandler, debugContentHandler);
+                            // Hook-up debug content handler if we must log the response document
+                            final ContentHandler responseContentHandler;
+                            final LocationSAXContentHandler debugContentHandler;
+                            if (logRequestResponse) {
+                                debugContentHandler = new LocationSAXContentHandler();
+                                responseContentHandler = new TeeContentHandler(contentHandler, debugContentHandler);
+                            } else {
+                                debugContentHandler = null;
+                                responseContentHandler = contentHandler;
+                            }
+
+                            outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds, pipelineContext,
+                                    requestDocument, responseContentHandler, allEvents, false);
+
+                            indentedLogger.endHandleOperation("ajax response", (debugContentHandler != null) ? Dom4jUtils.domToPrettyString(debugContentHandler.getDocument()) : null);
                         } else {
-                            debugContentHandler = null;
-                            responseContentHandler = contentHandler;
+                            // Noscript mode
+                            indentedLogger.startHandleOperation("response", "handling noscript response");
+                            outputNoscriptResponse(containingDocument, indentedLogger, pipelineContext, contentHandler, externalContext);
+                            indentedLogger.endHandleOperation();
                         }
-
-                        outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds, pipelineContext,
-                                requestDocument, responseContentHandler, allEvents, false);
-
-                        indentedLogger.endHandleOperation("ajax response", (debugContentHandler != null) ? Dom4jUtils.domToPrettyString(debugContentHandler.getDocument()) : null);
                     } else {
-                        // Noscript mode
-                        indentedLogger.startHandleOperation("response", "handling noscript response");
-                        outputNoscriptResponse(containingDocument, indentedLogger, pipelineContext, contentHandler, externalContext);
-                        indentedLogger.endHandleOperation();
-                    }
-                } else {
-                    // This is the second pass of a submission with replace="all". We make it so that the document is
-                    // not modified. However, we must then return it to its pool.
+                        // This is the second pass of a submission with replace="all". We make it so that the document is
+                        // not modified. However, we must then return it to its pool.
 
-                    indentedLogger.logDebug("response", "handling NOP response for submission with replace=\"all\"");
+                        indentedLogger.logDebug("response", "handling NOP response for submission with replace=\"all\"");
+                    }
                 }
 
                 // Notify state manager that we are done sending the response
@@ -309,10 +312,10 @@ public class XFormsServer extends ProcessorImpl {
             }
         }
 
-        // Check and run submission second pass if needed
+        // Check and run submission with replace="all"
         // NOTE: Do this outside the synchronized block, so that if this takes time, subsequent Ajax requests can still
         // hit the document
-        XFormsContainingDocument.checkAndRunDeferredSubmission(secondPassCallable, response);
+        XFormsContainingDocument.checkAndRunDeferredSubmission(replaceAllCallable, response);
     }
 
     private ExternalContext.Response getResponse(ContentHandler contentHandler, final ExternalContext externalContext) {

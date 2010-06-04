@@ -904,11 +904,8 @@ public class ControlTree implements ExternalCopyable {
                 final XFormsContextStack.BindingContext oldBindingContext = control.getBindingContext();
                 final List<Item> oldRepeatNodeset = oldBindingContext.getNodeset();
 
-                // Set new current binding for control element
-                repeatControl.setBindingContext(propertyContext, newBindingContext);
-
                 // Update iterations
-                final List<XFormsRepeatIterationControl> newIterations = repeatControl.updateIterations(propertyContext, oldRepeatNodeset, null);
+                final List<XFormsRepeatIterationControl> newIterations = repeatControl.updateIterations(propertyContext, newBindingContext, oldRepeatNodeset, null);
 
                 // Remember newly created iterations so we don't recurse into them in startRepeatIteration()
                 // o It is not needed to recurse into them because their bindings are up to date since they have just been created

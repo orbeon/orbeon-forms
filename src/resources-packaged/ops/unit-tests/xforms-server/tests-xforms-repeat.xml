@@ -593,7 +593,7 @@
             </xxf:event-response>
         </output>
     </test>
-    xxx
+
     <test description="xforms:insert with @context and @origin" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
@@ -2983,13 +2983,77 @@
         </output>
     </test>
 
+    <test description="Insert upon Ajax request causes repeat iteration creation without error" name="oxf:pipeline">
+        <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=315081&group_id=168&atid=350207 -->
+        <input name="config" href="xforms-server/wrap-server.xpl"/>
+        <input name="action">
+            <xxforms:action xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xxforms:event name="DOMActivate" source-control-id="insert-trigger"/>
+            </xxforms:action>
+        </input>
+        <input name="controls">
+            <controls
+                xmlns:xforms="http://www.w3.org/2002/xforms"
+                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:ev="http://www.w3.org/2001/xml-events">
+
+                <xforms:repeat id="company-repeat" ref="company"/>
+
+                <xforms:trigger id="insert-trigger">
+                    <xforms:insert id="insert" ev:event="DOMActivate" context="instance()" origin="xxforms:element('company')"/>
+                </xforms:trigger>
+            </controls>
+        </input>
+        <input name="models">
+            <models>
+                <xforms:model id="model">
+                    <xforms:instance id="instance">
+                        <companies/>
+                    </xforms:instance>
+                </xforms:model>
+            </models>
+        </input>
+        <input name="instances">
+            <instances>
+                <instance model-id="model" id="instance">
+                    <companies/>
+                </instance>
+            </instances>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <companies>
+                                    <company/>
+                                </companies>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="company-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="company-repeat" parent-indexes="" start-suffix="1" end-suffix="1"/>
+                    </xxf:control-values>
+                    <xxf:repeat-indexes>
+                        <xxf:repeat-index id="company-repeat" old-index="0" new-index="1"/>
+                    </xxf:repeat-indexes>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO:
 
     * test xforms-enabled events upon new repeat iteration
     * test same but with changes between new repeat iteration and next refresh
-    * test xforms-disabled events upon removed repeat iteration
     * test init events
     * index() on capture vs. bubbling (old vs. new index)
     * index() in xf:label/xf:output

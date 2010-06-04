@@ -321,11 +321,9 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         // Move things around and create new iterations if needed
         if (!compareNodesets(oldRepeatNodeset, newBindingContext.getNodeset())) {
 
-            setBindingContext(propertyContext, newBindingContext);
-
             // Update iterations
             final List<XFormsRepeatIterationControl> newIterations
-                    = updateIterations(propertyContext, oldRepeatNodeset, insertedNodeInfos);
+                    = updateIterations(propertyContext, newBindingContext, oldRepeatNodeset, insertedNodeInfos);
             // Initialize all new iterations
             final ControlTree currentControlTree = containingDocument.getControls().getCurrentControlTree();
             for (final XFormsRepeatIterationControl newIteration: newIterations) {
@@ -345,22 +343,29 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
      * NOTE: The new binding context must have been set on this control before calling.
      *
      * @param propertyContext       current context
-     * @param oldRepeatNodeset      old node-set
-     * @param insertedNodeInfos     nodes just inserted by xforms:insert if any, or null
+     * @param newBindingContext     new binding context
+     * @param oldRepeatItems        old items
+     * @param insertedItems         items just inserted by xforms:insert if any, or null
      * @return                      new iterations if any, or an empty list
      */
-    public List<XFormsRepeatIterationControl> updateIterations(PropertyContext propertyContext, List<Item> oldRepeatNodeset,
-                                                               List<Item> insertedNodeInfos) {
+    public List<XFormsRepeatIterationControl> updateIterations(PropertyContext propertyContext,
+                                                               XFormsContextStack.BindingContext newBindingContext,
+                                                               List<Item> oldRepeatItems, List<Item> insertedItems) {
 
         // NOTE: The following assumes the nodesets have changed
+
+        final XFormsControls controls = containingDocument.getControls();
+
+        // Do this before setBindingContext() because after that controls are temporarily in an inconsistent state.
+        controls.cloneInitialStateIfNeeded(propertyContext);
+
+        // Set new current binding for control element
+        setBindingContext(propertyContext, newBindingContext);
 
         // Get current (new) nodeset
         final List<Item> newRepeatNodeset = getBindingContext().getNodeset();
 
-        final XFormsControls controls = containingDocument.getControls();
-        controls.cloneInitialStateIfNeeded(propertyContext);
-
-        final boolean isInsert = insertedNodeInfos != null;
+        final boolean isInsert = insertedItems != null;
 
         final ControlTree currentControlTree = controls.getCurrentControlTree();
 
@@ -376,10 +381,10 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         if (newRepeatNodeset != null && newRepeatNodeset.size() > 0) {
 
             // For each new node, what its old index was, -1 if it was not there
-            final int[] oldIndexes = findNodeIndexes(newRepeatNodeset, oldRepeatNodeset);
+            final int[] oldIndexes = findNodeIndexes(newRepeatNodeset, oldRepeatItems);
 
             // For each old node, what its new index is, -1 if it is no longer there
-            final int[] newIndexes = findNodeIndexes(oldRepeatNodeset, newRepeatNodeset);
+            final int[] newIndexes = findNodeIndexes(oldRepeatItems, newRepeatNodeset);
 
             // Remove control information for iterations that move or just disappear
             final List oldChildren = getChildren();
@@ -423,7 +428,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
                 // We want to point to a new node (case of insert)
 
                 // First, try to point to the last inserted node if found
-                final int[] foobar = findNodeIndexes(insertedNodeInfos, newRepeatNodeset);
+                final int[] foobar = findNodeIndexes(insertedItems, newRepeatNodeset);
 
                 for (int i = foobar.length - 1; i >= 0; i--) {
                     if (foobar[i] != -1) {

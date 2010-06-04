@@ -79,7 +79,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     private boolean replaced;
 
     /**
-     * Create an XFormsInstance from a container element. The container contains meta-informationa about the instance,
+     * Create an XFormsInstance from a container element. The container contains meta-information about the instance,
      * such as id, username, URI, etc.
      *
      * <instance readonly="true" cache="true" id="instance-id" model-id="model-id" source-uri="http://..." username="jdoe" password="password">
@@ -152,11 +152,11 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                 exposeXPathTypes
                         ? new TypedDocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, configuration)
                         : new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, configuration),
-                instanceSourceURI, requestBodyHash, username, password, cache, timeToLive, validation, handleXInclude, exposeXPathTypes);
+                instanceSourceURI, requestBodyHash, username, password, domain, cache, timeToLive, validation, handleXInclude, exposeXPathTypes);
     }
 
     protected XFormsInstance(String modelEffectiveId, String instanceStaticId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String requestBodyHash,
-                             String username, String password, boolean cache, long timeToLive, String validation, boolean handleXInclude, boolean exposeXPathTypes) {
+                             String username, String password, String domain, boolean cache, long timeToLive, String validation, boolean handleXInclude, boolean exposeXPathTypes) {
 
         if (cache && instanceSourceURI == null)
             throw new OXFException("Only XForms instances externally loaded through the src attribute may have xxforms:cache=\"true\".");

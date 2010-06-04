@@ -17,6 +17,7 @@ import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -37,8 +38,7 @@ public class Model {
     public final XBLBindings.Scope scope;
     public final Document document;
 
-    public final List<Element> instanceElements;
-    public final Set<String> instanceStaticIds;
+    public final Map<String, Instance> instances;
 
     public final String staticId;
     public final String prefixedId;
@@ -53,7 +53,7 @@ public class Model {
     public final Set<String> computedBindExpressionsInstances;
     public final Set<String> validationBindInstances;
 
-    public Model(XFormsStaticState staticState, XBLBindings.Scope scope, Document document) {
+    public Model(PropertyContext propertyContext, XFormsStaticState staticState, XBLBindings.Scope scope, Document document) {
 
         assert scope != null;
         assert document != null;
@@ -62,16 +62,18 @@ public class Model {
         this.scope = scope;
         this.document = document;
 
-        instanceElements = Dom4jUtils.elements(document.getRootElement(), XFormsConstants.XFORMS_INSTANCE_QNAME);
-        instanceStaticIds = new LinkedHashSet<String>(instanceElements.size());
+        final List<Element> instanceElements = Dom4jUtils.elements(document.getRootElement(), XFormsConstants.XFORMS_INSTANCE_QNAME);
+        instances = new LinkedHashMap<String, Instance>(instanceElements.size());
+
         for (final Element instanceElement: instanceElements) {
-            instanceStaticIds.add(XFormsUtils.getElementStaticId(instanceElement));
+            final Instance newInstance = new Instance(propertyContext, instanceElement);
+            instances.put(newInstance.staticId, newInstance);
         }
 
         staticId = XFormsUtils.getElementStaticId(document.getRootElement());
         prefixedId = scope.getFullPrefix() + staticId;
-        final boolean hasInstances = instanceStaticIds.size() > 0;
-        defaultInstanceStaticId = hasInstances  ? instanceStaticIds.iterator().next() : null;
+        final boolean hasInstances = instances.size() > 0;
+        defaultInstanceStaticId = hasInstances  ? instances.keySet().iterator().next() : null;
         defaultInstancePrefixedId = hasInstances ? scope.getFullPrefix() + defaultInstanceStaticId : null;
 
         bindElements = Dom4jUtils.elements(document.getRootElement(), XFormsConstants.XFORMS_BIND_QNAME);

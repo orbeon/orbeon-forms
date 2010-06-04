@@ -23,15 +23,13 @@ import org.orbeon.saxon.om.DocumentInfo;
  */
 public class ReadonlyXFormsInstance extends XFormsInstance {
 
-//    public ReadonlyXFormsInstance(Element containerElement) {
-//        super(containerElement);
-//    }
-
     public ReadonlyXFormsInstance(String modelId, String instanceStaticId, DocumentInfo instanceDocumentInfo,
                                   String instanceSourceURI, String requestBodyHash,
-                                  String username, String password, boolean cache, long timeToLive, String validation,
+                                  String username, String password, String domain, boolean cache, long timeToLive, String validation,
                                   boolean handleXInclude, boolean exposeXPathTypes) {
-        super(modelId, instanceStaticId, instanceDocumentInfo, instanceSourceURI, requestBodyHash, username, password, cache, timeToLive, validation, handleXInclude, exposeXPathTypes);
+
+        super(modelId, instanceStaticId, instanceDocumentInfo, instanceSourceURI, requestBodyHash, username, password, domain,
+                cache, timeToLive, validation, handleXInclude, exposeXPathTypes);
     }
 
     /**

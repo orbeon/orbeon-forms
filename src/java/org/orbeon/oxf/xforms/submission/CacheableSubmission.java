@@ -159,7 +159,7 @@ public class CacheableSubmission extends BaseSubmission {
 
                                             // Create new shared instance
                                             return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, instanceSourceURI,
-                                                    requestBodyHash, updatedP2.username, updatedP2.password, true, timeToLive, validation, handleXInclude,
+                                                    requestBodyHash, updatedP2.username, updatedP2.password, updatedP2.domain, true, timeToLive, validation, handleXInclude,
                                                     XFormsProperties.isExposeXPathTypes(containingDocument));
                                         }
                                     } catch (ThrowableWrapper throwableWrapper) {

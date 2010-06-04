@@ -166,7 +166,7 @@ public class InstanceReplacer extends BaseReplacer {
                             "instance", updatedInstance.getEffectiveId());
 
                     newInstance = new ReadonlyXFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
-                            (DocumentInfo) resultingDocument, connectionResult.resourceURI, resultingRequestBodyHash, p2.username, p2.password,
+                            (DocumentInfo) resultingDocument, connectionResult.resourceURI, resultingRequestBodyHash, p2.username, p2.password, p2.domain,
                             p2.isCache, p2.timeToLive, updatedInstance.getValidation(), p2.isHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
                 }
                 newDocumentRootElement = newInstance.getInstanceRootElementInfo();

@@ -409,7 +409,7 @@ public class XBLBindings {
                         final List<Document> implementationModelDocuments = xblImplementations.get(controlElement.getQName());
                         if (implementationModelDocuments != null && implementationModelDocuments.size() > 0) {
                             // Say we DO annotate because these models are outside the template
-                            addModelDocuments(implementationModelDocuments, newPrefix, true,
+                            addModelDocuments(propertyContext, implementationModelDocuments, newPrefix, true,
                                     newInnerScope, outerScope, XFormsConstants.XXBLScope.inner);
                             if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", "registered XBL implementation model documents", "count", Integer.toString(implementationModelDocuments.size()));
@@ -423,7 +423,7 @@ public class XBLBindings {
                         final List<Document> templateModelDocuments = XFormsStaticState.extractNestedModels(propertyContext, compactShadowTreeWrapper, true, locationData);
                         if (templateModelDocuments.size() > 0) {
                             // Say we don't annotate documents because already annotated as part as template processing
-                            addModelDocuments(templateModelDocuments, newPrefix, false, newInnerScope, null, null);
+                            addModelDocuments(propertyContext, templateModelDocuments, newPrefix, false, newInnerScope, null, null);
                             if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", "created and registered XBL template model documents", "count", Integer.toString(templateModelDocuments.size()));
                         }
@@ -485,7 +485,7 @@ public class XBLBindings {
         return annotatedDocument;
     }
 
-    private void addModelDocuments(List<Document> modelDocuments, String prefix, boolean annotate,
+    private void addModelDocuments(PropertyContext propertyContext, List<Document> modelDocuments, String prefix, boolean annotate,
                                    Scope newInnerScope, Scope outerScope, XFormsConstants.XXBLScope startScope) {
         for (Document currentModelDocument: modelDocuments) {
 
@@ -496,7 +496,7 @@ public class XBLBindings {
             }
 
             // Store models by "prefixed id"
-            staticState.addModelDocument(newInnerScope, currentModelDocument);
+            staticState.addModelDocument(propertyContext, newInnerScope, currentModelDocument);
         }
     }
 

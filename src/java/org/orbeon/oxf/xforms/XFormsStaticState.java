@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.analysis.IdGenerator;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
 import org.orbeon.oxf.xforms.analysis.controls.*;
+import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandler;
@@ -463,7 +464,7 @@ public class XFormsStaticState {
             for (final Element modelElement: topLevelModelsElements) {
                 // Copy the element because we may need it in staticStateDocument for encoding
                 final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(modelElement);
-                addModelDocument(xblBindings.getTopLevelScope(), modelDocument);
+                addModelDocument(pipelineContext, xblBindings.getTopLevelScope(), modelDocument);
                 modelsCount++;
             }
 
@@ -504,7 +505,7 @@ public class XFormsStaticState {
             final List<Document> extractedModels = extractNestedModels(pipelineContext, controlsDocumentInfo, false, locationData);
             indentedLogger.logDebug("", "created nested model documents", "count", Integer.toString(extractedModels.size()));
             for (final Document currentModelDocument: extractedModels) {
-                addModelDocument(xblBindings.getTopLevelScope(), currentModelDocument);
+                addModelDocument(pipelineContext, xblBindings.getTopLevelScope(), currentModelDocument);
             }
         }
     }
@@ -512,16 +513,17 @@ public class XFormsStaticState {
     /**
      * Register a model document. Used by this and XBLBindings.
      *
+     * @param propertyContext   current context
      * @param scope             XBL scope
      * @param modelDocument     model document
      */
-    public void addModelDocument(XBLBindings.Scope scope, Document modelDocument) {
+    public void addModelDocument(PropertyContext propertyContext, XBLBindings.Scope scope, Document modelDocument) {
         List<Model> models = modelsByScope.get(scope);
         if (models == null) {
             models = new ArrayList<Model>();
             modelsByScope.put(scope, models);
         }
-        final Model newModel = new Model(this, scope, modelDocument);
+        final Model newModel = new Model(propertyContext, this, scope, modelDocument);
         models.add(newModel);
         modelsByPrefixedId.put(newModel.prefixedId, newModel);
     }
@@ -602,13 +604,13 @@ public class XFormsStaticState {
     }
 
     /**
-     * Return all instance containers of the specified model.
+     * Return all instances of the specified model.
      *
      * @param modelPrefixedId       model prefixed id
-     * @return                      container elements
+     * @return                      instances
      */
-    public List<Element> getInstanceContainers(String modelPrefixedId) {
-        return modelsByPrefixedId.get(modelPrefixedId).instanceElements;
+    public Collection<Instance> getInstances(String modelPrefixedId) {
+        return modelsByPrefixedId.get(modelPrefixedId).instances.values();
     }
 
     /**
@@ -696,7 +698,7 @@ public class XFormsStaticState {
         XBLBindings.Scope currentScope = startScope;
         while (currentScope != null) {
             for (final Model model: getModelsForScope(currentScope)) {
-                if (model.instanceStaticIds.contains(instanceStaticId)) {
+                if (model.instances.containsKey(instanceStaticId)) {
                     return currentScope.getPrefixedIdForStaticId(instanceStaticId);
                 }
             }

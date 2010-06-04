@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -171,7 +171,7 @@ public class XFormsServerSharedInstancesCache {
 
             // Return a copy because id, etc. can be different
             return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, readonlyInstance.getDocumentInfo(),
-                    instanceSourceURI, readonlyInstance.getRequestBodyHash(), null, null, readonlyInstance.isCache(),
+                    instanceSourceURI, readonlyInstance.getRequestBodyHash(), null, null, null, readonlyInstance.isCache(),
                     readonlyInstance.getTimeToLive(), readonlyInstance.getValidation(), readonlyInstance.isHandleXInclude(), exposeXPathTypes);
         } else {
             // Not found

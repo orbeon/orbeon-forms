@@ -25,9 +25,10 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
 import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
+import org.orbeon.oxf.xforms.analysis.model.Instance;
+import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.processor.handlers.*;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.xml.sax.ContentHandler;
@@ -241,8 +242,33 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private void gatherInputDependencies(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, Stage1CacheableState stage1CacheableState) {
 
+        final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
+
+        // Add static instance source dependencies for top-level models
+        // TODO: check all models/instances
+        final XFormsStaticState staticState = containingDocument.getStaticState();
+        for (final Model model: staticState.getModelsForScope(staticState.getXBLBindings().getTopLevelScope())) {
+            for (final Instance instance: model.instances.values()) {
+                if (instance.dependencyURL != null) {
+                    if (!instance.isCacheHint) {
+                        stage1CacheableState.addReference(null, instance.dependencyURL, instance.xxformsUsername,
+                                instance.xxformsPassword, instance.xxformsPassword, forwardSubmissionHeaders);
+
+                        if (indentedLogger.isDebugEnabled())
+                                indentedLogger.logDebug("", "adding document cache dependency for non-cacheable instance", "instance URI", instance.dependencyURL);
+
+                    } else {
+                        // Don't add the dependency as we don't want the instance URI to be hit
+                        // For all practical purposes, globally shared instances must remain constant!
+                        if (indentedLogger.isDebugEnabled())
+                            indentedLogger.logDebug("", "not adding document cache dependency for cacheable instance", "instance URI", instance.dependencyURL);
+                    }
+                }
+            }
+        }
+
         // Set caching dependencies if the input was actually read
-        // TODO: check all models/instances: containingDocument.getAllModels()
+        // TODO: check all models/instances
         // Q: should use static dependency information instead? what about schema imports and instance replacements?
         for (final XFormsModel currentModel: containingDocument.getModels()) {
             // Add schema dependencies
@@ -253,36 +279,11 @@ public class XFormsToXHTML extends ProcessorImpl {
                     if (indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("", "adding document cache dependency for schema", "schema URI", currentSchemaURI);
 
-                    stage1CacheableState.addReference(null, currentSchemaURI, null, null, null,
-                            XFormsProperties.getForwardSubmissionHeaders(containingDocument));// TODO: support username / password on schema refs
+                    stage1CacheableState.addReference(null, currentSchemaURI, null, null, null, forwardSubmissionHeaders);// TODO: support username / password on schema refs
                 }
             }
-
-            // Add instance source dependencies
-            if (currentModel.getInstances() != null) {
-                for (final XFormsInstance currentInstance: currentModel.getInstances()) {
-                    final String instanceSourceURI = currentInstance.getSourceURI();
-
-                    if (instanceSourceURI != null) {
-                        if (!currentInstance.isCache()) {
-                            // Add dependency only for instances that are not globally shared
-                            if (indentedLogger.isDebugEnabled())
-                                indentedLogger.logDebug("", "adding document cache dependency for non-cacheable instance", "instance URI", instanceSourceURI);
-
-                            stage1CacheableState.addReference(null, instanceSourceURI, currentInstance.getUsername(), currentInstance.getPassword(), currentInstance.getDomain(),
-                                    XFormsProperties.getForwardSubmissionHeaders(containingDocument));
-                        } else {
-                            // Don't add the dependency as we don't want the instance URI to be hit
-                            // For all practical purposes, globally shared instances must remain constant!
-                            if (indentedLogger.isDebugEnabled())
-                                indentedLogger.logDebug("", "not adding document cache dependency for cacheable instance", "instance URI", instanceSourceURI);
-                        }
-                    }
-                }
-            }
-
-            // TODO: Add @src attributes from controls? Not used often.
         }
+        // TODO: Add @src attributes from controls? Not used often.
 
         // Set caching dependencies for XBL inclusions
         {

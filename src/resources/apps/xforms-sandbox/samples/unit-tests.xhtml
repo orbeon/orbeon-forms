@@ -28,13 +28,41 @@
                     <page/>
                     <report-text/>
                     <reports/>
+
+                    <!-- Timings -->
+                    <all-start/>
+                    <all-duration/>
+                    <page-start/>
+                    <page-duration/>
+
                 </instance>
             </xforms:instance>
+
+            <!-- Compute durations -->
+            <xforms:bind nodeset="all-start | page-start" calculate="if (. = '') then current-dateTime() else ."/>
+            <xforms:bind nodeset="*[ends-with(local-name(), '-duration')]"
+                         calculate="for $start-name in concat(substring-before(local-name(), '-duration'), '-start') return
+                                    for $start in ../*[local-name() = $start-name] return
+                                    for $duration in current-dateTime() - xs:dateTime($start) return
+                                        string-join(
+                                            (
+                                                string(round(minutes-from-duration($duration))),
+                                                format-number(round(seconds-from-duration($duration)), '00')
+                                            ), ':')"/>
+
+            <!-- Get the time to be updated every second -->
+            <xforms:action ev:event="my-update xforms-ready" if="in-progress = 'true'">
+                <xforms:recalculate/>
+                <xforms:refresh/>
+                <xforms:dispatch  name="my-update" target="main-model" delay="1000"/>
+            </xforms:action>
+
             <xforms:action ev:event="page-complete">
                 <xforms:delete nodeset="reports/in-progress"/>
                 <xforms:insert context="reports" nodeset="report" origin="saxon:parse(/instance/report-text)"/>
                 <xforms:insert context="reports/report[last()]" origin="xxforms:attribute('page', /instance/page)"/>
                 <xforms:setvalue ref="reports/report[last()]/@page" value="tokenize(., '/')[last()]"/>
+                <xforms:setvalue ref="page-start" value="current-dateTime()"/>
             </xforms:action>
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
@@ -106,10 +134,8 @@
             <xforms:group ref=".[in-progress = 'true']">
                 <xhtml:img src="/apps/fr/style/progress_bar.gif" alt="In progress" class="progress-bar"/>
                 <xforms:group ref=".[page != '']">
-                    <xhtml:div>
-                        Running test page
-                        <xhtml:b><xforms:output value="tokenize(page, '/')[last()]"/></xhtml:b>
-                    </xhtml:div>
+                    <xhtml:div>Running page: <xhtml:b><xforms:output value="tokenize(page, '/')[last()]"/></xhtml:b></xhtml:div>
+                    <xhtml:div>Time for this page: <xhtml:b><xforms:output value="page-duration"/></xhtml:b></xhtml:div>
                 </xforms:group>
             </xforms:group>
             <xforms:group ref=".[in-progress != 'true']">
@@ -117,9 +143,8 @@
                     <xhtml:b>Done</xhtml:b> running all the test cases
                 </xhtml:div>
             </xforms:group>
-            <xhtml:div>
-                Tests ran: <xhtml:b><xforms:output value="count(reports/report/testcase/test)"/></xhtml:b>
-            </xhtml:div>
+            <xhtml:div>Total tests ran: <xhtml:b><xforms:output value="count(reports/report/testcase/test)"/></xhtml:b></xhtml:div>
+            <xhtml:div>Total time: <xhtml:b><xforms:output value="all-duration"/></xhtml:b></xhtml:div>
         </xhtml:div>
 
         <xhtml:table class="gridtable">

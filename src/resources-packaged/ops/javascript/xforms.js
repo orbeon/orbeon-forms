@@ -4031,6 +4031,7 @@ ORBEON.widgets.YUICalendar = function() {
     // Set when the calendar is ceated the first time
     var yuiCalendar = null;
     var calendarDiv = null;
+    var yuiOverlay = null;
     // Set when the calendar is opened for a given control
     var control = null;
     var inputField = null;
@@ -4074,7 +4075,7 @@ ORBEON.widgets.YUICalendar = function() {
         inputField = null;
         mouseOverCalendar = false;
         // Hide calendar
-        YAHOO.util.Dom.setStyle(calendarDiv, "display", "none");
+        yuiOverlay.cfg.setProperty("visible", false);
         // Unsubscribe to global click
         ORBEON.xforms.Events.clickEvent.unsubscribe(clickAnywhere);
     }
@@ -4099,29 +4100,34 @@ ORBEON.widgets.YUICalendar = function() {
         },
 
         click: function(event, target) {
+            // Initialize calendarDiv and yuiOverlay
             if (calendarDiv == null) {
-                // Try to get existing div
-
-                // This typically can happen with portlets if the div has already been created
                 calendarDiv = ORBEON.util.Dom.getElementById("orbeon-calendar-div");
-            }
-            if (calendarDiv == null) {
-                // Still null, create YUI calendar the first time this is used
 
-                // Create div for the YUI calendar widget
-                calendarDiv = document.createElement("div");
-                calendarDiv.id = "orbeon-calendar-div";
-                document.body.appendChild(calendarDiv);
+                // If we can't find a div, this is the first time the YUI calendar is used, so create on
+                if (calendarDiv == null) {
+                    calendarDiv = document.createElement("div");
+                    calendarDiv.id = "orbeon-calendar-div";
+                    document.body.appendChild(calendarDiv);
+                }
+
+                yuiOverlay = new YAHOO.widget.Overlay(calendarDiv, {
+                    constraintoviewport: true
+                });
+                yuiOverlay.setBody(""); // Get overlay to create a body
+                yuiOverlay.render(document.body);
             }
+
             // Try to make sure the calendar appears in front of a dialog; doesn't work automatically as of 2008-12-10
             YAHOO.util.Dom.setStyle(calendarDiv, "z-index", ORBEON.xforms.Globals.lastDialogZIndex++);
 
             if (yuiCalendar == null) {
                 // Create YUI calendar
                 var hasTwoMonths = ORBEON.util.Utils.getProperty(DATE_PICKER_TWO_MONTHS_PROPERTY);
+                var overlayBodyId = YAHOO.util.Dom.generateId(YAHOO.util.Dom.getElementsByClassName("bd", null, calendarDiv)[0]);
                 yuiCalendar = hasTwoMonths
-                    ? new YAHOO.widget.CalendarGroup(calendarDiv.id)
-                    : new YAHOO.widget.Calendar(calendarDiv.id);
+                    ? new YAHOO.widget.CalendarGroup(overlayBodyId)
+                    : new YAHOO.widget.Calendar(overlayBodyId);
 
                 // Listeners on calendar events
                 yuiCalendar.renderEvent.subscribe(setupListeners, yuiCalendar, true);
@@ -4216,13 +4222,11 @@ ORBEON.widgets.YUICalendar = function() {
             ORBEON.xforms.Events.yuiCalendarCreated.fire({ yuiCalendar: yuiCalendar, control: control });
             yuiCalendar.cfg.applyConfig();
             yuiCalendar.render();
-            YAHOO.util.Dom.setStyle(calendarDiv, "display", "block");
 
-            // Position calendar below field
-            inputField = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0];
-            var xy = YAHOO.util.Dom.getXY(inputField);
-            xy[1] = xy[1] + 20;
-            YAHOO.util.Dom.setXY(calendarDiv, xy);
+            // Align the top left corner of the overlay on the bottom left corner of the input field
+            inputField = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, target)[0];
+            yuiOverlay.cfg.setProperty("context", [inputField.id, YAHOO.widget.Overlay.TOP_LEFT, YAHOO.widget.Overlay.BOTTOM_LEFT]);
+            yuiOverlay.cfg.setProperty("visible", true);
         },
 
         blur: function(event, target) {

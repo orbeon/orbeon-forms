@@ -55,12 +55,14 @@
                         <type/>
                     </type-change>
                     <disabled/>
+                    <readonly/>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="input | textarea | secret | input-boolean | date | time | date-time" constraint="false()"/>
             <xforms:bind nodeset="type-change[type = 'date']/input" type="xs:date"/>
             <xforms:bind nodeset="type-change[type = 'float']/input" type="xs:float"/>
-            <xforms:bind nodeset="disabled" readonly="true()" relevant="false()" calculate="12"/>
+            <xforms:bind nodeset="disabled" relevant="false()"/>
+            <xforms:bind nodeset="readonly" readonly="true()" relevant="context()/@relevant = 'true'"/>
             <xforms:instance id="flavors">
                 <flavors>
                     <flavor label="Fruits" color="red">
@@ -74,7 +76,7 @@
                 </flavors>
             </xforms:instance>
             <!-- Global MIPS that apply to all the controls -->
-            <xforms:bind nodeset="* except disabled" readonly="context()/@readonly = 'true'" relevant="context()/@relevant = 'true'"/>
+            <xforms:bind nodeset="* except (disabled, readonly)" readonly="context()/@readonly = 'true'" relevant="context()/@relevant = 'true'"/>
             <xforms:bind nodeset="@*" type="xs:boolean"/>
             <xforms:bind nodeset="input-boolean" type="xs:boolean"/>
             <xforms:bind nodeset="date" type="xs:date"/>
@@ -349,9 +351,18 @@
                     </xhtml:p>
                 </xforms:group>
 
-                <!-- Disabled field -->
-                <xhtml:h2>Disabled field</xhtml:h2>
-                <xforms:input ref="disabled" id="disabled"/>
+                <!-- Disabled and readonly field -->
+                <xhtml:h2>Disabled and readonly field</xhtml:h2>
+                <xforms:input ref="disabled" id="disabled-input">
+                    <xforms:label>Disabled input </xforms:label>
+                </xforms:input>
+                <xforms:input ref="readonly" id="readonly-input">
+                    <!-- This field is used by testReadonly() to test that a readonly field is still readonly after it becomes relevant,
+                         i.e. that the 'disabled' attribute on form controls is not removed when the control becomes relevant if it
+                         is readonly. -->
+                    <xforms:label>Readonly input </xforms:label>
+                </xforms:input>
+
             </xforms:repeat>
         </xhtml:div>
     </xhtml:body>

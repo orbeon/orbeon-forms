@@ -47,7 +47,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     testDisabledOnLoad: function() {
         // Checking that a disabled field has the 'disabled' attribute when the page is first loaded, so it can't get
         // the keyboard focus if the user tabs through it
-        var inputContainer = YAHOO.util.Dom.get("disabled" + XFORMS_SEPARATOR_1 + "1");
+        var inputContainer = YAHOO.util.Dom.get("disabled-input" + XFORMS_SEPARATOR_1 + "1");
         var inputField = ORBEON.util.Dom.getElementByTagName(inputContainer, "input");
         YAHOO.util.Assert.isTrue(inputField.disabled);
     },
@@ -72,7 +72,8 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         var elements = this.getFormControls();
         for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
             var element = elements[elementIndex];
-            if (element.id != "disabled$xforms-input-1" + XFORMS_SEPARATOR_1 + "1")
+            if (element.id != "disabled-input$xforms-input-1" + XFORMS_SEPARATOR_1 + "1"
+                    && element.id != "readonly-input$xforms-input-1" + XFORMS_SEPARATOR_1 + "1")
                 YAHOO.util.Assert.areEqual(disabled, element.disabled, "element " + element.id + " supposed to have disabled = " + disabled);
         }
     },
@@ -86,6 +87,22 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 ORBEON.xforms.Document.setValue("readonly", "false");
             }, function() {
                 this.checkDisabled(false);
+            });
+        });
+    },
+
+    testReadonlyBecomingRelevant: function() {
+        var inputContainer = YAHOO.util.Dom.get("readonly-input" + XFORMS_SEPARATOR_1 + "1");
+        var inputField = ORBEON.util.Dom.getElementByTagName(inputContainer, "input");
+        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+            YAHOO.util.Assert.isTrue(inputField.disabled, "input field initially disabled because bound to a readonly node");
+            ORBEON.xforms.Document.setValue("relevant", "false");
+        }, function() {
+            YAHOO.util.Assert.isTrue(inputField.disabled, "input field still disabled when non-relevant");
+            ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                ORBEON.xforms.Document.setValue("relevant", "true");
+            }, function() {
+                YAHOO.util.Assert.isTrue(inputField.disabled, "input field still disabled when becomes relevant because readonly");
             });
         });
     }
@@ -208,11 +225,11 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         // Click on text field
         YAHOO.util.UserAction.click(this.dateValueInputId);
         // Check calendar div shown
-        YAHOO.util.Assert.areEqual("block", document.getElementById("orbeon-calendar-div").style.display);
+        YAHOO.util.Assert.areEqual("visible", document.getElementById("orbeon-calendar-div").style.visibility);
         // Click on body
         YAHOO.util.UserAction.click(document.body);
         // Check calendar div is hidden
-        YAHOO.util.Assert.areEqual("none", document.getElementById("orbeon-calendar-div").style.display);
+        YAHOO.util.Assert.areEqual("hidden", document.getElementById("orbeon-calendar-div").style.visibility);
     },
 
     testCantOpenReadonly: function() {
@@ -224,7 +241,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
             // Click on text field
             YAHOO.util.UserAction.click(this.dateValueInputId);
             // Check that the div is still hidden
-            YAHOO.util.Assert.areEqual("none", document.getElementById("orbeon-calendar-div").style.display);
+            YAHOO.util.Assert.areEqual("hidden", document.getElementById("orbeon-calendar-div").style.visibility);
             // Restore read-only = false
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 ORBEON.xforms.Document.setValue("readonly", "false");

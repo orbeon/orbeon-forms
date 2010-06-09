@@ -2321,10 +2321,11 @@ ORBEON.xforms.Controls = {
             }
 
             // Add/remove the disabled attribute on form controls
+            var formFieldDisabled = ! isRelevant || ORBEON.xforms.Controls.isReadonly(control);
             function handleFormElement(element) {
                 var tagName = element.tagName.toLowerCase();
                 if (tagName == "input" || tagName == "textarea" || tagName == "select" || tagName == "button")
-                    ORBEON.xforms.Controls.setDisabledOnFormElement(element, ! isRelevant);
+                    ORBEON.xforms.Controls.setDisabledOnFormElement(element, formFieldDisabled);
                 return false;
             }
             handleFormElement(control);

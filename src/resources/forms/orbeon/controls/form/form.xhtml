@@ -76,6 +76,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         <email>info@orbeon.com</email>
                         <boolean>false</boolean>
                         <us-phone>5555555555</us-phone>
+                        <us-state>CA</us-state>
                         <dollars>10.99</dollars>
                         <date>2009-10-16</date>
                         <time>17:47:57</time>
@@ -139,10 +140,12 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                     <xforms:bind id="date-picker-bind" nodeset="date-picker" type="xforms:date"
                                  name="date-picker"/>
                     <xforms:bind id="email-bind" nodeset="email" type="xforms:email" name="email"/>
-                    <xforms:bind id="us-phone-bind" nodeset="us-phone" type="xforms:nonNegativeInteger"
-                                 name="us-phone"/>
                     <xforms:bind id="boolean-bind" nodeset="boolean" type="xforms:boolean" name="boolean"/>
                     <xforms:bind id="dollars-bind" nodeset="dollars" type="xforms:decimal" name="dollars"/>
+                    <xforms:bind id="us-phone-bind" nodeset="us-phone" type="xforms:nonNegativeInteger"
+                                 name="us-phone"/>
+                    <xforms:bind id="us-state-bind" nodeset="us-state" type="xforms:string"
+                                 name="us-state"/>
                 </xforms:bind>
                 <xforms:bind id="selection-controls-bind" nodeset="selection-controls"
                              name="selection-controls">
@@ -281,6 +284,12 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert/>
                         </us-phone>
+                        <us-state>
+                            <label>US State</label>
+                            <hint>US state selector</hint>
+                            <help/>
+                            <alert/>
+                        </us-state>
                         <dollars>
                             <label>Dollars</label>
                             <hint>Custom currency field</hint>
@@ -773,6 +782,12 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert/>
                         </us-phone>
+                        <us-state>
+                            <label>Etat US</label>
+                            <hint>Sélecteur d'état US</hint>
+                            <help/>
+                            <alert/>
+                        </us-state>
                         <dollars>
                             <label>Dollars</label>
                             <hint>Champ monnaie sur mesure</hint>
@@ -1148,7 +1163,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                               xmlns:xbl="http://www.w3.org/ns/xbl"
                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                               id="number-control"
-                                              bind="number-bind">
+                                              bind="number-bind" class="fr-width-10em">
                                     <xforms:label ref="$form-resources/number/label"/>
                                     <xforms:hint ref="$form-resources/number/hint"/>
                                     <xforms:help ref="$form-resources/number/help"/>
@@ -1158,7 +1173,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <xhtml:td>
                                 <xforms:secret xmlns="http://orbeon.org/oxf/xml/form-builder" id="secret-control"
                                                bind="secret-bind"
-                                               xxforms:autocomplete="off">
+                                               xxforms:autocomplete="off" class="fr-width-10em">
                                     <xforms:label ref="$form-resources/secret/label"/>
                                     <xforms:hint ref="$form-resources/secret/hint"/>
                                     <xforms:help ref="$form-resources/secret/help"/>
@@ -1351,18 +1366,6 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" bind="us-phone-bind"
-                                             id="us-phone-control">
-                                    <xforms:label ref="$form-resources/us-phone/label"/>
-                                    <xforms:hint ref="$form-resources/us-phone/hint"/>
-                                    <xforms:help ref="$form-resources/us-phone/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:us-phone>
-                            </xhtml:td>
-
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
                                 <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" bind="dollars-bind"
                                                           id="dollars-control">
                                     <xforms:label ref="$form-resources/dollars/label"/>
@@ -1371,7 +1374,26 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 </fr:currency>
                             </xhtml:td>
-                            <xhtml:td/>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" bind="us-phone-bind"
+                                             id="us-phone-control">
+                                    <xforms:label ref="$form-resources/us-phone/label"/>
+                                    <xforms:hint ref="$form-resources/us-phone/hint"/>
+                                    <xforms:help ref="$form-resources/us-phone/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:us-phone>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" bind="us-state-bind"
+                                             id="us-state-control" class="fr-width-5em">
+                                    <xforms:label ref="$form-resources/us-state/label"/>
+                                    <xforms:hint ref="$form-resources/us-state/hint"/>
+                                    <xforms:help ref="$form-resources/us-state/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:us-state>
+                            </xhtml:td>
                             <xhtml:td/>
                         </xhtml:tr>
                     </fr:grid>
@@ -1434,7 +1456,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                                 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                                 appearance="minimal"
                                                 bind="dropdown-bind"
-                                                id="dropdown-control">
+                                                id="dropdown-control" class="fr-width-5em">
                                     <xforms:label ref="$form-resources/dropdown/label"/>
                                     <xforms:hint ref="$form-resources/dropdown/hint"/>
                                     <xforms:help ref="$form-resources/dropdown/help"/>

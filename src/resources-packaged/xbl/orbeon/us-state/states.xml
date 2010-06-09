@@ -1,0 +1,69 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<states>
+    <state value="AL"/>
+    <state value="AK"/>
+    <state value="AZ"/>
+    <state value="AR"/>
+    <state value="CA"/>
+    <state value="CO"/>
+    <state value="CT"/>
+    <state value="DE"/>
+    <state value="DC"/>
+    <state value="FL"/>
+    <state value="GA"/>
+    <state value="HI"/>
+    <state value="ID"/>
+    <state value="IL"/>
+    <state value="IN"/>
+    <state value="IA"/>
+    <state value="KS"/>
+    <state value="LA"/>
+    <state value="ME"/>
+    <state value="MD"/>
+    <state value="MA"/>
+    <state value="MI"/>
+    <state value="MN"/>
+    <state value="MS"/>
+    <state value="MO"/>
+    <state value="MT"/>
+    <state value="NE"/>
+    <state value="NV"/>
+    <state value="NH"/>
+    <state value="NJ"/>
+    <state value="NM"/>
+    <state value="NY"/>
+    <state value="NC"/>
+    <state value="ND"/>
+    <state value="OH"/>
+    <state value="OK"/>
+    <state value="OR"/>
+    <state value="PA"/>
+    <state value="RI"/>
+    <state value="SC"/>
+    <state value="SD"/>
+    <state value="TN"/>
+    <state value="TX"/>
+    <state value="UT"/>
+    <state value="VT"/>
+    <state value="VA"/>
+    <state value="WA"/>
+    <state value="WV"/>
+    <state value="WI"/>
+    <state value="WY"/>
+    <state value="AS"/>
+    <state value="GU"/>
+    <state value="MP"/>
+    <state value="PR"/>
+</states>

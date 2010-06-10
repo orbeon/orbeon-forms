@@ -1526,4 +1526,95 @@
         </output>
     </test>
 
+    <test description="current() function" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl" />
+        <input name="document">
+           <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms"
+                       xmlns:saxon="http://saxon.sf.net/">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <!-- These instances are inspired from the XForms 1.1 spec -->
+                        <xforms:instance xmlns="">
+                           <converter>
+                              <amount>100</amount>
+                              <currency>jpy</currency>
+                              <convertedAmount/>
+                           </converter>
+                        </xforms:instance>
+
+                        <xforms:instance xmlns="" id="convTable">
+                           <convTable date="20040212" currency="cdn">
+                              <rate currency="eur">0.59376</rate>
+                              <rate currency="mxn">8.37597</rate>
+                              <rate currency="jpy">80.23451</rate>
+                              <rate currency="usd">0.76138</rate>
+                           </convTable>
+                        </xforms:instance>
+
+                        <xforms:bind ref="convertedAmount"
+                                     calculate="xs:decimal(../amount) * instance('convTable')/rate[@currency = current()/../currency]"/>
+
+
+                        <!-- Test from actions -->
+                        <xforms:instance xmlns="" id="values">
+                           <values>
+                               <value/>
+                               <value/>
+                               <value/>
+                           </values>
+                        </xforms:instance>
+
+                        <xforms:action ev:event="xforms-ready">
+                            <!-- Set value[1] to 100 -->
+                            <xforms:setvalue ref="instance('values')/value[1]" value="context()/amount"/>
+                            <!-- Set value[1] to 101-->
+                            <xforms:setvalue ref="instance('values')/value[2]" value="current()/../value[1] + 1"/>
+                            <!-- Set value[2] to 101-->
+                            <xforms:setvalue ref="instance('values')/value[3]" value="preceding-sibling::value[1]"/>
+                            <!-- Set value[3] to the sum of all value elements that have value 101 -->
+                            <xforms:setvalue ref="instance('values')/value[3]" value="sum((../value[. = current()]))"/>
+                        </xforms:action>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="xf-1" model-id="model">
+                                <converter>
+                                    <amount>100</amount>
+                                    <currency>jpy</currency>
+                                    <convertedAmount>8023.451</convertedAmount>
+                                </converter>
+                            </instance>
+                            <instance id="convTable" model-id="model">
+                                <convTable date="20040212" currency="cdn">
+                                    <rate currency="eur">0.59376</rate>
+                                    <rate currency="mxn">8.37597</rate>
+                                    <rate currency="jpy">80.23451</rate>
+                                    <rate currency="usd">0.76138</rate>
+                                </convTable>
+                            </instance>
+                            <instance id="values" model-id="model">
+                                <values>
+                                    <value>100</value>
+                                    <value>101</value>
+                                    <value>202</value>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

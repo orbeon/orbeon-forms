@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.function.*;
+import org.orbeon.oxf.xforms.function.Current;
 import org.orbeon.oxf.xforms.function.Last;
 import org.orbeon.oxf.xforms.function.exforms.EXFormsReadonly;
 import org.orbeon.oxf.xforms.function.exforms.EXFormsRelevant;
@@ -154,7 +155,10 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("instance", Instance.class, 0, 0, 1, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
 
-        register("context", Context.class, 0, 0, 0, Type.ITEM_TYPE, StaticProperty.EXACTLY_ONE);
+        // 7.10.2 The current() Function
+        register("current", Current.class, 0, 0, 0, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+        // 7.10.4 The context() Function
+        register("context", Context.class, 0, 0, 0, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
 
         // 7.11 Object Functions
 

@@ -68,7 +68,7 @@ public class OptimizedSubmission extends BaseSubmission {
                 "container type", request.getContainerType(), "norewrite", Boolean.toString(submission.isURLNorewrite()),
                 "url type", submission.getUrlType(),
                 "local-submission-forward", Boolean.toString(XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument)),
-                "local-submission-include", Boolean.toString(XFormsProperties.isOptimizeLocalSubmissionForward(containingDocument))
+                "local-submission-include", Boolean.toString(XFormsProperties.isOptimizeLocalSubmissionInclude(containingDocument))
             );
         }
 

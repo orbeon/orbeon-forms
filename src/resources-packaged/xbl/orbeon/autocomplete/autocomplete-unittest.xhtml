@@ -119,7 +119,7 @@
         </xhtml:div>
         <xhtml:div>
             <fr:autocomplete ref="instance('selected-countries')/static" id="static-autocomplete"
-                             dynamic-itemset="false" style="width: 15em" max-results-displayed="4" tabindex="1">
+                             dynamic-itemset="false" max-results-displayed="4" show-full-itemset-dropdown="true" tabindex="1">
                 <xforms:label>Country code: </xforms:label>
                 <xforms:itemset nodeset="instance('all-countries')/country">
                     <xforms:label ref="name"/>
@@ -156,7 +156,7 @@
         </xhtml:div>
         <xhtml:div>
             <fr:autocomplete ref="instance('selected-countries')/dynamic" id="dynamic-autocomplete"
-                             dynamic-itemset="true" style="width: 15em">
+                             dynamic-itemset="true" show-full-itemset-dropdown="true">
 
                 <!-- React to user searching -->
                 <xforms:action ev:event="fr-search-changed">

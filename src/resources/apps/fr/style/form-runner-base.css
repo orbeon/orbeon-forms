@@ -378,6 +378,9 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
+/* Override previous rule for autocomplete input, which can't be sized with width: 100% */
+.fr-grid .xbl-fr-autocomplete .xforms-input input { width: 140px }
+
 /* Make HTML editor shorter by default */
 .fr-grid textarea.xforms-mediatype-text-html { height: 10em }
 

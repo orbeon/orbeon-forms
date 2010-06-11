@@ -33,6 +33,7 @@
         <xbl:resources>
             <xbl:style src="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css"/>
             <xbl:style src="/xbl/orbeon/autocomplete/autocomplete.css"/>
+            <xbl:style src="/ops/yui/button/assets/skins/sam/button.css"/>
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-set-label" phase="target">
@@ -117,6 +118,12 @@
                                         </xforms:action>
                                     </xforms:action>
                                 </xforms:input>
+                                <!-- Drop-down with the list of all the possible values -->
+                                <xsl:if test="not(@dynamic-itemset = 'true') and @show-full-itemset-dropdown = 'true'">
+                                    <fr:select1-button ref="." xxbl:scope="outer">
+                                        <xbl:content includes="xforms|itemset,xforms|item"/>
+                                    </fr:select1-button>
+                                </xsl:if>
                                 <xhtml:div class="fr-autocomplete-yui-div"/>
                             </xhtml:div>
 

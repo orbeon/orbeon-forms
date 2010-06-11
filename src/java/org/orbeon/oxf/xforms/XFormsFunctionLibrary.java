@@ -365,9 +365,10 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 4, BuiltInAtomicType.STRING, StaticProperty.ALLOWS_ZERO_OR_ONE, null);
         
         // xxforms:itemset()
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}itemset", XXFormsItemset.class, 0, 2, 2, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}itemset", XXFormsItemset.class, 0, 2, 3, Type.ITEM_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
         StandardFunction.arg(e, 1, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE, null);
+        StandardFunction.arg(e, 2, BuiltInAtomicType.BOOLEAN, StaticProperty.EXACTLY_ONE, null);
 
         // === XSLT 2.0 function
         e = register("format-date", FormatDate.class, StandardNames.XS_DATE, 2, 5, BuiltInAtomicType.STRING, StaticProperty.EXACTLY_ONE);

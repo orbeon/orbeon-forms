@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.ExpressionTool;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
@@ -40,18 +41,22 @@ public class XXFormsItemset extends XFormsFunction {
             // Get format
             final String format = argument[1].evaluateAsString(xpathContext).toString();
 
+            // Whether to mark selected values
+            final Expression selectedExpression = (argument.length < 3) ? null : argument[2];
+            final boolean selected = (selectedExpression != null) && ExpressionTool.effectiveBooleanValue(selectedExpression.iterate(xpathContext));
+
             // Obtain itemset
             final PropertyContext pipelineContext = getOrCreatePipelineContext();
             final Itemset itemset = select1Control.getItemset(pipelineContext, true);
 
-            final String controlValue = select1Control.getValue(pipelineContext);
+            final String controlValueForSelection = selected ? select1Control.getValue(pipelineContext) : null;
             final boolean isMultiple = select1Control instanceof XFormsSelectControl;
 
             if ("json".equalsIgnoreCase(format)) {
-                final String json = itemset.getJSONTreeInfo(pipelineContext, controlValue, isMultiple, select1Control.getLocationData());
+                final String json = itemset.getJSONTreeInfo(pipelineContext, controlValueForSelection, isMultiple, select1Control.getLocationData());
                 return StringValue.makeStringValue(json);
             } else {
-                return itemset.getXMLTreeInfo(xpathContext.getConfiguration(), controlValue, isMultiple, select1Control.getLocationData());
+                return itemset.getXMLTreeInfo(xpathContext.getConfiguration(), controlValueForSelection, isMultiple, select1Control.getLocationData());
             }
         } else {
             return null;

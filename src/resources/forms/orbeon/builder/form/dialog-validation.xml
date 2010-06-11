@@ -26,11 +26,16 @@
 
     <xforms:label ref="$form-resources/dialog-validation-details/dialog-title"/>
 
-
     <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
     <xhtml:div>
         <xhtml:div class="fr-grid">
             <xhtml:div class="fr-grid-content">
+
+                <xxforms:variable name="schema" select="$model/xs:schema[1]" as="element(xs:schema)?"/>
+                <xxforms:variable name="schema-namespace" select="$schema/@targetNamespace" as="xs:string?"/>
+                <xxforms:variable name="schema-prefixes" select="if (exists($schema)) then in-scope-prefixes($schema) else ()" as="xs:string*"/>
+                <xxforms:variable name="schema-namespaces" select="if (exists($schema)) then for $p in in-scope-prefixes($schema) return namespace-uri-for-prefix($p, $schema) else ()" as="xs:string*"/>
+                <xxforms:variable name="schema-prefix" select="if (exists($schema)) then $schema-prefixes[index-of($schema-namespaces, $schema-namespace)[1]] else ()" as="xs:string?"/>
 
                 <xforms:group appearance="xxforms:fieldset">
                     <xforms:label ref="$form-resources/dialog-validation-details/types/label"/>
@@ -47,7 +52,7 @@
                     </xforms:select1>
 
                     <!-- Schema type selection if applicable -->
-                    <xforms:select1 ref="schema-type[$model/xs:schema]">
+                    <xforms:select1 ref="schema-type[exists($schema)]">
                         <xforms:label>
                             <xhtml:img src="/forms/orbeon/builder/images/schema.gif" alt="" title=""/>
                             <xhtml:span><xforms:output value="$form-resources/dialog-validation-details/schema-type/label"/></xhtml:span>
@@ -58,9 +63,9 @@
                             <xforms:value/>
                         </xforms:item>
                         <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
-                        <xforms:itemset nodeset="$model/xs:schema/xs:simpleType" xxforms:refresh-items="true">
-                            <xforms:label ref="@name"/>
-                            <xforms:value ref="@name"/>
+                        <xforms:itemset nodeset="$schema/xs:simpleType" xxforms:refresh-items="true">
+                            <xforms:label value="concat($schema-prefix, ':', @name)"/>
+                            <xforms:value value="concat($schema-prefix, ':', @name)"/>
                         </xforms:itemset>
                         <xforms:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
                     </xforms:select1>

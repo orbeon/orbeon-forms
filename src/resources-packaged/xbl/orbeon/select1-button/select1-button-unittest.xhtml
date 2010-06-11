@@ -1,0 +1,77 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <xhtml:head>
+        <xhtml:title>XBL - Select1 Button</xhtml:title>
+        <xforms:model id="main-model">
+
+            <xforms:instance id="selected-state">
+                <selected-state>
+                    <state>CA</state>
+                </selected-state>
+            </xforms:instance>
+
+            <!-- New state added to be added -->
+            <xforms:instance id="utopia">
+                <state abbreviation="UA" name="Utopia"/>
+            </xforms:instance>
+
+            <!-- Instance containing list of states, loaded on page load -->
+            <xforms:instance id="states"><dummy/></xforms:instance>
+            <xforms:submission id="get-states" method="post" resource="/xforms-sandbox/service/zip-states" serialization="none" replace="instance" instance="states"/>
+            <xforms:send ev:event="xforms-model-construct-done" submission="get-states"/>
+
+        </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <!-- <xhtml:script type="text/javascript" src="/xbl/orbeon/autocomplete/select1-button-unittest.js"/> -->
+        <xhtml:style type="text/css">
+            .operation { margin-bottom: 1em }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+
+        <!-- Link to add new state -->
+        <xhtml:div class="operation">
+            Current state: <xhtml:b><xforms:output ref="state"/></xhtml:b> |
+            <xforms:trigger appearance="minimal">
+                <xforms:label>Add new state</xforms:label>
+                <xforms:insert ev:event="DOMActivate" context="instance('states')" origin="instance('utopia')"/>
+            </xforms:trigger> |
+            <xforms:trigger appearance="minimal">
+                <xforms:label>Set to Oregon</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref="state">OR</xforms:setvalue>
+            </xforms:trigger>
+        </xhtml:div>
+
+        <!-- Control we are testing -->
+        <fr:select1-button ref="state">
+            <xforms:itemset nodeset="instance('states')/state">
+                <xforms:label ref="@name"/>
+                <xforms:value ref="@abbreviation"/>
+            </xforms:itemset>
+        </fr:select1-button>
+
+    </xhtml:body>
+</xhtml:html>

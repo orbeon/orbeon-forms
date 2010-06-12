@@ -17,8 +17,7 @@ ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Select1Button, "xbl-fr-select1-butto
 YAHOO.xbl.fr.Select1Button.prototype = {
 
     htmlButton: null,
-    htmlSelect: null,
-    select1Control: null,
+    select1ControlId: null,
     yuiButton: null,
 
     /**
@@ -28,8 +27,7 @@ YAHOO.xbl.fr.Select1Button.prototype = {
 
         // Get references to HTML elements
         this.htmlButton = YAHOO.util.Dom.getElementsByClassName("fr-select1-button-button", null, this.container)[0];
-        this.select1Control = YAHOO.util.Dom.getElementsByClassName("fr-select1-button-select1", null, this.container)[0];
-        this.htmlSelect = ORBEON.util.Dom.getElementByTagName(this.select1Control , "select");
+        this.select1ControlId = YAHOO.util.Dom.getElementsByClassName("fr-select1-button-select1", null, this.container)[0].id;
 
         // Initialize YUI button
         this.yuiButton = new YAHOO.widget.Button(this.htmlButton.id, {
@@ -41,19 +39,22 @@ YAHOO.xbl.fr.Select1Button.prototype = {
 
         // Populate list and set initial value
         this.itemsetChanged();
-        var initialValue = ORBEON.xforms.Document.getValue(this.select1Control.id);
-        for (var optionIndex = 0; optionIndex < this.htmlSelect.options.length; optionIndex++) {
-            var option = this.htmlSelect.options[optionIndex];
-            if (option.value  == initialValue) {
-                this.yuiButton.set("label", option.text);
-                break;
-            }
-        }
+        this.valueChanged();
+    },
+
+    /**
+     * We can't store a reference to the HTML select as an attribute of this object, as the HTML select gets entirely
+     * recreated on IE when the itemset changes.
+     */
+    getHTMLSelect: function() {
+        var select1Control = YAHOO.util.Dom.get(this.select1ControlId);
+        return ORBEON.util.Dom.getElementByTagName(select1Control , "select");
     },
 
     getMenuItems: function() {
         var newMenuItems = [];
-        var options = this.htmlSelect.options;
+        var htmlSelect = this.getHTMLSelect();
+        var options = htmlSelect.options;
         for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
             var option = { label: options[optionIndex].text, value: options[optionIndex].value };
             newMenuItems.push({ text: option.label, value: option.value, onclick: { fn: this.selectionMade, obj: option, scope: this }});
@@ -66,21 +67,20 @@ YAHOO.xbl.fr.Select1Button.prototype = {
      */
     selectionMade: function(name, event, option) {
         this.yuiButton.set("label", option.label);
-        ORBEON.xforms.Document.setValue(this.select1Control.id, option.value);
+        ORBEON.xforms.Document.setValue(this.select1ControlId, option.value);
     },
 
     /**
      * When the server tells us that the value changed, lookup the label for the new value, and set it on the button.
      */
     valueChanged: function() {
-        var newValue = ORBEON.xforms.Document.getValue(this.select1Control.id);
-        var menu = this.yuiButton.getMenu();
-        var yuiItems = menu.getItems();
-        for (var yuiItemIndex = 0; yuiItemIndex < yuiItems.length; yuiItemIndex++) {
-            var yuiItem = yuiItems[yuiItemIndex];
-            if (yuiItem.value == newValue) {
-                var label = yuiItem.cfg.getProperty("text");
-                this.yuiButton.set("label", label);
+        var htmlSelect = this.getHTMLSelect();
+        var currentValue = ORBEON.xforms.Document.getValue(this.select1ControlId);
+        for (var optionIndex = 0; optionIndex < htmlSelect.options.length; optionIndex++) {
+            var option = htmlSelect.options[optionIndex];
+            if (option.value  == currentValue) {
+                this.yuiButton.set("label", option.text);
+                break;
             }
         }
     },

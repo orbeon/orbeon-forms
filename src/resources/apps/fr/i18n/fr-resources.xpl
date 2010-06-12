@@ -51,16 +51,19 @@
                         <xsl:variable name="language" as="xs:string" select="substring-before($name-without-prefix, '.')"/>
                         <xsl:variable name="path" as="xs:string" select="translate(substring-after($name-without-prefix, '.'), '.', '/')"/>
                         <!-- Get resource for selected language -->
-                        <xsl:variable name="resource" as="element(resource)?" select="$resources[@xml:lang = $language]"/>
-                        <xsl:variable name="node" as="element()?" select="$resource/saxon:evaluate($path)"/>
-                        <xsl:choose>
-                            <xsl:when test="empty($node)">
-                                <xsl:message>Cannot find for resource for property '<xsl:value-of select="$name"/>'</xsl:message>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:sequence select="(generate-id($node), pipeline:property($name))"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <!-- NOTE: Support '*' to specify all languages -->
+                        <xsl:variable name="resource" as="element(resource)*" select="$resources[$language = '*' or @xml:lang = $language]"/>
+                        <xsl:for-each select="$resource">
+                            <xsl:variable name="node" as="element()?" select="./saxon:evaluate($path)"/>
+                            <xsl:choose>
+                                <xsl:when test="empty($node)">
+                                    <xsl:message>Cannot find for resource for property '<xsl:value-of select="$name"/>'</xsl:message>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:sequence select="(generate-id($node), pipeline:property($name))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:for-each>
                     </xsl:for-each>
                 </xsl:variable>
                 <!-- ID of nodes we override -->

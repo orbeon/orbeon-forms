@@ -178,7 +178,8 @@
                       xxforms:noscript="{$is-noscript}"
                       xxforms:noscript-support="{$is-noscript-support}"
                       xxforms:xforms11-switch="false"
-                      xxforms:xpath-analysis="false">
+                      xxforms:xpath-analysis="false"
+                      xxforms:xhtml-layout="nospan">
 
             <!-- Parameters passed to this page -->
             <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->

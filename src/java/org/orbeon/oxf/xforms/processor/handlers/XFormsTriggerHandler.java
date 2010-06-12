@@ -84,7 +84,7 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
     protected QName getAppearance(Attributes controlAttributes) {
         // Override appearance in noscript mode
         final QName originalAppearance = super.getAppearance(controlAttributes);
-        if (handlerContext.isNoScript() && originalAppearance != null && XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(originalAppearance))
+        if (handlerContext.isNoScript() && XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(originalAppearance))
             return XFormsConstants.XXFORMS_MINIMAL_APPEARANCE_QNAME;
         else
             return originalAppearance;

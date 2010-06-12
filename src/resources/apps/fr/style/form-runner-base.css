@@ -98,7 +98,9 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 
 /* Make the button look like a link for noscript mode */
 /* TODO: add *zoom: 1 for IE? */
-.xforms-trigger-appearance-xxforms-minimal, .xforms-trigger-appearance-xxforms-minimal button {
+.xforms-trigger-appearance-xxforms-minimal,
+    .xforms-trigger-appearance-xxforms-minimal button,
+    .xforms-trigger-appearance-xxforms-minimal input {
     display: -moz-inline-box; display: inline-block;
     text-decoration: underline;
     font-size: inherit;
@@ -108,14 +110,6 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 
 /* But for boolean inputs, no background and border (for IE) */
 .xforms-type-boolean input { background: none; border: none }
-
-/* Radio buttons */
-.xforms-select1-appearance-full span { display: block; clear: both }
-.xforms-select1-appearance-full span label { margin-left: .5em; margin-right: 1em }
-
-/* Checkboxes */
-.xforms-select-appearance-full span { display: block; clear: both }
-.xforms-select-appearance-full span label { margin-left: .5em; margin-right: 1em }
 
 /* Upload control information */
 .xforms-upload-info {
@@ -248,45 +242,38 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 /* ***** Repeats **************************************************************************************************** */
 
 /* Repeats: all */
-.fr-repeat td { vertical-align: top; padding: 0.2em }
-/* First column of the table with the number displayed */
-.fr-repeat .fr-repeat-column { width: auto }
-.fr-repeat {
-    background-color: #EEEEEE;
-    /* Fix for Firefox in cases where the top and left borders of the table are not displayed */
-    margin: 1px 0 0 1px;
-}
+.fr-repeat td { vertical-align: middle }
 
 /* Repeats: shows as sections (can have multiple lines per iteration; repeated field labels) */
 .fr-repeat-sections th { display: none }
 .fr-repeat-sections .xforms-label { margin-top: 0 }
-.fr-repeat-sections .xforms-control { display: block } /* Otherwise control shows on same line as label in certain cases */
+.fr-repeat-sections .xforms-control { display: block }  /* Otherwise control shows on same line as label in certain cases */
+.yui-skin-sam .yui-dt .fr-repeat-sections tr.yui-dt-first td { border-top: none } /* remove top border added by YUI */
 
 /* Repeats: shows as table (1 line per iteration; labels used as header of table) */
 .fr-repeat-table {
-    border-collapse: collapse;
-    width: 100%
+    width: 100%;
+    clear: both
 }
-.fr-repeat-table td , .fr-repeat-table th { border: 1px solid #ddd; padding: .2em .5em .2em .5em }
 /* Styling for last dummy line added so IE displays the bottom border of the table */
 .fr-repeat-table .fr-repeat-last-line td { border: none; padding: 0 }
 .fr-repeat-table .fr-repeat-last-line { display: none }
-.fr-repeat-table th { background-color: #ddd }
 /* Don't show label, help, hint for controls inside a repeat-table (they are shown in the column header) */
 .fr-repeat-table td .xforms-label { display: none }
 .fr-repeat-table td .xforms-help-image { display: none }
 .fr-repeat-table td .xforms-help { display: none }
 .fr-repeat-table td .xforms-hint { display: none }
 /* But if there is a nested table, show those in the label in the column header of that table */
-.fr-repeat-table tr th .xforms-label { display: block; }
+.fr-repeat-table tr th .xforms-label { display: inline }
+.fr-repeat-table tr th .xforms-help-image { margin-top: 0 }
 
-
-.fr-repeat-table .fr-repeat-column-number { width: 1.5em; text-align: right }
+.yui-skin-sam .fr-repeat-column-trigger .yui-dt-liner { padding: 4px } /* override YUI */
 .fr-repeat-table .fr-repeat-column-trigger { width: 1.5em; text-align: center }
-.fr-grid .fr-grid-content .fr-repeat-table .fr-repeat-column-trigger .xforms-trigger { margin-top: 0 }/* because there is a margin set for triggers in grids below */
-
-/* Avoid funny background color in view mode */
-.fr-mode-view .fr-repeat-table .fr-grid-content { background-color: inherit }
+.yui-skin-sam .fr-repeat-table .fr-repeat-column-trigger { vertical-align: middle } /* override YUI */
+.fr-repeat-table .fr-repeat-column-trigger img { margin: 0; display: block }
+.fr-repeat-table .fr-repeat-column-trigger span img { *margin-left: 0px } /* IE buttons depress; is there a way to remove their 1px 3px padding? */
+/*.fr-repeat-table .fr-repeat-column-trigger button img { margin: 2px } *//* not sure why we need a different margin here */
+.fr-repeat-table .fr-repeat-column-trigger button { display: block; margin: auto }
 
 /* ***** Dialogs **************************************************************************************************** */
 
@@ -382,7 +369,7 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 .fr-grid .xbl-fr-autocomplete .xforms-input input { width: 140px }
 
 /* Make HTML editor shorter by default */
-.fr-grid textarea.xforms-mediatype-text-html { height: 10em }
+.fr-grid textarea.xforms-mediatype-text-html { height: 10.1em } /* NOTE: with Firefox, 10em makes bottom line disappear */
 
 /* Set this again as default is 100% above */
 /* NOTE: This doesn't work well with IE 6/7, see below hand-tuned widths for IE */
@@ -391,28 +378,29 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
     width: 7.5em;
 }
 
-/* Radio buttons */
-.fr-grid .xforms-select1-appearance-full span input { float: left }
-.fr-grid .xforms-select1-appearance-full span label { float: left; margin-right: 0 }
-/* Size of text for radio button; needs to be set for every page width / columns number combination */
-#doc .fr-grid-2-columns .xforms-select1-appearance-full span label { width: 21em; *width: 20.5em }
+/* Checkboxes and radio buttons */
+.xforms-select1-appearance-full span { display: block; clear: both }
+.xforms-select1-appearance-full span label { margin-left: .5em; margin-right: 1em }
 
-#doc4 .fr-grid-1-columns .xforms-select1-appearance-full span label { width: 68em; *width: 66em }
-#doc4 .fr-grid-2-columns .xforms-select1-appearance-full span label { width: 32em; *width: 31em  }
-#doc4 .fr-grid-3-columns .xforms-select1-appearance-full span label { width: 20em; *width: 19em }
-#doc4 .fr-grid-4-columns .xforms-select1-appearance-full span label { width: 14.5em; *width: 13.5em }
+.xforms-select-appearance-full span { display: block; clear: both }
+.xforms-select-appearance-full span label { margin-left: .5em; margin-right: 1em }
 
-/* Checkboxes */
-.fr-grid .xforms-select-appearance-full span input { float: left }
-.fr-grid .xforms-select-appearance-full span label { float: left; margin-right: 0 }
-/* Size of text for checkboxes; needs to be set for every page width / columns number combination */
-#doc .fr-grid-1-columns .xforms-select-appearance-full span label { width: 50em; *width: 48.8em }
-#doc .fr-grid-2-columns .xforms-select-appearance-full span label { width: 22.5em; *width: 21.9em }
+.xforms-select-appearance-full span label, .xforms-select1-appearance-full span label {
+    display: block;
+    padding-left: 17px;
+    text-indent: -17px;
+}
 
-#doc4 .fr-grid-1-columns .xforms-select-appearance-full span label { width: 68em; *width: 66em }
-#doc4 .fr-grid-2-columns .xforms-select-appearance-full span label { width: 32.2em; *width: 31em }
-#doc4 .fr-grid-3-columns .xforms-select-appearance-full span label { width: 20.2em; *width: 19em }
-#doc4 .fr-grid-4-columns .xforms-select-appearance-full span label { width: 14.5em; *width: 13.5em }
+.xforms-select-appearance-full span label input, .xforms-select1-appearance-full span label input  {
+    width: 13px;
+    height: 13px;
+    padding: 0;
+    margin: 0 4px 0 0;
+    vertical-align: bottom;
+    position: relative;
+    top: -1px;
+    *overflow: hidden;
+}
 
 /* But for boolean inputs, don't size (for IE) */
 .fr-grid .xforms-type-boolean input {
@@ -437,6 +425,7 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 .fr-grid-td { width: auto; vertical-align: top; overflow: hidden }
 .fr-grid-td .fb-grid-content { width: 64em; *width: 62.4576em }
 
+.fr-grid-1-columns .fr-grid-td { width: 100% }
 .fr-grid-2-columns .fr-grid-td { width: 50% }
 .fr-grid-3-columns .fr-grid-td { width: 33.3% }
 .fr-grid-4-columns .fr-grid-td { width: 25% }
@@ -461,7 +450,8 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 
 /* Hand-tuned control widths for IE <= 7 */
 /* TODO: more controls */
-#doc4 .fr-grid-td .fr-grid-content .xforms-textarea { *width: 98% }
+#doc4 .fr-grid-1-columns .fr-grid-td .fr-grid-content .xforms-textarea { *width: 98% }
+
 #doc4 .fr-grid-2-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 99.5% }
 #doc4 .fr-grid-3-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 95% }
 #doc4 .fr-grid-4-columns .fr-grid-td .fr-grid-content .xforms-input-input { *width: 95% }
@@ -486,6 +476,20 @@ button.xforms-trigger img, .xforms-trigger button img { margin-right: 10px }
 /* Show placeholder frame for buttons */
 .fr-buttons-placeholder { width: 100%; display: block; text-align: center }
 .fr-buttons-placeholder div { margin: .5em }
+
+/* Custom control widths */
+#fr-view .fr-grid .fr-grid-content .fr-width-2em input.xforms-input-input,
+    #fr-view .fr-grid .fr-grid-content input.fr-width-2em,
+    #fr-view .fr-grid .fr-grid-content select.fr-width-2em, #fr-view .fr-grid .fr-grid-content .fr-width-2em select { width: 2em }
+#fr-view .fr-grid .fr-grid-content .fr-width-5em input.xforms-input-input,
+    #fr-view .fr-grid .fr-grid-content input.fr-width-5em,
+    #fr-view .fr-grid .fr-grid-content select.fr-width-5em, #fr-view .fr-grid .fr-grid-content .fr-width-5em select { width: 5em }
+#fr-view .fr-grid .fr-grid-content .fr-width-10em input.xforms-input-input,
+    #fr-view .fr-grid .fr-grid-content input.fr-width-10em,
+    #fr-view .fr-grid .fr-grid-content select.fr-width-10em, #fr-view .fr-grid .fr-grid-content .fr-width-10em select { width: 10em }
+#fr-view .fr-grid .fr-grid-content .fr-width-15em input.xforms-input-input,
+    #fr-view .fr-grid .fr-grid-content input.fr-width-15em,
+    #fr-view .fr-grid .fr-grid-content select.fr-width-15em, #fr-view .fr-grid .fr-grid-content .fr-width-15em select { width: 15em }
 
 /* ***** View, PDF, email ******************************************************************************************* */
 

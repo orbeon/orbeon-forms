@@ -547,6 +547,12 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String controlEffectiveId,
                                          String forEffectiveId, LHHAC lhha, String elementName, String value,
                                          boolean mustOutputHTMLFragment, boolean addIds) throws SAXException {
+        outputLabelForStart(handlerContext, attributes, controlEffectiveId, forEffectiveId, lhha, elementName, addIds);
+        outputLabelForEnd(handlerContext, elementName, value, mustOutputHTMLFragment);
+    }
+
+    protected static void outputLabelForStart(HandlerContext handlerContext, Attributes attributes, String controlEffectiveId,
+                                              String forEffectiveId, LHHAC lhha, String elementName, boolean addIds) throws SAXException {
 
         // Replace id attribute to be foo-label, foo-hint, foo-help, or foo-alert
         final AttributesImpl newAttribute;
@@ -567,6 +573,14 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName, newAttribute);
+    }
+
+    protected static void outputLabelForEnd(HandlerContext handlerContext, String elementName, String value, boolean mustOutputHTMLFragment) throws SAXException {
+
+        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        final String labelQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+
         // Only output content when there value is non-empty
         if (value != null && !value.equals("")) {
             if (mustOutputHTMLFragment) {

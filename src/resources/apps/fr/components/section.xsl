@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -50,7 +50,7 @@
                 <!-- Open/close button -->
                 <xforms:group appearance="xxforms:internal">
                     <xsl:if test="$is-section-collapse">
-                        <xforms:switch id="switch-button-{$section-id}" xxforms:readonly-appearance="dynamic">
+                        <xforms:switch id="switch-button-{$section-id}" xxforms:readonly-appearance="dynamic" class="fr-section-arrow">
                             <xforms:case id="case-button-{$section-id}-closed" selected="{if (not($open)) then 'true' else 'false'}">
                                 <!-- "+" trigger -->
                                 <xforms:trigger appearance="minimal" id="button-{$section-id}-open" class="fr-section-open-close">
@@ -97,7 +97,7 @@
                         </xsl:when>
                         <xsl:when test="$is-section-collapse">
                             <!-- Set the section id to this trigger: this id matching is needed for noscript help -->
-                            <xforms:trigger id="{$section-id}" appearance="minimal">
+                            <xforms:trigger id="{$section-id}" appearance="minimal" class="fr-section-label">
                                 <xsl:apply-templates select="xforms:label | xforms:help | xforms:alert"/>
                             </xforms:trigger>
                         </xsl:when>

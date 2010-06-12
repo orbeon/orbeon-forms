@@ -519,7 +519,14 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         addItemAttributes(item, spanAttributes);
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, spanAttributes);
 
+        final boolean testSpanAroundInput = true;
+
         {
+            if (testSpanAroundInput) {
+                reusableAttributes.clear();
+                outputLabelForStart(handlerContext, reusableAttributes, itemEffectiveId, itemEffectiveId, LHHAC.LABEL, "label", false);
+            }
+
             {
                 // xhtml:input
                 final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
@@ -551,11 +558,16 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
             }
 
-            // We don't output the label within <input></input>, because XHTML won't display it.
-            final String label = item.getLabel();
-            if (label != null) { // allow null label to tell not to output the <label> element at all
-                reusableAttributes.clear();
-                outputLabelFor(handlerContext, reusableAttributes, itemEffectiveId, itemEffectiveId, LHHAC.LABEL, "label", label, false, false);// TODO: may be HTML for full appearance
+            if (testSpanAroundInput) {
+                final String label = item.getLabel();
+                outputLabelForEnd(handlerContext, "label", label, false);// TODO: may be HTML for full appearance
+            } else {
+                // We don't output the label within <input></input>, because XHTML won't display it.
+                final String label = item.getLabel();
+                if (label != null) { // allow null label to tell not to output the <label> element at all
+                    reusableAttributes.clear();
+                    outputLabelFor(handlerContext, reusableAttributes, itemEffectiveId, itemEffectiveId, LHHAC.LABEL, "label", label, false, false);// TODO: may be HTML for full appearance
+                }
             }
         }
 

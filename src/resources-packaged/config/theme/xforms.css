@@ -145,6 +145,12 @@ html body .xforms-form tr.xforms-disabled,
     border: none;
     background: transparent;
     cursor: hand;
+    *width: auto;  *overflow: visible; /* IE 6/7 HACK: remove funny variable padding within button */
+}
+
+/* Special rule for Firefox to remove extra padding inside noscript buttons working as links */
+button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trigger-appearance-xxforms-minimal button::-moz-focus-inner { 
+    border: 0; padding: 0;
 }
 
 .xforms-input input.xforms-type-date {

@@ -5768,7 +5768,7 @@ ORBEON.xforms.Server = {
                         // Case of going offline
                         if (event.eventName == "DOMActivate") {
                             var eventElement = ORBEON.util.Dom.getElementById(event.targetId);
-                            if (ORBEON.util.Dom.hasClass(eventElement, "xxforms-offline"))
+                            if (eventElement && ORBEON.util.Dom.hasClass(eventElement, "xxforms-offline"))
                                 sendInitialDynamicState = true;
                         }
                     }

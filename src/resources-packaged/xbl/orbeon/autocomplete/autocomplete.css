@@ -1,7 +1,26 @@
-/* Override position: absolute in YUI, otherwise the the input is taken out of the flow
-   and content after the autocomplete will show below the input field.  */
-.fr-autocomplete-search .xforms-input-input { position: static; width: 140px }
-.fr-autocomplete-search input { vertical-align: middle }
+/**
+ * The structure of the HTML as seen by the browser can be summaries as follows:
+ *
+ *      div class="xbl-fr-autocomplete"
+ *          div class="yui-ac"
+ *              span class="xforms-input"
+ *                  input class="xforms-input-input"    Input in which users type
+ *              div class="xbl-fr-select1-button"       Component showing full itemset
+ *              div class="yui-ac-container"
+ *                  div class="yui-ac-content"          Suggestions, position: absolute
+ *
+ */
+
+/**
+ * Override position: absolute in YUI, otherwise the the input is taken out of the flow and content after the
+ * autocomplete will show under the input field. Only the yui-ac-content is position:absolute, not the .yui-ac.
+ * The downside of this technique is that we can't automatically size the suggestion box based on the width of the input
+ * field, and need to set the width of the input field and the suggestion box.
+ */
+.xbl-fr-autocomplete .xforms-input-input { position: static; width: 140px }
+.xbl-fr-autocomplete .yui-ac { position: static }
+.xbl-fr-autocomplete .yui-ac-container { top: auto; position: static }
+.xbl-fr-autocomplete .yui-ac-content { width: 140px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
 
 /* Make the div that contains the text field inline-block so the component can be used in inline mode
    http://wiki.orbeon.com/forms/doc/contributor-guide/ie-bugs#TOC-Inline-block */
@@ -13,21 +32,14 @@
     vertical-align: middle;
 }
 
-/* Set positioning to absolute, overriding the YUI relative positioning, so the suggestion list is not cropped if the
-   control is used is a box with overflow: hidden, as in Form Runner. More on this at:
-   http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Absolutely-positioned-box-inside-a- */
-/*.xbl-fr-autocomplete .yui-ac { position: absolute }*/
-
-/* Required so the left border of the suggestion box is aligned with the left border of the text field.
-   http://wiki.orbeon.com/forms/doc/contributor-guide/ie-bugs#TOC-IE6:-position:-absolute-div-acquiri */
-/*.xbl-fr-autocomplete .yui-ac-container { left: 0; }*/
-.xbl-fr-autocomplete .yui-ac { position: static }
-.xbl-fr-autocomplete .yui-ac-container { top: auto; position: static }
-.xbl-fr-autocomplete .yui-ac-content { width: 140px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
-
+/* Full itemset button inline, next to the text field */
 .xbl-fr-autocomplete .xbl-fr-select1-button { vertical-align: middle; display: inline-block; *display: inline }
 
+/* Get the input field vertically aligned on the full itemset button */
 .xbl-fr-autocomplete .xbl-fr-select1-button .yui-menu-button { vertical-align: middle }
+.xbl-fr-autocomplete input { vertical-align: middle }
+
+/* Hide the text that would otherwise in the full itemset button */
 .xbl-fr-autocomplete .xbl-fr-select1-button .yui-menu-button button {
     width: 22px;
     text-indent: -9999px;

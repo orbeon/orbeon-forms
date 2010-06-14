@@ -55,8 +55,8 @@
                     <xf:value/>
                 </xf:item>
                 <xf:itemset ref="instance()/state" xxbl:scope="inner">
-                    <xf:label ref="@value"/>
-                    <xf:value ref="@value"/>
+                    <xf:label ref="@name"/>
+                    <xf:value ref="@abbreviation"/>
                 </xf:itemset>
             </xf:select1>
         </xbl:template>

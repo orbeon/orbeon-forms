@@ -436,7 +436,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 /* ***** Submission connection ************************************************************************** */
 
                 // Iterate through submissions and run the first match
-                for (Submission submission: submissions) {
+                for (final Submission submission: submissions) {
                     if (submission.isMatch(propertyContext, p, p2, sp)) {
                         if (indentedLogger.isDebugEnabled())
                             indentedLogger.startHandleOperation("", "connecting", "type", submission.getType());
@@ -1068,7 +1068,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                       XFormsInstance defaultReplaceInstance, Item submissionElementContextItem) {
         final Object destinationObject;
         if (targetref == null) {
-            // There is no explicit @targetref, so the target is implicity the root element of either the instance
+            // There is no explicit @targetref, so the target is implicitly the root element of either the instance
             // pointed to by @ref, or the instance specified by @instance or @xxforms:instance.
             destinationObject = defaultReplaceInstance.getInstanceRootElementInfo();
         } else {
@@ -1144,7 +1144,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         // Revalidate instance
         // NOTE: We need to do this here so that bind/@type works correctly. XForms 1.1 seems to say that this
         // must be done after pruning, but then it is not clear how XML Schema validation would work then.
-        if (modelForInstance != null)
+        if (resolvedValidate && modelForInstance != null)
             modelForInstance.doRevalidate(propertyContext);
 
         // Get selected nodes (re-root and prune)

@@ -1,5 +1,21 @@
-.xbl-fr-spell-checker { display: inline; }
-.xbl-fr-spell-checker .xbl-fr-spell-checker-icon { background-image: url('../../../apps/fr/style/images/silk/spellcheck.png'); display: inline-block; width: 16px; height: 16px }
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+
+.xbl-fr-spell-checker { display: inline; vertical-align: top }
+.xbl-fr-spell-checker .xbl-fr-button .fr-spell-checker-start button {
+    background: url(../../../apps/fr/style/images/silk/spellcheck.png) no-repeat 5px; padding: 0 10px 0 25px;}
+
 .fr-spell-checker-dialog { width: 460px }
 .fr-spell-checker-dialog .xforms-label { width: 90px; display: inline-block }
 .fr-spell-checker-dialog .xforms-output-output { font-weight: bold }

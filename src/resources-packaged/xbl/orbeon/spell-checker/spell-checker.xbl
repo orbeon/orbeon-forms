@@ -125,13 +125,13 @@
                     </xxforms:variable>
 
                     <!-- Trigger that starts spell checking -->
-                    <xforms:trigger appearance="minimal" ref="." class="xbl-fr-spell-checker-icon">
-                        <xforms:label/>
+                    <fr:button ref="." class="fr-spell-checker-start">
+                        <xforms:label>Spell check</xforms:label>
                         <xforms:action ev:event="DOMActivate">
                             <xforms:setvalue ref="instance('request')/text" value="$binding"/>
                             <xforms:send submission="spell-check-submission"/>
                         </xforms:action>
-                    </xforms:trigger>
+                    </fr:button>
 
                     <!-- Spell checking dialog -->
                     <xxforms:dialog id="spell-checking-dialog" class="fr-spell-checker-dialog">

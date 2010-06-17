@@ -1453,7 +1453,6 @@
 
                     </xforms:model>
                 </xhtml:head>
-                <xhtml:body/>
             </xhtml:html>
         </input>
         <output name="response">

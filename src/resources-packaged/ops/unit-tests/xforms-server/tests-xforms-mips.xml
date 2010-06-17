@@ -259,7 +259,6 @@
 
                                 </xforms:model>
                             </xhtml:head>
-                            <xhtml:body/>
                         </xhtml:html>
                     </p:input>
                     <p:output name="response" ref="response"/>
@@ -357,7 +356,6 @@
 
                                 </xforms:model>
                             </xhtml:head>
-                            <xhtml:body/>
                         </xhtml:html>
                     </p:input>
                     <p:output name="response" ref="response"/>

@@ -1257,4 +1257,165 @@
         </output>
     </test>
 
+    <test description="Test xforms:submission/@xxforms:recalculate" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+
+                        <xforms:instance id="request">
+                            <request/>
+                        </xforms:instance>
+
+                        <xforms:instance id="response-calculate-norebuild">
+                            <response/>
+                        </xforms:instance>
+
+                        <xforms:instance id="response-calculate-rebuild">
+                            <response/>
+                        </xforms:instance>
+
+                        <xforms:instance id="response-nocalculate-norebuild">
+                            <response/>
+                        </xforms:instance>
+
+                        <xforms:instance id="response-nocalculate-rebuild">
+                            <response/>
+                        </xforms:instance>
+
+                        <xforms:instance id="template" xxforms:readonly="true">
+                            <request>
+                                <value/>
+                                <value/>
+                                <position>1</position>
+                                <source>42</source>
+                            </request>
+                        </xforms:instance>
+
+                        <xforms:bind ref="instance()/value[position() = instance()/position]" calculate="instance()/source"/>
+
+                        <!-- Run submissions upon init -->
+                        <xforms:action ev:event="xforms-model-construct-done">
+                            <xforms:send submission="calculate-norebuild"/>
+                            <xforms:send submission="calculate-rebuild"/>
+                            <xforms:send submission="nocalculate-norebuild"/>
+                            <xforms:send submission="nocalculate-rebuild"/>
+                        </xforms:action>
+
+                        <xforms:submission id="calculate-norebuild" ref="instance()" method="post" resource="test:"
+                                           replace="instance" instance="response-calculate-norebuild"
+                                           validate="false" relevant="false">
+
+                            <xforms:action ev:event="xforms-submit">
+                                <!-- Restore state -->
+                                <xforms:insert nodeset="instance()" origin="instance('template')"/>
+                                <xforms:refresh/>
+                                <!-- setvalue: expecting just recalculate -->
+                                <xforms:setvalue ref="instance()/source">888</xforms:setvalue>
+                                <xforms:setvalue ref="instance()/position">2</xforms:setvalue>
+                            </xforms:action>
+                        </xforms:submission>
+
+                        <xforms:submission id="calculate-rebuild" ref="instance()" method="post" resource="test:"
+                                           replace="instance" instance="response-calculate-rebuild"
+                                           validate="false" relevant="false">
+
+                            <xforms:action ev:event="xforms-submit">
+                                <!-- Restore state but don't refresh -->
+                                <xforms:insert nodeset="instance()" origin="instance('template')"/>
+
+                                <!-- Because of insert above, expecting: rebuild, recalculate -->
+                                <xforms:setvalue ref="instance()/source">888</xforms:setvalue>
+                                <xforms:setvalue ref="instance()/position">2</xforms:setvalue>
+                            </xforms:action>
+                        </xforms:submission>
+
+                        <xforms:submission id="nocalculate-norebuild" ref="instance()" method="post" resource="test:"
+                                           replace="instance" instance="response-nocalculate-norebuild"
+                                           validate="false" relevant="false" xxforms:calculate="false">
+
+                            <xforms:action ev:event="xforms-submit">
+                                <!-- Restore state -->
+                                <xforms:insert nodeset="instance()" origin="instance('template')"/>
+                                <xforms:refresh/>
+                                <!-- NOT expecting rebuild or recalculate, binds point to new instance -->
+                                <xforms:setvalue ref="instance()/source">888</xforms:setvalue>
+                                <xforms:setvalue ref="instance()/position">2</xforms:setvalue>
+                            </xforms:action>
+                        </xforms:submission>
+
+                        <xforms:submission id="nocalculate-rebuild" ref="instance()" method="post" resource="test:"
+                                           replace="instance" instance="response-nocalculate-rebuild"
+                                           validate="false" relevant="false" xxforms:calculate="false">
+
+                            <xforms:action ev:event="xforms-submit">
+                                <!-- Restore state but don't refresh -->
+                                <xforms:insert nodeset="instance()" origin="instance('template')"/>
+
+                                <!-- NOT expecting rebuild or recalculate, and binds point to old instance -->
+                                <xforms:setvalue ref="instance()/source">888</xforms:setvalue>
+                                <xforms:setvalue ref="instance()/position">2</xforms:setvalue>
+                            </xforms:action>
+                        </xforms:submission>
+
+                    </xforms:model>
+                </xhtml:head>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="request" model-id="model">
+                                <request>
+                                    <value/>
+                                    <value>888</value>
+                                    <position>2</position>
+                                    <source>888</source>
+                                </request>
+                            </instance>
+                            <instance id="response-calculate-norebuild" model-id="model" replaced="true">
+                                <request>
+                                    <value>888</value>
+                                    <value/>
+                                    <position>2</position>
+                                    <source>888</source>
+                                </request>
+                            </instance>
+                            <instance id="response-calculate-rebuild" model-id="model" replaced="true">
+                                <request>
+                                    <value/>
+                                    <value>888</value>
+                                    <position>2</position>
+                                    <source>888</source>
+                                </request>
+                            </instance>
+                            <instance id="response-nocalculate-norebuild" model-id="model" replaced="true">
+                                <request>
+                                    <value>42</value>
+                                    <value/>
+                                    <position>2</position>
+                                    <source>888</source>
+                                </request>
+                            </instance>
+                            <instance id="response-nocalculate-rebuild" model-id="model" replaced="true">
+                                <request>
+                                    <value/>
+                                    <value/>
+                                    <position>2</position>
+                                    <source>888</source>
+                                </request>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

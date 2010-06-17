@@ -271,6 +271,7 @@ public class XFormsConstants {
 
     public static final QName XXFORMS_OFFLINE_QNAME = new QName("offline", XXFORMS_NAMESPACE);
 
+    public static final QName XXFORMS_CALCULATE_QNAME = new QName("calculate", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_USERNAME_QNAME = new QName("username", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_PASSWORD_QNAME = new QName("password", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DOMAIN_QNAME = new QName("domain", XXFORMS_NAMESPACE);

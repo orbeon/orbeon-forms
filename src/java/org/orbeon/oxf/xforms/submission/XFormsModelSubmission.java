@@ -76,6 +76,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
     private String avtValidate;
     private String avtRelevant;
+    private String avtXXFormsCalculate;
 
     private String avtSerialization;
     private boolean serialize = true;// computed from @serialization attribute or legacy @serialize attribute
@@ -186,6 +187,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             }
             avtValidate = submissionElement.attributeValue("validate");
             avtRelevant = submissionElement.attributeValue("relevant");
+            avtXXFormsCalculate = submissionElement.attributeValue(XFormsConstants.XXFORMS_CALCULATE_QNAME);
 
             avtSerialization = submissionElement.attributeValue("serialization");
             if (avtSerialization != null) {
@@ -345,13 +347,22 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final XFormsModel modelForInstance;
                 if (p.refInstance != null) {
                     modelForInstance = p.refInstance.getModel(containingDocument);
-                    {
+                    if (modelForInstance != null) {
+                        // NOTE: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
+                        // Here, we rebuild/recalculate instead the model containing the submission's single-node binding.
+                        // This can be different than the model containing the submission if using e.g. xxforms:instance().
+
                         // NOTE: XForms 1.1 seems to say this should happen regardless of whether we serialize or not. If
                         // the instance is not serialized and if no instance data is otherwise used for the submission,
-                        // this seems however unneeded.
-
-                        // TODO: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
-                        modelForInstance.rebuildRecalculateIfNeeded(propertyContext);
+                        // this seems however unneeded so we optimize out.
+                        if (p.resolvedValidate || p.resolvedRelevant || p.resolvedXXFormsCalculate) {
+                            // Rebuild impacts validation, relevance and calculated values (set by recalculate)
+                            modelForInstance.doRebuild(propertyContext);
+                        }
+                        if (p.resolvedRelevant || p.resolvedXXFormsCalculate) {
+                            // Recalculate impacts relevance and calculated values
+                            modelForInstance.doRecalculate(propertyContext, false);
+                        }
                     }
                 } else {
                     // Case where no instance was found
@@ -696,6 +707,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         final boolean resolvedValidate;
         final boolean resolvedRelevant;
+        final boolean resolvedXXFormsCalculate;
 
         final boolean isHandlingClientGetAll;
 
@@ -769,10 +781,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 // Resolve validate and relevant AVTs
                 final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo , avtValidate);
-                resolvedValidate = !"false".equals(resolvedValidateString);
+                // "The default value is "false" if the value of serialization is "none" and "true" otherwise"
+                resolvedValidate = serialize && !"false".equals(resolvedValidateString);
 
                 final String resolvedRelevantString = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo , avtRelevant);
-                resolvedRelevant = !"false".equals(resolvedRelevantString);
+                // "The default value is "false" if the value of serialization is "none" and "true" otherwise"
+                resolvedRelevant = serialize && !"false".equals(resolvedRelevantString);
+
+                final String resolvedCalculateString = XFormsUtils.resolveAttributeValueTemplates(propertyContext, xpathContext, refNodeInfo , avtXXFormsCalculate);
+                resolvedXXFormsCalculate = serialize && !"false".equals(resolvedCalculateString);
             }
 
             isHandlingClientGetAll = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && actualHttpMethod.equals("GET")
@@ -1142,8 +1159,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final Document documentToSubmit;
 
         // Revalidate instance
-        // NOTE: We need to do this here so that bind/@type works correctly. XForms 1.1 seems to say that this
+        // NOTE: We need to do this before pruning so that bind/@type works correctly. XForms 1.1 seems to say that this
         // must be done after pruning, but then it is not clear how XML Schema validation would work then.
+        // Also, if validate="false" or if serialization="none", then we do not revalidate. Now whether this optimization
+        // is acceptable depends on whether validate="false" only means "don't check the instance's validity" or also
+        // don't even recalculate. If the latter, then this also means that type annotations won't be updated, which
+        // can impact serializations that use type information, for example multipart. But in that case, here we decide
+        // the optimization is worth it anyway.
         if (resolvedValidate && modelForInstance != null)
             modelForInstance.doRevalidate(propertyContext);
 

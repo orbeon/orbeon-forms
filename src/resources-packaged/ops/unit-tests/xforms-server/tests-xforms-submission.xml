@@ -149,44 +149,34 @@
     </test>
 
     <test description="Submitting required but empty values fails submission" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="main-model">
+                        <xforms:instance id="main-instance">
+                            <instance xmlns="">
+                                <required-but-emtpy-element/>
+                                <other-element required-but-emtpy-attribute=""/>
+                                <submission-serialized>false</submission-serialized>
+                                <submission-result/>
+                            </instance>
+                        </xforms:instance>
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="main-model">
-                                    <xforms:instance id="main-instance">
-                                        <instance xmlns="">
-                                            <required-but-emtpy-element/>
-                                            <other-element required-but-emtpy-attribute=""/>
-                                            <submission-serialized>false</submission-serialized>
-                                            <submission-result/>
-                                        </instance>
-                                    </xforms:instance>
+                        <xforms:bind nodeset="required-but-emtpy-element" required="true()"/>
+                        <xforms:bind nodeset="other-element/@required-but-emtpy-attribute" required="true()"/>
 
-                                    <xforms:bind nodeset="required-but-emtpy-element" required="true()"/>
-                                    <xforms:bind nodeset="other-element/@required-but-emtpy-attribute" required="true()"/>
-
-                                    <xforms:submission id="test-submission" method="post" action="test:" replace="instance">
-                                        <xforms:setvalue ev:event="xforms-submit-error" ref="submission-result">error</xforms:setvalue>
-                                        <xforms:setvalue ev:event="xforms-submit-done" ref="submission-result">done</xforms:setvalue>
-                                        <xforms:setvalue ev:event="xforms-submit-serialize" ref="submission-serialized">true</xforms:setvalue>
-                                    </xforms:submission>
-                                    <xforms:send ev:event="xforms-ready" submission="test-submission"/>
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                        <xforms:submission id="test-submission" method="post" action="test:" replace="instance">
+                            <xforms:setvalue ev:event="xforms-submit-error" ref="submission-result">error</xforms:setvalue>
+                            <xforms:setvalue ev:event="xforms-submit-done" ref="submission-result">done</xforms:setvalue>
+                            <xforms:setvalue ev:event="xforms-submit-serialize" ref="submission-serialized">true</xforms:setvalue>
+                        </xforms:submission>
+                        <xforms:send ev:event="xforms-ready" submission="test-submission"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -212,49 +202,39 @@
     </test>
 
     <test description="Instance replacement on xforms-ready with read-only instance properly updates controls" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                        <xforms:instance id="initial-instance">
+                            <instance>
+                                <value>1</value>
+                            </instance>
+                        </xforms:instance>
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model>
-                                    <xforms:instance id="initial-instance">
-                                        <instance>
-                                            <value>1</value>
-                                        </instance>
-                                    </xforms:instance>
+                        <xforms:instance id="new-instance" xxforms:readonly="true">
+                            <instance>
+                                <value>2</value>
+                            </instance>
+                        </xforms:instance>
 
-                                    <xforms:instance id="new-instance" xxforms:readonly="true">
-                                        <instance>
-                                            <value>2</value>
-                                        </instance>
-                                    </xforms:instance>
+                        <xforms:submission id="replace-submission"
+                                           ref="instance('new-instance')" method="post" resource="test:"
+                                           replace="instance" instance="initial-instance"
+                                           xxforms:readonly="true"/>
 
-                                    <xforms:submission id="replace-submission"
-                                                       ref="instance('new-instance')" method="post" resource="test:"
-                                                       replace="instance" instance="initial-instance"
-                                                       xxforms:readonly="true"/>
+                        <!-- When this is called on xforms-ready, controls must update properly -->
+                        <xforms:send ev:event="xforms-ready" submission="replace-submission"/>
 
-                                    <!-- When this is called on xforms-ready, controls must update properly -->
-                                    <xforms:send ev:event="xforms-ready" submission="replace-submission"/>
-
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-                                <xforms:input ref="value" id="my-input">
-                                    <xforms:label>Value:</xforms:label>
-                                </xforms:input>
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:input ref="value" id="my-input">
+                        <xforms:label>Value:</xforms:label>
+                    </xforms:input>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -279,49 +259,39 @@
     </test>
 
     <test description="XInclude upon replacement of cached instance" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <!-- Instance with XInclude -->
+                        <xforms:instance id="instance-xinclude">
+                            <dummy xmlns=""/>
+                        </xforms:instance>
+                        <!-- Load instance upon init -->
+                        <xforms:send ev:event="xforms-model-construct-done" submission="get-instance-xinclude"/>
+                        <xforms:submission id="get-instance-xinclude" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/url-generator/included-1.xml"
+                                replace="instance" instance="instance-xinclude" xxforms:readonly="true" xxforms:shared="application" xxforms:xinclude="true"/>
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
-                                    <!-- Instance with XInclude -->
-                                    <xforms:instance id="instance-xinclude">
-                                        <dummy xmlns=""/>
-                                    </xforms:instance>
-                                    <!-- Load instance upon init -->
-                                    <xforms:send ev:event="xforms-model-construct-done" submission="get-instance-xinclude"/>
-                                    <xforms:submission id="get-instance-xinclude" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/url-generator/included-1.xml"
-                                            replace="instance" instance="instance-xinclude" xxforms:readonly="true" xxforms:shared="application" xxforms:xinclude="true"/>
+                        <!-- Instance without XInclude -->
+                        <xforms:instance id="instance-no-xinclude">
+                            <dummy xmlns=""/>
+                        </xforms:instance>
+                        <!-- Load instance upon init -->
+                        <xforms:send ev:event="xforms-model-construct-done" submission="get-instance-no-xinclude"/>
+                        <xforms:submission id="get-instance-no-xinclude" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/url-generator/included-1.xml"
+                                replace="instance" instance="instance-no-xinclude" xxforms:readonly="true" xxforms:cache="true" xxforms:xinclude="false"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <!-- The title is found under the XIncluded content -->
+                    <xforms:output id="my-output-xinclude" ref="instance('instance-xinclude')//xhtml:title"/>
 
-                                    <!-- Instance without XInclude -->
-                                    <xforms:instance id="instance-no-xinclude">
-                                        <dummy xmlns=""/>
-                                    </xforms:instance>
-                                    <!-- Load instance upon init -->
-                                    <xforms:send ev:event="xforms-model-construct-done" submission="get-instance-no-xinclude"/>
-                                    <xforms:submission id="get-instance-no-xinclude" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/url-generator/included-1.xml"
-                                            replace="instance" instance="instance-no-xinclude" xxforms:readonly="true" xxforms:cache="true" xxforms:xinclude="false"/>
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-                                <!-- The title is found under the XIncluded content -->
-                                <xforms:output id="my-output-xinclude" ref="instance('instance-xinclude')//xhtml:title"/>
-
-                                <xforms:output id="my-output-no-xinclude" ref="instance('instance-no-xinclude')//xhtml:title"/>
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                    <xforms:output id="my-output-no-xinclude" ref="instance('instance-no-xinclude')//xhtml:title"/>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -344,57 +314,47 @@
     </test>
 
     <test description="Instance replacement: replace submitted instance" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model">
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
+                        <xforms:instance id="source-instance">
+                            <dummy xmlns=""/>
+                        </xforms:instance>
 
-                                    <xforms:instance id="source-instance">
-                                        <dummy xmlns=""/>
-                                    </xforms:instance>
+                        <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
+                        <xforms:submission id="replace-instance" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance"/>
 
-                                    <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
-                                    <xforms:submission id="replace-instance" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance"/>
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+                        <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
+                                                 ))"/>
+                        <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
+                                                 ))"/>
 
-                                    <!-- TEST: Events to gather -->
-                                    <xforms:instance id="events">
-                                        <events/>
-                                    </xforms:instance>
-                                    <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
-                                                             for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
-                                                             ))"/>
-                                    <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
-                                                             ))"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -424,57 +384,47 @@
     </test>
 
     <test description="Instance replacement: replace submitted instance using @targetref" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model">
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
+                        <xforms:instance id="source-instance">
+                            <dummy xmlns=""/>
+                        </xforms:instance>
 
-                                    <xforms:instance id="source-instance">
-                                        <dummy xmlns=""/>
-                                    </xforms:instance>
+                        <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
+                        <xforms:submission id="replace-instance" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance" targetref="instance('source-instance')"/>
 
-                                    <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
-                                    <xforms:submission id="replace-instance" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance" targetref="instance('source-instance')"/>
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+                        <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
+                                                 ))"/>
+                        <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
+                                                 ))"/>
 
-                                    <!-- TEST: Events to gather -->
-                                    <xforms:instance id="events">
-                                        <events/>
-                                    </xforms:instance>
-                                    <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
-                                                             for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
-                                                             ))"/>
-                                    <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
-                                                             ))"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -504,61 +454,51 @@
     </test>
 
     <test description="Instance replacement: replace subset of submitted instance using @targetref" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model">
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
+                        <xforms:instance id="source-instance">
+                            <books xmlns="">
+                                <before/>
+                                <here/>
+                                <after/>
+                            </books>
+                        </xforms:instance>
 
-                                    <xforms:instance id="source-instance">
-                                        <books xmlns="">
-                                            <before/>
-                                            <here/>
-                                            <after/>
-                                        </books>
-                                    </xforms:instance>
+                        <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
+                        <xforms:submission id="replace-instance" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance" targetref="instance('source-instance')/here"/>
 
-                                    <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
-                                    <xforms:submission id="replace-instance" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance" targetref="instance('source-instance')/here"/>
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+                        <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
+                                                 ))"/>
+                        <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
+                                                 ))"/>
 
-                                    <!-- TEST: Events to gather -->
-                                    <xforms:instance id="events">
-                                        <events/>
-                                    </xforms:instance>
-                                    <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
-                                                             for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
-                                                             ))"/>
-                                    <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
-                                                             ))"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -593,61 +533,51 @@
     </test>
 
     <test description="Instance replacement: replace other instance" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model">
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
+                        <xforms:instance id="source-instance">
+                            <dummy xmlns=""/>
+                        </xforms:instance>
 
-                                    <xforms:instance id="source-instance">
-                                        <dummy xmlns=""/>
-                                    </xforms:instance>
+                        <xforms:instance id="destination-instance">
+                            <dummy xmlns=""/>
+                        </xforms:instance>
 
-                                    <xforms:instance id="destination-instance">
-                                        <dummy xmlns=""/>
-                                    </xforms:instance>
+                        <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
+                        <xforms:submission id="replace-instance" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance" instance="destination-instance"/>
 
-                                    <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
-                                    <xforms:submission id="replace-instance" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance" instance="destination-instance"/>
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+                        <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
+                                                 ))"/>
+                        <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
+                                                 ))"/>
 
-                                    <!-- TEST: Events to gather -->
-                                    <xforms:instance id="events">
-                                        <events/>
-                                    </xforms:instance>
-                                    <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
-                                                             for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
-                                                             ))"/>
-                                    <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
-                                                             ))"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -680,61 +610,51 @@
     </test>
 
     <test description="Instance replacement: replace other instance using @instance and @targetref" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model">
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
+                        <xforms:instance id="source-instance">
+                            <dummy xmlns=""/>
+                        </xforms:instance>
 
-                                    <xforms:instance id="source-instance">
-                                        <dummy xmlns=""/>
-                                    </xforms:instance>
+                        <xforms:instance id="destination-instance">
+                            <dummy xmlns=""/>
+                        </xforms:instance>
 
-                                    <xforms:instance id="destination-instance">
-                                        <dummy xmlns=""/>
-                                    </xforms:instance>
+                        <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
+                        <xforms:submission id="replace-instance" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance" instance="destination-instance" targetref="."/>
 
-                                    <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
-                                    <xforms:submission id="replace-instance" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance" instance="destination-instance" targetref="."/>
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+                        <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
+                                                 ))"/>
+                        <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
+                                                 ))"/>
 
-                                    <!-- TEST: Events to gather -->
-                                    <xforms:instance id="events">
-                                        <events/>
-                                    </xforms:instance>
-                                    <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
-                                                             for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
-                                                             ))"/>
-                                    <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
-                                                             ))"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -767,61 +687,51 @@
     </test>
 
     <test description="Instance replacement: replace other instance using @targetref only" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model">
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
+                        <xforms:instance id="source-instance">
+                            <dummy xmlns=""/>
+                        </xforms:instance>
 
-                                    <xforms:instance id="source-instance">
-                                        <dummy xmlns=""/>
-                                    </xforms:instance>
+                        <xforms:instance id="destination-instance">
+                            <dummy xmlns=""/>
+                        </xforms:instance>
 
-                                    <xforms:instance id="destination-instance">
-                                        <dummy xmlns=""/>
-                                    </xforms:instance>
+                        <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
+                        <xforms:submission id="replace-instance" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance" targetref="instance('destination-instance')"/>
 
-                                    <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
-                                    <xforms:submission id="replace-instance" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance" targetref="instance('destination-instance')"/>
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+                        <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
+                                                 ))"/>
+                        <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
+                                                 ))"/>
 
-                                    <!-- TEST: Events to gather -->
-                                    <xforms:instance id="events">
-                                        <events/>
-                                    </xforms:instance>
-                                    <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
-                                                             for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
-                                                             ))"/>
-                                    <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
-                                                             ))"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -854,65 +764,55 @@
     </test>
 
     <test description="Instance replacement: replace subset of other instance using @targetref only" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model">
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
+                        <xforms:instance id="source-instance">
+                            <dummy xmlns=""/>
+                        </xforms:instance>
 
-                                    <xforms:instance id="source-instance">
-                                        <dummy xmlns=""/>
-                                    </xforms:instance>
+                        <xforms:instance id="destination-instance">
+                            <books>
+                                <before/>
+                                <here/>
+                                <after/>
+                            </books>
+                        </xforms:instance>
 
-                                    <xforms:instance id="destination-instance">
-                                        <books>
-                                            <before/>
-                                            <here/>
-                                            <after/>
-                                        </books>
-                                    </xforms:instance>
+                        <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
+                        <xforms:submission id="replace-instance" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance" targetref="instance('destination-instance')/here"/>
 
-                                    <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
-                                    <xforms:submission id="replace-instance" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance" targetref="instance('destination-instance')/here"/>
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+                        <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
+                                                 ))"/>
+                        <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
+                                                 ))"/>
 
-                                    <!-- TEST: Events to gather -->
-                                    <xforms:instance id="events">
-                                        <events/>
-                                    </xforms:instance>
-                                    <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
-                                                             for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
-                                                             ))"/>
-                                    <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
-                                                             ))"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -950,70 +850,60 @@
     </test>
 
     <test description="Instance replacement: destination points to instance element node" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model">
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
+                        <xforms:instance id="source-instance">
+                            <dummy xmlns="" foo="bar"/>
+                        </xforms:instance>
 
-                                    <xforms:instance id="source-instance">
-                                        <dummy xmlns="" foo="bar"/>
-                                    </xforms:instance>
+                        <xforms:action ev:event="xforms-model-construct-done">
+                            <xforms:send submission="replace-instance-1"/>
+                            <xforms:send submission="replace-instance-2"/>
+                            <xforms:send submission="replace-instance-3"/>
+                        </xforms:action>
+                        <!-- Attribute node -->
+                        <xforms:submission id="replace-instance-1" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance" targetref="/*/@bar"/>
+                        <!-- Document node -->
+                        <xforms:submission id="replace-instance-2" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance" targetref="/"/>
+                        <!-- Non-instance element -->
+                        <xforms:submission id="replace-instance-3" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance" targetref="xxforms:element('foobar')"/>
 
-                                    <xforms:action ev:event="xforms-model-construct-done">
-                                        <xforms:send submission="replace-instance-1"/>
-                                        <xforms:send submission="replace-instance-2"/>
-                                        <xforms:send submission="replace-instance-3"/>
-                                    </xforms:action>
-                                    <!-- Attribute node -->
-                                    <xforms:submission id="replace-instance-1" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance" targetref="/*/@bar"/>
-                                    <!-- Document node -->
-                                    <xforms:submission id="replace-instance-2" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance" targetref="/"/>
-                                    <!-- Non-instance element -->
-                                    <xforms:submission id="replace-instance-3" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance" targetref="xxforms:element('foobar')"/>
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+                        <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
+                                                 ))"/>
+                        <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('error-type') return xxforms:attribute('error-type', $c)
+                                                 ))"/>
 
-                                    <!-- TEST: Events to gather -->
-                                    <xforms:instance id="events">
-                                        <events/>
-                                    </xforms:instance>
-                                    <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
-                                                             for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
-                                                             ))"/>
-                                    <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('error-type') return xxforms:attribute('error-type', $c)
-                                                             ))"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -1041,86 +931,76 @@
     </test>
 
     <test description="Instance replacement: replace dispatches events for controls bound to replaced subset" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
+                        <xforms:instance id="source-instance">
+                            <books xmlns="">
+                                <book/>
+                                <book>
+                                    <title lang="fr">Jacques le fataliste et son maître</title>
+                                    <author>Diderot</author>
+                                </book>
+                            </books>
+                        </xforms:instance>
 
-                                    <xforms:instance id="source-instance">
-                                        <books xmlns="">
-                                            <book/>
-                                            <book>
-                                                <title lang="fr">Jacques le fataliste et son maître</title>
-                                                <author>Diderot</author>
-                                            </book>
-                                        </books>
-                                    </xforms:instance>
+                        <xforms:action ev:event="xforms-ready">
+                            <!-- Refresh will cause UI events dispatch -->
+                            <xforms:refresh/>
+                            <!-- Clear all events recorded so far -->
+                            <xforms:delete nodeset="instance('events')/*"/>
+                            <!-- Start submission -->
+                            <xforms:send submission="replace-instance"/>
+                        </xforms:action>
+                        <xforms:submission id="replace-instance" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance" targetref="instance('source-instance')/book"/>
 
-                                    <xforms:action ev:event="xforms-ready">
-                                        <!-- Refresh will cause UI events dispatch -->
-                                        <xforms:refresh/>
-                                        <!-- Clear all events recorded so far -->
-                                        <xforms:delete nodeset="instance('events')/*"/>
-                                        <!-- Start submission -->
-                                        <xforms:send submission="replace-instance"/>
-                                    </xforms:action>
-                                    <xforms:submission id="replace-instance" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance" targetref="instance('source-instance')/book"/>
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+                        <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
+                                                 ))"/>
+                        <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
+                                                 ))"/>
 
-                                    <!-- TEST: Events to gather -->
-                                    <xforms:instance id="events">
-                                        <events/>
-                                    </xforms:instance>
-                                    <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
-                                                             for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
-                                                             ))"/>
-                                    <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
-                                                             ))"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
+                    <xforms:group id="group">
+                        <xforms:insert ev:event="#all"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
+                                                 ))"/>
 
-                                <xforms:group id="group">
-                                    <xforms:insert ev:event="#all"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
-                                                             ))"/>
-
-                                    <!-- This must change -->
-                                    <xforms:input id="title1" ref="book[1]/title"/>
-                                    <xforms:input id="lang1" ref="book[1]/title/@lang"/>
-                                    <!-- This must not -->
-                                    <xforms:input id="title2" ref="book[2]/title"/>
-                                    <xforms:input id="lang2" ref="book[2]/title/@lang"/>
-                                </xforms:group>
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                        <!-- This must change -->
+                        <xforms:input id="title1" ref="book[1]/title"/>
+                        <xforms:input id="lang1" ref="book[1]/title/@lang"/>
+                        <!-- This must not -->
+                        <xforms:input id="title2" ref="book[2]/title"/>
+                        <xforms:input id="lang2" ref="book[2]/title/@lang"/>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -1164,57 +1044,47 @@
     </test>
     
     <test description="Instance replacement: replace text" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model">
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
+                        <xforms:instance id="source-instance">
+                            <book xmlns=""/>
+                        </xforms:instance>
 
-                                    <xforms:instance id="source-instance">
-                                        <book xmlns=""/>
-                                    </xforms:instance>
+                        <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
+                        <xforms:submission id="replace-instance" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="text" targetref="instance('source-instance')"/>
 
-                                    <xforms:send ev:event="xforms-model-construct-done" submission="replace-instance"/>
-                                    <xforms:submission id="replace-instance" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="text" targetref="instance('source-instance')"/>
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+                        <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
+                                                 ))"/>
+                        <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
+                                                 ))"/>
 
-                                    <!-- TEST: Events to gather -->
-                                    <xforms:instance id="events">
-                                        <events/>
-                                    </xforms:instance>
-                                    <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
-                                                             for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
-                                                             ))"/>
-                                    <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('error-type') return xxforms:attribute('inserted-nodes', $c)
-                                                             ))"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -1240,72 +1110,62 @@
     </test>
 
     <test description="Instance replacement: errors when using xxforms:readonly and/or xxforms:shared" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
+                        <xforms:instance id="source-instance">
+                            <dummy xmlns="">
+                                <nested-element/>
+                            </dummy>
+                        </xforms:instance>
 
-                                    <xforms:instance id="source-instance">
-                                        <dummy xmlns="">
-                                            <nested-element/>
-                                        </dummy>
-                                    </xforms:instance>
+                        <xforms:action ev:event="xforms-model-construct-done">
+                            <xforms:send submission="replace-instance-1"/>
+                            <xforms:send submission="replace-instance-2"/>
+                            <xforms:send submission="replace-instance-3"/>
+                        </xforms:action>
+                        <!-- xxforms:readonly -->
+                        <xforms:submission id="replace-instance-1" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance" targetref="/*/nested-element" xxforms:readonly="true"/>
+                        <!-- xxforms:shared -->
+                        <xforms:submission id="replace-instance-2" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance" targetref="/*/nested-element" xxforms:readonly="true" xxforms:shared="application"/>
+                        <!-- Regular case -->
+                        <xforms:submission id="replace-instance-3" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
+                                replace="instance" targetref="/*/nested-element" />
 
-                                    <xforms:action ev:event="xforms-model-construct-done">
-                                        <xforms:send submission="replace-instance-1"/>
-                                        <xforms:send submission="replace-instance-2"/>
-                                        <xforms:send submission="replace-instance-3"/>
-                                    </xforms:action>
-                                    <!-- xxforms:readonly -->
-                                    <xforms:submission id="replace-instance-1" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance" targetref="/*/nested-element" xxforms:readonly="true"/>
-                                    <!-- xxforms:shared -->
-                                    <xforms:submission id="replace-instance-2" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance" targetref="/*/nested-element" xxforms:readonly="true" xxforms:shared="application"/>
-                                    <!-- Regular case -->
-                                    <xforms:submission id="replace-instance-3" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml"
-                                            replace="instance" targetref="/*/nested-element" />
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+                        <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
+                                                 for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
+                                                 ))"/>
+                        <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
+                                       context="instance('events')" nodeset="*"
+                                       origin="xxforms:element('event',
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 for $c in event('error-type') return xxforms:attribute('error-type', $c)
+                                                 ))"/>
 
-                                    <!-- TEST: Events to gather -->
-                                    <xforms:instance id="events">
-                                        <events/>
-                                    </xforms:instance>
-                                    <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('inserted-nodes')[1] return xxforms:attribute('inserted-nodes', name($c)),
-                                                             for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
-                                                             ))"/>
-                                    <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                                   context="instance('events')" nodeset="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             for $c in event('error-type') return xxforms:attribute('error-type', $c)
-                                                             ))"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -1340,52 +1200,42 @@
     </test>
 
     <test description="Replacement of read-write cached instance keeps instances separate" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
+                        <xforms:instance id="instance-1">
+                            <dummy xmlns=""/>
+                        </xforms:instance>
+                        <xforms:instance id="instance-2">
+                            <dummy xmlns=""/>
+                        </xforms:instance>
 
-                                    <xforms:instance id="instance-1">
-                                        <dummy xmlns=""/>
-                                    </xforms:instance>
-                                    <xforms:instance id="instance-2">
-                                        <dummy xmlns=""/>
-                                    </xforms:instance>
+                        <!-- Load instances upon init -->
+                        <xforms:action ev:event="xforms-model-construct-done">
+                            <xforms:send submission="get-instance-1"/>
+                            <xforms:send submission="get-instance-2"/>
+                        </xforms:action>
+                        <xforms:submission id="get-instance-1" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/test-data/book-diderot.xml"
+                                replace="instance" targetref="instance('instance-1')" xxforms:readonly="false" xxforms:cache="true">
+                            <xforms:setvalue ev:event="xforms-submit-done" ref="details/link">http://en.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xforms:setvalue>
+                        </xforms:submission>
+                        <xforms:submission id="get-instance-2" method="get" serialization="none"
+                                resource="oxf:/ops/unit-tests/test-data/book-diderot.xml"
+                                replace="instance" targetref="instance('instance-2')" xxforms:cache="true">
+                            <xforms:setvalue ev:event="xforms-submit-done" ref="instance('instance-2')/details/link">http://fr.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xforms:setvalue>
+                        </xforms:submission>
 
-                                    <!-- Load instances upon init -->
-                                    <xforms:action ev:event="xforms-model-construct-done">
-                                        <xforms:send submission="get-instance-1"/>
-                                        <xforms:send submission="get-instance-2"/>
-                                    </xforms:action>
-                                    <xforms:submission id="get-instance-1" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/test-data/book-diderot.xml"
-                                            replace="instance" targetref="instance('instance-1')" xxforms:readonly="false" xxforms:cache="true">
-                                        <xforms:setvalue ev:event="xforms-submit-done" ref="details/link">http://en.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xforms:setvalue>
-                                    </xforms:submission>
-                                    <xforms:submission id="get-instance-2" method="get" serialization="none"
-                                            resource="oxf:/ops/unit-tests/test-data/book-diderot.xml"
-                                            replace="instance" targetref="instance('instance-2')" xxforms:cache="true">
-                                        <xforms:setvalue ev:event="xforms-submit-done" ref="instance('instance-2')/details/link">http://fr.wikipedia.org/wiki/Jacques_le_fataliste_et_son_ma%C3%AEtre</xforms:setvalue>
-                                    </xforms:submission>
-
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-                                <xforms:output id="my-output-1" ref="instance('instance-1')/details/link"/>
-                                <xforms:output id="my-output-2" ref="instance('instance-2')/details/link"/>
-                            </xhtml:body>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="my-output-1" ref="instance('instance-1')/details/link"/>
+                    <xforms:output id="my-output-2" ref="instance('instance-2')/details/link"/>
+                </xhtml:body>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">

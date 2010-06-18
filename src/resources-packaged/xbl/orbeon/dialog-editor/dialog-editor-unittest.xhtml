@@ -55,10 +55,21 @@
         <xhtml:style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent  }
             .add { margin-top: 1em }
+            .line { margin-bottom: 1em }
+            .xforms-textarea .xforms-label { vertical-align: top; padding-right: 1em }
+            textarea { vertical-align: top }
 
+            /* Hide label on button */
             .xbl-fr-dialog-editor .xbl-fr-button .fr-dialog-editor-open-edit button,
                     .xbl-fr-dialog-editor .xbl-fr-button .fr-dialog-editor-open-view button{
                 width: 27px;
+                text-indent: -9999px;
+                padding: 0;
+                *text-indent: 0;
+                *padding-left: 9999px;
+            }
+            .xbl-fr-spell-checker .xbl-fr-button .fr-spell-checker-start button {
+                width: 25px;
                 text-indent: -9999px;
                 padding: 0;
                 *text-indent: 0;
@@ -70,9 +81,13 @@
     <xhtml:body>
 
         <xforms:repeat nodeset="text">
-            <fr:dialog-editor ref=".">
-                <xforms:label>Excerpt</xforms:label>
-            </fr:dialog-editor>
+            <xhtml:div class="line">
+                <xforms:textarea ref=".">
+                    <xforms:label>Excerpt</xforms:label>
+                </xforms:textarea>
+                <fr:dialog-editor ref="."/>
+                <fr:spell-checker ref="."/>
+            </xhtml:div>
         </xforms:repeat>
 
         <xhtml:div class="add">

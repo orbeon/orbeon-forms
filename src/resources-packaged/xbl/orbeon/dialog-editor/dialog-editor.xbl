@@ -51,10 +51,6 @@
                 </xxforms:variable>
 
                 <xforms:group ref="$external">
-                    <!-- Display value -->
-                    <xforms:output ref=".">
-                        <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
-                    </xforms:output>
                     <!-- Button to open dialog -->
                     <xforms:group appearance="xxforms:internal">
                         <xforms:action ev:event="DOMActivate">

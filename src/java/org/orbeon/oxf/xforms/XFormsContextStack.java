@@ -558,7 +558,7 @@ public class XFormsContextStack {
             } catch (Throwable e) {
                 // TODO: should be dispatched to element having the @model attribute
                 // Any other exception occurring within
-                container.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, container));
+                container.dispatchEvent(propertyContext, new XFormsBindingExceptionEvent(containingDocument, container, e));
             }
         } catch (ValidationException e) {
             if (bindingElement != null) {

@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsRootControl;
 import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsValueChangeWithFocusChangeEvent;
@@ -800,7 +801,9 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         final String eventName = event.getName();
         if (XFormsEvents.XFORMS_BINDING_EXCEPTION.equals(eventName)) {
             // The default action for this event results in the following: Fatal error.
-            throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(), event.getTargetObject().getLocationData());
+            final XFormsBindingExceptionEvent bindingExceptionEvent = (XFormsBindingExceptionEvent) event;
+            throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(),
+                    bindingExceptionEvent.getThrowable(), event.getTargetObject().getLocationData());
         }
     }
 

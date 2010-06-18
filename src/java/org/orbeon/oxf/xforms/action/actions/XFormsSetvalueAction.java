@@ -19,7 +19,6 @@ import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsInstance;
-import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -113,22 +112,12 @@ public class XFormsSetvalueAction extends XFormsAction {
             final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
             if (modifiedInstance != null) {// can be null if you set a value in a non-instance doc
 
-                containingDocument.getXPathDependencies().markValueChanged(modifiedInstance.getModel(containingDocument), currentNode);
+                // Tell the model about the value change
+                modifiedInstance.getModel(containingDocument).markValueChange(currentNode, isCalculate);
 
                 // Dispatch extension event to instance
                 final XBLContainer modifiedContainer = modifiedInstance.getXBLContainer(containingDocument);
                 modifiedContainer.dispatchEvent(propertyContext, new XXFormsValueChanged(containingDocument, modifiedInstance));
-
-                if (!isCalculate) {
-                    // When this is called from a calculate, we don't set the flags as revalidate and refresh will have been set already
-
-                    // "XForms Actions that change only the value of an instance node results in setting the flags for
-                    // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
-                    final XFormsModel.DeferredActionContext deferredActionContext = modifiedInstance.getModel(containingDocument).getDeferredActionContext();
-                    deferredActionContext.recalculate = true;
-                    deferredActionContext.revalidate = true;
-                    modifiedContainer.requireRefresh();
-                }
             } else {
                 // NOTE: Is this the right thing to do if the value modified is not an instance value? Might not be needed!
                 containingDocument.getControls().markDirtySinceLastRequest(true);

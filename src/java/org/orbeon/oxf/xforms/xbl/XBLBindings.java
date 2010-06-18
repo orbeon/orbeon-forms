@@ -517,7 +517,9 @@ public class XBLBindings {
         if (templateElement != null) {
 
             if (indentedLogger.isDebugEnabled()) {
-                indentedLogger.startHandleOperation("", "generating XBL shadow content", "bound element", Dom4jUtils.elementToDebugString(boundElement), "binding id", XFormsUtils.getElementStaticId(binding));
+                indentedLogger.startHandleOperation("", "generating XBL shadow content",
+                        "bound element", Dom4jUtils.elementToDebugString(boundElement),
+                        "binding id", XFormsUtils.getElementStaticId(binding));
             }
 
             // TODO: in script mode, XHTML elements in template should only be kept during page generation

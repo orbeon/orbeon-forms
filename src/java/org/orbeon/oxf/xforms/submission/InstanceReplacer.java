@@ -178,12 +178,18 @@ public class InstanceReplacer extends BaseReplacer {
             // performed by the insert action (10.3 The insert Element) and the
             // delete action"
 
+            // NOTE: As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
+            // performing RRRR directly.
+
             if (isDestinationRootElement) {
                 // Optimized insertion for instance root element replacement
 
-                // Handle new instance and associated event markings
+                // Update model instance
                 final XFormsModel replaceModel = newInstance.getModel(containingDocument);
-                replaceModel.handleUpdatedInstance(newInstance);
+                replaceModel.setInstance(newInstance, true);
+
+                // Call this directly, since we are not using insert/delete here
+                replaceModel.markStructuralChange();
 
                 // Dispatch xforms-delete event
                 // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement
@@ -217,14 +223,13 @@ public class InstanceReplacer extends BaseReplacer {
                     XFormsDeleteAction.doDelete(propertyContext, containingDocument, detailsLogger, destinationCollection, 1, true);
                 }
 
-                // Perform model instance update
-                // Handle new instance and associated event markings
+                // Update model instance
                 // NOTE: The inserted node NodeWrapper.index might be out of date at this point because:
                 // * doInsert() dispatches an event which might itself change the instance
                 // * doDelete() does as well
                 // Does this mean that we should check that the node is still where it should be?
                 final XFormsModel updatedModel = updatedInstance.getModel(containingDocument);
-                updatedModel.handleUpdatedInstance(updatedInstance);
+                updatedModel.setInstance(updatedInstance, true);
             }
 
             // Dispatch xforms-submit-done

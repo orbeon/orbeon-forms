@@ -328,7 +328,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      * @param instance          XFormsInstance to set
      * @param replaced          whether this is an instance replacement (as result of a submission)
      */
-    private void setInstance(XFormsInstance instance, boolean replaced) {
+    public void setInstance(XFormsInstance instance, boolean replaced) {
 
         // Mark the instance as replaced if needed
         instance.setReplaced(replaced);
@@ -600,9 +600,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // TODO: a, b, c
 
         // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-        deferredActionContext.rebuild = true;
-        deferredActionContext.recalculate = true;
-        deferredActionContext.revalidate = true;
+        deferredActionContext.markStructuralChange();
 
         doRebuild(propertyContext);
         doRecalculate(propertyContext, false);
@@ -1027,34 +1025,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     private void doRefresh(PropertyContext propertyContext) {
-        getXBLContainer().synchronizeAndRefresh(propertyContext);
-    }
+        // This is called in response to dispatching xforms-refresh to this model, whether using the xforms:refresh
+        // action or by dispatching the event by hand.
 
-    /**
-     * Handle an updated instance after a submission with instance replacement/update.
-     *
-     * @param updatedInstance   instance to replace or update (can be new instance object or existing one)
-     */
-    public void handleUpdatedInstance(final XFormsInstance updatedInstance) {
-
-        // Set the instance on this model
-        // Instance object might already be there, or might be a new one. In any case, instance needs to be marked as updated.
-        setInstance(updatedInstance, true);
-
-        {
-            final XFormsModel.DeferredActionContext deferredActionContext = getDeferredActionContext();
-            deferredActionContext.rebuild = true;
-            deferredActionContext.recalculate = true;
-            deferredActionContext.revalidate = true;
-        }
-
-        final XFormsControls xformsControls = containingDocument.getControls();
-        if (xformsControls.isInitialized()) {
-            // Controls exist, otherwise there is no point in doing anything controls-related
-
-            // As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
-            // performing RRRR directly
-            markStructuralChange();
+        // NOTE: If the refresh flag is not set, we do not call synchronizeAndRefresh() because that would only have the
+        // side effect of performing RRR on models, but  but not update the UI, which wouldn't make sense for xforms-refresh.
+        // This said, is unlikely (impossible?) that the RRR flags would be set but not the refresh flag.
+        if (containingDocument.getControls().isRequireRefresh()) {
+            getXBLContainer().synchronizeAndRefresh(propertyContext);
         }
     }
 
@@ -1065,12 +1043,27 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         public boolean recalculate;
         public boolean revalidate;
 
-        public void setAllDeferredFlags(boolean value) {
-            rebuild = value;
-            recalculate = value;
-            revalidate = value;
-            if (value)
-                getXBLContainer().requireRefresh();
+        public void markStructuralChange() {
+
+            // "XForms Actions that change the tree structure of instance data result in setting all four deferred update
+            // flags to true for the model over which they operate"
+
+            rebuild = true;
+            recalculate = true;
+            revalidate = true;
+
+            getXBLContainer().requireRefresh();
+        }
+
+        public void markValueChange() {
+
+            // "XForms Actions that change only the value of an instance node results in setting the flags for
+            // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
+
+            recalculate = true;
+            revalidate = true;
+
+            getXBLContainer().requireRefresh();
         }
     }
 
@@ -1078,9 +1071,19 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return deferredActionContext;
     }
 
+    public void markValueChange(NodeInfo nodeInfo, boolean isCalculate) {
+        if (!isCalculate) {
+            // When this is called from a calculate, we don't set the flags as revalidate and refresh will have been set already
+            deferredActionContext.markValueChange();
+        }
+
+        // Notify dependencies of the change
+        containingDocument.getXPathDependencies().markValueChanged(this, nodeInfo);
+    }
+
     public void markStructuralChange() {
         // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-        deferredActionContext.setAllDeferredFlags(true);
+        deferredActionContext.markStructuralChange();
 
         // Notify dependencies of the change
         containingDocument.getXPathDependencies().markStructuralChange(this);

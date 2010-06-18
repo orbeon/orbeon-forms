@@ -739,7 +739,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     public void requireRefresh() {
         // Delegate to controls
         // Note that we don't recurse as for now refresh is global
-        containingDocument.getControls().requireRefresh();
+        final XFormsControls controls = containingDocument.getControls();
+        if (controls.isInitialized()) {
+            // Controls exist, otherwise there is no point in doing anything controls-related
+            controls.requireRefresh();
+        }
     }
 
     public void refreshIfNeeded(PropertyContext propertyContext) {
@@ -1063,12 +1067,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             // NOTE: We used to do this, following XForms 1.0, but XForms 1.1 has changed the behavior
             //currentModel.getBinds().rebuild(pipelineContext);
 
-            final XFormsModel.DeferredActionContext deferredActionContext = model.getDeferredActionContext();
-            deferredActionContext.recalculate = true;
-            deferredActionContext.revalidate = true;
+            model.getDeferredActionContext().markValueChange();
         }
-        // This container requires refresh
-        requireRefresh();
     }
 
     public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {

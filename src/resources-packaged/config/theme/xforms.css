@@ -149,7 +149,7 @@ html body .xforms-form tr.xforms-disabled,
 }
 
 /* Special rule for Firefox to remove extra padding inside noscript buttons working as links */
-button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trigger-appearance-xxforms-minimal button::-moz-focus-inner { 
+button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trigger-appearance-xxforms-minimal button::-moz-focus-inner {
     border: 0; padding: 0;
 }
 
@@ -303,6 +303,9 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 	top: -7px;
 	width: 25px;
 }
+
+/* For dialogs, prevent collapsing if the header when the label is empty */
+.xforms-dialog .hd { height: 2em }
 
 
 /* ***** Repeats **************************************************************************************************** */

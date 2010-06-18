@@ -752,8 +752,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                     // Don't consider this as fatal
                     // TODO: must dispatch xforms-compute-error? Check if safe to do so.
                     final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
-                    if (indentedLogger.isInfoEnabled())
-                        indentedLogger.logInfo("", "exception while evaluating XPath expression", e);
+                    indentedLogger.logWarning("", "exception while evaluating XPath expression", e);
 
                     return null;
                 } finally {
@@ -793,8 +792,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 // Don't consider this as fatal
                 // TODO: must dispatch xforms-compute-error? Check if safe to do so.
                 final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
-                if (indentedLogger.isInfoEnabled())
-                    indentedLogger.logInfo("", "exception while evaluating XPath expression", e);
+                indentedLogger.logWarning("", "exception while evaluating XPath expression", e);
 
                 return null;
             } finally {
@@ -836,8 +834,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
                 // Don't consider this as fatal
                 // TODO: must dispatch xforms-compute-error? Check if safe to do so.
                 final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
-                if (indentedLogger.isInfoEnabled())
-                    indentedLogger.logInfo("", "exception while evaluating XPath expression", e);
+                indentedLogger.logWarning("", "exception while evaluating XPath expression", e);
 
                 return null;
             } finally {

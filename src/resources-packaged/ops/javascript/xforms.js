@@ -6763,6 +6763,25 @@ ORBEON.xforms.Server = {
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-incremental");
                                         }
+                                    } else if (type != null) {
+                                        // Type has changed for any control but xforms:input
+
+                                        var typePrefix = "xforms-type-";
+
+                                        // Remove existing type classes
+                                        var classesArray = documentElement.className.split(" ");
+                                        for (var classIndex = 0; classIndex < classesArray.length; classIndex++) {
+                                            var currentClass = classesArray[classIndex];
+                                            if (currentClass.indexOf(typePrefix) == 0) {
+                                                ORBEON.util.Dom.removeClass(documentElement, currentClass);
+                                            }
+                                        }
+
+                                        // Add new class
+                                        var typeRegexp = /}(.*)/g;
+                                        var typeResult = typeRegexp.exec(type);
+                                        if (typeResult.length >= 2)
+                                            ORBEON.util.Dom.addClass(documentElement, typePrefix + typeResult[1]);
                                     }
 
                                     // Handle readonly

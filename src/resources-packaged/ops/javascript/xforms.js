@@ -6133,12 +6133,14 @@ ORBEON.xforms.Server = {
     keepModelProgressPanelDisplayed: function(responseXML) {
         if (responseXML && responseXML.documentElement
                     && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
-            var foundSubmissionWithNoTarget = false;
+            var foundSubmissionOrLoadWithNoTarget = false;
             YAHOO.util.Dom.getElementsBy(function(element) {
-                if (ORBEON.util.Utils.getLocalName(element) == "submission" && ORBEON.util.Dom.getAttribute(element, "target") == null)
-                    foundSubmissionWithNoTarget = true;
+                var localName = ORBEON.util.Utils.getLocalName(element);
+                var hasTargetAttribute = ORBEON.util.Dom.getAttribute(element, "target") == null;
+                if ((localName  == "submission" || localName == "load") && hasTargetAttribute)
+                    foundSubmissionOrLoadWithNoTarget = true;
             }, null, responseXML.documentElement);
-            return foundSubmissionWithNoTarget;
+            return foundSubmissionOrLoadWithNoTarget;
         }
         return false;
     },

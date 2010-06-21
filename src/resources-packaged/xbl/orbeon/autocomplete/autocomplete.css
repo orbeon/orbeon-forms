@@ -32,6 +32,9 @@
     vertical-align: middle;
 }
 
+/* Always show the text field and the button for full list on the same line */
+.xbl-fr-autocomplete .yui-ac { white-space: nowrap }
+
 /* Full itemset button inline, next to the text field */
 .xbl-fr-autocomplete .xbl-fr-select1-button { vertical-align: middle; display: inline-block; *display: inline }
 

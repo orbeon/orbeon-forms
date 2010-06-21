@@ -1915,7 +1915,7 @@ ORBEON.xforms.Controls = {
                         //
                         // This is to prevent the error "Could not set the selected property. Unspecified error." in IE.
                         // Like noted in this blog entry: http://ianso.blogspot.com/2005_10_01_ianso_archive.html (search
-                        // for the error message), it seems that DOM updates are somewhat asynchrous and that when you
+                        // for the error message), it seems that DOM updates are somewhat asynchronous and that when you
                         // make an element visible and change a property right after that, it is sometimes as if the element
                         // is not visible yet, and so the property cannot be changed.
                     }
@@ -6519,10 +6519,12 @@ ORBEON.xforms.Server = {
                                         // Case of checkboxes / radio buttons
 
                                         // Actual values:
-                                        //     <span>
-                                        //         <input type="checkbox" checked="" value="v" name="xforms-element-97" id="element-97-opsitem0"/>
-                                        //         <label for="xforms-element-97-opsitem0" id="xforms-element-99">Vanilla</label>
-                                        //     </span>
+                                        //
+                                        //  <span>
+                                        //    <label for="my-new-select1$$e1">
+                                        //      <input id="my-new-select1$$e1" type="radio" checked name="my-new-select1" value="orange"/>Orange
+                                        //    </label>
+                                        //  </span>
 
                                         // Get template
                                         var template = ORBEON.util.Dom.hasClass(documentElement, "xforms-select")
@@ -6774,8 +6776,9 @@ ORBEON.xforms.Server = {
                                             var booleanTemplateClone = booleanTemplate.cloneNode(true);
 
                                             // Remove the label we have in the template for each individual checkbox/radio button
+                                            // Do this because the checkbox label is actually not used
                                             var templateLabelElement = booleanTemplateClone.getElementsByTagName("label")[0];
-                                            templateLabelElement.parentNode.removeChild(templateLabelElement);
+                                            ORBEON.util.Utils.stringReplace(templateLabelElement, "$xforms-template-label$", "");
 
                                             // Remove the disabled attribute from the template, which is there so tab would skip over form elements in template
                                             var booleanInput = ORBEON.util.Dom.getElementByTagName(booleanTemplateClone, "input");
@@ -6791,7 +6794,6 @@ ORBEON.xforms.Server = {
                                             // Update classes
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-input-appearance-minimal");
-                                            ORBEON.util.Dom.addClass(documentElement, "xforms-type-boolean");
                                             ORBEON.util.Dom.addClass(documentElement, "xforms-incremental");
                                         }
                                     } else if (type != null) {

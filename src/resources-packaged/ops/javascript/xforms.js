@@ -1317,6 +1317,26 @@ ORBEON.util.Utils = {
         }
 
         return cursor;
+    },
+
+    /**
+     * Check whether a region is completely visible (i.e. is fully inside the viewport).
+     * Note: this function is different than the function with the same name in YUI.
+     */
+    fitsInViewport: function(element) {
+
+        // Viewport coordinates
+        var viewportFirstTop = YAHOO.util.Dom.getDocumentScrollTop();
+        var viewportFirstLeft = YAHOO.util.Dom.getDocumentScrollLeft();
+        var viewportSecondTop = viewportFirstTop + YAHOO.util.Dom.getViewportHeight();
+        var viewportSecondLeft = viewportFirstLeft + YAHOO.util.Dom.getViewportWidth();
+        var viewportRegion = new YAHOO.util.Region(viewportFirstTop, viewportSecondLeft, viewportSecondTop, viewportFirstLeft);
+
+        // Element coordinates
+        var elementRegion = YAHOO.util.Dom.getRegion(element);
+
+        return viewportRegion.top <= elementRegion.top && viewportRegion.left <= elementRegion.left
+            && elementRegion.bottom <= viewportRegion.bottom && elementRegion.right <= viewportRegion.right;
     }
 };
 
@@ -4224,9 +4244,20 @@ ORBEON.widgets.YUICalendar = function() {
             yuiCalendar.cfg.applyConfig();
             yuiCalendar.render();
 
-            // Align the top left corner of the overlay on the bottom left corner of the input field
+            // Align overlay the best we can
             inputField = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, target)[0];
+            // 1. Show overlay below the input field
+            yuiOverlay.cfg.setProperty("constraintoviewport", false);
             yuiOverlay.cfg.setProperty("context", [inputField.id, YAHOO.widget.Overlay.TOP_LEFT, YAHOO.widget.Overlay.BOTTOM_LEFT]);
+            if (! ORBEON.util.Utils.fitsInViewport(yuiOverlay.element)) {
+                // 2. If it was not entirely visible, show it above the input field
+                yuiOverlay.cfg.setProperty("context", [inputField.id, YAHOO.widget.Overlay.BOTTOM_LEFT, YAHOO.widget.Overlay.TOP_LEFT]);
+                if (! ORBEON.util.Utils.fitsInViewport(yuiOverlay.element)) {
+                    // 3. If it was not entirely visible, do our best to make it visible
+                    yuiOverlay.cfg.setProperty("constraintoviewport", true);
+                    yuiOverlay.cfg.setProperty("context", [inputField.id, YAHOO.widget.Overlay.TOP_LEFT, YAHOO.widget.Overlay.TOP_RIGHT]);
+                }
+            }
             yuiOverlay.cfg.setProperty("visible", true);
         },
 

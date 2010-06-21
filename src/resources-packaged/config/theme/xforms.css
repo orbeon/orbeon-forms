@@ -304,10 +304,6 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 	width: 25px;
 }
 
-/* For dialogs, prevent collapsing if the header when the label is empty */
-.xforms-dialog .hd { height: 2em }
-
-
 /* ***** Repeats **************************************************************************************************** */
 
 .xforms-repeat-selected-item-1 {

@@ -6778,9 +6778,8 @@ ORBEON.xforms.Server = {
                                         }
 
                                         // Add new class
-                                        var typeRegexp = /}(.*)/g;
-                                        var typeResult = typeRegexp.exec(type);
-                                        if (typeResult.length >= 2)
+                                        var typeResult = /}(.*)/.exec(type);
+                                        if (typeResult != null && typeResult.length >= 2)
                                             ORBEON.util.Dom.addClass(documentElement, typePrefix + typeResult[1]);
                                     }
 

@@ -17,14 +17,15 @@
 
             <xforms:instance>
                 <instance>
-                    <text>
+                    <text readonly="false">
                         This should never now (it is non-relevant).
                     </text>
-                    <text>
+                    <text readonly="false">
                         All the world's a stage, and all the men and women merely players: they have their exits and
                         their entrances; and one man in his time plays many parts...
                     </text>
-                    <text>To be or not to be– that is the question: Whether 'tis nobler in the mind to suffer The slings
+                    <text readonly="true">
+                        To be or not to be– that is the question: Whether 'tis nobler in the mind to suffer The slings
                         and arrows of outrageous fortune, Or to take arms against a sea of troubles And, by opposing,
                         end them. To die, to sleep No more – and by a sleep to say we end The heartache and the thousand
                         natural shocks That flesh is heir to – ‘tis a consummation Devoutly to be wished. To die, to
@@ -45,7 +46,7 @@
             </xforms:instance>
 
             <xforms:bind nodeset="text[1]" relevant="false()"/>
-            <xforms:bind nodeset="text[3]" readonly="true()"/>
+            <xforms:bind nodeset="text" readonly="@readonly = 'true'"/>
 
             <xforms:action ev:event="xforms-model-construct-done" xxforms:iterate="text">
                 <xforms:setvalue ref="." value="normalize-space(.)"/>
@@ -85,8 +86,12 @@
                 <xforms:textarea ref=".">
                     <xforms:label>Excerpt</xforms:label>
                 </xforms:textarea>
-                <fr:dialog-editor ref="."/>
-                <fr:spell-checker ref="."/>
+                <fr:dialog-editor ref="." id="my-dialog-editor"/>
+                <fr:spell-checker ref="." id="my-spell-checker"/>
+                <fr:button>
+                    <xforms:label>Toggle readonly</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="@readonly" value="if (. = 'true') then 'false' else 'true'"/>
+                </fr:button>
             </xhtml:div>
         </xforms:repeat>
 

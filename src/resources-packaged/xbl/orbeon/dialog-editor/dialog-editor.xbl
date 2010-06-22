@@ -30,8 +30,8 @@
 
     <xbl:binding id="fr-dialog-editor" element="fr|dialog-editor">
         <xbl:implementation>
-            <xforms:model>
-                <xforms:instance>
+            <xforms:model id="dialog-editor-model">
+                <xforms:instance id="dialog-editor-instance">
                     <text readonly=""/>
                 </xforms:instance>
                 <xforms:bind nodeset="." readonly="@readonly = 'true'"/>
@@ -43,14 +43,14 @@
         <xbl:template>
             <xforms:group appearance="xxforms:internal" id="container">
                 <xxforms:variable name="internal" select="."/>
-                <xxforms:variable name="external">
+                <xxforms:variable name="external" id="var-bound-to-external">
                     <xxforms:sequence xbl:attr="select=ref" xxbl:scope="outer"/>
-                    <xforms:setvalue ev:event="xforms-enabled" ref="$internal/@readonly" value="exforms:readonly($external)"/>
-                    <xforms:setvalue ev:event="xforms-readonly" ref="$internal/@readonly">true</xforms:setvalue>
-                    <xforms:setvalue ev:event="xforms-readwrite" ref="$internal/@readonly">false</xforms:setvalue>
+                </xxforms:variable>
+                <xxforms:variable name="readonly" select="exforms:readonly($external)">
+                    <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$internal/@readonly" value="$readonly"/>
                 </xxforms:variable>
 
-                <xforms:group ref="$external">
+                <xforms:group ref="$external" id="group-external">
                     <!-- Button to open dialog -->
                     <xforms:group appearance="xxforms:internal">
                         <xforms:action ev:event="DOMActivate">
@@ -58,23 +58,21 @@
                             <xxforms:show dialog="dialog"/>
                             <xforms:setfocus control="textarea"/>
                         </xforms:action>
-                        <xforms:group ref=".[$internal/@readonly = 'false']">
+                        <xforms:group ref=".[not($readonly)]" id="edit-button">
                             <fr:button id="open-edit" class="fr-dialog-editor-open-edit">
                                 <xforms:label>Edit</xforms:label>
-                                <!--<xforms:hint>Edit</xforms:hint>-->
                             </fr:button>
                         </xforms:group>
-                        <xforms:group ref=".[$internal/@readonly = 'true']">
+                        <xforms:group ref=".[$readonly]" id="view-button">
                             <fr:button id="open-view" class="fr-dialog-editor-open-view">
                                 <xforms:label>View</xforms:label>
-                                <!--<xforms:hint>View</xforms:hint>-->
                             </fr:button>
                         </xforms:group>
                     </xforms:group>
                 </xforms:group>
 
                 <!-- Dialog to edit value -->
-                <xxforms:dialog id="dialog" class="fr-dialog-editor-dialog">
+                <xxforms:dialog id="dialog" class="fr-dialog-editor-dialog" close="false">
                     <xbl:content includes="xforms|label"/>
                     <xforms:textarea ref="$internal" id="textarea">
                         <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
@@ -82,7 +80,7 @@
                     <xhtml:div class="fr-dialog-editor-buttons">
                         <xforms:group appearance="xxforms:internal">
                             <xxforms:hide ev:event="DOMActivate" dialog="dialog"/>
-                            <xforms:group ref=".[$internal/@readonly = 'false']">
+                            <xforms:group ref=".[not($readonly)]">
                                 <fr:button class="fr-dialog-editor-positive">
                                     <xforms:label>OK</xforms:label>
                                     <xforms:setvalue ev:event="DOMActivate" ref="$external" value="$internal"/>
@@ -91,7 +89,7 @@
                                     <xforms:label>Cancel</xforms:label>
                                 </fr:button>
                             </xforms:group>
-                            <xforms:group ref=".[$internal/@readonly = 'true']">
+                            <xforms:group ref=".[$readonly]">
                                 <fr:button class="fr-dialog-editor-close">
                                     <xforms:label>Close</xforms:label>
                                 </fr:button>

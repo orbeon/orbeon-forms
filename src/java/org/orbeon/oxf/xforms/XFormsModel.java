@@ -939,7 +939,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // TODO: rebuild computational dependency data structures
 
             // Controls may have @bind or xxforms:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
-            containingDocument.getControls().requireRefresh();
+            getXBLContainer().requireRefresh();
         }
 
         // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
@@ -1055,12 +1055,16 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             getXBLContainer().requireRefresh();
         }
 
-        public void markValueChange() {
+        public void markValueChange(boolean isCalculate) {
 
             // "XForms Actions that change only the value of an instance node results in setting the flags for
             // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
 
-            recalculate = true;
+            if (!isCalculate) {
+                // Only set recalculate when we are not currently performing a recalculate (vaoid infinite loop)
+                recalculate = true;
+            }
+
             revalidate = true;
 
             getXBLContainer().requireRefresh();
@@ -1072,17 +1076,16 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     public void markValueChange(NodeInfo nodeInfo, boolean isCalculate) {
-        if (!isCalculate) {
-            // When this is called from a calculate, we don't set the flags as revalidate and refresh will have been set already
-            deferredActionContext.markValueChange();
-        }
+        // Set the flags
+        deferredActionContext.markValueChange(isCalculate);
 
         // Notify dependencies of the change
-        containingDocument.getXPathDependencies().markValueChanged(this, nodeInfo);
+        if (nodeInfo != null)
+            containingDocument.getXPathDependencies().markValueChanged(this, nodeInfo);
     }
 
     public void markStructuralChange() {
-        // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
+        // Set the flags
         deferredActionContext.markStructuralChange();
 
         // Notify dependencies of the change

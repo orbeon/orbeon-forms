@@ -738,8 +738,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     }
 
     public void requireRefresh() {
-        // Delegate to controls
-        // Note that we don't recurse as for now refresh is global
+        // Note that we don't recurse into children container as for now refresh is global
         final XFormsControls controls = containingDocument.getControls();
         if (controls.isInitialized()) {
             // Controls exist, otherwise there is no point in doing anything controls-related
@@ -1070,7 +1069,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             // NOTE: We used to do this, following XForms 1.0, but XForms 1.1 has changed the behavior
             //currentModel.getBinds().rebuild(pipelineContext);
 
-            model.getDeferredActionContext().markValueChange();
+            model.markValueChange(null, false);
         }
     }
 

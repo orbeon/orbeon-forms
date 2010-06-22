@@ -1311,7 +1311,9 @@
                             <xforms:action ev:event="xforms-submit">
                                 <!-- Restore state -->
                                 <xforms:insert nodeset="instance()" origin="instance('template')"/>
-                                <xforms:refresh/>
+                                <xforms:rebuild/>
+                                <xforms:recalculate/>
+                                <xforms:revalidate/>
                                 <!-- setvalue: expecting just recalculate -->
                                 <xforms:setvalue ref="instance()/source">888</xforms:setvalue>
                                 <xforms:setvalue ref="instance()/position">2</xforms:setvalue>
@@ -1339,7 +1341,9 @@
                             <xforms:action ev:event="xforms-submit">
                                 <!-- Restore state -->
                                 <xforms:insert nodeset="instance()" origin="instance('template')"/>
-                                <xforms:refresh/>
+                                <xforms:rebuild/>
+                                <xforms:recalculate/>
+                                <xforms:revalidate/>
                                 <!-- NOT expecting rebuild or recalculate, binds point to new instance -->
                                 <xforms:setvalue ref="instance()/source">888</xforms:setvalue>
                                 <xforms:setvalue ref="instance()/position">2</xforms:setvalue>
@@ -1483,7 +1487,9 @@
                             <xforms:action ev:event="xforms-submit">
                                 <!-- Restore state -->
                                 <xforms:insert nodeset="instance()" origin="instance('template')"/>
-                                <xforms:refresh/>
+                                <xforms:rebuild/>
+                                <xforms:recalculate/>
+                                <xforms:revalidate/>
                                 <!-- setvalue: expecting just revalidate; integer type points to value[1] -->
                                 <xforms:setvalue ref="instance()/position">2</xforms:setvalue>
                             </xforms:action>
@@ -1515,7 +1521,9 @@
                             <xforms:action ev:event="xforms-submit">
                                 <!-- Restore state -->
                                 <xforms:insert nodeset="instance()" origin="instance('template')"/>
-                                <xforms:refresh/>
+                                <xforms:rebuild/>
+                                <xforms:recalculate/>
+                                <xforms:revalidate/>
                                 <!-- NOT expecting rebuild or revalidate, binds point to new instance -->
                                 <xforms:setvalue ref="instance()/position">2</xforms:setvalue>
                             </xforms:action>

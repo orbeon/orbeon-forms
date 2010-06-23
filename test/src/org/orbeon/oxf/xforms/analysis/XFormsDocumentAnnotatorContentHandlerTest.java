@@ -50,7 +50,7 @@ public class XFormsDocumentAnnotatorContentHandlerTest extends ResourceManagerTe
 
         final Map<String, Map<String, String>> mappings = new HashMap<String, Map<String, String>>();
         final XFormsAnnotatorContentHandler ch = new XFormsAnnotatorContentHandler(new XFormsAnnotatorContentHandler.Metadata(new IdGenerator(), mappings));
-        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", ch, false, false);
+        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", ch, false, false, false);
 
         // Test that ns information is provided for those elements
         Map<String, String> result = mappings.get("output-in-title");

@@ -35,7 +35,7 @@ import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -670,7 +670,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             // Rewrite URLs
             final StringBuilder sb = new StringBuilder(rawValue.length() * 2);// just an approx of the size it may take
             // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
-            XFormsUtils.streamHTMLFragment(new XHTMLRewrite().getRewriteContentHandler(propertyContext, new ForwardingContentHandler() {
+            XFormsUtils.streamHTMLFragment(new XHTMLRewrite().getRewriteXMLReceiver(propertyContext, new ForwardingXMLReceiver() {
 
                 private boolean isStartElement;
 

@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -33,7 +33,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsTriggerControl triggerControl = (XFormsTriggerControl) control;
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
 
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, triggerControl, true);
 
@@ -43,13 +43,13 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         // xhtml:a
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String aQName = XMLUtils.buildQName(xhtmlPrefix, ENCLOSING_ELEMENT_NAME);
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName, containerAttributes);
+        xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName, containerAttributes);
         {
             final String labelValue = getTriggerLabel(triggerControl);
             final boolean mustOutputHTMLFragment = triggerControl != null && triggerControl.isHTMLLabel(pipelineContext);
-            outputLabelText(contentHandler, triggerControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
+            outputLabelText(xmlReceiver, triggerControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
         }
-        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName);
+        xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, ENCLOSING_ELEMENT_NAME, aQName);
     }
 
     @Override

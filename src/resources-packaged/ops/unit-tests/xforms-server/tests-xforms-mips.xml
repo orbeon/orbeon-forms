@@ -208,70 +208,62 @@
     </test>
 
     <test description="Boolean MIP values conversion" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
 
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
-                    <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model>
+                        <xforms:instance id="instance">
+                            <instance>
+                                <a/>
+                                <b/>
+                                <c/>
+                                <d/>
+                                <e/>
+                                <f/>
+                                <g/>
+                                <h/>
+                                <i/>
+                                <j/>
 
-                                    <xforms:instance id="instance">
-                                        <instance>
-                                            <a/>
-                                            <b/>
-                                            <c/>
-                                            <d/>
-                                            <e/>
-                                            <f/>
-                                            <g/>
-                                            <h/>
-                                            <i/>
-                                            <j/>
+                                <false>false</false>
+                                <true>true</true>
+                            </instance>
+                        </xforms:instance>
 
-                                            <false>false</false>
-                                            <true>true</true>
-                                        </instance>
-                                    </xforms:instance>
+                        <xforms:bind nodeset="a" constraint="'false'"/>
+                        <xforms:bind nodeset="b" constraint="false()"/>
+                        <xforms:bind nodeset="c" constraint="'true'"/>
+                        <xforms:bind nodeset="d" constraint="true()"/>
+                        <xforms:bind nodeset="e" constraint="../true"/>
+                        <xforms:bind nodeset="f" constraint="../false"/>
+                        <xforms:bind nodeset="g" constraint="non-existing"/>
+                        <xforms:bind nodeset="h" constraint="0"/>
+                        <xforms:bind nodeset="i" constraint="1000"/>
+                        <xforms:bind nodeset="j" constraint="number('NaN')"/>
 
-                                    <xforms:bind nodeset="a" constraint="'false'"/>
-                                    <xforms:bind nodeset="b" constraint="false()"/>
-                                    <xforms:bind nodeset="c" constraint="'true'"/>
-                                    <xforms:bind nodeset="d" constraint="true()"/>
-                                    <xforms:bind nodeset="e" constraint="../true"/>
-                                    <xforms:bind nodeset="f" constraint="../false"/>
-                                    <xforms:bind nodeset="g" constraint="non-existing"/>
-                                    <xforms:bind nodeset="h" constraint="0"/>
-                                    <xforms:bind nodeset="i" constraint="1000"/>
-                                    <xforms:bind nodeset="j" constraint="number('NaN')"/>
+                        <xforms:instance id="result">
+                            <result/>
+                        </xforms:instance>
 
-                                    <xforms:instance id="result">
-                                        <result/>
-                                    </xforms:instance>
+                        <!-- Result for "a" might change in the future if instead the xs:boolean() logic is used -->
 
-                                    <xforms:action ev:event="xforms-ready" xxforms:iterate="*">
-                                        <xxforms:variable name="current" select="."/>
-                                        <xforms:insert context="instance('result')" nodeset="*" origin="xxforms:element(name($current), xxforms:valid($current))"/>
-                                    </xforms:action>
+                        <xforms:action ev:event="xforms-ready" xxforms:iterate="*">
+                            <xxforms:variable name="current" select="."/>
+                            <xforms:insert context="instance('result')" nodeset="*" origin="xxforms:element(name($current), xxforms:valid($current))"/>
+                        </xforms:action>
 
-                                </xforms:model>
-                            </xhtml:head>
-                        </xhtml:html>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-
-            </p:config>
+                    </xforms:model>
+                </xhtml:head>
+            </xhtml:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="xf-1">
+                            <instance id="instance" model-id="model">
                                 <instance>
                                     <a/>
                                     <b/>
@@ -287,9 +279,9 @@
                                     <true>true</true>
                                 </instance>
                             </instance>
-                            <instance id="result" model-id="xf-1">
+                            <instance id="result" model-id="model">
                                 <result>
-                                    <a>true</a><!-- this might change in the future if instead the xs:boolean() logic is used -->
+                                    <a>true</a>
                                     <b>false</b>
                                     <c>true</c>
                                     <d>true</d>
@@ -1134,6 +1126,19 @@
                                 </triggers>
                             </instance>
                             <instance id="fr-form-instance" model-id="fr-form-model" source-uri="oxf:/apps/xforms-sandbox/samples/bugs/bug-events-data.xml" replaced="true">
+                                <!--
+  Copyright (C) 2009 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
                                 <book>
                                     <title>Cool title</title>
                                 </book>

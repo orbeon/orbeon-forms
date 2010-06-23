@@ -22,6 +22,7 @@ import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
@@ -99,7 +100,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
                 // Get URI references from cache
                 final KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
@@ -155,10 +156,10 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 }
 
                 // At this point, we have a templatesInfo, so run the transformation
-                runTransformer(pipelineContext, contentHandler, templatesInfo, attributes, isDumbOutputLocation, isSmartOutputLocation);
+                runTransformer(pipelineContext, xmlReceiver, templatesInfo, attributes, isDumbOutputLocation, isSmartOutputLocation);
             }
 
-            private void runTransformer(PipelineContext pipelineContext, final ContentHandler contentHandler, TemplatesInfo templatesInfo,
+            private void runTransformer(PipelineContext pipelineContext, final XMLReceiver xmlReceiver, TemplatesInfo templatesInfo,
                                         Map<String, Boolean> attributes, final boolean dumbOutputLocation, final boolean smartOutputLocation) {
 
                 StringBuilderWriter saxonStringBuilderWriter = null;
@@ -181,7 +182,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     final LocationData processorLocationData = getLocationData();
 
                     // Output filter to fix-up SAX stream and handle location data if needed
-                    final SAXResult saxResult = new SAXResult(new SimpleForwardingContentHandler(contentHandler) {
+                    final XMLReceiver outputReceiver = new SimpleForwardingXMLReceiver(xmlReceiver) {
 
                         private Locator inputLocator;
                         private OutputLocator outputLocator;
@@ -251,7 +252,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
 
                         public void endDocument() throws SAXException {
-                            if (getContentHandler() == null) {
+                            if (endDocumentCalled()) {
                                 // Hack to test if Saxon outputs more than one endDocument() event
                                 logger.warn("XSLT transformer attempted to call endDocument() more than once.");
                                 return;
@@ -334,7 +335,11 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
                             return null;
                         }
-                    });
+                    };
+
+                    // Create result, also setting LexicalHandler to handle comments
+                    final SAXResult saxResult = new SAXResult(outputReceiver);
+                    saxResult.setLexicalHandler(outputReceiver);
 
                     if (processorLocationData != null) {
                         final String processorSystemId = processorLocationData.getSystemID();
@@ -354,9 +359,9 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             // data in a SAX store.
                             final SAXStore dataSaxStore = new SAXStore();
                             readInputAsSAX(pipelineContext, INPUT_DATA, dataSaxStore);
-                            dataSaxStore.replay(transformerHandler);
+                            dataSaxStore.replay(new ForwardingXMLReceiver(transformerHandler, transformerHandler));
                         } else {
-                            readInputAsSAX(pipelineContext, INPUT_DATA, transformerHandler);
+                            readInputAsSAX(pipelineContext, INPUT_DATA, new ForwardingXMLReceiver(transformerHandler, transformerHandler));
                         }
                     } finally {
 
@@ -503,19 +508,19 @@ public abstract class XSLTTransformer extends ProcessorImpl {
              */
             private TemplatesInfo createTransformer(PipelineContext pipelineContext, String transformerClass, Map<String, Boolean> attributes) {
                 StringErrorListener errorListener = new StringErrorListener(logger);
-                final StylesheetForwardingContentHandler topStylesheetContentHandler = new StylesheetForwardingContentHandler();
+                final StylesheetForwardingXMLReceiver topStylesheetXMLReceiver = new StylesheetForwardingXMLReceiver();
                 try {
                     // Create transformer
                     final TemplatesInfo templatesInfo = new TemplatesInfo();
-                    final List<StylesheetForwardingContentHandler> xsltContentHandlers = new ArrayList<StylesheetForwardingContentHandler>();
+                    final List<StylesheetForwardingXMLReceiver> xsltXMLReceivers = new ArrayList<StylesheetForwardingXMLReceiver>();
                     {
-                        // Create SAXSource adding our forwarding content handler
+                        // Create SAXSource adding our forwarding receiver
                         final SAXSource stylesheetSAXSource;
                         {
-                            xsltContentHandlers.add(topStylesheetContentHandler);
-                            XMLReader xmlReader = new ProcessorOutputXMLReader(pipelineContext, getInputByName(INPUT_CONFIG).getOutput()) {
+                            xsltXMLReceivers.add(topStylesheetXMLReceiver);
+                            final XMLReader xmlReader = new ProcessorOutputXMLReader(pipelineContext, getInputByName(INPUT_CONFIG).getOutput()) {
                                 public void setContentHandler(ContentHandler handler) {
-                                    super.setContentHandler(new TeeContentHandler(Arrays.asList(topStylesheetContentHandler, handler)));
+                                    super.setContentHandler(new TeeXMLReceiver(Arrays.asList(topStylesheetXMLReceiver, new SimpleForwardingXMLReceiver(handler))));
                                 }
                             };
                             stylesheetSAXSource = new SAXSource(xmlReader, new InputSource());
@@ -523,10 +528,10 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                         // Put listener in context that will be called by URI resolved
                         pipelineContext.setAttribute(PipelineContext.XSLT_STYLESHEET_URI_LISTENER, new URIResolverListener() {
-                            public ContentHandler getContentHandler() {
-                                StylesheetForwardingContentHandler contentHandler = new StylesheetForwardingContentHandler();
-                                xsltContentHandlers.add(contentHandler);
-                                return contentHandler;
+                            public XMLReceiver getXMLReceiver() {
+                                StylesheetForwardingXMLReceiver xmlReceiver = new StylesheetForwardingXMLReceiver();
+                                xsltXMLReceivers.add(xmlReceiver);
+                                return xmlReceiver;
                             }
                         });
                         final TransformerURIResolver uriResolver
@@ -534,21 +539,20 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         templatesInfo.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerClass, attributes, errorListener, uriResolver);
                         uriResolver.destroy();
                         templatesInfo.transformerClass = transformerClass;
-                        templatesInfo.systemId = topStylesheetContentHandler.getSystemId();
+                        templatesInfo.systemId = topStylesheetXMLReceiver.getSystemId();
                     }
 
                     // Update cache
                     {
                         // Create uriReferences
                         URIReferences uriReferences = new URIReferences();
-                        for (Iterator<StylesheetForwardingContentHandler> i = xsltContentHandlers.iterator(); i.hasNext();) {
-                            StylesheetForwardingContentHandler contentHandler = i.next();
+                        for (final StylesheetForwardingXMLReceiver xsltXMLReceiver : xsltXMLReceivers) {
                             uriReferences.hasDynamicDocumentReferences = uriReferences.hasDynamicDocumentReferences
-                                    || contentHandler.getURIReferences().hasDynamicDocumentReferences;
+                                    || xsltXMLReceiver.getURIReferences().hasDynamicDocumentReferences;
                             uriReferences.stylesheetReferences.addAll
-                                    (contentHandler.getURIReferences().stylesheetReferences);
+                                    (xsltXMLReceiver.getURIReferences().stylesheetReferences);
                             uriReferences.documentReferences.addAll
-                                    (contentHandler.getURIReferences().documentReferences);
+                                    (xsltXMLReceiver.getURIReferences().documentReferences);
                         }
 
                         // Put in cache: configKey -> uriReferences
@@ -569,13 +573,13 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         // Use error messages information and provide location data of first error
                         final ValidationException validationException = new ValidationException(errorListener.getMessages(), errorListener.getErrors().get(0));
                         // If possible add location of top-level stylesheet
-                        if (topStylesheetContentHandler.getSystemId() != null)
-                            validationException.addLocationData(new ExtendedLocationData(new LocationData(topStylesheetContentHandler.getSystemId(), -1, -1), "creating XSLT transformer"));
+                        if (topStylesheetXMLReceiver.getSystemId() != null)
+                            validationException.addLocationData(new ExtendedLocationData(new LocationData(topStylesheetXMLReceiver.getSystemId(), -1, -1), "creating XSLT transformer"));
                         throw validationException;
                     } else {
                         // No XSLT errors are available
                         final LocationData transformerExceptionLocationData
-                            = StringErrorListener.getTransformerExceptionLocationData(e, topStylesheetContentHandler.getSystemId());
+                            = StringErrorListener.getTransformerExceptionLocationData(e, topStylesheetXMLReceiver.getSystemId());
                         if (transformerExceptionLocationData.getSystemID() != null)
                             throw ValidationException.wrapException(e, new ExtendedLocationData(transformerExceptionLocationData, "creating XSLT transformer"));
                         else
@@ -599,8 +603,8 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 //                    }
 //                    throw ve;
                 } catch (Exception e) {
-                    if (topStylesheetContentHandler.getSystemId() != null) {
-                        throw ValidationException.wrapException(e, new ExtendedLocationData(topStylesheetContentHandler.getSystemId(), -1, -1, "creating XSLT transformer"));
+                    if (topStylesheetXMLReceiver.getSystemId() != null) {
+                        throw ValidationException.wrapException(e, new ExtendedLocationData(topStylesheetXMLReceiver.getSystemId(), -1, -1, "creating XSLT transformer"));
                     } else {
                         throw new OXFException(e);
                     }
@@ -658,7 +662,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
      *
      * @see #getURIReferences()
      */
-    private static class StylesheetForwardingContentHandler extends ForwardingContentHandler {
+    private static class StylesheetForwardingXMLReceiver extends ForwardingXMLReceiver {
 
         /**
          * This is context that will resolve any prefix, function, and variable.
@@ -750,15 +754,10 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         private String systemId;
         private final NamespaceSupport3 namespaces = new NamespaceSupport3();
 
-        public StylesheetForwardingContentHandler() {
+        public StylesheetForwardingXMLReceiver() {
             super();
             initDummySaxonXPathContext();
         }
-
-//        public StylesheetForwardingContentHandler(ContentHandler contentHandler) {
-//            super(contentHandler);
-//            initDummySaxonXPathContext();
-//        }
 
         public URIReferences getURIReferences() {
             return uriReferences;

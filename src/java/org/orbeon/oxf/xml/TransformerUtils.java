@@ -16,6 +16,8 @@ package org.orbeon.oxf.xml;
 import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
 import org.orbeon.oxf.util.StringBuilderWriter;
@@ -37,7 +39,6 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXTransformerFactory;
-import javax.xml.transform.sax.TemplatesHandler;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
@@ -184,7 +185,7 @@ public class TransformerUtils {
      *
      * @return  a new identity TransformerHandler object
      */
-    public static TransformerHandler getIdentityTransformerHandler() {
+    public static TransformerXMLReceiver getIdentityTransformerHandler() {
         try {
             TransformerHandler transformerHandler = new TransformerFactoryImpl().newTransformerHandler();
             // Wrap TransformerHandler for properties
@@ -194,7 +195,7 @@ public class TransformerUtils {
         }
     }
 
-    public static TransformerHandler getIdentityTransformerHandler(Configuration configuration) {
+    public static TransformerXMLReceiver getIdentityTransformerHandler(Configuration configuration) {
         try {
             TransformerHandler transformerHandler = new TransformerFactoryImpl(configuration).newTransformerHandler();
             // Wrap TransformerHandler for properties
@@ -206,10 +207,6 @@ public class TransformerUtils {
 
     public static TransformerHandler getTransformerHandler(Templates templates, String clazz, Map attributes) throws TransformerConfigurationException {
         return ((attributes != null) ? getFactory(clazz, attributes) : getFactory(clazz)).newTransformerHandler(templates);
-    }
-
-    public static TemplatesHandler getTemplatesHandler(String clazz) throws TransformerException {
-        return getFactory(clazz).newTemplatesHandler();
     }
 
     public static Templates getTemplates(Source source, String clazz, Map attributes, ErrorListener errorListener, URIResolver uriResolver)
@@ -248,7 +245,7 @@ public class TransformerUtils {
      * @return  dom4j document
      */
     public static Document saxStoreToDom4jDocument(SAXStore saxStore) {
-        final TransformerHandler identity = getIdentityTransformerHandler();
+        final TransformerXMLReceiver identity = getIdentityTransformerHandler();
         final LocationDocumentResult documentResult = new LocationDocumentResult();
         identity.setResult(documentResult);
         try {
@@ -268,8 +265,7 @@ public class TransformerUtils {
     public static DocumentInfo saxStoreToTinyTree(Configuration configuration, SAXStore saxStore) {
         final TinyBuilder treeBuilder = new TinyBuilder();
         try {
-            final TransformerHandler identity = getIdentityTransformerHandler(configuration);
-
+            final TransformerXMLReceiver identity = getIdentityTransformerHandler(configuration);
             identity.setResult(treeBuilder);
             saxStore.replay(identity);
         } catch (SAXException e) {
@@ -337,64 +333,60 @@ public class TransformerUtils {
         return new TransformerWrapper(transformer, publicProperty, privateProperty);
     }
 
-    public static TransformerHandler testCreateTransformerHandlerWrapper(TransformerHandler transformerHandler, String publicProperty, String privateProperty) {
-        return new TransformerHandlerWrapper(transformerHandler, publicProperty, privateProperty);
-    }
-
     /**
      * Transform an InputStream to a dom4j Document.
      */
-    public static Document readDom4j(InputStream inputStream, String systemId, boolean handleXInclude) {
+    public static Document readDom4j(InputStream inputStream, String systemId, boolean handleXInclude, boolean handleLexical) {
         final LocationSAXContentHandler dom4jResult = new LocationSAXContentHandler();
         {
-            final ContentHandler ch;
+            final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                ch = new XIncludeProcessor.XIncludeContentHandler(null, dom4jResult, null, new TransformerURIResolver(false));
+                xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, dom4jResult, null, new TransformerURIResolver(false));
             } else {
-                ch = dom4jResult;
+                xmlReceiver = dom4jResult;
             }
-            XMLUtils.inputStreamToSAX(inputStream, systemId, ch, false, false);
+            XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, false, false, handleLexical);
         }
         return dom4jResult.getDocument();
 
     }
 
     /**
-     * Transform a SAX Source to a dom4j Document.
+     * Transform an InputStream to a dom4j Document.
      */
-//    private static Document readDom4j(Source source, boolean handleXInclude) {
-//        final LocationSAXContentHandler dom4jResult = new LocationSAXContentHandler();
-//        try {
-//            final Transformer identity = getIdentityTransformer();
-//            if (handleXInclude) {
-//                // Insert XIncludeContentHandler
-//                identity.transform(source, new SAXResult(new XIncludeProcessor.XIncludeContentHandler(null, dom4jResult, null, new TransformerURIResolver(false))));
-//            } else {
-//                identity.transform(source, new SAXResult(dom4jResult));
-//            }
-//        } catch (TransformerException e) {
-//            throw new OXFException(e);
-//        }
-//        return dom4jResult.getDocument();
-//    }
+    public static Document readDom4j(Source source, boolean handleXInclude) {
+        final LocationSAXContentHandler dom4jResult = new LocationSAXContentHandler();
+        {
+            final XMLReceiver xmlReceiver;
+            if (handleXInclude) {
+                // Insert XIncludeContentHandler
+                xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, dom4jResult, null, new TransformerURIResolver(false));
+            } else {
+                xmlReceiver = dom4jResult;
+            }
+            sourceToSAX(source, xmlReceiver);
+        }
+        return dom4jResult.getDocument();
+
+    }
 
     /**
      * Transform an InputStream to a TinyTree.
      */
-    public static DocumentInfo readTinyTree(Configuration configuration, InputStream inputStream, String systemId, boolean handleXInclude) {
+    public static DocumentInfo readTinyTree(Configuration configuration, InputStream inputStream, String systemId, boolean handleXInclude, boolean handleLexical) {
         final TinyBuilder treeBuilder = new TinyBuilder();
         {
-            final TransformerHandler identityHandler = getIdentityTransformerHandler(configuration);
+            final TransformerXMLReceiver identityHandler = getIdentityTransformerHandler(configuration);
             identityHandler.setResult(treeBuilder);
-            final ContentHandler ch;
+            final XMLReceiver xmlReceiver;
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                ch = new XIncludeProcessor.XIncludeContentHandler(null, identityHandler, null, new TransformerURIResolver(false));
+                xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, identityHandler, null, new TransformerURIResolver(false));
             } else {
-                ch = identityHandler;
+                xmlReceiver = identityHandler;
             }
-            XMLUtils.inputStreamToSAX(inputStream, systemId, ch, false, false);
+            XMLUtils.inputStreamToSAX(inputStream, systemId, xmlReceiver, false, false, handleLexical);
         }
         return (DocumentInfo) treeBuilder.getCurrentRoot();
     }
@@ -402,16 +394,17 @@ public class TransformerUtils {
     /**
      * Transform a SAX Source to a TinyTree.
      */
-    public static DocumentInfo readTinyTree(Source source, boolean handleXInclude) {
+    public static DocumentInfo readTinyTree(Configuration configuration, Source source, boolean handleXInclude) {
         final TinyBuilder treeBuilder = new TinyBuilder();
         try {
-            final Transformer identity = getIdentityTransformer();
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
-                final TransformerHandler identityHandler = getIdentityTransformerHandler();
+                final TransformerXMLReceiver identityHandler = getIdentityTransformerHandler(configuration);
                 identityHandler.setResult(treeBuilder);
-                identity.transform(source, new SAXResult(new XIncludeProcessor.XIncludeContentHandler(null, identityHandler, null, new TransformerURIResolver(false))));
+                final XMLReceiver receiver = new XIncludeProcessor.XIncludeXMLReceiver(null, identityHandler, null, new TransformerURIResolver(false));
+                TransformerUtils.sourceToSAX(source, receiver);
             } else {
+                final Transformer identity = getIdentityTransformer(configuration);
                 identity.transform(source, treeBuilder);
             }
 
@@ -420,20 +413,6 @@ public class TransformerUtils {
         }
         return (DocumentInfo) treeBuilder.getCurrentRoot();
     }
-
-    /**
-     * Transform a TinyTree to a dom4j document.
-     */
-//    public static Document tinyTreeToDom4j(NodeInfo nodeInfo) {
-//        try {
-//            final Transformer identity = getIdentityTransformer();
-//            final LocationDocumentResult documentResult = new LocationDocumentResult();
-//            identity.transform(nodeInfo, documentResult);
-//            return documentResult.getDocument();
-//        } catch (TransformerException e) {
-//            throw new OXFException(e);
-//        }
-//    }
 
     /**
      * Transform a TinyTree to a dom4j document.
@@ -450,23 +429,11 @@ public class TransformerUtils {
     }
 
     /**
-     * Transforms a W3C DOM into a new W3C DOM. Useful when the initial DOM is immutable.
-     *
-     */
-    public static org.w3c.dom.Document domDocument2DomDocument(org.w3c.dom.Document document) throws TransformerException {
-        final Transformer identity = getIdentityTransformer();
-        final DOMResult domResult = new DOMResult();
-        identity.transform(new DOMSource(document), domResult);
-        final Node resultNode = domResult.getNode();
-        return (resultNode instanceof org.w3c.dom.Document) ? ((org.w3c.dom.Document) resultNode) : resultNode.getOwnerDocument();
-    }
-
-    /**
      * Transform a String to a TinyTree.
      */
-    public static DocumentInfo stringToTinyTree(Configuration configuration, String string, boolean handleXInclude) {
+    public static DocumentInfo stringToTinyTree(Configuration configuration, String string, boolean handleXInclude, boolean handleLexical) {
         try {
-            return readTinyTree(configuration, new ByteArrayInputStream(string.getBytes("utf-8")), null, handleXInclude);
+            return readTinyTree(configuration, new ByteArrayInputStream(string.getBytes("utf-8")), null, handleXInclude, handleLexical);
         } catch (UnsupportedEncodingException e) {
             throw new OXFException(e);// should not happen
         }
@@ -475,10 +442,32 @@ public class TransformerUtils {
     /**
      * Transform a TinyTree to SAX events.
      */
-    public static void writeTinyTree(NodeInfo nodeInfo, ContentHandler contentHandler) {
+    public static void writeTinyTree(NodeInfo nodeInfo, XMLReceiver xmlReceiver) {
+        sourceToSAX(nodeInfo, xmlReceiver);
+    }
+
+    /**
+     * Transform a SAX source to SAX events.
+     */
+    public static void sourceToSAX(Source source, XMLReceiver xmlReceiver) {
         try {
             final Transformer identity = getIdentityTransformer();
-            identity.transform(nodeInfo, new SAXResult(contentHandler));
+            final SAXResult saxResult = new SAXResult(xmlReceiver);
+            saxResult.setLexicalHandler(xmlReceiver);
+            identity.transform(source, saxResult);
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    /**
+     * Transform a SAX source to SAX events.
+     */
+    private static void sourceToSAX(Source source, ContentHandler contentHandler) {
+        try {
+            final Transformer identity = getIdentityTransformer();
+            final SAXResult saxResult = new SAXResult(contentHandler);
+            identity.transform(source, saxResult);
         } catch (TransformerException e) {
             throw new OXFException(e);
         }
@@ -487,13 +476,15 @@ public class TransformerUtils {
     /**
      * Transform a dom4j Node to SAX events.
      */
+    public static void writeDom4j(org.dom4j.Node node, XMLReceiver xmlReceiver) {
+        sourceToSAX(new LocationDocumentSource(node), xmlReceiver);
+    }
+
+    /**
+     * Transform a dom4j Node to SAX events.
+     */
     public static void writeDom4j(org.dom4j.Node node, ContentHandler contentHandler) {
-        try {
-            final Transformer identity = getIdentityTransformer();
-            identity.transform(new LocationDocumentSource(node), new SAXResult(contentHandler));
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
+        sourceToSAX(new LocationDocumentSource(node), contentHandler);
     }
 
     /**
@@ -528,28 +519,18 @@ public class TransformerUtils {
      * Transform a TinyTree to a SAXStore.
      */
     public static SAXStore tinyTreeToSAXStore(NodeInfo nodeInfo) {
-        try {
-            final Transformer identity = getXMLIdentityTransformer();
-            final SAXStore result = new SAXStore();
-            identity.transform(nodeInfo, new SAXResult(result));
-            return result;
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
+        final SAXStore saxStore = new SAXStore();
+        sourceToSAX(nodeInfo, saxStore);
+        return saxStore;
     }
 
     /**
      * Transform a dom4j document to a SAXStore.
      */
     public static SAXStore dom4jToSAXStore(Document document) {
-        try {
-            final Transformer identity = getXMLIdentityTransformer();
-            final SAXStore result = new SAXStore();
-            identity.transform(new LocationDocumentSource(document), new SAXResult(result));
-            return result;
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
+        final SAXStore saxStore = new SAXStore();
+        sourceToSAX(new LocationDocumentSource(document), saxStore);
+        return saxStore;
     }
 }
 
@@ -642,14 +623,14 @@ class TransformerWrapper extends Transformer {
     }
 }
 
-class TransformerHandlerWrapper extends ForwardingContentHandler implements TransformerHandler {
+class TransformerHandlerWrapper extends ForwardingXMLReceiver implements TransformerXMLReceiver {
 
     private TransformerHandler transformerHandler;
     private String publicProperty;
     private String privateProperty;
 
     public TransformerHandlerWrapper(TransformerHandler transformerHandler, String publicProperty, String privateProperty) {
-        super(transformerHandler);
+        super(transformerHandler, transformerHandler);
         this.transformerHandler = transformerHandler;
         this.publicProperty = publicProperty;
         this.privateProperty = privateProperty;

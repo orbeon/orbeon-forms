@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -420,7 +421,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
     private void outputFull(String uri, String localname, Attributes attributes, String effectiveId,
                             XFormsValueControl xformsControl, Itemset itemset, boolean isMultiple, boolean isBooleanInput) throws SAXException {
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, !isFull);
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
@@ -439,7 +440,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             // Old layout always output container <span>/<fieldset>, and in new layout we only put it for select/select1
             final boolean outputContainerElement = !isBooleanInput || !handlerContext.isSpanHTMLLayout();
             if (outputContainerElement)
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName, containerAttributes);
+                xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName, containerAttributes);
             {
                 if (handlerContext.isNoScript()) {
                     // Output <legend>
@@ -448,12 +449,12 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     reusableAttributes.clear();
                     // TODO: handle other attributes? xforms-disabled?
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-label");
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, legendName, legendQName, reusableAttributes);
+                    xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, legendName, legendQName, reusableAttributes);
                     if (xformsControl != null) {
                         final boolean mustOutputHTMLFragment = xformsControl.isHTMLLabel(pipelineContext);
-                        outputLabelText(contentHandler, xformsControl, xformsControl.getLabel(pipelineContext), xhtmlPrefix, mustOutputHTMLFragment);
+                        outputLabelText(xmlReceiver, xformsControl, xformsControl.getLabel(pipelineContext), xhtmlPrefix, mustOutputHTMLFragment);
                     }
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, legendName, legendQName);
+                    xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, legendName, legendQName);
                 }
 
                 if (itemset != null) {
@@ -461,13 +462,13 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     for (Iterator<Item> i = itemset.toList().iterator(); i.hasNext(); itemIndex++) {
                         final Item item = i.next();
                         final String itemEffectiveId = getItemId(effectiveId, Integer.toString(itemIndex));
-                        handleItemFull(pipelineContext, handlerContext, contentHandler, reusableAttributes, attributes, xhtmlPrefix, spanQName,
+                        handleItemFull(pipelineContext, handlerContext, xmlReceiver, reusableAttributes, attributes, xhtmlPrefix, spanQName,
                                 containingDocument, xformsControl, effectiveId, itemEffectiveId, isMultiple, fullItemType, item, itemIndex == 0);
                     }
                 }
             }
             if (outputContainerElement)
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName);
+                xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName);
         }
 
         // NOTE: Templates for full items are output globally in XHTMLBodyHandler

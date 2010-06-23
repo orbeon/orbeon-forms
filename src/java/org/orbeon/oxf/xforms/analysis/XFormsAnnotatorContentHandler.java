@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -27,7 +28,6 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -49,7 +49,7 @@ import java.util.*;
  * ContentHandler (at least two separate outputs) are produced, one for the annotated output, another for the extracted
  * output.
  */
-public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
+public class XFormsAnnotatorContentHandler extends ForwardingXMLReceiver {
 
     private SAXStore saxStore;
 
@@ -200,24 +200,24 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
     /**
      * Constructor for top-level document.
      *
-     * @param contentHandler        output of transformation
+     * @param saxStore              output of transformation
      * @param externalContext       external context
      * @param metadata              metadata to gather
      */
-    public XFormsAnnotatorContentHandler(SAXStore contentHandler, ExternalContext externalContext, Metadata metadata) {
-        this(contentHandler, externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), metadata);
+    public XFormsAnnotatorContentHandler(SAXStore saxStore, ExternalContext externalContext, Metadata metadata) {
+        this(saxStore, externalContext.getRequest().getContainerNamespace(), "portlet".equals(externalContext.getRequest().getContainerType()), metadata);
     }
 
     /**
      * Constructor for XBL shadow trees and top-level documents.
      *
-     * @param contentHandler        output of transformation
+     * @param xmlReceiver           output of transformation
      * @param containerNamespace    container namespace for portlets
      * @param portlet               whether we are in portlet mode
      * @param metadata              metadata to gather
      */
-    public XFormsAnnotatorContentHandler(ContentHandler contentHandler, String containerNamespace, boolean portlet, Metadata metadata) {
-        super(contentHandler, contentHandler != null);
+    public XFormsAnnotatorContentHandler(XMLReceiver xmlReceiver, String containerNamespace, boolean portlet, Metadata metadata) {
+        super(xmlReceiver);
 
         this.containerNamespace = containerNamespace;
         this.portlet = portlet;
@@ -225,8 +225,8 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
         this.metadata = metadata;
         this.isGenerateIds = true;
 
-        if (contentHandler instanceof SAXStore)
-            this.saxStore = (SAXStore) contentHandler;
+        if (xmlReceiver instanceof SAXStore)
+            this.saxStore = (SAXStore) xmlReceiver;
     }
 
     /**
@@ -299,7 +299,7 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
             // Create a new id and update the attributes if needed
             attributes = getAttributesGatherNamespaces(attributes, reusableStringArray, idIndex);
 
-            if (saxStore != null && Version.instance().isPE()) {
+            if (saxStore != null && Version.isPE()) {
                 // Remember mark if xxforms:update="full"
                 final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
                 if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
@@ -488,8 +488,11 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
         final Map<String, String> namespaces = new HashMap<String, String>();
         for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
             final String namespacePrefix = (String) e.nextElement();
-            if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
+            if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals("")) {
                 namespaces.put(namespacePrefix, namespaceSupport.getURI(namespacePrefix));
+                 // Intern namespace strings to save memory; should use NamePool later
+//                namespaces.put(namespacePrefix.intern(), namespaceSupport.getURI(namespacePrefix).intern());
+            }
         }
         // Re-add standard "xml" prefix mapping
         // TODO: WHY?
@@ -621,5 +624,42 @@ public class XFormsAnnotatorContentHandler extends ForwardingContentHandler {
         }
 
         return attributes;
+    }
+
+    @Override
+    public void startDTD(String name, String publicId, String systemId) throws SAXException {
+        // NOP
+    }
+
+    @Override
+    public void endDTD() throws SAXException {
+        // NOP
+    }
+
+    @Override
+    public void startEntity(String name) throws SAXException {
+        // NOP
+    }
+
+    @Override
+    public void endEntity(String name) throws SAXException {
+        // NOP
+    }
+
+    @Override
+    public void startCDATA() throws SAXException {
+        // NOP
+    }
+
+    @Override
+    public void endCDATA() throws SAXException {
+        // NOP
+    }
+
+    @Override
+    public void comment(char[] ch, int start, int length) throws SAXException {
+        if (inPreserve) {
+            super.comment(ch, start, length);
+        }
     }
 }

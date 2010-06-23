@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor.serializer.legacy;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.TransformerUtils;
 
@@ -33,7 +34,7 @@ public class TextSerializer extends HttpTextSerializer {
     protected void readInput(PipelineContext context, ProcessorInput input, Config config, Writer writer) {
 
         // Create an identity transformer and start the transformation
-        TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         TransformerUtils.applyOutputProperties(identity.getTransformer(),
                 config.method != null ? config.method : DEFAULT_METHOD,
                 null,
@@ -45,6 +46,6 @@ public class TextSerializer extends HttpTextSerializer {
                 false,
                 DEFAULT_INDENT_AMOUNT);
         identity.setResult(new StreamResult(writer));
-        readInputAsSAX(context, INPUT_DATA, new SerializerContentHandler(identity, writer, isSerializeXML11()));
+        readInputAsSAX(context, INPUT_DATA, new SerializerXMLReceiver(identity, writer, isSerializeXML11()));
     }
 }

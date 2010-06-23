@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.cache;
 
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+
 public interface CacheableInputOutput {
-    OutputCacheKey getKey(org.orbeon.oxf.pipeline.api.PipelineContext context);
-    Object getValidity(org.orbeon.oxf.pipeline.api.PipelineContext context);
+    OutputCacheKey getKey(PipelineContext pipelineContext);
+    Object getValidity(PipelineContext pipelineContext);
 }

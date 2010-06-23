@@ -15,8 +15,8 @@ package org.orbeon.oxf.resources;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.w3c.dom.Node;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.XMLReader;
 
 import java.io.InputStream;
@@ -98,31 +98,33 @@ public class PriorityResourceManagerImpl implements ResourceManager {
             }
         });
     }
+    
+    public Document getContentAsDOM4J(final String key, final boolean validating, final boolean handleXInclude, final boolean handleLexical) {
+        return (Document) delegate(new Operation() {
+            public Object run(ResourceManager resourceManager) {
+                return resourceManager.getContentAsDOM4J(key, validating, handleXInclude, handleLexical);
+            }
+        });
+    }
 
-    public void getContentAsSAX(final String key, final ContentHandler handler) {
+    public void getContentAsSAX(final String key, final XMLReceiver xmlReceiver) {
         delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
-                resourceManager.getContentAsSAX(key, handler);
+                resourceManager.getContentAsSAX(key, xmlReceiver);
                 return null;
             }
         });
     }
 
-    public void getContentAsSAX(final String key, final ContentHandler handler, final boolean validating, final boolean handleXInclude) {
+    public void getContentAsSAX(final String key, final XMLReceiver xmlReceiver, final boolean validating, final boolean handleXInclude, final boolean handleLexical) {
         delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
-                resourceManager.getContentAsSAX(key, handler, validating, handleXInclude);
+                resourceManager.getContentAsSAX(key, xmlReceiver, validating, handleXInclude, handleLexical);
                 return null;
             }
         });
     }
 
-    /**
-     * Returns a binary input stream for the specified key. The key could point
-     * to any document type (text or binary).
-     * @param key A Resource Manager key
-     * @return a input stream
-     */
     public InputStream getContentAsStream(final String key) {
         return (InputStream) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
@@ -131,12 +133,6 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         });
     }
 
-    /**
-     * Gets the last modified timestamp for the specified resource
-     * @param key A Resource Manager key
-     * @param doNotThrowResourceNotFound
-     * @return a timestamp
-     */
     public long lastModified(final String key, boolean doNotThrowResourceNotFound) {
         for (ResourceManager resourceManager: resourceManagers) {
             long lastModified = resourceManager.lastModified(key, true);
@@ -146,10 +142,6 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         throw new ResourceNotFoundException("Cannot find resource " + key);
     }
 
-    /**
-     * Returns the length of the file denoted by this abstract path name.
-     * @return The length, in bytes, of the file denoted by this abstract path name, or 0L if the file does not exist
-     */
     public int length(final String key) {
         return (Integer) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
@@ -158,10 +150,6 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         });
     }
 
-    /**
-     * Indicates if the resource manager implementation supports write operations
-     * @return true if write operations are allowed
-     */
     public boolean canWrite(final String key) {
         final boolean[] result = new boolean[1];
         delegate(new Operation() {
@@ -175,11 +163,6 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         return result[0];
     }
 
-    /**
-     * Allows writing to the resource
-     * @param key A Resource Manager key
-     * @return an output stream
-     */
     public OutputStream getOutputStream(final String key) {
         return (OutputStream) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
@@ -190,11 +173,6 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         });
     }
 
-    /**
-     * Allow writing to the resource
-     * @param key A Resource Manager key
-     * @return  a writer
-     */
     public Writer getWriter(final String key) {
         return (Writer) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
@@ -214,8 +192,8 @@ public class PriorityResourceManagerImpl implements ResourceManager {
     }
 
 
-    public ContentHandler getWriteContentHandler(final String key) {
-        return (ContentHandler) delegate(new Operation() {
+    public XMLReceiver getWriteContentHandler(final String key) {
+        return (XMLReceiver) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
                 if (!resourceManager.canWrite(key))
                     throw new ResourceNotFoundException("Try next resource manager.");

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -39,7 +40,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsTextareaControl textareaControl = (XFormsTextareaControl) control;
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
         final boolean isConcreteControl = textareaControl != null;
 
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, control, true);
@@ -62,13 +63,13 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
 
                 handleDisabledAttribute(reusableAttributes, containingDocument, textareaControl);
 
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, containerAttributes);
+                xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, containerAttributes);
                 if (isConcreteControl) {
                     final String value = textareaControl.getExternalValue(pipelineContext);
                     if (value != null)
-                        contentHandler.characters(value.toCharArray(), 0, value.length());
+                        xmlReceiver.characters(value.toCharArray(), 0, value.length());
                 }
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName);
+                xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName);
             } else {
                 // Static readonly
 
@@ -79,19 +80,19 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                 final String containerName = isHTMLMediaType ? "span" : "pre";
                 final String containerQName = XMLUtils.buildQName(xhtmlPrefix, containerName);
 
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName, containerAttributes);
+                xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName, containerAttributes);
                 if (isConcreteControl) {
                     final String value = textareaControl.getExternalValue(pipelineContext);
                     if (value != null) {
                         if (!isHTMLMediaType) {
                             // NOTE: Don't replace spaces with &nbsp;, as this is not the right algorithm for all cases
-                            contentHandler.characters(value.toCharArray(), 0, value.length());
+                            xmlReceiver.characters(value.toCharArray(), 0, value.length());
                         } else {
-                            XFormsUtils.streamHTMLFragment(contentHandler, value, textareaControl.getLocationData(), xhtmlPrefix);
+                            XFormsUtils.streamHTMLFragment(xmlReceiver, value, textareaControl.getLocationData(), xhtmlPrefix);
                         }
                     }
                 }
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName);
+                xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, containerName, containerQName);
             }
         }
     }

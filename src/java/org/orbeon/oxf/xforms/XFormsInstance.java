@@ -15,6 +15,8 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -39,11 +41,7 @@ import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.VirtualNode;
-import org.xml.sax.ContentHandler;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.sax.SAXResult;
-import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +128,7 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
                     }
                 } else {
                     // Just use TinyTree as is
-                    documentInfo = TransformerUtils.stringToTinyTree(configuration, xmlString, false);
+                    documentInfo = TransformerUtils.stringToTinyTree(configuration, xmlString, false, true);
                 }
             } else {
                 // Instance document is not available, defer to later initialization
@@ -457,24 +455,19 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     /**
      * Output the instance to the specified ContentHandler
      *
-     * @param contentHandler    ContentHandler to write to
+     * @param xmlReceiver   receiver to write to
      */
-    public void read(ContentHandler contentHandler) {
-        try {
-            final Transformer identity = TransformerUtils.getIdentityTransformer();
-            identity.transform(documentInfo, new SAXResult(contentHandler));
-        } catch (Exception e) {
-            throw new OXFException(e);
-        }
+    public void read(XMLReceiver xmlReceiver) {
+        TransformerUtils.sourceToSAX(documentInfo, xmlReceiver);
     }
 
     /**
      * This prints the instance with extra annotation attributes to System.out. For debug only.
      */
     public void debugReadOut() {
-        final TransformerHandler  th = TransformerUtils.getIdentityTransformerHandler();
-        th.setResult(new StreamResult(System.out));
-        read(th);
+        final TransformerXMLReceiver identityTransformerHandler = TransformerUtils.getIdentityTransformerHandler();
+        identityTransformerHandler.setResult(new StreamResult(System.out));
+        read(identityTransformerHandler);
     }
 
     /**

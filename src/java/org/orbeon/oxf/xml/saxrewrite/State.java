@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xml.saxrewrite;
 
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
@@ -34,7 +34,8 @@ public abstract class State {
     /**
      * The destination of the rewrite transformation.
      */
-    protected final ContentHandler contentHandler;
+    protected final XMLReceiver xmlReceiver;
+
     /**
      * What you think.
      */
@@ -42,15 +43,15 @@ public abstract class State {
 
     /**
      *
-     * @param previousState  The previous state.
-     * @param contentHandler The destination for the rewrite transformation..
+     * @param previousState previous state
+     * @param xmlReceiver   destination for the rewrite transformation
 
      * @see #previousState
-     * @see #contentHandler
+     * @see #xmlReceiver
      */
-    public State(final State previousState, final ContentHandler contentHandler) {
+    public State(final State previousState, final XMLReceiver xmlReceiver) {
         this.previousState = previousState;
-        this.contentHandler = contentHandler;
+        this.xmlReceiver = xmlReceiver;
     }
 
     /**
@@ -60,7 +61,7 @@ public abstract class State {
      */
     protected void endElementStart(final String ns, final String lnam, final String qnam)
             throws SAXException {
-        contentHandler.endElement(ns, lnam, qnam);
+        xmlReceiver.endElement(ns, lnam, qnam);
     }
 
     /**
@@ -79,12 +80,12 @@ public abstract class State {
 
     public State characters(final char[] ch, final int strt, final int len)
             throws SAXException {
-        contentHandler.characters(ch, strt, len);
+        xmlReceiver.characters(ch, strt, len);
         return this;
     }
 
     public State endDocument() throws SAXException {
-        contentHandler.endDocument();
+        xmlReceiver.endDocument();
         return this;
     }
 
@@ -100,34 +101,34 @@ public abstract class State {
     }
 
     public State endPrefixMapping(final String pfx) throws SAXException {
-        contentHandler.endPrefixMapping(pfx);
+        xmlReceiver.endPrefixMapping(pfx);
         return this;
     }
 
     public State ignorableWhitespace(final char[] ch, final int strt, final int len)
             throws SAXException {
-        contentHandler.ignorableWhitespace(ch, strt, len);
+        xmlReceiver.ignorableWhitespace(ch, strt, len);
         return this;
     }
 
     public State processingInstruction(final String trgt, final String dat)
             throws SAXException {
-        contentHandler.processingInstruction(trgt, dat);
+        xmlReceiver.processingInstruction(trgt, dat);
         return this;
     }
 
     public State setDocumentLocator(final Locator lctr) {
-        contentHandler.setDocumentLocator(lctr);
+        xmlReceiver.setDocumentLocator(lctr);
         return this;
     }
 
     public State skippedEntity(final String nam) throws SAXException {
-        contentHandler.skippedEntity(nam);
+        xmlReceiver.skippedEntity(nam);
         return this;
     }
 
     public State startDocument() throws SAXException {
-        contentHandler.startDocument();
+        xmlReceiver.startDocument();
         return this;
     }
 
@@ -144,7 +145,42 @@ public abstract class State {
     }
 
     public State startPrefixMapping(final String pfx, final String uri) throws SAXException {
-        contentHandler.startPrefixMapping(pfx, uri);
+        xmlReceiver.startPrefixMapping(pfx, uri);
+        return this;
+    }
+
+    public State startDTD(String name, String publicId, String systemId) throws SAXException {
+        xmlReceiver.startDTD(name, publicId, systemId);
+        return this;
+    }
+
+    public State endDTD() throws SAXException {
+        xmlReceiver.endDTD();
+        return this;
+    }
+
+    public State startEntity(String name) throws SAXException {
+        xmlReceiver.startEntity(name);
+        return this;
+    }
+
+    public State endEntity(String name) throws SAXException {
+        xmlReceiver.endEntity(name);
+        return this;
+    }
+
+    public State startCDATA() throws SAXException {
+        xmlReceiver.startCDATA();
+        return this;
+    }
+
+    public State endCDATA() throws SAXException {
+        xmlReceiver.endCDATA();
+        return this;
+    }
+
+    public State comment(char[] ch, int start, int length) throws SAXException {
+        xmlReceiver.comment(ch, start, length);
         return this;
     }
 }

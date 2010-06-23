@@ -28,6 +28,6 @@ public class NonLazyUserDataDocument extends DefaultDocument {
     }
 
     protected org.dom4j.DocumentFactory getDocumentFactory() {
-        return NonLazyUserDataDocumentFactory.getInstance14();
+        return NonLazyUserDataDocumentFactory.getInstance();
     }
 }

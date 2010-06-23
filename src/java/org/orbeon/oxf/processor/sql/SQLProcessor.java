@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.sql;
 
@@ -18,12 +18,16 @@ import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.sql.interpreters.*;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.*;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocumentFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -71,9 +75,8 @@ public class SQLProcessor extends ProcessorImpl {
     public static final Namespace XSI_NAMESPACE = new Namespace(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
     static {
         NULL_DOCUMENT = new NonLazyUserDataDocument();
-        final NonLazyUserDataDocumentFactory fctry
-                = NonLazyUserDataDocumentFactory.getInstance14();
-        Element nullElement = fctry.createElement("null");
+        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+        Element nullElement = factory.createElement("null");
         final QName attNm = new QName
                 (XMLConstants.XSI_NIL_ATTRIBUTE, XSI_NAMESPACE);
         nullElement.addAttribute(attNm, "true");
@@ -104,8 +107,8 @@ public class SQLProcessor extends ProcessorImpl {
     public ProcessorOutput createOutput(String name) {
         // This will be called only if there is an output
         ProcessorOutput output = new ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                execute(context, contentHandler);
+            public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
+                execute(context, xmlReceiver);
             }
         };
         addOutput(name, output);
@@ -114,7 +117,7 @@ public class SQLProcessor extends ProcessorImpl {
 
     public void start(PipelineContext context) {
         // This will be called only if no output is connected
-        execute(context, new NullSerializer.NullContentHandler());
+        execute(context, new XMLReceiverAdapter());
     }
 
     private static class Config {
@@ -129,7 +132,7 @@ public class SQLProcessor extends ProcessorImpl {
         public List xpathExpressions;
     }
 
-    protected void execute(final PipelineContext context, ContentHandler contentHandler) {
+    protected void execute(final PipelineContext context, XMLReceiver xmlReceiver) {
         try {
             // Cache, read and interpret the config input
             Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
@@ -199,10 +202,10 @@ public class SQLProcessor extends ProcessorImpl {
                     });
                     // Create SAXStore
                     try {
-                        SAXStore store = new SAXStore();
-                        LocationSAXWriter saxw = new LocationSAXWriter();
-                        saxw.setContentHandler(store);
-                        saxw.write(configDocument);
+                        final SAXStore store = new SAXStore();
+                        final LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
+                        locationSAXWriter.setContentHandler(store);
+                        locationSAXWriter.write(configDocument);
                         // Return the normalized document
                         return new Config(store, useXPathExpressions, xpathExpressions);
                     } catch (SAXException e) {
@@ -265,7 +268,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
 
             // Replay the config SAX store through the interpreter
-            config.configInput.replay(new RootInterpreter(context, getPropertySet(), data, datasource, xpathContentHandler, contentHandler));
+            config.configInput.replay(new RootInterpreter(context, getPropertySet(), data, datasource, xpathContentHandler, xmlReceiver));
         } catch (OXFException e) {
             throw e;
         } catch (Exception e) {
@@ -274,17 +277,18 @@ public class SQLProcessor extends ProcessorImpl {
     }
 
     private static class RootInterpreter extends InterpreterContentHandler {
+
         private SQLProcessorInterpreterContext interpreterContext;
         private NamespaceSupport namespaceSupport = new NamespaceSupport();
 
-        public RootInterpreter(PipelineContext context, PropertySet propertySet, Node input, Datasource datasource, XPathContentHandler xpathContentHandler, ContentHandler output) {
+        public RootInterpreter(PipelineContext context, PropertySet propertySet, Node input, Datasource datasource, XPathContentHandler xpathContentHandler, XMLReceiver output) {
             super(null, false);
             interpreterContext = new SQLProcessorInterpreterContext(propertySet);
             interpreterContext.setPipelineContext(context);
             interpreterContext.setInput(input);
             interpreterContext.setDatasource(datasource);
             interpreterContext.setXPathContentHandler(xpathContentHandler);
-            interpreterContext.setOutput(new DeferredContentHandlerImpl(output));
+            interpreterContext.setOutput(new DeferredXMLReceiverImpl(output));
             interpreterContext.setNamespaceSupport(namespaceSupport);
             addElementHandler(new ConfigInterpreter(interpreterContext), SQL_NAMESPACE_URI, "config");
         }
@@ -413,7 +417,7 @@ public class SQLProcessor extends ProcessorImpl {
         private boolean forward;
         private boolean repeating;
         private SAXStore saxStore;
-        private DeferredContentHandler savedOutput;
+        private DeferredXMLReceiver savedOutput;
         private Attributes savedAttributes;
 
         private Map elementHandlers = new HashMap();
@@ -498,7 +502,7 @@ public class SQLProcessor extends ProcessorImpl {
                         savedAttributes = new AttributesImpl(attributes);
                         elementHandler.saxStore = new SAXStore();
                         elementHandler.saxStore.setDocumentLocator(documentLocator);
-                        getInterpreterContext().setOutput(new DeferredContentHandlerImpl(elementHandler.saxStore));
+                        getInterpreterContext().setOutput(new DeferredXMLReceiverImpl(elementHandler.saxStore));
                     } else {
                         // Notify start of element
                         currentHandler = elementHandler;
@@ -609,7 +613,7 @@ public class SQLProcessor extends ProcessorImpl {
         }
     }
 
-    public static abstract class ForwardingContentHandler implements ContentHandler {
+    public static abstract class ForwardingContentHandler implements XMLReceiver {
 
         public ForwardingContentHandler() {
         }
@@ -680,6 +684,29 @@ public class SQLProcessor extends ProcessorImpl {
             final ContentHandler contentHandler = getContentHandler();
             if (contentHandler != null)
                 contentHandler.startPrefixMapping(s, s1);
+        }
+
+        // Ignore LexicalHandler methods as we don't plan to do anything useful with them
+
+        public void startDTD(String name, String publicId, String systemId) throws SAXException {
+        }
+
+        public void endDTD() throws SAXException {
+        }
+
+        public void startEntity(String name) throws SAXException {
+        }
+
+        public void endEntity(String name) throws SAXException {
+        }
+
+        public void startCDATA() throws SAXException {
+        }
+
+        public void endCDATA() throws SAXException {
+        }
+
+        public void comment(char[] ch, int start, int length) throws SAXException {
         }
     }
 }

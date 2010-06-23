@@ -21,6 +21,8 @@ import org.dom4j.Text;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.DOMSerializer;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorFactory;
@@ -49,9 +51,7 @@ import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 
-import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
 
 /**
@@ -139,9 +139,7 @@ public class XBLBindings {
 
         @Override
         public boolean equals(Object obj) {
-            if (!(obj instanceof Scope))
-                return false;
-            return this == obj || scopeId.equals(((Scope) obj).scopeId);
+            return obj instanceof Scope && (this == obj || scopeId.equals(((Scope) obj).scopeId));
         }
     }
 
@@ -218,7 +216,9 @@ public class XBLBindings {
             final List<String> includes = metadata.getBindingsIncludes();
             if (includes != null) {
                 for (final String include: includes) {
-                    xblDocuments.add(ResourceManagerWrapper.instance().getContentAsDOM4J(include));
+                    xblDocuments.add(readXBLResource(include));
+//                    System.out.println(Dom4jUtils.domToPrettyString(xblDocuments.get(xblDocuments.size() - 1)));
+
                 }
             }
         }
@@ -236,6 +236,12 @@ public class XBLBindings {
             indentedLogger.endHandleOperation("xbl:xbl count", Integer.toString(xblDocuments.size()),
                     "xbl:binding count", Integer.toString(xblBindingCount));
         }
+    }
+
+    private Document readXBLResource(String include) {
+        final boolean handleXInclude = true; // handle XInclude
+        final boolean handleLexical = false; // don't handle comments and other lexical information
+        return ResourceManagerWrapper.instance().getContentAsDOM4J(include, false, handleXInclude, handleLexical);
     }
 
     private int extractXBLBindings(Document xblDocument, XFormsStaticState staticState) {
@@ -391,7 +397,7 @@ public class XBLBindings {
                         indentedLogger.startHandleOperation("", "adding XBL bindings");
                         int xblBindingCount = 0;
                         for (final String include: includes.subList(initialIncludesCount, finalIncludesCount)) {
-                            xblBindingCount += extractXBLBindings(ResourceManagerWrapper.instance().getContentAsDOM4J(include), staticState);
+                            xblBindingCount += extractXBLBindings(readXBLResource(include), staticState);
                         }
                         indentedLogger.endHandleOperation("xbl:xbl count", Integer.toString(finalIncludesCount - initialIncludesCount),
                                 "xbl:binding count", Integer.toString(xblBindingCount),
@@ -548,7 +554,7 @@ public class XBLBindings {
     }
 
     private boolean hasFullUpdate(Document shadowTreeDocument) {
-        if (Version.instance().isPE()) {
+        if (Version.isPE()) {
             final boolean[] hasUpdateFull = new boolean[1];
             Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
                 public void startElement(Element element) {
@@ -572,14 +578,14 @@ public class XBLBindings {
     // Keep public for unit tests
     public Document annotateShadowTree(Document shadowTreeDocument, final String prefix, boolean hasFullUpdate) {
         // Create transformer
-        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
 
         // Set result
         final LocationDocumentResult documentResult = new LocationDocumentResult();
         identity.setResult(documentResult);
 
         // Put SAXStore in the middle if we have full updates
-        final ContentHandler output = hasFullUpdate ? new SAXStore(identity) : identity;
+        final XMLReceiver output = hasFullUpdate ? new SAXStore(identity) : identity;
 
         // Write the document through the annotator
         // TODO: this adds xml:base on root element, must fix
@@ -634,7 +640,7 @@ public class XBLBindings {
     }
 
     private LocationDocumentResult filterShadowTree(Document fullShadowTree, String prefix, Scope innerScope, String controlPrefixedId, String baseURI) {
-        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         final LocationDocumentResult result = new LocationDocumentResult();
         identity.setResult(result);
 
@@ -647,7 +653,7 @@ public class XBLBindings {
     }
 
     private void gatherScopeMappingsAndTransform(Document document, String prefix, Scope innerScope, Scope outerScope,
-                                                 XFormsConstants.XXBLScope startScope, ContentHandler result, boolean ignoreRootElement, String baseURI) {
+                                                 XFormsConstants.XXBLScope startScope, XMLReceiver result, boolean ignoreRootElement, String baseURI) {
         // Run transformation which gathers scope information and extracts compact tree into the output ContentHandler
         TransformerUtils.writeDom4j(document, new ScopeExtractorContentHandler(result, prefix, innerScope, outerScope, ignoreRootElement, startScope, baseURI));
     }
@@ -666,7 +672,7 @@ public class XBLBindings {
 
         /**
          *
-         * @param contentHandler        output of transformation
+         * @param xmlReceiver           output of transformation
          * @param prefix                prefix of the ids within the new shadow tree, e.g. "my-stuff$my-foo-bar$"
          * @param innerScope            inner scope
          * @param outerScope            outer scope, i.e. scope of the bound element
@@ -674,9 +680,9 @@ public class XBLBindings {
          * @param baseURI               base URI of new tree
          * @param startScope            scope of root element
          */
-        public ScopeExtractorContentHandler(ContentHandler contentHandler, String prefix, Scope innerScope, Scope outerScope,
+        public ScopeExtractorContentHandler(XMLReceiver xmlReceiver, String prefix, Scope innerScope, Scope outerScope,
                                             boolean ignoreRootElement, XFormsConstants.XXBLScope startScope, String baseURI) {
-            super(contentHandler, metadata, ignoreRootElement, baseURI);
+            super(xmlReceiver, metadata, ignoreRootElement, baseURI);
             assert innerScope != null;
             assert outerScope != null;
 

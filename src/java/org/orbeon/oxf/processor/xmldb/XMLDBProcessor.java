@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -20,6 +20,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.ProcessorImpl;
@@ -93,7 +94,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
             public Object read(PipelineContext context, ProcessorInput input) {
                 // Use readInputAsSAX so that we can filter namespaces if needed
                 LocationSAXContentHandler ch = new LocationSAXContentHandler();
-                readInputAsSAX(context, input, new NamespaceCleanupContentHandler(ch, isSerializeXML11()));
+                readInputAsSAX(context, input, new NamespaceCleanupXMLReceiver(ch, isSerializeXML11()));
                 return readConfig(ch.getDocument());
             }
         });
@@ -168,10 +169,10 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
      * @param resourceId        optional resource id on which the query is run
      * @param query             selects resources in the collection that must be searched
      * @param namespaceContext  namespace mappings
-     * @param contentHandler    ContentHandler where the resources are output
+     * @param xmlReceiver       receiver where the resources are output
      */
     protected void query(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection,
-                         String resourceId, String query, Map<String, String> namespaceContext, ContentHandler contentHandler) {
+                         String resourceId, String query, Map<String, String> namespaceContext, XMLReceiver xmlReceiver) {
         ensureDriverRegistered(pipelineContext, datasource);
         try {
             // Execute query
@@ -181,9 +182,9 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
             for (ResourceIterator i = result.getIterator(); i.hasMoreResources();) {
                 Resource resource = i.nextResource();
                 if (resource instanceof XMLResource) {
-                    ((XMLResource) resource).getContentAsSAX(new DatabaseReadContentHandler(contentHandler));
+                    ((XMLResource) resource).getContentAsSAX(new DatabaseReadXMLReceiver(xmlReceiver));
                 } else if (resource instanceof BinaryResource) {
-                    XMLUtils.inputStreamToBase64Characters(new ByteArrayInputStream((byte[]) resource.getContent()), contentHandler);
+                    XMLUtils.inputStreamToBase64Characters(new ByteArrayInputStream((byte[]) resource.getContent()), xmlReceiver);
                 } else {
                     throw new OXFException("Unsupported resource type: " + resource.getClass());
                 }
@@ -289,8 +290,9 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
             XMLResource xmlResource = (XMLResource) collection.createResource(resourceId, "XMLResource");
 
             // Write to the resource
+            // NOTE: Writing comments is not supported yet
             ContentHandler contentHandler = xmlResource.setContentAsSAX();
-            readInputAsSAX(pipelineContext, input, new NamespaceCleanupContentHandler(contentHandler, isSerializeXML11()));
+            readInputAsSAX(pipelineContext, input, new NamespaceCleanupXMLReceiver(contentHandler, isSerializeXML11()));
 
             // Store resource
             collection.storeResource(xmlResource);
@@ -408,13 +410,13 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         }
     }
 
-     protected void executeOperation(PipelineContext pipelineContext, ContentHandler contentHandler) {
+     protected void executeOperation(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
         // Get datasource and configuration
         final Datasource datasource = getDatasource(pipelineContext);
         final Config config = getConfig(pipelineContext);
 
         if ("query".equals(config.getOperation())) {
-            query(pipelineContext, datasource, config.getCollection(), "true".equals(config.getCreateCollection()), config.getResourceId(), config.getQuery(), config.getNamespaceContext(), contentHandler);
+            query(pipelineContext, datasource, config.getCollection(), "true".equals(config.getCreateCollection()), config.getResourceId(), config.getQuery(), config.getNamespaceContext(), xmlReceiver);
         } else if ("insert".equals(config.getOperation())) {
             insert(pipelineContext, datasource, config.getCollection(), "true".equals(config.getCreateCollection()), config.getResourceId(), getInputByName(INPUT_DATA));
         } else if ("delete".equals(config.getOperation())) {
@@ -487,12 +489,12 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
     /**
      * Clean-up the SAX output. Some databases, such as eXist, output incorrect SAX that causes issues down the line.
      */
-    public static class DatabaseReadContentHandler extends ForwardingContentHandler {
+    public static class DatabaseReadXMLReceiver extends ForwardingXMLReceiver {
 
         private int startDocumentLevel = 0;
 
-        public DatabaseReadContentHandler(ContentHandler contentHandler) {
-            super(contentHandler);
+        public DatabaseReadXMLReceiver(XMLReceiver xmlReceiver) {
+            super(xmlReceiver);
         }
 
         public void startDocument() throws SAXException {

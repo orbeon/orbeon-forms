@@ -17,11 +17,11 @@ import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -40,10 +40,10 @@ import java.util.*;
  *
  * TODO: Should use pools of handlers to reduce memory consumption?
  */
-public class ElementHandlerController implements ElementHandlerContext, ContentHandler {
+public class ElementHandlerController implements ElementHandlerContext, XMLReceiver {
 
     private Object elementHandlerContext;
-    private DeferredContentHandler output;
+    private DeferredXMLReceiver output;
 
     private final Map<String, List<HandlerMatcher>> handlerMatchers = new HashMap<String, List<HandlerMatcher>>();
     private final Map<String, String> uriHandlers = new HashMap<String, String>();
@@ -111,11 +111,11 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
         this.elementHandlerContext = elementHandlerContext;
     }
 
-    public DeferredContentHandler getOutput() {
+    public DeferredXMLReceiver getOutput() {
         return output;
     }
 
-    public void setOutput(DeferredContentHandler output) {
+    public void setOutput(DeferredXMLReceiver output) {
         this.output = output;
     }
 
@@ -386,6 +386,125 @@ public class ElementHandlerController implements ElementHandlerContext, ContentH
                 this.locator.pushLocator(locator);
                 // But don't forward this! SAX prevents calls to setDocumentLocator() mid-course. Our own locator will do the job.
             }
+        }
+    }
+
+    public void startDTD(String name, String publicId, String systemId) throws SAXException {
+        try {
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.startDTD(name, publicId, systemId);
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Send to output
+                output.startDTD(name, publicId, systemId);
+            }
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new LocationData(locator));
+        }
+    }
+
+    public void endDTD() throws SAXException {
+        try {
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.endDTD();
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Send to output
+                output.endDTD();
+            }
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new LocationData(locator));
+        }
+    }
+
+    public void startEntity(String name) throws SAXException {
+        try {
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.startEntity(name);
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Send to output
+                output.startEntity(name);
+            }
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new LocationData(locator));
+        }
+    }
+
+    public void endEntity(String name) throws SAXException {
+        try {
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.endEntity(name);
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Send to output
+                output.endEntity(name);
+            }
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new LocationData(locator));
+        }
+    }
+
+    public void startCDATA() throws SAXException {
+        try {
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.startCDATA();
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Send to output
+                output.startCDATA();
+            }
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new LocationData(locator));
+        }
+    }
+
+    public void endCDATA() throws SAXException {
+        try {
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.endCDATA();
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Send to output
+                output.endCDATA();
+            }
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new LocationData(locator));
+        }
+    }
+
+    public void comment(char[] ch, int start, int length) throws SAXException {
+        try {
+            if (isFillingUpSAXStore) {
+                // Fill-up SAXStore
+                currentHandlerInfo.saxStore.comment(ch, start, length);
+            } else if (currentHandlerInfo != null && !currentHandlerInfo.elementHandler.isForwarding()) {
+                // The current handler doesn't want forwarding
+                // Just ignore content
+            } else {
+                // Send to output
+                output.comment(ch, start, length);
+            }
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new LocationData(locator));
         }
     }
 

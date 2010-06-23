@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
@@ -23,8 +23,8 @@ import org.jfree.data.general.Dataset;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.serializer.legacy.JFreeChartSerializer;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -46,23 +46,23 @@ public class JFreeChartProcessor extends JFreeChartSerializer {
 
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+        return new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+            public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 JFreeChartSerializer.ChartConfig chartConfig = readChartConfig(context);
                 ChartInfo info = createChart(context, chartConfig);
                 try {
-                    contentHandler.startDocument();
-                    contentHandler.startElement("", "chart-info", "chart-info", new AttributesImpl());
+                    xmlReceiver.startDocument();
+                    xmlReceiver.startElement("", "chart-info", "chart-info", new AttributesImpl());
 
-                    contentHandler.startElement("", "file", "file", new AttributesImpl());
-                    contentHandler.characters(info.file.toCharArray(), 0, info.file.length());
-                    contentHandler.endElement("", "file", "file");
+                    xmlReceiver.startElement("", "file", "file", new AttributesImpl());
+                    xmlReceiver.characters(info.file.toCharArray(), 0, info.file.length());
+                    xmlReceiver.endElement("", "file", "file");
 
                     if (chartConfig.getMap() != null) {
                         AttributesImpl atts = new AttributesImpl();
 
                         atts.addAttribute("", "name", "name", "CDATA", chartConfig.getMap());
-                        contentHandler.startElement("", "map", "map", atts);
+                        xmlReceiver.startElement("", "map", "map", atts);
 
                         EntityCollection entities = info.getInfo().getEntityCollection();
 
@@ -73,29 +73,27 @@ public class JFreeChartProcessor extends JFreeChartSerializer {
                             attr.addAttribute("", "shape", "shape", "CDATA", entity.getShapeType());
                             attr.addAttribute("", "coords", "coords", "CDATA", entity.getShapeCoords());
 
-                            if (entity.getURLText() == null ? false : !entity.getURLText().equals("")) {
+                            if (entity.getURLText() != null && !entity.getURLText().equals("")) {
                                 attr.addAttribute("", "href", "href", "CDATA", entity.getURLText());
                             }
-                            if (entity.getToolTipText() == null ? false : !entity.getToolTipText().equals("")) {
+                            if (entity.getToolTipText() != null && !entity.getToolTipText().equals("")) {
                                 attr.addAttribute("", "title", "title", "CDATA", entity.getToolTipText());
 
                             }
-                            contentHandler.startElement("", "area", "area", attr);
-                            contentHandler.endElement("", "area", "area");
+                            xmlReceiver.startElement("", "area", "area", attr);
+                            xmlReceiver.endElement("", "area", "area");
                         }
 
-                        contentHandler.endElement("", "map", "map");
+                        xmlReceiver.endElement("", "map", "map");
                     }
-                    contentHandler.endElement("", "chart-info", "chart-info");
-                    contentHandler.endDocument();
+                    xmlReceiver.endElement("", "chart-info", "chart-info");
+                    xmlReceiver.endDocument();
 
                 } catch (SAXException e) {
                     throw new OXFException(e);
                 }
             }
         };
-
-        return output;
     }
 
 
@@ -200,20 +198,17 @@ public class JFreeChartProcessor extends JFreeChartSerializer {
         } catch (Exception e) {
             throw new OXFException(e);
         }
-        ChartInfo chartInfo = new ChartInfo(info, file);
-
-        return chartInfo;
+        return new ChartInfo(info, file);
     }
 
     protected JFreeChartSerializer.ChartConfig readChartConfig(PipelineContext context) {
-        JFreeChartSerializer.ChartConfig chartConfig = (JFreeChartSerializer.ChartConfig) readCacheInputAsObject(context, getInputByName(INPUT_CHART),
+        return (JFreeChartSerializer.ChartConfig) readCacheInputAsObject(context, getInputByName(INPUT_CHART),
                 new CacheableInputReader() {
                     public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
                         return createChartConfig(context, input);
                     }
 
                 });
-        return chartConfig;
     }
 
 

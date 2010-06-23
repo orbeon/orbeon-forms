@@ -25,7 +25,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.servlet.ServletExternalContext;
-import org.orbeon.oxf.xml.ContentHandlerAdapter;
+import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -768,7 +768,7 @@ public class NetUtils {
             // Read from URL and convert to Base64
             is = URLFactory.createURL(value).openStream();
             final StringBuffer sb = new StringBuffer();
-            XMLUtils.inputStreamToBase64Characters(is, new ContentHandlerAdapter() {
+            XMLUtils.inputStreamToBase64Characters(is, new XMLReceiverAdapter() {
                 public void characters(char ch[], int start, int length) {
                     sb.append(ch, start, length);
                 }

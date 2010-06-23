@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
+import org.dom4j.DocumentFactory;
 import org.dom4j.util.NodeComparator;
 import org.dom4j.util.NonLazyElement;
 
@@ -83,21 +84,20 @@ public class NonLazyUserDataElement extends NonLazyElement {
     }
 
     protected org.dom4j.Element createElement( final String name ) {
-        final org.dom4j.DocumentFactory fctry = getDocumentFactory();
-        final org.dom4j.QName qnam = fctry.createQName( name );
+        final org.dom4j.DocumentFactory factory = getDocumentFactory();
+        final org.dom4j.QName qnam = factory.createQName( name );
         return createElement( qnam );
     }
     
     protected org.dom4j.Element createElement( final org.dom4j.QName qName ) {
-        final NonLazyUserDataDocumentFactory fctry 
-            = NonLazyUserDataDocumentFactory.getInstance14();
-        final org.dom4j.Element ret = fctry.createElement( qName );
+        final DocumentFactory factory  = NonLazyUserDataDocumentFactory.getInstance();
+        final org.dom4j.Element ret = factory.createElement( qName );
         final Object dta = getCopyOfUserData();
         ret.setData( dta );
         return ret;
     }
     protected org.dom4j.DocumentFactory getDocumentFactory() {
-        return NonLazyUserDataDocumentFactory.getInstance14();
+        return NonLazyUserDataDocumentFactory.getInstance();
     }
 
     public Object getData() {

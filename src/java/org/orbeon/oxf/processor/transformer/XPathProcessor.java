@@ -20,12 +20,13 @@ import org.dom4j.tree.DefaultText;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
+import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -34,7 +35,6 @@ import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.trans.XPathException;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.util.HashMap;
@@ -59,7 +59,7 @@ public class XPathProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
 
                Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                     public Object read(PipelineContext context, final ProcessorInput input) {
@@ -83,7 +83,7 @@ public class XPathProcessor extends ProcessorImpl {
                     xpath = XPathCache.getXPathExpression(context, documentInfo.getConfiguration(), documentInfo,
                             config.getExpression(), config.getNamespaces(), null, PipelineFunctionLibrary.instance(), baseURI, locationData);
                     List results = xpath.evaluate();
-                    contentHandler.startDocument();
+                    xmlReceiver.startDocument();
                     // WARNING: Here we break the rule that processors must output valid XML documents, because
                     // we potentially output several root nodes. This works because the XPathProcessor is always
                     // connected to an aggregator, which adds a new root node.
@@ -103,13 +103,13 @@ public class XPathProcessor extends ProcessorImpl {
                             final DOMGenerator domGenerator = new DOMGenerator
                                     (element, "xpath result doc", DOMGenerator.ZeroValidity, systemId);
                             final ProcessorOutput domOutput = domGenerator.createOutput(OUTPUT_DATA);
-                            domOutput.read(context, new EmbeddedDocumentContentHandler(contentHandler));
+                            domOutput.read(context, new EmbeddedDocumentXMLReceiver(xmlReceiver));
                         } else if (result instanceof NodeInfo) {
                             final NodeInfo nodeInfo = (NodeInfo) result;
-                            TransformerUtils.writeTinyTree(nodeInfo, new EmbeddedDocumentContentHandler(contentHandler));
+                            TransformerUtils.writeTinyTree(nodeInfo, new EmbeddedDocumentXMLReceiver(xmlReceiver));
                         } else if (result instanceof DefaultProcessingInstruction) {
                             DefaultProcessingInstruction processingInstruction = (DefaultProcessingInstruction) result;
-                            contentHandler.processingInstruction(processingInstruction.getTarget(), processingInstruction.getText());
+                            xmlReceiver.processingInstruction(processingInstruction.getTarget(), processingInstruction.getText());
                         } else if (result instanceof DefaultText) {
                             strVal = ((DefaultText) result).getText();
                         } else if (result instanceof String) {
@@ -131,10 +131,10 @@ public class XPathProcessor extends ProcessorImpl {
                         if (strVal != null) {
                             final char[] ch = strVal.toCharArray();
                             final int len = strVal.length();
-                            contentHandler.characters( ch, 0, len );
+                            xmlReceiver.characters( ch, 0, len );
                         }
                     }
-                    contentHandler.endDocument();
+                    xmlReceiver.endDocument();
                 } catch (XPathException xpe) {
                     throw new OXFException(xpe);
                 } catch (SAXException e) {

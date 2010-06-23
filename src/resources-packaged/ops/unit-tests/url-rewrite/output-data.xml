@@ -12,6 +12,8 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <!-- Make sure text from foreign elements is untouched.  Added because Erik noticed we were -->
+    <!-- actually dropping text in this case. -->
     <p>
         <a/>c
     </p>
@@ -20,6 +22,7 @@
         <a/>c
     </p>
     <xhtml:body background="/orbeon/images/body-background1.png">
+        <!-- Simple rewrites -->
         <xhtml:div>
             <xhtml:form action="/orbeon/my-action">
                 <xhtml:a href="/orbeon/path">Click Here!</xhtml:a>
@@ -31,6 +34,7 @@
                 <xhtml:input type="text" src="/my-image4.png"/>
             </xhtml:form>
         </xhtml:div>
+        <!-- Check f:url-norewrite -->
         <xhtml:div>
             <xhtml:form action="/my-action">
                 <xhtml:a href="/path">Click Here!</xhtml:a>
@@ -40,6 +44,7 @@
                 <xhtml:img src="?a=1&amp;b=2"/>
             </xhtml:form>
         </xhtml:div>
+        <!-- Text handling -->
         <xhtml:div>
             <xhtml:p>123wsrp_rewrite456</xhtml:p>
             <xhtml:script>
@@ -49,6 +54,7 @@
                 <xhtml:p>123wsrp_rewrite456</xhtml:p>
             </SCRIPT>
         </xhtml:div>
+        <!-- Table background -->
         <xhtml:table>
             <xhtml:tr>
                 <xhtml:td background="/orbeon/images/td-background.png">Hello</xhtml:td>

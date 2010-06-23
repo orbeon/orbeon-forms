@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xml;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -27,7 +25,7 @@ import java.io.Writer;
  * o This assumes that all input elements are HTML or XHTML elements.
  * o Only attributes in no namespace are serialized.
  */
-public class HTMLFragmentSerializer implements ContentHandler {
+public class HTMLFragmentSerializer extends XMLReceiverAdapter {
 
     private final Writer writer;
     private final boolean skipRootElement;
@@ -39,12 +37,7 @@ public class HTMLFragmentSerializer implements ContentHandler {
         this.skipRootElement = skipRootElement;
     }
 
-    public void startDocument() {}
-    public void endDocument() {}
-    public void startPrefixMapping(String s, String s1) {}
-    public void endPrefixMapping(String s) {}
-    public void setDocumentLocator(Locator locator) {}
-
+    @Override
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         if (!skipRootElement || level > 0) {
             try {
@@ -75,6 +68,7 @@ public class HTMLFragmentSerializer implements ContentHandler {
         level++;
     }
 
+    @Override
     public void endElement(String uri, String localname, String qName) throws SAXException {
         level--;
         if (!skipRootElement || level > 0) {
@@ -88,6 +82,7 @@ public class HTMLFragmentSerializer implements ContentHandler {
         }
     }
 
+    @Override
     public void characters(char[] chars, int start, int length) throws SAXException {
         if (!skipRootElement || level > 0) {
             try {
@@ -98,7 +93,16 @@ public class HTMLFragmentSerializer implements ContentHandler {
         }
     }
 
-    public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {}
-    public void processingInstruction(String s, String s1) throws SAXException {}
-    public void skippedEntity(String s) throws SAXException {}
+    @Override
+    public void comment(char[] chars, int start, int length) throws SAXException {
+        if (!skipRootElement || level > 0) {
+            try {
+                writer.write("<!-- ");
+                writer.write(XMLUtils.escapeXMLMinimal(new String(chars, start, length)));
+                writer.write("-->");
+            } catch (IOException e) {
+                throw new SAXException(e);
+            }
+        }
+    }
 }

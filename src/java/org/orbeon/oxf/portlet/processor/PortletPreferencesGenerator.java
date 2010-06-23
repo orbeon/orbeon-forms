@@ -1,26 +1,26 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.portlet.processor;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.xml.sax.ContentHandler;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
@@ -37,7 +37,7 @@ public class PortletPreferencesGenerator extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
                 if (!(externalContext.getNativeRequest() instanceof PortletRequest))
@@ -46,7 +46,7 @@ public class PortletPreferencesGenerator extends ProcessorImpl {
                 final PortletRequest portletRequest = (PortletRequest) externalContext.getNativeRequest();
                 final PortletPreferences preferences = portletRequest.getPreferences();
 
-                final ContentHandlerHelper helper = new ContentHandlerHelper(contentHandler);
+                final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
                 helper.startDocument();
                 helper.startElement("portlet-preferences");
 

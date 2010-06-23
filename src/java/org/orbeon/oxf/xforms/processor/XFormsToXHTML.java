@@ -18,6 +18,8 @@ import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.util.IndentedLogger;
@@ -31,7 +33,6 @@ import org.orbeon.oxf.xforms.processor.handlers.*;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.sax.TransformerHandler;
@@ -62,8 +63,8 @@ public class XFormsToXHTML extends ProcessorImpl {
     @Override
     public ProcessorOutput createOutput(final String outputName) {
         final ProcessorOutput output = new URIProcessorOutputImpl(XFormsToXHTML.this, outputName, INPUT_ANNOTATED_DOCUMENT) {
-            public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
-                doIt(pipelineContext, contentHandler, this, outputName);
+            public void readImpl(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
+                doIt(pipelineContext, xmlReceiver, this, outputName);
             }
 
             @Override
@@ -120,7 +121,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         public Stage1CacheableState stage1CacheableState;
     }
 
-    private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler, final URIProcessorOutputImpl processorOutput, String outputName) {
+    private void doIt(final PipelineContext pipelineContext, XMLReceiver xmlReceiver, final URIProcessorOutputImpl processorOutput, String outputName) {
 
         final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
         final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsToXHTML.logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
@@ -142,7 +143,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         final Stage1CacheableState stage1CacheableState = new Stage1CacheableState();
                         final Stage2CacheableState stage2CacheableState;
                         {
-                            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+                            final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
                             // TODO: Use TinyTree instead of dom4j Document
                             final LocationDocumentResult documentResult = new LocationDocumentResult();
                             identity.setResult(documentResult);
@@ -202,10 +203,10 @@ public class XFormsToXHTML extends ProcessorImpl {
             if (outputName.equals("document")) {
                 // Normal case where we output XHTML
                 outputResponseDocument(pipelineContext, externalContext, indentedLogger, stage2CacheableState.getAnnotatedSAXStore(),
-                        containingDocument[0], contentHandler);
+                        containingDocument[0], xmlReceiver);
             } else {
                 // Output in test mode
-                testOutputResponseState(pipelineContext, containingDocument[0], indentedLogger, contentHandler);
+                testOutputResponseState(pipelineContext, containingDocument[0], indentedLogger, xmlReceiver);
             }
 
             // Notify state manager
@@ -300,7 +301,7 @@ public class XFormsToXHTML extends ProcessorImpl {
     public static void outputResponseDocument(final PipelineContext pipelineContext, final ExternalContext externalContext,
                                              final IndentedLogger indentedLogger,
                                              final SAXStore annotatedDocument, final XFormsContainingDocument containingDocument,
-                                             final ContentHandler contentHandler) throws SAXException, IOException {
+                                             final XMLReceiver xmlReceiver) throws SAXException, IOException {
 
         final List<XFormsContainingDocument.Load> loads = containingDocument.getLoadsToRun();
         if (containingDocument.isGotSubmissionReplaceAll()) {
@@ -324,7 +325,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             externalContext.getResponse().sendRedirect(redirectResource, null, false, false, true);
 
             // Still send out a null document to signal that no further processing must take place
-            XMLUtils.streamNullDocument(contentHandler);
+            XMLUtils.streamNullDocument(xmlReceiver);
         } else {
             // 3. Regular case: produce an XHTML document out
 
@@ -349,18 +350,18 @@ public class XFormsToXHTML extends ProcessorImpl {
             }
 
             // Set final output
-            controller.setOutput(new DeferredContentHandlerImpl(contentHandler));
+            controller.setOutput(new DeferredXMLReceiverImpl(xmlReceiver));
             // Set handler context
             controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, externalContext, null));
             // Process the entire input
-            annotatedDocument.replay(new ExceptionWrapperContentHandler(controller, "converting XHTML+XForms document to XHTML"));
+            annotatedDocument.replay(new ExceptionWrapperXMLReceiver(controller, "converting XHTML+XForms document to XHTML"));
         }
     }
 
     private void testOutputResponseState(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument,
-                                         final IndentedLogger indentedLogger, final ContentHandler contentHandler) throws SAXException {
+                                         final IndentedLogger indentedLogger, final XMLReceiver xmlReceiver) throws SAXException {
         // Output XML response
 
-        XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, pipelineContext, null, contentHandler, false, true);
+        XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, pipelineContext, null, xmlReceiver, false, true);
     }
 }

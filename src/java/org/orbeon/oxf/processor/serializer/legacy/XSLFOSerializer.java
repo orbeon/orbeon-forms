@@ -22,6 +22,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 
 import java.io.File;
 import java.io.OutputStream;
@@ -54,7 +55,7 @@ public class XSLFOSerializer extends HttpBinarySerializer {
             Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, outputStream);
 
             // Send data to FOP
-            readInputAsSAX(context, INPUT_DATA, fop.getDefaultHandler());
+            readInputAsSAX(context, INPUT_DATA, new ForwardingXMLReceiver(fop.getDefaultHandler()));
         } catch (Exception e) {
             throw new OXFException(e);
         }

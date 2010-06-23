@@ -23,7 +23,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xml.ContentHandlerAdapter;
+import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -222,7 +222,7 @@ public class TestScriptProcessor extends ProcessorImpl {
                 // As for KeyValidity as does ProcessorImpl.readCacheInputAsObject()
                 KeyValidity keyValidity = getInputKeyValidity(pipelineContext, input);
                 // Read input in every case (we ignore the content)
-                readInputAsSAX(pipelineContext, input, new ContentHandlerAdapter());
+                readInputAsSAX(pipelineContext, input, new XMLReceiverAdapter());
 
                 // Cache result if possible, asking again for KeyValidity if needed
                 if (keyValidity == null)

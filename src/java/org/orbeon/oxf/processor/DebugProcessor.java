@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
@@ -18,12 +18,12 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 public class DebugProcessor extends ProcessorImpl {
@@ -38,7 +38,7 @@ public class DebugProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(final String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 try {
                     if (logger.isInfoEnabled()) {
 
@@ -73,11 +73,11 @@ public class DebugProcessor extends ProcessorImpl {
                                 + Dom4jUtils.domToPrettyString(loggedDocument));
 
                         // Set to output
-                        saxStore.replay(contentHandler);
+                        saxStore.replay(xmlReceiver);
 
                     } else {
                         // No debugging, just pass-through
-                        readInputAsSAX(pipelineContext, name, contentHandler);
+                        readInputAsSAX(pipelineContext, name, xmlReceiver);
                     }
                 } catch (SAXException e) {
                     throw new OXFException(e);

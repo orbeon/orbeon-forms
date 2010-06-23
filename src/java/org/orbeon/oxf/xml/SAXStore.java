@@ -15,15 +15,15 @@ package org.orbeon.oxf.xml;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.SAXLoggerProcessor;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ import java.util.List;
  *
  * TODO: Handling of system IDs is not optimal in memory as system IDs are unlikely to change much within a document.
  */
-public class SAXStore extends ForwardingContentHandler implements Serializable, Externalizable {
+public class SAXStore extends ForwardingXMLReceiver implements Serializable, Externalizable {
 
     public static final byte START_DOCUMENT = 0x00;
     public static final byte END_DOCUMENT = 0x01;
@@ -50,6 +50,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     public static final byte PI = 0x07;
     public static final byte SKIPPED_ENTITY = 0x09;
     public static final byte START_PREFIX_MAPPING = 0x0A;
+    public static final byte COMMENT = 0x0B;
 
     private static final int INITIAL_SIZE = 10;
 
@@ -110,8 +111,8 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
             this.stringBufferPosition = store.stringBuffer.size();
         }
 
-        public void replay(ContentHandler ch) throws SAXException {
-            SAXStore.this.replay(ch, this);
+        public void replay(XMLReceiver xmlReceiver) throws SAXException {
+            SAXStore.this.replay(xmlReceiver, this);
         }
     }
 
@@ -166,8 +167,8 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         }
     }
 
-    public SAXStore(ContentHandler contentHandler) {
-        super.setContentHandler(contentHandler);
+    public SAXStore(XMLReceiver xmlReceiver) {
+        super.setXMLReceiver(xmlReceiver);
         super.setForward(true);
         init();
     }
@@ -200,11 +201,11 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         locator = null;
     }
 
-    public void replay(ContentHandler ch) throws SAXException {
-        replay(ch, START_MARK);
+    public void replay(XMLReceiver xmlReceiver) throws SAXException {
+        replay(xmlReceiver, START_MARK);
     }
 
-    public void replay(ContentHandler ch, Mark mark) throws SAXException {
+    public void replay(XMLReceiver xmlReceiver, Mark mark) throws SAXException {
         int intBufferPos = mark.intBufferPosition;
         int charBufferPos = mark.charBufferPosition;
         int stringBufferPos = mark.stringBufferPosition;
@@ -249,7 +250,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         };
 
         if (hasDocumentLocator) {
-            ch.setDocumentLocator(outputLocator);
+            xmlReceiver.setDocumentLocator(outputLocator);
         }
 
         // Handle element marks
@@ -261,7 +262,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
             final boolean eventHasLocation = hasDocumentLocator && eventType != END_PREFIX_MAPPING && eventType != START_PREFIX_MAPPING;
             switch (eventType) {
                 case START_DOCUMENT: {
-                    ch.startDocument();
+                    xmlReceiver.startDocument();
                     break;
                 }
                 case START_ELEMENT: {
@@ -275,19 +276,19 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
                                 stringBuffer.get(stringBufferPos++), stringBuffer.get(stringBufferPos++),
                                 stringBuffer.get(stringBufferPos++), stringBuffer.get(stringBufferPos++));
                     }
-                    ch.startElement(namespaceURI, localName, qName, attributes);
+                    xmlReceiver.startElement(namespaceURI, localName, qName, attributes);
                     elementLevel++;
                     break;
                 }
                 case CHARACTERS: {
                     final int length = intBuffer[intBufferPos++];
-                    ch.characters(charBuffer, charBufferPos, length);
+                    xmlReceiver.characters(charBuffer, charBufferPos, length);
                     charBufferPos += length;
                     break;
                 }
                 case END_ELEMENT: {
                     elementLevel--;
-                    ch.endElement(stringBuffer.get(stringBufferPos++),
+                    xmlReceiver.endElement(stringBuffer.get(stringBufferPos++),
                             stringBuffer.get(stringBufferPos++),
                             stringBuffer.get(stringBufferPos++));
 
@@ -299,31 +300,39 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
                     break;
                 }
                 case END_DOCUMENT: {
-                    ch.endDocument();
+                    xmlReceiver.endDocument();
                     break;
                 }
                 case END_PREFIX_MAPPING: {
-                    ch.endPrefixMapping(stringBuffer.get(stringBufferPos++));
+                    xmlReceiver.endPrefixMapping(stringBuffer.get(stringBufferPos++));
                     break;
                 }
                 case IGN_WHITESPACE: {
                     final int length = intBuffer[intBufferPos++];
-                    ch.ignorableWhitespace(charBuffer, charBufferPos, length);
+                    xmlReceiver.ignorableWhitespace(charBuffer, charBufferPos, length);
                     charBufferPos += length;
                     break;
                 }
                 case PI: {
-                    ch.processingInstruction(stringBuffer.get(stringBufferPos++),
+                    xmlReceiver.processingInstruction(stringBuffer.get(stringBufferPos++),
                             stringBuffer.get(stringBufferPos++));
                     break;
                 }
                 case SKIPPED_ENTITY: {
-                    ch.skippedEntity(stringBuffer.get(stringBufferPos++));
+                    xmlReceiver.skippedEntity(stringBuffer.get(stringBufferPos++));
                     break;
                 }
                 case START_PREFIX_MAPPING: {
-                    ch.startPrefixMapping(stringBuffer.get(stringBufferPos++),
+                    xmlReceiver.startPrefixMapping(stringBuffer.get(stringBufferPos++),
                             stringBuffer.get(stringBufferPos++));
+                    break;
+                }
+                case COMMENT: {
+
+                    final int length = intBuffer[intBufferPos++];
+                    xmlReceiver.comment(charBuffer, charBufferPos, length);
+                    charBufferPos += length;
+
                     break;
                 }
             }
@@ -344,7 +353,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
      */
     public void readOut() {
         try {
-            final TransformerHandler  th = TransformerUtils.getIdentityTransformerHandler();
+            final TransformerXMLReceiver th = TransformerUtils.getIdentityTransformerHandler();
             th.setResult(new StreamResult(System.out));
             th.startDocument();
             replay(th);
@@ -359,7 +368,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
      */
     public void logContents() {
         try {
-            replay(new SAXLoggerProcessor.DebugContentHandler());
+            replay(new SAXLoggerProcessor.DebugXMLReceiver());
         } catch (SAXException e) {
             throw new OXFException(e);
         }
@@ -386,11 +395,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         addToCharBuffer(chars, start, length);
         addToIntBuffer(length);
 
-        if (locator != null) {
-            addToLineBuffer(locator.getLineNumber());
-            addToLineBuffer(locator.getColumnNumber());
-            addToSystemIdBuffer(locator.getSystemId());
-        }
+        addLocation();
 
         super.characters(chars, start, length);
     }
@@ -399,11 +404,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     public void endDocument() throws SAXException {
 
         addToEventBuffer(END_DOCUMENT);
-        if (locator != null) {
-            addToLineBuffer(locator.getLineNumber());
-            addToLineBuffer(locator.getColumnNumber());
-            addToSystemIdBuffer(locator.getSystemId());
-        }
+        addLocation();
         super.endDocument();
 
         // The resulting SAXStore should never keep references to whoever filled it
@@ -414,11 +415,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     public void endElement(String uri, String localname, String qName) throws SAXException {
 
         addToEventBuffer(END_ELEMENT);
-        if (locator != null) {
-            addToLineBuffer(locator.getLineNumber());
-            addToLineBuffer(locator.getColumnNumber());
-            addToSystemIdBuffer(locator.getSystemId());
-        }
+        addLocation();
         stringBuffer.add(uri);
         stringBuffer.add(localname);
         stringBuffer.add(qName);
@@ -445,11 +442,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         addToCharBuffer(chars, start, length);
         addToIntBuffer(length);
 
-        if (locator != null) {
-            addToLineBuffer(locator.getLineNumber());
-            addToLineBuffer(locator.getColumnNumber());
-            addToSystemIdBuffer(locator.getSystemId());
-        }
+        addLocation();
 
         super.ignorableWhitespace(chars, start, length);
     }
@@ -458,11 +451,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     public void processingInstruction(String s, String s1) throws SAXException {
 
         addToEventBuffer(PI);
-        if (locator != null) {
-            addToLineBuffer(locator.getLineNumber());
-            addToLineBuffer(locator.getColumnNumber());
-            addToSystemIdBuffer(locator.getSystemId());
-        }
+        addLocation();
         stringBuffer.add(s);
         stringBuffer.add(s1);
 
@@ -480,11 +469,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     public void skippedEntity(String s) throws SAXException {
 
         addToEventBuffer(SKIPPED_ENTITY);
-        if (locator != null) {
-            addToLineBuffer(locator.getLineNumber());
-            addToLineBuffer(locator.getColumnNumber());
-            addToSystemIdBuffer(locator.getSystemId());
-        }
+        addLocation();
         stringBuffer.add(s);
 
         super.skippedEntity(s);
@@ -494,11 +479,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
     public void startDocument() throws SAXException {
 
         addToEventBuffer(START_DOCUMENT);
-        if (locator != null) {
-            addToLineBuffer(locator.getLineNumber());
-            addToLineBuffer(locator.getColumnNumber());
-            addToSystemIdBuffer(locator.getSystemId());
-        }
+        addLocation();
         super.startDocument();
     }
 
@@ -522,6 +503,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         super.startElement(uri, localname, qName, attributes);
     }
 
+    @Override
     public void startPrefixMapping(String s, String s1) throws SAXException {
 
         addToEventBuffer(START_PREFIX_MAPPING);
@@ -532,6 +514,25 @@ public class SAXStore extends ForwardingContentHandler implements Serializable, 
         super.startPrefixMapping(s, s1);
     }
 
+    @Override
+    public void comment(char[] ch, int start, int length) throws SAXException {
+
+        addToEventBuffer(COMMENT);
+        addToCharBuffer(ch, start, length);
+        addToIntBuffer(length);
+
+        addLocation();
+
+        super.comment(ch, start, length);
+    }
+
+    private final void addLocation() {
+        if (locator != null) {
+            addToLineBuffer(locator.getLineNumber());
+            addToLineBuffer(locator.getColumnNumber());
+            addToSystemIdBuffer(locator.getSystemId());
+        }
+    }
 
     protected void addToCharBuffer(char[] chars, int start, int length) {
         if (charBuffer.length - charBufferPosition <= length) {

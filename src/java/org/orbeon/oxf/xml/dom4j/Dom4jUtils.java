@@ -22,7 +22,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.StringBuilderWriter;
-import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
+import org.orbeon.oxf.xml.NamespaceCleanupXMLReceiver;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.SAXException;
@@ -51,7 +51,7 @@ public class Dom4jUtils {
 
     static {
         NULL_DOCUMENT = new NonLazyUserDataDocument();
-        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
         Element nullElement = factory.createElement("null");
         nullElement.addAttribute(XMLConstants.XSI_NIL_QNAME, "true");
         NULL_DOCUMENT.setRootElement(nullElement);
@@ -61,7 +61,7 @@ public class Dom4jUtils {
         final XMLReader xmlReader = XMLUtils.newXMLReader(validating, handleXInclude);
 
         final SAXReader saxReader = new SAXReader(xmlReader);
-        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
         saxReader.setDocumentFactory(factory);
         return saxReader;
     }
@@ -420,7 +420,7 @@ public class Dom4jUtils {
             return document;
         final LocationSAXWriter writer = new LocationSAXWriter();
         final LocationSAXContentHandler ch = new LocationSAXContentHandler();
-        writer.setContentHandler(new NamespaceCleanupContentHandler(ch, xml11));
+        writer.setContentHandler(new NamespaceCleanupXMLReceiver(ch, xml11));
         try {
             writer.write(document);
         } catch (SAXException e) {
@@ -438,8 +438,12 @@ public class Dom4jUtils {
             final List currentNamespaces = currentNode.declaredNamespaces();
             for (Iterator j = currentNamespaces.iterator(); j.hasNext();) {
                 final Namespace namespace = (Namespace) j.next();
-                if (!namespaces.containsKey(namespace.getPrefix()))
+                if (!namespaces.containsKey(namespace.getPrefix())) {
                     namespaces.put(namespace.getPrefix(), namespace.getURI());
+
+                    // TODO: Intern namespace strings to save memory; should use NamePool later
+//                    namespaces.put(namespace.getPrefix().intern(), namespace.getURI().intern());
+                }
             }
         }
         // It seems that by default this may not be declared. However, it should be: "The prefix xml is by definition
@@ -564,32 +568,32 @@ public class Dom4jUtils {
     }
 
     public static XPath createXPath(final String expression) throws InvalidXPathException {
-        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
         return factory.createXPath(expression);
     }
 
     public static Text createText(final String text) {
-        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
         return factory.createText(text);
     }
 
     public static Element createElement(final String name) {
-        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
         return factory.createElement(name);
     }
 
     public static Element createElement(final String qualifiedName, final String namespaceURI) {
-        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
         return factory.createElement(qualifiedName, namespaceURI);
     }
 
     public static Attribute createAttribute(final QName qName, final String value) {
-        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
         return factory.createAttribute(null, qName, value);
     }
 
     public static Namespace createNamespace(final String prefix, final String uri) {
-        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
         return factory.createNamespace(prefix, uri);
     }
 
@@ -608,7 +612,7 @@ public class Dom4jUtils {
      */
     public static Document createDocumentCopyElement(final Element newRoot) {
         final Element copy = newRoot.createCopy();
-        final NonLazyUserDataDocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance14();
+        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
         return factory.createDocument(copy);
     }
 
@@ -691,8 +695,8 @@ public class Dom4jUtils {
     }
 
     public static Document createDocument() {
-        final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance14();
-        return fctry.createDocument();
+        final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+        return factory.createDocument();
     }
 
     /**

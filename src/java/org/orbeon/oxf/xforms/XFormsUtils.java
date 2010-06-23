@@ -23,6 +23,8 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
@@ -45,18 +47,15 @@ import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
 import org.w3c.tidy.Tidy;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
 import java.io.*;
 import java.net.URI;
@@ -139,16 +138,10 @@ public class XFormsUtils {
 
         // Get SAXStore
         // TODO: This is not optimal since we create a second in-memory representation. Should stream instead.
-        final SAXStore saxStore;
-        try {
-            saxStore = new SAXStore();
-            final SAXResult saxResult = new SAXResult(saxStore);
-            final Transformer identity = TransformerUtils.getIdentityTransformer();
-            final Source source = encodeLocationData ? new LocationDocumentSource(documentToEncode) : new DocumentSource(documentToEncode);
-            identity.transform(source, saxResult);
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
+        final SAXStore saxStore = new SAXStore();
+        // NOTE: We don't encode XML comments and use only the ContentHandler interface
+        final Source source = encodeLocationData ? new LocationDocumentSource(documentToEncode) : new DocumentSource(documentToEncode);
+        TransformerUtils.sourceToSAX(source, saxStore);
 
         // Serialize SAXStore to bytes
         // TODO: This is not optimal since we create a third in-memory representation. Should stream instead.
@@ -322,7 +315,7 @@ public class XFormsUtils {
 //        }
 //    }
 
-    public static void streamHTMLFragment(ContentHandler contentHandler, String value, LocationData locationData, String xhtmlPrefix) {
+    public static void streamHTMLFragment(XMLReceiver xmlReceiver, String value, LocationData locationData, String xhtmlPrefix) {
         
         if (value != null && value.trim().length() > 0) { // don't parse blank values
 
@@ -362,14 +355,8 @@ public class XFormsUtils {
                 final org.w3c.dom.Document htmlDocument = htmlStringToDocument(value, locationData);
 
                 // Stream fragment to the output
-                try {
-                    if (htmlDocument != null) {
-                        final Transformer identity = TransformerUtils.getIdentityTransformer();
-                        identity.transform(new DOMSource(htmlDocument),
-                                new SAXResult(new HTMLBodyContentHandler(contentHandler, xhtmlPrefix)));
-                    }
-                } catch (TransformerException e) {
-                    throw new OXFException(e);
+                if (htmlDocument != null) {
+                    TransformerUtils.sourceToSAX(new DOMSource(htmlDocument), new HTMLBodyXMLReceiver(xmlReceiver, xhtmlPrefix));
                 }
 //            }
         }
@@ -735,7 +722,7 @@ public class XFormsUtils {
 
         // Deserialize SAXStore to dom4j document
         // TODO: This is not optimal
-        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         final LocationDocumentResult result = new LocationDocumentResult();
         identity.setResult(result);
         try {

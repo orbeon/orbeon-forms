@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
@@ -17,8 +17,8 @@ import org.jaxen.Function;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
-import org.orbeon.oxf.xml.DeferredContentHandler;
-import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
+import org.orbeon.oxf.xml.DeferredXMLReceiver;
+import org.orbeon.oxf.xml.DeferredXMLReceiverImpl;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandler {
 
-    private DeferredContentHandler savedOutput;
+    private DeferredXMLReceiver savedOutput;
 
     private boolean hiding;
     private int rowNum = 1;
@@ -185,7 +185,7 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
                 // The first time, everything is sent to the footer SAXStore
                 if (currentGroup.isShowHeader()) {
                     savedOutput = interpreterContext.getOutput();
-                    interpreterContext.setOutput(new DeferredContentHandlerImpl(currentGroup.getFooter()));
+                    interpreterContext.setOutput(new DeferredXMLReceiverImpl(currentGroup.getFooter()));
                     hiding = false;
                 } else
                     hiding = true;

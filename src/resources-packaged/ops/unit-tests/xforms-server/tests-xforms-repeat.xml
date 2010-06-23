@@ -483,10 +483,10 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="department-repeat" index="2"/><!-- changed by first setindex -->
+                            <control effective-id="department-repeat" index="2"/>
                             <control effective-id="employee-repeat·1" index="1"/>
                             <control effective-id="employee-repeat·2" index="1"/>
-                            <control effective-id="employee-repeat·3" index="4"/><!-- changed by second setindex -->
+                            <control effective-id="employee-repeat·3" index="4"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -976,13 +976,9 @@
                             </instance>
                             <instance id="events" model-id="xf-2">
                                 <events>
-                                    <!-- Relevance event on repeat container -->
                                     <event type="xforms-enabled" target="my-repeat" indexes=""/>
-                                    <!-- NOTE: We no longer dispatch events to repeat iterations -->
-                                    <!-- Initial events dispatched to initial two iterations -->
                                     <event type="xforms-enabled" target="my-input" indexes="1"/>
                                     <event type="xforms-enabled" target="my-input" indexes="2"/>
-                                    <!-- Event dispatched when new iteration 2 is created -->
                                     <event type="xforms-enabled" target="my-input" indexes="2"/>
                                 </events>
                             </instance>
@@ -1873,6 +1869,7 @@
                                         </inner>
                                     </outer>
                                     <outer>
+                                        <!-- Event #2 reaches associated input -->
                                         <value/>
                                         <inner>
                                             <value/>
@@ -1887,6 +1884,7 @@
                                             <value/>
                                         </inner>
                                         <inner>
+                                            <!-- Event #1 reaches associated input -->
                                             <value/>
                                         </inner>
                                         <inner>

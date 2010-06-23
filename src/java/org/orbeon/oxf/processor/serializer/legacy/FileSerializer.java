@@ -18,6 +18,7 @@ import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
@@ -306,14 +307,14 @@ public class FileSerializer extends ProcessorImpl {
         Writer writer = getWriter(outputStream, config);
 
         // Create an identity transformer and start the transformation
-        TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         TransformerUtils.applyOutputProperties(identity.getTransformer(),
                 config.getMethod(), config.getVersion(), config.getPublicDoctype(),
                 config.getSystemDoctype(), config.getEncoding(), config.isOmitXMLDeclaration(), config.isStandalone(),
                 config.isIndent(), config.getIndentAmount());
 
         identity.setResult(new StreamResult(writer));
-        readInputAsSAX(context, input, new SerializerContentHandler(identity, writer, getPropertySet().getBoolean("serialize-xml-11", false).booleanValue()));
+        readInputAsSAX(context, input, new SerializerXMLReceiver(identity, writer, getPropertySet().getBoolean("serialize-xml-11", false).booleanValue()));
     }
 
     protected Writer getWriter(OutputStream outputStream, Config config) {

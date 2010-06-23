@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.generator;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
@@ -23,7 +24,6 @@ import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.xml.sax.ContentHandler;
 
 import java.io.PrintWriter;
 import java.util.Iterator;
@@ -45,7 +45,7 @@ public class ExceptionGenerator extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 // Get top throwable
                 Throwable throwable = (Throwable) context.getAttribute(PipelineContext.THROWABLE);
                 // Throwable is mandatory
@@ -53,7 +53,7 @@ public class ExceptionGenerator extends ProcessorImpl {
                     throw new OXFException("Missing throwable object in ExceptionGenerator");
                 // Write out document
                 try {
-                    final ContentHandlerHelper helper = new ContentHandlerHelper(contentHandler);
+                    final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
                     helper.startDocument();
                     helper.startElement(ROOT_ELEMENT_NAME);
 

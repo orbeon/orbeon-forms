@@ -1843,6 +1843,8 @@
                 </xhtml:head>
                 <xhtml:body>
 
+                    <!-- TODO: we cannot dispatch xxforms-dialog-open to my-dialog before it is enabled -->
+
                     <xforms:insert ev:event="#all"
                                    context="instance('events')" nodeset="*"
                                    origin="xxforms:element('event',
@@ -1871,7 +1873,6 @@
                             </instance>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <!-- TODO: we cannot dispatch this to my-dialog before it is enabled -->
                                     <event type="xxforms-dialog-open" target="my-dialog" indexes=""/>
                                     <event type="xforms-enabled" target="input1" indexes=""/>
                                     <event type="xforms-enabled" target="input2" indexes=""/>

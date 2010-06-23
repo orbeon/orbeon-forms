@@ -834,7 +834,7 @@
     <test description="Label change on xxforms:dialog" name="oxf:pipeline">
         <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -890,6 +890,395 @@
                         <xxf:control id="dialog-1·3" label="Vanilla"/>
                         <xxf:div id="dialog-1·3" visibility="hidden"/>
                     </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Comments in XForms document are not propagated" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-init.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <!-- Comment 1 -->
+                <xhtml:head>
+                    <!-- Comment 2 -->
+                    <xforms:model id="model">
+                        <!-- Comment 3 -->
+                        <xforms:instance id="instance">
+                            <labels xmlns="">
+                                <!-- Comment 4 -->
+                                <label>Banana</label>
+                                <label>Strawberry</label>
+                            </labels>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <!-- Comment 5 -->
+                <xhtml:body>
+                    <!-- Comment 6 -->
+                    <xforms:repeat ref="label">
+                        <!-- Comment 7 -->
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:head>
+                    <xhtml:link rel="stylesheet" href="/xforms-server/xforms-yuicalendar-min.css" type="text/css" media="all"/>
+                    <xhtml:script type="text/javascript" src="/xforms-server/xforms-yuicalendar-min.js"/>
+                    <xhtml:script type="text/javascript">var opsXFormsProperties = {"session-heartbeat-delay":-1};</xhtml:script>
+                    <xhtml:script type="text/javascript"/>
+                </xhtml:head>
+                <xhtml:body class="yui-skin-sam">
+                    <noscript xmlns="http://www.w3.org/1999/xhtml">
+                        <div class="xforms-noscript-panel">
+                            <p>Your browser does not appear to support JavaScript. You may want to try one of the following:</p>
+                            <ul>
+                                <li>Turn on JavaScript in your browser if it supports it.</li>
+                                <li>Use a browser that supports JavaScript.</li>
+                                <li>Try a JavaScript-free version of this page, if made available by the application author.</li>
+                            </ul>
+                        </div>
+                    </noscript>
+                    <xhtml:form id="xforms-form" class="xforms-form xforms-initially-hidden xforms-layout-nospan" action="/doc/home-welcome" method="POST" onsubmit="return false">
+                        <xhtml:input type="hidden" name="$uuid" value="4A00AF98-7464-2F85-9AF6-291447DCC6F8"/>
+                        <xhtml:input type="hidden" name="$static-state" value="X29xIUN8Mudjr..."/>
+                        <xhtml:input type="hidden" name="$dynamic-state" value="X29xIUN8Mudjr..."/>
+                        <xhtml:input type="hidden" name="$server-events" value=""/>
+                        <xhtml:input type="hidden" name="$client-state" value=""/>
+                        <xhtml:input type="hidden" name="$repeat-tree" value="xf-1"/>
+                        <xhtml:input type="hidden" name="$repeat-indexes" value="xf-1 1"/>
+                        <xhtml:span class="xforms-loading-loading">Loading...</xhtml:span>
+                        <xhtml:span class="xforms-loading-none"/>
+                        <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-error-panel xforms-initially-hidden">
+                            <div class="hd">An error has occurred</div>
+                            <div class="bd">
+                                <p>You may want to try one of the following:</p>
+                                <ul>
+                                    <li>
+                                        <a class="xforms-error-panel-close">Close this dialog</a>and continue to use this page.
+                                    </li>
+                                    <li>
+                                        <a class="xforms-error-panel-reload">Reload this page</a>. Note that you will lose any unsaved changes.
+                                    </li>
+                                    <li>
+                                        <p>If the above does not work, try reloading the page yourself. Note that you will lose any unsaved changes:</p>
+                                        <ul>
+                                            <li>With Firefox: hold down the
+                                                <code>shift</code>key and click the Reload button in your browser toolbar.
+                                            </li>
+                                            <li>With Safari and Chrome: click the Reload button in your browser toolbar.</li>
+                                            <li>With Internet Explorer: hold down the
+                                                <code>control</code>key and click the Reload button in your browser toolbar.
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>Return
+                                        <a href="/">home</a>.
+                                    </li>
+                                </ul>
+                                <div class="xforms-error-panel-details-hidden">
+                                    <p>
+                                        <a class="xforms-error-panel-show-details">
+                                            <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
+                                            <span>Show details</span>
+                                        </a>
+                                    </p>
+                                </div>
+                                <div class="xforms-error-panel-details-shown xforms-disabled">
+                                    <p>
+                                        <a class="xforms-error-panel-hide-details">
+                                            <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
+                                            <span>Hide details</span>
+                                        </a>
+                                    </p>
+                                    <div class="xforms-error-panel-details"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-help-panel xforms-initially-hidden">
+                            <div class="hd">Help</div>
+                            <div class="bd">
+                                <div class="xforms-help-panel-message"/>
+                                <div class="xforms-help-panel-close">
+                                    <button>Close</button>
+                                </div>
+                            </div>
+                        </div>
+                        <xhtml:span id="xforms-select-full-template" class="xforms-template">
+                            <xhtml:span class="xforms-deselected">
+                                <xhtml:label for="$xforms-item-effective-id$">
+                                    <xhtml:input id="$xforms-item-effective-id$" type="checkbox" name="$xforms-effective-id$" value="$xforms-template-value$" disabled="disabled"/>$xforms-template-label$
+                                </xhtml:label>
+                            </xhtml:span>
+                        </xhtml:span>
+                        <xhtml:span id="xforms-select1-full-template" class="xforms-template">
+                            <xhtml:span class="xforms-deselected">
+                                <xhtml:label for="$xforms-item-effective-id$">
+                                    <xhtml:input id="$xforms-item-effective-id$" type="radio" name="$xforms-effective-id$" value="$xforms-template-value$" disabled="disabled"/>$xforms-template-label$
+                                </xhtml:label>
+                            </xhtml:span>
+                        </xhtml:span>
+                        <xhtml:span id="repeat-begin-xf-1" class="xforms-repeat-begin-end"/>
+                        <xhtml:span class="xforms-repeat-delimiter"/>
+                        <xhtml:span class="xforms-repeat-delimiter"/>
+                        <xhtml:span class="xforms-repeat-delimiter"/>
+                        <xhtml:span id="repeat-end-xf-1" class="xforms-repeat-begin-end"/>
+                    </xhtml:form>
+                </xhtml:body>
+            </xhtml:html>
+        </output>
+    </test>
+
+    <test description="Comments in inline instance are preserved" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <!-- This comment is ignored for now -->
+                            <labels xmlns="">
+                                <!-- Comment 2 -->
+                                <label>Banana</label>
+                                <!-- Comment 3 --><!-- Comment 4 -->
+                                <label>Strawberry</label>
+                            </labels>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output" value="string-join(//comment(), ' - ')"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <labels>
+                                    <!-- Comment 2 -->
+                                    <label>Banana</label>
+                                    <!-- Comment 3 --><!-- Comment 4 -->
+                                    <label>Strawberry</label>
+                                </labels>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output">Comment 2 - Comment 3 - Comment 4</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Comments in external instances are preserved" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance-readwrite" src="oxf:/ops/unit-tests/comments.xml"/>
+                        <xforms:instance id="instance-readonly" src="oxf:/ops/unit-tests/comments.xml" xxforms:readonly="true"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output-readwrite" value="string-join(//comment(), ' - ')"/>
+                    <xforms:output id="output-readonly" value="string-join(instance('instance-readonly')//comment(), ' - ')"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance-readwrite" model-id="model" source-uri="oxf:/ops/unit-tests/comments.xml">
+                                <document>
+                                    <!-- Comment 1 -->
+                                    <element/>
+                                    <!-- Multi-line
+         comment -->
+                                    <element/>
+                                </document>
+                            </instance>
+                            <instance readonly="true" id="instance-readonly" model-id="model" source-uri="oxf:/ops/unit-tests/comments.xml">
+                                <document>
+                                    <!-- Comment 1 -->
+                                    <element/>
+                                    <!-- Multi-line
+         comment -->
+                                    <element/>
+                                </document>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output-readwrite">Comment 1 - Multi-line comment</xxf:control>
+                        <xxf:control id="output-readonly">Comment 1 - Multi-line comment</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Comments in instance loaded by submission are preserved" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance-readwrite"><dummy/></xforms:instance>
+                        <xforms:instance id="instance-readonly"><dummy/></xforms:instance>
+
+                        <xforms:submission id="readwrite" method="get" resource="oxf:/ops/unit-tests/comments.xml" replace="instance" instance="instance-readwrite"/>
+                        <xforms:submission id="readonly" method="get" resource="oxf:/ops/unit-tests/comments.xml" replace="instance" instance="instance-readonly" xxforms:readonly="true"/>
+
+                        <xforms:action ev:event="xforms-model-construct-done">
+                            <xforms:send submission="readwrite"/>
+                            <xforms:send submission="readonly"/>
+                        </xforms:action>
+
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output-readwrite" value="string-join(//comment(), ' - ')"/>
+                    <xforms:output id="output-readonly" value="string-join(instance('instance-readonly')//comment(), ' - ')"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance-readwrite" model-id="model" source-uri="oxf:/ops/unit-tests/comments.xml" replaced="true">
+                                <document>
+                                    <!-- Comment 1 -->
+                                    <element/>
+                                    <!-- Multi-line
+         comment -->
+                                    <element/>
+                                </document>
+                            </instance>
+                            <instance readonly="true" id="instance-readonly" model-id="model" source-uri="oxf:/ops/unit-tests/comments.xml" replaced="true">
+                                <document>
+                                    <!-- Comment 1 -->
+                                    <element/>
+                                    <!-- Multi-line
+         comment -->
+                                    <element/>
+                                </document>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output-readwrite">Comment 1 - Multi-line comment</xxf:control>
+                        <xxf:control id="output-readonly">Comment 1 - Multi-line comment</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Instance comments preserved in state deserialization" name="oxf:pipeline">
+        <input name="config" href="xforms-server/wrap-server.xpl"/>
+        <input name="action">
+            <xxforms:action xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xxforms:event name="update" source-control-id="model"/>
+            </xxforms:action>
+        </input>
+        <input name="controls">
+            <controls xmlns:xforms="http://www.w3.org/2002/xforms"/>
+        </input>
+        <input name="models">
+            <models xmlns:xforms="http://www.w3.org/2002/xforms"  xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xforms:model id="model" xxforms:external-events="update">
+                    <xforms:instance id="instance-readwrite"><dummy/></xforms:instance>
+                    <xforms:instance id="instance-readonly"><dummy/></xforms:instance>
+                    <xforms:instance id="results">
+                        <results>
+                            <comments/>
+                            <comments/>
+                        </results>
+                    </xforms:instance>
+
+                    <xforms:action id="action-1" ev:event="update">
+                        <xforms:setvalue id="setvalue-1" ref="instance('results')/comments[1]" value="string-join(instance()//comment(), ' - ')"/>
+                        <xforms:setvalue id="setvalue-2" ref="instance('results')/comments[2]" value="string-join(instance('instance-readonly')//comment(), ' - ')"/>
+                    </xforms:action>
+
+                </xforms:model>
+            </models>
+        </input>
+        <input name="instances">
+            <instances>
+                <instance id="instance-readwrite" model-id="model" replaced="true">
+                    <document>
+                        <!-- Comment 1 -->
+                        <element/>
+                        <!-- Comment 2 -->
+                        <element/>
+                    </document>
+                </instance>
+                <instance id="instance-readonly" model-id="model" readonly="true" replaced="true">
+                    <document>
+                        <!-- Comment 1 -->
+                        <element/>
+                        <!-- Comment 2 -->
+                        <element/>
+                    </document>
+                </instance>
+                <instance id="results" model-id="model">
+                    <results>
+                        <comments/>
+                        <comments/>
+                    </results>
+                </instance>
+            </instances>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance-readwrite" model-id="model" replaced="true">
+                                <document>
+                                    <!-- Comment 1 -->
+                                    <element/>
+                                    <!-- Comment 2 -->
+                                    <element/>
+                                </document>
+                            </instance>
+                            <instance readonly="true" id="instance-readonly" model-id="model" replaced="true">
+                                <document>
+                                    <!-- Comment 1 -->
+                                    <element/>
+                                    <!-- Comment 2 -->
+                                    <element/>
+                                </document>
+                            </instance>
+                            <instance id="results" model-id="model">
+                                <results>
+                                    <comments>Comment 1 - Comment 2</comments>
+                                    <comments>Comment 1 - Comment 2</comments>
+                                </results>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>

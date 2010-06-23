@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -75,7 +76,7 @@ import java.util.Stack;
  *   <last-id id="123"/>
  * </static-state>
  */
-public class XFormsExtractorContentHandler extends ForwardingContentHandler {
+public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
 
     public static final QName LAST_ID_QNAME = new QName("last-id");
 
@@ -108,12 +109,12 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
      * Constructor for top-level document.
      *
      * @param externalContext   external context to obtain request path, properties, etc.
-     * @param contentHandler    resulting static state document
+     * @param xmlReceiver       resulting static state document
      * @param metadata          metadata
      */
-    public XFormsExtractorContentHandler(ExternalContext externalContext, ContentHandler contentHandler,
+    public XFormsExtractorContentHandler(ExternalContext externalContext, XMLReceiver xmlReceiver,
                                          XFormsAnnotatorContentHandler.Metadata metadata) {
-        super(contentHandler);
+        super(xmlReceiver);
 
         this.isTopLevel = true;
         this.externalContext = externalContext;
@@ -151,14 +152,14 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     /**
      * Constructor for nested document (XBL templates).
      *
-     * @param contentHandler    resulting static state document
+     * @param xmlReceiver       resulting static state document
      * @param metadata          metadata
      * @param ignoreRootElement whether root element must just be skipped
      * @param baseURI           base URI
      */
-    public XFormsExtractorContentHandler(ContentHandler contentHandler, XFormsAnnotatorContentHandler.Metadata metadata,
+    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, XFormsAnnotatorContentHandler.Metadata metadata,
                                          boolean ignoreRootElement, String baseURI) {
-        super(contentHandler, contentHandler != null);
+        super(xmlReceiver);
 
         this.isTopLevel = false;
         this.externalContext = null;
@@ -457,5 +458,42 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
     protected void endXFormsOrExtension(String uri, String localname, String qName) {
         // NOP
+    }
+
+    @Override
+    public void startDTD(String name, String publicId, String systemId) throws SAXException {
+        // NOP
+    }
+
+    @Override
+    public void endDTD() throws SAXException {
+        // NOP
+    }
+
+    @Override
+    public void startEntity(String name) throws SAXException {
+        // NOP
+    }
+
+    @Override
+    public void endEntity(String name) throws SAXException {
+        // NOP
+    }
+
+    @Override
+    public void startCDATA() throws SAXException {
+        // NOP
+    }
+
+    @Override
+    public void endCDATA() throws SAXException {
+        // NOP
+    }
+
+    @Override
+    public void comment(char[] ch, int start, int length) throws SAXException {
+        if (inPreserve) {
+            super.comment(ch, start, length);
+        }
     }
 }

@@ -20,6 +20,7 @@ import org.exolab.castor.xml.Marshaller;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.xml.SAXStore;
@@ -32,10 +33,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.ParserAdapter;
 
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXResult;
 import java.io.IOException;
 import java.io.StringReader;
 
@@ -53,10 +52,10 @@ public class ScopeGenerator extends ScopeProcessorBase {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.DigestTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, final ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
                 try {
                     State state = (State) getFilledOutState(pipelineContext);
-                    state.saxStore.replay(contentHandler);
+                    state.saxStore.replay(xmlReceiver);
                 } catch (SAXException e) {
                     throw new OXFException(e);
                 }
@@ -128,9 +127,9 @@ public class ScopeGenerator extends ScopeProcessorBase {
                         }
 
                         // Compute digest of the SAX Store
-                        XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
-                        state.saxStore.replay(digestContentHandler);
-                        state.digest = digestContentHandler.getResult();
+                        XMLUtils.DigestContentHandler digester = new XMLUtils.DigestContentHandler("MD5");
+                        state.saxStore.replay(digester);
+                        state.digest = digester.getResult();
                     }
                     return true;
 
@@ -160,36 +159,36 @@ public class ScopeGenerator extends ScopeProcessorBase {
     }
 
     public static SAXStore getSAXStore(Object value, Mapping mapping) throws SAXException, TransformerException, IOException, MappingException {
-        final SAXStore result;
+        final SAXStore resultStore;
         if (value instanceof ScopeStore) {
             final ScopeStore contextStore = (ScopeStore) value;
-            result = contextStore.getSaxStore();
+            resultStore = contextStore.getSaxStore();
         } else {
             if (value instanceof SAXStore) {
-                result = (SAXStore) value;
+                resultStore = (SAXStore) value;
             } else {
                 // Write "foreign" object to new SAX store
-                result = new SAXStore();
+                resultStore = new SAXStore();
                 if (value instanceof Document) {
                     // dom4j document
                     final LocationSAXWriter saxWriter = new LocationSAXWriter();
-                    saxWriter.setContentHandler(result);
+                    saxWriter.setContentHandler(resultStore);
+                    saxWriter.setLexicalHandler(resultStore);
                     saxWriter.write((Document) value);
                 } else if (value instanceof org.w3c.dom.Document) {
                     // W3C DOM document
-                    final Transformer identity = TransformerUtils.getIdentityTransformer();
-                    identity.transform(new DOMSource((org.w3c.dom.Document) value), new SAXResult(result));
+                    TransformerUtils.sourceToSAX(new DOMSource((org.w3c.dom.Document) value), resultStore);
                 } else if (value instanceof String) {
                     // Consider the String containing a document to parse
-                    XMLUtils.stringToSAX((String) value, "", result, false, false);
+                    XMLUtils.stringToSAX((String) value, "", resultStore, false, false, true);
                 } else {
                     // Consider the object a JavaBean
-                    readBean(value, mapping, result);
+                    readBean(value, mapping, resultStore);
                 }
             }
         }
 
-        return result;
+        return resultStore;
     }
 
     protected static void readBean(Object bean, Mapping mapping, ContentHandler contentHandler) {

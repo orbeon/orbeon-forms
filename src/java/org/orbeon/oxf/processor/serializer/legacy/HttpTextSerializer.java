@@ -1,28 +1,28 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.serializer.legacy;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.serializer.HttpSerializerBase;
 import org.orbeon.oxf.util.ContentHandlerWriter;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -76,9 +76,9 @@ public abstract class HttpTextSerializer extends HttpSerializerBase {
         if (!name.equals(OUTPUT_DATA))
             throw new OXFException("Invalid output created: " + name);
         final ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 // Create OutputStream that converts to Base64
-                final Writer writer = new ContentHandlerWriter(contentHandler);
+                final Writer writer = new ContentHandlerWriter(xmlReceiver);
 
                 // Read configuration input
                 final Config config = readConfig(pipelineContext);
@@ -93,17 +93,17 @@ public abstract class HttpTextSerializer extends HttpSerializerBase {
                         attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType + "; charset=" + encoding);
 
                     // Start document
-                    contentHandler.startDocument();
-                    contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-                    contentHandler.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-                    contentHandler.startElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT, attributes);
+                    xmlReceiver.startDocument();
+                    xmlReceiver.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+                    xmlReceiver.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+                    xmlReceiver.startElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT, attributes);
 
                     // Write content
                     readInput(pipelineContext, getInputByName(INPUT_DATA), config, writer);
 
                     // End document
-                    contentHandler.endElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT);
-                    contentHandler.endDocument();
+                    xmlReceiver.endElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT);
+                    xmlReceiver.endDocument();
 
                 } catch (SAXException e) {
                     throw new OXFException(e);

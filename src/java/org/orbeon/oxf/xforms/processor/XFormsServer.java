@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ResponseAdapter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
@@ -40,7 +41,7 @@ import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TeeContentHandler;
+import org.orbeon.oxf.xml.TeeXMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
@@ -88,8 +89,8 @@ public class XFormsServer extends ProcessorImpl {
      */
     public ProcessorOutput createOutput(final String outputName) {
         final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), outputName) {
-            public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
-                doIt(pipelineContext, contentHandler);
+            public void readImpl(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
+                doIt(pipelineContext, xmlReceiver);
             }
         };
         addOutput(outputName, output);
@@ -104,7 +105,7 @@ public class XFormsServer extends ProcessorImpl {
         doIt(pipelineContext, null);
     }
 
-    private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler) {
+    private void doIt(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
         // Use request input provided by client
         final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
@@ -164,13 +165,13 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output simple resulting document
                 try {
-                    final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
-                    ch.startDocument();
-                    contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
-                    ch.endElement();
-                    contentHandler.endPrefixMapping("xxf");
-                    ch.endDocument();
+                    final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
+                    helper.startDocument();
+                    xmlReceiver.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                    helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
+                    helper.endElement();
+                    xmlReceiver.endPrefixMapping("xxf");
+                    helper.endDocument();
                 } catch (SAXException e) {
                     throw new OXFException(e);
                 }
@@ -181,7 +182,7 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         // Find an output stream for xforms:submission[@replace = 'all']
-        final ExternalContext.Response response = getResponse(contentHandler, externalContext);
+        final ExternalContext.Response response = getResponse(xmlReceiver, externalContext);
 
         // Find or restore containing document from the incoming request
         final XFormsContainingDocument containingDocument
@@ -264,7 +265,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 if (replaceAllCallable == null) {
                     // Handle response here (if not null, is handled after synchronized block)
-                    if (contentHandler != null) {
+                    if (xmlReceiver != null) {
                         // Create resulting document if there is a ContentHandler
                         if (containingDocument.isGotSubmissionReplaceAll() && (isNoscript || XFormsProperties.isAjaxPortlet(containingDocument))) {
                             // NOP: Response already sent out by a submission
@@ -274,14 +275,14 @@ public class XFormsServer extends ProcessorImpl {
                             indentedLogger.startHandleOperation("response", "handling regular Ajax response");
 
                             // Hook-up debug content handler if we must log the response document
-                            final ContentHandler responseContentHandler;
+                            final XMLReceiver responseContentHandler;
                             final LocationSAXContentHandler debugContentHandler;
                             if (logRequestResponse) {
                                 debugContentHandler = new LocationSAXContentHandler();
-                                responseContentHandler = new TeeContentHandler(contentHandler, debugContentHandler);
+                                responseContentHandler = new TeeXMLReceiver(xmlReceiver, debugContentHandler);
                             } else {
                                 debugContentHandler = null;
-                                responseContentHandler = contentHandler;
+                                responseContentHandler = xmlReceiver;
                             }
 
                             outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds, pipelineContext,
@@ -291,7 +292,7 @@ public class XFormsServer extends ProcessorImpl {
                         } else {
                             // Noscript mode
                             indentedLogger.startHandleOperation("response", "handling noscript response");
-                            outputNoscriptResponse(containingDocument, indentedLogger, pipelineContext, contentHandler, externalContext);
+                            outputNoscriptResponse(containingDocument, indentedLogger, pipelineContext, xmlReceiver, externalContext);
                             indentedLogger.endHandleOperation();
                         }
                     } else {
@@ -652,13 +653,13 @@ public class XFormsServer extends ProcessorImpl {
      *
      * @param containingDocument            containing document
      * @param pipelineContext               pipeline context
-     * @param contentHandler                content handler for the XHTML result
+     * @param xmlReceiver                   handler for the XHTML result
      * @param externalContext               external context
      * @throws IOException
      * @throws SAXException
      */
     private void outputNoscriptResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, PipelineContext pipelineContext,
-                                               ContentHandler contentHandler, ExternalContext externalContext) throws IOException, SAXException {
+                                               XMLReceiver xmlReceiver, ExternalContext externalContext) throws IOException, SAXException {
         // This will also cache the containing document if needed
         // QUESTION: Do we actually need to cache if a xforms:submission[@replace = 'all'] happened?
 
@@ -676,7 +677,7 @@ public class XFormsServer extends ProcessorImpl {
             externalContext.getResponse().sendRedirect(redirectResource, null, false, false, true);
 
             // Still send out a null document to signal that no further processing must take place
-            XMLUtils.streamNullDocument(contentHandler);
+            XMLUtils.streamNullDocument(xmlReceiver);
         } else {
             // Response will be Ajax response or XHTML document
             final SAXStore xhtmlDocument = containingDocument.getStaticState().getXHTMLDocument();
@@ -685,7 +686,7 @@ public class XFormsServer extends ProcessorImpl {
 
             indentedLogger.logDebug("response", "handling noscript response for XHTML output");
             XFormsToXHTML.outputResponseDocument(pipelineContext, externalContext, indentedLogger, xhtmlDocument,
-                    containingDocument, contentHandler);
+                    containingDocument, xmlReceiver);
         }
     }
 
@@ -697,13 +698,13 @@ public class XFormsServer extends ProcessorImpl {
      * @param valueChangeControlIds             control ids for which the client sent a value change
      * @param pipelineContext                   current context
      * @param requestDocument                   incoming request document (for all events mode)
-     * @param contentHandler                    content handler for the Ajax result
+     * @param xmlReceiver                       handler for the Ajax result
      * @param allEvents                         whether to handle all events
      * @param testOutputAllActions              for testing purposes
      */
     public static void outputAjaxResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
                                           Set<String> valueChangeControlIds, PipelineContext pipelineContext,
-                                          Document requestDocument, ContentHandler contentHandler, boolean allEvents,
+                                          Document requestDocument, XMLReceiver xmlReceiver, boolean allEvents,
                                           boolean testOutputAllActions) {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
@@ -712,9 +713,9 @@ public class XFormsServer extends ProcessorImpl {
         final boolean testOutputStaticState = false;
 
         try {
-            final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
+            final ContentHandlerHelper ch = new ContentHandlerHelper(xmlReceiver);
             ch.startDocument();
-            contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
+            xmlReceiver.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
 
             // Compute server events
@@ -965,7 +966,7 @@ public class XFormsServer extends ProcessorImpl {
             }
 
             ch.endElement();
-            contentHandler.endPrefixMapping("xxf");
+            xmlReceiver.endPrefixMapping("xxf");
             ch.endDocument();
         } catch (SAXException e) {
             throw new OXFException(e);

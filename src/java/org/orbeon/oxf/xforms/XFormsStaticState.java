@@ -53,7 +53,6 @@ import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.Transformer;
-import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
 
@@ -261,18 +260,17 @@ public class XFormsStaticState {
             this.metadata = new XFormsAnnotatorContentHandler.Metadata(idGenerator, namespacesMap);
             try {
 //                if (xhtmlDocument == null) {
-                    // Recompute from staticStateDocument
-                    // TODO: Can there be in this case a nested xhtml:html element, thereby causing duplicate id exceptions?
-                    final Transformer identity = TransformerUtils.getIdentityTransformer();
+                // Recompute from staticStateDocument
+                // TODO: Can there be in this case a nested xhtml:html element, thereby causing duplicate id exceptions?
 
-                    // Detach xhtml element as models and controls are enough to produce namespaces map
-                    if (htmlElement != null)
-                        htmlElement.detach();
-                    // Compute namespaces map
-                    identity.transform(new DocumentSource(staticStateDocument), new SAXResult(new XFormsAnnotatorContentHandler(this.metadata)));
-                    // Re-attach xhtml element
-                    if (htmlElement != null)
-                        staticStateElement.add(htmlElement);
+                // Detach xhtml element as models and controls are enough to produce namespaces map
+                if (htmlElement != null)
+                    htmlElement.detach();
+                // Compute namespaces map
+                TransformerUtils.sourceToSAX(new DocumentSource(staticStateDocument), new XFormsAnnotatorContentHandler(this.metadata));
+                // Re-attach xhtml element
+                if (htmlElement != null)
+                    staticStateElement.add(htmlElement);
 //                } else {
 //                    // Recompute from xhtmlDocument
 //                    final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();

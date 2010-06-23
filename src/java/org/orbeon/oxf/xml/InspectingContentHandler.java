@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -24,12 +24,12 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.util.Stack;
 
 /**
- * Just like ForwardingContentHandler (a SAX content handler that forwards SAX events to another content handler), but
+ * Just like ForwardingXMLReceiver (a SAX handler that forwards SAX events to another handler), but
  * checks the validity of the SAX stream.
  *
  * TODO: check for duplicate attributes.
  */
-public class InspectingContentHandler extends ForwardingContentHandler {
+public class InspectingContentHandler extends ForwardingXMLReceiver {
 
     private Locator locator;
 
@@ -40,8 +40,8 @@ public class InspectingContentHandler extends ForwardingContentHandler {
 
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
-    public InspectingContentHandler(ContentHandler contentHandler) {
-        super(contentHandler);
+    public InspectingContentHandler(XMLReceiver xmlReceiver) {
+        super(xmlReceiver);
     }
 
     public void startDocument() throws SAXException {

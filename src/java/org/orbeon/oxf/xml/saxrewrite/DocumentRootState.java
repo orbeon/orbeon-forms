@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xml.saxrewrite;
 
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
@@ -28,8 +28,8 @@ public class DocumentRootState extends State {
 
     protected State nextState = this;
 
-    public DocumentRootState(final State previousState, final ContentHandler contentHandler) {
-        super(previousState, contentHandler);
+    public DocumentRootState(final State previousState, final XMLReceiver xmlReceiver) {
+        super(previousState, xmlReceiver);
     }
 
     /**

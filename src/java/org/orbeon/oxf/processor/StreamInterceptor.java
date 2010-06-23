@@ -1,31 +1,29 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor;
 
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.generator.TidyConfig;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
@@ -74,15 +72,7 @@ public class StreamInterceptor {
         this.contentType = contentType;
     }
 
-    public void parse(ContentHandler contentHandler) {
-        parse(contentHandler, null, false);
-    }
-
-    public void parse(ContentHandler contentHandler, boolean fragment) {
-        parse(contentHandler, null, fragment);
-    }
-
-    public void parse(ContentHandler contentHandler, TidyConfig tidyConfig, boolean fragment) {
+    public void parse(XMLReceiver xmlReceiver, TidyConfig tidyConfig, boolean fragment) {
         try {
             // Create InputSource
             InputSource inputSource = null;
@@ -114,7 +104,7 @@ public class StreamInterceptor {
             if (inputSource != null) {
                 if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType)) {
                     // The document contains HTML. Parse it using Tidy.
-                    Tidy tidy = new Tidy();
+                    final Tidy tidy = new Tidy();
                     if (tidyConfig != null) {
                         tidy.setShowWarnings(tidyConfig.isShowWarnings());
                         tidy.setQuiet(tidyConfig.isQuiet());
@@ -122,7 +112,7 @@ public class StreamInterceptor {
                             tidy.setErrout(new PrintWriter(new StringWriter()));
                     }
 
-                    InputStream inputStream;
+                    final InputStream inputStream;
                     if (writer == null) {
                         // Unfortunately, it doesn't look like tidy support
                         // detecting the encoding from the HTML document, so we
@@ -140,42 +130,31 @@ public class StreamInterceptor {
                         tidy.setInputEncoding("utf-8");
                     }
 
-                    Document document = tidy.parseDOM(inputStream, null);
+                    final Document document = tidy.parseDOM(inputStream, null);
                     // Output the result
-                    Transformer transformer = TransformerUtils.getIdentityTransformer();
-
                     if (fragment) {
                         // Do not generate start and end document events
-                        transformer.transform(new DOMSource(document), new SAXResult(new ForwardingContentHandler(contentHandler) {
-                            public void startDocument() {
-                            }
-
-                            public void endDocument() {
-                            }
-                        }));
+                        TransformerUtils.sourceToSAX(new DOMSource(document), new EmbeddedDocumentXMLReceiver(xmlReceiver));
                     } else {
                         // Generate a complete document
-                        transformer.transform(new DOMSource(document), new SAXResult(contentHandler));
+                        TransformerUtils.sourceToSAX(new DOMSource(document), xmlReceiver);
                     }
+
                 } else {
                     // Assume it is XML and parse the output
                     final XMLReader reader = XMLUtils.newXMLReader(false, false);
 
                     if (fragment) {
                         // Do not generate start and end document events
-                        reader.setContentHandler(new ForwardingContentHandler(contentHandler) {
-                            public void startDocument() {
-                            }
-
-                            public void endDocument() {
-                            }
-                        });
+                        final XMLReceiver forwardingXMLReceiver = new EmbeddedDocumentXMLReceiver(xmlReceiver);
+                        reader.setContentHandler(forwardingXMLReceiver);
+                        reader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER, forwardingXMLReceiver);
                     } else {
                         // Generate a complete document
-                        reader.setContentHandler(contentHandler);
+                        reader.setContentHandler(xmlReceiver);
+                        reader.setProperty(XMLConstants.SAX_LEXICAL_HANDLER, xmlReceiver);
                     }
 
-                    //inputSource.setSystemId();
                     reader.parse(inputSource);
                 }
             }

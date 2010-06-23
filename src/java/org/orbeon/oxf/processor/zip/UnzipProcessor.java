@@ -1,17 +1,30 @@
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 package org.orbeon.oxf.processor.zip;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.serializer.BinaryTextContentHandler;
+import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -34,20 +47,20 @@ public class UnzipProcessor extends ProcessorImpl {
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
 
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 try {
                     // Read input in a temporary file
                     final File temporaryZipFile;
                     {
                         final FileItem fileItem = NetUtils.prepareFileItem(context, NetUtils.REQUEST_SCOPE);
                         final OutputStream fileOutputStream = fileItem.getOutputStream();
-                        readInputAsSAX(context, getInputByName(INPUT_DATA), new BinaryTextContentHandler(null, fileOutputStream, true, false, null, false, false, null, false));
+                        readInputAsSAX(context, getInputByName(INPUT_DATA), new BinaryTextXMLReceiver(null, fileOutputStream, true, false, null, false, false, null, false));
                         temporaryZipFile = ((DiskFileItem) fileItem).getStoreLocation();
                     }
 
-                    contentHandler.startDocument();
+                    xmlReceiver.startDocument();
                     // <files>
-                    contentHandler.startElement("", "files", "files", XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", "files", "files", XMLUtils.EMPTY_ATTRIBUTES);
                     ZipFile zipFile = new ZipFile(temporaryZipFile);
                     for (Enumeration entries = zipFile.entries(); entries.hasMoreElements();) {
                         // Go through each entry in the zip file
@@ -64,14 +77,14 @@ public class UnzipProcessor extends ProcessorImpl {
                         fileAttributes.addAttribute("", "name", "name", "CDATA", fileName);
                         fileAttributes.addAttribute("", "size", "size", "CDATA", Long.toString(fileSize));
                         fileAttributes.addAttribute("", "dateTime", "dateTime", "CDATA", fileTime);
-                        contentHandler.startElement("", "file", "file", fileAttributes);
-                        contentHandler.characters(uri.toCharArray(), 0, uri.length());
+                        xmlReceiver.startElement("", "file", "file", fileAttributes);
+                        xmlReceiver.characters(uri.toCharArray(), 0, uri.length());
                         // </file>
-                        contentHandler.endElement("", "file", "file");
+                        xmlReceiver.endElement("", "file", "file");
                     }
                     // </files>
-                    contentHandler.endElement("", "files", "files");
-                    contentHandler.endDocument();
+                    xmlReceiver.endElement("", "files", "files");
+                    xmlReceiver.endDocument();
 
                 } catch (IOException e) {
                     throw new OXFException(e);

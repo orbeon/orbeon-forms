@@ -25,7 +25,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
 
-    private DeferredContentHandler currentSavedOutput;
+    private DeferredXMLReceiver currentSavedOutput;
     private OutputInterceptor currentOutputInterceptor;
     private String currentCaseEffectiveId;
     private boolean isVisible;
@@ -82,10 +82,10 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
             currentOutputInterceptor.setAddedClasses(isVisible ? "xforms-case-selected" : "xforms-case-deselected");
 
             // TODO: is the use of XFormsElementFilterContentHandler necessary now?
-            handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(currentOutputInterceptor)));
+            handlerContext.getController().setOutput(new DeferredXMLReceiverImpl(new XFormsElementFilterXMLReceiver(currentOutputInterceptor)));
         } else if (!isVisible) {
             // Case not visible, set output to a black hole
-            handlerContext.getController().setOutput(new DeferredContentHandlerAdapter());
+            handlerContext.getController().setOutput(new DeferredXMLReceiverAdapter());
         }
     }
 

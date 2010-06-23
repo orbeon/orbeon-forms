@@ -21,10 +21,7 @@ import com.softwareag.tamino.db.api.namespace.TXQLNamespace;
 import com.softwareag.tamino.db.api.namespace.TXQNamespace;
 import com.softwareag.tamino.db.api.objectModel.TXMLObject;
 import com.softwareag.tamino.db.api.response.*;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Namespace;
-import org.dom4j.QName;
+import org.dom4j.*;
 import org.dom4j.io.SAXReader;
 import org.dom4j.tree.DefaultText;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocumentFactory;
@@ -81,9 +78,9 @@ public class TDOM4JInputStreamInterpreter extends TInputStreamInterpreter {
 			SAXReader saxReader = (parserName == null || parserName.equals( "") ) ? new SAXReader() : new SAXReader( parserName );
             
 			// Make sure the document and its children are thread safe by using our
-                        // document factory.
-			final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance14();
-			saxReader.setDocumentFactory( fctry );
+            // document factory.
+			final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+			saxReader.setDocumentFactory(factory);
  
 			// Invoke the parsing and obtain the Document instance
 			document = saxReader.read( inputStream );

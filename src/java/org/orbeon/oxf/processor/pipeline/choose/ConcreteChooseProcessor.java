@@ -20,6 +20,7 @@ import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -29,7 +30,6 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.trans.XPathException;
-import org.xml.sax.ContentHandler;
 
 import java.util.*;
 
@@ -119,12 +119,12 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
     public ProcessorOutput createOutput(String name) {
         final String _name = name;
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 State state = (State) getState(context);
                 if (!state.started)
                     start(context);
                 ProcessorOutput branchOutput = state.selectedBranchOutputs.get(_name);
-                branchOutput.read(context, contentHandler);
+                branchOutput.read(context, xmlReceiver);
             }
 
             protected OutputCacheKey getKeyImpl(PipelineContext context) {

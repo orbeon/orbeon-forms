@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
@@ -363,7 +364,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
 
 
-        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
 
         final LocationDocumentResult documentResult = new LocationDocumentResult();
         identity.setResult(documentResult);
@@ -372,7 +373,7 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
         final SAXStore annotatedSAXStore = new SAXStore(new XFormsExtractorContentHandler(externalContext, identity, metadata));
 
         // Read the input through the annotator and gather namespace mappings
-        XMLUtils.urlToSAX(documentURL, new XFormsAnnotatorContentHandler(annotatedSAXStore, externalContext, metadata), false, false);
+        XMLUtils.urlToSAX(documentURL, new XFormsAnnotatorContentHandler(annotatedSAXStore, externalContext, metadata), false, false, false);
 
         // Get static state document and create static state object
         final Document staticStateDocument = documentResult.getDocument();

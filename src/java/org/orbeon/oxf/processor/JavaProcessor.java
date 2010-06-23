@@ -24,6 +24,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.resources.ExpirationMap;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
@@ -31,7 +32,6 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.xml.sax.ContentHandler;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -63,8 +63,8 @@ public class JavaProcessor extends ProcessorImpl {
     public ProcessorOutput createOutput(final String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
 
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                getInput(context).getOutput().read(context, contentHandler);
+            public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
+                getInput(context).getOutput().read(context, xmlReceiver);
             }
 
             public OutputCacheKey getKeyImpl(PipelineContext context) {
@@ -116,8 +116,8 @@ public class JavaProcessor extends ProcessorImpl {
                     // Delegate
                     ProcessorInput userProcessorInput = processor.createInput(inputName);
                     ProcessorOutput topOutput = new ProcessorImpl.ProcessorOutputImpl(getClass(), inputName) {
-                        protected void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                            javaProcessorInput.getOutput().read(context, contentHandler);
+                        protected void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
+                            javaProcessorInput.getOutput().read(context, xmlReceiver);
                         }
                     };
                     // Connect

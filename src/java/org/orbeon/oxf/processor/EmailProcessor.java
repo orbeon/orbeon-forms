@@ -22,7 +22,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.URLGenerator;
-import org.orbeon.oxf.processor.serializer.BinaryTextContentHandler;
+import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
@@ -413,9 +413,8 @@ public class EmailProcessor extends ProcessorImpl {
             throws IOException, TransformerException {
 
         final FileItem fileItem = NetUtils.prepareFileItem(pipelineContext, NetUtils.REQUEST_SCOPE);
-        final ContentHandler ch = new BinaryTextContentHandler(fileItem.getOutputStream());
-        final Transformer identity = TransformerUtils.getIdentityTransformer();
-        identity.transform(source, new SAXResult(ch));
+        TransformerUtils.sourceToSAX(source, new BinaryTextXMLReceiver(fileItem.getOutputStream()));
+
         return fileItem;
     }
 

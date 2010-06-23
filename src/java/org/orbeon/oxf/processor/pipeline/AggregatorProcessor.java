@@ -1,38 +1,38 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.pipeline;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.cache.CacheKey;
+import org.orbeon.oxf.cache.CompoundOutputCacheKey;
+import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
+import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.cache.OutputCacheKey;
-import org.orbeon.oxf.cache.CacheKey;
-import org.orbeon.oxf.cache.CompoundOutputCacheKey;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 
 public class AggregatorProcessor extends ProcessorImpl {
@@ -47,7 +47,7 @@ public class AggregatorProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
 
                 try {
                     // Read config
@@ -82,22 +82,22 @@ public class AggregatorProcessor extends ProcessorImpl {
                     }
 
                     // Start document
-                    contentHandler.startDocument();
+                    xmlReceiver.startDocument();
                     if (!rootNamespaceURI.equals(""))
-                        contentHandler.startPrefixMapping(rootPrefix, rootNamespaceURI);
-                    contentHandler.startElement(rootNamespaceURI, rootLocalName, rootQName, XMLUtils.EMPTY_ATTRIBUTES);
+                        xmlReceiver.startPrefixMapping(rootPrefix, rootNamespaceURI);
+                    xmlReceiver.startElement(rootNamespaceURI, rootLocalName, rootQName, XMLUtils.EMPTY_ATTRIBUTES);
 
                     // Processor input processors
                     for (Iterator i = getInputsByName(INPUT_DATA).iterator(); i.hasNext();) {
                         ProcessorInput input = (ProcessorInput) i.next();
-                        readInputAsSAX(context, input, new EmbeddedDocumentContentHandler(contentHandler));
+                        readInputAsSAX(context, input, new EmbeddedDocumentXMLReceiver(xmlReceiver));
                     }
 
                     // End document
-                    contentHandler.endElement(rootNamespaceURI, rootLocalName, rootQName);
+                    xmlReceiver.endElement(rootNamespaceURI, rootLocalName, rootQName);
                     if (!rootNamespaceURI.equals(""))
-                        contentHandler.endPrefixMapping(rootPrefix);
-                    contentHandler.endDocument();
+                        xmlReceiver.endPrefixMapping(rootPrefix);
+                    xmlReceiver.endDocument();
                 } catch (SAXException e) {
                     throw new OXFException(e);
                 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
@@ -36,14 +37,10 @@ import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.xerces.XIncludeHandler;
-import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.*;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXResult;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -67,6 +64,7 @@ public class URLGenerator extends ProcessorImpl {
 
     public static final boolean DEFAULT_VALIDATING = false;
     public static final boolean DEFAULT_HANDLE_XINCLUDE = false;
+    public static final boolean DEFAULT_HANDLE_LEXICAL = true;
 
     private static final boolean DEFAULT_FORCE_CONTENT_TYPE = false;
     private static final boolean DEFAULT_FORCE_ENCODING = false;
@@ -77,6 +75,7 @@ public class URLGenerator extends ProcessorImpl {
     public static final String URL_NAMESPACE_URI = "http://www.orbeon.org/oxf/xml/url";
     public static final String VALIDATING_PROPERTY = "validating";
     public static final String HANDLE_XINCLUDE_PROPERTY = "handle-xinclude";
+    public static final String HANDLE_LEXICAL_PROPERTY = "handle-lexical";
 
     private ConfigURIReferences localConfigURIReferences;
 
@@ -120,11 +119,10 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     public URLGenerator(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, String mode,
-                      Map<String, String[]> headerNameValues, String forwardHeaders,
-                      boolean cacheUseLocalCache) {
+                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, boolean handleLexical,
+                      String mode, Map<String, String[]> headerNameValues, String forwardHeaders, boolean cacheUseLocalCache) {
         this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType, encoding,
-                forceEncoding, ignoreConnectionEncoding, validating, handleXInclude, mode,
+                forceEncoding, ignoreConnectionEncoding, validating, handleXInclude, handleLexical, mode,
                 headerNameValues, forwardHeaders,
                 cacheUseLocalCache, new TidyConfig(null)));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
@@ -141,6 +139,7 @@ public class URLGenerator extends ProcessorImpl {
         private Map<String, String[]> headerNameValues;
         private String forwardHeaders;
         private boolean handleXInclude = DEFAULT_HANDLE_XINCLUDE;
+        private boolean handleLexical = DEFAULT_HANDLE_LEXICAL;
 
         private String mode;
 
@@ -168,9 +167,10 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, String mode,
-                      Map<String, String[]> headerNameValues, String forwardHeaders,
-                      boolean cacheUseLocalCache, TidyConfig tidyConfig) {
+                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, boolean handleLexical,
+                      String mode, Map<String, String[]> headerNameValues, String forwardHeaders, boolean cacheUseLocalCache,
+                      TidyConfig tidyConfig) {
+
             this.url = url;
             this.contentType = contentType;
             this.forceContentType = forceContentType;
@@ -181,6 +181,7 @@ public class URLGenerator extends ProcessorImpl {
             this.headerNameValues = headerNameValues;
             this.forwardHeaders = forwardHeaders;
             this.handleXInclude = handleXInclude;
+            this.handleLexical = handleLexical;
 
             this.mode = mode;
 
@@ -225,6 +226,10 @@ public class URLGenerator extends ProcessorImpl {
             return handleXInclude;
         }
 
+        public boolean isHandleLexical() {
+            return handleLexical;
+        }
+
         public String getMode() {
             return mode;
         }
@@ -240,14 +245,6 @@ public class URLGenerator extends ProcessorImpl {
         public boolean isCacheUseLocalCache() {
             return cacheUseLocalCache;
         }
-
-//        public boolean isCacheAlwaysRevalidate() {
-//            return cacheAlwaysRevalidate;
-//        }
-
-//        public int getCacheExpiration() {
-//            return cacheExpiration;
-//        }
 
         public String toString() {
             return "[" + getURL().toExternalForm() + "|" + getContentType() + "|" + getEncoding() + "|" + isValidating() + "|" + isHandleXInclude() + "|" + isForceContentType()
@@ -266,7 +263,7 @@ public class URLGenerator extends ProcessorImpl {
 
     public ProcessorOutput createOutput(final String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
                 makeSureStateIsSet(pipelineContext);
 
@@ -343,6 +340,9 @@ public class URLGenerator extends ProcessorImpl {
                                 final boolean defaultHandleXInclude = getPropertySet().getBoolean(HANDLE_XINCLUDE_PROPERTY, DEFAULT_HANDLE_XINCLUDE);
                                 final boolean handleXInclude = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", defaultHandleXInclude);
 
+                                final boolean defaultHandleLexical = getPropertySet().getBoolean(HANDLE_LEXICAL_PROPERTY, DEFAULT_HANDLE_LEXICAL);
+                                final boolean handleLexical = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-lexical", defaultHandleLexical);
+
                                 // Output mode
                                 final String mode = XPathUtils.selectStringValueNormalize(configElement, "/config/mode");
 
@@ -364,7 +364,7 @@ public class URLGenerator extends ProcessorImpl {
 
                                     // Create configuration
                                     final Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
-                                            ignoreConnectionEncoding, validating, handleXInclude, mode,
+                                            ignoreConnectionEncoding, validating, handleXInclude, handleLexical, mode,
                                             headerNameValues, forwardHeaders,
                                             cacheUseLocalCache, tidyConfig);
                                     if (logger.isDebugEnabled())
@@ -398,7 +398,7 @@ public class URLGenerator extends ProcessorImpl {
                         final Object cachedResource = (localCacheKey == null) ? null : ObjectCache.instance().findValid(pipelineContext, localCacheKey, localCacheValidity);
                         if (cachedResource != null) {
                             // Just replay the cached resource
-                            ((SAXStore) cachedResource).replay(contentHandler);
+                            ((SAXStore) cachedResource).replay(xmlReceiver);
                         } else {
                             // We need to read the resource
 
@@ -428,7 +428,7 @@ public class URLGenerator extends ProcessorImpl {
                             final Long validity = (Long) getHandlerValidity(pipelineContext, configURIReferences.config.getURL(), handler);
 
                             // Create store for caching if necessary
-                            final ContentHandler output = isUseLocalCache ? new SAXStore(contentHandler) : contentHandler;
+                            final XMLReceiver output = isUseLocalCache ? new SAXStore(xmlReceiver) : xmlReceiver;
 
                             // Handle mode
                             String mode = configURIReferences.config.getMode();
@@ -472,7 +472,7 @@ public class URLGenerator extends ProcessorImpl {
                             // Cache the resource if requested
                             if (isUseLocalCache) {
                                 // Make sure SAXStore loses its reference on its output so that we don't clutter the cache
-                                ((SAXStore) output).setContentHandler(null);
+                                ((SAXStore) output).setXMLReceiver(null);
                                 // Add to cache
                                 ObjectCache.instance().add(pipelineContext, localCacheKey, localCacheValidity, output);
                             }
@@ -631,9 +631,9 @@ public class URLGenerator extends ProcessorImpl {
         String getConnectionEncoding() throws IOException;
         int getConnectionStatusCode() throws IOException;
         void destroy() throws IOException;
-        void readHTML(ContentHandler output) throws IOException;
+        void readHTML(XMLReceiver xmlReceiver) throws IOException;
         void readText(ContentHandler output, String contentType, Long lastModified) throws IOException;
-        void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException;
+        void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver) throws IOException;
         void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException;
     }
 
@@ -694,9 +694,9 @@ public class URLGenerator extends ProcessorImpl {
             return null;
         }
 
-        public void readHTML(ContentHandler output) throws IOException {
+        public void readHTML(XMLReceiver xmlReceiver) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-            URLResourceHandler.readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), output);
+            URLResourceHandler.readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), xmlReceiver);
         }
 
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
@@ -704,14 +704,16 @@ public class URLGenerator extends ProcessorImpl {
             ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
-        public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {
+        public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver) throws IOException {
             if (getExternalEncoding() != null) {
                 // The encoding is set externally, either forced by the user, or set by the connection
                 inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-                XMLUtils.readerToSAX(new InputStreamReader(inputStream, getExternalEncoding()), config.getURL().toExternalForm(), output, config.isValidating(), config.isHandleXInclude());
+                XMLUtils.readerToSAX(new InputStreamReader(inputStream, getExternalEncoding()), config.getURL().toExternalForm(),
+                        xmlReceiver, config.isValidating(), config.isHandleXInclude(), config.isHandleLexical());
             } else {
                 // Regular case, the resource manager does the job and autodetects the encoding
-                ResourceManagerWrapper.instance().getContentAsSAX(getKey(), output, config.isValidating(), config.isHandleXInclude());
+                ResourceManagerWrapper.instance().getContentAsSAX(getKey(),
+                        xmlReceiver, config.isValidating(), config.isHandleXInclude(), config.isHandleLexical());
             }
         }
 
@@ -826,10 +828,10 @@ public class URLGenerator extends ProcessorImpl {
             return null;
         }
 
-        public void readHTML(ContentHandler output) throws IOException {
+        public void readHTML(XMLReceiver xmlReceiver) throws IOException {
             openConnection();
             checkStatusCode();
-            readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), output);
+            readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), xmlReceiver);
         }
 
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
@@ -842,13 +844,13 @@ public class URLGenerator extends ProcessorImpl {
             ProcessorUtils.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode());
         }
 
-        public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {
+        public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver) throws IOException {
             openConnection();
             checkStatusCode();
             // Read the resource from the resource manager and parse it as XML
             try {
                 final XMLReader reader = XMLUtils.newXMLReader(config.isValidating(), config.isHandleXInclude());
-                reader.setContentHandler(output);
+                reader.setContentHandler(xmlReceiver);
                 final InputSource inputSource;
                 if (getExternalEncoding() != null) {
                     // The encoding is set externally, either force by the user, or set by the connection
@@ -870,7 +872,7 @@ public class URLGenerator extends ProcessorImpl {
                 throw new ValidationException("Got non-success status code: " + statusCode, new LocationData(config.getURL().toExternalForm(), -1, -1));
         }
 
-        public static void readHTML(InputStream is, TidyConfig tidyConfig, String encoding, ContentHandler output) {
+        public static void readHTML(InputStream is, TidyConfig tidyConfig, String encoding, XMLReceiver output) {
             Tidy tidy = new Tidy();
 //          tidy.setOnlyErrors(false);
             tidy.setShowWarnings(tidyConfig.isShowWarnings());
@@ -881,13 +883,7 @@ public class URLGenerator extends ProcessorImpl {
             tidy.setInputEncoding(TidyConfig.getTidyEncoding(encoding));
 
             // Parse and output to SAXResult
-            Document document = tidy.parseDOM(is, null);
-            try {
-                Transformer transformer = TransformerUtils.getIdentityTransformer();
-                transformer.transform(new DOMSource(document), new SAXResult(output));
-            } catch (TransformerException e) {
-                throw new OXFException(e);
-            }
+            TransformerUtils.sourceToSAX(new DOMSource(tidy.parseDOM(is, null)), output);
         }
 
     }

@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2006 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.execute;
 
@@ -19,12 +19,12 @@ import org.apache.tools.ant.types.Commandline;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 
 /**
@@ -110,7 +110,7 @@ public class ExecuteProcessor extends ProcessorImpl {
         }
     }
 
-    public void doIt(PipelineContext pipelineContext, String outputName, ContentHandler contentHandler) {
+    public void doIt(PipelineContext pipelineContext, String outputName, XMLReceiver xmlReceiver) {
         try {
             // Read config
             final Config config = (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
@@ -201,24 +201,24 @@ public class ExecuteProcessor extends ProcessorImpl {
             final State state = (State) getState(pipelineContext);
             state.isRead = true;
 
-            if (contentHandler != null) {
+            if (xmlReceiver != null) {
                 // Output or remember stdout
                 state.outputString = project.getProperty(OUTPUT_PROPERTY);
                 if (outputName.equals(OUTPUT_STDOUT)) {
-                    outputStdout(contentHandler, state);
+                    outputStdout(xmlReceiver, state);
                 }
 
                 // Output or remember stderr
                 state.errorString = project.getProperty(ERROR_PROPERTY);
                 if (outputName.equals(OUTPUT_STDERR)) {
-                    outputStderr(contentHandler, state);
+                    outputStderr(xmlReceiver, state);
                 }
 
                 // Output or remember result
                 state.result = project.getProperty(RESULT_PROPERTY);
 //                logger.info("xxx: result " + state.result);
                 if (outputName.equals(OUTPUT_RESULT)) {
-                    outputResult(contentHandler, state);
+                    outputResult(xmlReceiver, state);
                 }
             }
 
@@ -237,8 +237,8 @@ public class ExecuteProcessor extends ProcessorImpl {
         state.errorString = null;
     }
 
-    private void outputResult(ContentHandler contentHandler, State state) {
-        final ContentHandlerHelper helper = new ContentHandlerHelper(contentHandler);
+    private void outputResult(XMLReceiver xmlReceiver, State state) {
+        final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
         helper.startDocument();
         helper.startElement("result");
         helper.text(state.result);
@@ -251,19 +251,19 @@ public class ExecuteProcessor extends ProcessorImpl {
      */
     public ProcessorOutput createOutput(final String outputName) {
         final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), outputName) {
-            public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 final State state = (State) getState(pipelineContext);
                 if (!state.isRead) {
                     // We haven't run the command yet
-                    doIt(pipelineContext, outputName, contentHandler);
+                    doIt(pipelineContext, outputName, xmlReceiver);
                 } else {
                     // We have already run the command
                     if (outputName.equals(OUTPUT_STDOUT)) {
-                        outputStdout(contentHandler, state);
+                        outputStdout(xmlReceiver, state);
                     } else if (outputName.equals(OUTPUT_STDERR)) {
-                        outputStderr(contentHandler, state);
+                        outputStderr(xmlReceiver, state);
                     } else if (outputName.equals(OUTPUT_RESULT)) {
-                        outputResult(contentHandler, state);
+                        outputResult(xmlReceiver, state);
                     }
                 }
             }

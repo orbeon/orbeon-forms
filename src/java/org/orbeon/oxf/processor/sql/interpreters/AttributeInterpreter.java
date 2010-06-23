@@ -1,30 +1,30 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
+import org.dom4j.Namespace;
+import org.dom4j.QName;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
-import org.orbeon.oxf.xml.ContentHandlerAdapter;
-import org.orbeon.oxf.xml.DeferredContentHandler;
-import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
+import org.orbeon.oxf.xml.DeferredXMLReceiver;
+import org.orbeon.oxf.xml.DeferredXMLReceiverImpl;
+import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.common.ValidationException;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.Locator;
-import org.dom4j.QName;
-import org.dom4j.Namespace;
+import org.xml.sax.SAXException;
 
 import java.util.Map;
 
@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler {
 
-    private DeferredContentHandler savedOutput;
+    private DeferredXMLReceiver savedOutput;
     private String attributeName;
     private StringBuffer content;
 
@@ -49,7 +49,7 @@ public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler
         // Remember output
         savedOutput = getInterpreterContext().getOutput();
         // New output just gather character data
-        getInterpreterContext().setOutput(new DeferredContentHandlerImpl(new ContentHandlerAdapter() {
+        getInterpreterContext().setOutput(new DeferredXMLReceiverImpl(new XMLReceiverAdapter() {
             public void characters(char ch[], int start, int length) {
                 if (content == null)
                     content = new StringBuffer();

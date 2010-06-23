@@ -14,6 +14,8 @@
 package org.orbeon.oxf.processor.serializer.legacy;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -36,7 +38,7 @@ public class HTMLSerializer extends HttpTextSerializer {
     protected void readInput(PipelineContext context, ProcessorInput input, Config config, Writer writer) {
 
         // Create an identity transformer and start the transformation
-        TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         TransformerUtils.applyOutputProperties(identity.getTransformer(),
                 config.method != null ? config.method : DEFAULT_METHOD,
                 config.version != null ? config.version : null,
@@ -49,12 +51,12 @@ public class HTMLSerializer extends HttpTextSerializer {
                 config.indentAmount);
 
         identity.setResult(new StreamResult(writer));
-        ProcessorImpl.readInputAsSAX(context, input, new StripNamespaceContentHandler(identity, writer, isSerializeXML11()));
+        ProcessorImpl.readInputAsSAX(context, input, new StripNamespaceXMLReceiver(identity, writer, isSerializeXML11()));
     }
 
-    protected static class StripNamespaceContentHandler extends SerializerContentHandler {
-        public StripNamespaceContentHandler(ContentHandler contentHandler, Writer writer, boolean serializeXML11) {
-            super(contentHandler, writer, serializeXML11);
+    protected static class StripNamespaceXMLReceiver extends SerializerXMLReceiver {
+        public StripNamespaceXMLReceiver(XMLReceiver xmlReceiver, Writer writer, boolean serializeXML11) {
+            super(xmlReceiver, writer, serializeXML11);
         }
 
         public void startPrefixMapping(String s, String s1) throws SAXException {

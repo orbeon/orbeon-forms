@@ -14,10 +14,10 @@
 package org.orbeon.oxf.processor;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.xml.sax.ContentHandler;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 
 public interface ProcessorOutput extends ProcessorReader, ProcessorInputOutput {
-    void read(PipelineContext context, ContentHandler contentHandler);
+    void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver);
     void setInput(ProcessorInput processorInput);
     ProcessorInput getInput();
     String getId();

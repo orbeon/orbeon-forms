@@ -1,20 +1,20 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.util;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xml.ContentHandlerAdapter;
+import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.io.OutputStream;
  * broken up at any point. We have to put data back together so we can correctly feed the Base64
  * decoder.
  */
-public class Base64ContentHandler extends ContentHandlerAdapter {
+public class Base64XMLReceiver extends XMLReceiverAdapter {
     private OutputStream os;
     private char[] buffer = new char[76];
     private int bufferSize;
@@ -36,7 +36,7 @@ public class Base64ContentHandler extends ContentHandlerAdapter {
     private int charCount;
     private int byteCount;
 
-    public Base64ContentHandler(OutputStream os) {
+    public Base64XMLReceiver(OutputStream os) {
         this.os = os;
     }
 

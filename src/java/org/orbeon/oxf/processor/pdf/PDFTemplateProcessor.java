@@ -23,7 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.serializer.BinaryTextContentHandler;
+import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.processor.serializer.legacy.HttpBinarySerializer;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.XPathCache;
@@ -89,7 +89,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
                 if (inputName != null) {
                     // Read the input
                     final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    readInputAsSAX(pipelineContext, inputName,  new BinaryTextContentHandler(null, os, true, false, null, false, false, null, false));
+                    readInputAsSAX(pipelineContext, inputName,  new BinaryTextXMLReceiver(null, os, true, false, null, false, false, null, false));
 
                     // Create the reader
                     reader = new PdfReader(os.toByteArray());
@@ -427,7 +427,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
                 if (inputName != null) {
                     // Read the input
                     final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    readInputAsSAX(pipelineContext, inputName, new BinaryTextContentHandler(null, os, true, false, null, false, false, null, false));
+                    readInputAsSAX(pipelineContext, inputName, new BinaryTextXMLReceiver(null, os, true, false, null, false, false, null, false));
 
                     // Create the image
                     image = Image.getInstance(os.toByteArray());

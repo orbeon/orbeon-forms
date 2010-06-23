@@ -1,23 +1,26 @@
 /**
- * Copyright (C) 2005 TAO Consulting Pte Ltd. 
- * Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package biz.taoconsulting.oxf.processor.converter;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.dom4j.Document;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.SimpleProcessor;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.util.Base64ContentHandler;
+import org.orbeon.oxf.processor.SimpleProcessor;
+import org.orbeon.oxf.util.Base64XMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.pdfbox.exceptions.OutlineNotLocalException;
 import org.pdfbox.pdmodel.PDDocument;
@@ -31,15 +34,11 @@ import org.pdfbox.util.PDFTextStripper;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import org.apache.log4j.Logger;
-import org.apache.commons.lang.StringUtils;
-import org.dom4j.Document;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -121,20 +120,20 @@ public class FromPdfConverter extends SimpleProcessor {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
-    public void generateData(PipelineContext context, ContentHandler contentHandler) {
+    public void generateData(PipelineContext context, XMLReceiver xmlReceiver) {
         // We will read the scope of conversion from the Config input
         // the PDF from Data and write the output to Data
         // Data Input is base 64, so sax won't do
 
         // Read the configuration options and get the scope
-        String scope = getScopeFromInput(context, INPUT_CONFIG, INPUT_SCOPE);
+        String scope = getScopeFromInput(context, INPUT_CONFIG);
 
         // Read binary content of PDF into an Inputstream
         InputStream pdfStream = getPDFStreamFromInput(context, INPUT_DATA);
 
         // Process the PDF, we get the SAX Stream back directly
         logger.info("Ready to call extractFromPDF");
-        extractFromPDF(pdfStream, contentHandler, scope);
+        extractFromPDF(pdfStream, xmlReceiver, scope);
 
     }
 
@@ -153,7 +152,7 @@ public class FromPdfConverter extends SimpleProcessor {
 
         // Now read the binary PDF File, so we can generate the XML
         logger.info("Creating the Base64 Content handler for the uploaded file");
-        Base64ContentHandler base64ContentHandler = new Base64ContentHandler(os);
+        Base64XMLReceiver base64ContentHandler = new Base64XMLReceiver(os);
 
         try {
             readInputAsSAX(context, inputName, base64ContentHandler);
@@ -173,10 +172,10 @@ public class FromPdfConverter extends SimpleProcessor {
      *
      * @param context
      * @param inputName
-     * @param scopeName
+
      * @return the validated scope
      */
-    private String getScopeFromInput(PipelineContext context, String inputName, String scopeName) {
+    private String getScopeFromInput(PipelineContext context, String inputName) {
         String scope;
         Document scopeDocument = readInputAsDOM4J(context, inputName);
         scope = (String) scopeDocument.selectObject(INPUT_SCOPE);
@@ -197,24 +196,24 @@ public class FromPdfConverter extends SimpleProcessor {
         return SCOPE_BOOKMARKS; // If we got here the scope wasn't valid
     }
 
-    private void extractFromPDF(InputStream inputStream, ContentHandler contentHandler, String scope) {
+    private void extractFromPDF(InputStream inputStream, XMLReceiver xmlReceiver, String scope) {
 
         logger.info("Extract from PDF started");
         // Write the header information of the PDF
         PDDocument doc = null;
 
         try {
-            contentHandler.startDocument();
+            xmlReceiver.startDocument();
             logger.info("Start document completed");
 
             // Some variables for our PDF processing
-            doc = getPDFdocument(inputStream, contentHandler); // PDF
+            doc = getPDFdocument(inputStream, xmlReceiver); // PDF
             // Document
 
             if (doc == null) {
-                contentHandler.startElement("", TAG_ROOT, TAG_ROOT, null);
-                addErrorTagToOutput(contentHandler, "No PDF Information could be extracted");
-                contentHandler.endElement("", TAG_ROOT, TAG_ROOT);
+                xmlReceiver.startElement("", TAG_ROOT, TAG_ROOT, null);
+                addErrorTagToOutput(xmlReceiver, "No PDF Information could be extracted");
+                xmlReceiver.endElement("", TAG_ROOT, TAG_ROOT);
                 return; //No processing on empty documents
 
             }
@@ -230,7 +229,7 @@ public class FromPdfConverter extends SimpleProcessor {
             logger.info("Got handle to allPages in PDF");
         } catch (Exception e) {
             logger.error(e);
-            addErrorTagToOutput(contentHandler, e.toString());
+            addErrorTagToOutput(xmlReceiver, e.toString());
             this.allPages = null;
         }
 
@@ -238,7 +237,7 @@ public class FromPdfConverter extends SimpleProcessor {
 
             // Get the document information
             logger.info("Ready to retrieve basic PDF information");
-            PDDocumentInformation docInfo = getDocumentInformation(doc, contentHandler);
+            PDDocumentInformation docInfo = getDocumentInformation(doc, xmlReceiver);
             AttributesImpl atts = new AttributesImpl();
             // Capture the number of pages
             addPageCountAttribute(atts, doc);
@@ -248,53 +247,53 @@ public class FromPdfConverter extends SimpleProcessor {
 
             // Start the PDF Document
             logger.info("writing the root element PDFDocument");
-            contentHandler.startElement("", TAG_ROOT, TAG_ROOT, atts);
+            xmlReceiver.startElement("", TAG_ROOT, TAG_ROOT, atts);
 
             logger.info("PDFDocument tag succesful opened");
             //Pull the Meta data from the PDF Document
             atts = new AttributesImpl();
 
             logger.info("PDFMetadata Element start");
-            contentHandler.startElement("", TAG_META, TAG_META, atts);
-            extractMetaDataFromPDF(contentHandler, doc);
-            contentHandler.endElement("", TAG_META, TAG_META);
+            xmlReceiver.startElement("", TAG_META, TAG_META, atts);
+            extractMetaDataFromPDF(xmlReceiver, doc);
+            xmlReceiver.endElement("", TAG_META, TAG_META);
             logger.info("PDFMetadata Element end");
             // Get the PDF Content based on the selection in config
 
             if (scope.equals(SCOPE_PAGES)) {
                 //PDF page by page
                 logger.info("Will extract pages");
-                extractPagesFromPDF(contentHandler, doc, scope);
+                extractPagesFromPDF(xmlReceiver, doc);
             } else if (scope.equals(SCOPE_METADATA)) {
                 logger.info("No action bejond meta data");
                 // No further action required since it was meta data only!
             } else if (scope.equals(SCOPE_BOOKMARKPAGES)) {
                 // Try bookmarks then pages
                 logger.info("Will extract bookmarks first then pages");
-                if (extractOutlineFromPDF(contentHandler, doc, scope) == false) {
+                if (!extractOutlineFromPDF(xmlReceiver, doc, scope)) {
                     logger.info("No outline found, using pages");
-                    extractPagesFromPDF(contentHandler, doc, scope);
+                    extractPagesFromPDF(xmlReceiver, doc);
                 }
 
             } else {
                 // PDF in outlines - default
                 logger.info("Will extract: " + scope);
-                extractOutlineFromPDF(contentHandler, doc, scope);
+                extractOutlineFromPDF(xmlReceiver, doc, scope);
             }
 
             //If we got here it worked
             logger.info("Writing end element " + TAG_ROOT);
-            contentHandler.endElement("", TAG_ROOT, TAG_ROOT);
+            xmlReceiver.endElement("", TAG_ROOT, TAG_ROOT);
             logger.info("About to close PDFDocument and SaxDocument");
-            contentHandler.endDocument();
+            xmlReceiver.endDocument();
             doc.close(); // We finish it once we are done
             logger.info("Closed PDF and XML");
         } catch (IOException e) {
             logger.error(e);
-            addErrorTagToOutput(contentHandler, e.toString());
+            addErrorTagToOutput(xmlReceiver, e.toString());
         } catch (SAXException e) {
             logger.error(e);
-            addErrorTagToOutput(contentHandler, e.toString());
+            addErrorTagToOutput(xmlReceiver, e.toString());
         }
     }
 
@@ -391,10 +390,10 @@ public class FromPdfConverter extends SimpleProcessor {
     }
 
     /**
-     * @param contentHandler
+     * @param xmlReceiver
      * @param doc
      */
-    private boolean extractMetaDataFromPDF(ContentHandler contentHandler, PDDocument doc) {
+    private boolean extractMetaDataFromPDF(XMLReceiver xmlReceiver, PDDocument doc) {
         // Reads the meta data from the input stream and pushes them 1:1 to the
         // output
         // The Meta data is converted to sax using XMLUtils and start/end document
@@ -411,33 +410,32 @@ public class FromPdfConverter extends SimpleProcessor {
                 return false;
 
             // The content handler for that input stream...
-            ContentHandler PDMetaContent = new PdfMetadataContentHandler(contentHandler);
+            final XMLReceiver pdfMetaContent = new PdfMetadataContentHandler(xmlReceiver);
 
             //read the XML metadata into an inputstream
             InputStream xmlInputStream = metadata.createInputStream();
             logger.info("Before creating sax stream for meta data");
-            XMLUtils.inputStreamToSAX(xmlInputStream, "PDF", PDMetaContent, false, false);
+            XMLUtils.inputStreamToSAX(xmlInputStream, "PDF", pdfMetaContent, false, false, false);
             //Now pull it in and write it out 1:1
             logger.info("Meta data stream created in SAX");
         } catch (IOException e) {
             // If it goes wrong
             logger.error(e);
-            addErrorTagToOutput(contentHandler, e.toString());
+            addErrorTagToOutput(xmlReceiver, e.toString());
             tmpReturn = false;
         } catch (Exception e) {
             logger.error(e);
-            addErrorTagToOutput(contentHandler, e.toString());
+            addErrorTagToOutput(xmlReceiver, e.toString());
             tmpReturn = false;
         }
         return tmpReturn;
     }
 
     /**
-     * @param contentHandler
+     * @param xmlReceiver
      * @param doc
-     * @param scope
      */
-    private boolean extractPagesFromPDF(ContentHandler contentHandler, PDDocument doc, String scope) {
+    private boolean extractPagesFromPDF(XMLReceiver xmlReceiver, PDDocument doc) {
 
         // This extracts all pages with the text per page
         boolean tmpReturn = true; // Benefit of the doubt
@@ -457,30 +455,25 @@ public class FromPdfConverter extends SimpleProcessor {
                 stripper.setStartPage(i);
                 stripper.setEndPage(i);
                 String textBetweenBookmarks = stripper.getText(doc);
-                contentHandler.startElement("", TAG_PAGE, TAG_PAGE, atts);
+                xmlReceiver.startElement("", TAG_PAGE, TAG_PAGE, atts);
                 textBetweenBookmarks = MassageTextResult(textBetweenBookmarks);
-                contentHandler.characters(textBetweenBookmarks.toCharArray(), 0, textBetweenBookmarks.length());
-                contentHandler.endElement("", TAG_PAGE, TAG_PAGE);
+                xmlReceiver.characters(textBetweenBookmarks.toCharArray(), 0, textBetweenBookmarks.length());
+                xmlReceiver.endElement("", TAG_PAGE, TAG_PAGE);
             }
         } catch (IOException e) {
             // If it goes wrong
             logger.error(e);
-            addErrorTagToOutput(contentHandler, e.toString());
+            addErrorTagToOutput(xmlReceiver, e.toString());
             tmpReturn = false;
         } catch (SAXException e) {
             // If it goes wrong
             logger.error(e);
-            addErrorTagToOutput(contentHandler, e.toString());
+            addErrorTagToOutput(xmlReceiver, e.toString());
             tmpReturn = false;
         }
         return tmpReturn;
     }
 
-    /**
-     * @param contentHandler
-     * @param root
-     * @param scope
-     */
     private boolean extractOutlineFromPDF(ContentHandler contentHandler, PDDocument doc, String scope) {
 
         //    Get the document catalog
@@ -526,13 +519,9 @@ public class FromPdfConverter extends SimpleProcessor {
     }
 
     /**
-     * processBookmark get's called recursivly for all nested bookmarks extracts
+     * processBookmark gets called recursively for all nested bookmarks extracts
      * the bookmark and the text
-     *
-     * @param contentHandler
-     * @param item
-     * @param scope
-     * @param i
+
      */
     private void processBookmark(ContentHandler hd, PDDocument doc, PDOutlineItem curItem, String scope, int level) {
         // First we check on what page the bookmark is. If we can't retrieve the
@@ -590,15 +579,10 @@ public class FromPdfConverter extends SimpleProcessor {
             logger.error(e);
             addErrorTagToOutput(hd, e.toString());
         } finally {
-            // Nothing conculding to do
+            // Nothing concluding to do
         }
     }
 
-    /**
-     * @param textBetweenBookmarks
-     * @return
-     * @throws UnsupportedEncodingException
-     */
     private String MassageTextResult(String rawString) {
         // Removes unwanted characters
         // Currently we need to get rid of chr(13);

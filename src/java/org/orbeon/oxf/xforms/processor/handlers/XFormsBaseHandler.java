@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.ControlAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -579,17 +580,17 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String labelQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
 
         // Only output content when there value is non-empty
         if (value != null && !value.equals("")) {
             if (mustOutputHTMLFragment) {
-                XFormsUtils.streamHTMLFragment(contentHandler, value, null, xhtmlPrefix);
+                XFormsUtils.streamHTMLFragment(xmlReceiver, value, null, xhtmlPrefix);
             } else {
-                contentHandler.characters(value.toCharArray(), 0, value.length());
+                xmlReceiver.characters(value.toCharArray(), 0, value.length());
             }
         }
-        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName);
+        xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName);
     }
 
     protected static String getLHHACId(String controlEffectiveId, String suffix) {
@@ -597,13 +598,13 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return XFormsUtils.appendToEffectiveId(controlEffectiveId, XFormsConstants.LHHAC_SEPARATOR + suffix);
     }
 
-    protected static void outputLabelText(ContentHandler contentHandler, XFormsControl xformsControl, String value, String xhtmlPrefix, boolean mustOutputHTMLFragment) throws SAXException {
+    protected static void outputLabelText(XMLReceiver xmlReceiver, XFormsControl xformsControl, String value, String xhtmlPrefix, boolean mustOutputHTMLFragment) throws SAXException {
         // Only output content when there value is non-empty
         if (value != null && !value.equals("")) {
             if (mustOutputHTMLFragment)
-                XFormsUtils.streamHTMLFragment(contentHandler, value, xformsControl != null ? xformsControl.getLocationData() : null, xhtmlPrefix);
+                XFormsUtils.streamHTMLFragment(xmlReceiver, value, xformsControl != null ? xformsControl.getLocationData() : null, xhtmlPrefix);
             else
-                contentHandler.characters(value.toCharArray(), 0, value.length());
+                xmlReceiver.characters(value.toCharArray(), 0, value.length());
         }
     }
 

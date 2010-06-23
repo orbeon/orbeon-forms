@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xml.ContentHandlerAdapter;
+import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.saxon.expr.ExpressionVisitor;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
@@ -86,7 +86,7 @@ public class XXFormsDocBase64 extends XFormsFunction {
             // Source produces a binary document (content Base64-encoded)
             final SAXSource source = (SAXSource) resolver.resolve(href, baseURI);
             final XMLReader xmlReader = source.getXMLReader();
-            xmlReader.setContentHandler(new ContentHandlerAdapter() {
+            xmlReader.setContentHandler(new XMLReceiverAdapter() {
                 public void characters(char ch[], int start, int length) throws SAXException {
                     // Append Base64-encoded text only
                     sb.append(ch, start, length);

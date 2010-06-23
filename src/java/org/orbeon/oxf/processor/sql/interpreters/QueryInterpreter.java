@@ -23,7 +23,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
-import org.orbeon.oxf.util.Base64ContentHandler;
+import org.orbeon.oxf.util.Base64XMLReceiver;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -495,7 +495,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                         if (xpathContentHandler != null && xpathContentHandler.containsExpression(parameter.getSelect())) {
                                             // Handle streaming if possible
                                             OutputStream blobOutputStream = getInterpreterContext().getDelegate().getBlobOutputStream(stmt, index);
-                                            xpathContentHandler.selectContentHandler(parameter.getSelect(), new Base64ContentHandler(blobOutputStream));
+                                            xpathContentHandler.selectContentHandler(parameter.getSelect(), new Base64XMLReceiver(blobOutputStream));
                                             blobOutputStream.close();
                                         } else {
                                             String base64Value = XPathUtils.selectStringValue(currentNode, parameter.getSelect(), prefixesMap, variableContext, getInterpreterContext().getFunctionContext());

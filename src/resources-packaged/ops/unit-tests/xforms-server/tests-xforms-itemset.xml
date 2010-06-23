@@ -347,6 +347,7 @@
                                     <item id="1" relevant="false"/>
                                     <item id="2">
                                         <item id="2.1"/>
+                                        <!-- All the content of 2.2 will be non-relevant -->
                                         <item id="2.2" relevant="false">
                                             <item id="2.2.1"/>
                                             <item id="2.2.2" relevant="false"/>
@@ -371,6 +372,7 @@
                                             <item id="2.3.1"/>
                                             <item id="2.3.2">
                                                 <item id="2.3.3"/>
+                                                <!-- This one must appear -->
                                                 <item id="2.three.4"/>
                                             </item>
                                         </item>

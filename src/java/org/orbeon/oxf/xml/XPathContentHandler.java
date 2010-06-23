@@ -1,19 +1,20 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -44,7 +45,7 @@ import java.util.Map;
  *       o Handle single node vs. all nodes
  *       o Handle duplicate expressions (e.g. /a/b/c added several times)
  */
-public class XPathContentHandler implements ContentHandler {
+public class XPathContentHandler implements XMLReceiver {
 
     private Map expressions;
     private List expressionsList;
@@ -95,7 +96,7 @@ public class XPathContentHandler implements ContentHandler {
         this.readInputCallback = readInputCallback;
     }
 
-    public void selectContentHandler(String xpathExpression, ContentHandler contentHandler) throws SAXException {
+    public void selectContentHandler(String xpathExpression, XMLReceiver xmlReceiver) throws SAXException {
         if (!canStream)
             throw new OXFException("Cannot stream");
         Expression expression = (Expression) expressions.get(xpathExpression);
@@ -104,7 +105,7 @@ public class XPathContentHandler implements ContentHandler {
 
         // Check if the expression has already been computed
         if (expression.result != null) {
-            expression.result.replay(contentHandler);
+            expression.result.replay(xmlReceiver);
             return;
         }
 
@@ -113,7 +114,7 @@ public class XPathContentHandler implements ContentHandler {
             if (readInputCallback == null)
                 throw new OXFException("Read not started and no read callback specified");
             searchedExpression = expression;
-            output = contentHandler;
+            output = xmlReceiver;
             readInputCallback.run();
             // At this point, all the stream is read
             searchedExpression = null;
@@ -207,7 +208,7 @@ public class XPathContentHandler implements ContentHandler {
             expressionsArray[i].expressionContentHandler.startPrefixMapping(prefix, uri);
     }
 
-    private static abstract class ExpressionSearchHandler extends ForwardingContentHandler {
+    private static abstract class ExpressionSearchHandler extends ForwardingXMLReceiver {
         protected Expression expresssion;
 
         protected ExpressionSearchHandler(Expression expresssion) {
@@ -251,7 +252,35 @@ public class XPathContentHandler implements ContentHandler {
         }
     }
 
-//    private class Handler2 extends ExpressionSearchHandler {
+    public void startDTD(String name, String publicId, String systemId) throws SAXException {
+        // Ignore
+    }
+
+    public void endDTD() throws SAXException {
+        // Ignore
+    }
+
+    public void startEntity(String name) throws SAXException {
+        // Ignore
+    }
+
+    public void endEntity(String name) throws SAXException {
+        // Ignore
+    }
+
+    public void startCDATA() throws SAXException {
+        // Ignore
+    }
+
+    public void endCDATA() throws SAXException {
+        // Ignore
+    }
+
+    public void comment(char[] ch, int start, int length) throws SAXException {
+        // Ignore
+    }
+
+    //    private class Handler2 extends ExpressionSearchHandler {
 //
 //        public Handler2(Expression expresssion) {
 //            super(expresssion);

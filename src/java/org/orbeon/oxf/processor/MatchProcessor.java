@@ -17,8 +17,8 @@ import org.dom4j.Document;
 import org.orbeon.oro.text.regex.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public abstract class MatchProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         final ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
                 try {
                     // Read inputs
@@ -47,25 +47,25 @@ public abstract class MatchProcessor extends ProcessorImpl {
                     final Result result = match(regexp, text);
 
                     // Output result
-                    contentHandler.startDocument();
-                    contentHandler.startElement("", "result", "result", XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startDocument();
+                    xmlReceiver.startElement("", "result", "result", XMLUtils.EMPTY_ATTRIBUTES);
 
                     // <matches>
-                    contentHandler.startElement("", "matches", "matches", XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", "matches", "matches", XMLUtils.EMPTY_ATTRIBUTES);
                     final String matches = Boolean.toString(result.matches);
-                    contentHandler.characters(matches.toCharArray(), 0, matches.length());
-                    contentHandler.endElement("", "matches", "matches");
+                    xmlReceiver.characters(matches.toCharArray(), 0, matches.length());
+                    xmlReceiver.endElement("", "matches", "matches");
 
                     // <group>
                     for (final String group: result.groups) {
-                        contentHandler.startElement("", "group", "group", XMLUtils.EMPTY_ATTRIBUTES);
+                        xmlReceiver.startElement("", "group", "group", XMLUtils.EMPTY_ATTRIBUTES);
                         if (group != null)
-                            contentHandler.characters(group.toCharArray(), 0, group.length());
-                        contentHandler.endElement("", "group", "group");
+                            xmlReceiver.characters(group.toCharArray(), 0, group.length());
+                        xmlReceiver.endElement("", "group", "group");
                     }
 
-                    contentHandler.endElement("", "result", "result");
-                    contentHandler.endDocument();
+                    xmlReceiver.endElement("", "result", "result");
+                    xmlReceiver.endDocument();
                 } catch (SAXException e) {
                     throw new OXFException(e);
                 }

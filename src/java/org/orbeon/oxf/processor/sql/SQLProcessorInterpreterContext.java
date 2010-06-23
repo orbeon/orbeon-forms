@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.sql;
 
@@ -24,7 +24,7 @@ import org.orbeon.oxf.processor.DatabaseContext;
 import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.sql.delegates.SQLProcessorGenericDelegate;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.xml.DeferredContentHandler;
+import org.orbeon.oxf.xml.DeferredXMLReceiver;
 import org.orbeon.oxf.xml.XPathContentHandler;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Locator;
@@ -53,7 +53,7 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
     private PipelineContext pipelineContext;
     private Node input;
     private XPathContentHandler xpathContentHandler;
-    private DeferredContentHandler output;
+    private DeferredXMLReceiver output;
     private NamespaceSupport namespaceSupport;
 
     private List executionContextStack;
@@ -371,11 +371,11 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
         this.xpathContentHandler = xpathContentHandler;
     }
 
-    public DeferredContentHandler getOutput() {
+    public DeferredXMLReceiver getOutput() {
         return output;
     }
 
-    public void setOutput(DeferredContentHandler output) {
+    public void setOutput(DeferredXMLReceiver output) {
         this.output = output;
     }
 

@@ -250,7 +250,7 @@ public class ControlsComparator {
 
                     // Write out incremental updates
                     try {
-                        ((SAXStore) ch.getContentHandler()).replay(tempCH.getContentHandler());
+                        ((SAXStore) ch.getXmlReceiver()).replay(tempCH.getXmlReceiver());
                     } catch (SAXException e) {
                         throw new OXFException(e);
                     }
@@ -266,7 +266,7 @@ public class ControlsComparator {
     }
 
     private boolean mustDoFullUpdate() {
-        return tempCH != null && ((SAXStore) ch.getContentHandler()).getAttributesCount() >= fullUpdateThreshold;
+        return tempCH != null && ((SAXStore) ch.getXmlReceiver()).getAttributesCount() >= fullUpdateThreshold;
     }
 
     private SAXStore.Mark getUpdateFullMark(XFormsControl control) {
@@ -335,8 +335,8 @@ public class ControlsComparator {
             // So for now, perform simple steps here, and later this can be revisited.
             //
             final ExternalContext externalContext = XFormsUtils.getExternalContext(pipelineContext);
-            controller.setOutput(new DeferredContentHandlerImpl(new XHTMLRewrite().getRewriteContentHandler(externalContext,
-                    new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getContentHandler()), true), true)));
+            controller.setOutput(new DeferredXMLReceiverImpl(new XHTMLRewrite().getRewriteXMLReceiver(externalContext,
+                    new HTMLFragmentSerializer(new ContentHandlerWriter(ch.getXmlReceiver()), true), true)));
 
             // Create handler context
             final HandlerContext handlerContext = new HandlerContext(controller, pipelineContext, containingDocument, externalContext, control2.getEffectiveId()) {

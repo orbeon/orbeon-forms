@@ -17,6 +17,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request;
 import org.orbeon.oxf.pipeline.api.ExternalContext.Response;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.portlet.PortletExternalContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
@@ -29,7 +30,6 @@ import org.orbeon.oxf.xml.saxrewrite.FragmentRootState;
 import org.orbeon.oxf.xml.saxrewrite.State;
 import org.orbeon.oxf.xml.saxrewrite.StatefulHandler;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -113,16 +113,16 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
         /**
          * @param previousState     The previous state.
-         * @param contentHandler    The destination for the rewrite transformation.
+         * @param xmlReceiver       The destination for the rewrite transformation.
          * @param request
          * @param response          Used to perform URL rewrites.
          * @param isPortlet         Whether or not the context is a portlet context.
          * @param scriptDepth       How below script elt we are.
          * @param rewriteURI        URI of elements (i.e. xhtml uri or "") of elements that need rewriting.
          */
-        State2(final State previousState, final ContentHandler contentHandler, final Request request, final Response response,
+        State2(final State previousState, final XMLReceiver xmlReceiver, final Request request, final Response response,
                final boolean isPortlet, final int scriptDepth, final String rewriteURI) {
-            super(previousState, contentHandler);
+            super(previousState, xmlReceiver);
             this.request = request;
             this.response = response;
             this.isPortlet = isPortlet;
@@ -148,6 +148,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
             }
         }
 
+        @Override
         protected void endElementStart(final String ns, final String lnam, final String qnam)
                 throws SAXException {
             scriptDepthOnEnd(ns, lnam);
@@ -186,9 +187,9 @@ abstract class AbstractRewrite extends ProcessorImpl {
          *
          * @param rewriteURI
          */
-        RewriteState(final State stt, final ContentHandler contentHandler, final Request request, final Response response
+        RewriteState(final State stt, final XMLReceiver xmlReceiver, final Request request, final Response response
                 , final boolean isPortlet, final int scriptDepth, final String rewriteURI) {
-            super(stt, contentHandler, request, response, isPortlet, scriptDepth, rewriteURI);
+            super(stt, xmlReceiver, request, response, isPortlet, scriptDepth, rewriteURI);
         }
 
         /**
@@ -227,7 +228,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 final String newRes = response.rewriteResourceURL(res, false);
                 final int idx = newAtts.getIndex("", resAtt);
                 newAtts.setValue(idx, newRes);
-                contentHandler.startElement(ns, lnam, qnam, newAtts);
+                xmlReceiver.startElement(ns, lnam, qnam, newAtts);
             }
             return ret;
         }
@@ -292,7 +293,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     }
                 }
 
-                contentHandler.startElement(ns, lnam, qnam, newAtts);
+                xmlReceiver.startElement(ns, lnam, qnam, newAtts);
             }
             return ret;
         }
@@ -338,7 +339,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     newAtts.setValue(idx, sb.toString());
                 }
 
-                contentHandler.startElement(ns, lnam, qnam, newAtts);
+                xmlReceiver.startElement(ns, lnam, qnam, newAtts);
             }
             return ret;
         }
@@ -405,7 +406,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 } else {
                     newAtts.setValue(idx, newHref);
                 }
-                contentHandler.startElement(ns, lnam, qnam, newAtts);
+                xmlReceiver.startElement(ns, lnam, qnam, newAtts);
             }
             return ret;
         }
@@ -445,7 +446,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 final String newHref = response.rewriteActionURL(href);
                 final int idx = newAtts.getIndex("", HREF_ATT);
                 newAtts.setValue(idx, newHref);
-                contentHandler.startElement(ns, lnam, qnam, newAtts);
+                xmlReceiver.startElement(ns, lnam, qnam, newAtts);
             }
             return ret;
         }
@@ -554,11 +555,11 @@ abstract class AbstractRewrite extends ProcessorImpl {
                         = atts.getValue("http://orbeon.org/oxf/xml/portlet", "is-portlet-form");
                 if ("true".equals(isPrtltFrm)) {
                     ret = new NoRewriteState
-                            (this, contentHandler, request, response, isPortlet, scriptDepth, rewriteURI);
+                            (this, xmlReceiver, request, response, isPortlet, scriptDepth, rewriteURI);
                 } else {
                     ret = this;
                 }
-                contentHandler.startElement(ns, lnam, qnam, newAtts);
+                xmlReceiver.startElement(ns, lnam, qnam, newAtts);
             } else {
                 ret = null;
             }
@@ -585,7 +586,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 int last = 0;
                 if (last < bfLen) {
                     final int len = bfLen - last;
-                    contentHandler.characters(chs, chsStrt + last, len);
+                    xmlReceiver.characters(chs, chsStrt + last, len);
                 }
                 charactersBuf.clear();
             }
@@ -594,6 +595,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         /**
          * Just calls flushCharacters and super.endElement( ... )
          */
+        @Override
         protected void endElementStart(final String ns, final String lnam, final String qnam)
                 throws SAXException {
             flushCharacters();
@@ -656,7 +658,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
             done :
             if ("true".equals(noRewriteValue)) {
-                final State stt = new NoRewriteState(this, contentHandler, request, response, isPortlet, scriptDepth, rewriteURI);
+                final State stt = new NoRewriteState(this, xmlReceiver, request, response, isPortlet, scriptDepth, rewriteURI);
                 ret = stt.startElement(ns, lnam, qnam, atts);
             } else if (XMLConstants.OPS_FORMATTING_URI.equals(ns) && "rewrite".equals(lnam)) {
                 final String typ = atts.getValue("", "type");
@@ -671,7 +673,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                         newURL = response.rewriteResourceURL(url, false);
                     }
                     final char[] chs = newURL.toCharArray();
-                    contentHandler.characters(chs, 0, chs.length);
+                    xmlReceiver.characters(chs, 0, chs.length);
                 }
             } else {
                 scriptDepthOnStart(ns, lnam);
@@ -720,7 +722,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     if (ret != null) break done;
                 }
                 ret = this;
-                contentHandler.startElement(ns, lnam, qnam, atts);
+                xmlReceiver.startElement(ns, lnam, qnam, atts);
             }
             return ret;
         }
@@ -729,10 +731,11 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * If haveScriptAncestor then just forward data to destination contentHandler. Otherwise store that data in the
          * buffer and do not forward. Also manages init'ing and growing charactersBuf as need be.
          */
+        @Override
         public State characters(final char[] ch, final int strt, final int len)
                 throws SAXException {
             if (scriptDepth > 0) {
-                contentHandler.characters(ch, strt, len);
+                xmlReceiver.characters(ch, strt, len);
             } else {
                 final int bufLen = charactersBuf == null ? 0 : charactersBuf.position();
                 final int cpcty = bufLen + (len * 2);
@@ -752,6 +755,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         /**
          * Just calls flushCharacters and super.ignorableWhitespace( ... )
          */
+        @Override
         public State ignorableWhitespace(final char[] ch, final int strt, final int len)
                 throws SAXException {
             flushCharacters();
@@ -761,6 +765,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         /**
          * Just calls flushCharacters and super.processingInstruction( ... )
          */
+        @Override
         public State processingInstruction(final String trgt, final String dat)
                 throws SAXException {
             flushCharacters();
@@ -770,6 +775,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         /**
          * Just calls flushCharacters and super.skippedEntity( ... )
          */
+        @Override
         public State skippedEntity(final String nam) throws SAXException {
             flushCharacters();
             return super.skippedEntity(nam);
@@ -783,9 +789,10 @@ abstract class AbstractRewrite extends ProcessorImpl {
      * to new RewriteState(this, contentHandler, response, isPortlet, haveScriptAncestor).
      */
     static class NoRewriteState extends State2 {
-        NoRewriteState(final State2 previousState, final ContentHandler contentHandler, final Request request, final Response response,
+
+        NoRewriteState(final State2 previousState, final XMLReceiver xmlReceiver, final Request request, final Response response,
                 final boolean isPortlet, final int scriptDepth, final String rewriteURI) {
-            super(previousState, contentHandler, request, response, isPortlet, scriptDepth, rewriteURI);
+            super(previousState, xmlReceiver, request, response, isPortlet, scriptDepth, rewriteURI);
         }
 
         protected State startElementStart(final String ns, final String lnam, final String qnam, Attributes atts) throws SAXException {
@@ -802,12 +809,12 @@ abstract class AbstractRewrite extends ProcessorImpl {
             }
 
             if ("false".equals(noRewriteValue)) {
-                final State stt = new RewriteState(this, contentHandler, request, response, isPortlet, scriptDepth, rewriteURI);
+                final State stt = new RewriteState(this, xmlReceiver, request, response, isPortlet, scriptDepth, rewriteURI);
                 ret = stt.startElement(ns, lnam, qnam, atts);
             } else {
                 scriptDepthOnStart(ns, lnam);
                 final Attributes newAtts = XMLUtils.getAttributesFromDefaultNamespace(atts);
-                contentHandler.startElement(ns, lnam, qnam, newAtts);
+                xmlReceiver.startElement(ns, lnam, qnam, newAtts);
                 ret = this;
             }
             return ret;
@@ -835,6 +842,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
     /**
      * @return new RewriteOutput( cls, nam ) after adding it with addOutput.
      */
+    @Override
     public ProcessorOutput createOutput(final String name) {
 
         final ProcessorOutput processorOutput = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
@@ -843,20 +851,20 @@ abstract class AbstractRewrite extends ProcessorImpl {
              * Creates a StatefulHandler and uses that to translate the events from the input, rewrite-in, and then
              * send them to the contentHandler (the output).
              */
-            public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
-                readInputAsSAX(pipelineContext, REWRITE_IN, getRewriteContentHandler(pipelineContext, contentHandler, false));
+            public void readImpl(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
+                readInputAsSAX(pipelineContext, REWRITE_IN, getRewriteXMLReceiver(pipelineContext, xmlReceiver, false));
             }
         };
         addOutput(name, processorOutput);
         return processorOutput;
     }
 
-    public ContentHandler getRewriteContentHandler(final PropertyContext propertyContext, final ContentHandler contentHandler, final boolean fragment) {
+    public XMLReceiver getRewriteXMLReceiver(final PropertyContext propertyContext, final XMLReceiver xmlReceiver, final boolean fragment) {
         final ExternalContext externalContext = (ExternalContext) propertyContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        return getRewriteContentHandler(externalContext, contentHandler, fragment);
+        return getRewriteXMLReceiver(externalContext, xmlReceiver, fragment);
     }
 
-    public ContentHandler getRewriteContentHandler(final ExternalContext externalContext, final ContentHandler contentHandler, final boolean fragment) {
+    public XMLReceiver getRewriteXMLReceiver(final ExternalContext externalContext, final XMLReceiver xmlReceiver, final boolean fragment) {
 
         final boolean isPortlet = externalContext instanceof PortletExternalContext;
 
@@ -864,14 +872,14 @@ abstract class AbstractRewrite extends ProcessorImpl {
         final State rootState;
         if (fragment) {
             // Start directly with rewrite state
-            final FragmentRootState fragmentRootState = new FragmentRootState(null, contentHandler);
-            final State afterRootState = new RewriteState(fragmentRootState, contentHandler, externalContext.getRequest(), externalContext.getResponse(), isPortlet, 0, rewriteURI);
+            final FragmentRootState fragmentRootState = new FragmentRootState(null, xmlReceiver);
+            final State afterRootState = new RewriteState(fragmentRootState, xmlReceiver, externalContext.getRequest(), externalContext.getResponse(), isPortlet, 0, rewriteURI);
             fragmentRootState.setNextState(afterRootState);
             rootState = fragmentRootState;
         } else {
             // Start with root filter
-            final DocumentRootState documentRootState = new DocumentRootState(null, contentHandler);
-            final State afterRootState = new RewriteState(documentRootState, contentHandler, externalContext.getRequest(), externalContext.getResponse(), isPortlet, 0, rewriteURI);
+            final DocumentRootState documentRootState = new DocumentRootState(null, xmlReceiver);
+            final State afterRootState = new RewriteState(documentRootState, xmlReceiver, externalContext.getRequest(), externalContext.getResponse(), isPortlet, 0, rewriteURI);
             documentRootState.setNextState(afterRootState);
             rootState = documentRootState;
         }

@@ -34,7 +34,7 @@ public class CallXSLT extends SimpleProcessor {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
-    public void generateMyoutput(PipelineContext pipelineContext, ContentHandler contentHandler) throws SAXException {
+    public void generateMyoutput(PipelineContext pipelineContext, XMLReceiver xmlReceiver) throws SAXException {
 
         // Define the name of the processor (this is a QName)
         final QName processorName = new QName("xslt", XMLConstants.OXF_PROCESSORS_NAMESPACE);
@@ -69,6 +69,6 @@ public class CallXSLT extends SimpleProcessor {
         final Document result = domSerializerData.getDocument(newPipelineContext); // must use same PipelineContext as start()
 
         // Serialize result to output
-        TransformerUtils.writeDom4j(result, contentHandler);
+        TransformerUtils.writeDom4j(result, xmlReceiver);
     }
 }

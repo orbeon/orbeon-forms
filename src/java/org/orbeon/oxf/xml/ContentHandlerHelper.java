@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -29,28 +29,28 @@ public class ContentHandlerHelper {
     public static final String CDATA = "CDATA";
     private Stack<String> elementNamespaces = new Stack<String>();
     private Stack<String> elements = new Stack<String>();
-    private ContentHandler contentHandler;
+    private XMLReceiver xmlReceiver;
     private AttributesImpl attributesImpl = new AttributesImpl();
 
-    public ContentHandlerHelper(ContentHandler contentHandler) {
-        this.contentHandler = contentHandler;
+    public ContentHandlerHelper(XMLReceiver xmlReceiver) {
+        this.xmlReceiver = xmlReceiver;
     }
 
     /**
      * ContentHandler to write to. 
      *
-     * @param contentHandler    ContentHandler to write to
+     * @param xmlReceiver       receiver to write to
      * @param validateStream    true if the stream must be validated by InspectingContentHandler
      */
-    public ContentHandlerHelper(ContentHandler contentHandler, boolean validateStream) {
+    public ContentHandlerHelper(XMLReceiver xmlReceiver, boolean validateStream) {
         if (validateStream)
-            this.contentHandler = new InspectingContentHandler(contentHandler);
+            this.xmlReceiver = new InspectingContentHandler(xmlReceiver);
         else
-            this.contentHandler = contentHandler;
+            this.xmlReceiver = xmlReceiver;
     }
 
-    public ContentHandler getContentHandler() {
-        return contentHandler;
+    public XMLReceiver getXmlReceiver() {
+        return xmlReceiver;
     }
 
     public void startElement(String name) {
@@ -73,7 +73,7 @@ public class ContentHandlerHelper {
     public void startElement(String prefix, String namespaceURI, String name, Attributes attributes) {
         try {
             String qname = prefix == null || "".equals(prefix) ? name : prefix + ":" + name;
-            contentHandler.startElement(namespaceURI, name, qname, attributes);
+            xmlReceiver.startElement(namespaceURI, name, qname, attributes);
             elementNamespaces.add(namespaceURI);
             elements.add(name);
         } catch (SAXException e) {
@@ -99,7 +99,7 @@ public class ContentHandlerHelper {
         try {
             String name = elements.pop();
             String namespace = elementNamespaces.pop();
-            contentHandler.endElement(namespace, name, name);
+            xmlReceiver.endElement(namespace, name, name);
         } catch (SAXException e) {
             throw new OXFException(e);
         }
@@ -167,7 +167,7 @@ public class ContentHandlerHelper {
     public void text(String text)  {
         try {
             if (text != null)
-                contentHandler.characters(text.toCharArray(), 0, text.length());
+                xmlReceiver.characters(text.toCharArray(), 0, text.length());
         } catch (SAXException e) {
             throw new OXFException(e);
         }
@@ -175,7 +175,7 @@ public class ContentHandlerHelper {
 
     public void startDocument() {
         try {
-            contentHandler.startDocument();
+            xmlReceiver.startDocument();
         } catch (SAXException e) {
             throw new OXFException(e);
         }
@@ -186,7 +186,7 @@ public class ContentHandlerHelper {
             if (!elements.isEmpty()) {
                 throw new OXFException("Element '" + elements.peek() + "' not closed");
             }
-            contentHandler.endDocument();
+            xmlReceiver.endDocument();
         } catch (SAXException e) {
             throw new OXFException(e);
         }

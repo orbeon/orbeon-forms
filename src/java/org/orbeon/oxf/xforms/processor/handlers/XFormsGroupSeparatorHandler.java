@@ -20,7 +20,7 @@ import org.xml.sax.SAXException;
 
 public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
 
-    private DeferredContentHandler currentSavedOutput;
+    private DeferredXMLReceiver currentSavedOutput;
     private OutputInterceptor outputInterceptor;
 
     @Override
@@ -75,13 +75,13 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
                 }
             });
             // TODO: is the use of XFormsElementFilterContentHandler necessary now?
-            controller.setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(outputInterceptor)));
+            controller.setOutput(new DeferredXMLReceiverImpl(new XFormsElementFilterXMLReceiver(outputInterceptor)));
 
             // Set control classes
             outputInterceptor.setAddedClasses(elementClasses);
         } else if (isDisabled(control)) {
             // In noscript, if the group not visible, set output to a black hole
-            handlerContext.getController().setOutput(new DeferredContentHandlerAdapter());
+            handlerContext.getController().setOutput(new DeferredXMLReceiverAdapter());
         }
 
         // Don't support label, help, alert, or hint and other appearances, only the content!

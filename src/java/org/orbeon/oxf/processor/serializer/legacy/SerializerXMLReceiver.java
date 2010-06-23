@@ -14,7 +14,8 @@
 package org.orbeon.oxf.processor.serializer.legacy;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.NamespaceCleanupXMLReceiver;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -28,21 +29,21 @@ import java.io.Writer;
  *
  * Also clean invalid XML 1.0 namespace declarations if needed.
  */
-public class SerializerContentHandler extends NamespaceCleanupContentHandler {
+public class SerializerXMLReceiver extends NamespaceCleanupXMLReceiver {
     private Writer writer;
     private OutputStream os;
 
-    public SerializerContentHandler(ContentHandler contentHandler, boolean serializeXML11) {
-        super(contentHandler, serializeXML11);
+    public SerializerXMLReceiver(XMLReceiver xmlReceiver, boolean serializeXML11) {
+        super(xmlReceiver, serializeXML11);
     }
 
-    public SerializerContentHandler(ContentHandler contentHandler, Writer writer, boolean serializeXML11) {
-        this(contentHandler, serializeXML11);
+    public SerializerXMLReceiver(XMLReceiver xmlReceiver, Writer writer, boolean serializeXML11) {
+        this(xmlReceiver, serializeXML11);
         this.writer = writer;
     }
 
-    public SerializerContentHandler(ContentHandler contentHandler, OutputStream os, boolean serializeXML11) {
-        this(contentHandler, serializeXML11);
+    public SerializerXMLReceiver(XMLReceiver xmlReceiver, OutputStream os, boolean serializeXML11) {
+        this(xmlReceiver, serializeXML11);
         this.os = os;
     }
 
@@ -54,18 +55,6 @@ public class SerializerContentHandler extends NamespaceCleanupContentHandler {
                         writer.flush();
                     if (os != null)
                         os.flush();
-                } else if ("start-comment".equals(data)) {
-                    super.processingInstruction(Result.PI_DISABLE_OUTPUT_ESCAPING, "");
-                    super.characters("<!--".toCharArray(), 0, 4);
-//                    if (writer != null) {
-//                        writer.write("<!--");
-//                    }
-                } else if ("end-comment".equals(data)) {
-                    super.characters("-->".toCharArray(), 0, 3);
-                    super.processingInstruction(Result.PI_ENABLE_OUTPUT_ESCAPING, "");
-//                    if (writer != null) {
-//                        writer.write("-->");
-//                    }
                 }
             } catch (IOException e) {
                 throw new OXFException(e);

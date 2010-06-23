@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.pipeline;
 
@@ -21,6 +21,7 @@ import org.orbeon.oxf.debugger.api.Breakpoint;
 import org.orbeon.oxf.debugger.api.BreakpointKey;
 import org.orbeon.oxf.debugger.api.Debuggable;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.ast.*;
@@ -34,7 +35,6 @@ import org.orbeon.oxf.xml.SchemaRepository;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.xml.sax.ContentHandler;
 
 import java.net.MalformedURLException;
 import java.util.*;
@@ -83,7 +83,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
 
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
 
-            public void readImpl(final PipelineContext context, final ContentHandler contentHandler) {
+            public void readImpl(final PipelineContext context, final XMLReceiver xmlReceiver) {
                 final ProcessorInput bottomInput = getInput(context);
                 if (bottomInput.getOutput() == null)
                     throw new ValidationException("Pipeline output '" + name +
@@ -91,7 +91,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                             PipelineProcessor.this.getLocationData());
                 executeChildren(context, new Runnable() {
                     public void run() {
-                        readInputAsSAX(context, bottomInput, contentHandler);
+                        readInputAsSAX(context, bottomInput, xmlReceiver);
                     }
                 });
             }
@@ -448,8 +448,8 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             ProcessorInput pipelineReaderInput = pipelineReader.createInput("pipeline");
 
             pipelineReaderInput.setOutput(new ProcessorImpl.ProcessorOutputImpl(getClass(), "dummy") {
-                public void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                    ProcessorImpl.readInputAsSAX(context, _configInput, contentHandler);
+                public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
+                    ProcessorImpl.readInputAsSAX(context, _configInput, xmlReceiver);
                 }
 
                 public OutputCacheKey getKeyImpl(PipelineContext context) {
@@ -558,13 +558,13 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             this.locationData = locationData;
         }
 
-        public void readImpl(final PipelineContext context, final ContentHandler contentHandler) {
+        public void readImpl(final PipelineContext context, final XMLReceiver xmlReceiver) {
             final State state = (State) getParentState(context);
             executeParents(context, new Runnable() {
                 public void run() {
                     // NOTE: It is not useful to catch and wrap location data here, as this would
                     // duplicate the work done in ProcessorImpl
-                    readInputAsSAX(context, getPipelineInputFromState(state), contentHandler);
+                    readInputAsSAX(context, getPipelineInputFromState(state), xmlReceiver);
                 }
             });
         }

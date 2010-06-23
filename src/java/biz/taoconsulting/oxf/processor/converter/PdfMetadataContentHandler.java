@@ -1,20 +1,20 @@
 /**
- *  Copyright (C) 2005 TAO Consulting Pte Ltd, based on work (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package biz.taoconsulting.oxf.processor.converter;
 
-import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.xml.sax.ContentHandler;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.xml.sax.SAXException;
 
 /**
@@ -24,22 +24,10 @@ import org.xml.sax.SAXException;
  *         sax events with the exception of start and end document. All other
  *         events are handled by the superclass
  */
-public class PdfMetadataContentHandler extends ForwardingContentHandler {
+public class PdfMetadataContentHandler extends ForwardingXMLReceiver {
 
-    /**
-     * @param contentHandler We activate the forwarding mechanism per default So we don't
-     *                       need to call the two parameter fucntion
-     */
-    public PdfMetadataContentHandler() {
-        super();
-    }
-
-    public PdfMetadataContentHandler(ContentHandler contentHandler) {
-        super(contentHandler, true);
-    }
-
-    public PdfMetadataContentHandler(ContentHandler contentHandler, boolean forward) {
-        super(contentHandler, forward);
+    public PdfMetadataContentHandler(XMLReceiver xmlReceiver) {
+        super(xmlReceiver);
     }
 
     // The superclass does all we need, we just need to strip out
@@ -50,6 +38,6 @@ public class PdfMetadataContentHandler extends ForwardingContentHandler {
     }
 
     public void startDocument() throws SAXException {
-        //    We don't take action and don't call the super event
+        // We don't take action and don't call the super event
     }
 }

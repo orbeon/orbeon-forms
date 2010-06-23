@@ -23,6 +23,8 @@ import org.orbeon.oxf.debugger.api.BreakpointKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext.Trace;
 import org.orbeon.oxf.pipeline.api.PipelineContext.TraceInfo;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.properties.Properties;
@@ -39,10 +41,8 @@ import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.w3c.dom.Document;
-import org.xml.sax.ContentHandler;
 
 import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
 
 /**
@@ -238,13 +238,13 @@ public abstract class ProcessorImpl implements Processor {
             public ProcessorOutput createOutput(String outputName) {
                 final ProcessorOutput output = new URIProcessorOutputImpl(this, outputName, INPUT_CONFIG) {
                     @Override
-                    protected void readImpl(PipelineContext pipelineContext, final ContentHandler contentHandler) {
+                    protected void readImpl(PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
                         final boolean[] foundInCache = new boolean[] { false };
                         readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                             @Override
                             public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
                                 // Read the input directly into the output
-                                readInputAsSAX(pipelineContext, processorInput, contentHandler);
+                                readInputAsSAX(pipelineContext, processorInput, xmlReceiver);
 
                                 // Return dependencies object
                                 return getURIReferences(pipelineContext);
@@ -259,7 +259,7 @@ public abstract class ProcessorImpl implements Processor {
                         // Finding the dependencies in cache doesn't mean we don't read to the output: after all,
                         // we were asked to.
                         if (foundInCache[0]) {
-                            readInputAsSAX(pipelineContext, getInputByName(INPUT_CONFIG), contentHandler);
+                            readInputAsSAX(pipelineContext, getInputByName(INPUT_CONFIG), xmlReceiver);
                         }
                     }
                 };
@@ -423,9 +423,9 @@ public abstract class ProcessorImpl implements Processor {
     /**
      * The fundamental read method based on SAX.
      */
-    protected static void readInputAsSAX(PipelineContext context, final ProcessorInput input, ContentHandler contentHandler) {
+    protected static void readInputAsSAX(PipelineContext context, final ProcessorInput input, XMLReceiver xmlReceiver) {
 //        if (input instanceof ProcessorInputImpl) {
-//            input.getOutput().read(context, new ForwardingContentHandler(contentHandler) {
+//            input.getOutput().read(context, new SimpleForwardingXMLReceiver(contentHandler) {
 //                private Locator locator;
 //                public void setDocumentLocator(Locator locator) {
 //                    this.locator = locator;
@@ -442,16 +442,16 @@ public abstract class ProcessorImpl implements Processor {
 //                }
 //            });
 //        } else {
-            input.getOutput().read(context, contentHandler);
+            input.getOutput().read(context, xmlReceiver);
 //        }
     }
 
-    protected void readInputAsSAX(PipelineContext context, String inputName, ContentHandler contentHandler) {
-        readInputAsSAX(context, getInputByName(inputName), contentHandler);
+    protected void readInputAsSAX(PipelineContext context, String inputName, XMLReceiver xmlReceiver) {
+        readInputAsSAX(context, getInputByName(inputName), xmlReceiver);
     }
 
     protected Document readInputAsDOM(PipelineContext context, ProcessorInput input) {
-        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         final DOMResult domResult = new DOMResult(XMLUtils.createDocument());
         identity.setResult(domResult);
         readInputAsSAX(context, input, identity);
@@ -467,7 +467,7 @@ public abstract class ProcessorImpl implements Processor {
     protected DocumentInfo readInputAsTinyTree(PipelineContext pipelineContext, Configuration configuration, ProcessorInput input) {
         final TinyBuilder treeBuilder = new TinyBuilder();
 
-        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler(configuration);
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler(configuration);
         identity.setResult(treeBuilder);
         readInputAsSAX(pipelineContext, input, identity);
 
@@ -966,7 +966,7 @@ public abstract class ProcessorImpl implements Processor {
             this.breakpointKey = breakpointKey;
         }
 
-        protected abstract void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler);
+        protected abstract void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver);
 
         protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
             return null;
@@ -1023,7 +1023,7 @@ public abstract class ProcessorImpl implements Processor {
             public void setBreakpointKey(BreakpointKey breakpointKey) {
             }
 
-            public void read(PipelineContext context, ContentHandler ch) {
+            public void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 throw new OXFException("This method should never be called!!!");
             }
         }
@@ -1042,18 +1042,18 @@ public abstract class ProcessorImpl implements Processor {
             private ProcessorOutput previousProcessorOutput;
 
             private class ForwarderProcessorOutput extends ProcessorFilter {
-                public void read(PipelineContext context, ContentHandler contentHandler) {
-                    previousProcessorOutput.read(context, contentHandler);
+                public void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
+                    previousProcessorOutput.read(pipelineContext, xmlReceiver);
                 }
 
-                public OutputCacheKey getKey(PipelineContext context) {
+                public OutputCacheKey getKey(PipelineContext pipelineContext) {
                     return previousProcessorOutput instanceof CacheableInputOutput
-                            ? ((CacheableInputOutput) previousProcessorOutput).getKey(context) : null;
+                            ? ((CacheableInputOutput) previousProcessorOutput).getKey(pipelineContext) : null;
                 }
 
-                public Object getValidity(PipelineContext context) {
+                public Object getValidity(PipelineContext pipelineContext) {
                     return previousProcessorOutput instanceof CacheableInputOutput
-                            ? ((CacheableInputOutput) previousProcessorOutput).getValidity(context) : null;
+                            ? ((CacheableInputOutput) previousProcessorOutput).getValidity(pipelineContext) : null;
                 }
 
             }
@@ -1066,18 +1066,18 @@ public abstract class ProcessorImpl implements Processor {
                 processorInput.setOutput(new ForwarderProcessorOutput());
             }
 
-            public void read(PipelineContext context, ContentHandler contentHandler) {
-                processorOutput.read(context, contentHandler);
+            public void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
+                processorOutput.read(pipelineContext, xmlReceiver);
             }
 
-            public OutputCacheKey getKey(PipelineContext context) {
+            public OutputCacheKey getKey(PipelineContext pipelineContext) {
                 return processorOutput instanceof CacheableInputOutput
-                        ? ((CacheableInputOutput) processorOutput).getKey(context) : null;
+                        ? ((CacheableInputOutput) processorOutput).getKey(pipelineContext) : null;
             }
 
-            public Object getValidity(PipelineContext context) {
+            public Object getValidity(PipelineContext pipelineContext) {
                 return processorOutput instanceof CacheableInputOutput
-                        ? ((CacheableInputOutput) processorOutput).getValidity(context) : null;
+                        ? ((CacheableInputOutput) processorOutput).getValidity(pipelineContext) : null;
             }
         }
 
@@ -1087,17 +1087,17 @@ public abstract class ProcessorImpl implements Processor {
 
             // Final filter (i.e. at the top, executed last)
             ProcessorFilter filter = new ProcessorFilter() {
-                public void read(PipelineContext context, ContentHandler contentHandler) {
+                public void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                     // Read the current processor output
-                    readImpl(context, contentHandler);
+                    readImpl(pipelineContext, xmlReceiver);
                 }
 
-                public OutputCacheKey getKey(PipelineContext context) {
-                    return getKeyImpl(context);
+                public OutputCacheKey getKey(PipelineContext pipelineContext) {
+                    return getKeyImpl(pipelineContext);
                 }
 
-                public Object getValidity(PipelineContext context) {
-                    return getValidityImpl(context);
+                public Object getValidity(PipelineContext pipelineContext) {
+                    return getValidityImpl(pipelineContext);
                 }
             };
 
@@ -1184,17 +1184,17 @@ public abstract class ProcessorImpl implements Processor {
             if (isSAXInspection != null && isSAXInspection.booleanValue()) {
                 final ProcessorFilter previousFilter = filter;
                 filter = new ProcessorFilter() {
-                    public void read(PipelineContext context, ContentHandler contentHandler) {
-                        InspectingContentHandler inspectingContentHandler = new InspectingContentHandler(contentHandler);
-                        previousFilter.read(context, inspectingContentHandler);
+                    public void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
+                        InspectingContentHandler inspectingContentHandler = new InspectingContentHandler(xmlReceiver);
+                        previousFilter.read(pipelineContext, inspectingContentHandler);
                     }
 
-                    public OutputCacheKey getKey(PipelineContext context) {
-                        return previousFilter.getKey(context);
+                    public OutputCacheKey getKey(PipelineContext pipelineContext) {
+                        return previousFilter.getKey(pipelineContext);
                     }
 
-                    public Object getValidity(PipelineContext context) {
-                        return previousFilter.getValidity(context);
+                    public Object getValidity(PipelineContext pipelineContext) {
+                        return previousFilter.getValidity(pipelineContext);
                     }
                 };
             }
@@ -1215,8 +1215,8 @@ public abstract class ProcessorImpl implements Processor {
             return filter;
         }
 
-        public final void read(PipelineContext context, ContentHandler contentHandler) {
-            final Trace trc = context.getTrace();
+        public final void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
+            final Trace trc = pipelineContext.getTrace();
             final TraceInfo tinf;
             if (trc == null) {
                 tinf = null;
@@ -1235,7 +1235,7 @@ public abstract class ProcessorImpl implements Processor {
                 trc.add(tinf);
             }
             try {
-                getFilter().read(context, contentHandler);
+                getFilter().read(pipelineContext, xmlReceiver);
             } catch (AbstractMethodError e) {
                 logger.error(e);
             } catch (Exception e) {
@@ -1245,12 +1245,12 @@ public abstract class ProcessorImpl implements Processor {
             }
         }
 
-        public final OutputCacheKey getKey(PipelineContext context) {
-            return getFilter().getKey(context);
+        public final OutputCacheKey getKey(PipelineContext pipelineContext) {
+            return getFilter().getKey(pipelineContext);
         }
 
-        public final Object getValidity(PipelineContext context) {
-            return getFilter().getValidity(context);
+        public final Object getValidity(PipelineContext pipelineContext) {
+            return getFilter().getValidity(pipelineContext);
         }
 
         public final KeyValidity getKeyValidityImpl(PipelineContext context) {

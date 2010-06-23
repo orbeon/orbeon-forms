@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.serializer;
 
@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
@@ -27,7 +28,6 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -245,7 +245,7 @@ public class FileSerializer extends ProcessorImpl {
                             logger.debug("Output not cached");
                         try {
                             ResultStoreOutputStream resultStoreOutputStream = new ResultStoreOutputStream(fileOutputStream);
-                            readInputAsSAX(context, input, new BinaryTextContentHandler(null, resultStoreOutputStream, true,
+                            readInputAsSAX(context, input, new BinaryTextXMLReceiver(null, resultStoreOutputStream, true,
                                     config.forceContentType, config.requestedContentType, config.ignoreDocumentContentType,
                                     config.forceEncoding, config.requestedEncoding, config.ignoreDocumentEncoding));
                             resultStoreOutputStream.close();
@@ -264,7 +264,7 @@ public class FileSerializer extends ProcessorImpl {
                 }
             } else {
                 // Caching is not enabled
-                readInputAsSAX(context, dataInput, new BinaryTextContentHandler(null, fileOutputStream, true,
+                readInputAsSAX(context, dataInput, new BinaryTextXMLReceiver(null, fileOutputStream, true,
                         config.forceContentType, config.requestedContentType, config.ignoreDocumentContentType,
                         config.forceEncoding, config.requestedEncoding, config.ignoreDocumentEncoding));
 
@@ -283,7 +283,7 @@ public class FileSerializer extends ProcessorImpl {
     public ProcessorOutput createOutput(String name) {
 
         final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 OutputStream fileOutputStream = null;
                 try {
                     //Get the input and config
@@ -321,11 +321,11 @@ public class FileSerializer extends ProcessorImpl {
                             resultURL = localURL;
                     }
 
-                    contentHandler.startDocument();
-                    contentHandler.startElement("", "url", "url", XMLUtils.EMPTY_ATTRIBUTES);
-                    contentHandler.characters(resultURL.toCharArray(), 0, resultURL.length());
-                    contentHandler.endElement("", "url", "url");
-                    contentHandler.endDocument();
+                    xmlReceiver.startDocument();
+                    xmlReceiver.startElement("", "url", "url", XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.characters(resultURL.toCharArray(), 0, resultURL.length());
+                    xmlReceiver.endElement("", "url", "url");
+                    xmlReceiver.endDocument();
                 }
                 catch (SAXException e) {
                     throw new OXFException(e);

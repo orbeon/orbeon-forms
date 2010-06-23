@@ -20,14 +20,12 @@ import org.apache.axis.message.PrefixedQName;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
 import org.apache.axis.soap.SOAPConstants;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.QName;
-import org.dom4j.Text;
+import org.dom4j.*;
 import org.dom4j.io.DOMReader;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.servicedirectory.ServiceDirectory;
 import org.orbeon.oxf.util.JMSUtils;
 import org.orbeon.oxf.util.PooledXPathExpression;
@@ -42,7 +40,6 @@ import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
@@ -73,10 +70,10 @@ public class DelegationProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(final org.orbeon.oxf.pipeline.api.PipelineContext context, final ContentHandler contentHandler) {
+            public void readImpl(final PipelineContext context, final XMLReceiver xmlReceiver) {
                 final List<ServiceDefinition> services = readServices(readInputAsDOM4J(context, INPUT_INTERFACE));
 
-                readInputAsSAX(context, INPUT_CALL, new ForwardingContentHandler(contentHandler) {
+                readInputAsSAX(context, INPUT_CALL, new ForwardingXMLReceiver(xmlReceiver) {
 
                     Locator locator;
                     String operationName;
@@ -302,9 +299,9 @@ public class DelegationProcessor extends ProcessorImpl {
 
                                             // Send body from result envelope
                                             final LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
-                                            locationSAXWriter.setContentHandler(contentHandler);
-                                            final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance14();
-                                            final Document resultEnvelopeDOM4j = new DOMReader(fctry).read(resultEnvelope.getAsDocument());
+                                            locationSAXWriter.setContentHandler(xmlReceiver);
+                                            final DocumentFactory factory = NonLazyUserDataDocumentFactory.getInstance();
+                                            final Document resultEnvelopeDOM4j = new DOMReader(factory).read(resultEnvelope.getAsDocument());
 
                                             final String xpathString =
                                                     operation != null && operation.select != null
@@ -380,7 +377,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                             if (home == null)
                                                 throw new ValidationException("Home interface not found in JNDI context: " + service.jndiName, new LocationData(locator));
                                             final Method create = home.getClass().getDeclaredMethod("create", new Class[]{});
-                                            final Object instance = create.invoke(home, new Object[]{});
+                                            final Object instance = create.invoke(home);
                                             final String result = callMethod(instance.getClass(), operationName, parameterTypes, instance, parameterValues);
 
                                             super.characters(result.toCharArray(), 0, result.length());

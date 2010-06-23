@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.apache.commons.collections.map.CompositeMap;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.Version;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.*;
@@ -51,7 +52,7 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
 
         // Register control handlers on controller
         {
@@ -63,9 +64,9 @@ public class XHTMLHeadHandler extends XFormsBaseHandler {
         formattingPrefix = handlerContext.findFormattingPrefixDeclare();
 
         // Open head element
-        contentHandler.startElement(uri, localname, qName, attributes);
+        xmlReceiver.startElement(uri, localname, qName, attributes);
 
-        final ContentHandlerHelper helper = new ContentHandlerHelper(contentHandler);
+        final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
         final String xhtmlPrefix = XMLUtils.prefixFromQName(qName); // current prefix for XHTML
 
         // Gather information about appearances of controls which use Script

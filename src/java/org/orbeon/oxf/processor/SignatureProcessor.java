@@ -15,12 +15,13 @@ package org.orbeon.oxf.processor;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
-import org.xml.sax.ContentHandler;
 
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -43,7 +44,7 @@ public class SignatureProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, final ContentHandler contentHandler) {
+            public void readImpl(PipelineContext context, final XMLReceiver xmlReceiver) {
                 try {
                     final Document privDoc = readCacheInputAsDOM4J(context, INPUT_PRIVATE_KEY);
                     final String privString = XPathUtils.selectStringValueNormalize(privDoc, "/private-key");
@@ -55,9 +56,9 @@ public class SignatureProcessor extends ProcessorImpl {
                     final Signature dsa = Signature.getInstance("SHA1withDSA");
                     dsa.initSign(privKey);
 
-                    contentHandler.startDocument();
-                    contentHandler.startElement("", SIGNED_DATA_ELEMENT, SIGNED_DATA_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
-                    contentHandler.startElement("", DATA_ELEMENT, DATA_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startDocument();
+                    xmlReceiver.startElement("", SIGNED_DATA_ELEMENT, SIGNED_DATA_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", DATA_ELEMENT, DATA_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
 
                     final Document data = readCacheInputAsDOM4J(context, INPUT_DATA);
                     final String dataStr = Dom4jUtils.domToString(data);
@@ -65,19 +66,19 @@ public class SignatureProcessor extends ProcessorImpl {
                     final String sig = new sun.misc.BASE64Encoder().encode(dsa.sign());
 
                     final LocationSAXWriter saxw = new LocationSAXWriter();
-                    saxw.setContentHandler(contentHandler);
+                    saxw.setContentHandler(xmlReceiver);
                     saxw.write(data.getRootElement());
 
-                    contentHandler.endElement("", DATA_ELEMENT, DATA_ELEMENT);
+                    xmlReceiver.endElement("", DATA_ELEMENT, DATA_ELEMENT);
 
-                    contentHandler.startElement("", SIGNATURE_ELEMENT, SIGNATURE_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startElement("", SIGNATURE_ELEMENT, SIGNATURE_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
                     char[] sigChars = new char[sig.length()];
                     sig.getChars(0, sig.length(), sigChars, 0);
-                    contentHandler.characters(sigChars, 0, sigChars.length);
-                    contentHandler.endElement("", SIGNATURE_ELEMENT, SIGNATURE_ELEMENT);
+                    xmlReceiver.characters(sigChars, 0, sigChars.length);
+                    xmlReceiver.endElement("", SIGNATURE_ELEMENT, SIGNATURE_ELEMENT);
 
-                    contentHandler.endElement("", SIGNED_DATA_ELEMENT, SIGNED_DATA_ELEMENT);
-                    contentHandler.endDocument();
+                    xmlReceiver.endElement("", SIGNED_DATA_ELEMENT, SIGNED_DATA_ELEMENT);
+                    xmlReceiver.endDocument();
 
                 } catch (Exception e) {
                     throw new OXFException(e);

@@ -523,10 +523,15 @@
                             </instance>
                             <instance id="fr-state-instance" model-id="my-summary$fr-error-summary-model">
                                 <state>
+                                    <!-- Whether errors are shown incrementally or not -->
                                     <incremental/>
+                                    <!-- Observer element -->
                                     <observer>my-group</observer>
+                                    <!-- Whether the form is valid or invalid -->
                                     <valid>false</valid>
+                                    <!-- Number of errors -->
                                     <errors-count>5</errors-count>
+                                    <!-- Number of visible errors -->
                                     <visible-errors-count>2</visible-errors-count>
                                 </state>
                             </instance>

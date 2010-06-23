@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
@@ -55,9 +56,9 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
         attributes = XMLUtils.appendToClassAttribute(attributes, "yui-skin-sam");
 
         // Start xhtml:body
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        contentHandler.startElement(uri, localname, qName, attributes);
-        helper = new ContentHandlerHelper(contentHandler);
+        final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
+        xmlReceiver.startElement(uri, localname, qName, attributes);
+        helper = new ContentHandlerHelper(xmlReceiver);
 
         final XFormsControls xformsControls = containingDocument.getControls();
         final String htmlPrefix = XMLUtils.prefixFromQName(qName);
@@ -190,12 +191,12 @@ public class XHTMLBodyHandler extends XFormsBaseHandler {
                 // HACK: We would be ok with just one template, but IE 6 doesn't allow setting the input/@type attribute properly
 
                 // xforms:select[@appearance = 'full'], xforms:input[@type = 'xs:boolean']
-                XFormsSelect1Handler.outputItemFullTemplate(pipelineContext, handlerContext, contentHandler, htmlPrefix, spanQName,
+                XFormsSelect1Handler.outputItemFullTemplate(pipelineContext, handlerContext, xmlReceiver, htmlPrefix, spanQName,
                         containingDocument, reusableAttributes, attributes,
                         "xforms-select-full-template", TEMPLATE_ID, true, "checkbox");
 
                 // xforms:select1[@appearance = 'full']
-                XFormsSelect1Handler.outputItemFullTemplate(pipelineContext, handlerContext, contentHandler, htmlPrefix, spanQName,
+                XFormsSelect1Handler.outputItemFullTemplate(pipelineContext, handlerContext, xmlReceiver, htmlPrefix, spanQName,
                         containingDocument, reusableAttributes, attributes,
                         "xforms-select1-full-template", TEMPLATE_ID, true, "radio");
             }

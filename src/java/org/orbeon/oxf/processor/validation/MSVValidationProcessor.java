@@ -20,19 +20,23 @@ import org.dom4j.Document;
 import org.iso_relax.verifier.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.ExceptionWrapperContentHandler;
-import org.orbeon.oxf.xml.TeeContentHandler;
+import org.orbeon.oxf.xml.ExceptionWrapperXMLReceiver;
+import org.orbeon.oxf.xml.TeeXMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
-import org.xml.sax.*;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.parsers.SAXParserFactory;
@@ -112,7 +116,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         final ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            protected void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, final ContentHandler contentHandler) {
+            protected void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, final XMLReceiver xmlReceiver) {
                 try {
                     // read config input ot determine of we should decorate or not
                     final Document configDoc = readCacheInputAsDOM4J(context, INPUT_CONFIG);
@@ -179,11 +183,11 @@ public class MSVValidationProcessor extends ProcessorImpl {
                                 a.addAttribute("", COLUMN_ATTRIBUTE,
                                         COLUMN_ATTRIBUTE, "CDATA", Integer.toString(ve.getLocationData().getCol()));
 
-                                contentHandler.startElement(ORBEON_ERROR_NS,
+                                xmlReceiver.startElement(ORBEON_ERROR_NS,
                                         ERROR_ELEMENT,
                                         ORBEON_ERROR_PREFIX + ":" + ERROR_ELEMENT,
                                         a);
-                                contentHandler.endElement(ORBEON_ERROR_NS,
+                                xmlReceiver.endElement(ORBEON_ERROR_NS,
                                         ERROR_ELEMENT,
                                         ORBEON_ERROR_PREFIX + ":" + ERROR_ELEMENT);
 
@@ -205,14 +209,15 @@ public class MSVValidationProcessor extends ProcessorImpl {
                         }
                     });
 
+                    // NOTE: VerifierHandler only supports ContentHandler, not LexicalHandler. Comments are never validated.
                     final VerifierHandler verifierHandler = verifier.getVerifierHandler();
-                    final List contentHandlers = Arrays.asList(new ExceptionWrapperContentHandler(verifierHandler, "validating document"), contentHandler);
+                    final List<XMLReceiver> xmlReceivers = Arrays.asList(new ExceptionWrapperXMLReceiver(verifierHandler, "validating document"), xmlReceiver);
 
                     long time = 0;
                     if (logger.isDebugEnabled()) {
                         time = System.currentTimeMillis();
                     }
-                    readInputAsSAX(context, getInputByName(INPUT_DATA), new TeeContentHandler(contentHandlers));
+                    readInputAsSAX(context, getInputByName(INPUT_DATA), new TeeXMLReceiver(xmlReceivers));
                     if (logger.isDebugEnabled()) {
                         logger.debug(schemaId + " validation completed in " + (System.currentTimeMillis() - time));
                     }

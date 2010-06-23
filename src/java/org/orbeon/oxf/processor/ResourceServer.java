@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -20,7 +20,7 @@ import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UserAgent;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
@@ -54,7 +54,7 @@ public class ResourceServer extends ProcessorImpl {
 
         final MimeTypeConfig mimeTypeConfig = (MimeTypeConfig) readCacheInputAsObject(context, getInputByName(MIMETYPE_INPUT), new CacheableInputReader() {
             public Object read(PipelineContext context, ProcessorInput input) {
-                MimeTypesContentHandler ch = new MimeTypesContentHandler();
+                final MimeTypesContentHandler ch = new MimeTypesContentHandler();
                 readInputAsSAX(context, input, ch);
                 return ch.getMimeTypes();
             }
@@ -159,7 +159,7 @@ public class ResourceServer extends ProcessorImpl {
         }
     }
 
-    private static class MimeTypesContentHandler extends ForwardingContentHandler {
+    private static class MimeTypesContentHandler extends ForwardingXMLReceiver {
         public static final String MIMETYPE_ELEMENT = "mime-type";
         public static final String NAME_ELEMENT = "name";
         public static final String PATTERN_ELEMENT = "pattern";

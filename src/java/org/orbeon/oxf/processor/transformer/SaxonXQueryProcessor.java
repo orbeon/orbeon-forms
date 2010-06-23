@@ -18,6 +18,7 @@ import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.xslt.StringErrorListener;
@@ -30,7 +31,6 @@ import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.query.DynamicQueryContext;
 import org.orbeon.saxon.query.StaticQueryContext;
 import org.orbeon.saxon.query.XQueryExpression;
-import org.xml.sax.ContentHandler;
 
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXResult;
@@ -64,7 +64,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 try {
                     final Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
 
@@ -157,7 +157,10 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     dynamicContext.setContextItem(staticContext.buildDocument(new DocumentSource(dataDocument)));
                     dynamicContext.setURIResolver(uriResolver);
                     // TODO: use xqueryExpression.getStaticContext() when Saxon is upgraded
-                    xqueryExpression.run(dynamicContext, new SAXResult(contentHandler), new java.util.Properties());
+                    final SAXResult saxResult = new SAXResult(xmlReceiver);
+                    saxResult.setLexicalHandler(xmlReceiver);
+
+                    xqueryExpression.run(dynamicContext, saxResult, new java.util.Properties());
 
                 } catch (Exception e) {
                     throw new OXFException(e);

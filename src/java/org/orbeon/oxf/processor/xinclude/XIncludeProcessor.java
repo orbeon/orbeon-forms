@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.xml.*;
@@ -50,7 +51,7 @@ public class XIncludeProcessor extends ProcessorImpl {
     @Override
     public ProcessorOutput createOutput(final String name) {
         final ProcessorOutput output = new URIProcessorOutputImpl(XIncludeProcessor.this, name, INPUT_CONFIG) {
-            public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
+            public void readImpl(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
                 /**
                  * The code below reads the input in a SAX store, before replaying the SAX store to the
                  * XIncludeContentHandler.
@@ -85,7 +86,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                         // TODO: Should be smarter and only buffer when we find a read of input:* (maybe pipeline API should do this automatically)
                         readInputAsSAX(pipelineContext, INPUT_CONFIG, saxStore);
                         try {
-                            saxStore.replay(new XIncludeContentHandler(pipelineContext, contentHandler, uriReferences, uriResolver));
+                            saxStore.replay(new XIncludeXMLReceiver(pipelineContext, xmlReceiver, uriReferences, uriResolver));
                         } catch (SAXException e) {
                             throw new OXFException(e);
                         }
@@ -101,7 +102,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                     // TODO: Should be smarter and only buffer when we find a read of input:* (maybe pipeline API should do this automatically)
                     readInputAsSAX(pipelineContext, INPUT_CONFIG, saxStore);
                     try {
-                        saxStore.replay(new XIncludeContentHandler(pipelineContext, contentHandler, null, uriResolver));
+                        saxStore.replay(new XIncludeXMLReceiver(pipelineContext, xmlReceiver, null, uriResolver));
                     } catch (SAXException e) {
                         throw new OXFException(e);
                     }
@@ -112,7 +113,7 @@ public class XIncludeProcessor extends ProcessorImpl {
         return output;
     }
 
-    public static class XIncludeContentHandler extends ForwardingContentHandler {
+    public static class XIncludeXMLReceiver extends ForwardingXMLReceiver {
 
         private boolean processXInclude;
         private PipelineContext pipelineContext;
@@ -131,16 +132,16 @@ public class XIncludeProcessor extends ProcessorImpl {
 
         private boolean generateXMLBase;
 
-        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver) {
-            this(true, pipelineContext, contentHandler, uriReferences, uriResolver, true, null, null, true, new OutputLocator());
+        public XIncludeXMLReceiver(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver) {
+            this(true, pipelineContext, xmlReceiver, uriReferences, uriResolver, true, null, null, true, new OutputLocator());
         }
 
-        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport3 parentNamespaceSupport, boolean generateXMLBase, OutputLocator outputLocator) {
-            this(true, pipelineContext, contentHandler, uriReferences, uriResolver, false, xmlBase, parentNamespaceSupport, generateXMLBase, outputLocator);
+        public XIncludeXMLReceiver(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport3 parentNamespaceSupport, boolean generateXMLBase, OutputLocator outputLocator) {
+            this(true, pipelineContext, xmlReceiver, uriReferences, uriResolver, false, xmlBase, parentNamespaceSupport, generateXMLBase, outputLocator);
         }
 
-        private XIncludeContentHandler(boolean processXInclude, PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport3 paremtNamespaceSupport, boolean generateXMLBase, OutputLocator outputLocator) {
-            super(contentHandler);
+        private XIncludeXMLReceiver(boolean processXInclude, PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport3 paremtNamespaceSupport, boolean generateXMLBase, OutputLocator outputLocator) {
+            super(xmlReceiver);
             this.processXInclude = processXInclude;
             this.pipelineContext = pipelineContext;
             this.uriReferences = uriReferences;
@@ -216,7 +217,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                             final String base = outputLocator == null ? null : outputLocator.getSystemId();
                             final SAXSource source = (SAXSource) uriResolver.resolve(href, base);
                             final XMLReader xmlReader = source.getXMLReader();
-                            xmlReader.setContentHandler(new XIncludeContentHandler(pipelineContext, getContentHandler(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase, outputLocator));
+                            xmlReader.setContentHandler(new XIncludeXMLReceiver(pipelineContext, getXMLReceiver(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase, outputLocator));
 
                             // Keep URI reference
                             if (uriReferences != null)

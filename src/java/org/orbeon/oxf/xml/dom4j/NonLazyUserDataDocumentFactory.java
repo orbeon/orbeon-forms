@@ -24,23 +24,10 @@ import org.dom4j.util.UserDataAttribute;
  */
 public class NonLazyUserDataDocumentFactory extends DocumentFactory {
 
-    private static final NonLazyUserDataDocumentFactory singleton
-            = new NonLazyUserDataDocumentFactory();
+    private static final NonLazyUserDataDocumentFactory SINGLETON = new NonLazyUserDataDocumentFactory();
 
-    /**
-     * This would return NonLazyUserDataDocumentFactory however silly 1.4 compiler complains claiming that it is an
-     * incompatible override of DocumentFactory.getInstance. (Statics cannot override, sigh.) So this method just here
-     * to be safe and getInstance14() is what should really be used.
-     */
     public static DocumentFactory getInstance() {
-        return singleton;
-    }
-
-    /**
-     * See getInstance().
-     */
-    public static NonLazyUserDataDocumentFactory getInstance14() {
-        return singleton;
+        return SINGLETON;
     }
 
     public Element createElement(final QName qName) {

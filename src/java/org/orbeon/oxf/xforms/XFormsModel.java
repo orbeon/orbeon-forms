@@ -796,7 +796,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // Read result as XML and create new shared instance
                 // TODO: Handle validating?
                 final DocumentInfo documentInfo = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
-                        connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude);
+                        connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude, true);
                 return new ReadonlyXFormsInstance(effectiveId, instanceStaticId, documentInfo, instanceSourceURI,
                         null, null, null, null, true, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
             } catch (Exception e) {
@@ -852,10 +852,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // Read result as XML
                 // TODO: use submission code
                 if (!instance.isReadonlyHint) {
-                    instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
+                    instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false, true);
                 } else {
                     instanceDocument = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
-                            connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
+                            connectionResult.getResponseInputStream(), connectionResult.resourceURI, false, true);
                 }
             } finally {
                 // Clean-up
@@ -870,11 +870,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // TODO: Handle validating and handleXInclude!
 
             if (!instance.isReadonlyHint) {
-                instanceDocument = containingDocument.getURIResolver().readURLAsDocument(absoluteURLString,
-                        instance.xxformsUsername, instance.xxformsPassword, instance.xxformsDomain,
+                instanceDocument = containingDocument.getURIResolver().readAsDom4j(
+                        absoluteURLString, instance.xxformsUsername, instance.xxformsPassword, instance.xxformsDomain,
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             } else {
-                instanceDocument = containingDocument.getURIResolver().readURLAsDocumentInfo(containingDocument.getStaticState().getXPathConfiguration(),
+                instanceDocument = containingDocument.getURIResolver().readAsTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
                         absoluteURLString, instance.xxformsUsername, instance.xxformsPassword, instance.xxformsDomain,
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             }
@@ -912,10 +912,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // Read result as XML
             // TODO: use submission code
             if (!isReadonlyHint) {
-                instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
+                instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false, true);
             } else {
                 instanceDocument = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
-                        connectionResult.getResponseInputStream(), connectionResult.resourceURI, false);
+                        connectionResult.getResponseInputStream(), connectionResult.resourceURI, false, true);
             }
         } finally {
             // Clean-up

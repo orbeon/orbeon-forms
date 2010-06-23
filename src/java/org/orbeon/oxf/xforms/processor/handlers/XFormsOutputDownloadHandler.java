@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
@@ -20,7 +21,6 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -38,13 +38,13 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsOutputControl outputControl = (XFormsOutputControl) control;
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl);
 
         if (!handlerContext.isSpanHTMLLayout())
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
+            xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
         {
             final AttributesImpl aAttributes = getAnchorAttributes(outputControl, containerAttributes);
 
@@ -52,16 +52,16 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
             handleAccessibilityAttributes(attributes, aAttributes);
 
             final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, aAttributes);
+            xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, aAttributes);
             {
                 final String labelValue = (control != null) ? control.getLabel(pipelineContext) : null;
                 final boolean mustOutputHTMLFragment = control != null && control.isHTMLLabel(pipelineContext);
-                outputLabelText(contentHandler, control, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
+                outputLabelText(xmlReceiver, control, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
             }
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
+            xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
         }
         if (!handlerContext.isSpanHTMLLayout())
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
+            xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
     }
 
     private AttributesImpl getAnchorAttributes(XFormsOutputControl outputControl, AttributesImpl containerAttributes) {

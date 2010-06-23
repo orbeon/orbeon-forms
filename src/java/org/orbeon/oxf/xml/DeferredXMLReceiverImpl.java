@@ -1,28 +1,28 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * ContentHandler with an additional method allowing for adding attributes.
  */
-public class DeferredContentHandlerImpl extends ForwardingContentHandler implements DeferredContentHandler  {
+public class DeferredXMLReceiverImpl extends ForwardingXMLReceiver implements DeferredXMLReceiver {
 
     private boolean storedElement;
     private String uri;
@@ -30,8 +30,8 @@ public class DeferredContentHandlerImpl extends ForwardingContentHandler impleme
     private String qName;
     private AttributesImpl attributes;
 
-    public DeferredContentHandlerImpl(ContentHandler contentHandler) {
-        super(contentHandler);
+    public DeferredXMLReceiverImpl(XMLReceiver xmlReceiver) {
+        super(xmlReceiver);
     }
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {

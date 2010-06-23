@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.converter;
 
@@ -21,17 +21,17 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
-import org.orbeon.oxf.util.Base64ContentHandler;
+import org.orbeon.oxf.util.Base64XMLReceiver;
 import org.orbeon.oxf.util.XLSUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
-import org.xml.sax.ContentHandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -51,12 +51,12 @@ public class FromXLSConverter extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
 
                 try {
                     // Read binary content of Excel file
                     ByteArrayOutputStream os =  new ByteArrayOutputStream();
-                    Base64ContentHandler base64ContentHandler = new Base64ContentHandler(os);
+                    Base64XMLReceiver base64ContentHandler = new Base64XMLReceiver(os);
                     readInputAsSAX(context, INPUT_DATA, base64ContentHandler);
                     final byte[] fileContent = os.toByteArray();
 
@@ -66,7 +66,7 @@ public class FromXLSConverter extends ProcessorImpl {
                     final DOMGenerator domGenerator = new DOMGenerator
                         ( d, "from xls output", DOMGenerator.ZeroValidity
                           , DOMGenerator.DefaultContext );
-                    domGenerator.createOutput(OUTPUT_DATA).read(context, contentHandler);
+                    domGenerator.createOutput(OUTPUT_DATA).read(context, xmlReceiver);
 
                 } catch (IOException e) {
                     throw new OXFException(e);

@@ -21,6 +21,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
@@ -35,7 +36,6 @@ import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.trans.XPathException;
-import org.xml.sax.ContentHandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -58,7 +58,7 @@ public class XLSGenerator extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
 
                 try {
                     // Read binary content of uploaded Excel file
@@ -108,7 +108,7 @@ public class XLSGenerator extends ProcessorImpl {
                     final DOMGenerator domGenerator = new DOMGenerator
                         ( d, "xls generator output", DOMGenerator.ZeroValidity
                           , DOMGenerator.DefaultContext );
-                    domGenerator.createOutput(OUTPUT_DATA).read(context, contentHandler);
+                    domGenerator.createOutput(OUTPUT_DATA).read(context, xmlReceiver);
                 } catch (XPathException xpe) {
                     throw new OXFException(xpe);
                 } catch (IOException e) {

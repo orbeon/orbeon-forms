@@ -16,10 +16,11 @@ package org.orbeon.oxf.processor;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.ForwardingXMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
@@ -34,8 +35,8 @@ public class SAXLoggerProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                readInputAsSAX(context, INPUT_DATA, new DebugContentHandler(contentHandler));
+            public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
+                readInputAsSAX(context, INPUT_DATA, new DebugXMLReceiver(xmlReceiver));
             }
 
             public OutputCacheKey getKeyImpl(PipelineContext context) {
@@ -50,108 +51,143 @@ public class SAXLoggerProcessor extends ProcessorImpl {
         return output;
     }
 
-    public static class DebugContentHandler extends ForwardingContentHandler {
+    public static class DebugXMLReceiver extends ForwardingXMLReceiver {
 
         private Locator locator;
         private int level = 0;
 
-        public DebugContentHandler() {
-            this(new NullSerializer.NullContentHandler());
+        public DebugXMLReceiver() {
+            this(new XMLReceiverAdapter());
         }
 
-        public DebugContentHandler(ContentHandler contentHandler) {
-            super(contentHandler);
+        public DebugXMLReceiver(XMLReceiver xmlReceiver) {
+            super(xmlReceiver);
         }
 
+        @Override
         public void characters(char[] chars, int start, int length) throws SAXException {
-            final StringBuilder message = new StringBuilder(getLogSpaces());
-            message.append("characters('" + new String(chars, start, length) + "', " + start + ", " + length + ")");
-            addLocatorInfo(message);
-            logger.info(message.toString());
+            log("characters('" + new String(chars, start, length) + "', " + start + ", " + length + ")");
             super.characters(chars, start, length);
         }
 
+        @Override
         public void endDocument() throws SAXException {
-            final StringBuilder message = new StringBuilder(getLogSpaces());
-            message.append("endDocument()");
-            addLocatorInfo(message);
-            logger.info(message.toString());
+            log("endDocument()");
             super.endDocument();
         }
 
+        @Override
         public void endElement(String uri, String localname, String qName) throws SAXException {
             level--;
-            final StringBuilder message = new StringBuilder(getLogSpaces());
-            message.append("endElement('" + uri + "', '" + localname + "', '" + qName + "')");
-            addLocatorInfo(message);
-            logger.info(message.toString());
+            log("endElement('" + uri + "', '" + localname + "', '" + qName + "')");
             super.endElement(uri, localname, qName);
         }
 
+        @Override
         public void endPrefixMapping(String s) throws SAXException {
-            final StringBuilder message = new StringBuilder(getLogSpaces());
-            message.append("endPrefixMapping('" + s + "')");
-            logger.info(message);
+            log("endPrefixMapping('" + s + "')");
             super.endPrefixMapping(s);
         }
 
+        @Override
         public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {
-            final StringBuilder message = new StringBuilder(getLogSpaces());
-            message.append("ignorableWhitespace('" + new String(chars, start, length) + "', " + start + ", " + length + ")");
-            addLocatorInfo(message);
-            logger.info(message.toString());
+            log("ignorableWhitespace('" + new String(chars, start, length) + "', " + start + ", " + length + ")");
             super.ignorableWhitespace(chars, start, length);
         }
 
+        @Override
         public void processingInstruction(String s, String s1) throws SAXException {
-            final StringBuilder message = new StringBuilder(getLogSpaces());
-            message.append("processingInstruction('" + s + "', '" + s1 + "')");
-            addLocatorInfo(message);
-            logger.info(message.toString());
+            log("processingInstruction('" + s + "', '" + s1 + "')");
             super.processingInstruction(s, s1);
         }
 
+        @Override
         public void setDocumentLocator(Locator locator) {
             logger.info("setDocumentLocator(...)");
             this.locator = locator;
             super.setDocumentLocator(locator);
         }
 
+        @Override
         public void skippedEntity(String s) throws SAXException {
-            final StringBuilder message = new StringBuilder(getLogSpaces());
-            message.append("skippedEntity('" + s + "')");
-            addLocatorInfo(message);
-            logger.info(message.toString());
+            log("skippedEntity('" + s + "')");
             super.skippedEntity(s);
         }
 
+        @Override
         public void startDocument() throws SAXException {
-            final StringBuilder message = new StringBuilder(getLogSpaces());
-            message.append("startDocument()");
-            addLocatorInfo(message);
-            logger.info(message.toString());
+            log("startDocument()");
             super.startDocument();
         }
 
+        @Override
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-            final StringBuilder message = new StringBuilder(getLogSpaces());
-            message.append("startElement('" + uri + "', '" + localname + "', '" + qName + "'");
+
+            final StringBuilder message = new StringBuilder("startElement('" + uri + "', '" + localname + "', '" + qName + "'");
             for (int i = 0; i < attributes.getLength(); i++)
                 message.append(", ('" + attributes.getURI(i) + "', '" + attributes.getLocalName(i)
                         + "', '" + attributes.getQName(i) + "', '" + attributes.getValue(i) + "')");
             message.append(")");
 
-            addLocatorInfo(message);
-            logger.info(message.toString());
+            log(message.toString());
+
             super.startElement(uri, localname, qName, attributes);
             level++;
         }
 
+        @Override
         public void startPrefixMapping(String s, String s1) throws SAXException {
-            final StringBuilder message = new StringBuilder(getLogSpaces());
-            message.append("startPrefixMapping('" + s + "', '" + s1 + "')");
-            logger.info(message);
+            log("startPrefixMapping('" + s + "', '" + s1 + "')");
             super.startPrefixMapping(s, s1);
+        }
+
+        @Override
+        public void comment(char[] chars, int start, int length) throws SAXException {
+            log("comment('" + new String(chars, start, length) + "')");
+            super.comment(chars, start, length);
+        }
+
+        @Override
+        public void startDTD(String name, String publicId, String systemId) throws SAXException {
+            log("startDTD('" + name + ", " + publicId + ", " + systemId + "')");
+            super.startDTD(name, publicId, systemId);
+        }
+
+        @Override
+        public void endDTD() throws SAXException {
+            log("endDTD()");
+            super.endDTD();
+        }
+
+        @Override
+        public void startEntity(String name) throws SAXException {
+            log("startEntity('" + name + "')");
+            super.startEntity(name);
+        }
+
+        @Override
+        public void endEntity(String name) throws SAXException {
+            log("endEntity('" + name + "')");
+            super.endEntity(name);
+        }
+
+        @Override
+        public void startCDATA() throws SAXException {
+            log("startCDATA()");
+            super.startCDATA();
+        }
+
+        @Override
+        public void endCDATA() throws SAXException {
+            log("endCDATA()");
+            super.endCDATA();
+        }
+
+        private void log(String message) {
+            final StringBuilder builder = new StringBuilder(getLogSpaces());
+            builder.append(message);
+            addLocatorInfo(builder);
+            logger.info(builder.toString());
         }
 
         private void addLocatorInfo(StringBuilder message) {

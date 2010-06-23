@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.resources;
 
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.w3c.dom.Node;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.XMLReader;
 
 import java.io.InputStream;
@@ -37,57 +37,60 @@ public interface ResourceManager {
      * Gets a W3C DOM node for the specified key. The key must point to an XML
      * document, or a OXFException is raised.
      *
-     * @param key A Resource Manager key
+     * @param key a Resource Manager key
      * @return a node element
      */
-    public Node getContentAsDOM(String key);
+    Node getContentAsDOM(String key);
 
     /**
      * Gets a DOM4J document for the specified key. The key must point to an XML
      * document, or a OXFException is raised.
      *
-     * @param key A Resource Manager key
+     * @param key a Resource Manager key
      * @return  a document element
      */
-    public org.dom4j.Document getContentAsDOM4J(String key);
-
+    org.dom4j.Document getContentAsDOM4J(String key);
+    
     /**
-     * Gets a document form the resource manager and send SAX events to the
-     * specified content handler. the key must point to an XML
+     * Gets a DOM4J document for the specified key. The key must point to an XML
      * document, or a OXFException is raised.
      *
-     * @param key       A Resource Manager key
-     * @param handler   The content handler where SAX events are sent
+     * @param key               a Resource Manager key
+     * @param validating        whether the XML parser must attempt to validate the resource
+     * @param handleXInclude    whether the XML parser must process XInclude instructions
+     * @param handleLexical     whether the XML parser must output SAX LexicalHandler events, including comments
+     * @return  a document element
      */
-    public void getContentAsSAX(String key, ContentHandler handler);
+    org.dom4j.Document getContentAsDOM4J(String key, boolean validating, boolean handleXInclude, boolean handleLexical);
 
     /**
-     * Gets a document form the resource manager and send SAX events to the
-     * specified content handler. the key must point to an XML
-     * document, or a OXFException is raised.
+     * Gets a document form the resource manager and send SAX events to the specified receiver. the key must point to an
+     * XML document, or a OXFException is raised.
+     *
+     * @param key           a Resource Manager key
+     * @param xmlReceiver   receiver where SAX events are sent
+     */
+    void getContentAsSAX(String key, XMLReceiver xmlReceiver);
+
+    /**
+     * Gets a document form the resource manager and send SAX events to the specified receiver. the key must point to an
+     * XML document, or a OXFException is raised.
      * 
-     * @param key               A Resource Manager key
-     * @param handler           The content handler where SAX events are sent
-     * @param validating        Whether the XML parser must attempt to validate the resource
-     * @param handleXInclude    Whether the XML parser must process XInclude instructions
+     * @param key            a Resource Manager key
+     * @param xmlReceiver    receiver where SAX events are sent
+     * @param validating     whether the XML parser must attempt to validate the resource
+     * @param handleXInclude whether the XML parser must process XInclude instructions
+     * @param handleLexical  whether the XML parser must output SAX LexicalHandler events, including comments
      */
-    public void getContentAsSAX(String key, ContentHandler handler, boolean validating, boolean handleXInclude);
-
-    /**
-     * Returns a character reader from the resource manager for the specified
-     * key. The key could point to any text document.
-     * @param key A Resource Manager key
-     * @return a character reader
-     */
-//    public Reader getContentAsReader(String key);
+    void getContentAsSAX(String key, XMLReceiver xmlReceiver, boolean validating, boolean handleXInclude, boolean handleLexical);
 
     /**
      * Returns a binary input stream for the specified key. The key could point
      * to any document type (text or binary).
-     * @param key A Resource Manager key
+     * @param key a Resource Manager key
      * @return a input stream
      */
-    public InputStream getContentAsStream(String key);
+    InputStream getContentAsStream(String key);
 
     /**
      * Returns a XMLReader interface to the resource manager. One should then
@@ -96,76 +99,63 @@ public interface ResourceManager {
      *
      * @return An XML reader
      */
-    public XMLReader getXMLReader();
+    XMLReader getXMLReader();
 
     /**
      * Gets the last modified timestamp for the specified resource
-     * @param key A Resource Manager key
+     * @param key a Resource Manager key
      * @param doNotThrowResourceNotFound
      * @return a timestamp
      */
-    public long lastModified(String key, boolean doNotThrowResourceNotFound);
+    long lastModified(String key, boolean doNotThrowResourceNotFound);
 
     /**
      * Returns the length of the file denoted by this abstract pathname.
      * @return The length, in bytes, of the file denoted by this abstract pathname, or 0L if the file does not exist
      */
-    public int length(String key);
+    int length(String key);
 
     /**
      * Indicates if the resource manager implementation suports write operations
-     * @param key A Resource Manager key
+     * @param key a Resource Manager key
      * @return true if write operations are allowed
      */
-    public boolean canWrite(String key);
+    boolean canWrite(String key);
 
     /**
-     * Write the specified document in the Resource Manager
-     * @param key A Resource Manager key
-     * @param node The W3C DOM node to write
+     * Returns a receiver that can write to the Resource Manager.
+     *
+     * @param key   a Resource Manager key
+     * @return      receiver
      */
-//    public void writeDOM(String key, Node node);
-
-    /**
-     * Write the specified document in the Resource Manager
-     * @param key A Resource Manager key
-     * @param document A DOM4J document
-     */
-//    public void writeDOM4J(String key, org.dom4j.Document document);
-
-    /**
-     * Returns a ContentHandler that can write to the Resource Manager
-     * @param key A Resource Manager key
-     * @return A ContentHandler
-     */
-    public ContentHandler getWriteContentHandler(String key);
+    XMLReceiver getWriteContentHandler(String key);
 
     /**
      * Allows writing to the resource
-     * @param key A Resource Manager key
+     * @param key a Resource Manager key
      * @return an output stream
      */
-    public OutputStream getOutputStream(String key);
+    OutputStream getOutputStream(String key);
 
     /**
      * Allow writing to the resource
-     * @param key A Resource Manager key
+     * @param key a Resource Manager key
      * @return  a writer
      */
-    public Writer getWriter(String key);
+    Writer getWriter(String key);
 
     /**
      * Returns the path to the given resource on the file system. If a path on
      * the local file system cannot be provided by the resource manager, null is
      * returned.
      */
-    public String getRealPath(String key);
+    String getRealPath(String key);
 
     /**
      * Check if a resource exists given its key.
      *
-     * @param key   A Resource Manager key
+     * @param key   a Resource Manager key
      * @return      true iif the resource exists
      */
-    public boolean exists(String key);
+    boolean exists(String key);
 }

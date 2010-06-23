@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xml.saxrewrite;
 
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
  * Driver for a state machine that response to SAX events. Just forwards SAX events to a State which in turn returns
  * the next State.
  */
-public final class StatefulHandler implements ContentHandler {
+public final class StatefulHandler implements XMLReceiver {
     /**
      * The current state.
      */
@@ -80,5 +80,33 @@ public final class StatefulHandler implements ContentHandler {
 
     public void startPrefixMapping(final String pfx, final String uri) throws SAXException {
         state = state.startPrefixMapping(pfx, uri);
+    }
+
+    public void startDTD(String name, String publicId, String systemId) throws SAXException {
+        state = state.startDTD(name, publicId, systemId);
+    }
+
+    public void endDTD() throws SAXException {
+        state = state.endDTD();
+    }
+
+    public void startEntity(String name) throws SAXException {
+        state = state.startEntity(name);
+    }
+
+    public void endEntity(String name) throws SAXException {
+        state = state.endEntity(name);
+    }
+
+    public void startCDATA() throws SAXException {
+        state = state.startCDATA();
+    }
+
+    public void endCDATA() throws SAXException {
+        state = state.endCDATA();
+    }
+
+    public void comment(char[] ch, int start, int length) throws SAXException {
+        state = state.comment(ch, start, length);
     }
 }

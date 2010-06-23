@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.orbeon.oxf.xml.NamespaceSupport3;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * ContentHandler that gathers namespace information on XForms elements (xforms:* and xxforms:*).
  */
-public class XFormsNamespaceExtractorContentHandler extends ForwardingContentHandler {
+public class XFormsNamespaceExtractorContentHandler extends ForwardingXMLReceiver {
 
     private int level = 0;
     private int xformsInstanceLevel = -1;

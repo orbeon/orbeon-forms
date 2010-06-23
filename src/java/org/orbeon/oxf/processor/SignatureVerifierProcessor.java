@@ -16,12 +16,13 @@ package org.orbeon.oxf.processor;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
-import org.xml.sax.ContentHandler;
 
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -44,7 +45,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, final ContentHandler contentHandler) {
+            public void readImpl(PipelineContext context, final XMLReceiver xmlReceiver) {
                 try {
                     final Document pubDoc = readCacheInputAsDOM4J(context, INPUT_PUBLIC_KEY);
                     final String pubString = XPathUtils.selectStringValueNormalize(pubDoc, "/public-key");
@@ -70,7 +71,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
                         throw new OXFException("Invalid Signature");
                     else {
                         final LocationSAXWriter saw = new LocationSAXWriter();
-                        saw.setContentHandler(contentHandler);
+                        saw.setContentHandler(xmlReceiver);
                         saw.write(sigData);
                     }
                 } catch (Exception e) {

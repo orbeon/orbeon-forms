@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.serializer;
 
@@ -28,7 +28,7 @@ public class HttpSerializer extends HttpSerializerBase {
     public static final String HTTP_SERIALIZER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/http-serializer";
 
     protected String getDefaultContentType() {
-        return BinaryTextContentHandler.DEFAULT_BINARY_CONTENT_TYPE;
+        return BinaryTextXMLReceiver.DEFAULT_BINARY_CONTENT_TYPE;
     }
 
     protected String getConfigSchemaNamespaceURI() {
@@ -39,7 +39,7 @@ public class HttpSerializer extends HttpSerializerBase {
         try {
             final Config httpConfig = (Config) config;
 
-            readInputAsSAX(context, input, new BinaryTextContentHandler(response, outputStream, true,
+            readInputAsSAX(context, input, new BinaryTextXMLReceiver(response, outputStream, true,
                     httpConfig.forceContentType, httpConfig.contentType, httpConfig.ignoreDocumentContentType,
                     httpConfig.forceEncoding, httpConfig.encoding, httpConfig.ignoreDocumentEncoding));
 

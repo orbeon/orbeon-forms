@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl;
-import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -36,7 +36,7 @@ public class XFormsTriggerFullHandler extends XFormsTriggerHandler {
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsTriggerControl triggerControl = (XFormsTriggerControl) control;
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
 
         final String labelValue = getTriggerLabel(triggerControl);
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, triggerControl, true);
@@ -66,7 +66,7 @@ public class XFormsTriggerFullHandler extends XFormsTriggerHandler {
                     final StringBuilder sb = new StringBuilder(labelValue.length());
 
                     final String[] imageInfo = new String[3];// who needs classes? ;-)
-                    XFormsUtils.streamHTMLFragment(new ContentHandlerAdapter() {
+                    XFormsUtils.streamHTMLFragment(new XMLReceiverAdapter() {
                         public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
                             if (imageInfo[0] == null && "img".equals(localName)) {
                                 // Remember information of first image found
@@ -122,13 +122,13 @@ public class XFormsTriggerFullHandler extends XFormsTriggerHandler {
         // xhtml:button or xhtml:input
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
         handleDisabledAttribute(containerAttributes, containingDocument, triggerControl);
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, spanQName, containerAttributes);
+        xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, spanQName, containerAttributes);
         {
             if ("button".equals(elementName)) {
                 // Output content of <button> element
-                outputLabelText(contentHandler, triggerControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
+                outputLabelText(xmlReceiver, triggerControl, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
             }
         }
-        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, spanQName);
+        xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, spanQName);
     }
 }

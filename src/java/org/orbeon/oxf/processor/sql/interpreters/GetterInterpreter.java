@@ -112,6 +112,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                     } else if (interpreterContext.getDelegate().isXMLType(columnType, columnTypeName)) {
                         // The fragment is stored as a native XMLType
                         org.w3c.dom.Node node = interpreterContext.getDelegate().getDOM(resultSet, columnName);
+                        // NOTE: XML comments not supported yet
                         if (node != null) {
                             TransformerUtils.getIdentityTransformer().transform(new DOMSource(node),
                                     new SAXResult(new SQLProcessor.ForwardingContentHandler() {

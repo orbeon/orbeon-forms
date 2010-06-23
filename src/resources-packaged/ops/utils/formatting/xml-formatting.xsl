@@ -208,8 +208,13 @@
         </span>
     </xsl:template>
 
-    <xsl:template match="comment() | processing-instruction()" mode="xml-formatting">
-        <span class="xml-comment"><xsl:value-of select="."/></span>
+    <xsl:template match="comment()" mode="xml-formatting">
+        <!-- TODO: replace line breaks -->
+        <span class="xml-comment">&lt;!--<xsl:value-of select="."/>--></span>
+    </xsl:template>
+
+    <xsl:template match="processing-instruction()" mode="xml-formatting">
+        <span class="xml-comment">&lt;?<xsl:value-of select="concat(name(), ' ', .)"/>?></span>
     </xsl:template>
 
     <xsl:template name="display-element-name">

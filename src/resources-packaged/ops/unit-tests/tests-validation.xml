@@ -122,11 +122,6 @@
                                     extroverted beagle
                                 </qualification>
                             </character>
-                            <!--              <character>-->
-                            <!--                <name>Peppermint Patty</name>-->
-                            <!--                <since>1966-08-22</since>-->
-                            <!--                <qualification>bold, brash and tomboyish</qualification>-->
-                            <!--              </character>-->
                         </book>
                     </p:input>
 
@@ -150,11 +145,6 @@
                         extroverted beagle
                     </qualification>
                 </character>
-                <!--        <character>-->
-                <!--          <name>Peppermint Patty</name>-->
-                <!--          <since>1966-08-22</since>-->
-                <!--          <qualification>bold, brash and tomboyish</qualification>-->
-                <!--        </character>-->
             </book>
         </output>
     </test>

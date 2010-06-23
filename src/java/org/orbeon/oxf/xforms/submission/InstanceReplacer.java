@@ -68,7 +68,7 @@ public class InstanceReplacer extends BaseReplacer {
                 // Resulting instance must not be read-only
 
                 // TODO: What about configuring validation? And what default to choose?
-                resultingDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
+                resultingDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude, true);
 
                 if (indentedLogger.isDebugEnabled())
                     indentedLogger.logDebug("", "deserializing to mutable instance");
@@ -78,7 +78,7 @@ public class InstanceReplacer extends BaseReplacer {
                 // TODO: What about configuring validation? And what default to choose?
                 // NOTE: isApplicationSharedHint is always false when get get here. isApplicationSharedHint="true" is handled above.
                 resultingDocument = TransformerUtils.readTinyTree(containingDocument.getStaticState().getXPathConfiguration(),
-                        connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude);
+                        connectionResult.getResponseInputStream(), connectionResult.resourceURI, isHandleXInclude, true);
 
                 if (indentedLogger.isDebugEnabled())
                     indentedLogger.logDebug("", "deserializing to read-only instance");

@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.serializer.legacy;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -36,7 +37,7 @@ public class XMLSerializer extends HttpTextSerializer {
     protected void readInput(PipelineContext context, ProcessorInput input, Config config, Writer writer) {
 
         // Create an identity transformer and start the transformation
-        TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
 
         if(config.publicDoctype != null && config.systemDoctype == null)
             throw new OXFException("XML Serializer must have a system doctype if a public doctype is present");
@@ -53,6 +54,6 @@ public class XMLSerializer extends HttpTextSerializer {
                 config.indentAmount);
 
         identity.setResult(new StreamResult(writer));
-        ProcessorImpl.readInputAsSAX(context, input, new SerializerContentHandler(identity, writer, isSerializeXML11()));
+        ProcessorImpl.readInputAsSAX(context, input, new SerializerXMLReceiver(identity, writer, isSerializeXML11()));
     }
 }

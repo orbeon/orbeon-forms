@@ -19,6 +19,7 @@ import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
@@ -26,7 +27,6 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
@@ -72,7 +72,7 @@ public class TeeProcessor extends ProcessorImpl {
             this.isMultipleReads = isMultipleReads;
         }
 
-        public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+        public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
             try {
                 final State state = (State) getState(context);
                 if (state.store == null) {
@@ -85,10 +85,10 @@ public class TeeProcessor extends ProcessorImpl {
 
                     // Create SAXStore and read input through it
                     final ProcessorInput input = getInputByName(INPUT_DATA);
-                    state.store = new SAXStore(contentHandler);
+                    state.store = new SAXStore(xmlReceiver);
                     readInputAsSAX(context, input, state.store);
                 } else {
-                    state.store.replay(contentHandler);
+                    state.store.replay(xmlReceiver);
                 }
 
                 // If this output can be read only once, increase read count

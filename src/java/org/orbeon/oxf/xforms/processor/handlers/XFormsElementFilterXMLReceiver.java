@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,18 +13,18 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xml.ElementFilterContentHandler;
+import org.orbeon.oxf.xml.ElementFilterXMLReceiver;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 
 /**
  * This filters out all elements in the XForms or "xxforms" namespace.
  */
-public class XFormsElementFilterContentHandler extends ElementFilterContentHandler {
+public class XFormsElementFilterXMLReceiver extends ElementFilterXMLReceiver {
 
-    public XFormsElementFilterContentHandler(ContentHandler contentHandler) {
-        super(contentHandler);
+    public XFormsElementFilterXMLReceiver(XMLReceiver xmlReceiver) {
+        super(xmlReceiver);
     }
 
     protected boolean isFilterElement(String uri, String localname, String qName, Attributes attributes) {

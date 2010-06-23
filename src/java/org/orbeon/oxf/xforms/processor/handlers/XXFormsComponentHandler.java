@@ -60,7 +60,7 @@ public class XXFormsComponentHandler extends XFormsBaseHandler {
 
             // Forward shadow content to handler
             // TODO: would be better to handle inclusion and namespaces using XIncludeProcessor facilities instead of custom code
-            TransformerUtils.writeDom4j(shadowTree, new EmbeddedDocumentContentHandler(controller) {
+            TransformerUtils.writeDom4j(shadowTree, new EmbeddedDocumentXMLReceiver(controller) {
 
                 private int level = 0;
 

@@ -21,6 +21,7 @@ import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
@@ -28,12 +29,11 @@ import org.orbeon.oxf.processor.pipeline.TeeProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
+import org.orbeon.oxf.xml.EmbeddedDocumentXMLReceiver;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.trans.XPathException;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -115,13 +115,13 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(final String name) {
         final ProcessorOutput output = new ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 try {
                     final State state = (State) getState(pipelineContext);
 
                     // Open document
-                    contentHandler.startDocument();
-                    contentHandler.startElement(rootNamespaceURI, rootLocalName, rootQName, new AttributesImpl());
+                    xmlReceiver.startDocument();
+                    xmlReceiver.startElement(rootNamespaceURI, rootLocalName, rootQName, new AttributesImpl());
 
                     // Read n times from iterationOutput
                     PooledXPathExpression expression = null;
@@ -141,7 +141,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
 
                             // Run iteration
                             forEachBlockProcessor.reset(pipelineContext);
-                            iterationOutput.read(pipelineContext, new EmbeddedDocumentContentHandler(contentHandler));
+                            iterationOutput.read(pipelineContext, new EmbeddedDocumentXMLReceiver(xmlReceiver));
                         }
                     } catch (XPathException e) {
                         throw new OXFException(e);
@@ -156,8 +156,8 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
                     commitInputs(pipelineContext, iterationCount);
 
                     // Close document
-                    contentHandler.endElement(rootNamespaceURI, rootLocalName, rootQName);
-                    contentHandler.endDocument();
+                    xmlReceiver.endElement(rootNamespaceURI, rootLocalName, rootQName);
+                    xmlReceiver.endDocument();
                 } catch (SAXException e) {
                     throw new OXFException(e);
                 }
@@ -317,9 +317,9 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
             super(ConcreteForEachProcessor.class, name);
         }
 
-        protected void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+        protected void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
             // Delegate to the p:for-each input
-            ConcreteForEachProcessor.this.readInputAsSAX(pipelineContext, getName(), contentHandler);
+            ConcreteForEachProcessor.this.readInputAsSAX(pipelineContext, getName(), xmlReceiver);
         }
 
         protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
@@ -342,9 +342,9 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
             super(clazz, name);
         }
 
-        protected void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+        protected void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
             final State state = (State) getState(pipelineContext);
-            state.domGenerator.getOutputByName(OUTPUT_DATA).read(pipelineContext, contentHandler);
+            state.domGenerator.getOutputByName(OUTPUT_DATA).read(pipelineContext, xmlReceiver);
         }
 
         protected OutputCacheKey getKeyImpl(PipelineContext context) {

@@ -19,6 +19,8 @@ import org.dom4j.io.DocumentResult;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.xmldb.XMLDBProcessor;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -26,7 +28,6 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.xml.sax.ContentHandler;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.base.XMLDBException;
@@ -225,7 +226,7 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     private Document executeQuery(String query) {
 
         final DocumentResult result = new DocumentResult();
-        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         identity.setResult(result);
 
         XMLDB_ACCESSOR.query(getPipelineContext(), new Datasource(EXIST_XMLDB_DRIVER,
@@ -324,8 +325,8 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
     private static class XMLDBAccessor extends XMLDBProcessor {
 
         @Override
-        public void query(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query, Map namespaceContext, ContentHandler contentHandler) {
-            super.query(pipelineContext, datasource, collectionName, createCollection, resourceId, query, namespaceContext, contentHandler);
+        public void query(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query, Map namespaceContext, XMLReceiver xmlReceiver) {
+            super.query(pipelineContext, datasource, collectionName, createCollection, resourceId, query, namespaceContext, xmlReceiver);
         }
 
         protected Document getResource(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceName) {
@@ -345,10 +346,10 @@ public class XFormsPersistentApplicationStateStore extends XFormsStateStore {
                 } else if (resource instanceof XMLResource) {
 
                     final LocationDocumentResult documentResult = new LocationDocumentResult();
-                    final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+                    final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
                     identity.setResult(documentResult);
 
-                    ((XMLResource) resource).getContentAsSAX(new DatabaseReadContentHandler(identity));
+                    ((XMLResource) resource).getContentAsSAX(new DatabaseReadXMLReceiver(identity));
 
                     return documentResult.getDocument();
                 } else {

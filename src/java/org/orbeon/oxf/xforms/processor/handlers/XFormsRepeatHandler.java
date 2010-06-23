@@ -18,8 +18,8 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
-import org.orbeon.oxf.xml.DeferredContentHandler;
-import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
+import org.orbeon.oxf.xml.DeferredXMLReceiver;
+import org.orbeon.oxf.xml.DeferredXMLReceiverImpl;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.xml.sax.Attributes;
@@ -60,7 +60,7 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandler {
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
 
         // Place interceptor on output
-        final DeferredContentHandler savedOutput = handlerContext.getController().getOutput();
+        final DeferredXMLReceiver savedOutput = handlerContext.getController().getOutput();
         final OutputInterceptor outputInterceptor = !isMustGenerateDelimiters ? null : new OutputInterceptor(savedOutput, spanQName, new OutputInterceptor.Listener() {
             public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
                 // Delimiter: begin repeat
@@ -74,7 +74,7 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandler {
         });
         // TODO: is the use of XFormsElementFilterContentHandler necessary now?
         if (outputInterceptor != null)
-            handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(outputInterceptor)));
+            handlerContext.getController().setOutput(new DeferredXMLReceiverImpl(new XFormsElementFilterXMLReceiver(outputInterceptor)));
 
         if (isConcreteControl && (isTopLevelRepeat || !isMustGenerateTemplate)) {
 

@@ -1,15 +1,15 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.generator;
 
@@ -21,11 +21,11 @@ import org.exolab.castor.xml.Marshaller;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.ParserAdapter;
@@ -114,18 +114,18 @@ public class BeanGenerator extends ProcessorImpl {
                 });
     }
 
-    protected void readBean(PipelineContext context, Config config, Mapping mapping, ContentHandler contentHandler) {
-        ExternalContext externalContext = (ExternalContext) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.EXTERNAL_CONTEXT);
+    protected void readBean(PipelineContext context, Config config, Mapping mapping, XMLReceiver xmlReceiver) {
+        ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         if (externalContext == null)
             throw new OXFException("Missing external context in BeanGenerator");
         try {
-            contentHandler.startDocument();
+            xmlReceiver.startDocument();
             String rootElementName = "beans";
-            contentHandler.startElement("", rootElementName, rootElementName, XMLUtils.EMPTY_ATTRIBUTES);
+            xmlReceiver.startElement("", rootElementName, rootElementName, XMLUtils.EMPTY_ATTRIBUTES);
 
             // Initialize Castor
             ParserAdapter adapter = new ParserAdapter(XMLUtils.newSAXParser().getParser());
-            adapter.setContentHandler(contentHandler);
+            adapter.setContentHandler(xmlReceiver);
             Marshaller marshaller = new Marshaller(adapter);
             marshaller.setMarshalAsDocument(false);
             marshaller.setMapping(mapping);
@@ -137,15 +137,11 @@ public class BeanGenerator extends ProcessorImpl {
                     // Create empty element
                     if (logger.isInfoEnabled())
                         logger.info("Bean " + attName + " is null");
-                    contentHandler.startElement("", attName, attName, XMLUtils.EMPTY_ATTRIBUTES);
-                    contentHandler.endElement("", attName, attName);
+                    xmlReceiver.startElement("", attName, attName, XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.endElement("", attName, attName);
                 } else if (bean instanceof org.w3c.dom.Document) {
                     // W3C Document: send as-is
-                    Transformer identity = TransformerUtils.getIdentityTransformer();
-                    identity.transform(new DOMSource((org.w3c.dom.Document) bean), new SAXResult(new ForwardingContentHandler(contentHandler) {
-                        public void startDocument() {}
-                        public void endDocument() {}
-                    }));
+                    TransformerUtils.sourceToSAX(new DOMSource((org.w3c.dom.Document) bean), new EmbeddedDocumentXMLReceiver(xmlReceiver));
                 } else {
                     // Serialize with Castor
                     if (logger.isDebugEnabled())
@@ -154,8 +150,8 @@ public class BeanGenerator extends ProcessorImpl {
                     marshaller.marshal(bean);
                 }
             }
-            contentHandler.endElement("", rootElementName, rootElementName);
-            contentHandler.endDocument();
+            xmlReceiver.endElement("", rootElementName, rootElementName);
+            xmlReceiver.endDocument();
 
         } catch (Exception e) {
             throw new OXFException(e);
@@ -164,10 +160,10 @@ public class BeanGenerator extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.DigestTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 try {
                     State state = (State) getFilledOutState(pipelineContext);
-                    state.beanStore.replay(contentHandler);
+                    state.beanStore.replay(xmlReceiver);
                 } catch (SAXException e) {
                     throw new OXFException(e);
                 }
@@ -184,10 +180,10 @@ public class BeanGenerator extends ProcessorImpl {
                 State state = (State) digestState;
                 if (state.beanStore == null) {
                     state.beanStore = new SAXStore();
-                    XMLUtils.DigestContentHandler dch = new XMLUtils.DigestContentHandler("MD5");
-                    TeeContentHandler tee = new TeeContentHandler(Arrays.asList(new Object[]{state.beanStore, dch}));
+                    final XMLUtils.DigestContentHandler digester = new XMLUtils.DigestContentHandler("MD5");
+                    final TeeXMLReceiver tee = new TeeXMLReceiver(Arrays.asList(state.beanStore, digester));
                     readBean(pipelineContext, getConfig(pipelineContext), getMapping(pipelineContext), tee);
-                    state.digest = dch.getResult();
+                    state.digest = digester.getResult();
                 }
                 return true;
             }

@@ -19,6 +19,7 @@ import org.dom4j.Element;
 import org.dom4j.VisitorSupport;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -64,7 +65,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, final ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
                 try {
                     Element filterElement = readInputAsDOM4J(pipelineContext, INPUT_FILTER).getRootElement();
                     Document instance = ( Document )readInputAsDOM4J( pipelineContext, INPUT_INSTANCE ).clone();
@@ -104,14 +105,14 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     });
 
                     // Output as SAX
-                    contentHandler.startDocument();
-                    contentHandler.startElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
+                    xmlReceiver.startDocument();
+                    xmlReceiver.startElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
                     if (!allMarked[0]) {
                         // If all the nodes of the instance map to parameters, we don't output the instance parameter
-                        outputParameter("$instance", XFormsUtils.encodeXML(pipelineContext, instance, false), contentHandler);
+                        outputParameter("$instance", XFormsUtils.encodeXML(pipelineContext, instance, false), xmlReceiver);
                     }
-                    contentHandler.endElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT);
-                    contentHandler.endDocument();
+                    xmlReceiver.endElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT);
+                    xmlReceiver.endDocument();
 
                 } catch (Exception e) {
                     throw new OXFException(e);

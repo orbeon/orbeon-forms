@@ -17,17 +17,16 @@ import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.Base64ContentHandler;
+import org.orbeon.oxf.util.Base64XMLReceiver;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.TextContentHandler;
-import org.orbeon.oxf.xml.ContentHandlerAdapter;
+import org.orbeon.oxf.util.TextXMLReceiver;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.Result;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +34,7 @@ import java.util.Map;
 /**
  * ContentHandler able to serialize text or binary documents to an output stream.
  */
-public class BinaryTextContentHandler extends ContentHandlerAdapter {
+public class BinaryTextXMLReceiver extends XMLReceiverAdapter {
 
     public static final String DEFAULT_BINARY_CONTENT_TYPE = "application/octet-stream";
     public static final String DEFAULT_TEXT_CONTENT_TYPE = "text/plain";
@@ -63,7 +62,7 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
      *
      * @param outputStream  OutputStream to write to
      */
-    public BinaryTextContentHandler(OutputStream outputStream) {
+    public BinaryTextXMLReceiver(OutputStream outputStream) {
         this(null, outputStream, true, false, null, false, false, null, false);
     }
 
@@ -80,7 +79,7 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
      * @param requestedEncoding
      * @param ignoreDocumentEncoding
      */
-    public BinaryTextContentHandler(ExternalContext.Response response, OutputStream outputStream, boolean isCloseStream,
+    public BinaryTextXMLReceiver(ExternalContext.Response response, OutputStream outputStream, boolean isCloseStream,
                                     boolean forceContentType, String requestedContentType, boolean ignoreDocumentContentType,
                                     boolean forceEncoding, String requestedEncoding, boolean ignoreDocumentEncoding) {
         this.outputStream = outputStream;
@@ -93,13 +92,6 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
         this.requestedEncoding = requestedEncoding;
         this.ignoreDocumentEncoding = ignoreDocumentEncoding;
     }
-
-//    private boolean started;
-//    public void startDocument() throws SAXException {
-//        if (started)
-//            throw new IllegalStateException("startDocument already called");
-//        started = true;
-//    }
 
     public void startPrefixMapping(String prefix, String uri) {
         if (elementLevel == 0) {
@@ -174,7 +166,7 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
                 if (response != null)
                     response.setContentType(contentType);
 
-                outputContentHandler = new Base64ContentHandler(outputStream);
+                outputContentHandler = new Base64XMLReceiver(outputStream);
             } else {
                 // Get content-type and encoding
                 final String contentType = getContentType(contentTypeAttribute, DEFAULT_TEXT_CONTENT_TYPE);
@@ -189,7 +181,7 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
                 } catch (UnsupportedEncodingException e) {
                     throw new OXFException(e);
                 }
-                outputContentHandler = new TextContentHandler(writer);
+                outputContentHandler = new TextXMLReceiver(writer);
             }
         }
     }
@@ -237,18 +229,6 @@ public class BinaryTextContentHandler extends ContentHandlerAdapter {
                         writer.flush();
                     if (outputStream != null)
                         outputStream.flush();
-                } else if ("start-comment".equals(data)) {
-                    super.processingInstruction(Result.PI_DISABLE_OUTPUT_ESCAPING, "");
-                    super.characters("<!--".toCharArray(), 0, 4);
-//                    if (writer != null) {
-//                        writer.write("<!--");
-//                    }
-                } else if ("end-comment".equals(data)) {
-                    super.characters("-->".toCharArray(), 0, 3);
-                    super.processingInstruction(Result.PI_ENABLE_OUTPUT_ESCAPING, "");
-//                    if (writer != null) {
-//                        writer.write("-->");
-//                    }
                 }
             } catch (IOException e) {
                 throw new OXFException(e);

@@ -1,22 +1,23 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
- *  This program is free software; you can redistribute it and/or modify it under the terms of the
- *  GNU Lesser General Public License as published by the Free Software Foundation; either version
- *  2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
  *
- *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.SimpleProcessor;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -33,20 +34,20 @@ public class ListInputs extends SimpleProcessor {
         addOutputInfo(new ProcessorInputOutputInfo("list"));
     }
 
-    public void generateList(PipelineContext pipelineContext, ContentHandler contentHandler) {
+    public void generateList(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
         try {
             Map inputMap = getConnectedInputs();
 
-            contentHandler.startDocument();
-            contentHandler.startElement("", "inputs", "inputs", new AttributesImpl());
+            xmlReceiver.startDocument();
+            xmlReceiver.startElement("", "inputs", "inputs", new AttributesImpl());
             for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
                 String inputName = (String) i.next();
                 List inputsForName = (List) inputMap.get(inputName);
 
                 for (Iterator j = inputsForName.iterator(); j.hasNext();) {
                     ProcessorInput input = (ProcessorInput) j.next();
-                    addStringElement(contentHandler, "input", input.getName());
-                    readInputAsSAX(pipelineContext, input, new ForwardingContentHandler(contentHandler) {
+                    addStringElement(xmlReceiver, "input", input.getName());
+                    readInputAsSAX(pipelineContext, input, new SimpleForwardingXMLReceiver(xmlReceiver) {
                         public void startDocument() {
                         }
                         public void endDocument() {
@@ -54,8 +55,8 @@ public class ListInputs extends SimpleProcessor {
                     });
                 }
             }
-            contentHandler.endElement("", "inputs", "inputs");
-            contentHandler.endDocument();
+            xmlReceiver.endElement("", "inputs", "inputs");
+            xmlReceiver.endDocument();
         } catch (Exception e) {
             throw new OXFException(e);
         }

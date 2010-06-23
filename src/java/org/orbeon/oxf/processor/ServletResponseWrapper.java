@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.generator.TidyConfig;
 import org.orbeon.oxf.util.NetUtils;
 import org.xml.sax.ContentHandler;
@@ -154,12 +155,12 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper {
     public void setResponse(ServletResponse servletResponse) {
     }
 
-    public void parse(ContentHandler contentHandler) {
-        parse(contentHandler, null);
+    public void parse(XMLReceiver xmlReceiver) {
+        parse(xmlReceiver, null);
     }
 
-    public void parse(ContentHandler contentHandler, TidyConfig tidyConfig) {
-        streamInterceptor.parse(contentHandler, tidyConfig, false);
+    public void parse(XMLReceiver xmlReceiver, TidyConfig tidyConfig) {
+        streamInterceptor.parse(xmlReceiver, tidyConfig, false);
     }
 
     public static class ByteArrayServletOutputStream extends ServletOutputStream {

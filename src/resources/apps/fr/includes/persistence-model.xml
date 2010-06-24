@@ -488,7 +488,7 @@
 
     <!-- React to successful submission when saving/updating -->
     <xforms:action ev:event="xforms-submit-done" ev:target="fr-create-update-submission">
-        <xforms:setvalue ref="instance('fr-persistence-instance')/message"
+        <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/message"
                          model="fr-resources-model" value="$fr-fr-resources/detail/messages/save-success"/>
 
         <!-- Show success message -->

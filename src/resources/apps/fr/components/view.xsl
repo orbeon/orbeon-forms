@@ -30,7 +30,7 @@
 
         <xsl:variable name="view" select="."/>
         <xsl:variable name="body" select="($view/fr:body, .)[1]"/>
-        
+
         <xsl:variable name="width" select="$view/@width"/>
         <xsl:if test="$width and not($width = ('750px', '950px', '974px', '1154px', '100%'))">
             <xsl:message terminate="yes">Value of fr:view/@view is not valid</xsl:message>
@@ -128,11 +128,16 @@
                                     </xforms:group>
 
                                     <!-- Error summary (if at bottom) -->
-                                    <xsl:if test="$error-summary-bottom">
+                                    <!-- If we configuration tells us the bottom error summary should not be shown, still include it but hide it with 'display: none'.
+                                         This is necessary because the persistence model relies on the error summary to know if the data is valid. -->
+                                    <xhtml:div>
+                                        <xsl:if test="not($error-summary-bottom)">
+                                            <xsl:attribute name="style">display: none</xsl:attribute>
+                                        </xsl:if>
                                         <xsl:call-template name="fr-error-summary">
                                             <xsl:with-param name="position" select="'bottom'"/>
                                         </xsl:call-template>
-                                    </xsl:if>
+                                    </xhtml:div>
                                 </xhtml:div>
                                 <!-- Noscript help section (shown only in edit mode) -->
                                 <xsl:if test="$is-noscript and $mode = ('edit', 'new')">

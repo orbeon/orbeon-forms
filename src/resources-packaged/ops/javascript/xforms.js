@@ -1851,6 +1851,23 @@ ORBEON.xforms.Controls = {
                 var inputField = control.getElementsByTagName("input")[0];
                 inputField.value = displayDate;
 			}
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime")) {
+            // Only update value if different from the one we have. This handle the case where the fields contain invalid
+            // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how
+            // to separate into 2 values.
+            if (ORBEON.xforms.Controls.getCurrentValue(control) != newControlValue) {
+                var separatorIndex = newControlValue.indexOf("T");
+                // Populate date field
+                var datePartString = newControlValue.substring(0, separatorIndex);
+                var datePartJSDate = ORBEON.util.DateTime.magicDateToJSDate(datePartString);
+                var inputFieldDate = control.getElementsByTagName("input")[0];
+                inputFieldDate.value = datePartJSDate == null ? datePartString : ORBEON.util.DateTime.jsDateToformatDisplayDate(datePartJSDate);
+                // Populate time field
+                var timePartString = newControlValue.substring(separatorIndex + 1);
+                var timePartJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timePartString);
+                var inputFieldTime = control.getElementsByTagName("input")[1];
+                inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToformatDisplayTime(timePartJSDate);
+            }
         } else if ((ORBEON.util.Dom.hasClass(control, "xforms-input") && !ORBEON.util.Dom.hasClass(control, "xforms-type-boolean"))
                 || ORBEON.util.Dom.hasClass(control, "xforms-secret")) {
             // Regular XForms input (not boolean, date, time or dateTime) or secret
@@ -1920,23 +1937,6 @@ ORBEON.xforms.Controls = {
                         // is not visible yet, and so the property cannot be changed.
                     }
                 }
-            }
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-type-dateTime")) {
-            // Only update value if different from the one we have. This handle the case where the fields contain invalid
-            // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how
-            // to separate into 2 values.
-            if (ORBEON.xforms.Controls.getCurrentValue(control) != newControlValue) {
-                var separatorIndex = newControlValue.indexOf("T");
-                // Populate date field
-                var datePartString = newControlValue.substring(0, separatorIndex);
-                var datePartJSDate = ORBEON.util.DateTime.magicDateToJSDate(datePartString);
-                var inputFieldDate = control.getElementsByTagName("input")[0];
-                inputFieldDate.value = datePartJSDate == null ? datePartString : ORBEON.util.DateTime.jsDateToformatDisplayDate(datePartJSDate);
-                // Populate time field
-                var timePartString = newControlValue.substring(separatorIndex + 1);
-                var timePartJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timePartString);
-                var inputFieldTime = control.getElementsByTagName("input")[1];
-                inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToformatDisplayTime(timePartJSDate);
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
                 && ! ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {

@@ -53,7 +53,7 @@
     </menu>
     <menu label="Processors Reference">
         <menu label="Producing XML">
-            <menu-item label="URL Generator" href="processors-generators-url"/>
+            <menu-item label="URL Generator" href="http://wiki.orbeon.com/forms/doc/developer-guide/processors-url-generator"/>
             <menu-item label="Request Generator" href="processors-generators-request"/>
             <menu-item label="Other Generators" href="processors-generators"/>
         </menu>

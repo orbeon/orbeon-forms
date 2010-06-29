@@ -252,7 +252,7 @@ public class PooledXPathExpression {
         return expression.iterate(dynamicContext);
     }
 
-    private XPathDynamicContext prepareDynamicContext(XPathContextMajor xpathContext, Object functionContext) throws XPathException {
+    public XPathDynamicContext prepareDynamicContext(XPathContextMajor xpathContext, Object functionContext) throws XPathException {
 
         final XPathDynamicContext dynamicContext;
         if (xpathContext == null) {

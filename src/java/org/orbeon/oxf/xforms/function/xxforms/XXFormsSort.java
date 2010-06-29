@@ -38,13 +38,26 @@ public class XXFormsSort extends XFormsFunction {
         final Expression sequenceToSortExpression = argument[0];
         final Expression sortKeyExpression = argument[1];
 
-        return sort(xpathContext, sequenceToSortExpression, sortKeyExpression);
+        return sort(xpathContext, null, sequenceToSortExpression, sortKeyExpression);
     }
 
-    protected SequenceIterator sort(XPathContext xpathContext, Expression sequenceToSortExpression, final Expression sortKeyExpression) throws XPathException {
+    protected SequenceIterator sort(XPathContext xpathContext, final XPathContext keyXPathContext, Expression sequenceToSortExpression, final Expression sortKeyExpression) throws XPathException {
         final SortKeyEvaluator sortKeyEvaluator = new SortKeyEvaluator() {
             public Item evaluateSortKey(int n, XPathContext context) throws XPathException {
-                Item c = sortKeyExpression.evaluateItem(context);
+
+                // The context may be provided from "outside" (e.g. because the expression was compiled at runtime).
+                // In that case, use it, and make sure it has the correct current iterator.
+
+                final XPathContext sortKeyContext; {
+                    if (keyXPathContext != null) {
+                        sortKeyContext = keyXPathContext;
+                        sortKeyContext.setCurrentIterator(context.getCurrentIterator());
+                    } else {
+                        sortKeyContext = context;
+                    }
+                }
+
+                Item c = sortKeyExpression.evaluateItem(sortKeyContext);
                 if (c instanceof NodeInfo) {
                     final Value v = ((NodeInfo)c).atomize();
                     if (v.getLength() == 0) {

@@ -15,7 +15,10 @@ package org.orbeon.oxf.xforms.function.exforms;
 
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsSort;
-import org.orbeon.saxon.expr.*;
+import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.ExpressionVisitor;
+import org.orbeon.saxon.expr.StaticProperty;
+import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
@@ -30,16 +33,17 @@ public class EXFormsSort extends XXFormsSort {
         final Expression sequenceToSortExpression = argument[0];
         final Expression selectExpression = argument[1];
 
-        final XPathContextMajor newXPathContext = xpathContext.newCleanContext();
-
+        final XPathContext sortKeyContext;
         final Expression sortKeyExpression;
         {
-            // Prepare expression
-            final PooledXPathExpression xpathExpression = prepareExpression(xpathContext, selectExpression, false);
-            sortKeyExpression = xpathExpression.prepareExpression(newXPathContext, PooledXPathExpression.getFunctionContext(xpathContext));
+            // Prepare dynamic sort expression and its dynamic context
+            final PooledXPathExpression pooledExpression = prepareExpression(xpathContext, selectExpression, false);
+
+            sortKeyContext = pooledExpression.prepareDynamicContext(null, PooledXPathExpression.getFunctionContext(xpathContext)).getXPathContextObject();
+            sortKeyExpression = pooledExpression.getExpression();
         }
 
-        return sort(newXPathContext, sequenceToSortExpression, sortKeyExpression);
+        return sort(xpathContext, sortKeyContext, sequenceToSortExpression, sortKeyExpression);
     }
 
     @Override

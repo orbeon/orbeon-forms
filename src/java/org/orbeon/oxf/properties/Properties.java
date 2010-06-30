@@ -101,7 +101,6 @@ public class Properties {
      */
     private void update() {
         if (!initializing) {
-            Throwable throwable = null;
             done:
             try {
                 initializing = true;
@@ -137,14 +136,16 @@ public class Properties {
                 // Read updated properties document
                 domSerializer.start(pipelineContext);
                 final Document document = domSerializer.getDocument(pipelineContext);
+
+                if (document == null || document.content() == null || document.content().size() == 0) {
+                    throw new OXFException("Failure to initialize Orbeon Forms properties");
+                }
+
                 propertyStore = new PropertyStore(document);
 
                 lastUpdate = current;
             } finally {
                 initializing = false;
-            }
-            if (throwable != null) {
-                throw new OXFException("Failure to initialize Orbeon Forms properties", throwable);
             }
         }
     }

@@ -55,7 +55,7 @@ public class XPathContentHandler implements XMLReceiver {
     private boolean readStarted;
 
     private Expression searchedExpression;
-    private ContentHandler output;
+    private XMLReceiver output;
 
     private static class Expression {
         public Expression(String xpathExpression) {
@@ -234,11 +234,11 @@ public class XPathContentHandler implements XMLReceiver {
                 setForward(true);
                 if (searchedExpression == expresssion) {
                     // Output directly
-                    setContentHandler(output);
+                    setXMLReceiver(output);
                 } else {
                     // Store result
                     expresssion.result = new SAXStore();
-                    setContentHandler(expresssion.result);
+                    setXMLReceiver(expresssion.result);
                 }
             }
             super.startElement(namespaceURI, localName, qName, atts);

@@ -154,12 +154,10 @@ public class SAXStore extends ForwardingXMLReceiver implements Serializable, Ext
     }
 
     public SAXStore() {
-        super.setForward(false);
         init();
     }
 
     public SAXStore(ObjectInput input) {
-        super.setForward(false);
         try {
             readExternal(input);
         } catch (Exception e) {
@@ -169,7 +167,6 @@ public class SAXStore extends ForwardingXMLReceiver implements Serializable, Ext
 
     public SAXStore(XMLReceiver xmlReceiver) {
         super.setXMLReceiver(xmlReceiver);
-        super.setForward(true);
         init();
     }
 

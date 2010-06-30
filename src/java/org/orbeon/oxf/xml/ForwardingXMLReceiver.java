@@ -25,16 +25,15 @@ public class ForwardingXMLReceiver implements XMLReceiver {
     private transient XMLReceiver xmlReceiver;
     private transient ContentHandler contentHandler;
     private transient LexicalHandler lexicalHandler;
-
-    private boolean forward;
+    
+    private boolean forwardContent;
+    private boolean forwardLexical;
 
     public ForwardingXMLReceiver() {
     }
 
     public ForwardingXMLReceiver(XMLReceiver xmlReceiver) {
-        this((ContentHandler) xmlReceiver);
-        this.xmlReceiver = xmlReceiver;
-        this.lexicalHandler = xmlReceiver;
+        setXMLReceiver(xmlReceiver);
     }
 
     public ForwardingXMLReceiver(ContentHandler contentHandler, LexicalHandler lexicalHandler) {
@@ -43,66 +42,7 @@ public class ForwardingXMLReceiver implements XMLReceiver {
     }
 
     public ForwardingXMLReceiver(ContentHandler contentHandler) {
-        this.contentHandler = contentHandler;
-        this.forward = this.contentHandler != null;
-    }
-
-    public void characters(char[] chars, int start, int length) throws SAXException {
-        if (forward)
-            contentHandler.characters(chars, start, length);
-    }
-
-    public void endDocument() throws SAXException {
-        if (forward) {
-            contentHandler.endDocument();
-            contentHandler = null;
-            forward = false;
-        }
-    }
-
-    public void endElement(String uri, String localname, String qName) throws SAXException {
-        if (forward)
-            contentHandler.endElement(uri, localname, qName);
-    }
-
-    public void endPrefixMapping(String s) throws SAXException {
-        if (forward)
-            contentHandler.endPrefixMapping(s);
-    }
-
-    public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {
-        if (forward)
-            contentHandler.ignorableWhitespace(chars, start, length);
-    }
-
-    public void processingInstruction(String s, String s1) throws SAXException {
-        if (forward)
-            contentHandler.processingInstruction(s, s1);
-    }
-
-    public void setDocumentLocator(Locator locator) {
-        if (forward)
-            contentHandler.setDocumentLocator(locator);
-    }
-
-    public void skippedEntity(String s) throws SAXException {
-        if (forward)
-            contentHandler.skippedEntity(s);
-    }
-
-    public void startDocument() throws SAXException {
-        if (forward)
-            contentHandler.startDocument();
-    }
-
-    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        if (forward)
-            contentHandler.startElement(uri, localname, qName, attributes);
-    }
-
-    public void startPrefixMapping(String s, String s1) throws SAXException {
-        if (forward)
-            contentHandler.startPrefixMapping(s, s1);
+        setContentHandler(contentHandler);
     }
 
     public XMLReceiver getXMLReceiver() {
@@ -110,59 +50,119 @@ public class ForwardingXMLReceiver implements XMLReceiver {
     }
 
     public void setContentHandler(final ContentHandler contentHandler) {
+        this.xmlReceiver = null;
         this.contentHandler = contentHandler;
-        if (this.contentHandler == null)
-            forward = false;
+        this.lexicalHandler = null;
+
+        setForward(true);
     }
 
     public void setXMLReceiver(final XMLReceiver xmlReceiver) {
         this.xmlReceiver = xmlReceiver;
         this.contentHandler = xmlReceiver;
         this.lexicalHandler = xmlReceiver;
-        if (this.contentHandler == null)
-            forward = false;
-    }
 
-    protected boolean getForward() {
-        return forward;
+        setForward(true);
     }
 
     public void setForward(boolean forward) {
-        this.forward = forward;
+        this.forwardContent = forward && contentHandler != null;
+        this.forwardLexical = forward && lexicalHandler != null;
     }
 
+    // ContentHandler methods
+
+    public void characters(char[] chars, int start, int length) throws SAXException {
+        if (forwardContent)
+            contentHandler.characters(chars, start, length);
+    }
+
+    public void endDocument() throws SAXException {
+        if (forwardContent) {
+            contentHandler.endDocument();
+        }
+        setXMLReceiver(null);
+    }
+
+    public void endElement(String uri, String localname, String qName) throws SAXException {
+        if (forwardContent)
+            contentHandler.endElement(uri, localname, qName);
+    }
+
+    public void endPrefixMapping(String s) throws SAXException {
+        if (forwardContent)
+            contentHandler.endPrefixMapping(s);
+    }
+
+    public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {
+        if (forwardContent)
+            contentHandler.ignorableWhitespace(chars, start, length);
+    }
+
+    public void processingInstruction(String s, String s1) throws SAXException {
+        if (forwardContent)
+            contentHandler.processingInstruction(s, s1);
+    }
+
+    public void setDocumentLocator(Locator locator) {
+        if (forwardContent)
+            contentHandler.setDocumentLocator(locator);
+    }
+
+    public void skippedEntity(String s) throws SAXException {
+        if (forwardContent)
+            contentHandler.skippedEntity(s);
+    }
+
+    public void startDocument() throws SAXException {
+        if (forwardContent)
+            contentHandler.startDocument();
+    }
+
+    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        if (forwardContent)
+            contentHandler.startElement(uri, localname, qName, attributes);
+    }
+
+    public void startPrefixMapping(String s, String s1) throws SAXException {
+        if (forwardContent)
+            contentHandler.startPrefixMapping(s, s1);
+    }
+
+    // LexicalHandler methods
+
     public void startDTD(String name, String publicId, String systemId) throws SAXException {
-        if (forward && lexicalHandler != null)
+        if (forwardLexical)
             lexicalHandler.startDTD(name, publicId, systemId);
     }
 
     public void endDTD() throws SAXException {
-        if (forward && lexicalHandler != null)
+        if (forwardLexical)
             lexicalHandler.endDTD();
     }
 
     public void startEntity(String name) throws SAXException {
-        if (forward && lexicalHandler != null)
+        if (forwardLexical)
             lexicalHandler.startEntity(name);
     }
 
     public void endEntity(String name) throws SAXException {
-        if (forward && lexicalHandler != null)
+        if (forwardLexical)
             lexicalHandler.endEntity(name);
     }
 
     public void startCDATA() throws SAXException {
-        if (forward && lexicalHandler != null)
+        if (forwardLexical)
             lexicalHandler.startCDATA();
     }
 
     public void endCDATA() throws SAXException {
-        if (forward && lexicalHandler != null)
+        if (forwardLexical)
             lexicalHandler.endCDATA();
     }
 
     public void comment(char[] ch, int start, int length) throws SAXException {
-        if (forward && lexicalHandler != null)
+        if (forwardLexical)
             lexicalHandler.comment(ch, start, length);
     }
 }

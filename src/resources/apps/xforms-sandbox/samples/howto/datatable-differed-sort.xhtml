@@ -1,0 +1,134 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+    xmlns:exf="http://www.exforms.org/exf/1-0"
+    xmlns:howto="http://www.orbeon.com/howto">
+
+    <xhtml:head>
+        <xhtml:title>Datatable - Differed sort</xhtml:title>
+        <xforms:model>
+
+            <xforms:instance id="contacts">
+                <contacts>
+                    <contact>
+                        <name>Tom</name>
+                        <email>tom@cat.com</email>
+                        <phone>(555) 894-3975</phone>
+                    </contact>
+                    <contact>
+                        <name>Jerry</name>
+                        <email>jerry@mouse.com</email>
+                        <phone>(555) 379-4661</phone>
+                    </contact>
+                    <contact>
+                        <name>Spike</name>
+                        <email>spike@dog.com</email>
+                        <phone>(555) 927-2793</phone>
+                    </contact>
+                    <contact>
+                        <name>Tyke</name>
+                        <email>spike@puppy.com</email>
+                        <phone>(555) 289-9713</phone>
+                    </contact>
+                </contacts>
+            </xforms:instance>
+
+            <xforms:instance id="sorting">
+                <sorting>
+                    <column/>
+                    <order/>
+                </sorting>
+            </xforms:instance>
+
+            <xforms:instance id="resources">
+                <resources>
+                    <sort-ascending>Click to sort ascending</sort-ascending>
+                    <sort-descending>Click to sort descending</sort-descending>
+                </resources>
+            </xforms:instance>
+
+            <xxforms:variable name="sorting" select="instance('sorting')"/>
+            <xxforms:variable name="resources" select="instance('resources')"/>
+
+        </xforms:model>
+
+    </xhtml:head>
+    <xhtml:body>
+
+        <xhtml:h2>Datatable handles the sorting</xhtml:h2>
+
+        <fr:datatable>
+            <xhtml:thead>
+                <xhtml:tr>
+                    <xhtml:th fr:sortable="true" fr:sortKey="name">Name</xhtml:th>
+                    <xhtml:th fr:sortable="true" fr:sortKey="email">Email</xhtml:th>
+                    <xhtml:th fr:sortable="true" fr:sortKey="phone">Phone</xhtml:th>
+                </xhtml:tr>
+            </xhtml:thead>
+            <xhtml:tbody>
+                <xforms:repeat nodeset="contact">
+                    <xhtml:tr>
+                        <xhtml:td>
+                            <xforms:input ref="name"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:input ref="email"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:input ref="phone"/>
+                        </xhtml:td>
+                    </xhtml:tr>
+                </xforms:repeat>
+            </xhtml:tbody>
+        </fr:datatable>
+
+        <xhtml:h2>You handle the sorting</xhtml:h2>
+
+        <fr:datatable sortAndPaginationMode="external">
+            <xforms:action ev:event="fr-update-sort">
+                <xxforms:variable name="column" select="('name', 'email', 'phone')[event('fr-column')]"/>
+                <xxforms:variable name="contacts" select="contact"/>
+                <xforms:setvalue ref="$sorting/order" value="if ($sorting/column = $column and . = 'ascending') then 'descending' else 'ascending'"/>
+                <xforms:setvalue ref="$sorting/column" value="$column"/>
+                <xforms:delete nodeset="$contacts"/>
+                <xforms:insert context="instance('contacts')" nodeset="*" origin="exf:sort($contacts, $column, 'text', instance('sorting')/order)"/>
+            </xforms:action>
+            <xhtml:thead>
+                <xhtml:tr>
+                    <xhtml:th fr:sortMessage="if ($sorting/column = 'name' and $sorting/order = 'ascending') then $resources/sort-descending else $resources/sort-ascending"
+                              class="{if ($sorting/column != 'name') then '' else if ($sorting/order = 'ascending') then 'yui-dt-asc' else 'yui-dt-desc'}"
+                              fr:sortable="true" fr:sortKey="name">Name</xhtml:th>
+                    <xhtml:th fr:sortMessage="if ($sorting/column = 'email' and $sorting/order = 'ascending') then $resources/sort-descending else $resources/sort-ascending"
+                              class="{if ($sorting/column != 'email') then '' else if ($sorting/order = 'ascending') then 'yui-dt-asc' else 'yui-dt-desc'}"
+                              fr:sortable="true" fr:sortKey="email">Email</xhtml:th>
+                    <xhtml:th fr:sortMessage="if ($sorting/column = 'phone' and $sorting/order = 'ascending') then $resources/sort-descending else $resources/sort-ascending"
+                              class="{if ($sorting/column != 'phone') then '' else if ($sorting/order = 'ascending') then 'yui-dt-asc' else 'yui-dt-desc'}"
+                              fr:sortable="true" fr:sortKey="phone">Phone</xhtml:th>
+                </xhtml:tr>
+            </xhtml:thead>
+            <xhtml:tbody>
+                <xforms:repeat nodeset="contact">
+                    <xhtml:tr>
+                        <xhtml:td>
+                            <xforms:input ref="name"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:input ref="email"/>
+                        </xhtml:td>
+                        <xhtml:td>
+                            <xforms:input ref="phone"/>
+                        </xhtml:td>
+                    </xhtml:tr>
+                </xforms:repeat>
+            </xhtml:tbody>
+        </fr:datatable>
+
+    </xhtml:body>
+</xhtml:html>

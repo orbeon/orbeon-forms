@@ -168,15 +168,15 @@ public class ProcessorTest extends ResourceManagerTestBase {
                 List domSerializers = new ArrayList();
                 List expectedDocuments = new ArrayList();
                 for (Iterator j = XPathUtils.selectIterator(testNode, "output"); j.hasNext();) {
-                    Element outputElement = (Element) j.next();
-                    String name = XPathUtils.selectStringValue(outputElement, "@name");
+                    final Element outputElement = (Element) j.next();
+                    final String name = XPathUtils.selectStringValue(outputElement, "@name");
                     if (name == null || name.equals(""))
                         throw new OXFException("Output name is mandatory");
 
-                    Document doc = ProcessorUtils.createDocumentFromEmbeddedOrHref(outputElement, XPathUtils.selectStringValue(outputElement, "@href"));
+                    final Document doc = ProcessorUtils.createDocumentFromEmbeddedOrHref(outputElement, XPathUtils.selectStringValue(outputElement, "@href"));
 
                     expectedDocuments.add(doc);
-                    DOMSerializer domSerializer = new DOMSerializer();
+                    final DOMSerializer domSerializer = new DOMSerializer();
                     PipelineUtils.connect(processor, name, domSerializer, "data");
                     domSerializers.add(domSerializer);
                 }

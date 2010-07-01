@@ -37,7 +37,7 @@ public class DebugProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(final String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 try {
                     if (logger.isInfoEnabled()) {

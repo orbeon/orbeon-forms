@@ -25,25 +25,33 @@ import java.util.Map;
 
 /**
  * This is the class that must be extended to create a custom processor. See the <a
- * href="http://www.orbeon.com/ops/doc/reference-processor-api">Processor API section</a> in the OXF
- * Manual for more information.
+ * href="http://www.orbeon.com/ops/doc/reference-processor-api">Processor API section</a>  for more information.
  */
 public abstract class SimpleProcessor extends ProcessorImpl {
 
-    private final String GENERATE = "generate";
+    private static final String GENERATE = "generate";
 
     private Map<String, Method> outputToMethod = new HashMap<String, Method>();
 
     /**
-     * Iterate through the <code>generateXXX</code> methods and stores a reference to the method in
-     * <code>outputToMethod</code>. This constructor must be called by subclasses.
+     * This constructor must be called by subclasses.
+     *
+     * Iterate through the generateXxx() methods and stores a reference to the method in outputToMethod.
+     *
+     * This checks for the following signatures:
+     *
+     *  generateXxx(PipelineContext context, XMLReceiver xmlReceiver)
+     *  generateXxx(PipelineContext context, ContentHandler contentHandler)
+     *
+     * For a given "Xxx", only one of the two methods should be implemented. If both are present, the ContentHandler
+     * version is ignored.
      */
     public SimpleProcessor() {
         final Method[] methods = getClass().getDeclaredMethods();
         for (final Method method : methods) {
             final Class[] parameterTypes = method.getParameterTypes();
             if (method.getName().startsWith(GENERATE) && parameterTypes.length == 2
-                    && parameterTypes[0].equals(org.orbeon.oxf.pipeline.api.PipelineContext.class)
+                    && parameterTypes[0].equals(PipelineContext.class)
                     && (parameterTypes[1].equals(XMLReceiver.class) || parameterTypes[1].equals(ContentHandler.class))) {
                 final String javaName = method.getName().substring(GENERATE.length());
                 outputToMethod.put(NamingConvention.javaToXMLName(javaName), method);
@@ -52,7 +60,7 @@ public abstract class SimpleProcessor extends ProcessorImpl {
     }
 
     /**
-     * Delegates processing to the appropriate generateXXX method.
+     * Create an output. Delegate processing to the appropriate generateXXX() method.
      */
     public ProcessorOutput createOutput(final String name) {
         final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
@@ -62,7 +70,6 @@ public abstract class SimpleProcessor extends ProcessorImpl {
                     if (method == null)
                         throw new OXFException("Cannot find \"generate\" method for output \"" + name
                                 + "\" in class \"" + SimpleProcessor.this.getClass().getName() + "\"");
-                    // TODO XMLReceiver: support ContentHandler for backward compatibility
                     method.invoke(SimpleProcessor.this, context, xmlReceiver);
                 } catch (Exception e) {
                     throw new OXFException(e);

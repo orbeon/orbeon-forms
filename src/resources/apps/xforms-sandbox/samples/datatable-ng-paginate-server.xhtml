@@ -46,7 +46,7 @@
             pagination handled server side.</p>
 
         <xxforms:variable name="params" select="instance('params')"/>
-        <fr:datatable paginated="true" sortAndPaginationMode="external"
+        <fr:datatable paginated="true" sortAndPaginationMode="external" modal="true"
             nbPages="ceiling(/atom:feed/twit:nbResults div /atom:feed/twit:rpp)" page="$params/page">
             <xforms:action ev:event="fr-goto-page">
                 <xforms:setvalue ref="$params/page" value="event('fr-new-page')"/>
@@ -71,21 +71,21 @@
                     <th fr:sortable="true"
                         fr:sortMessage="if ($params/sortBy='published' and $params/sortOrder='ascending') then 'Click to sort descending' else 'Click to sort ascending'"
                         fr:resizeable="true"
-                        class=" {if ($params/sortBy='published') 
+                        class=" {if ($params/sortBy='published')
                         then  if($params/sortOrder='ascending') then 'yui-dt-asc' else 'yui-dt-desc'
                         else ''}"
                         >Date</th>
                     <th fr:sortable="true"
                         fr:sortMessage="if ($params/sortBy='author/name' and $params/sortOrder='ascending') then 'Click to sort descending' else 'Click to sort ascending'"
                         fr:resizeable="true"
-                        class=" {if ($params/sortBy='author/name') 
+                        class=" {if ($params/sortBy='author/name')
                         then  if($params/sortOrder='ascending') then 'yui-dt-asc' else 'yui-dt-desc'
                         else ''}"
                         >Author</th>
                     <th fr:sortable="true"
                         fr:sortMessage="if ($params/sortBy='title' and $params/sortOrder='ascending') then 'Click to sort descending' else 'Click to sort ascending'"
                         fr:resizeable="true"
-                        class=" {if ($params/sortBy='title') 
+                        class=" {if ($params/sortBy='title')
                         then  if($params/sortOrder='ascending') then 'yui-dt-asc' else 'yui-dt-desc'
                         else ''}"
                         >Title</th>

@@ -598,8 +598,8 @@
         <xsd:complexType>
             <xsd:sequence minOccurs="0">
                 <xsd:element ref="xforms:label"/>
-                <xsd:element ref="xforms:mediatype"/>
-                <xsd:element ref="xforms:filename"/>
+                <xsd:element ref="xforms:mediatype" minOccurs="0"/>
+                <xsd:element ref="xforms:filename" minOccurs="0"/>
                 <xsd:group ref="xforms:UI.Common" minOccurs="0" maxOccurs="unbounded"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>

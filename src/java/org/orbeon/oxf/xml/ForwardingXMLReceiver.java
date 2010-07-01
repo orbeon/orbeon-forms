@@ -37,8 +37,10 @@ public class ForwardingXMLReceiver implements XMLReceiver {
     }
 
     public ForwardingXMLReceiver(ContentHandler contentHandler, LexicalHandler lexicalHandler) {
-        this(contentHandler);
+        this.contentHandler = contentHandler;
         this.lexicalHandler = lexicalHandler;
+
+        setForward(true);
     }
 
     public ForwardingXMLReceiver(ContentHandler contentHandler) {

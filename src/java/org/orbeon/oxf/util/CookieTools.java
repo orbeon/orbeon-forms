@@ -18,10 +18,9 @@
 
 package org.orbeon.oxf.util;
 
-import java.text.*;
-import java.util.*;
-
 import javax.servlet.http.Cookie;
+import java.text.FieldPosition;
+import java.util.Date;
 
 // XXX use only one Date instance/request, reuse it.
 

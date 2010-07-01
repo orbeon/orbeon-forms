@@ -16,13 +16,8 @@
  */
 package org.orbeon.oxf.util;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.text.*;
+import java.util.*;
 
 /**
  * Utility class to generate HTTP dates.

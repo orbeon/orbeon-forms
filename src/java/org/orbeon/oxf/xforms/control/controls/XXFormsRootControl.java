@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls;
 
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 

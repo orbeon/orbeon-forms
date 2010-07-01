@@ -20,15 +20,10 @@
 
 package org.orbeon.oxf.util;
 
-import java.lang.ref.SoftReference;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import org.apache.commons.pool.*;
 
-import org.apache.commons.pool.BaseObjectPool;
-import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.PoolableObjectFactory;
+import java.lang.ref.SoftReference;
+import java.util.*;
 
 /**
  * A {@link java.lang.ref.SoftReference SoftReference} based

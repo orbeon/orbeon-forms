@@ -14,10 +14,7 @@
 package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 
 /**
  * This ContentHandler receives an XHTML document or pseudo-XHTML document (XHTML in no namespace), and outputs SAX

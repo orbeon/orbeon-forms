@@ -17,10 +17,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.DocumentResult;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.xmldb.XMLDBProcessor;
 import org.orbeon.oxf.xforms.XFormsProperties;
@@ -29,15 +26,10 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.xmldb.api.base.Collection;
-import org.xmldb.api.base.Resource;
-import org.xmldb.api.base.XMLDBException;
+import org.xmldb.api.base.*;
 import org.xmldb.api.modules.XMLResource;
 
-import javax.xml.transform.sax.TransformerHandler;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This store:

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.xml.sax.SAXException;
 
 /**
  * Forwards all the SAX events to a content handler, except for startDocument and endDocument.

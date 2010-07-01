@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,16 +13,13 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
-
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.DateValue;
-import org.orbeon.saxon.value.NumericValue;
+import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
+
+import java.util.*;
 
 public class DaysToDate extends XFormsFunction {
 

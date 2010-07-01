@@ -14,12 +14,8 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.Connection;
-import org.orbeon.oxf.util.ConnectionResult;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 

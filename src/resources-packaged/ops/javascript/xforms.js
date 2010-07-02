@@ -6962,7 +6962,8 @@ ORBEON.xforms.Server = {
                                         ORBEON.xforms.Controls.setAlertMessage(documentElement, newAlert);
                                     // Store validity, label, hint, help in element
                                     var newValid = ORBEON.util.Dom.getAttribute(controlElement, "valid");
-                                    ORBEON.xforms.Controls.setValid(documentElement, newValid);
+                                    if (newValid != null)
+                                        ORBEON.xforms.Controls.setValid(documentElement, newValid);
 
                                     // After we update classes on textarea, copy those classes on the FCKeditor iframe
                                     if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")

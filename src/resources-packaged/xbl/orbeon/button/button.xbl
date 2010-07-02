@@ -41,12 +41,13 @@
                     *zoom: 1;
                     *display: inline;
                     vertical-align: middle;
+                    *margin: 0 0 1px 0;
                 }
             </xbl:style>
         </xbl:resources>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <!-- Group has complete single-node binding -->
-            <xforms:group class="yui-button yui-push-button{if (/fr:button/@class) then concat(' ', /fr:button/@class) else ''}" 
+            <xforms:group class="yui-button yui-push-button{if (/fr:button/@class) then concat(' ', /fr:button/@class) else ''}"
                           xbl:attr="model context ref bind" xxbl:scope="outer" xsl:version="2.0">
                 <xhtml:span class="first-child">
                     <!-- Bind trigger so it can handle read-only -->

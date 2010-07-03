@@ -6127,20 +6127,25 @@ ORBEON.xforms.Server = {
     },
 
     /**
-     * Keep the model progress panel if the server tells us to do a submission which isn't opened in another window.
-     * The logic here corresponds to the following XPath: exists(//xxf:submission[empty(@target)]).
+     * Keep the model progress panel if the server tells us to do a submission or load which isn't opened in another
+     * window and for which the user didn't specify xxforms:show-progress="false".
+     *
+     * The logic here corresponds to the following XPath:
+     * exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])
      */
     keepModelProgressPanelDisplayed: function(responseXML) {
         if (responseXML && responseXML.documentElement
                     && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
-            var foundSubmissionOrLoadWithNoTarget = false;
+            var foundLoadOrSubmissionOrLoadWithNoTargetNoDownload = false;
             YAHOO.util.Dom.getElementsBy(function(element) {
                 var localName = ORBEON.util.Utils.getLocalName(element);
                 var hasTargetAttribute = ORBEON.util.Dom.getAttribute(element, "target") == null;
-                if ((localName  == "submission" || localName == "load") && hasTargetAttribute)
-                    foundSubmissionOrLoadWithNoTarget = true;
+                if ((localName  == "submission" || localName == "load")) {
+                    if (ORBEON.util.Dom.getAttribute(element, "target") == null && ORBEON.util.Dom.getAttribute(element, "show-progress") == null)
+                        foundLoadOrSubmissionOrLoadWithNoTargetNoDownload = true;
+                }
             }, null, responseXML.documentElement);
-            return foundSubmissionOrLoadWithNoTarget;
+            return foundLoadOrSubmissionOrLoadWithNoTargetNoDownload;
         }
         return false;
     },
